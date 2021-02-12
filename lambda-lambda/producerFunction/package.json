@@ -1,0 +1,11 @@
+{
+  "name": "consumerfunction",
+  "version": "1.0.0",
+  "description": "Lambda Destinations tester, Success returns a json blob, Failure throws an error",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Benjamin Smith",
+  "license": "MIT-0"
+}

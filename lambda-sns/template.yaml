@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Lambda to SNS
+
+Resources:
+  # Define the SNS topic
+  MySnsTopic:
+    Type: AWS::SNS::Topic
+
+  # Define the publisher Lambda function with permissions
+  TopicPublisherFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+      MemorySize: 128
+      Environment:
+        Variables:
+          SNStopic: !Ref MySnsTopic
+      Policies:
+        ## Read more about SAM Policy templates at:
+        ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt MySnsTopic.TopicName
+
+Outputs:
+  TopicPublisherFunction:
+    Description: TopicPublisherFunction function name
+    Value: !Ref TopicPublisherFunction
+  
+  SNStopicName:
+    Description: SNS topic name
+    Value: !GetAtt MySnsTopic.TopicName
+
+  SNStopicARN:
+    Description: SNS topic ARN
+    Value: !Ref MySnsTopic

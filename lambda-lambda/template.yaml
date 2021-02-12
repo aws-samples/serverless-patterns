@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda to Lambda
+  
+Resources:
+  producerFunction:
+    Type: AWS::Serverless::Function
+    Description: Lambda Function that will trigger DestinationFunction on failure
+    Properties:
+      CodeUri: producerFunction/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+      EventInvokeConfig:
+        DestinationConfig:
+          OnFailure:
+            Type: Lambda
+            Destination: !GetAtt failHandlerFunction.Arn  # Arn of a Lambda function declared in the template file. 
+          OnSuccess:
+            Type: Lambda
+            Destination: !GetAtt SuccessHandlerFunction.Arn  # Arn of a Lambda function declared in the template file. 
+  failHandlerFunction:
+    Type: AWS::Serverless::Function
+    Description: Invoked by ConsumerFunction Lambda on failure
+    Properties:
+      CodeUri: failHandlerFunction/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+  SuccessHandlerFunction:
+    Type: AWS::Serverless::Function
+    Description: Invoked by ConsumerFunction Lambda on success
+    Properties:
+      CodeUri: SuccessHandlerFunction/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3

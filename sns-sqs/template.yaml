@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SNS to SQS
+
+Resources:
+  # Define the SQS queue
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+
+  # Define the SNS topic
+  MySnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      # Subscribes the SQS queue to the SNS topic
+      Subscription:
+        - Protocol: sqs
+          Endpoint: !GetAtt MySqsQueue.Arn
+
+  # Policy allows SNS to publish to this SQS queue
+  SnsToSqsPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal: "*"
+            Resource: !GetAtt MySqsQueue.Arn
+            Action: SQS:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref MySnsTopic
+      Queues:
+        - Ref: MySqsQueue
+
+Outputs:
+  MySqsQueueName:
+    Description: SQS queue name
+    Value: !GetAtt MySqsQueue.QueueName
+  MySqsQueueArn:
+    Description: SQS queue ARN
+    Value: !GetAtt MySqsQueue.Arn
+  MySqsQueueURL:
+    Description: SQS queue URL
+    Value: !Ref MySqsQueue    
+  MySnsTopicName:
+    Description: 
+    Description: SNS topic name
+    Value: !GetAtt MySnsTopic.TopicName
+  MySnsTopicArn:
+    Description: SNS topic ARN
+    Value: !Ref MySnsTopic
+

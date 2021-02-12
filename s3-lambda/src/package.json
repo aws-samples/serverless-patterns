@@ -1,0 +1,14 @@
+{
+  "name": "destinationfunction",
+  "version": "1.0.0",
+  "description": "Lambda Destination handler function",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Benjamin Smith",
+  "license": "MIT-0",
+  "dependencies": {
+    "sharp": "^0.27.1"
+  }
+}

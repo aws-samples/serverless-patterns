@@ -1,0 +1,25 @@
+{
+    "Comment": "A Retry example of the Amazon States Language using an AWS Lambda Function",
+    "StartAt": "GenerateRefernceNumber",
+    "States": {
+        "GenerateRefernceNumber": {
+            "Type": "Task",
+            "Resource": "${GenerateRefernceNumberArn}",
+            "ResultPath":"$.ticketId",
+            "Parameters": {
+                "message.$": "$.message"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "IntervalSeconds": 20,
+                    "MaxAttempts": 5,
+                    "BackoffRate": 10
+                }
+            ],
+            "End": true
+        }
+    }
+}

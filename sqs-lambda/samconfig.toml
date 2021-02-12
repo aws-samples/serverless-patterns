@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "patterns-sqs-to-lambda"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-18x8jmf1fa7ob"
+s3_prefix = "patterns-sqs-to-lambda"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"

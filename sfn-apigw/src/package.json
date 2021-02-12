@@ -1,0 +1,11 @@
+{
+  "name": "sfn-to-lambda",
+  "version": "1.0.0",
+  "description": "Invoke a Lambda function from a Step Functions Express WF",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Benjamin Smith",
+  "license": "MIT-0"
+}

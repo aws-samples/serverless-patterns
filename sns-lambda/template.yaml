@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SNS to Lambda
+
+Resources:
+  # Define the SNS topic
+  MySnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Protocol: lambda
+          Endpoint: !GetAtt TopicConsumerFunction1.Arn    
+
+  # Provide permission for SNS to invoke the Lambda function
+  TopicConsumerFunction1Permission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref TopicConsumerFunction1
+      Principal: sns.amazonaws.com
+
+  # Define the consumer Lambda function
+  TopicConsumerFunction1:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+      MemorySize: 128
+
+Outputs:
+  TopicConsumerFunction1Name:
+    Description: TopicConsumerFunction1 function name
+    Value: !Ref TopicConsumerFunction1
+  
+  SNStopicName:
+    Description: SNS topic name
+    Value: !GetAtt MySnsTopic.TopicName
+
+  SNStopicARN:
+    Description: SNS topic ARN
+    Value: !Ref MySnsTopic

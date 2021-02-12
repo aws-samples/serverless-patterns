@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Persist an item to a DynamoDB table from Lambda
+Resources:
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  LambdaPutDynamoDB:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+      Role: !GetAtt LambdaExecRole.Arn
+      Environment:
+        Variables:
+          DatabaseTable: !Ref DynamoTable
+      Policies:
+        - LambdaExecRole
+        
+##########################################################################
+#   DynamoDB                                                            #
+##########################################################################
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      Tags: 
+        - Key: "Department"
+          Value: "Engineering"
+        - Key: "AppType"
+          Value : "Serverless"   
+      AttributeDefinitions:
+      - AttributeName: ID
+        AttributeType: S
+      KeySchema:
+      - AttributeName: ID
+        KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+  LambdaExecRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 
+            - "lambda.amazonaws.com"
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: AllowPutSpecificTable
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action: "dynamodb:PutItem"
+            Resource:
+              !Sub
+              - 'arn:aws:dynamodb:*:*:table/${table}'
+              - { table: !Ref DynamoTable}
+Outputs:
+  LambdFunction:
+    Value: !Ref LambdaPutDynamoDB
+    Description: LambdaPutDynamoDB function  Arn
+
+  DynamoDbTable:
+    Value: !Ref DynamoTable
+    Description: DynamoDb Table 
