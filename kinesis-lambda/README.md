@@ -1,6 +1,6 @@
-# AWS Service 1 to AWS Service 2
+# AWS Kinesis Data Streams to AWS Lambda using a consumer
 
-This pattern << explain usage >>
+This pattern creates an AWS Kinesis Data Stream, a stream consumer, and an AWS Lambda function. When data is added to the stream, the Lambda function is triggered via a consumer.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 

@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Kinesis Data Stream to AWS Lambda with Enhanced Fanout via a consumer
+
+Resources:
+  # Define an AWS Kinesis Data Stream
+  KinesisStream:
+    Type: "AWS::Kinesis::Stream"
+    Properties:
+      ShardCount: 4
+  
+  # Define and attach a consumer to the Kinesis Data Stream
+  ApplicationConsumer:
+    Type: "AWS::Kinesis::StreamConsumer"
+    Properties:
+      StreamARN: !GetAtt KinesisStream.Arn
+      ConsumerName: ApplicationConsumer
+      
+  # Define an AWS Lambda and attach it to the application consumer
+  ApplicationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Runtime: nodejs12.x
+      Handler: app.lambdaHandler
+      Tracing: Active
+      Events:
+        Stream:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt ApplicationConsumer.ConsumerARN
+            StartingPosition: LATEST
+            BatchSize: 100
+            
+Outputs:
+  # Kinesis Data Stream name for data producers to use
+  KinesisStream:
+    Description: Kinesis Data Stream name
+    Value: !Ref KinesisStream
