@@ -1,8 +1,8 @@
-# AWS Kinesis Data Streams to AWS Lambda using a consumer
+# AWS Kinesis Data Streams to AWS Lambda
 
-This pattern creates an AWS Kinesis Data Stream, a stream consumer, and an AWS Lambda function. When data is added to the stream, the Lambda function is triggered via a consumer.
+This pattern creates an AWS Kinesis Data Stream, a stream consumer, and an AWS Lambda function. When data is added to the stream, the Lambda function is invoked.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/kinesis-to-lambda](https://serverlessland.com/patterns/kinesis-to-lambda)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -23,11 +23,12 @@ Important: this application uses various AWS services and there are costs associ
 
 1. From the command line, run:
 ```
+cd kinesis-lambda
 sam deploy --guided
 ```
 Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and ARNs.
+* Note the outputs from the SAM deployment process. These contain the resource names and ARNs.
 
 ## How it works
 
@@ -35,7 +36,33 @@ Explain how the service interaction works.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Use the Amazon Kinesis Data Generator for testing. The easiest way to use this tool is to use the [hosted generator](https://awslabs.github.io/amazon-kinesis-data-generator/web/producer.html) and follow the [setup instructions](https://awslabs.github.io/amazon-kinesis-data-generator/web/help.html).
+
+After you have the generator configured, you should have a custom URL to generate data for your Kinesis data stream. In your configuration steps, you created a username and password. Log in to the generator using those credentials.
+
+When you are logged in, you can generate data for your stream test.
+
+1. Choose the region you deployed the application to
+1. For Stream/delivery stream, select your stream.
+1. For Records per second, keep the default value of 100.
+1. On the Template 1 tab, name the template Sensor1.
+1. Use the following template:
+    ```JSON
+    {
+        "sensorId": {{random.number(50)}},
+        "currentTemperature": {{random.number(
+            {
+                "min":10,
+                "max":150
+            }
+        )}},
+        "status": "{{random.arrayElement(
+            ["OK","FAIL","WARN"]
+        )}}"
+    }
+    ```
+1. Choose Send Data.
+1. After several seconds, choose Stop Sending Data.
 
 
 ----

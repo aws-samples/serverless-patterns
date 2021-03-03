@@ -7,7 +7,7 @@ Resources:
   KinesisStream:
     Type: "AWS::Kinesis::Stream"
     Properties:
-      ShardCount: 4
+      ShardCount: 1
   
   # Define and attach a consumer to the Kinesis Data Stream
   ApplicationConsumer:
