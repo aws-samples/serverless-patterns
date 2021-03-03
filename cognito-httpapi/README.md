@@ -24,7 +24,6 @@ Important: this application uses various AWS services and there are costs associ
 
 1. From the command line, run:
 ```
-cd cognito-httpapi
 sam deploy -g --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM
 ```
 * Choose a stack name

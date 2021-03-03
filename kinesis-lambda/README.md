@@ -23,7 +23,6 @@ Important: this application uses various AWS services and there are costs associ
 
 1. From the command line, run:
 ```
-cd kinesis-lambda
 sam deploy --guided
 ```
 Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
