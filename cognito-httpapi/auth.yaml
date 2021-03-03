@@ -1,0 +1,85 @@
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cognito user pool with hosted domain
+
+Parameters:
+  ClientDomain:
+    Type: String
+    Description: Domain allowed to use this UserPool
+  AppName:
+    Type: String
+    Description: Used to name auth domain and Cognito services
+  Postman:
+    Type: String
+    
+Conditions:
+  UsePostman: !Equals
+    - !Ref Postman
+    - "true"
+
+Resources:
+  # Create a Cognito User pool foruser management
+  UserPool:
+    Type: AWS::Cognito::UserPool 
+    Properties:
+      Policies: 
+        PasswordPolicy: 
+          MinimumLength: 8
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes: 
+        - email
+      Schema: 
+        - AttributeDataType: String 
+          Name: email 
+          Required: false
+
+  # Create an application for authentication
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient 
+    Properties: 
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      SupportedIdentityProviders:
+        - COGNITO
+      CallbackURLs:
+        - !Ref ClientDomain
+        - !If [UsePostman, https://oauth.pstmn.io/v1/callback, !Ref AWS::NoValue]
+      LogoutURLs:
+        - !Ref ClientDomain
+        - !If [UsePostman, https://oauth.pstmn.io/v1/callback, !Ref AWS::NoValue]
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+        - !If [UsePostman, implicit, !Ref AWS::NoValue] # Implicit is only used for testing with postman and should not be in production.
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+
+  # Create a hosted domain for users to signup and login
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties: 
+      Domain: !Ref AppName
+      UserPoolId: !Ref UserPool
+    
+Outputs:
+    UserPoolId:
+      Description: "User pool ID"
+      Value: !Ref UserPool
+
+    UserPoolClientId:
+      Description: "Application client ID"
+      Value: !Ref UserPoolClient
+
+    AuthUrl:
+      Description: "URL used for authentication"
+      Value: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/login
+      
+    Issuer:
+      Description: "Url used for issuer on HTTP API JWT tokens"
+      Value: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
