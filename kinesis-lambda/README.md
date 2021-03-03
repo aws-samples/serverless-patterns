@@ -30,10 +30,6 @@ Choose a stack name, select the desired AWS Region, and allow SAM to create role
 
 * Note the outputs from the SAM deployment process. These contain the resource names and ARNs.
 
-## How it works
-
-Explain how the service interaction works.
-
 ## Testing
 
 Use the Amazon Kinesis Data Generator for testing. The easiest way to use this tool is to use the [hosted generator](https://awslabs.github.io/amazon-kinesis-data-generator/web/producer.html) and follow the [setup instructions](https://awslabs.github.io/amazon-kinesis-data-generator/web/help.html).
