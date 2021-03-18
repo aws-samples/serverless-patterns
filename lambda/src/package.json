@@ -1,0 +1,11 @@
+{
+  "name": "Simple AWS Lambda function",
+  "version": "1.0.0",
+  "description": "Simple AWS Lambda handler function",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Benjamin Smith",
+  "license": "MIT-0"
+}

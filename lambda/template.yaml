@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Simple Lambda function
+  
+Resources:
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  simpleFunction:
+    Type: AWS::Serverless::Function
+    Description: A simple Lambda Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+
+##########################################################################
+#   Stack outputs                                                        #
+##########################################################################
+Outputs:
+  simpleFunction:
+    Description: Simple Lambda Function ARN
+    Value: GetAtt simpleFunction.Arn  # Arn of Lambda function declared in the template file. 
+
+    
