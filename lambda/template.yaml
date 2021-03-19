@@ -19,8 +19,12 @@ Resources:
 #   Stack outputs                                                        #
 ##########################################################################
 Outputs:
-  simpleFunction:
+  simpleFunctionARN:
     Description: Simple Lambda Function ARN
-    Value: GetAtt simpleFunction.Arn  # Arn of Lambda function declared in the template file. 
+    Value: !GetAtt simpleFunction.Arn  # Arn of Lambda function declared in the template file. 
+
+  simpleFunctionName:
+    Description: Simple Lambda Function Name
+    Value: !Ref simpleFunction  # Name of Lambda function declared in the template file. 
 
     
