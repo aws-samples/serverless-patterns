@@ -1,8 +1,12 @@
 # Amazon API Gateway HTTP APIs to AWS Step Functions Express Workflow, with Amazon Cloudwatch Logs enabled 
 
-The HTTP's API endpoint can be called from an application (e.g. a web front end) to run an express workflow and return the result.
 
 The SAM template deploys a HTTP APIs endpoint with an integration that syncronsouly invokes a Step Functions Express workflow and returns the response. The SAM template contains the minimum IAM resources required to run the application with logging enabled. 
+
+The HTTP's API endpoint can be called from an application (e.g. a web front end) to run an express workflow and return the result.
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sfn
+
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -17,9 +21,19 @@ Important: this application uses various AWS services and there are costs associ
 
 1. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
 
-1. Create a new directory, navigate to that directory in a terminal and enter ```git clone https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge```.
+1. Create a new directory, navigate to that directory in a terminal and enter:
+``` 
+git clone https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn
 
-1. From the command line, run:
+```
+
+5. Change directory to the pattern directory:
+```
+cd apigw-sfn
+```
+
+4. From the command line, run:
+
 ```
 sam deploy --guided
 ```

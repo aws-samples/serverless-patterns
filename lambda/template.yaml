@@ -13,8 +13,6 @@ Resources:
       CodeUri: src/
       Handler: app.handler
       Runtime: nodejs12.x
-      Timeout: 3
-
 ##########################################################################
 #   Stack outputs                                                        #
 ##########################################################################
@@ -26,5 +24,3 @@ Outputs:
   simpleFunctionName:
     Description: Simple Lambda Function Name
     Value: !Ref simpleFunction  # Name of Lambda function declared in the template file. 
-
-    
