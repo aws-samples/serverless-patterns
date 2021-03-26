@@ -9,6 +9,8 @@ assignees: jbesw
 
 To submit a template to the Serverless Patterns Collection, submit an issue with the following information.
 
+Use the model template located at https://github.com/aws-samples/serverless-patterns/tree/main/_pattern-model to set up a README, template and any associated code.
+
 ## Description (mid-length e.g. "Create a Lambda function that sends events to EventBridge.")
 
 ## Language: (optional e.g. "Python", if you have a Lambda function in your example)
