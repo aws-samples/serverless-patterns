@@ -4,6 +4,8 @@ This pattern is a Lambda function asynchronously triggered by a Lambda Function.
 
 The SAM template deploys three Lambda functions. A Producer function invokes a failure handler Lambda function on failure, or on Success handler Lambda function on success using event destinations.
 
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-lambda
+
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
@@ -17,9 +19,15 @@ Important: this application uses various AWS services and there are costs associ
 
 1. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
 
-1. Create a new directory, navigate to that directory in a terminal and enter ```git clone https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge```.
+1. Create a new directory, navigate to that directory in a terminal and enter:
 
-1. From the command line, run:
+ ```
+ git clone https://github.com/aws-samples/serverless-patterns
+
+ cd lambda-lambda
+ ```
+
+4. From the command line, run:
 ```
 sam deploy --guided
 ```
