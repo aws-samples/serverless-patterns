@@ -1,14 +1,15 @@
 {
-  "name": "destinationfunction",
+  "name": "resizer",
   "version": "1.0.0",
-  "description": "Lambda Destination handler function",
+  "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Benjamin Smith",
+  "keywords": [],
+  "author": "James Beswick",
   "license": "MIT-0",
   "dependencies": {
-    "sharp": "^0.27.1"
+    "gm": "^1.23.1"
   }
 }
