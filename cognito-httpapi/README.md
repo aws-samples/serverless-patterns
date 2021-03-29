@@ -18,29 +18,28 @@ Important: this application uses various AWS services and there are costs associ
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-
-``` 
-git clone https://github.com/aws-samples/serverless-patterns
-
-```
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
 2. Change directory to the pattern directory:
-```
-cd cognito-httpapi
-```
+    ```
+    cd cognito-httpapi
+    ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
-```
-sam deploy -g --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM
-```
-* Enter a stack name
-* Select the desired AWS Region
-* Enter a client domain
-* Enter an AppName
-* For **TestWithPostman**, set this to true for local development and testing only. Do not enable for production as it allows implicit grant OAuth flow that is less secure.
-* Allow SAM to create roles with the required permissions.
+    ```
+    sam deploy -g --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM
+    ```
+1. During the prompts:
+    * Enter a stack name
+    * Select the desired AWS Region
+    * Enter a client domain
+    * Enter an AppName
+    * For **TestWithPostman**, set this to true for local development and testing only. Do not enable for production as it allows implicit grant OAuth flow that is less secure.
+    * Allow SAM to create roles with the required permissions.
 
-Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
+    Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## Testing
 

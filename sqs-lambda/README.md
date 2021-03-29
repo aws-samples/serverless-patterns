@@ -16,27 +16,26 @@ Important: this application uses various AWS services and there are costs associ
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+1. Change directory to the pattern directory:
+    ```
+    cd sqs-lambda
+    ```
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+    ```
+    sam deploy --guided
+    ```
+1. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region
+    * Allow SAM CLI to create IAM roles with the required permissions.
 
-``` 
-git clone https://github.com/aws-samples/serverless-patterns
+    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-```
-2. Change directory to the pattern directory:
-```
-cd sqs-lambda
-```
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
-```
-sam deploy --guided
-```
-4. During the prompts:
-* Enter a stack name
-* Enter the desired AWS Region
-* Allow SAM CLI to create IAM roles with the required permissions.
-
-Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+   
 ## Example event payload from SQS to Lambda
 
 ```
