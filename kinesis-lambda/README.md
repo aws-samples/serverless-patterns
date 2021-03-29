@@ -68,6 +68,16 @@ When you are logged in, you can generate data for your stream test.
 1. Choose Send Data.
 1. After several seconds, choose Stop Sending Data.
 
+## Cleanup
+
+1. Delete the stack
+    ```bash
+    aws cloudformation delete-stack --stack-name STACK_NAME
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    ```
 
 ## Cleanup
  
