@@ -1,6 +1,8 @@
 # Amazon EventBridge to Amazon SNS
 
-This pattern creates an EventBridge rule and an SNS topic. The SNS topic is invoked by the EventBridge rule. 
+The AWS SAM template deploys an SNS topic that is triggered by an EventBridge rule. The SNS topic policy provides the permission for EventBridge to invoke the SNS topic.
+
+In this example, the EventBridge rule specified in `template.yaml` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see Example event payload from EventBridge to SNS in the README) to the SNS topic.
 
 Learn more about this pattern at Serverless Land Patterns: TBD
 
@@ -11,20 +13,24 @@ Important: this application uses various AWS services and there are costs associ
 * AWS CLI already configured with Administrator permission
 * [NodeJS 12.x installed](https://nodejs.org/en/download/)
 
-## Installation Instructions
+## Deployment Instructions
 
 1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and login.
 
 1. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
 
-1. Create a new directory, navigate to that directory in a terminal and enter ```git clone https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge```.
-
+1. Create a new directory, navigate to that directory in a terminal and enter 
+    ```
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
 1. Change directory to this pattern.
-
+    ```
+    cd serverless-patterns/eventbridge-sns
+    ```
 1. From the command line, run:
-```
-sam deploy --guided
-```
+    ```
+    sam deploy --guided
+    ```
 Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and ARNs.
@@ -46,31 +52,31 @@ Choose a stack name, select the desired AWS Region, and allow SAM to create role
 
 ```
 
-## How it works
-
-The AWS SAM template deploys the resources and the IAM permissions required to run the application.
-
-The EventBridge rule specified in `template.yaml` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see above) to the SNS topic.
-
 ## Testing
 
 Use the [AWS CLI](https://aws.amazon.com/cli/) to send a test event to EventBridge:
 
 1. Subscribe your email address to the SNS topic:
+    ```bash
+    aws sns subscribe --topic-arn ENTER_YOUR_TOPIC_ARN --protocol email-json --notification-endpoint ENTER_YOUR_EMAIL_ADDRESS
+    ```
+1. Click the confirmation link delivered to your email to verify the endpoint.
+1. Send an event to EventBridge:
+    ```bash
+    aws events put-events --entries file://event.json
+    ```
+1. The event is delivered to your email address.
 
-```bash
-aws sns subscribe --topic-arn ENTER_YOUR_TOPIC_ARN --protocol email-json --notification-endpoint ENTER_YOUR_EMAIL_ADDRESS
-```
+## Cleanup
 
-2. Click the confirmation link delivered to your email to verify the endpoint.
-
-3. Send an event to EventBridge:
-
-```bash
-aws events put-events --entries file://event.json
-```
-
-4. The event is delivered to your email address.
+1. Delete the stack
+    ```bash
+    aws cloudformation delete-stack --stack-name STACK_NAME
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    ```
 
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
