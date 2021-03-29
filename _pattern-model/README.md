@@ -8,26 +8,33 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Requirements
 
-* AWS CLI already configured with Administrator permission
-* [NodeJS 14.x installed](https://nodejs.org/en/download/)
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
 ## Deployment Instructions
 
-1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and login.
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+1. Change directory to the pattern directory:
+    ```
+    cd _patterns-model
+    ```
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+    ```
+    sam deploy --guided
+    ```
+1. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region
+    * Allow SAM CLI to create IAM roles with the required permissions.
 
-1. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
+    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Create a new directory, navigate to that directory in a terminal and enter ```git clone https://github.com/aws-samples/serverless-patterns```.
-
-1. Change directory to this pattern.
-
-1. From the command line, run:
-```
-sam deploy --guided
-```
-Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
-
-1. Note the outputs from the SAM deployment process. These contain the resource names and ARNs.
+1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
@@ -38,9 +45,15 @@ Explain how the service interaction works.
 Provide steps to trigger the integration and show what should be observed if successful.
 
 ## Cleanup
-
-Provide steps to remove the CloudFormations stack and resources used in the template.
-
+ 
+1. Delete the stack
+    ```bash
+    aws cloudformation delete-stack --stack-name STACK_NAME
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
