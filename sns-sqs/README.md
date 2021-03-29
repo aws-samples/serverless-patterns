@@ -2,7 +2,7 @@
 
 This pattern creates an SNS topic and an SQS queue. The SQS queue is subscribed to the SNS topic. 
 
-Learn more about this pattern at  Serverless Land Patterns: TBD
+Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sns-sql](https://serverlessland.com/patterns/sns-sqs)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -17,9 +17,17 @@ Important: this application uses various AWS services and there are costs associ
 
 1. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
 
-1. Create a new directory, navigate to that directory in a terminal and enter ```git clone https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge```.
+1. Create a new directory, navigate to that directory in a terminal and enter:
 
-1. Change directory to this pattern.
+``` 
+git clone https://github.com/aws-samples/serverless-patterns
+
+```
+
+1. Change directory to the pattern directory:
+```
+cd sns-sqs
+```
 
 1. From the command line, run:
 ```
@@ -59,14 +67,12 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SNS topi
 1. Send the SNS message:
 
 ```bash
-aws sns publish --topic-arn ENTER_SNS_TOPIC_ARN FROM_OUTPUT --subject testSubject --message testMessage
+aws sns publish --topic-arn ENTER_SNS_TOPIC_ARN  --subject testSubject --message testMessage
 ```
 2. Retrieve the message from the SQS queue, using the queue URL from the AWS SAM deployment outputs:
 ```bash
 aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
 ```
-
-
 
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
