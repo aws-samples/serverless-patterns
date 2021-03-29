@@ -1,37 +1,56 @@
 # AWS Lambda to Amazon EventBridge
 
-This pattern creates a Lambda function that publishes to EventBridge. 
+This pattern creates a Lambda function that publishes an event to EventBridge. 
 
-Learn more about this pattern at Serverless Land Patterns: TBD
+Learn more about this pattern at the Serverless Land Patterns Collection: [https://serverlessland.com/patterns/lambda-eventbridge](https://serverlessland.com/patterns/lambda-eventbridge)
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
+
+You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
-* AWS CLI already configured with Administrator permission
-* [NodeJS 12.x installed](https://nodejs.org/en/download/)
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
 ## Deployment Instructions
 
-1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and login.
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
 
-1. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
+``` 
+git clone https://github.com/aws-samples/serverless-patterns
 
-1. Create a new directory, navigate to that directory in a terminal and enter ```git clone https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge```.
-
-1. Change directory to this pattern.
-
-1. From the command line, run:
+```
+2. Change directory to the pattern directory:
+```
+cd lambda-eventbridge
+```
+3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
 ```
 sam deploy --guided
 ```
-Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
+4. During the prompts:
+* Enter a stack name
+* Enter the desired AWS Region
+* Allow SAM CLI to create IAM roles with the required permissions.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and ARNs.
+Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+
+5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-The AWS SAM template deploys the resources and the IAM permissions required to run the application. When the Lambda function is invoked, it publishes a test event to the default event bus in EventBridge.
+The AWS SAM template deploys the following resources:
+
+| Type | Logical ID |
+| --- | --- |
+| AWS::Lambda::Function | PublisherFunction |
+| AWS::IAM::Role | PublisherFunctionRole |
+
+When the Lambda function is invoked, it publishes an event to the default event bus in EventBridge.
+
 
 ## Testing
 
@@ -47,8 +66,38 @@ aws lambda invoke --function-name ENTER_YOUR_PUBLISHER_FUNCTION_NAME outfile.txt
 ```bash
 sam logs -n ENTER_YOUR_PUBLISHER_FUNCTION_NAME
 ```
+You should see an event delivered to the default event bus:
+```bash
+2021-03-29T15:16:01.033+01:00
+2021-03-29T14:16:00.995Z	50d553a9-6a0d-45e3-acc6-87cfd895d0dd	INFO	Sending following event to EventBridge:  {
+  Entries: [
+    {
+      Detail: '{"message":"Hello from publisher1","state":"new"}',
+      DetailType: 'Message',
+      EventBusName: 'default',
+      Source: 'demo.event',
+      Time: 2021-03-29T14:16:00.993Z
+    }
+  ]
+}
+	2021-03-29T14:16:00.995Z 50d553a9-6a0d-45e3-acc6-87cfd895d0dd INFO Sending following event to EventBridge: { Entries: [ { Detail: '{"message":"Hello from publisher1","state":"new"}', DetailType: 'Message', EventBusName: 'default', Source: 'demo.event', Time: 2021-03-29T14:16:00.993Z } ] }
+	2021-03-29T15:16:01.696+01:00
+2021-03-29T14:16:01.695Z	50d553a9-6a0d-45e3-acc6-87cfd895d0dd	INFO	{
+  FailedEntryCount: 0,
+  Entries: [ { EventId: '577df32f-e3db-efea-6a16-9e042a48d748' } ]
+}
+```
 
-
+## Cleanup
+ 
+1. Delete the stack
+    ```bash
+    aws cloudformation delete-stack --stack-name STACK_NAME
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
