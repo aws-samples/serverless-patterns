@@ -21,17 +21,17 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a new directory, navigate to that directory in a terminal and enter:
 
- ```
- git clone https://github.com/aws-samples/serverless-patterns
+    ```
+    git clone https://github.com/aws-samples/serverless-patterns
+    cd lambda-lambda
+    ```
 
- cd lambda-lambda
- ```
+1. From the command line, run:
+    ```
+    sam deploy --guided
+    ```
 
-4. From the command line, run:
-```
-sam deploy --guided
-```
-Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
+1. Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
 
 ## How it works
 

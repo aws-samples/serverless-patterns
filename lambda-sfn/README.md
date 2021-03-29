@@ -3,7 +3,7 @@ This pattern is a Lambda function asynchronously triggered when an object is upl
 
 The SAM template deploys a Lambda function, an S3 bucket and the IAM resources required to ru the application. A Lambda function consumes `ObjectCreated` events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image and creates a thumbail version of the image in the same bucket.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sfn
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sfn.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -41,7 +41,7 @@ Choose a stack name, select the desired AWS Region, and allow SAM to create role
 
 ## Testing
 
-Edit the sample event data in the `/events/inputFile.txt` File. Providing your sourcebucket name and a .jpg object key. Note the S3 bucket name is provided by the stack output after deployment.
+Edit the sample event data in the `/events/inputFile.txt` File. Providing the sourcebucket name and a .jpg object key. Note the S3 bucket name is provided by the stack output after deployment.
 
 ### Success Testing
 

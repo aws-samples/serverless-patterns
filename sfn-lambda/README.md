@@ -39,7 +39,6 @@ Choose a stack name, select the desired AWS Region, and allow SAM to create role
 * The Lambda function generates a random ID.
 * If the function does not fail the ID is returned in Step Function execution results within a `ticketId` object
 * If the Lambda function fails, the Step Functions workflow will retry up to 5 times before exiting with a `status:FAILED` response.
-==============================================
 
 ## Testing
 

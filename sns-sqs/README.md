@@ -1,6 +1,6 @@
 # Amazon SNS to Amazon SQS
 
-This pattern creates an SNS topic and an SQS queue. The SQS queue is subscribed to the SNS topic. 
+The SAM template deploys a SNS topic and an SQS queue. The SQS queue is subscribed to the SNS topic. SNS invokes the SQS queue when new messages are available. When messages are sent to the SNS topic, they are delivered as a JSON event payload to the SQS queue.
 
 Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sns-sql](https://serverlessland.com/patterns/sns-sqs)
 
@@ -19,21 +19,20 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a new directory, navigate to that directory in a terminal and enter:
 
-``` 
-git clone https://github.com/aws-samples/serverless-patterns
-
-```
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
 
 1. Change directory to the pattern directory:
-```
-cd sns-sqs
-```
+    ```
+    cd sns-sqs
+    ```
 
 1. From the command line, run:
-```
-sam deploy --guided
-```
-Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
+    ```
+    sam deploy --guided
+    ```
+    Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and ARNs.
 
@@ -53,13 +52,6 @@ Choose a stack name, select the desired AWS Region, and allow SAM to create role
     ]
 }
 ```
-
-## How it works
-
-The AWS SAM template deploys the resources and the IAM permissions required to run the application.
-
-When messages are sent to the SNS topic, they are delivered as a JSON event payload (see above) to the SQS queue.
-
 ### Testing
 
 Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SNS topic and observe the event delivered to the Lambda function:

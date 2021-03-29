@@ -1,8 +1,8 @@
 # AWS Lambda to Amazon SQS
 
-This pattern creates an SQS queue and a Lambda function. The Lambda function publishes to the SQS queue. 
+The SAM template deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. The Lambda function publishes a message to the SQS queue when invoked.
 
-Learn more about this pattern at Serverless Land Patterns: TBD
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs//
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -17,15 +17,21 @@ Important: this application uses various AWS services and there are costs associ
 
 1. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
 
-1. Create a new directory, navigate to that directory in a terminal and enter ```git clone https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge```.
+1. Create a new directory, navigate to that directory in a terminal:
+    ```
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
 
-1. Change directory to this pattern.
+1. Change directory to this pattern:
+    ```
+    cd serverless-patterns/lambda-sqs
+    ```
 
 1. From the command line, run:
-```
-sam deploy --guided
-```
-Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
+    ```
+    sam deploy --guided
+    ```
+    Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and ARNs.
 
@@ -44,12 +50,6 @@ Choose a stack name, select the desired AWS Region, and allow SAM to create role
 }
 
 ```
-
-## How it works
-
-The AWS SAM template deploys the resources and the IAM permissions required to run the application.
-
-When the Lambda function is invoked, it publishes a message to the SQS topic.
 
 ### Testing
 

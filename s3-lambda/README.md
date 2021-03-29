@@ -1,8 +1,6 @@
 # AWS Amazon S3 to AWS Lambda - Create a Lambda function that resizes images uploaded to S3
 
-This pattern is a Lambda function asynchronously triggered when an object is uploaded to an S3 bucket. 
-
-The SAM template deploys a Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes `ObjectCreated` events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image and creates a thumbail version of the image in the same bucket.
+The SAM template deploys a Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image and creates a thumbail version of the image in the same bucket.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-lambda](https://serverlessland.com/patterns/s3-lambda)
 
@@ -20,17 +18,17 @@ Important: this application uses various AWS services and there are costs associ
 1. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
 
 1. Create a new directory, navigate to that directory in a terminal and enter:
- ```
- git clone https://github.com/aws-samples/serverless-patterns
- cd s3-lambda
- ```
+    ```
+    git clone https://github.com/aws-samples/serverless-patterns
+    cd s3-lambda
+    ```
 
-4. From the command line, run:
-```
-sam build
-sam deploy --guided
-```
-Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
+1. From the command line, run:
+    ```
+    sam build
+    sam deploy --guided
+    ```
+    Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
 
 ## How it works
 

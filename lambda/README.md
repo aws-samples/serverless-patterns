@@ -1,8 +1,6 @@
 # AWS Lambda to AWS Lambda - Create a Lambda function that consumes events
 
-This pattern is a simple Lambda function. 
-
-The SAM template deploys A single Lambda function. The Lambda function concatenates `event.name` to a string and outputs the result.
+The SAM template deploys a single Lambda function. The Lambda function concatenates `event.name` to a string and outputs the result.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. From the command line, run:
 ```
-cd lambda
+cd serverless-patterns/lambda
 sam deploy --guided
 ```
 Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
