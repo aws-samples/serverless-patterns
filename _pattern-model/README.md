@@ -37,6 +37,9 @@ Explain how the service interaction works.
 
 Provide steps to trigger the integration and show what should be observed if successful.
 
+## Cleanup
+
+Provide steps to remove the CloudFormations stack and resources used in the template.
 
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
