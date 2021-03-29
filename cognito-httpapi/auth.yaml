@@ -9,9 +9,6 @@ Parameters:
   ClientDomain:
     Type: String
     Description: Domain allowed to use this UserPool
-  AppName:
-    Type: String
-    Description: Used to name auth domain and Cognito services
   Postman:
     Type: String
     
@@ -64,7 +61,7 @@ Resources:
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties: 
-      Domain: !Ref AppName
+      Domain: !Sub myauth${AWS::AccountId}
       UserPoolId: !Ref UserPool
     
 Outputs:

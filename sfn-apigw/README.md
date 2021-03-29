@@ -22,7 +22,6 @@ Important: this application uses various AWS services and there are costs associ
 1. Create a new directory, navigate to that directory in a terminal and enter:
 ```
 git clone https://github.com/aws-samples/serverless-patterns
-
 cd sfn-apigw
 ```
 
@@ -40,7 +39,6 @@ Choose a stack name, select the desired AWS Region, and allow SAM to create role
 * The Lambda function generates a random ID.
 * If the function does not fail, the Step Functions Execution ARN is returned.
 * If the Lambda function fails, the Step Functions workflow will retry up to 5 times before exiting with a `status:FAILED` response.
-==============================================
 
 ## Testing
 
@@ -56,7 +54,6 @@ aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMach
 {
     "executionArn": "arn:aws:states:eu-west-1:123456:execution:StateMachinetoAPIGW-hwTnEeeEGdgy:test",
     "startDate": "2021-02-10T17:02:33.009000+00:00"
-}
 }
 ```
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
