@@ -61,7 +61,7 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to invoke the Lambda function. Th
 1. Invoke the Lambda function to publish a message to SNS:
 
 ```bash
-aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME outfile.txt
+aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME response.json
 ```
 
 ## Cleanup

@@ -57,7 +57,7 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a test event to EventBrid
 1. Send an event to EventBridge:
 
 ```bash
-aws lambda invoke --function-name ENTER_YOUR_PUBLISHER_FUNCTION_NAME outfile.txt
+aws lambda invoke --function-name ENTER_YOUR_PUBLISHER_FUNCTION_NAME response.json
 ```
 
 2. Retrieve the logs from the Lambda function:

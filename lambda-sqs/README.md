@@ -59,7 +59,7 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to invoke the Lambda function. Th
 1. Invoke the Lambda function to publish a message to the SQS queue:
 
 ```bash
-aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME outfile.txt
+aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME response.json
 ```
 2. Retrieve the message from the SQS queue, using the queue URL from the AWS SAM deployment outputs:
 ```bash
