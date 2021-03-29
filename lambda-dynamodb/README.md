@@ -37,7 +37,6 @@ Choose a stack name, select the desired AWS Region, and allow SAM to create role
 * The Function uses the AWS SDK to perform a `put` command on a DynamoDB table 
 * The name of the DynamoDB table is passed to the Lambda function via an environment variable named `DatabaseTable`
 * The Lambda function is granted `PutItem` permissions, defined in the `LambdaExecRole` IAM Role.
-==============================================
 
 ## Testing
 

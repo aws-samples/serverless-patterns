@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
 ```
 sam deploy --guided
 ```
-Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
+Choose a stack name, select the desired AWS Region, and allow SAM to create roles with the required permissions. Once you have run guided mode once, you can use `sam deploy` in future to use these defaugitlts.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and ARNs.
 
