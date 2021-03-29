@@ -1,6 +1,7 @@
 # Amazon Cognito to Amazon API Gateway HTTP APIs (JWT)
 
 The SAM template deploys a nested stack with authentication configured using Cognito. It also deploys an HTTP API configured with a JWT authorizer based on the Cognito configuration and a Lambda function on a secure route.
+
 Note: when deploying this pattern, both *CAPABILITY_AUTO_EXPAND* and *CAPABILITY_IAM* are required.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/cognito-httpapi](https://serverlessland.com/patterns/cognito-httpapi)
@@ -12,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * AWS CLI already configured with Administrator permission
 * [NodeJS 14.x installed](https://nodejs.org/en/download/)
 
-## Installation Instructions
+## Deployment Instructions
 
 1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and login.
 

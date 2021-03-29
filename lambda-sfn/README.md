@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * AWS CLI already configured with Administrator permission
 * [NodeJS 12.x installed](https://nodejs.org/en/download/)
 
-## Installation Instructions
+## Deployment Instructions
 
 1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and login.
 

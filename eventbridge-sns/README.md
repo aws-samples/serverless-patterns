@@ -4,7 +4,7 @@ The AWS SAM template deploys an SNS topic that is triggered by an EventBridge ru
 
 In this example, the EventBridge rule specified in `template.yaml` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see Example event payload from EventBridge to SNS in the README) to the SNS topic.
 
-Learn more about this pattern at Serverless Land Patterns: TBD
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-sns.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -19,14 +19,16 @@ Important: this application uses various AWS services and there are costs associ
 
 1. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
 
-1. Create a new directory, navigate to that directory in a terminal and enter 
-    ```
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-1. Change directory to this pattern.
-    ```
-    cd serverless-patterns/eventbridge-sns
-    ```
+1. Create a new directory, navigate to that directory in a terminal and enter:
+
+ ```git clone https://github.com/aws-samples/serverless-patterns```.
+
+1. Change directory to this pattern:
+
+```
+cd serverless-patterns/eventbridge-sns
+```
+
 1. From the command line, run:
     ```
     sam deploy --guided
@@ -48,8 +50,6 @@ Choose a stack name, select the desired AWS Region, and allow SAM to create role
   "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-12345678012cd9412345678012.pem",
   "UnsubscribeURL" : "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:12345678012:patterns-eb-sns-MySnsTopic-12345678012:12345678-1124-447a-8c2a-12345678012"
 }
-
-
 ```
 
 ## Testing
