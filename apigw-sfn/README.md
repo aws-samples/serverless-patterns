@@ -1,12 +1,10 @@
 # Amazon API Gateway HTTP APIs to AWS Step Functions Express Workflow, with Amazon Cloudwatch Logs enabled 
 
-
 The SAM template deploys a HTTP APIs endpoint with an integration that syncronsouly invokes a Step Functions Express workflow and returns the response. The SAM template contains the minimum IAM resources required to run the application with logging enabled. 
 
 The HTTP's API endpoint can be called from an application (e.g. a web front end) to run an express workflow and return the result.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sfn
-
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -19,20 +17,21 @@ Important: this application uses various AWS services and there are costs associ
 
 1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and login.
 
-1. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
+2. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [install the AWS Serverless Application Model CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on your local machine.
 
-1. Create a new directory, navigate to that directory in a terminal and enter:
+3. Create a new directory, navigate to that directory in a terminal and enter:
+
 ``` 
 git clone https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn
 
 ```
 
-5. Change directory to the pattern directory:
+4. Change directory to the pattern directory:
 ```
 cd apigw-sfn
 ```
 
-4. From the command line, run:
+5. From the command line, run:
 
 ```
 sam deploy --guided
@@ -44,14 +43,13 @@ Choose a stack name, select the desired AWS Region, and allow SAM to create role
 * Send a `POST` request to the HTTP APIs endpoint.
 * The HTTP APIs integration will start a synchronous execution of the Step Functions Express workflow.
 * The Results of the Express workflow is returned via the HTTP API's request.
-==============================================
 
 ## Testing
 
 Run the following command to send an HTTP `POST` request to the HTTP APIs endpoint. Note, you must edit the {HelloWorldApi} placeholder with the URL of the deployed HTTP APIs endpoint. This is provided in the stack outputs.
 
 ```bash
-curl --location --request POST '{HelloWorldApi} \
+curl --location --request POST '{HelloWorldApi}' \
 > --header 'Content-Type: application/json' \
 > --data-raw '{ "IsHelloWorldExample": "Yes" }'
 ```
