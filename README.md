@@ -2,7 +2,7 @@
 
 This repo contains serverless patterns showing how to integrate services services using infrastructure-as-code (IaC). You can use these patterns to help develop your own projects quickly.
 
-Learn more about these patterns at TBD.
+Learn more about these patterns at https://serverlessland.com/patterns.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
