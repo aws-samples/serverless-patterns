@@ -38,7 +38,6 @@ Resources:
 
 Outputs:
   MySnsTopicName:
-    Description: 
     Description: SNS topic name
     Value: !GetAtt MySnsTopic.TopicName
   MySnsTopicArn:
