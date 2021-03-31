@@ -45,7 +45,6 @@ Outputs:
     Description: SQS queue URL
     Value: !Ref MySqsQueue    
   MySnsTopicName:
-    Description: 
     Description: SNS topic name
     Value: !GetAtt MySnsTopic.TopicName
   MySnsTopicArn:
