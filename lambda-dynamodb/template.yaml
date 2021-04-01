@@ -13,12 +13,15 @@ Resources:
       Handler: app.handler
       Runtime: nodejs12.x
       Timeout: 3
-      Role: !GetAtt LambdaExecRole.Arn
       Environment:
         Variables:
           DatabaseTable: !Ref DynamoTable
       Policies:
-        - LambdaExecRole
+        ## Read more about SAM Policy templates at:
+        ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+        - DynamoDBWritePolicy:
+            TableName: !Ref DynamoTable
+
         
 ##########################################################################
 #   DynamoDB                                                            #
@@ -26,11 +29,6 @@ Resources:
   DynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      Tags: 
-        - Key: "Department"
-          Value: "Engineering"
-        - Key: "AppType"
-          Value : "Serverless"   
       AttributeDefinitions:
       - AttributeName: ID
         AttributeType: S
@@ -39,30 +37,9 @@ Resources:
         KeyType: HASH
       BillingMode: PAY_PER_REQUEST
 ##########################################################################
-#   Roles                                                               #
+#   OUTPUTS                                                              #
 ##########################################################################
-  LambdaExecRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: 
-            - "lambda.amazonaws.com"
-          Action: sts:AssumeRole
-      Policies:
-      - PolicyName: AllowPutSpecificTable
-        PolicyDocument:
-          Version: 2012-10-17
-          Statement:
-          - Effect: Allow
-            Action: "dynamodb:PutItem"
-            Resource:
-              !Sub
-              - 'arn:aws:dynamodb:*:*:table/${table}'
-              - { table: !Ref DynamoTable}
+  
 Outputs:
   LambdFunction:
     Value: !Ref LambdaPutDynamoDB
