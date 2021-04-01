@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../lambda/index.ts", "../lambda/api.ts"],
+  "sourcesContent": ["export { handler as ApiLambda } from \"./api\";", "\nimport { Handler } from \"aws-lambda\";\nimport config from \"../config.json\";\n\nexport const handler: Handler = async (event) => {\n  return {\n    body: `Hello Serverless Citizen, your happy path is: \"${event.path}\"`,\n    headers: config.headers,\n    statusCode: 200,\n  };\n};"],
+  "mappings": ";;;;;;;;AAAA;AAAA;AAAA;AAAA;;;;;;;;;;;;;;;;;;;;;;;;;ACIO,IAAM,UAAmB,OAAO,UAAU;AAC/C,SAAO;AAAA,IACL,MAAM,kDAAkD,MAAM;AAAA,IAC9D,SAAS,eAAO;AAAA,IAChB,YAAY;AAAA;AAAA;",
+  "names": []
+}
