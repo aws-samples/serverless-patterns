@@ -1,0 +1,15 @@
+{
+  "apiName": "ServerlessLand",
+  "apiDescription": "General purpose Lambda to get request from API Gateway with CDK",
+  "api": {
+    "handler": "ApiLambda"
+  },
+  "headers": {
+      "Content-Type": "text/plain;charset=utf-8",
+      "X-Clacks-Overhead": "GNU Terry Pratchett"
+    },
+    "tags": [
+      {"key": "Key", "value": "Value"},
+      {"key": "Project", "value": "ServerlessLand"}
+    ]
+}
