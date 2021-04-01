@@ -11,7 +11,6 @@ Resources:
       Description: An Amazon DynamoDB trigger that logs the updates made to a table.
       MemorySize: 128
       Timeout: 3
-      Policies: AWSLambdaDynamoDBExecutionRole
       Events:
         MyDynamoDBtable:
           Type: DynamoDB
