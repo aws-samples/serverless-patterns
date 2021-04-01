@@ -1,14 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Simple Lambda function
+Description: Simple Lambda Function
   
 Resources:
 ##########################################################################
 #   Lambda Function                                                      #
 ##########################################################################
-  simpleFunction:
+  SimpleFunction:
     Type: AWS::Serverless::Function
-    Description: A simple Lambda Function
+    Description: A Simple Lambda Function
     Properties:
       CodeUri: src/
       Handler: app.handler
@@ -17,10 +17,10 @@ Resources:
 #   Stack outputs                                                        #
 ##########################################################################
 Outputs:
-  simpleFunctionARN:
+  SimpleFunctionARN:
     Description: Simple Lambda Function ARN
-    Value: !GetAtt simpleFunction.Arn  # Arn of Lambda function declared in the template file. 
+    Value: !GetAtt SimpleFunction.Arn  # Arn of Lambda function declared in the template file. 
 
-  simpleFunctionName:
+  SimpleFunctionName:
     Description: Simple Lambda Function Name
-    Value: !Ref simpleFunction  # Name of Lambda function declared in the template file. 
+    Value: !Ref SimpleFunction  # Name of Lambda function declared in the template file. 
