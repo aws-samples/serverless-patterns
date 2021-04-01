@@ -12,8 +12,14 @@ Resources:
     Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
     Properties:
       DefinitionUri: statemachine/StateMachine.asl.json
-      Role:
-        Fn::GetAtt: [ StatesExecutionRole, Arn ]
+      Policies:
+        -  Version: "2012-10-17"
+           Statement:
+             - Effect: Allow
+               Action:
+                 - "cloudwatch:*"
+                 - "logs:*"
+               Resource: "*"
       Type: EXPRESS
       Logging:
         Destinations:
@@ -65,28 +71,7 @@ Resources:
               Action: "states:StartSyncExecution"
               Resource: !GetAtt StateMachineExpressSync.Arn
 
-  StatesExecutionRole:
-    Type: "AWS::IAM::Role"
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service:
-                - !Sub states.${AWS::Region}.amazonaws.com
-            Action: "sts:AssumeRole"
-      Path: "/"
-      Policies:
-        - PolicyName: StatesExecutionPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "cloudwatch:*"
-                  - "logs:*"
-                Resource: "*"
+ 
 ##########################################################################
 #   Outputs                                                              #
 ##########################################################################
