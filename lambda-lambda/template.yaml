@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Lambda to Lambda
+Description: This pattern is a Lambda function asynchronously triggered by a Lambda Function.
   
 Resources:
-  producerFunction:
+  ProducerFunction:
     Type: AWS::Serverless::Function
-    Description: Lambda Function that will trigger DestinationFunction on failure
+    Description: Lambda Function that will trigger Destination Function onSuccess or onFailure
     Properties:
-      CodeUri: producerFunction/
+      CodeUri: ProducerFunction/
       Handler: app.handler
       Runtime: nodejs12.x
       Timeout: 3
@@ -15,23 +15,42 @@ Resources:
         DestinationConfig:
           OnFailure:
             Type: Lambda
-            Destination: !GetAtt failHandlerFunction.Arn  # Arn of a Lambda function declared in the template file. 
+            Destination: !GetAtt OnFailureFunction.Arn  # Arn of a Lambda function declared in the template file. 
           OnSuccess:
             Type: Lambda
-            Destination: !GetAtt SuccessHandlerFunction.Arn  # Arn of a Lambda function declared in the template file. 
-  failHandlerFunction:
+            Destination: !GetAtt OnSuccessFunction.Arn  # Arn of a Lambda function declared in the template file. 
+  OnFailureFunction:
     Type: AWS::Serverless::Function
-    Description: Invoked by ConsumerFunction Lambda on failure
+    Description: Invoked by ProducerFunction Lambda onFailure
     Properties:
-      CodeUri: failHandlerFunction/
+      CodeUri: OnFailureFunction/
       Handler: app.handler
       Runtime: nodejs12.x
       Timeout: 3
-  SuccessHandlerFunction:
+  OnSuccessFunction:
     Type: AWS::Serverless::Function
-    Description: Invoked by ConsumerFunction Lambda on success
+    Description: Invoked by ProducerFunction Lambda onSuccess
     Properties:
-      CodeUri: SuccessHandlerFunction/
+      CodeUri: OnSuccessFunction/
       Handler: app.handler
       Runtime: nodejs12.x
       Timeout: 3
+Outputs:
+  ProducerFunctionName:
+    Description: Producer Lambda Function Name
+    Value: !Ref ProducerFunction  # Arn of Lambda function declared in the template file. 
+  ProducerFunctionARN:
+    Description: Producer Lambda Function ARN
+    Value: !GetAtt ProducerFunction.Arn  # Arn of Lambda function declared in the template file. 
+  OnSuccessFunctionName:
+    Description: OnSuccess Lambda Function Name
+    Value: !Ref OnSuccessFunction  # Arn of Lambda function declared in the template file. 
+  OnSuccessFunctionARN:
+    Description: OnSuccess Lambda Function ARN
+    Value: !GetAtt OnSuccessFunction.Arn  # Arn of Lambda function declared in the template file. 
+  OnFailureFunctionName:
+    Description: OnFailure Lambda Function Name
+    Value: !Ref OnFailureFunction  # Arn of Lambda function declared in the template file. 
+  OnFailureFunctionARN:
+    Description: OnFailure Lambda Function ARN
+    Value: !GetAtt OnFailureFunction.Arn  # Arn of Lambda function declared in the template file. 

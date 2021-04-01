@@ -2,11 +2,11 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-// Lambda Destination handler function
+// Lambda Destination OnSuccess Lambda Function
 
 exports.handler = async (event) => {
   // do some further processing on event
-  console.log('Further Processing for successful function ')
+  console.log('Further processing for successful function invocation ')
   console.log(JSON.stringify(event, null, 2))
   
 }

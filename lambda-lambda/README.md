@@ -40,9 +40,21 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
+The AWS SAM template deploys the following resources:
+
+| Logical ID | Type | 
+| --- | --- |
+| ProducerFunction | AWS::Lambda::Function | 
+| PublisherFunctionRole | AWS::IAM::Role |
+| OnSuccessFunction | AWS::Lambda::Function | 
+| OnSuccessFunctionRole | AWS::IAM::Role |
+| OnFailureFunction | AWS::Lambda::Function | 
+| OnFailureFunctionRole | AWS::IAM::Role |
+| ProducerFunctionEventInvokeConfig | AWS::Lambda::EventInvokeConfig |
+
 * Use the AWS CLI to asynchronously invoke the producer function.
-* A successfull execution will asynchronously invoke the `successHandlerFunction`
-* An unsuccessfull, or failed execution will asynchronously invoke the `failHandlerFunction`
+* A successfull execution will asynchronously invoke the `OnSuccessFunction`
+* An unsuccessfull, or failed execution will asynchronously invoke the `OnFailureFunction`
 * which you can see in CloudWatch Logs.
 
 ==============================================
