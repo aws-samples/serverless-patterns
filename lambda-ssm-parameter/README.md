@@ -40,10 +40,12 @@ Important: this application uses various AWS services and there are costs associ
 
 This pattern creates an AWS Lambda function and an AWS Systems Manager Parameter Store parameter. The parameter is added as a function environment variable named "SSMParameterName". The function execution role only allows Get and Put actions on the parameter. The function supports a JSON event in the following format:
 
+```
 {
   "method": "{GET || PUT}",
   "body": "{NewParameterValue}"
 }
+```
 
 The method can be either GET (retrieve current parameter value) or PUT (update parameter with new value). The body of the event is used to define the new value of the parameter.
 
