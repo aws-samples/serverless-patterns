@@ -1,6 +1,6 @@
 # Amazon API Gateway REST API with AWS Lambda proxy integration
 
-This pattern in CDK offers a boilerlate to generate an Amazon API Gateway REST API endpoint with a a greedy proxy ("{proxy+}") and "ANY" method from the specified path, meaning it will accept by default any method and any path. The lambda provided in TypeScript only returns the path.
+This pattern in CDK offers a boilerlate to generate an Amazon API Gateway REST API endpoint with a a greedy proxy ("{proxy+}") and "ANY" method from the specified path, meaning it will accept by default any method and any path. The Lambda function provided in TypeScript only returns the path.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-cdk
 
@@ -33,28 +33,11 @@ Important: this application uses various AWS services and there are costs associ
       npx cdk deploy --app 'ts-node .'
     ```
 
-## How it works
-
-Explain how the service interaction works.
-
 ## Testing
 
-After the deploy start, CDK will show all changes and creations of resources to be done. Aceept with "Y". Then, at the end, if you is using this default example you'll receive as Output your API Gateway URL with Lambda Integration, such as:
-
-```bash
- ✅  ServerlessLandApi
-
-Outputs:
-ServerlessLandApi.ServerlessLandEndpointC36EEEC4 = https://<random-id>.execute-api.us-east-1.amazonaws.com/prod/
-```
-
-Acessing in your browser you should see:
-
-```
-Hello, your path is: "/"
-```
-
-This page should log any path you type after the last "/" meaning you could use as a start point as a general purpose endpoint for various types of applications.
+1. After deployment, the output shows the API Gateway URL with the Lambda integration, for example: ```ServerlessLandApi.ServerlessLandEndpointC36EEEC4 = https://<random-id>.execute-api.us-east-1.amazonaws.com/prod/```.
+1. Accessing the URL in a browser, you see: ```Hello, your path is: "/"```.
+3. This page logs any path you type after "/". You can use this as a starting point as a general purpose endpoint for various types of applications.
 
 ## Cleanup
  
@@ -62,7 +45,8 @@ This page should log any path you type after the last "/" meaning you could use 
     ```bash
     npx cdk destroy --app 'ts-node .'
     ```
-It will ask you to confirm the destruction, then after you accept, just wait for the resource deletion complete.
+2. Confirm the removal and wait for the resource deletion to complete.
+
 ----
 
 © Copyright 2021 [Ibrahim Cesar](https://ibrahimcesar.cloud)
