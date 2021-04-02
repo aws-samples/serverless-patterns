@@ -7,17 +7,18 @@ paths:
     get:
       responses:
         default:
-          description: "Default response for GET /"
+          description: "Response for GET /"
       x-amazon-apigateway-integration:
         type: "aws_proxy"
         integrationSubtype: "SQS-SendMessage"
         credentials:
-          Fn::GetAtt: [HttpApiRole, Arn]
+          Fn::GetAtt: [MyHttpApiRole, Arn]
         connectionType: "INTERNET"
         payloadFormatVersion: "1.0"
         requestParameters:
           MessageBody: "$request.body.message"
-          QueueUrl: "$request.header.queueUrl"
+          QueueUrl:
+            Ref: MySqsQueue
 
 x-amazon-apigateway-cors:
   allowMethods:

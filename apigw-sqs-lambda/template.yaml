@@ -51,7 +51,7 @@ Resources:
 ##########################################################################
 #   Roles                                                               #
 ##########################################################################
-  HttpApiRole:
+  MyHttpApiRole:
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
