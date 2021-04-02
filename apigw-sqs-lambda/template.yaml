@@ -19,6 +19,9 @@ Resources:
   MyHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      AccessLogSettings:
+        DestinationArn: !GetAtt MyHttpApiAccessLogs.Arn
+        Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","routeKey":"$context.routeKey", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }'
       DefinitionBody:
         'Fn::Transform':
           Name: 'AWS::Include'
@@ -74,6 +77,26 @@ Resources:
                 - 'sqs:GetQueueUrl'
                 - 'sqs:SendMessageBatch'
               Resource: !GetAtt MySqsQueue.Arn
+            - Effect: Allow
+              Action:
+                - 'logs:CreateLogGroup'
+                - 'logs:CreateLogStream'
+                - 'logs:DescribeLogGroups'
+                - 'logs:DescribeLogStreams'
+                - 'logs:PutLogEvents'
+                - 'logs:GetLogEvents'
+                - 'logs:FilterLogEvents'
+              Resource: !GetAtt MyHttpApiAccessLogs.Arn
+
+##########################################################################
+#   Cloudwatch Logs                                                       #
+##########################################################################
+
+  MyHttpApiAccessLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: MyHttpApi-Access-Logs
+      RetentionInDays: 1
 
 ##########################################################################
 #   Outputs                                                              #
