@@ -3,11 +3,11 @@ info:
   title: "Queue Based Leveling Example"
   version: "2021-03-31 17:32:29UTC"
 paths:
-  /:
-    get:
+  /submit:
+    post:
       responses:
         default:
-          description: "Response for GET /"
+          description: "Response for POST /"
       x-amazon-apigateway-integration:
         type: "aws_proxy"
         integrationSubtype: "SQS-SendMessage"
@@ -16,7 +16,7 @@ paths:
         connectionType: "INTERNET"
         payloadFormatVersion: "1.0"
         requestParameters:
-          MessageBody: "$request.body.message"
+          MessageBody: "$request.body"
           QueueUrl:
             Ref: MySqsQueue
 
