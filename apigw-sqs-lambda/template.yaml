@@ -35,12 +35,9 @@ Resources:
       Description: Lambda to be invoked by the SQS Queue
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs14.x
       Timeout: 3
       MemorySize: 128
-      Policies:
-        - SQSPollerPolicy:
-            QueueName: !GetAtt MySqsQueue.QueueName
       Events:
         MySQSEvent:
           Type: SQS
