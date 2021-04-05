@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create an API destination in EventBridge - open API using Webhook.site
+
+Parameters:
+  MyWebhookURL:
+    Type: String
+    Default: 'https://webhook.site/<<ENTER YOUR UNIQUE URL HERE>>'
+
+Resources:
+  MyEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "MyEventBus"
+
+  MyConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      Description: 'My connection with an API key'
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: MyWebhook
+          ApiKeyValue: MyAPIkey
+
+  MyApiDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'MyWebhookTest'
+      ConnectionArn: !GetAtt MyConnection.Arn
+      InvocationEndpoint: !Ref MyWebhookURL
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+
+  EventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt MyApiDestination.Arn
+
+  EventRule: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      State: "ENABLED"
+      EventBusName: !Ref MyEventBus
+      EventPattern: 
+        source:
+          - "MyTestApp"
+        detail-type:
+          - "MyTestMessage"       
+      Targets: 
+        - Arn: !GetAtt MyApiDestination.Arn
+          RoleArn: !GetAtt EventBridgeTargetRole.Arn
+          Id: "MyAPIdestination"
+
+Outputs:
+  MyEventBusName:
+    Description: Application EventBus Name
+    Value: !Ref MyEventBus
+
+  MyEventBusArn:
+    Description: Application EventBus ARN
+    Value: !GetAtt MyEventBus.Arn
+
+  MyConnectionName:
+    Value: !Ref MyConnection
+  MyConnectionArn:
+    Value: !GetAtt MyConnection.Arn        
+
+  MyApiDestinationName:
+    Value: !Ref MyApiDestination
+  MyApiDestinationArn:
+    Value: !GetAtt MyApiDestination.Arn
+
+  EventBridgeTargetRoleArn:
+    Value: !GetAtt EventBridgeTargetRole.Arn

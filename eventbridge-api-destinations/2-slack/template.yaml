@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create an API destination in EventBridge - use Slack as a target.
+
+Parameters:
+  MySlackToken:
+    Type: String
+    Default: 'xoxb-<<ENTER YOUR BOT'S ACCESS TOKEN HERE>>'
+  MySlackChannel:
+    Type: String
+    Default: '<< ENTER YOUR SLACK CHANNEL ID >>'
+  MyEventBusName:
+    Type: String
+    Default: "MyEventBus"
+
+Resources:
+  MyConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      Description: 'My connection with an API key'
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: 'Authorization'
+          ApiKeyValue: !Sub 'Authorization ${MySlackToken}'
+
+  MyApiDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'MySlackNotifier'
+      ConnectionArn: !GetAtt MyConnection.Arn
+      InvocationEndpoint: 'https://slack.com/api/chat.postMessage'
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+
+  EventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt MyApiDestination.Arn
+
+  EventRule: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      State: "ENABLED"
+      EventBusName: !Ref MyEventBusName
+      EventPattern: 
+        source:
+          - "MyTestApp"
+        detail-type:
+          - "MyTestMessage"       
+      Targets: 
+        - Arn: !GetAtt MyApiDestination.Arn
+          RoleArn: !GetAtt EventBridgeTargetRole.Arn
+          Id: "MyAPIdestination"
+          InputTransformer:
+            InputPathsMap:
+              text: $.detail.event
+            InputTemplate: !Sub >
+              {
+                "channel": "${MySlackChannel}",
+                "text": <text>
+              }
+
+Outputs:
+  MyConnectionName:
+    Value: !Ref MyConnection
+  MyConnectionArn:
+    Value: !GetAtt MyConnection.Arn        
+
+  MyApiDestinationName:
+    Value: !Ref MyApiDestination
+  MyApiDestinationArn:
+    Value: !GetAtt MyApiDestination.Arn
+
+  EventBridgeTargetRoleArn:
+    Value: !GetAtt EventBridgeTargetRole.Arn
