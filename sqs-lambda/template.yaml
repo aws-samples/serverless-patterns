@@ -16,9 +16,6 @@ Resources:
       Runtime: nodejs12.x
       Timeout: 3
       MemorySize: 128
-      Policies:  
-        - SQSPollerPolicy:
-            QueueName: !GetAtt MySqsQueue.QueueName
       Events:
         MySQSEvent:
           Type: SQS
