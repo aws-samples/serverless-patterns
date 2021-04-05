@@ -5,10 +5,10 @@ Description: Create an API destination in EventBridge - use Slack as a target.
 Parameters:
   MySlackToken:
     Type: String
-    Default: 'xoxb-<<ENTER YOUR BOT'S ACCESS TOKEN HERE>>'
+    Default: "xoxb-ENTER YOUR BOT'S ACCESS TOKEN HERE"
   MySlackChannel:
     Type: String
-    Default: '<< ENTER YOUR SLACK CHANNEL ID >>'
+    Default: "ENTER YOUR SLACK CHANNEL ID"
   MyEventBusName:
     Type: String
     Default: "MyEventBus"
@@ -18,18 +18,18 @@ Resources:
     Type: AWS::Events::Connection
     Properties:
       AuthorizationType: API_KEY
-      Description: 'My connection with an API key'
+      Description: "My connection with an API key"
       AuthParameters:
         ApiKeyAuthParameters:
-          ApiKeyName: 'Authorization'
-          ApiKeyValue: !Sub 'Authorization ${MySlackToken}'
+          ApiKeyName: "Authorization"
+          ApiKeyValue: !Sub 'Bearer ${MySlackToken}'
 
   MyApiDestination:
     Type: AWS::Events::ApiDestination
     Properties:
-      Name: 'MySlackNotifier'
+      Name: "MySlackNotifier"
       ConnectionArn: !GetAtt MyConnection.Arn
-      InvocationEndpoint: 'https://slack.com/api/chat.postMessage'
+      InvocationEndpoint: "https://slack.com/api/chat.postMessage"
       HttpMethod: POST
       InvocationRateLimitPerSecond: 10
 
