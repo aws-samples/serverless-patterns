@@ -33,22 +33,6 @@ Resources:
           - OPTIONS
           - POST
       Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaFunction}/invocations
-  # IAM Role that defines the services the function can access and which actions the function can perform
-  FunctionExecutionRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      Description: !Sub 'Function Exectuion Role for ${AppName}-function'
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - 'sts:AssumeRole'
-            Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
   # Lambda Function - uses Globals to define additional configuration values
   LambdaFunction:
     Type: 'AWS::Serverless::Function'
