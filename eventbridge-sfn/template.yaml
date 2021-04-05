@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - EventBridge to Step Functions
+
+Resources:
+
+  # CloudWatch Log Group
+  EC2StateWatcherLogs:
+    Type: AWS::Logs::LogGroup
+
+  # Step Function
+  EC2StateWatcher:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      # Logging is a good idea. We also need at least one policy attached to the Step
+      # Function in order to deploy.
+      Logging:
+        Level: ERROR
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt EC2StateWatcherLogs.Arn
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - logs:*
+            Resource: "*"
+      Definition:
+        StartAt: What Happened?
+        States:
+          # The three states that trigger this Step Function each have their own path.
+          What Happened?:
+            Type: Choice
+            Choices:
+              - Variable: $.state
+                StringEquals: running
+                Next: It's Running
+              - Variable: $.state
+                StringEquals: stopped
+                Next: It's Stopped
+              - Variable: $.state
+                StringEquals: terminated
+                Next: It's Gone
+          # These Pass states can be replaced to contain business logic for reacting to
+          # state changes. See other Step Function to Service patterns for examples.
+          It's Running:
+            Type: Pass
+            End: true
+          It's Stopped:
+            Type: Pass
+            End: true
+          It's Gone:
+            Type: Pass
+            End: true
+      Events:
+        StateChange:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: default
+            # The detail key contains the EC2 specific event data. In this example, the
+            # rest of the event properties are not needed and discarded.
+            InputPath: $.detail
+            Pattern:
+              source:
+                - aws.ec2
+              detail:
+                state:
+                  - running
+                  - stopped
+                  - terminated
+
+Outputs:
+
+  EC2StateWatcherArn:
+    Description: EC2StateWatcher state machine ARN
+    Value: !Ref EC2StateWatcher
