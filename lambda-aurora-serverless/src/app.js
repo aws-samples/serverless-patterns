@@ -100,6 +100,6 @@ exports.handler = async (event, context) => {
     return response;
   } catch (error) {
     console.error(error);
-    throw new Error("Function Error");
+    throw new Error(error);
   }
 };
