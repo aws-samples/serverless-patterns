@@ -1,6 +1,6 @@
 # Amazon API Gateway HTTP API to AWS Lambda
 
-This pattern creates an AWS Lambda function and an Aurora Serverless cluster with Data API and a Secrets Manager secret.
+This pattern creates an AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigw-http-api-lambda
+    cd lambda-aurora-serverless
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -32,47 +32,35 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-This pattern creates an AWS Lambda function and an Aurora Serverless cluster with Data API and a Secrets Manager secret. The function queries a database on the Aurora cluster and returns the results.
-
-!!! Explain how the function queries a system database by default, but you can use the RDS Query Editor to connect to the database using the Secret Arn to create a table and insert records. Then update the lambda function sqlParams to execute statements against the new table. !!!
+This pattern creates an AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret. The function creates an example table named "music", inserts a row with data from the event object, then returns the results.
 
 ## Testing
 
-Once the application is deployed, navigate to the Lambda function and configure test events. Invoke the function with each test event to query a database on the Aurora cluster. Review the Amazon CloudWatch Logs for details on the function invocation.
+Once the application is deployed, navigate to the Lambda function and configure a test event using the sample event available in this repo. Invoke the function to execute sql statements against the database. Modify the test event before subsequent invocations to insert new data into the example "music" table. Review the Amazon CloudWatch Logs for details on the function invocation.
 
-When first connecting to the Aurora Serverless cluster after a period of inactivity, you may receive the following error: 
+After a period of inactivity the DB cluster may scale down, which is expected when using Aurora Serverless. If you attempt to invoke the function during this time, you may receive a "Communications link failure" error. Simply wait a few seconds a invoke the function again. In a production environment, retry logic is recommended.
 
-```
-BadRequestException: Communications link failure
-The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
-code: 'BadRequestException'
-statusCode: 400
-retryable: true
-```
-
-
-Example POST Request: https://{HttpApiId}.execute-api.us-east-2.amazonaws.com/path1/path2?foo=bar
-- Request Header: "Content-Type: application/json"
-- Request Body: {"key1":"value1", "key2":"value2"}
-
-Response: 
+Example test event:
 ```
 {
-  "functionName": "http-api-lambda-proxy-function",
-  "xForwardedFor": "{YourIpAddress}",
-  "contentType": "application/json",
-  "method": "POST",
-  "rawPath": "/path1/path2",
-  "queryString": {
-    "foo": "bar"
-  },
-  "body": "{\"key1\":\"value1\", \"key2\":\"value2\"}"
+  "body": {
+    "artist": "The Beatles",
+    "album": "Abbey Road"
+  }
+}
+```
+
+Response:
+```
+{
+  "statusCode": 200,
+  "body": "[{\"id\":1,\"artist\":\"The Beatles\",\"album\":\"Abbey Road\"}]"
 }
 ```
 

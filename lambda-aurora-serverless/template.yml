@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An AWS Lambda function and an Aurora Serverless cluster with Data API and a Secrets Manager secret
+Description: An AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret
 
 # Global values that are applied to all applicable resources in this template
 Globals:
@@ -12,17 +12,17 @@ Globals:
 
 Parameters:
   DBClusterName:
-    Description: Aurora RDS cluster name.
+    Description: Aurora DB cluster name.
     Type: String
     Default: aurora-test-cluster
   DatabaseName:
-    Description: Aurora RDS database name.
+    Description: Aurora database name.
     Type: String
     Default: aurora_test_db
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9_]*'
     ConstraintDescription: Must begin with a letter and only contain alphanumeric characters.
   DBAdminUserName:
-    Description: The admin user name, between 2 to 16 alphanumeric characters.
+    Description: The admin user name.
     Type: String
     Default: admin_user
     MinLength: '2'
@@ -42,8 +42,8 @@ Resources:
         GenerateStringKey: password
         PasswordLength: 30
         ExcludeCharacters: '"@/\'
-  # Aurora Serverless Cluster with Data API
-  RDSCluster:
+  # Aurora Serverless DB Cluster with Data API
+  AuroraCluster:
     Type: 'AWS::RDS::DBCluster'
     Properties:
       DBClusterIdentifier: !Ref DBClusterName
@@ -86,7 +86,7 @@ Resources:
                   - 'secretsmanager:DescribeSecret'
                   - 'secretsmanager:GetSecretValue'
                 Resource: !Ref DBSecret
-        # Permission to execute a SQL statement against database using the RDS Data API
+        # Permission to execute a SQL statement against database using the Data API
         - PolicyName: RDSDataAPIPolicy
           PolicyDocument:
             Version: 2012-10-17
@@ -111,11 +111,11 @@ Resources:
 
 Outputs:
   DBClusterArn:
-    Description: Aurora Database Cluster Resource ARN
+    Description: Aurora DB Cluster Resource ARN
     Value: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
-  DBEndpointAddress:
-    Description: Aurora Database Endpoint Address
-    Value: !GetAtt RDSCluster.Endpoint.Address
+  DBClusterEndpoint:
+    Description: Aurora DB Cluster Endpoint Address
+    Value: !GetAtt AuroraCluster.Endpoint.Address
   DBName:
     Description: Aurora Database Name
     Value: !Ref DatabaseName
