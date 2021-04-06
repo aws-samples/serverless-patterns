@@ -38,13 +38,13 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates an AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret. The function creates an example table named "music", inserts a row with data from the event object, then returns the results.
+This pattern creates an AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret. The function creates an example table named "music", inserts a row with data from the event object, then returns the results of a select query.
 
 ## Testing
 
 Once the application is deployed, navigate to the Lambda function and configure a test event using the sample event available in this repo. Invoke the function to execute sql statements against the database. Modify the test event before subsequent invocations to insert new data into the example "music" table. Review the Amazon CloudWatch Logs for details on the function invocation.
 
-After a period of inactivity the DB cluster may scale down, which is expected when using Aurora Serverless. If you attempt to invoke the function during this time, you may receive a "Communications link failure" error. Simply wait a few seconds a invoke the function again. In a production environment, retry logic is recommended.
+After a period of inactivity the DB cluster may scale down, which is expected when using Aurora Serverless. If you attempt to invoke the function during this time, you may receive a "Communications link failure" error. Simply wait a few seconds and invoke the function again. In a production environment, retry logic is recommended.
 
 Example test event:
 ```
