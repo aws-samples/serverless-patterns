@@ -39,7 +39,6 @@ Resources:
     Properties:
       FunctionName: !Sub '${AppName}-function'
       Handler: app.handler
-      Role: !GetAtt FunctionExecutionRole.Arn
       # Example function environment variables
       Environment:
         Variables:
