@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: EventBridge source bus - API Gateway webhook to custom event bus 
+
+Parameters:
+  EventSource:
+    Type: String
+    Description: Webhook source 
+    Default: 'CrossRegionTest'
+
+Resources:
+  MyEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "CrossRegionSource"
+
+  EventRuleRegion1: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule - us-east-1 routing"
+      EventBusName: !Ref MyEventBus
+      State: "ENABLED"
+      EventPattern: 
+        source:
+          - !Ref EventSource
+        detail:
+          apiEvent:
+            region:
+              - "us-east-1"
+      Targets: 
+        - Arn: !Sub "arn:aws:events:us-east-1:${AWS::AccountId}:event-bus/CrossRegionDestination"
+          Id: "CrossRegionEventBus1"
+          RoleArn: !GetAtt EventBridgeIAMrole.Arn
+
+  EventRuleRegion2: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule - us-west-2 routing"
+      EventBusName: !Ref MyEventBus
+      State: "ENABLED"
+      EventPattern: 
+        source:
+          - !Ref EventSource
+        detail:
+          apiEvent:
+            region:
+              - "us-west-2"
+      Targets: 
+        - Arn: !Sub "arn:aws:events:us-west-2:${AWS::AccountId}:event-bus/CrossRegionDestination"
+          Id: "CrossRegionEventBus2"
+          RoleArn: !GetAtt EventBridgeIAMrole.Arn
+
+  EventRuleRegion3: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule - eu-west-1 routing"
+      EventBusName: !Ref MyEventBus
+      State: "ENABLED"
+      EventPattern: 
+        source:
+          - !Ref EventSource
+        detail:
+          apiEvent:
+            region:
+              - "eu-west-1"
+      Targets: 
+        - Arn: !Sub "arn:aws:events:eu-west-1:${AWS::AccountId}:event-bus/CrossRegionDestination"
+          Id: "CrossRegionEventBus3"
+          RoleArn: !GetAtt EventBridgeIAMrole.Arn
+
+  EventBridgeIAMrole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              !Sub events.amazonaws.com
+          Action: sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: PutEventsDestinationBus
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - events:PutEvents
+            Resource:
+            - !Sub "arn:aws:events:us-east-1:${AWS::AccountId}:event-bus/CrossRegionDestination"
+            - !Sub "arn:aws:events:us-west-2:${AWS::AccountId}:event-bus/CrossRegionDestination"
+            - !Sub "arn:aws:events:eu-west-1:${AWS::AccountId}:event-bus/CrossRegionDestination"
+
+  # Optional section of the template that create an API Gateway webhook to put events
+  # onto the bus via a Lambda function. You can route the event to one of the three regions
+  # by using /?region=REGION_CODE as a query parameter.
+
+  # DELETE everything after this comment if you don't need the webhook for testing.
+
+  WebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      MemorySize: 128
+      Timeout: 3
+      Runtime: nodejs14.x
+      Environment:
+        Variables:
+          EVENTSOURCE: !Ref EventSource
+          EVENT_BUS_NAME: !Ref MyEventBus
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref MyEventBus
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: GET
+
+Outputs:
+  WebhookApiUrl:
+    Description: "API Gateway HTTP API endpoint for webhook"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com?region=<<region code>>"

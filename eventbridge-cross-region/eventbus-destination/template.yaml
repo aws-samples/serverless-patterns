@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: EventBridge destination bus - Cross-region destination bus and logging Lambda function
+
+Parameters:
+  EventSource:
+    Type: String
+    Description: Webhook source 
+    Default: 'webhook'
+
+Resources:
+  MyEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "CrossRegionDestination"
+
+  LoggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      MemorySize: 128
+      Timeout: 3
+      Runtime: nodejs14.x
+
+  EventRule: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      EventBusName: !Ref MyEventBus
+      State: "ENABLED"
+      EventPattern: 
+        source:
+          - !Ref EventSource     
+      Targets: 
+        - Arn: !GetAtt LoggerFunction.Arn
+          Id: "ConsumerTarget"
+
+  PermissionForEventsToInvokeLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: 
+        Ref: "LoggerFunction"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt EventRule.Arn
+
