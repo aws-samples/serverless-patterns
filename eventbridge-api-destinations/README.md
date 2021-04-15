@@ -4,7 +4,7 @@ With the new [API destinations feature](https://aws.amazon.com/blogs/compute/usi
 
 This patterns configures an EventRule rule that routes to an API Destinations target. It configures a Connection, which contains the authorization for the API endpoint, and the API, which contains the URL, http method, and other configuration information.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-api-destinations
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
