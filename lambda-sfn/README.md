@@ -1,7 +1,6 @@
-# AWS Lambda To AWS StepFunctions Express Workflow, with Amazon Cloudwatch Logs enabled - Create a Lambda function that an act as a proxy to transform data before invoking a Step Fucntions Express workflow
-This pattern is a Lambda function asynchronously triggered when an object is uploaded to an S3 bucket. 
+# Invoke an AWS Step Functions workflow from AWS Lambda, with logging enabled
 
-The SAM template deploys a Lambda function, an S3 bucket and the IAM resources required to ru the application. A Lambda function consumes `ObjectCreated` events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image and creates a thumbail version of the image in the same bucket.
+The SAM template deploys a Lambda function, a Step Functions Express workflow, a Log group and the IAM resources required to run the application. A Lambda function uses the AWS SDK to asyncronously invoke the Express workflow, passing the event body as a string. The Express Workflow results are logged in Amazon CloudWatch Logs. The Lambda function returns the Express Workflow execution ARN and startDate.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sfn.
 
@@ -38,19 +37,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-## How it works
-
-* Use the AWS CLI upload an image to S3
-* If the object is a .jpg or a .png, the code creates a thumbnail and saves it to the target bucket. 
-* The code assumes that the destination bucket exists and its name is a concatenation of the source bucket name followed by the string -resized
-
-==============================================
-
 ## Testing
-
-Edit the sample event data in the `/events/inputFile.txt` File. Providing the sourcebucket name and a .jpg object key. Note the S3 bucket name is provided by the stack output after deployment.
-
-### Success Testing
 
 Run the following Lambda CLI invoke command to invoke the function. Note, you must edit the {LambdaProxyArn} placeholder with the ARN of the deployed Lambda function. This is provided in the stack outputs.
 
