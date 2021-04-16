@@ -1,4 +1,4 @@
-# AWS Lambda to AWS Lambda - Create a Lambda function that consumes events
+# AWS Lambda - Create a Lambda function that consumes events
 
 The SAM template deploys a single Lambda function. The Lambda function concatenates `event.name` to a string and outputs the result.
 
