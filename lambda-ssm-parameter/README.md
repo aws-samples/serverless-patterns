@@ -1,4 +1,4 @@
-# Amazon API Gateway HTTP API to AWS Lambda
+# AWS Lambda AWS Systems Manager Parameter Store
 
 This pattern creates an AWS Lambda function and an AWS Systems Manager Parameter Store parameter.
 
