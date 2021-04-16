@@ -13,7 +13,9 @@ Resources:
       Handler: app.handler
       Runtime: nodejs12.x
       Timeout: 3
-      Role: !GetAtt LambdaExecRole.Arn
+      Policies:
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: !GetAtt StateMachine.StateMachineName
       Environment:
         Variables:
           StateMachineArn: !GetAtt StateMachine.Arn
@@ -25,8 +27,14 @@ Resources:
     Properties:
       DefinitionUri: statemachine/stateMachine.asl.json
       Type: EXPRESS
-      Role:
-        Fn::GetAtt: [ StatesExecutionRole, Arn ]
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "cloudwatch:*"
+                - "logs:*"
+              Resource: "*"
       Logging:
         Destinations:
           - CloudWatchLogsLogGroup:
@@ -42,51 +50,6 @@ Resources:
     Properties:
       LogGroupName: !Join [ "/", [ "stepfunctions", StateMachine]]
         
-##########################################################################
-#   Roles                                                               #
-##########################################################################
-  LambdaExecRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: 
-            - "lambda.amazonaws.com"
-          Action: sts:AssumeRole
-      Policies:
-      - PolicyName: AllowSFNExec
-        PolicyDocument:
-          Version: 2012-10-17
-          Statement:
-          - Effect: Allow
-            Action: "states:StartExecution"
-            Resource: !GetAtt StateMachine.Arn
-
-  StatesExecutionRole:
-    Type: "AWS::IAM::Role"
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service:
-                - !Sub states.${AWS::Region}.amazonaws.com
-            Action: "sts:AssumeRole"
-      Path: "/"
-      Policies:
-        - PolicyName: StatesExecutionPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "cloudwatch:*"
-                  - "logs:*"
-                Resource: "*"
 Outputs:
   StateMachine:
     Value: !Ref StateMachine
