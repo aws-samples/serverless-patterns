@@ -1,4 +1,4 @@
-# AWS Lambda AWS Systems Manager Parameter Store
+# AWS Lambda to AWS Systems Manager Parameter Store
 
 This pattern creates an AWS Lambda function and an AWS Systems Manager Parameter Store parameter.
 
