@@ -4,7 +4,7 @@ In this pattern, called "Queue based leveling", a serverless queue is introduced
 
 The queue acts as a buffer to alleviate traffic spikes and ensure your workload can sustain the arriving load by buffering all the requests durably. It also helps downstream consumers to process the incoming requests at a consistent pace.
 
-Learn more about this pattern at Serverless Land Patterns: https://beta.serverlessland.com/patterns/apigw-sqs.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sqs.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
