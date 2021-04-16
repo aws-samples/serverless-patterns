@@ -1,6 +1,8 @@
-# AWS API Gateway HTTP APIs to Lambda Function through Amazon SQS Queue for buffering
+# AWS API Gateway HTTP APIs to Amazon SQS for buffering
 
-In this pattern, called "Queue based leveling", a serverless queue is introduced between your API Gateway and your workers -Lambda function in our case. The introduced queue acts as a buffer to alleviate spike concerns and make sure your BE application can sustain the load that is coming in by buffering all the requests and not loosing them.It also gives the benefit to your downstream consumers to process the incoming requests at their own pace.
+In this pattern, called "Queue based leveling", a serverless queue is introduced between your API Gateway and your workers, a Lambda function in this case. 
+
+The queue acts as a buffer to alleviate traffic spikes and ensure your workload can sustain the arriving load by buffering all the requests durably. It also helps downstream consumers to process the incoming requests at a consistent pace.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sqs-lambda
 
