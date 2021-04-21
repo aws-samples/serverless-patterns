@@ -38,10 +38,10 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-# Invoke lambda function with a "message" string in the input payload
-# Lambda function stores the payload in S3 and starts an Express Workflow passing the bucket and key
-# Express workflow calls lambda function passing the bucket and key
-# The Lambda function retrieves the using the bucket/key, converts to uppercase and returns it
+* Invoke lambda function with a "message" string in the input payload
+* Lambda function stores the payload in S3 and starts an Express Workflow passing the bucket and key
+* Express workflow calls lambda function passing the bucket and key
+* The Lambda function retrieves the using the bucket/key, converts to uppercase and returns it
 
 
 ## Testing
