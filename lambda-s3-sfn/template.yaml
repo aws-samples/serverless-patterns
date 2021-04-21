@@ -1,27 +1,81 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Service to Service description
+Description: >
+  Lambda function to store an uploaded file in S3 and start sync workflow to process it.
 
-# Comment each resource section to explain usage
+Globals:
+  Function:
+    Runtime: nodejs12.x
+    Timeout: 10  
+    Environment:
+        Variables:
+          UPLOADS_BUCKET: !Ref UploadsBucket
+
 Resources:
-  # Define the publisher Lambda function 
-  PublisherFunction:
+##########################################################################
+#  Lambda functions                                                      #
+##########################################################################
+  SavePayloadAndStartStateMachineFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/functions/savePayloadAndStartStateMachine
+      Handler: app.handler
+      Policies:
+        - S3CrudPolicy:
+            BucketName:
+              !Ref UploadsBucket
+        - StepFunctionsExecutionPolicy: # Manually change to StartSyncExecution after deployment
+            StateMachineName:
+              !GetAtt ProcessFileStateMachine.Name
+      Environment:
+          Variables:
+            PROCESS_FILE_STATE_MACHINE_ARN: !Ref ProcessFileStateMachine              
+              
+  ProcessFileFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
+      CodeUri: src/functions/processFile
       Handler: app.handler
-      Timeout: 3
-      Runtime: nodejs12.x
       Policies:
-        - Statement:
-          - Effect: Allow
-            # Can be scoped to an individual event bus
-            Resource: '*'
-            Action:
-              - events:PutEvents      
+        - S3CrudPolicy:
+            BucketName:
+              !Ref UploadsBucket
+              
+  AddFooterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/addFooter
+      Handler: app.handler
+      Policies:
+        - S3ReadPolicy:
+            BucketName:
+              !Ref UploadsBucket
+##########################################################################
+#  S3 Bucket                                                             #
+##########################################################################            
+  UploadsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: "lambda-s3-sfn-uploads"
 
-# In this section, list all common outputs for usage
+##########################################################################
+#  State Machine                                                        #
+########################################################################## 
+  ProcessFileStateMachine:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: src/statemachine/processFileStateMachine.asl.json
+      DefinitionSubstitutions:
+        ProcessFileFunctionArn: !GetAtt ProcessFileFunction.Arn
+        AddFooterFunctionArn: !GetAtt AddFooterFunction.Arn
+      Policies: 
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ProcessFileFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref AddFooterFunction            
+      Type: EXPRESS
+
 Outputs:
   PublisherFunction:
-    Description: PublisherFunction function name
-    Value: !Ref PublisherFunction
+    Description: SavePayloadAndStartStateMachineFunction
+    Value: !Ref SavePayloadAndStartStateMachineFunction
