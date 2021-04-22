@@ -9,9 +9,13 @@ exports.handler = async (event) => {
   
   const params = { Bucket, Key };
   const response = await s3.getObject(params).promise();
-    
-  const processedPayload = JSON.parse(response.Body.toString('utf-8'))  
-  let processedPayloadWithFooter = `${processedPayload}\r\r ***** Brought to you by Serverless Patterns - https://serverlessland.com/patterns  *****`
+  
+  console.log(response)  
+  const processedPayload = JSON.parse(response.Body.toString('utf-8'))
+  
+  console.log("processedPayload", processedPayload) 
+  const processedPayloadWithFooter = `${processedPayload} ***** Processed by lambda-s3-sfn serverless Pattern - https://serverlessland.com/patterns  *****`
+  console.log("processedPayloadWithFooter", processedPayloadWithFooter) 
 
   return processedPayloadWithFooter
 }

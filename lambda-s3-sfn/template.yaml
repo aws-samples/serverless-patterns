@@ -76,6 +76,6 @@ Resources:
       Type: EXPRESS
 
 Outputs:
-  PublisherFunction:
-    Description: SavePayloadAndStartStateMachineFunction
-    Value: !Ref SavePayloadAndStartStateMachineFunction
+  SavePayloadAndStartStateMachineFunction:
+    Description: Change the second function role action to "states:StartSyncExecution" then use this aws cli command to test the deployed lambda function SavePayloadAndStartStateMachineFunction
+    Value: !Sub "aws lambda invoke --function-name ${SavePayloadAndStartStateMachineFunction} --payload '{ \"payload\": \"hello world\"}'" 

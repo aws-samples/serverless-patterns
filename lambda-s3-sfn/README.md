@@ -46,13 +46,16 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-Run the following AWS CLI command to invoke function comand to start the Step Functions workflow. Note, you must edit the {LambdaToStateMachineExpressSync} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs.
+Run the following AWS CLI command to invoke function comand to start the Step Functions workflow. Note, you must edit the {SavePayloadAndStartStateMachineFunction} placeholder with the ARN of the deployed lambda function. This is provided in the stack outputs.
+```bash
+aws lambda invoke --function-name {SavePayloadAndStartStateMachineFunction} --payload '{ "payload": "something bigger than current input limit for express workflows (262kb)"}' /dev/stdout
+```
 
 ## Cleanup
  
-1. Delete the stack
+1. Empty/delete S3 bucket and delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+   aws s3 rm s3://lambda-s3-sfn-uploads --recursive && aws cloudformation delete-stack --stack-name lambda-s3-sfn 
     ```
 1. Confirm the stack has been deleted
     ```bash

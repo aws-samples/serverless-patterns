@@ -9,7 +9,7 @@ exports.handler = async(event) => {
     const uploadParams = {
         Bucket: process.env["UPLOADS_BUCKET"],
         Key: key,
-        Body: event 
+        Body: JSON.stringify(event) 
     };    
     
     //Store payload in S3

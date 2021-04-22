@@ -9,9 +9,12 @@ exports.handler = async (event) => {
   
   const params = { Bucket, Key };
   const response = await s3.getObject(params).promise();
+  
+  console.log("response", response);
     
-  const payload = JSON.parse(response.Body.toString('utf-8'))  
+  const payload = JSON.parse(response.Body.toString('utf-8')).payload
   // Can substitute a more complex processing step here 
+  console.log("payload", payload);
   const processedPayload = payload.toLocaleUpperCase()
   
   
