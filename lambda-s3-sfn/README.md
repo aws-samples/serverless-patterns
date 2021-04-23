@@ -48,7 +48,7 @@ Important: this application uses various AWS services and there are costs associ
 
 Run the following AWS CLI command to invoke function comand to start the Step Functions workflow. Note, you must edit the {SavePayloadAndStartStateMachineFunction} placeholder with the ARN of the deployed lambda function. This is provided in the stack outputs.
 ```bash
-aws lambda invoke --function-name {SavePayloadAndStartStateMachineFunction} --payload '{ "payload": "something bigger than current input limit for express workflows (262kb)"}' /dev/stdout
+aws lambda invoke --function-name lambda-s3-sfn-SavePayloadAndStartStateMachineFunct-421PUHMSDZ  --payload '{ "payload": "hello world"}' --cli-binary-format raw-in-base64-out response.json
 ```
 
 ## Cleanup
