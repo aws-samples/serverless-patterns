@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd lambda-s3-sfn
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -38,24 +38,26 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-* Invoke lambda function with a "message" string in the input payload
-* Lambda function stores the payload in S3 and starts an Express Workflow passing the bucket and key
-* Express workflow calls lambda function passing the bucket and key
-* The Lambda function retrieves the using the bucket/key, converts to uppercase and returns it
+* Invoke SavePayloadAndStartStateMachineFunction lambda function with a "payload" string in the input payload
+* SavePayloadAndStartStateMachineFunction stores the payload in S3 and starts an Express Workflow passing the bucket and key
+* Express Workflow calls the ProcessFileFunction, function retrieves uploaded json the using the bucket/key, converts to uppercase and returns it
+* Express Workflow calls the AddFooterFunction, function adds a footer and returns it
+* Express Workflow ends and returns the result to the client
 
 
 ## Testing
 
 Run the following AWS CLI command to invoke function comand to start the Step Functions workflow. Note, you must edit the {SavePayloadAndStartStateMachineFunction} placeholder with the ARN of the deployed lambda function. This is provided in the stack outputs.
+You can also replace payload with something that is bigger than the current task execution limit (262kb).
 ```bash
-aws lambda invoke --function-name lambda-s3-sfn-SavePayloadAndStartStateMachineFunct-421PUHMSDZ  --payload '{ "payload": "hello world"}' --cli-binary-format raw-in-base64-out response.json
+aws lambda invoke --function-name {SavePayloadAndStartStateMachineFunction}  --payload '{ "payload": "hello world"}' --cli-binary-format raw-in-base64-out response.json
 ```
 
 ## Cleanup
  
 1. Empty/delete S3 bucket and delete the stack
     ```bash
-   aws s3 rm s3://lambda-s3-sfn-uploads --recursive && aws cloudformation delete-stack --stack-name lambda-s3-sfn 
+   aws s3 rm s3://lambda-s3-sfn-uploads --recursive && aws cloudformation delete-stack --stack-name STACK_NAME 
     ```
 1. Confirm the stack has been deleted
     ```bash
