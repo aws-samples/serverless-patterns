@@ -1,6 +1,6 @@
-# Lambda to S3
+# AWS Lambda to AWS S3
 
-This SAM template creates Lambda function that writes to an S3 bucket when invoked.
+This SAM template creates a Lambda function that writes to an S3 bucket when invoked.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-s3
 
@@ -38,11 +38,11 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This SAM template creates Lambda function that writes to an S3 bucket when invoked. Once you run `sam deploy --guided`, you will enter the name of the destination bucket for the objects to be stored.
+This SAM template creates a Lambda function that writes to an S3 bucket when invoked. Once you run `sam deploy --guided`, you will enter the name of the destination bucket for the objects to be stored.
 
 ## Testing
 
-You can test the solution by accessing the Lambda console, finding your Lambda function, and clicking `Test` in the Code Source section. Then, go to the S3 console and ensure your object has been written to the bucket you specified.
+You can test the solution by accessing the Lambda console, finding your Lambda function, and clicking `Test` in the Code Source section. You can also invoke the function from the CLI using `aws lambda invoke --function-name ENTER_FUNCTION_NAME output.txt`. Then, go to the S3 console and ensure your object has been written to the bucket you specified.
 
 ## Cleanup
  
