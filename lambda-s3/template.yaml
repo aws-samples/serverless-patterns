@@ -11,7 +11,7 @@ Resources:
     Properties:
       BucketName: !Ref DestinationBucketName    
   ## Lambda function
-  ResizerFunction:
+  PutObjectFunction:
     Type: AWS::Serverless::Function 
     Properties:
       CodeUri: src/
