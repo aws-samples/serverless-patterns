@@ -1,8 +1,10 @@
-# AWS Lambda to S3 and Step Functions Express Workflow for processing large files
+# Amazon S3 and AWS Step Functions Express Workflow for processing large files
 
-This pattern is useful when processing user uploaded files larger than the current [task execution limits](https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-task-executions).
+This pattern creates a Lambda function that puts an object to S3, which triggers a Step Functions Express Workflow.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+This pattern is useful when processing uploaded files larger than the current [task execution limits](https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-task-executions).
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-s3-sfn.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -38,12 +40,11 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-* Invoke SavePayloadAndStartStateMachineFunction lambda function with a "payload" string in the input payload
+* Invoke SavePayloadAndStartStateMachineFunction Lambda function with a "payload" string in the input payload
 * SavePayloadAndStartStateMachineFunction stores the payload in S3 and starts an Express Workflow passing the bucket and key
-* Express Workflow calls the ProcessFileFunction, function retrieves uploaded json the using the bucket/key, converts to uppercase and returns it
+* Express Workflow calls the ProcessFileFunction, retrieves the uploaded json the using the bucket/key, converts to uppercase, and returns it
 * Express Workflow calls the AddFooterFunction, function adds a footer and returns it
 * Express Workflow ends and returns the result to the client
-
 
 ## Testing
 
@@ -55,11 +56,11 @@ aws lambda invoke --function-name {SavePayloadAndStartStateMachineFunction}  --p
 
 ## Cleanup
  
-1. Empty/delete S3 bucket and delete the stack
+1. Empty/delete S3 bucket and delete the stack:
     ```bash
    aws s3 rm s3://lambda-s3-sfn-uploads --recursive && aws cloudformation delete-stack --stack-name STACK_NAME 
     ```
-1. Confirm the stack has been deleted
+1. Confirm the stack has been deleted:
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
