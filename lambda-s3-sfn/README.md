@@ -1,6 +1,6 @@
 # Amazon S3 and AWS Step Functions Express Workflow for processing large files
 
-This pattern creates a Lambda function that puts an object to S3, which triggers a Step Functions Express Workflow.
+This pattern creates a Lambda function that puts an object to S3, which starts a synchronous Step Functions Express Workflow.
 
 This pattern is useful when processing uploaded files larger than the current [task execution limits](https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-task-executions).
 
