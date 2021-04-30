@@ -46,7 +46,13 @@ This SAM template creates an S3 bucket, allows you to upload objects to that buc
 
 ## Testing
 
-Upload an object to the S3 bucket you created and then check notifications (email, SMS, etc).
+* Go to the SNS Console and select the topic that was created after running `sam deploy`
+* Click on Create Subscription
+* Under Protocol, select the type of endpoint to subscribe to (email, SMS, etc.)
+* Confirm the message subscription
+* Upload an object to the S3 bucket you created
+* Check your notifications
+
 
 ## Cleanup
  
