@@ -2,7 +2,7 @@
 
 ![architecture diagram](architecture.png)
 
-This pattern creates an EventBridge Event Bus, a Step Function, and subscribes the Step Function to be executed when a `StartReminder` event is published to the newly created EventBridge Event Bus. The Step Function waits until the specified date before publishing a `Reminder` event to the EventBus using a TypeScript Lambda Function.
+This pattern creates an EventBridge event bus, a Step Functions workflow, and subscribes the Step Functions workflow to be executed when a `StartReminder` event is published to event bus. The Step Functions workflow waits until the specified date before publishing a `Reminder` event to the event bus using a Lambda function.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cdk-eventbridge-stepfunction
 
@@ -38,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-At the end of the deployment the CDK output will list an output of the name of the new EventBridge EventBus that the stack created.
+At the end of the deployment the CDK output will list an output of the name of the new EventBridge event bus that the stack created.
 
 Your output should look something like this:
 
@@ -61,9 +61,9 @@ For the `--eventbusname` parameter, use the name of the `reminderBus` EventBridg
 eventbridge-cli --eventbusname CdkEventbridgeStepfunctionStackreminderEventBusXXXXXXX
 ```
 
-Keep this running in the background while we execute the Step Function.
+Keep this running in the background while invoking the Step Functions workflow.
 
-### Send an event to the EventBus to trigger the Step Function
+### Send an event to the event bus to trigger the Step Functions workflow
 
 Once the tool is running, you can send a message to the event bus using the AWS Console. To do this, log into the AWS Console at [https://console.aws.amazon.com](https://console.aws.amazon.com)
 
@@ -81,7 +81,7 @@ Click on the "Send Events" button at the top right. This brings up a screen that
 
 * Event bus: Ensure that your new event bus is selected.
 * Event source: Enter `awsConsole`.
-* Detail type: Enter `StartReminder` - this is essential because only `StartReminder` events trigger the Step Function.
+* Detail type: Enter `StartReminder` - this is essential because only `StartReminder` events trigger the Step Functions workflow.
 * Event detail: In the event detail, you should craft a JSON payload that sets the `at` field to be a date that's a few minutes in the future. Make sure to adjust the time based on your local timezone in the `at` field.
 
 ```json
@@ -96,13 +96,13 @@ Click the "Send" button and the confirmation will be displayed:
 
 ![view confirmation](04_view_confirmation.png)
 
-### Check that the Step Function executed
+### Check that the Step Functions workflow started
 
 In the AWS Console, navigate to the Step Functions service. You should see your new state machine in the list.
 
 ![view state machines](05_view_state_machines.png)
 
-Click on your state machine, and you should see a list of executions. Click on the latest execution to view the result of the execution.
+Click on your state machine, and you should see a list of executions. Click on the latest to view the result of the execution.
 
 ![view executions](06_view_execution.png)
 
@@ -110,13 +110,13 @@ After the `at` date is reached, the execution status will be "Succeeded" and a m
 
 ### Monitor the event bus
 
-Once the Step Function has completed execution, at your terminal or command line, you should be able to see that the `reminder` Step Function has sent a `Reminder` message to the event bus.
+Once the Step Functions workflow has completed, at your terminal or command line, you should be able to see that the `reminder` Step Functions workflow has sent a `Reminder` message to the event bus.
 
 ![monitor event bus](07_view_monitor_eventbridge.png)
 
 ### Making changes
 
-You can customise the Step Function configuration by editing the code at `./lib/cdk-eventbridge-stepfunction-stack.ts`. To deploy changes, use the `npx cdk deploy` command.
+You can customize the Step Functions configuration by editing the code at `./lib/cdk-eventbridge-stepfunction-stack.ts`. To deploy changes, use the `npx cdk deploy` command.
 
 ## Cleanup
  
