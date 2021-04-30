@@ -47,9 +47,9 @@ This SAM template creates an S3 bucket, allows you to upload objects to that buc
 1. Upload an object to the S3 bucket created by the deployment.
 2. In the console, check the SQS queue created by the deployment for new messages containing the S3 event.
 3. You can also use the SQS CLI to fetch new messages from the queue:
-```
-aws sqs receive-message --queue-url <<QUEUE_URL>> --max-number-of-messages 10
-```
+    ```
+    aws sqs receive-message --queue-url <<QUEUE_URL>> --max-number-of-messages 10
+    ```
 
 ## Cleanup
  
