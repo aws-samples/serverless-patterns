@@ -81,5 +81,5 @@ Outputs:
     Value: !Sub "aws lambda invoke --function-name ${SavePayloadAndStartStateMachineFunction} --payload '{ \"payload\": \"hello world\"}' /dev/stdout"
   SavePayloadAndStartStateMachineFunctionCli2:
     Description: Change the second function role action to "states:StartSyncExecution" then use this AWS CLI 2 command to test the deployed lambda function SavePayloadAndStartStateMachineFunction
-    Value: !Sub "aws lambda invoke --function-name lambda-s3-sfn-SavePayloadAndStartStateMachineFunct-421PUHMSDZ  --payload '{ \"payload\": \"hello world\"}' --cli-binary-format raw-in-base64-out response.json"
+    Value: !Sub "aws lambda invoke --function-name ${SavePayloadAndStartStateMachineFunction}  --payload '{ \"payload\": \"hello world\"}' --cli-binary-format raw-in-base64-out response.json"
 
