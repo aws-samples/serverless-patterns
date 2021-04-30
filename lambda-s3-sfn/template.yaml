@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda function to store an uploaded file in S3 and start sync workflow to process it.
+
+Globals:
+  Function:
+    Runtime: nodejs12.x
+    Timeout: 10  
+    Environment:
+        Variables:
+          UPLOADS_BUCKET: !Ref UploadsBucket
+
+Resources:
+##########################################################################
+#  Lambda functions                                                      #
+##########################################################################
+  SavePayloadAndStartStateMachineFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/functions/savePayloadAndStartStateMachine
+      Handler: app.handler
+      Policies:
+        - S3CrudPolicy:
+            BucketName:
+              !Ref UploadsBucket
+        - StepFunctionsExecutionPolicy: # Manually change to StartSyncExecution after deployment
+            StateMachineName:
+              !GetAtt ProcessFileStateMachine.Name
+      Environment:
+          Variables:
+            PROCESS_FILE_STATE_MACHINE_ARN: !Ref ProcessFileStateMachine              
+              
+  ProcessFileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/processFile
+      Handler: app.handler
+      Policies:
+        - S3CrudPolicy:
+            BucketName:
+              !Ref UploadsBucket
+              
+  AddFooterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/addFooter
+      Handler: app.handler
+      Policies:
+        - S3ReadPolicy:
+            BucketName:
+              !Ref UploadsBucket
+##########################################################################
+#  S3 Bucket                                                             #
+##########################################################################            
+  UploadsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: "lambda-s3-sfn-uploads"
+
+##########################################################################
+#  State Machine                                                        #
+########################################################################## 
+  ProcessFileStateMachine:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: src/statemachine/processFileStateMachine.asl.json
+      DefinitionSubstitutions:
+        ProcessFileFunctionArn: !GetAtt ProcessFileFunction.Arn
+        AddFooterFunctionArn: !GetAtt AddFooterFunction.Arn
+      Policies: 
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ProcessFileFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref AddFooterFunction            
+      Type: EXPRESS
+
+Outputs:
+  SavePayloadAndStartStateMachineFunctionCli1:
+    Description: Change the second function role action to "states:StartSyncExecution" then use this AWS CLI 1 command to test the deployed lambda function SavePayloadAndStartStateMachineFunction
+    Value: !Sub "aws lambda invoke --function-name ${SavePayloadAndStartStateMachineFunction} --payload '{ \"payload\": \"hello world\"}' /dev/stdout"
+  SavePayloadAndStartStateMachineFunctionCli2:
+    Description: Change the second function role action to "states:StartSyncExecution" then use this AWS CLI 2 command to test the deployed lambda function SavePayloadAndStartStateMachineFunction
+    Value: !Sub "aws lambda invoke --function-name lambda-s3-sfn-SavePayloadAndStartStateMachineFunct-421PUHMSDZ  --payload '{ \"payload\": \"hello world\"}' --cli-binary-format raw-in-base64-out response.json"
+

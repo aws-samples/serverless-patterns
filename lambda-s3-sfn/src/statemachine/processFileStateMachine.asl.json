@@ -1,0 +1,24 @@
+{
+  "Comment": "Process Uploaded File State Machine",
+  "StartAt": "Process File",
+  "States": {
+    "Process File": {
+      "Type": "Task",
+      "Resource": "${ProcessFileFunctionArn}",
+      "Parameters": {
+        "Key.$": "$.Key",
+        "Bucket.$": "$.Bucket"
+      },
+      "Next": "Add Footer"
+    },
+    "Add Footer": {
+      "Type": "Task",
+      "Resource": "${AddFooterFunctionArn}",
+      "Parameters": {
+        "Key.$": "$.Key",
+        "Bucket.$": "$.Bucket"
+      },
+      "End": true
+    }
+  }
+}
