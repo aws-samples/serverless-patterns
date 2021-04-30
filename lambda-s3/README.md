@@ -1,10 +1,8 @@
-# Amazon S3 and AWS Step Functions Express Workflow for processing large files
+# AWS Lambda to AWS S3
 
-This pattern creates a Lambda function that puts an object to S3, which triggers a Step Functions Express Workflow.
+This SAM template creates a Lambda function that writes to an S3 bucket when invoked.
 
-This pattern is useful when processing uploaded files larger than the current [task execution limits](https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-task-executions).
-
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-s3-sfn.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-s3
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -23,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd lambda-s3-sfn
+    cd lambda-s3
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -40,27 +38,19 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-* Invoke SavePayloadAndStartStateMachineFunction Lambda function with a "payload" string in the input payload
-* SavePayloadAndStartStateMachineFunction stores the payload in S3 and starts an Express Workflow passing the bucket and key
-* Express Workflow calls the ProcessFileFunction, retrieves the uploaded json the using the bucket/key, converts to uppercase, and returns it
-* Express Workflow calls the AddFooterFunction, function adds a footer and returns it
-* Express Workflow ends and returns the result to the client
+This SAM template creates a Lambda function that writes to an S3 bucket when invoked. Once you run `sam deploy --guided`, you will enter the name of the destination bucket for the objects to be stored.
 
 ## Testing
 
-Run the following AWS CLI command to invoke function comand to start the Step Functions workflow. Note, you must edit the {SavePayloadAndStartStateMachineFunction} placeholder with the ARN of the deployed lambda function. This is provided in the stack outputs.
-You can also replace payload with something that is bigger than the current task execution limit (262kb).
-```bash
-aws lambda invoke --function-name {SavePayloadAndStartStateMachineFunction}  --payload '{ "payload": "hello world"}' --cli-binary-format raw-in-base64-out response.json
-```
+You can test the solution by accessing the Lambda console, finding your Lambda function, and clicking `Test` in the Code Source section. You can also invoke the function from the CLI using `aws lambda invoke --function-name ENTER_FUNCTION_NAME output.txt`. Then, go to the S3 console and ensure your object has been written to the bucket you specified.
 
 ## Cleanup
  
-1. Empty/delete S3 bucket and delete the stack:
+1. Delete the stack
     ```bash
-   aws s3 rm s3://lambda-s3-sfn-uploads --recursive && aws cloudformation delete-stack --stack-name STACK_NAME 
+    aws cloudformation delete-stack --stack-name STACK_NAME
     ```
-1. Confirm the stack has been deleted:
+1. Confirm the stack has been deleted
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```

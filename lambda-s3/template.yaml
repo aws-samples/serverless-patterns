@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Creates a Lambda function that writes to an S3 bucket
+Parameters:
+  DestinationBucketName:
+    Type: String
+Resources:
+  ## S3 bucket
+  DestinationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DestinationBucketName    
+  ## Lambda function
+  PutObjectFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      MemorySize: 128
+      Environment:
+        Variables:
+          DestinationBucketName: !Ref DestinationBucketName
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref DestinationBucketName
