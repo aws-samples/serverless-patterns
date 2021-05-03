@@ -1,0 +1,243 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An Amazon API Gateway WebSocket API and an AWS Lambda function.
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    CodeUri: ./src
+    Runtime: nodejs14.x
+    MemorySize: 128
+    Timeout: 15
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Amazon DynamoDB Configuration"
+        Parameters:
+          - WebSocketConnectionsTableNameSuffix
+          - ReadCapacityUnits
+          - WriteCapacityUnits
+    ParameterLabels:
+      ReadCapacityUnits:
+        default: Read Capacity Units
+      WriteCapacityUnits:
+        default: Write Capacity Units
+      WebSocketConnectionsTableNameSuffix:
+        default: WebSocket Connections Table Name Suffix
+
+
+Parameters:
+  WebSocketConnectionsTableNameSuffix:
+    Type: String
+    Default: 'websocket_connections'
+    Description: >
+      (Required) The suffix of the name of the Amazon DynamoDB table where connection identifiers 
+      will be stored. The table name will be prefixed by the Stack Name.
+    MinLength: 3
+    MaxLength: 50
+    AllowedPattern: ^[A-Za-z_]+$
+    ConstraintDescription: 'Required. Can be characters and underscore only. No numbers or special characters allowed.'
+  ReadCapacityUnits:
+    Description: Provisioned read throughput
+    Type: Number
+    Default: 5
+    MinValue: 5
+    MaxValue: 10000
+    ConstraintDescription: must be between 5 and 10000
+  WriteCapacityUnits:
+    Description: Provisioned write throughput
+    Type: Number
+    Default: 5
+    MinValue: 5
+    MaxValue: 10000
+    ConstraintDescription: must be between 5 and 10000
+
+
+Resources:
+  # API Gateway WebSocket API
+  WebSocketApi:
+    Type: 'AWS::ApiGatewayV2::Api'
+    Properties:
+      Name: !Ref AWS::StackName
+      Description: An Amazon API Gateway WebSocket API and an AWS Lambda function.
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+  # Lambda Function - uses Globals to define additional configuration values
+  OnConnectLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-onconnect-function'
+      Handler: onconnect.handler
+      MemorySize: 256
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WebSocketConnectionsTableName
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref WebSocketConnectionsTableName
+  # Function permissions grant an AWS service or another account permission to use a function
+  OnConnectFunctionResourcePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref OnConnectLambdaFunction
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*'
+  OnConnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      Description: OnConnect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnConnectLambdaFunction.Arn}/invocations
+  OnConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $connect
+      AuthorizationType: NONE
+      OperationName: OnConnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref OnConnectIntegration
+  # Lambda Function - uses Globals to define additional configuration values
+  PostLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-post-function'
+      Handler: post.handler
+      MemorySize: 256
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WebSocketConnectionsTableName
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref WebSocketConnectionsTableName
+      - Statement:
+        - Effect: Allow
+          Action:
+          - 'execute-api:ManageConnections'
+          Resource:
+          - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*'
+  # Function permissions grant an AWS service or another account permission to use a function
+  PostFunctionResourcePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref PostLambdaFunction
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*'
+  PostIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      Description: Post Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostLambdaFunction.Arn}/invocations
+  PostRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: post
+      AuthorizationType: NONE
+      OperationName: PostRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref PostIntegration
+  # Lambda Function - uses Globals to define additional configuration values
+  OnDisconnectLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-ondisconnect-function'
+      Handler: ondisconnect.handler
+      MemorySize: 256
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WebSocketConnectionsTableName
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref WebSocketConnectionsTableName
+  # Function permissions grant an AWS service or another account permission to use a function
+  OnDisconnectFunctionResourcePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref OnDisconnectLambdaFunction
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*'
+  OnDisconnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      Description: OnDisconnect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnDisconnectLambdaFunction.Arn}/invocations
+  OnDisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $disconnect
+      AuthorizationType: NONE
+      OperationName: OnDisconnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref OnDisconnectIntegration
+  WebSocketConnectionsTableName:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: connectionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: connectionId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnits
+        WriteCapacityUnits: !Ref WriteCapacityUnits
+      TableName: 
+        !Sub
+          - ${AWS::StackName}-${TableNameSuffix}
+          - { TableNameSuffix: !Ref WebSocketConnectionsTableNameSuffix }
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - OnConnectRoute
+      - PostRoute
+      - OnDisconnectRoute
+    Properties:
+      ApiId: !Ref WebSocketApi
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: prod
+      Description: Prod Stage
+      DeploymentId: !Ref Deployment
+      ApiId: !Ref WebSocketApi
+
+Outputs:
+  OnConnectLambdaFunctionArn:
+    Description: "OnConnect function ARN"
+    Value: !GetAtt OnConnectLambdaFunction.Arn
+  OnDisconnectLambdaFunctionArn:
+    Description: "OnDisconnect function ARN"
+    Value: !GetAtt OnDisconnectLambdaFunction.Arn
+  PostLambdaFunctionArn:
+    Description: "Post function ARN"
+    Value: !GetAtt PostLambdaFunction.Arn
+  WebSocketURL:
+    Description: "The WSS Protocol URL to connect to"
+    Value: !Join [ '', [ 'wss://', !Ref WebSocketApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+  WebSocketConnectionsTableNameArn:
+    Description: "WebSocket connections table ARN"
+    Value: !GetAtt WebSocketConnectionsTableName.Arn
