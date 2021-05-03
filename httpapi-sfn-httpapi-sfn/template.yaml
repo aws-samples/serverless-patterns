@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+      DefinitionBody:
+        openapi: "3.0.2"
+        info:
+          title: !Ref AWS::StackName
+        paths:
+          /:
+            post:
+              x-amazon-apigateway-integration:
+                integrationSubtype: StepFunctions-StartSyncExecution
+                credentials: !GetAtt HttpApiRole.Arn
+                requestParameters:
+                  Input: "$request.body"
+                  StateMachineArn: !Sub arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${AWS::StackName}-Stepception
+                payloadFormatVersion: 1.0
+                type: aws_proxy
+                connectionType: INTERNET
+
+  HttpApiRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - apigateway.amazonaws.com
+              - states.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+      - PolicyName: AllowSFNExec
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: states:StartSyncExecution
+              Resource: !Sub arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${AWS::StackName}-Stepception
+
+  StepceptionStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub ${AWS::StackName}-Stepception
+      Type: EXPRESS
+      Role: !GetAtt HttpApiRole.Arn
+      Definition:
+        StartAt: Stepception
+        States:
+          Stepception:
+            Type: Task
+            Resource: arn:aws:states:::apigateway:invoke
+            Parameters:
+              ApiEndpoint: !Sub ${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
+              Method: POST
+              Stage: prod
+              Path: /
+              AuthType: NO_AUTH
+            End: true
+
+Outputs:
+
+  StepFunctionArn:
+    Value: !Ref StepceptionStateMachine
+
+  ApiId:
+    Value: !Ref HttpApi
+
+  ExecuteApi:
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/prod/
