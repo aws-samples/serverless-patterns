@@ -62,7 +62,7 @@ Resources:
 #   Outputs                                                              #
 ##########################################################################
 Outputs:
-  MyStateMachineArn:
+  StateMachinetoSQSArn:
     Value: !Ref StateMachinetoSQS
     Description: StateMachinetoSQS Arn
   MyQueueURL:

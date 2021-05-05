@@ -19,22 +19,22 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
     cd sfn-lambda
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
     ```
-1. During the prompts:
+4. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
@@ -44,32 +44,68 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-Run the following AWS CLI command to send a 'start-sync-execution` comand to start the Step Functions workflow. Note, you must edit the {StateMachineExpressSynctoLambda} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs.
+Run the following AWS CLI command to send a 'start-execution` command to start the Step Functions workflow. Note, you must edit the {StateMachineExpressSynctoLambda} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs.
 
 ```bash
-aws stepfunctions start-sync-execution  --name "test" --state-machine-arn "{StateMachinetoSQS}" --input "{\"message\": {\"hello\" : \"world\" } }"
+aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMachinetoSQS}" --input "{\"message\": {\"hello\" : \"world\" } }"
 ```
 
-### Example output:
+### output:
 
 ```bash
 {
-    "executionArn": "arn:aws:states:eu-west-1:123:express:StateMachineExpressSynctoLambda-ftxlCWos7gZd:1:0d806925-361f-4dbf-af36-05ab6a40a8ec",
-    "stateMachineArn": "arn:aws:states:eu-west-1:123:stateMachine:StateMachineExpressSynctoLambda-ftxlCWos7gZd",
-    "name": "1",
-    "startDate": "2021-02-10T15:06:10.895000+00:00",
-    "stopDate": "2021-02-10T15:06:11.265000+00:00",
+    "executionArn": "arn:aws:states:us-east-1:123456789012:execution:MyStateMachine-LIXV3ls6HtnY:test",
+    "startDate": 1620244153.977
+}
+```
+
+Note the `executionArn` from the above output and run the below  cli command to get the status of the execution
+
+```bash
+aws stepfunctions describe-execution --execution-arn  "{executionArn}"
+```
+
+### Get execution status output:
+
+```bash
+{
+    "executionArn": "arn:aws:states:us-east-1:123456789012:execution:MyStateMachine-LIXV3ls6HtnY:test",
+    "stateMachineArn": "arn:aws:states:us-east-1:123456789012:stateMachine:MyStateMachine-LIXV3lsV8tnY",
+    "name": "60805db6-ca0a-44ee-b280-c6a44c5578a1",
     "status": "SUCCEEDED",
-    "input": "{\"message\":\"hello\"}",
+    "startDate": 1620244175.722,
+    "stopDate": 1620244175.849,
+    "input": "{\"message\": {\"hello\" : \"world\" } }",
     "inputDetails": {
         "included": true
     },
-    "output": "{\"message\":\"hello\",\"ticketId\":\"8pcna9\"}",
+    "output": "{\"MD5OfMessageBody\":\"fbc24bcc7a1794758fc1327fcfebdaf6\",\"MessageId\":\"faec3da7-cb2c-4b72-9cc8-98fdc4e72773\",\"SdkHttpMetadata\":{\"AllHttpHeaders\":{\"x-amzn-RequestId\":[\"522cc894-5c35-493d-a1ce-f95e71162dfd\"],\"Content-Length\":[\"378\"],\"Date\":[\"Wed, 05 May 2021 19:49:35 GMT\"],\"Content-Type\":[\"text/xml\"]},\"HttpHeaders\":{\"Content-Length\":\"378\",\"Content-Type\":\"text/xml\",\"Date\":\"Wed, 05 May 2021 19:49:35 GMT\",\"x-amzn-RequestId\":\"522cc894-5c35-493d-a1ce-f95e71162dfd\"},\"HttpStatusCode\":200},\"SdkResponseMetadata\":{\"RequestId\":\"522cc894-5c35-493d-a1ce-f95e71162dfd\"}}",
     "outputDetails": {
         "included": true
     }
 }
 ```
+Once the `status` is `SUCCEEDED`, we can verify if the message got delivered to the SQS or not by running the below command
+
+```bash
+aws sqs receive-message --queue-url  "{MyQueueURL}"
+```
+
+### Queue Message output:
+
+```bash
+{
+    "Messages": [
+        {
+            "MessageId": "3f7fb159-df5f-4acd-a127-f535064a73fd",
+            "ReceiptHandle": "AQEBi9nc1QjBPdjVNfoIBz0F7momTMA0EdMCv4UkQAQEBi9nc1QjBPdjVNfoIBz0F7momTMA0EdMCv4UkQ",
+            "MD5OfBody": "fbc24bcc7a1794758fc1327fcfebdaf6",
+            "Body": "{\"hello\":\"world\"}"
+        }
+    ]
+}
+```
+
 ## Cleanup
  
 1. Delete the stack
