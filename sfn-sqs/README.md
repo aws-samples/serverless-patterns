@@ -1,7 +1,7 @@
 # AWS Step Functions Standard Workflow to Amazon SQS, with no callback 
 
-The SAM template deploys a Step Functions workflow that takes in a payload and send it to an Amazon SQS. In this pattern the state machine 
-does not wait for a callback from the queue. The SAM template contains the minimum IAM resources required to run the application.
+The SAM template deploys a Step Functions workflow that takes in a payload and send it to an Amazon SQS. In this pattern, the state machine 
+DOES NOT WAIT for a callback from the queue. The SAM template contains the minimum IAM resources required to run the application.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-sqs
 
@@ -39,9 +39,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-* Start the Step Function execution with the event payload 
+* Start the Step Function execution with the sample event payload 
 * As part of the execution, part of the payload (the `message` attribute of the payload) gets pushed to the queue
-* Run the cli command to pull messages from the queue to verify the message got delivered.
+* Run the cli command to pull messages from the queue to verify if the message got delivered.
 
 ## Testing
 
