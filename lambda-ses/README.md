@@ -45,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 Lambda will be invoked to send an email to Amazon SES.
 This email can contain both plain text and HTML rendering.
 
-We place all new accounts in the Amazon SES sandbox.  While your account is in the sandbox, you can use all of the features of Amazon SES. However, when your account is in the sandbox, we apply the following restrictions to your account:
+All new AWS Accounts are placed in the Amazon SES sandbox environment.  While your account is in the sandbox, you can use all of the features of Amazon SES.  However, the following restrictions are applied:
 * You can only send mail to verified email addresses and domains, or to the Amazon SES mailbox simulator.
 * You can only send mail from verified email addresses and domains. 
 
