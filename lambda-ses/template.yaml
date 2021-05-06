@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Lambda to SES
+
+
+Parameters:
+  SenderEmailAddress:
+    Description: Sender email address that is verified from Amazon SES
+    Type: String
+    Default: SES_SENDER_IDENTITY
+  ReceiverEmailAddress:
+    Description: Receiver email address. If in sandbox, then verification required.
+    Type: String
+    Default: SES_RECEIVER_IDENTITY
+
+
+Resources:
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  SESSendFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+      MemorySize: 128
+      Environment:
+        Variables:
+          SES_SENDER_IDENTITY: !Ref SenderEmailAddress
+          SES_RECEIVER_IDENTITY: !Ref ReceiverEmailAddress
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'ses:SendEmail'
+                - 'ses:SendRawEmail'
+              Resource: '*' #Specify ARN(s) for identity. If in sandbox, specify both SENDER and RECEIVER ARNs
+
+##########################################################################
+#   OUTPUTS                                                              #
+##########################################################################
+Outputs:
+  SESSendFunction:
+    Description: SESSendFunction function name
+    Value: !Ref SESSendFunction
+  SenderEmailAddress:
+    Description: Sender email address
+    Value: !Ref SenderEmailAddress
+  SES_RECEIVER_IDENTITY:
+    Description: Receiver email address
+    Value: !Ref SES_RECEIVER_IDENTITY
