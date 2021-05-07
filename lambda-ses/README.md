@@ -1,6 +1,6 @@
 # AWS Lambda to Amazon SES
 
-This SAM template creates a Lambda function that sends an email with Amazon SES
+This SAM template creates a Lambda function that sends an email with Amazon SES.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-ses
 
@@ -15,6 +15,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Amazon SES](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-addresses-and-domains.html) verify identities in Amazon SES. Sandbox requires both sender and receiver addresses to be verified identities.
 
 ## Deployment Instructions
+1. Confirm both Sender and Receiver email addresses are verified in Amazon SES.
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
@@ -24,7 +25,13 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd lambda-ses
     ```
-    * (optional): change [template.yaml] policy resource to reference the arn of the sender email address or domain
+    * (optional): change [template.yaml] policy resource to reference the arn of the sender email address or domain 
+    [Line 31 in template.yaml]
+    ```
+      Policies:
+        - SESCrudPolicy: 
+          IdentityName: '*' #Specify ARN(s) for identity. If in sandbox, specify both SENDER and RECEIVER ARNs
+    ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
@@ -32,9 +39,8 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
-    * Amazon SES Sender identity - email address that you use to send email. 
-    * Amazon SES Receiver identity - email address that will receive email. 
+    * Allow SAM CLI to create IAM roles with the required permissions
+    * Amazon SES Sender identity - email address that you use to send email
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
@@ -42,20 +48,48 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Lambda will be invoked to send an email to Amazon SES.
-This email can contain both plain text and HTML rendering.
+Lambda will be invoked to send an email to Amazon SES. You will be able to customize the email based on the needs of your application by supplying the function with the event contents.
+
+Email address of the Sender(FROM) was already provide in the sam deploy. 
+This email message can contain both plain text and HTML renderings.
+The Body and Subject of the email message are passed into the function in an event.
+The receiver(TO) email address will also be supplied in the event.
+
+
+Event will pass the following:
+* HTMLBody - HTML email body
+* TXTBody - TXT email body
+* Subject - Subject of email
+* ReceiverAddress - The receiver of the email
+
+
 
 All new AWS Accounts are placed in the Amazon SES sandbox environment.  While your account is in the sandbox, you can use all of the features of Amazon SES.  However, the following restrictions are applied:
 * You can only send mail to verified email addresses and domains, or to the Amazon SES mailbox simulator.
 * You can only send mail from verified email addresses and domains. 
 
 
+
 ## Testing
 1. You can test the solution by accessing the Lambda console, finding the Lambda function, and clicking Test in the Code Source section.
 
-1. You can also invoke the function from the CLI using aws lambda invoke --function-name ENTER_FUNCTION_NAME output.txt.
+1. Create a new test event and supply the example event
 
+1. You can also invoke the function from the CLI using (replace YOUR_FUNCTION_NAME & TO_EMAIL_ADDRESS) 
 
+```
+aws lambda invoke --function-name YOUR_FUNCTION_NAME --invocation-type Event --payload  '{"HTMLBody": "HMTL Body Here","TXTBody": "TXT Body Here","Subject": "Subject Line", "ReceiverAddress": "TO_EMAIL_ADDRESS"}' output.txt
+```
+
+Example Event
+```
+{
+  "HTMLBody": "HMTL Body Here",
+  "TXTBody": "TXT Body Here",
+  "Subject": "Subject Line",
+  "ReceiverAddress": "TO_EMAIL_ADDRESS"
+}
+```
 
 ## Cleanup
  
