@@ -1,0 +1,57 @@
+{
+  "title": "Lambda to SES",
+  "description": "Create a Lambda function that sends emails via SES.",
+  "language": "Node.js",
+  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-ses.png",
+  "videoId": "",
+  "level":"100",
+  "framework": "SAM",
+  "services": {
+    "from": "lambda",
+    "to": "SES"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a Lambda function with permission to send an email with Amazon SES.  Specify the Sender/Receiver email addresses and the Lambda function will send an email based on these parameters with Amazon SES."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ses",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/lambda-ses/template.yaml",
+      "readmeURL": ""
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Verifying identities in Amazon SES",
+        "link": "https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-addresses-and-domains.html"
+      },
+      {
+        "text": "Moving out of the Amazon SES sandbox",
+        "link": "https://docs.aws.amazon.com/ses/latest/DeveloperGuide/request-production-access.html"
+      }  
+    ]
+  },
+  "author": {
+    "headline": "Presented by Curtis Darst, Solutions Architect",
+    "name": "Curtis Darst",
+    "imageURL": "https://pbs.twimg.com/profile_images/1390393791488659458/S_dO1BOE_400x400.jpg",
+    "twitter": "curtisdarst",
+    "bio": "Curtis is a Solutions Architect for EDU at Amazon Web Services based in the US. "
+  }
+}
