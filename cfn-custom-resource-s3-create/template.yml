@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: A CloudFormation Custom Resource and a Lambda function to create an S3 object.
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    CodeUri: ./src
+    Runtime: nodejs14.x
+    MemorySize: 128
+    Timeout: 15
+
+Parameters:
+  ExistingS3Bucket:
+    Description: Name of an existing S3 bucket, or leave blank to create a new S3 bucket.
+    Type: String
+    MaxLength: 63
+    AllowedPattern: ^[a-z0-9.-]*$
+
+Conditions: 
+  CreateS3Bucket: !Equals [!Ref ExistingS3Bucket, ""]
+
+Resources:
+  # If an exsiting S3 bucket name was not provided a new S3 bucket will be created
+  NewS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Condition: CreateS3Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # Lambda function to create an S3 object:
+  #   This function would normally be deployed in a separate CloudFormation template.
+  #   Then the function Arn would be referenced in other CloudFormation templates
+  #   as a custom resource whenever an S3 object needs to be created.
+  FunctionS3Create:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: app.handler
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !If [CreateS3Bucket, !Ref NewS3Bucket, !Ref ExistingS3Bucket]
+
+  # Example use of a CloudFormation custom resource:
+  #   This custom resource can be used in other CloudFormation templates after the function above is deployed.
+  #   If the CloudFormation stack is deleted, the S3 object will also be deleted.
+  #   More info: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cfn-customresource.html
+  CustomResourceS3Create:
+    Type: 'Custom::S3Create'
+    Properties:
+      # If this custom resource is used in another CloudFormation template: 
+      #   Modify the ServiceToken property to retrieve the function Arn from CloudFormation Exports.
+      #   For example:  ServiceToken: !ImportValue function-s3-create
+      #   However for this example, the function Arn is retrieved from a resource within this template:
+      ServiceToken: !GetAtt FunctionS3Create.Arn
+      
+      # Define the resource properties that the function requires to create the S3 object:
+      #   The Body property defines the content of the S3 object.
+      #   In this example, an html document named "index.html" is being created.
+      #   The html document includes a variable value that equals the S3 bucket name.
+      Bucket: !If [CreateS3Bucket, !Ref NewS3Bucket, !Ref ExistingS3Bucket]
+      Key: index.html
+      ContentType: text/html # application/json, text/css, text/html, text/plain
+      Body: !Sub
+        - | 
+          <!DOCTYPE html>
+          <head>
+            <title>Index</title>
+          </head>
+          <body>
+            <p>This object was created by using a CloudFormation custom resource.</p>
+            <p>The S3 bucket name is: ${varS3Bucket}</p>
+          </body>
+          </html>
+        - varS3Bucket: !If [CreateS3Bucket, !Ref NewS3Bucket, !Ref ExistingS3Bucket]
+
+Outputs:
+  S3BucketName:
+    Description: Name of the S3 bucket
+    Value: !If [CreateS3Bucket, !Ref NewS3Bucket, !Ref ExistingS3Bucket]
+  FunctionS3CreateArn:
+    Description: Arn of the Lambda function to create an S3 object
+    Value: !GetAtt FunctionS3Create.Arn
+    # The name used to reference the function Arn in CloudFormation Exports:
+    Export:
+      Name: function-s3-create
+  ResponseObjectKey:
+    Description: ObjectKey from Lambda function response
+    Value: !GetAtt CustomResourceS3Create.ObjectKey
