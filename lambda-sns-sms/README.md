@@ -1,6 +1,6 @@
 # AWS Lambda to Amazon SNS
 
-The SAM template deploys a Lambda function with IAM permissions configured to publish an SMS message to a phone number using a 10-digit long code (10DLC). The Lambda function publishes a message to the phone number when invoked. The AWS SAM template deploys the resources and the IAM permissions required to run the application.
+The SAM template deploys a Lambda function with IAM permissions configured to publish an SMS message to a US phone number using a 10-digit long code (10DLC). The Lambda function publishes a message to the phone number when invoked. The AWS SAM template deploys the resources and the IAM permissions required to run the application.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sns-sms/.
 

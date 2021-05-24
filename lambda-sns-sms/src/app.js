@@ -11,7 +11,13 @@ exports.handler = async (event) => {
   const params = {
     Message: `Message at ${Date()}`,
     Subject: 'New message from publisher',
-    PhoneNumber: process.env.phoneNumber
+    PhoneNumber: process.env.phoneNumber,
+    MessageAttributes:{
+      'AWS.MM.SMS.OriginationNumber':{
+        'DataType':'String',
+        'StringValue':process.env.tenDLC
+      }
+    }
   }
   
   // Send to SNS
