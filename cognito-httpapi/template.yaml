@@ -54,7 +54,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Handler: app.hadler
+      Handler: app.handler
       Runtime: nodejs14.x
       Events:
         AppApi:
