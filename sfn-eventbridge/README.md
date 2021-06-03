@@ -52,7 +52,7 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to execute the Step Functions wor
 aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STATE_MACHINE_ARN
 ```
 
-2. View CloudWatch Logs to see events that StepFunctions published to EventBridge:
+2. View CloudWatch Logs to see events that Step Functions published to EventBridge:
 ```bash
 aws logs tail ENTER_YOUR_CLOUDWATCH_LOG_GROUP
 ```
@@ -63,11 +63,13 @@ You should see an event that was delivered to the event bus:
   "version":"0",
   "id":"99c02ee9-53b9-ae01-87cb-18c59081ce73",
   "detail-type":"MyTestMessage",
-  "source":"MyTestApp","account":"123456789012",
+  "source":"MyTestApp",
+  "account":"123456789012",
   "time":"2021-06-03T00:55:46Z",
   "region":"ap-southeast-2",
   "resources": [
-    "arn:aws:states:ap-southeast-2:123456789012:stateMachine:MyStateMachine-BS6NgNCly8Ju","arn:aws:states:ap-southeast-2:123456789012:execution:MyStateMachine-BS6NgNCly8Ju:be1b8b85-24ab-40de-a293-a47f4cc677cb"
+    "arn:aws:states:ap-southeast-2:123456789012:stateMachine:MyStateMachine-BS6NgNCly8Ju",
+    "arn:aws:states:ap-southeast-2:123456789012:execution:MyStateMachine-BS6NgNCly8Ju:be1b8b85-24ab-40de-a293-a47f4cc677cb"
   ],
   "detail": {
     "Message":"Hello from Step Functions!"
