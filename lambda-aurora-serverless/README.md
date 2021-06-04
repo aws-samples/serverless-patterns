@@ -1,4 +1,4 @@
-# AWS Lambda and Amazon Aurora Servlerless
+# AWS Lambda and Amazon Aurora Serverless
 
 This pattern creates an AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret.
 
