@@ -1,4 +1,4 @@
-# Amazon API Gateway HTTP API to AWS Lambda
+# AWS Lambda and Amazon Aurora Servlerless
 
 This pattern creates an AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret.
 
