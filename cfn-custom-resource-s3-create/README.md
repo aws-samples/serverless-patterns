@@ -1,4 +1,4 @@
-# Amazon API Gateway HTTP API to AWS Lambda
+# AWS Lambda to Amazon S3 via a CloudFormation Custom Resource
 
 This pattern creates an Amazon S3 object by using an AWS CloudFormation custom resource and an AWS Lambda function.
 
