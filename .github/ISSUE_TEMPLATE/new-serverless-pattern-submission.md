@@ -1,6 +1,6 @@
 ---
 name: New serverless pattern submission
-about: Describe this issue template's purpose here.
+about: Submit your a new pattern
 title: New pattern submission
 labels: ''
 assignees: jbesw
@@ -8,6 +8,8 @@ assignees: jbesw
 ---
 
 To submit a template to the Serverless Patterns Collection, submit an issue with the following information.
+
+**To learn more about submitting a pattern, read the [publishing guidelines page](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md).**
 
 Use the model template located at https://github.com/aws-samples/serverless-patterns/tree/main/_pattern-model to set up a README, template and any associated code.
 
