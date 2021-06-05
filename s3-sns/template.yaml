@@ -36,5 +36,7 @@ Resources:
             Condition:
               ArnEquals:
                 aws:SourceArn: !Join ["",['arn:aws:s3:::',!Ref SourceBucketName]]
+              StringEquals:
+                aws:SourceAccount: !Ref 'AWS::AccountId'
       Topics:
         - !Ref SNSTopic
