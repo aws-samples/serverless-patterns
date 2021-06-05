@@ -56,10 +56,9 @@ Resources:
             Resource: !GetAtt ResizerQueue.Arn
             Condition:
               ArnLike:
-                "aws:SourceArn": !Join
-                  - ""
-                  - - "arn:aws:s3:::"
-                    - !Ref SourceBucketName
+                aws:SourceArn: !Join ["",['arn:aws:s3:::',!Ref SourceBucketName]]
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
       Queues:
         - Ref: ResizerQueue
 

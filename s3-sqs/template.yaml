@@ -35,8 +35,7 @@ Resources:
               ArnLike:
                 aws:SourceArn: !Join ["",['arn:aws:s3:::',!Ref SourceBucketName]]
               StringEquals:
-                'aws:SourceAccount': !Ref 'AWS::AccountId'
-                 aws:SourceAccount: !Ref AWS::AccountId                
+                aws:SourceAccount: !Ref AWS::AccountId
       Queues:
         - !Ref StandardQueue
 
