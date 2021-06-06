@@ -49,8 +49,8 @@ Resources:
         Statement:
           - Sid: Allow-SendMessage-To-Queue-From-S3-Event-Notification
             Effect: Allow
-            Principal:
-              AWS: "*"
+            Principal: 
+              Service: "s3.amazonaws.com"
             Action:
               - "sqs:SendMessage"
             Resource: !GetAtt ResizerQueue.Arn
