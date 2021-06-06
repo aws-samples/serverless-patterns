@@ -26,8 +26,8 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Principal:
-              AWS: '*'
+            Principal: 
+              Service: "s3.amazonaws.com"
             Action:
               - 'SQS:SendMessage'
             Resource: !GetAtt StandardQueue.Arn
