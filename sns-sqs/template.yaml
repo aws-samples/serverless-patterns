@@ -25,7 +25,8 @@ Resources:
         Statement:
           - Sid: "Allow SNS publish to SQS"
             Effect: Allow
-            Principal: "*"
+            Principal: 
+              Service: "sns.amazonaws.com"
             Resource: !GetAtt MySqsQueue.Arn
             Action: SQS:SendMessage
             Condition:
