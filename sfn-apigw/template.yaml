@@ -62,15 +62,6 @@ Resources:
             Action: "sts:AssumeRole"
       Path: "/"
       Policies:
-        - PolicyName: StatesExecutionPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "cloudwatch:*"
-                  - "logs:*"
-                Resource: "*"
 
         - PolicyName: LambdaExecute
           PolicyDocument:
