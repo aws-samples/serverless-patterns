@@ -1,0 +1,268 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - AppSync to DynamoDB
+
+Parameters:
+  Client:
+    Description: Client website for authentication redirects and cors (must start with https://)
+    Type: String
+    Default: https://myapp.com
+  TestWithPostman:
+    Description: Do you need to test with Postman? (Not recommended for production)
+    Type: String
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+
+Resources:
+  # Creates a nested stack with the required Cognito requirements
+  AuthStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./auth.yaml
+      Parameters:
+        ClientDomain: !Ref Client
+        Postman: !Ref TestWithPostman
+
+  # DynamoDB Table
+  DDBTable:
+    Type: AWS::Serverless::SimpleTable
+
+  # AppSync GraphQL API
+  AppSyncApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: MyAppSyncAPI
+      XrayEnabled: true
+      AuthenticationType: OPENID_CONNECT
+      OpenIDConnectConfig:
+        ClientId: !GetAtt AuthStack.Outputs.UserPoolClientId
+        Issuer: !GetAtt AuthStack.Outputs.Issuer
+
+  # AppSync Data source for DynamoDB
+  AppSyncDDBDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: DDBDataSource
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDDBDataSourceRole.Arn
+      DynamoDBConfig:
+        AwsRegion: !Ref AWS::Region
+        TableName: !Ref DDBTable
+
+  AppSyncDDBDataSourceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "appsync.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: DDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Action:
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:DeleteItem
+              - dynamodb:UpdateItem
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:BatchGetItem
+              - dynamodb:BatchWriteItem
+              Effect: Allow
+              Resource:
+                - !GetAtt DDBTable.Arn
+
+  AppSyncSchema:
+    Type: "AWS::AppSync::GraphQLSchema"
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Definition: |
+        type Note {
+          id: ID!
+          title: String
+          content: String
+        }
+        type PaginatedNotes {
+          notes: [Note!]!
+          nextToken: String
+        }
+        type Query {
+          allNotes(limit: Int, nextToken: String): PaginatedNotes!
+          getNote(id: ID!): Note
+        }
+        type Mutation {
+          saveNote(id: ID!, title: String!, content: String!): Note
+          deleteNote(id: ID!): Note
+        }
+        type Schema {
+          query: Query
+          mutation: Mutation
+        }
+  
+  AppSyncNotesTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: Notes-Table
+      Description: "The Notes Table AppSync Data Source"
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt DAppSyncDDBDataSourceRole.Arn
+      DynamoDBConfig:
+        TableName: !Ref DDBTable
+        AwsRegion: !Sub ${AWS::Region}
+
+  AppSyncAllNotesQueryResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: AppSyncSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Query
+      FieldName: allNotes
+      DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "operation": "Query",
+          "query": {
+            "expression": "id = :id",
+            "expressionValues": {
+              ":id": $util.dynamodb.toDynamoDBJson($ctx.identity.sub)
+            }
+          }
+        },
+        "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
+        "nextToken": $util.toJson(${ctx.args.nextToken})
+      ResponseMappingTemplate: |
+        {
+          "notes": $util.toJson($ctx.result.items),
+          "nextToken": $util.toJson(${ctx.args.nextToken})
+        }
+
+  AppSyncGetNoteQueryResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: AppSyncSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Query
+      FieldName: getNote
+      DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2012-02-28",
+          "operation": "GetItem",
+          "key": {
+            "NoteId": $util.dynamodb.toDynamoDBJson($ctx.args.NoteId),
+
+            "UserId": $util.dynamodb.toDynamoDBJson($ctx.identity.sub)
+
+          }
+
+        }
+
+      ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+
+
+  AppSyncSaveNoteMutationResolver:
+
+    Type: "AWS::AppSync::Resolver"
+
+    DependsOn: AppSyncSchema
+
+    Properties:
+
+      ApiId: !GetAtt AppSyncApi.ApiId
+
+      TypeName: Mutation
+
+      FieldName: saveNote
+
+      DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+
+      RequestMappingTemplate: |
+
+        {
+
+          "version": "2012-02-28",
+
+          "operation": "PutItem",
+
+          "key": {
+
+            "NoteId": $util.dynamodb.toDynamoDBJson($ctx.args.NoteId),
+
+            "UserId": $util.dynamodb.toDynamoDBJson($ctx.identity.sub)
+
+          },
+
+          "attributeValues": {
+
+            "title": $util.dynamodb.toDynamoDBJson($ctx.args.title),
+
+            "content": $util.dynamodb.toDynamoDBJson($ctx.args.content)
+
+          }
+
+        }
+
+      ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+
+
+  AppSyncDeleteNoteMutationResolver:
+
+    Type: "AWS::AppSync::Resolver"
+
+    DependsOn: AppSyncSchema
+
+    Properties:
+
+      ApiId: !GetAtt AppSyncApi.ApiId
+
+      TypeName: Mutation
+
+      FieldName: deleteNote
+
+      DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+
+      RequestMappingTemplate: |
+
+        {
+
+          "version": "2012-02-28",
+
+          "operation": "DeleteItem",
+
+          "key": {
+
+            "NoteId": $util.dynamodb.toDynamoDBJson($ctx.args.NoteId),
+
+            "UserId": $util.dynamodb.toDynamoDBJson($ctx.identity.sub)
+
+          }
+
+        }
+
+      ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+
+# In this section, list all common outputs for usage
+Outputs:
+  AppApiEndpoint:
+    Description: API Endpoint
+    Value: !GetAtt AppSyncApi.GraphQLUrl
+  AuthUrl:
+    Description: Url used to authenticate
+    Value: !GetAtt AuthStack.Outputs.AuthUrl
+  ClientId:
+    Description: Application client ID
+    Value: !GetAtt AuthStack.Outputs.UserPoolClientId
