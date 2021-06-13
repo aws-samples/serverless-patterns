@@ -1,8 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# AWS AppAync to Amazon DynamoDB
 
-This pattern << explain usage >>
+This pattern creates an AppSync API with a schems and a resolver to a DynamoDB table.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland/patterns/appsync-dynamodb
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd serverless-patterns/appsync-dynamodb
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -38,11 +38,12 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+This template creates an AppSync api tat uses a DynamoDB resolver. The demo application is a simple notes application.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+The easiest way to test the AppSync API is with the AppSync console at https://us-west-2.console.aws.amazon.com/appsync/home (change to your appropriate region)
+![AppSync Console](./console.png)
 
 ## Cleanup
  
