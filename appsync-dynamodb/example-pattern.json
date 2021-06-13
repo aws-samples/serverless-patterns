@@ -1,19 +1,19 @@
 {
-  "title": "Lambda to EventBridge",
-  "description": "Create a Lambda function that sends events to EventBridge.",
-  "language": "Node.js",
-  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
+  "title": "AppSyc to DynamoDB",
+  "description": "Create an AWS AppSync api endpoint with a resolver to Amazon DynamoDB",
+  "language": "Transormation template",
+  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-appsync-to-dynamodb.png",
   "videoId": "",
-  "level":"100",
+  "level":"300",
   "framework": "SAM",
   "services": {
-    "from": "lambda",
-    "to": "eventbridge"
+    "from": "appsync",
+    "to": "dynamodb"
   },
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The SAM template deploys a Lambda function with permission to publish events to EventBridge. The Lambda function publishes an event to the default bus in EventBridge when invoked."
+      "The SAM template deploys an AppSync api, a DynamoDB table, a GraphQL schema and multiple resolvers to the DynamoDB table."
     ]
   },
   "deploy": {
@@ -23,8 +23,8 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge",
-      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/lambda-eventbridge/template.yaml",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-dynamodb",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/appsync-dynamodb/template.yaml",
       "readmeURL": ""
     },
     "payloads": [
@@ -36,22 +36,13 @@
   },
   "resources": {
     "headline": "Additional resources",
-    "bullets": [
-      {
-        "text": "Integrating Amazon EventBridge into your serverless applications",
-        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
-      },
-      {
-        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
-        "link": "https://serverlessland.com/learn/eventbridge"
-      }      
-    ]
+    "bullets": []
   },
   "author": {
-    "headline": "Presented by James Beswick, Developer Advocate",
-    "name": "James Beswick",
+    "headline": "Presented by Eric Johnson, Developer Advocate",
+    "name": "Eric Johnson",
     "imageURL": "https://pbs.twimg.com/profile_images/1165718285754753025/OrGcUHER_400x400.jpg",
-    "twitter": "jbesw",
-    "bio": "James is a senior developer advocate for Serverless Applications at Amazon Web Services based in the US. Prior to joining AWS Ben worked in a number of different technical roles specializing in workflow Automation and web development."
+    "twitter": "edjgeek",
+    "bio": "Eric is a Principal Developer Advocate for Serverless Applications at Amazon Web Services and is based in Northern Colorado. Eric is a fanatic about serverless and enjoys helping developers understand how serverless technologies introduces a major paradigm shift in how they approach building and running applications at massive scale with minimal administration overhead. Prior to this, Eric has worked as a developer, solutions architect and AWS Evangelist for an AWS partner company."
   }
 }
