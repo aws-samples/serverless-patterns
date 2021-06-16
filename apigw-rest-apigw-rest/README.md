@@ -38,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates a public Amazon API Gateway REST API endpoint that proxies two secondary API Gateway REST API endpoints. The primary gateway inserts a header that is validated by the secondary endpoints. Traffic is restricted to only requests coming through the orimary API. This pattern allows centralized authorization, caching, throttling, and other API configurations.
+This pattern creates a public Amazon API Gateway REST API endpoint that proxies two secondary API Gateway REST API endpoints. The primary gateway inserts an API Key that is validated by the secondary endpoints. Traffic is restricted to only requests coming through the primary API. This pattern allows centralized authorization, caching, throttling, and other API configurations.
 
 ## Testing
 
