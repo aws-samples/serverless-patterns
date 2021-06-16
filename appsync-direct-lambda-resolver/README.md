@@ -51,6 +51,18 @@ You can test your AppSync API and Direct Lambda resolver by running a query from
 
 ![](test_query.png)
 
+You can run a query directly from your terminal:
+
+```
+# install curl. https://curl.se/
+# optional: install jq. https://stedolan.github.io/jq/
+# replace <graphqlUrl> and <apiKey> with the outputs values from `cdk deploy`
+curl --location --request POST '<graphqlUrl>' \
+--header 'x-api-key: <apiKey>' \
+--header 'Content-Type: application/json' \
+--data-raw '{"query":"query list { listTodos { items { id  name } } }","variables":{}}' | jq
+```
+
 ## Cleanup
 
 Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.

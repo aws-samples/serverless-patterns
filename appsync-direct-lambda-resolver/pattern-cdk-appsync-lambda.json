@@ -2,7 +2,7 @@
   "title": "AppSync to Lambda",
   "description": "Create an AppSync API with a direct Lambda resolver",
   "language": "Node.js",
-  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-appsync-direct-lambda-resolver.png",
+  "architectureURL": "patterns-appsync-direct-lambda-resolver.png",
   "videoId": "",
   "level": "100",
   "framework": "CDK",
@@ -40,8 +40,8 @@
     ]
   },
   "author": {
-    "headline": "Presented by Brice Pelle and Ami Patel",
-    "name": "Brice Pelle, Ami Patel",
-    "bio": "Brice is a Principal Solutions Archiect for AWS AppSync and Ami is a Cloud Applications Architect at Amazon Web Services."
+    "headline": "Presented by Ami Patel",
+    "name": "Ami Patel",
+    "bio": "Cloud Applications Architect @ AWS"
   }
 }
