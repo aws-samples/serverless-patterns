@@ -18,7 +18,7 @@ paths:
           default:
             statusCode: "200"
         requestParameters:
-          integration.request.header.x-api-key: {"Fn::Sub":["'${APIHeader}'",{"APIHeader": { "Ref": "ReportingApiApiKey"}}]}
+          integration.request.header.x-api-key: {"Fn::Sub":["'${APIHeader}'",{"APIHeader": { "Ref": "ApiKeyValue"}}]}
         passthroughBehavior: "when_no_match"
         type: "http_proxy"
   /admin/users:
@@ -37,7 +37,7 @@ paths:
           default:
             statusCode: "200"
         requestParameters:
-          integration.request.header.x-api-key: {"Fn::Sub":["'${APIHeader}'",{"APIHeader": { "Ref": "UserManagementApiApiKey"}}]}
+          integration.request.header.x-api-key: {"Fn::Sub":["'${APIHeader}'",{"APIHeader": { "Ref": "ApiKeyValue"}}]}
         passthroughBehavior: "when_no_match"
         type: "http_proxy"
 components:

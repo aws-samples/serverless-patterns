@@ -2,30 +2,20 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Centralized API
 
-Globals:
-  # Create a 
-  Api:
-    Auth:
-      ApiKeyRequired: true
-      UsagePlan:
-        CreateUsagePlan: PER_API # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-apiusageplan.html
+Parameters:
+  ApiKeyValue:
+    Type: String
+    Description: Value for the API keys
 
 Resources:
   ## Centralized primary API
   PrimaryApi:
     Type: AWS::Serverless::Api
-    DependsOn:
-      - ReportingApi
-      - UserManagementApi
     Properties:
       Description: Centralized API
       StageName: Prod
       EndpointConfiguration:
         Type: REGIONAL
-      Auth:
-        ApiKeyRequired: false
-        UsagePlan:
-          CreateUsagePlan: NONE
       DefinitionBody:
         'Fn::Transform':
           Name: 'AWS::Include'
@@ -37,20 +27,47 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: Reporting API
-      Description: Reporting API
       StageName: Prod
       EndpointConfiguration:
         Type: REGIONAL
+      Auth:
+        ApiKeyRequired: true
                   
   ## User management application API Endpoint
   UserManagementApi:
     Type: AWS::Serverless::Api
     Properties:
       Name: User Management API
-      Description: User Management API
       StageName: Prod
       EndpointConfiguration:
         Type: REGIONAL
+      Auth:
+        ApiKeyRequired: true
+
+  ApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Value: !Ref ApiKeyValue
+      Enabled: true
+
+  UsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn:
+      - ReportingApiProdStage
+      - UserManagementApiProdStage
+    Properties:
+      ApiStages:
+        - ApiId: !Ref ReportingApi
+          Stage: Prod
+        - ApiId: !Ref UserManagementApi
+          Stage: Prod
+
+  UsagePlanMapReporting:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties: 
+      KeyId: !Ref ApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref UsagePlan
                   
   ## Reporting application Lambda function
   ReportingFunction:
@@ -98,6 +115,3 @@ Outputs:
   PrimaryApiEndpoint:
     Description: Primary API endpoint
     Value: !Sub "https://${PrimaryApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
-  ApiKey:
-    Description: API Key Value
-    Value: !GetAtt ReportingApiApiKey.APIKeyId
