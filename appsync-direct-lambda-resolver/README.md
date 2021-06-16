@@ -23,7 +23,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 
 2. Change the working directory to this pattern's directory
 ```
-cd appsync-patterns/bricep-cdk-appsync-direct-lambda-resolver
+cd appsync-direct-lambda-resolver/cdk
 ```
 
 3. Install dependencies
