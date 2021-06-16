@@ -38,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This template creates an AppSync api tat uses a DynamoDB resolver. The demo application is a simple notes application.
+This template creates an AppSync api that uses a DynamoDB resolver. The demo application is a simple notes application.
 
 ## Testing
 
