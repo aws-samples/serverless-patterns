@@ -2,20 +2,30 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Centralized API
 
-Parameters:
-  ValidationKey:
-    Description: "Header value inserted on central API and validated on sub APIs"
-    Type: String
+Globals:
+  # Create a 
+  Api:
+    Auth:
+      ApiKeyRequired: true
+      UsagePlan:
+        CreateUsagePlan: PER_API # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-apiusageplan.html
 
 Resources:
   ## Centralized primary API
   PrimaryApi:
     Type: AWS::Serverless::Api
+    DependsOn:
+      - ReportingApi
+      - UserManagementApi
     Properties:
-      Name: Centralized-Primary
+      Description: Centralized API
       StageName: Prod
       EndpointConfiguration:
         Type: REGIONAL
+      Auth:
+        ApiKeyRequired: false
+        UsagePlan:
+          CreateUsagePlan: NONE
       DefinitionBody:
         'Fn::Transform':
           Name: 'AWS::Include'
@@ -26,47 +36,21 @@ Resources:
   ReportingApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: Centralized-ReportingApi
+      Name: Reporting API
+      Description: Reporting API
       StageName: Prod
       EndpointConfiguration:
         Type: REGIONAL
-      Auth:
-        ResourcePolicy:
-          CustomStatements:
-            - Effect: Allow
-              Principal: '*'
-              Action: 'execute-api:Invoke'
-              Resource: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/Prod/GET/'
-            - Effect: Deny
-              Principal: '*'
-              Action: 'execute-api:Invoke'
-              Resource: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/Prod/GET/'
-              Condition:
-                StringNotEquals:
-                  'aws:Referer': !Ref ValidationKey
                   
   ## User management application API Endpoint
   UserManagementApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: Centralized-UserManagementApi
+      Name: User Management API
+      Description: User Management API
       StageName: Prod
       EndpointConfiguration:
         Type: REGIONAL
-      Auth:
-        ResourcePolicy:
-          CustomStatements:
-            - Effect: Allow
-              Principal: '*'
-              Action: 'execute-api:Invoke'
-              Resource: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:*/Prod/GET/'
-            - Effect: Deny
-              Principal: '*'
-              Action: 'execute-api:Invoke'
-              Resource: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:*/Prod/GET/'
-              Condition:
-                StringNotEquals:
-                  'aws:Referer': !Ref ValidationKey
                   
   ## Reporting application Lambda function
   ReportingFunction:
@@ -114,3 +98,6 @@ Outputs:
   PrimaryApiEndpoint:
     Description: Primary API endpoint
     Value: !Sub "https://${PrimaryApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  ApiKey:
+    Description: API Key Value
+    Value: !GetAtt ReportingApiApiKey.APIKeyId
