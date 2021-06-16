@@ -1,6 +1,6 @@
 # Amazon API Gateway REST API to Amazon API Gateway REST API
 
-This pattern creates a primary API that centralizes configuration and proxies sub API endpoints while keeping the connection secure.
+This pattern creates a primary API that centralizes configuration and securely proxies sub API endpoints.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland/patterns/apigateway-rest-rest
 
