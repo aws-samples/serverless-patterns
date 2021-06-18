@@ -1,0 +1,29 @@
+type Todo {
+  id: ID!
+  name: String!
+  description: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type ModelTodoConnection {
+  items: [Todo]
+  nextToken: String
+}
+
+type Query {
+  getTodo(id: ID!): Todo
+  listTodos(limit: Int, nextToken: String): ModelTodoConnection
+}
+
+type Mutation {
+  createTodo(id: ID, name: String!, description: String): Todo
+  updateTodo(id: ID!, name: String, description: String): Todo
+  deleteTodo(id: ID!): Todo
+}
+
+type Subscription {
+  onCreateTodo: Todo @aws_subscribe(mutations: ["createTodo"])
+  onUpdateTodo: Todo @aws_subscribe(mutations: ["updateTodo"])
+  onDeleteTodo: Todo @aws_subscribe(mutations: ["deleteTodo"])
+}
