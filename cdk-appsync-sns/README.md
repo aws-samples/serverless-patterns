@@ -40,13 +40,7 @@ Important: this application uses various AWS services and there are costs associ
    npm run build
    ```
 
-5. Synthesize CloudFormation template from the AWS CDK app
-
-   ```sh
-   cdk synth
-   ```
-
-6. Deploy the stack to your default AWS account and region. The output of this command shows the GraphQL API id, URL, and API Key for your AppSync API, and the name of your SNS topic.
+5. Deploy the stack to your default AWS account and region. The output of this command shows the GraphQL API id, URL, and API Key for your AppSync API, and the name of your SNS topic.
 
    ```sh
    cdk deploy
