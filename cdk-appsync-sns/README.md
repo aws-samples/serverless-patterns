@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
 2. Change the working directory to this pattern's directory
 
    ```sh
-   cd appsync-sns/cdk
+   cd cdk-appsync-sns/cdk
    ```
 
 3. Install dependencies
