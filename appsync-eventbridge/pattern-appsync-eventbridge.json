@@ -2,7 +2,7 @@
   "title": "AppSync to EventBridge",
   "description": "Create an AppSync API with EventBridge as HTTP data source",
   "language": "Node.js",
-  "architectureURL": "patterns-appsync-eventbridge.png",
+  "architectureURL": "architecture-appsync-eventbridge.png",
   "videoId": "",
   "level": "100",
   "framework": "CDK",
