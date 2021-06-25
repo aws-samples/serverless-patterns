@@ -1,8 +1,8 @@
-# AppSync HTTP resolver to SNS
+# AppSync HTTP resolver to SQS
 
-This project contains a sample AWS CDK template for using [AWS AppSync](https://aws.amazon.com/appsync/) with [AWS SNS](https://aws.amazon.com/sns/) as an HTTP data source.
+This project contains a sample AWS CDK template for using [AWS AppSync](https://aws.amazon.com/appsync/) with [AWS SQS](https://aws.amazon.com/sqs/) as an HTTP data source.
 
-In the given pattern, AWS AppSync provides a `publish` query that sends a message to the configured SNS topic. The query returns the response MessageId, and the SequenceNumber if using a  FIFO (first-in-first-out) topic.
+In the given pattern, AWS AppSync provides a `sendMessage` query that sends a message to the configured SQS queue. The query returns the response MessageId, and the MD5OfMessageBody of the response.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
 2. Change the working directory to this pattern's directory
 
    ```sh
-   cd cdk-appsync-sns/cdk
+   cd cdk-appsync-sqs/cdk
    ```
 
 3. Install dependencies
@@ -40,7 +40,7 @@ Important: this application uses various AWS services and there are costs associ
    npm run build
    ```
 
-5. Deploy the stack to your default AWS account and region. The output of this command shows the GraphQL API id, URL, and API Key for your AppSync API, and the name of your SNS topic.
+5. Deploy the stack to your default AWS account and region. The output of this command shows the GraphQL API id, URL, and API Key for your AppSync API, and the name of your queue URL of your SQS queue.
 
    ```sh
    cdk deploy
@@ -48,9 +48,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Test
 
-You can test your AppSync API and publishing to your SNS topic from the console.
+You can test your AppSync API and send a message to your queue from the console.
 
-![test 'publish' in the console](console.png)
+![test 'sendMessage' in the console](console.png)
 
 You can run a query directly from your terminal:
 
@@ -61,7 +61,7 @@ You can run a query directly from your terminal:
 curl --location --silent --request POST '<graphqlUrl>' \
 --header 'x-api-key: <apiKey>' \
 --header 'Content-Type: application/json' \
---data-raw '{"query":"query Publish { publish(from: \"me\", message: \"hello world\") { MessageId SequenceNumber }}"}' | jq
+--data-raw '{"query":"query SendMessage { sendMessage(action: \"say\", message: \"hello world\") { MessageId MD5OfMessageBody }}"}' | jq
 ```
 
 ## Cleanup

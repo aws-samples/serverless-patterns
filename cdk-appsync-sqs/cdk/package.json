@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@aws-cdk/aws-appsync": "1.110.0",
-    "@aws-cdk/aws-sns": "1.110.0",
+    "@aws-cdk/aws-sqs": "1.110.0",
     "@aws-cdk/core": "1.110.0"
   }
 }
