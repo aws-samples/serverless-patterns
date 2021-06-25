@@ -17,7 +17,7 @@
     ]
   },
   "deploy": {
-    "text": ["See the Github repo for detailed instructions"]
+    "text": ["cdk deploy"]
   },
   "gitHub": {
     "template": {
