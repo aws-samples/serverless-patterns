@@ -47,7 +47,7 @@ cdk deploy
 
 You can test your AppSync API and Direct Lambda resolver by running a query from AWS AppSync console.
 
-![](sample_mutation.png)
+![](mutation.png)
 
 You can run a query directly from your terminal:
 
