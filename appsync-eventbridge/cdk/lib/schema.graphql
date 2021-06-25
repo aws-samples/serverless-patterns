@@ -1,13 +1,20 @@
-type Event {
-	result: String
+type EventDetails {
+	EventId: String
+	ErrorMessage: String
+	ErrorCode: String
 }
 
 type Mutation {
-	putEvent(event: String!): Event
+	putEvent(event: String!): Result
 }
 
 type Query {
-	getEvent: Event
+	getEvent: String
+}
+
+type Result {
+	Entries: [EventDetails]
+	FailedEntries: Int
 }
 
 schema {
