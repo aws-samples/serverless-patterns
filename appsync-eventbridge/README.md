@@ -1,4 +1,4 @@
-# AppSync Direct Lambda resolvers
+# AppSync EventBridge
 
 This project contains a sample pattern for using an Amazon EventBridge event bus as a HTTP data source with an AWS AppSync API. The given CDK template creates an AppSync API, an event bus and an IAM role that allows your API to add events to the event bus.
 
