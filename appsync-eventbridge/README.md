@@ -58,7 +58,7 @@ You can run a query directly from your terminal:
 curl --location --request POST '<graphqlUrl>' \
 --header 'x-api-key: <apiKey>' \
 --header 'Content-Type: application/json' \
---data-raw '{"mutation":"mutation add { putEvent(event:"Sample event") { result } }","variables":{}}' | jq
+--data-raw '{"mutation":"mutation add { putEvent(event:"Sample event") { Entries { EventId ErrorCode ErrorMessage    } FailedEntries } }","variables":{}}' | jq
 ```
 
 ## Cleanup
