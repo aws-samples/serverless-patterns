@@ -1,0 +1,16 @@
+type Event {
+	result: String
+}
+
+type Mutation {
+	putEvent(event: String!): Event
+}
+
+type Query {
+	getEvent: Event
+}
+
+schema {
+	query: Query
+	mutation: Mutation
+}
