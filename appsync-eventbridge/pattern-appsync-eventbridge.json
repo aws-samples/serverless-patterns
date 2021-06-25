@@ -1,8 +1,8 @@
 {
-  "title": "AppSync to Lambda",
-  "description": "Create an AppSync API with a direct Lambda resolver",
+  "title": "AppSync to EventBridge",
+  "description": "Create an AppSync API with EventBridge as HTTP data source",
   "language": "Node.js",
-  "architectureURL": "patterns-appsync-direct-lambda-resolver.png",
+  "architectureURL": "patterns-appsync-eventbridge.png",
   "videoId": "",
   "level": "100",
   "framework": "CDK",
