@@ -1,0 +1,129 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless patterns - REST API Gateway to Step Function
+
+Resources:
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+  WaitableStateMachine:
+    Type: AWS::Serverless::StateMachine 
+    Properties:
+      DefinitionUri: statemachine/waitable-stepfunction.asl.json
+      DefinitionSubstitutions:
+        DDBTable: !Ref StatusTable
+      Policies: 
+        - DynamoDBWritePolicy:
+            TableName: !Ref StatusTable
+
+##########################################################################
+#   DYNAMODB TABLE                                                       #
+##########################################################################
+  StatusTable:
+    Type: AWS::Serverless::SimpleTable 
+    Properties:
+      PrimaryKey:
+        Name: Id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+##########################################################################
+#   API GATEWAY ROLE WITH PERMISSIONS TO START EXECUTING STEP FUNCTION   #
+##########################################################################
+  ApiGatewayStepFunctionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: !Join ["", ["/", !Ref "AWS::StackName", "/"]]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowApiGatewayServiceToAssumeRole
+            Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: CallStepFunctions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'states:StartExecution'
+                Resource:
+                  - !Ref WaitableStateMachine
+  
+##########################################################################
+#   REST API GATEWAY                                                     #
+##########################################################################
+  apiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Name: !Sub ${AWS::StackName}-api
+
+##########################################################################
+#   API GATEWAY METHOD                                                   #
+##########################################################################
+  apiGatewayRootMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS
+        Credentials: !GetAtt ApiGatewayStepFunctionsRole.Arn 
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:states:action/StartExecution
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates: 
+          application/json: !Sub 
+            - |- 
+              #set($data = $util.escapeJavaScript($input.json('$'))) 
+              { 
+                "input": "$data", 
+                "stateMachineArn": "${StateMachineArn}"
+              }
+            - { StateMachineArn: !Ref WaitableStateMachine }
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: ''
+      ResourceId: !GetAtt apiGateway.RootResourceId
+      RestApiId: !Ref apiGateway
+
+##########################################################################
+#   API GATEWAY DEPLOYMENT                                               #
+##########################################################################
+  apiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - apiGatewayRootMethod
+    Properties:
+      RestApiId: !Ref apiGateway
+      StageName: 'dev'
+      
+##########################################################################
+#   OUTPUTS                                                              #
+##########################################################################
+Outputs:
+  WaitableStateMachineArn:
+    Description: "Waitable state machine ARN"
+    Value: !Ref WaitableStateMachine
+  WaitableStateMachineRole:
+    Description: "IAM Role created for waitable state machine based on the specified SAM Policy Templates"
+    Value: !GetAtt WaitableStateMachineRole.Arn
+
+
+
