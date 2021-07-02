@@ -22,7 +22,7 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-east-1:122975045562:cluster/lambda-demo-cluster/be149692-0e6b-4087-874b-bb0d8d29453d-2
+            Stream: arn:aws:kafka:us-east-1:123456789012:cluster/my-cluster/12abcd12-1234-1234-1234-1234abcd1234-1
             Topics:
               - ServerlessTopic
       Policies:
