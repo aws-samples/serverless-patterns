@@ -1,0 +1,46 @@
+{
+  "title": "Lambda to AppSync",
+  "description": "Create a Lambda function that calls an AppSync GraphQL API",
+  "language": "Node.js",
+  "architectureURL": "pattern-cdk-lambda-appsync.png",
+  "level": "100",
+  "framework": "CDK",
+  "services": {
+    "from": "lambda",
+    "to": "appsync"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application deploys a Lambda function and AppSync API. The amplify CLI `codegen` feature is used to create typescript code that the Lambda function uses to call the AppSync GraphQL API. A mutation called on the API triggers subscriptions. "
+    ]
+  },
+  "deploy": {
+    "text": ["See the Github repo for detailed instructions"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-lambda-appsync",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/cdk-lambda-appsync/cdk/lib/main.ts",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-lambda-appsync/README.md"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Simplify access to multiple microservices with AWS AppSync and AWS Amplify",
+        "link": "https://aws.amazon.com/blogs/mobile/appsync-microservices/"
+      },
+      {
+        "text": "Exporting AppSync operations to a Lambda layer for easy reuse",
+        "link": "https://docs.amplify.aws/guides/functions/appsync-operations-to-lambda-layer/q/platform/js"
+      }
+    ]
+  },
+  "author": {
+    "headline": "Presented by Brice Pellé",
+    "name": "Brice Pellé",
+    "bio": "Principal Solution Architect - AppSync @ AWS"
+  }
+}
