@@ -1,4 +1,4 @@
-# AWS AppAync to Amazon DynamoDB
+# AWS AppSync to Amazon DynamoDB
 
 This pattern creates an AppSync API with a schems and a resolver to a DynamoDB table.
 
