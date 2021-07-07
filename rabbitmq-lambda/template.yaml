@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: ARMQ Example
+
+Resources:
+  MQBroker:
+    Type: AWS::AmazonMQ::Broker
+    Properties: 
+      AutoMinorVersionUpgrade: false
+      BrokerName: myQueue
+      DeploymentMode: SINGLE_INSTANCE
+      EngineType: RABBITMQ
+      EngineVersion: "3.8.11"
+      HostInstanceType: mq.m5.large
+      PubliclyAccessible: true
+      Users:
+        - Password: '{{resolve:secretsmanager:MQAccess:SecretString:password}}'
+          Username: '{{resolve:secretsmanager:MQAccess:SecretString:username}}'
+          
+  MQConsumer:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Timeout: 3
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Resource: '*'
+              Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeVpcs
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            Broker: !GetAtt MQBroker.Arn
+            Queues:
+              - myQueue
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: <your_secret_arn>                
