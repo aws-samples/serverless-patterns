@@ -1,6 +1,6 @@
 # RabbitMQ to AWS Lambda
 
-The SAM template deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. SQS invokes the Lambda function when new messages are available.
+The SAM template deploys a Lambda function, a RabbitMQ queue and the IAM permissions required to run the application. RabbitMQ invokes the Lambda function when new messages are available.
 
 Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/rabbitmq-lambda](https://serverlessland.com/patterns/rabbitmq-lambda)
 
