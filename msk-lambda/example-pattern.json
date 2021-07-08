@@ -38,12 +38,12 @@
     "headline": "Additional resources",
     "bullets": [
       {
-        "text": "Integrating Amazon EventBridge into your serverless applications",
-        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+        "text": "Using Lambda with Amazon MSK",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
       },
       {
-        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
-        "link": "https://serverlessland.com/learn/eventbridge"
+        "text": "Using Amazon MSK as an event source for AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-msk-as-an-event-source-for-aws-lambda/"
       }      
     ]
   },
