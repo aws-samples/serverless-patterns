@@ -1,0 +1,14 @@
+{
+    "prefix": "PrivateAPIGateway",
+    "description": "A VPC Lambda to get request from API Gateway Private API with CDK",
+    "api": {
+      "handler": "ProxyLambda"
+    },
+    "headers": {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      "tags": [
+        {"key": "Key", "value": "Value"},
+        {"key": "Project", "value": "PrivateAPIGateway"}
+      ]
+  } 
