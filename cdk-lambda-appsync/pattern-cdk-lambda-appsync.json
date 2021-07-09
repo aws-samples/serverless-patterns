@@ -12,7 +12,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This CDK application deploys a Lambda function and AppSync API. The amplify CLI `codegen` feature is used to create typescript code that the Lambda function uses to call the AppSync GraphQL API. A mutation called on the API triggers subscriptions. "
+      "This CDK application deploys a Lambda function and AppSync API. The amplify CLI `codegen` feature is used to create typescript code that the Lambda function uses to call the AppSync GraphQL API. A mutation called on the API triggers subscriptions."
     ]
   },
   "deploy": {
@@ -28,6 +28,10 @@
   "resources": {
     "headline": "Additional resources",
     "bullets": [
+      {
+        "text": "Exporting AppSync operations to a Lambda layer for easy reuse",
+        "link": "https://docs.amplify.aws/guides/functions/appsync-operations-to-lambda-layer/q/platform/js"
+      },
       {
         "text": "Simplify access to multiple microservices with AWS AppSync and AWS Amplify",
         "link": "https://aws.amazon.com/blogs/mobile/appsync-microservices/"

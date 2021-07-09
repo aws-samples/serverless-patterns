@@ -2,7 +2,7 @@
 
 This project contains a sample AWS CDK template for calling [AWS AppSync](https://aws.amazon.com/appsync/) from an [AWS Lambda](https://aws.amazon.com/function/).
 
-In the given pattern, AWS AppSync provides a a schema that allows you to manage and read todos. A Lambda function is created that can interact with the GraphQL API. This function can create todos by using the codegen generated from the schema by the Amplify CLI.
+In the given pattern, AWS AppSync provides a a schema that allows you to manage and read todos. A Lambda function is created that can interact with the GraphQL API. This function can create todos by using the codegen generated from the schema by the [Amplify CLI codegen](https://docs.amplify.aws/cli).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -13,6 +13,10 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
+
+Make sure you install the Amplify CLI:
+
+* [Amplify CLI](https://docs.amplify.aws/cli/start/install): `npm install -g @aws-amplify/cli`
 
 ## Deploy
 
@@ -28,20 +32,13 @@ Important: this application uses various AWS services and there are costs associ
    cd cdk-lambda-appsync/cdk
    ```
 
-3. Install dependencies. This project uses the [amplify cli](https://github.com/aws-amplify/amplify-cli) to generate code from the schema.
+3. Install the project dependencies
 
    ```sh
-   npm install -g @aws-amplify/cli
    npm install
    ```
 
-4. This project uses typescript as client language for AWS CDK. Run the given command to compile typescript to javascript
-
-   ```sh
-   npm run build
-   ```
-
-5. Deploy the stack to your default AWS account and region. The output of this command shows the GraphQL API id, URL, and the lambda function ARN and name.
+4. Deploy the stack to your default AWS account and region. The output of this command shows the GraphQL API id, URL, and the lambda function ARN and name.
 
    ```sh
    cdk deploy
@@ -74,8 +71,9 @@ cdk destroy
 
 ## References
 
-1. [Simplify access to multiple microservices with AWS AppSync and AWS Amplify](https://aws.amazon.com/blogs/mobile/appsync-microservices/)
-2. [https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html](https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html)
+1. [Exporting AppSync operations to a Lambda layer for easy reuse](https://docs.amplify.aws/guides/functions/appsync-operations-to-lambda-layer/q/platform/js)
+2. [Simplify access to multiple microservices with AWS AppSync and AWS Amplify](https://aws.amazon.com/blogs/mobile/appsync-microservices/)
+3. [Tutorial: HTTP Resolvers](https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html)
 
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
