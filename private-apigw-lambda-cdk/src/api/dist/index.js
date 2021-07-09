@@ -1,0 +1,43 @@
+var __defProp = Object.defineProperty;
+var __markAsModule = (target) => __defProp(target, "__esModule", {value: true});
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, {get: all[name], enumerable: true});
+};
+
+// api/lambda/index.ts
+__markAsModule(exports);
+__export(exports, {
+  ProxyLambda: () => handler
+});
+
+// api/config.json
+var prefix = "PrivateAPISample";
+var description = "Sample VPC Lambda to get request from API Gateway Private API with CDK";
+var api = {
+  handler: "ProxyLambda"
+};
+var headers = {
+  "Content-Type": "text/plain;charset=utf-8"
+};
+var tags = [
+  {key: "Key", value: "Value"},
+  {key: "Project", value: "PrivateAPISample"}
+];
+var config_default = {
+  prefix,
+  description,
+  api,
+  headers,
+  tags
+};
+
+// api/lambda/api-handler.ts
+var handler = async (event) => {
+  return {
+    body: `Success for path: "${event.path}"`,
+    headers: config_default.headers,
+    statusCode: 200
+  };
+};
+//# sourceMappingURL=index.js.map
