@@ -1,8 +1,8 @@
-# AWS AppSync to Amazon DynamoDB
+# Amazon Managed Streaming for Apache Kafka (Amazon MSK) to AWS Lambda
 
-This pattern creates an AppSync API with a schema and a resolver to a DynamoDB table.
+This pattern deploys a Lambda function that uses an Amazon MSK topic as an event source.
 
-Learn more about this pattern at ServerlessLand Patterns: https://serverlessland.com/patterns/appsync-dynamodb
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/msk-lambda
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/appsync-dynamodb
+    cd msk-lambda
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -38,13 +38,43 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This template creates an AppSync api that uses a DynamoDB resolver. The demo application is a simple notes application.
+Lambda is a consumer application for your Kafka topic. It processes records from one or more partitions and sends the payload to the target function. Lambda continues to process batches until there are no more messages in the topic.
+
+Lambda internally polls for new messages from the event source and then synchronously invokes the target Lambda function. Lambda reads the messages in batches and provides these to your function as an event payload. The maximum batch size is configurable. (The default is 100 messages.) 
+
+The Lambda function’s event payload contains an array of records. Each array item contains details of the topic and Kafka partition identifier, together with a timestamp and base64 encoded message:
+
+```
+{   "eventSource": "aws:kafka",
+    "eventSourceArn": "arn:aws:kafka:sa-east-1:123456789012:cluster/vpc-2priv-2pub/751d2973-a626-431c-9d4e-d7975eb44dd7-2",
+    "records": {
+      "mytopic-0": [
+          {
+            "topic": "mytopic"
+            "partition": "0",
+            "offset": 15,
+            "timestamp": 1545084650987,
+            "timestampType": "CREATE_TIME",
+            "value": "SGVsbG8sIHRoaXMgaXMgYSB0ZXN0Lg==",
+          }
+      ]
+    }
+}
+```
 
 ## Testing
 
-The easiest way to test the AppSync API is with the AppSync console at https://us-west-2.console.aws.amazon.com/appsync/home (change to your appropriate region)
-![AppSync Console](./console.png)
+1. Publish messages to the Amazon MSK topic.
+Follow the steps as outlined in Step 4 to create a client machine and publish messages to the MSK Topic.
 
+
+2. Retrieve the logs from the Lambda function:
+```bash
+sam logs -n ENTER_YOUR_CONSUMER_FUNCTION_NAME
+```
+## Documentation
+- [Using Lambda with Amazon MSK](https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html)
+- [Using Amazon MSK as an event source for AWS Lambda](https://aws.amazon.com/blogs/compute/using-amazon-msk-as-an-event-source-for-aws-lambda/)
 ## Cleanup
  
 1. Delete the stack

@@ -1,8 +1,8 @@
-# AWS AppSync to Amazon DynamoDB
+# RabbitMQ to AWS Lambda
 
-This pattern creates an AppSync API with a schema and a resolver to a DynamoDB table.
+The SAM template deploys a Lambda function, a RabbitMQ queue and the IAM permissions required to run the application. RabbitMQ invokes the Lambda function when new messages are available.
 
-Learn more about this pattern at ServerlessLand Patterns: https://serverlessland.com/patterns/appsync-dynamodb
+Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/rabbitmq-lambda](https://serverlessland.com/patterns/rabbitmq-lambda)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -15,13 +15,19 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Deployment Instructions
 
+1. Set up your username and password for RabbitMQ access. In a new terminal window enter:
+    ```
+    aws secretsmanager create-secret --name MQaccess --secret-string '{"username": "your-username", "password": "your-password"}'
+    ```
+1. The command responds with the ARN of your new secret. Copy the ARN and paste it in the last line of the SAM template where it says `<your_secret_arn>`.
+
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/appsync-dynamodb
+    cd rabbitmq-lambda
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -32,18 +38,28 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+   
 
-## How it works
+### Testing
 
-This template creates an AppSync api that uses a DynamoDB resolver. The demo application is a simple notes application.
+1. Navigate to the AmazonMQ console and choose the newly created broker. 
 
-## Testing
+1. In the Connections panel, locate the URL for the RabbitMQ web console.
 
-The easiest way to test the AppSync API is with the AppSync console at https://us-west-2.console.aws.amazon.com/appsync/home (change to your appropriate region)
-![AppSync Console](./console.png)
+1. Sign in with the credentials you created and stored in the Secrets Manager earlier.
+
+1. Select Queues from the top panel and then choose Add a new queue.
+
+1. Enter ‘myQueue’ as the name for the queue and choose Add queue. (This must match exactly as that is the name you hardcoded in the AWS SAM template). Keep the other configuration options as default.
+
+1. In the RabbitMQ web console, choose Queues.
+
+1. Choose the name of the queue. Under the Publish message tab, enter a message, and choose Publish message to send
+
+1. In the MQconsumer Lambda function, select the Monitoring tab and then choose View logs in CloudWatch. The log streams show that the Lambda function is invoked by Amazon MQ and you see the message in the logs.
 
 ## Cleanup
  

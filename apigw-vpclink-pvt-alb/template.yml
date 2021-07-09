@@ -1,0 +1,225 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - API Gateway to Private HTTP Endpoint via VPC Link
+
+# Parameters to input VPC id and private subnet ids where the ECS cluster and Application Load Balancer will be created.
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  PrivateSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+  # Load balancer security group. CIDR and port ingress can be changed as required.
+  LoadBalancerSG:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: >-
+        LoadBalancer Security Group
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow from anyone on port 80
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+      VpcId: !Ref VpcId
+  # Load balancer security group egress rule to ECS cluster security group.
+  LoadBalancerSGEgressToECSSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroupEgress'
+    Properties:
+      GroupId: !GetAtt 
+        - LoadBalancerSG
+        - GroupId
+      IpProtocol: tcp
+      Description: Target group egress
+      DestinationSecurityGroupId: !GetAtt 
+        - ECSSecurityGroup
+        - GroupId
+      FromPort: 80
+      ToPort: 80
+  # ECS cluster security group.
+  ECSSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: >-
+        ECS Security Group
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: '-1'
+      VpcId: !Ref VpcId
+  # ECS cluster security group ingress from the load balancer.
+  ECSSecurityGroupIngressFromLoadBalancer:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      IpProtocol: tcp
+      Description: Ingress from Load Balancer
+      FromPort: 80
+      GroupId: !GetAtt 
+        - ECSSecurityGroup
+        - GroupId
+      SourceSecurityGroupId: !GetAtt 
+        - LoadBalancerSG
+        - GroupId
+      ToPort: 80
+  # Create the internal application load balancer (ALB) in the private subnets.
+  LoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Scheme: internal
+      SecurityGroups:
+        - !GetAtt 
+          - LoadBalancerSG
+          - GroupId
+      Subnets: !Ref PrivateSubnetIds
+      Type: application
+  # Create the ALB target group for ECS.
+  LoadBalancerListenerTargetGroupECS:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !Ref VpcId
+  # Create the ALB listener with the target group.
+  LoadBalancerListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref LoadBalancerListenerTargetGroupECS
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+  # Create the ECS Cluster and Fargate launch type service in the private subnets
+  ECSFargateCluster:
+    Type: 'AWS::ECS::Cluster'
+  ECSService:
+    Type: 'AWS::ECS::Service'
+    Properties:
+      Cluster: !Ref ECSFargateCluster
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      DesiredCount: 2
+      EnableECSManagedTags: false
+      HealthCheckGracePeriodSeconds: 60
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: web
+          ContainerPort: 80
+          TargetGroupArn: !Ref LoadBalancerListenerTargetGroupECS
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !GetAtt 
+              - ECSSecurityGroup
+              - GroupId
+          Subnets: !Ref PrivateSubnetIds
+      TaskDefinition: !Ref ECSServiceTaskDefinition
+    DependsOn:
+      - LoadBalancerListenerTargetGroupECS
+      - LoadBalancerListener
+  # Create the ECS Service task definition. 
+  # 'nginx' image is being used in the container definition.
+  # This image is pulled from the docker hub which is the default image repository.
+  # ECS task execution role and the task role is used which can be attached with additional IAM policies to configure the required permissions.
+  ECSServiceTaskDefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      ContainerDefinitions:
+        - Essential: true
+          Image: nginx
+          Name: web
+          PortMappings:
+            - ContainerPort: 80
+              Protocol: tcp
+      Cpu: '512'
+      ExecutionRoleArn: !GetAtt 
+        - ECSTaskExecutionRole
+        - Arn
+      Memory: '1024'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn: !GetAtt 
+        - ECSTaskRole
+        - Arn
+  ECSTaskExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: 2012-10-17
+  ECSTaskRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: 2012-10-17
+  # Create the VPC Link configured with the private subnets. Security groups are kept empty here, but can be configured as required.
+  VpcLink:
+      Type: 'AWS::ApiGatewayV2::VpcLink'
+      Properties:
+          Name: APIGWVpcLinkToPrivateHTTPEndpoint
+          SubnetIds: !Ref PrivateSubnetIds
+          SecurityGroupIds: []
+  # Create the API Gateway HTTP endpoint
+  APIGWHTTPEndpoint:
+      Type: 'AWS::ApiGatewayV2::Api'
+      Properties:
+          Name: serverlessland-pvt-endpoint
+          ProtocolType: HTTP
+  # Create the API Gateway HTTP_PROXY integration between the created API and the private load balancer via the VPC Link.
+  # Ensure that the 'DependsOn' attribute has the VPC Link dependency.
+  # This is to ensure that the VPC Link is created successfully before the integration and the API GW routes are created.
+  APIGWHTTPEndpointIntegration:
+      Type: 'AWS::ApiGatewayV2::Integration'
+      Properties:
+        ApiId: !Ref APIGWHTTPEndpoint
+        IntegrationType: HTTP_PROXY
+        ConnectionId: !Ref VpcLink
+        ConnectionType: VPC_LINK
+        IntegrationMethod: ANY
+        IntegrationUri: !Ref LoadBalancerListener
+        PayloadFormatVersion: '1.0'
+      DependsOn:
+      - VpcLink
+      - APIGWHTTPEndpoint
+      - LoadBalancerListener
+  # API GW route with ANY method
+  APIGWRoute:
+    Type: 'AWS::ApiGatewayV2::Route'
+    Properties:
+      ApiId: !Ref APIGWHTTPEndpoint
+      RouteKey: 'ANY /{proxy+}'
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref APIGWHTTPEndpointIntegration
+    DependsOn:
+    - APIGWHTTPEndpointIntegration
+  # Set a default stage
+  APIStageDefault:
+    Type: 'AWS::ApiGatewayV2::Stage'
+    Properties:
+      ApiId: !Ref APIGWHTTPEndpoint
+      StageName: $default
+      AutoDeploy: true
+    DependsOn:
+      - APIGWHTTPEndpoint
+
+Outputs:
+  # Generated API GW endpoint URL that can be used to access the application running on a private ECS Fargate cluster.
+  APIGWEndpoint:
+    Description: API Gateway Endpoint
+    Value: !GetAtt APIGWHTTPEndpoint.ApiEndpoint

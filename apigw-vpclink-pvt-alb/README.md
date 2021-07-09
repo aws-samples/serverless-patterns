@@ -1,10 +1,17 @@
-# AWS AppSync to Amazon DynamoDB
+# API Gateway to Private HTTP Endpoint via VPC Link
 
-This pattern creates an AppSync API with a schema and a resolver to a DynamoDB table.
+The SAM template in this pattern deploys the following resources. It requires a VPC id and private subnet ids as inputs. It is assumed that the VPC and subnets are already configured with the required network routes.
+### Deployed resources:
+* Requried Security Groups
+* ECS Fargate cluster with service and task definitions
+* Private Application Load Balancer with appropriate listener and target group
+* VPC Link
+* API gateway integration between the API endpoint and the private ALB via the VPC Link
 
-Learn more about this pattern at ServerlessLand Patterns: https://serverlessland.com/patterns/appsync-dynamodb
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-vpclink-pvt-alb/
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+
 
 ## Requirements
 
@@ -21,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/appsync-dynamodb
+    cd serverless-patterns/apigw-vpclink-pvt-alb
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -30,7 +37,9 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
+    * Enter the VPC Id
+    * Enter the comma separated list of private subnet ids
+    * Allow SAM CLI to create IAM roles with the required permissions
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
@@ -38,12 +47,16 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This template creates an AppSync api that uses a DynamoDB resolver. The demo application is a simple notes application.
+This pattern allows integration of public API gateway endpoint to a private Application Load Balancer with an ECS Fargate cluster behind it. It allows to build a secure pattern without exposing the private subnet resources and can be accessed only via a VPC Link.
 
 ## Testing
 
-The easiest way to test the AppSync API is with the AppSync console at https://us-west-2.console.aws.amazon.com/appsync/home (change to your appropriate region)
-![AppSync Console](./console.png)
+The stack creates and outputs the API endpoint. Open a browser and try out the generated API endpoint. You should see the Nginx home page.
+Or, run the below command with the appropriate API endpoint. You should get a 200 response code.
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" <API endpoint> ; echo
+```
 
 ## Cleanup
  

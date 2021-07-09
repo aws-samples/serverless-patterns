@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  msk-lambda-consumer
+
+  Sample SAM Template for msk-lambda-consumer
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  TopicConsumerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: topic-consumer/
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: arn:aws:kafka:us-east-1:123456789012:cluster/my-cluster/12abcd12-1234-1234-1234-1234abcd1234-1
+            Topics:
+              - ServerlessTopic
+      Policies:
+      - AWSLambdaMSKExecutionRole
+
+Outputs:
+  TopicConsumerFunction:
+    Description: "Topic Consumer Lambda Function ARN"
+    Value: !GetAtt TopicConsumerFunction.Arn
+  TopicConsumerFunctionIamRole:
+    Description: "Implicit IAM Role created for Topic Consumer function"
+    Value: !GetAtt TopicConsumerFunctionRole.Arn
