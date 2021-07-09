@@ -37,17 +37,21 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-* Since the API Gateway is private it can't be accessed from internet. 
-  * The api can be invoked from an EC2 Instance VPC
-    1. This example creates an EC2 instance in the VPC 
-    2. Log into AWS Account and navigte to EC2 
-    3. Select the EC2 instance created by this example
-    4. Hit the "Connect" button on top right 
-    5. On the connect page navigate to "Session Manager" Tab and hit "Connect" Button
-    6. On the web shell run curl the output for PrivateAPIGatewayApi.ApiUrl
+* Since the API Gateway is private it can't be accessed from internet
+
+  * The api can be invoked/accessed from an EC2 Instance from inside the VPC
+    1. Log into AWS Account and navigte to EC2 in AWS Console
+    2. Select the EC2 instance created by this example(The instance id is printed in the cdk)
+    3. Hit the "Connect" button on top right 
+    4. On Connect page navigate to "Session Manager" Tab and hit "Connect" Button
+    5. Locate PrivateAPIGatewayApi.ApiUrl from output printed by cdk, this is the api endpoint to be invoked
+    6. On shell screen run curl "<PrivateAPIGatewayApi.ApiUrl> output"
+
     ```curl https://<api_id>-<vpcid>.execute-api.<region>.amazonaws.com/prod```
-    7. You should see: ```Success path: "/"```.
-  * The Private API Gateway API can also be accessed from a VPN Connection or AWS Direct Connect
+
+    7. You should see: ```Success path: "/"```
+
+  * The Private API Gateway APIs can also be accessed from a VPN Connection or AWS Direct Connect
 
 
 ## Cleanup
