@@ -39,7 +39,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * Since the API Gateway is private it can't be accessed from internet
 
-  * The api can be invoked/accessed from an EC2 Instance from inside the VPC
+  * Private API Gateway APIs can be invoked/accessed from an EC2 Instance from inside VPC
     1. Log into AWS Account and navigte to EC2 in AWS Console
     2. Select the EC2 instance created by this example(The instance id is printed in the cdk)
     3. Hit the "Connect" button on top right 
