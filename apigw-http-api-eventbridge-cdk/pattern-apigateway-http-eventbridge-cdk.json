@@ -1,0 +1,53 @@
+{
+  "title": "HTTP API Gateway to EventBridge",
+  "description": "Create an HTTP API Gateway that sends events to EventBridge.",
+  "language": "Node.js",
+  "architectureURL": "",
+  "videoId": "",
+  "level":"100",
+  "framework": "CDK",
+  "services": {
+    "from": "apigatewayv2",
+    "to": "eventbridge"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK project creates an Amazon API gateway HTTP API endpoint. The endpoint uses service integrations to directly connect to Amazon EventBridge. An EventBridge rule sends all events to Cloudwatch Logs."
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-eventbridge-cdk",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/apigw-http-api-eventbridge-cdk/cdk/lib/api-eventbridge-stack.ts",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-eventbridge-cdk/README.md"
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Integrating Amazon EventBridge into your serverless applications",
+        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }      
+    ]
+  },
+  "author": {
+    "headline": "Presented by Hugo Sterin",
+    "name": "Hugo Sterin",
+    "bio": "Solutions Architect @ AWS"
+  }
+}
