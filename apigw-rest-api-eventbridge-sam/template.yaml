@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless patterns - REST API Gateway to EventBridge
+
+Resources:
+##########################################################################
+#   EventBus                                                        #
+##########################################################################
+  MyCustomEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: MyCustomEventBus
+
+
+##########################################################################
+#   API GATEWAY ROLE WITH PERMISSIONS TO PUT EVENTS   #
+##########################################################################
+  ApiGatewayEventBridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: !Join ["", ["/", !Ref "AWS::StackName", "/"]]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowApiGatewayServiceToAssumeRole
+            Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: EBPutEvents
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:PutEvents'
+                Resource:
+                  - !GetAtt  MyCustomEventBus.Arn
+  
+##########################################################################
+#   REST API GATEWAY                                                     #
+##########################################################################
+  apiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Name: !Sub ${AWS::StackName}-api
+
+##########################################################################
+#   API GATEWAY METHOD                                                   #
+##########################################################################
+  apiGatewayRootMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+      RequestParameters: 
+        method.request.header.X-Amz-Target: false
+        method.request.header.Content-Type: false
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS
+        Credentials: !GetAtt ApiGatewayEventBridgeRole.Arn 
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:events:action/PutEvents
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates: 
+          application/json: !Sub 
+            - |- 
+              #set($context.requestOverride.header.X-Amz-Target = "AWSEvents.PutEvents")
+              #set($context.requestOverride.header.Content-Type = "application/x-amz-json-1.1")            
+              #set($inputRoot = $input.path('$')) 
+              { 
+                "Entries": [
+                  #foreach($elem in $inputRoot.items)
+                  {
+                    "Detail": "$util.escapeJavaScript($elem.Detail).replaceAll("\\'","'")",
+                    "DetailType": "$elem.DetailType",
+                    "EventBusName": "${EventBusName}",
+                    "Source":"$elem.Source"
+                  }#if($foreach.hasNext),#end
+                  #end
+                ]
+
+              }
+            - { EventBusName: !Ref MyCustomEventBus }
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates: 
+              application/json: !Sub 
+                - |- 
+                  #set($inputRoot = $input.path('$'))
+                  {
+                  }
+                - {}
+      ResourceId: !GetAtt apiGateway.RootResourceId
+      RestApiId: !Ref apiGateway
+
+##########################################################################
+#   API GATEWAY DEPLOYMENT                                               #
+##########################################################################
+  apiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - apiGatewayRootMethod
+    Properties:
+      RestApiId: !Ref apiGateway
+      StageName: 'dev'
+      
+##########################################################################
+#   OUTPUTS                                                              #
+##########################################################################
+Outputs:
+  ApiEndpoint: 
+    Description: "API Gateway endpoint URL for Prod stage for Product api"
+    Value: !Sub "https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+
+
+
