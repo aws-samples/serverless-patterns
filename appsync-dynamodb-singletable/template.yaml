@@ -1,0 +1,209 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - AppSync to DynamoDB single-table
+
+Resources:
+  # Define a DynamoDB table
+  DDBTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+
+  # AppSync Role
+  DDBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+      Policies:
+        - PolicyName: DDBAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt DDBTable.Arn
+
+  # AppSync API
+  AppSyncApi:
+    Type: "AWS::AppSync::GraphQLApi"
+    Description: "The GraphQL API for the single table App"
+    Properties:
+      Name: SingleTableApi
+      AuthenticationType: "AMAZON_COGNITO_USER_POOLS"
+      XrayEnabled: true
+      AuthenticationType: API_KEY
+
+  # API Key for external access
+  AppSyncApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties: 
+      ApiId: !GetAtt AppSyncApi.ApiId
+
+  # AppSync Schema
+  AppSyncSchema:
+    Type: "AWS::AppSync::GraphQLSchema"
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Definition: |
+        type Parent{
+          PK: String!
+          SK: String!
+          children: [Child]
+          data: String!
+          type: String!
+        }
+
+        type Child {
+          PK: String!
+          SK: String!
+          data: String!
+          type: String!
+        }
+
+        type Mutation {
+          createParentItem(
+            PK: ID!,
+            SK: String!,
+            data: String!,
+            type: String!
+          ): Parent
+        
+          createChildItem(
+            PK: ID!,
+            SK: String!,
+            data: String!,
+            type: String!
+          ): Child
+        }
+        
+        type Query{
+          getParentWithChildren(PK: ID!): Parent
+        }
+
+  # AppSync Data Source for DynamoDB
+  DDBDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      Name: SingleTableDataSource
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Description: "The Single Table AppSync Data Source"
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt DDBRole.Arn
+      DynamoDBConfig:
+        TableName: !Ref DDBTable
+        AwsRegion: !Sub ${AWS::Region}
+
+  # Resolver: Qiery - Get parent with all child records
+  GetParentAndChildResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: AppSyncSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Query
+      FieldName: getParentWithChildren
+      DataSourceName: !GetAtt DDBDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+            "expression": "PK = :pk",
+            "expressionValues" : {
+                ":pk" : $util.dynamodb.toDynamoDBJson($ctx.args.PK)
+            }
+          }
+        }
+      ResponseMappingTemplate: |
+        #set($children = [])
+
+        #foreach($item in $ctx.result.items)
+          #if($item['type'] == "parent")
+            #set($PK = $item['PK'])
+            #set($SK = $item['SK'])
+            #set($data = $item['data'])
+            #set($type = $item['type'])
+          #end
+          #if($item['type'] == "child")
+            $util.qr($children.add($item))
+          #end
+        #end
+        
+        {
+          "PK": "${PK}",
+            "SK": "${SK}",
+            "children": $utils.toJson($children),
+            "data": "${data}",
+            "type": "${type}"
+        }
+
+  # Resolver: Mutation - Create parent
+  CreateParentMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: AppSyncSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Mutation
+      FieldName: createParentItem
+      DataSourceName: !GetAtt DDBDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2018-05-29",
+          "operation": "PutItem",
+          "key": {
+            "PK": $util.dynamodb.toDynamoDBJson($ctx.args.PK),
+            "SK": $util.dynamodb.toDynamoDBJson($ctx.args.SK)
+          },
+          "attributeValues": {
+            "data": $util.dynamodb.toDynamoDBJson($ctx.args.data),
+            "type": $util.dynamodb.toDynamoDBJson($ctx.args.type)
+          }
+        }
+      ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+  # Resolver: Mutation - Create child
+  CreateChildMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: AppSyncSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Mutation
+      FieldName: createChildItem
+      DataSourceName: !GetAtt DDBDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2018-05-29",
+          "operation": "PutItem",
+          "key": {
+            "PK": $util.dynamodb.toDynamoDBJson($ctx.args.PK),
+            "SK": $util.dynamodb.toDynamoDBJson($ctx.args.SK)
+          },
+          "attributeValues": {
+            "data": $util.dynamodb.toDynamoDBJson($ctx.args.data),
+            "type": $util.dynamodb.toDynamoDBJson($ctx.args.type)
+          }
+        }
+      ResponseMappingTemplate: "$util.toJson($ctx.result)"

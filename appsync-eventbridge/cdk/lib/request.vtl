@@ -1,0 +1,21 @@
+{
+  "version": "2018-05-29",
+  "method": "POST",
+  "resourcePath": "/",
+  "params": {
+    "headers": {
+      "content-type": "application/x-amz-json-1.1",
+      "x-amz-target":"AWSEvents.PutEvents"
+    },
+    "body": {
+      "Entries":[
+        {
+          "Source":"appsync",
+          "EventBusName": "AppSyncEventBus",
+          "Detail":"{ \"event\": \"$ctx.arguments.event\"}",
+          "DetailType":"Event Bridge via GraphQL"
+         }
+      ]
+    }
+  }
+}

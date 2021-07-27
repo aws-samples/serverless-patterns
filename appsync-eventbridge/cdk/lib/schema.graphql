@@ -1,0 +1,23 @@
+type EventDetails {
+	EventId: String
+	ErrorMessage: String
+	ErrorCode: String
+}
+
+type Mutation {
+	putEvent(event: String!): Result
+}
+
+type Query {
+	getEvent: String
+}
+
+type Result {
+	Entries: [EventDetails]
+	FailedEntries: Int
+}
+
+schema {
+	query: Query
+	mutation: Mutation
+}

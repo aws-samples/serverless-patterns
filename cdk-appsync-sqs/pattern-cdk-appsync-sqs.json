@@ -1,0 +1,46 @@
+{
+  "title": "AppSync to SQS",
+  "description": "Create an AppSync API with an SQS HTTP data source",
+  "language": "Node.js",
+  "architectureURL": "pattern-cdk-appsync-sqs.png",
+  "level": "100",
+  "framework": "CDK",
+  "services": {
+    "from": "appsync",
+    "to": "sqs"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application deploys an AppSync API which uses an SQS HTTP datasource. AWS AppSync provides a 'sendMessage' query that sends a message to the configured SQS queue. The query returns the response MessageId, and the MD5OfMessageBody of the response."
+    ]
+  },
+  "deploy": {
+    "text": ["See the Github repo for detailed instructions"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-appsync-sqs",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/cdk-appsync-sqs/cdk/lib/main.ts",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-appsync-sqs/README.md"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Simplify access to multiple microservices with AWS AppSync and AWS Amplify",
+        "link": "https://aws.amazon.com/blogs/mobile/appsync-microservices/"
+      },
+      {
+        "text": "Tutorial: HTTP Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html"
+      }
+    ]
+  },
+  "author": {
+    "headline": "Presented by Brice Pellé",
+    "name": "Brice Pellé",
+    "bio": "Principal Solution Architect - AppSync @ AWS"
+  }
+}
