@@ -1,6 +1,8 @@
 [
   {
-    "Message": "Hello world!",
-    "Source": "my-application"
+    "Source": "my-application",
+    "DetailType": "message",
+    "Detail": "Hello world!",
+    "Detail": "{\"message\":\"Hello world!\"}"
   }
 ]
