@@ -1,6 +1,6 @@
 # Amazon EventBridge to Amazon CloudWatch Logs
 
-This template an EventBridge event bus and rule that publishes matched events to CloudWatch Logs. In this example, the rule filters for specific attributes in the event before sending to the CloudWatch Logs target.
+This template creates an EventBridge event bus and rule that publishes matched events to CloudWatch Logs. In this example, the rule filters for specific attributes in the event before sending to the CloudWatch Logs target.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-cloudwatch
 
