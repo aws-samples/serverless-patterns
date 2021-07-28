@@ -1,4 +1,4 @@
-# AWS AppSync to Amazon DynamoDB
+# AWS AppSync to Amazon DynamoDB - Single table design
 
 This pattern creates an AppSync API with a schema and a resolver to a DynamoDB table following the single table design model.
 
