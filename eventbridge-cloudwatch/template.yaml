@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Sample template to deliver events from Amazon EventBridge to CloudWatch Logs
+
+Resources:
+  TestEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: test-bus
+  LogsRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref TestEventBus
+      EventPattern:
+        source: 
+          - 'my-application'
+        account:
+          - !Ref AWS::AccountId
+      Targets:
+        - Arn: !GetAtt LogGroupForEvents.Arn
+          Id: LogTarget
+  LogGroupForEvents:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/events/resource-policy-test
+  LogGroupForEventsPolicy:
+    Type: AWS::Logs::ResourcePolicy
+    Properties:
+      PolicyName: EventBridgeToCWLogsPolicy
+      PolicyDocument: !Sub 
+      - >
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "EventBridgetoCWLogsPolicy",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "delivery.logs.amazonaws.com",
+                  "events.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": [
+                "${logArn}"
+              ],
+              "Condition": {
+                "ArnEquals": {"aws:SourceArn": "${ruleArn}"}
+              }
+            }
+          ]
+        }
+      - { logArn: !GetAtt LogGroupForEvents.Arn, ruleArn:  !GetAtt LogsRule.Arn}
