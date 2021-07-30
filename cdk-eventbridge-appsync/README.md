@@ -65,6 +65,18 @@ aws events put-events --entries file://todo-update.json
 
 You can see your subscription triggered by your mutation by starting a subscription from the console as shown below:
 
+```graphql
+subscription MySubscription {
+  onUpdateTodo {
+    createdAt
+    description
+    id
+    name
+    updatedAt
+  }
+}
+```
+
 ![Listen for subscriptions in the console console](console.png)
 
 ## Cleanup
