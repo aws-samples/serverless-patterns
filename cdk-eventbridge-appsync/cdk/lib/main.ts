@@ -104,6 +104,7 @@ export class MainStack extends cdk.Stack {
     rule.addDependsOn(bus)
 
     new cdk.CfnOutput(this, 'apiId', { value: api.apiId })
+    new cdk.CfnOutput(this, 'apiName', { value: api.name })
     new cdk.CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
     new cdk.CfnOutput(this, 'apiKey', { value: api.apiKey! })
     new cdk.CfnOutput(this, 'busName', { value: bus.attrName })
