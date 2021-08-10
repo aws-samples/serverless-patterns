@@ -1,8 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# API Gateway REST API to EventBridge
 
-This pattern << explain usage >>
+This template creates an API Gateway REST API that puts an event to Amazon EventBridge. This pattern addresses some nuances with defining the VTL template mapping when integrating with EventBridge. An IAM permission for putting events to EventBridge is created for API Gateway.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: TBD
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
