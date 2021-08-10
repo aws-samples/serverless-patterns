@@ -2,7 +2,7 @@
 
 This template creates an API Gateway REST API that puts an event to Amazon EventBridge. This pattern addresses some nuances with defining the VTL template mapping when integrating with EventBridge. An IAM permission for putting events to EventBridge is created for API Gateway.
 
-Learn more about this pattern at Serverless Land Patterns: TBD
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigateway-rest-eventbridge
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -36,13 +36,18 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-## How it works
-
-Explain how the service interaction works.
-
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+To test the endpoint first send data using the following command. Be sure to update the endpoint with endpoint of your stack.
+
+```
+curl --location --request POST '<your api endpoint>' --header 'Content-Type: application/json' \
+--data-raw '{
+    "Detail":{
+        "message": "This is my test"
+    }
+}'
+```
 
 ## Cleanup
  
