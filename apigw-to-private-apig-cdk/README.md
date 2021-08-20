@@ -1,7 +1,7 @@
 
 # Amazon Public (or private) API Gateway to Private API Gateway integration
 
-This pattern in CDK offers a example to generate an Amazon public API Gateway to Amazon Privare API Gateway integration.
+This pattern in CDK offers a example to generate a public Amazon API Gateway to Amazon Private API Gateway integration.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-to-private-apig-cdk
 
