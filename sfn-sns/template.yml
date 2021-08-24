@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A Step Functions Express Workflow that sends messages to Amazon SNS
+
+Parameters:
+  SNSEndpoint:
+    Description: SNS endpoint
+    Type: String
+
+Resources:
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+
+  StateMachineExpressSynctoSNS:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: statemachine/StateMachine.asl.json
+      DefinitionSubstitutions:
+        StateMachineSNSTopic: !Ref StateMachineSNSTopic
+      Role:
+        Fn::GetAtt: [ StatesExecutionRole, Arn ]
+      Type: EXPRESS
+      
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+  StatesExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: SNSAccess
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Resource:
+                  - !Ref StateMachineSNSTopic
+                Action:
+                  - sns:Publish
+
+##########################################################################
+# Create SNS Topic and Subscription to notify on Step Function failures  #                                                          #
+##########################################################################  
+  StateMachineSNSTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      Subscription:
+        - Endpoint: !Ref SNSEndpoint
+          Protocol: email
+
+##########################################################################
+#   Outputs                                                              #
+##########################################################################
+Outputs:
+  StateMachineExpressSynctoSNS:
+    Value: !Ref StateMachineExpressSynctoSNS
+    Description: StateMachineExpressSynctoSNS Arn
+  StateMachineSNSTopicName:
+    Description: SNS topic name
+    Value: !GetAtt StateMachineSNSTopic.TopicName
+  StateMachineSNSTopicARN:
+    Description: SNS topic ARN
+    Value: !Ref StateMachineSNSTopic
