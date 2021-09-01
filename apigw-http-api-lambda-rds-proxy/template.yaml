@@ -1,14 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  serverless-rds-proxy-demo
+  apigw-http-api-lambda-rds-proxy
 
-  Sample SAM Template for serverless-rds-proxy-demo
+  Sample SAM Template for apigw-http-api-lambda-rds-proxy
 
 Parameters:
-  Vpc:
-    Type: AWS::EC2::VPC::Id
-    Description: "Vpc Id where the lambda function will be deployed"
   Subnets:
     Type: List<AWS::EC2::Subnet::Id>
     Description: "Subnets Ids where function will be deployed. Provide at least two"
