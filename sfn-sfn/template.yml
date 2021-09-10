@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A Step Functions Workflow to start a new execution of a state machine directly from the task state of a running execution
+
+
+Resources:
+##########################################################################
+#   CHILD and PARENT STEP FUNCTIONS                                      #
+##########################################################################
+
+  ChildStateMachine:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: statemachine/childStateMachine.asl.json
+      Type: EXPRESS
+      Role: !GetAtt ChildStateMachineExecutionRole.Arn
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt ChildStateMachineLogGroup.Arn
+        IncludeExecutionData: false
+        Level: 'ALL'
+
+  ParentStateMachine:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: statemachine/parentStateMachine.asl.json
+      DefinitionSubstitutions:
+        ChildStateMachineArn: !GetAtt ChildStateMachine.Arn
+      Role: !GetAtt ParentStateMachineExecutionRole.Arn
+      Type: EXPRESS
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt ParentStateMachineLogGroup.Arn
+        IncludeExecutionData: false
+        Level: 'ALL'
+
+##########################################################################
+#  LOG GROUPS                                                            #
+##########################################################################
+  ParentStateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", !Ref AWS::StackName, "parentStateMachine"]]
+  
+  ChildStateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", !Ref AWS::StackName, "childStateMachine"]]
+
+
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+  ChildStateMachineExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -  PolicyName: LogPermissions
+           PolicyDocument:
+             Version: "2012-10-17"
+             Statement:
+              - Effect: Allow
+                Action:
+                  - "cloudwatch:*"
+                  - "logs:*"
+                Resource: "*"
+                
+  ParentStateMachineExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: ChildStateMachineExecution
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Resource:
+                  - !GetAtt ChildStateMachine.Arn
+                Action:
+                  - states:StartExecution
+        -  PolicyName: LogPermissions
+           PolicyDocument:
+             Version: "2012-10-17"
+             Statement:
+              - Effect: Allow
+                Action:
+                  - "cloudwatch:*"
+                  - "logs:*"
+                Resource: "*"
+
+Outputs:
+  ParentStateMachineArn:
+    Value: !GetAtt ParentStateMachine.Arn
+    Description: ARN of the Parent State Machine
+  ParentStateMachineLogGroupName:
+    Value: !Ref ParentStateMachineLogGroup
+    Description: Name of the Parent CloudWatch Log Group
+  ChildStateMachineArn:
+    Value: !GetAtt ChildStateMachine.Arn
+    Description: ARN of the Child State Machine
+  ChildStateMachineLogGroupName:
+    Value: !Ref ChildStateMachineLogGroup
+    Description: Name of the Parent CloudWatch Log Group
+  
