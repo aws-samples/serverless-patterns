@@ -3,7 +3,6 @@ Transform: AWS::Serverless-2016-10-31
 Description: S3 Object Lambda
 
 Resources:
-  # S3 bucket
   S3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
@@ -37,7 +36,7 @@ Resources:
               AWS: '*'
             Condition:
               StringEquals:
-                's3:DataAccessPointAccount': !Sub ${AWS::AccountId} # !Ref 'AWS::AccountId'
+                's3:DataAccessPointAccount': !Sub ${AWS::AccountId}
 
   # S3 Access Point (Network origin: Internet)
   S3AccessPoint:
@@ -52,10 +51,6 @@ Resources:
     Properties: 
       Name: 'resize-olap'
       ObjectLambdaConfiguration: 
-          # AllowedFeatures: 
-          #   - GetObject-Range
-          #   - GetObject-PartNumber
-          # CloudWatchMetricsEnabled: True
           SupportingAccessPoint: !Sub 'arn:aws:s3:${AWS::Region}:${AWS::AccountId}:accesspoint/${S3AccessPoint}'
           TransformationConfigurations: 
           - Actions: 
@@ -73,12 +68,7 @@ Resources:
       Handler: app.handler
       Runtime: nodejs12.x
       MemorySize: 2048
-      # Layers:
-      #   - !Sub 'arn:aws:lambda:${AWS::Region}:175033217214:layer:graphicsmagick:2'
-      # The inputS3Url is a presigned URL that the function can use to download the original object from the supporting Access Point.
-      # In this way, the Lambda function doesn’t need to have S3 read permissions to retrieve the original object and can only access the object processed by each invocation.
-      # !! CrudPolicy may not be needed !!
-      # The function needs permission to call back to the Object Lambda access point with the WriteGetObjectResponse.
+      # The function needs permission to call back to the S3 Object Lambda Access Point with the WriteGetObjectResponse.
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref S3Bucket
