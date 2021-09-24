@@ -32,5 +32,9 @@ export class CdkStack extends cdk.Stack {
 
     // Write permissions for Lambda
     dynamoTable.grantWriteData(lambdaPutDynamoDB);
+
+    // Outputs
+    new cdk.CfnOutput(this, 'DynamoDbTableName', { value: dynamoTable.tableName });
+    new cdk.CfnOutput(this, 'LambdFunctionArn', { value: lambdaPutDynamoDB.functionArn });
   }
 }
