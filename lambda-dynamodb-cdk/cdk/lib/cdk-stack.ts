@@ -24,7 +24,13 @@ export class CdkStack extends cdk.Stack {
         timeout: cdk.Duration.seconds(3),
         entry: path.join(__dirname, '../src/app.ts'),
         handler: 'main',
+        environment: {
+          DatabaseTable: dynamoTable.tableName
+        }
       }
     );
+
+    // Write permissions for Lambda
+    dynamoTable.grantWriteData(lambdaPutDynamoDB);
   }
 }
