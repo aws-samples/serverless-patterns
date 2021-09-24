@@ -3,6 +3,7 @@
 */
 
 const AWS = require('aws-sdk');
+const moment = require('moment');
 
 const documentClient = new AWS.DynamoDB.DocumentClient();
 
@@ -11,7 +12,7 @@ export async function main( event: any ) {
     TableName : process.env.DatabaseTable,
     Item: {
       ID: Math.floor(Math.random() * Math.floor(10000000)).toString(),
-      created: Date.now(),
+      created: moment().format('YYYYMMDD-hhmmss'),
       metadata:JSON.stringify(event),
     }
   }
