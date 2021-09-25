@@ -1,0 +1,4 @@
+aws_cdk.aws_logs
+aws_cdk.aws_lambda
+aws_cdk.aws_iam
+-e .
