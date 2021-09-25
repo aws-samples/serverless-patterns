@@ -19,7 +19,7 @@ setuptools.setup(
     packages=setuptools.find_packages(where="lambda_sns_sms_cdk"),
 
     install_requires=[
-        "aws-cdk.core==1.121.0",
+        "aws-cdk.core==1.124.0",
     ],
 
     python_requires=">=3.6",

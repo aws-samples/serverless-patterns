@@ -1,7 +1,0 @@
-README.md
-setup.py
-lambda_sns_sms_cdk/lambda_sns_sms_cdk.egg-info/PKG-INFO
-lambda_sns_sms_cdk/lambda_sns_sms_cdk.egg-info/SOURCES.txt
-lambda_sns_sms_cdk/lambda_sns_sms_cdk.egg-info/dependency_links.txt
-lambda_sns_sms_cdk/lambda_sns_sms_cdk.egg-info/requires.txt
-lambda_sns_sms_cdk/lambda_sns_sms_cdk.egg-info/top_level.txt
