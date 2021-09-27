@@ -1,7 +1,8 @@
 [
     {
-      "DetailType": "transaction",
-      "Source": "cdk.myApp",
-      "Detail": "{\"location\":\"EUR-\"}"
+      "EventBusName": "test-bus-cdk",
+      "Source": "my-cdk-application",
+      "DetailType": "message",
+      "Detail": "{\"message\":\"Hello CDK world!\"}"
     }
   ]
