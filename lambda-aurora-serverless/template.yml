@@ -59,55 +59,26 @@ Resources:
         MinCapacity: 1
         MaxCapacity: 2
         SecondsUntilAutoPause: 3600
-  # IAM Role that defines the services the function can access and which actions the function can perform
-  FunctionExecutionRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      Description: !Sub 'Function Exectuion Role for ${DBClusterName}-function'
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - 'sts:AssumeRole'
-            Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-      Policies:
-        # Permission to read Secrets Manager secret
-        - PolicyName: SecretsManagerPolicy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'secretsmanager:DescribeSecret'
-                  - 'secretsmanager:GetSecretValue'
-                Resource: !Ref DBSecret
-        # Permission to execute a SQL statement against database using the Data API
-        - PolicyName: RDSDataAPIPolicy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'rds-data:ExecuteStatement'
-                Resource: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
   # Lambda Function - uses Globals to define additional configuration values
   LambdaFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       FunctionName: !Sub '${DBClusterName}-function'
       Handler: app.handler
-      Role: !GetAtt FunctionExecutionRole.Arn
       # Function environment variables
       Environment:
         Variables:
           DBClusterArn: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
           DBName: !Ref DatabaseName
           SecretArn: !Ref DBSecret
+      # Creates an IAM Role that defines the services the function can access and which actions the function can perform
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref DBSecret
+        - Statement:
+          - Effect: Allow
+            Action: 'rds-data:ExecuteStatement'
+            Resource: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
 
 Outputs:
   DBClusterArn:
