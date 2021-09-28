@@ -40,7 +40,7 @@ Important: this application uses various AWS services and there are costs associ
    python -m pip install -r requirements.txt
    ```
 
-5. Deploy the stack to your default AWS account and region. The output of this command shows the GraphQL API id, URL, api key, and the name of the EventBridge bus.
+5. Deploy the stack to your default AWS account and region.
 
    ```sh
    cdk deploy
