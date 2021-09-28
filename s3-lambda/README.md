@@ -50,7 +50,7 @@ Important: this application uses various AWS services and there are costs associ
 Run the following S3 CLI  command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the S3 Bucket. This is provided in the stack outputs.
 
 ```bash
-aws s3 cp './events/exampleImage.png'  s3://{SourceBucketName}
+aws s3 cp './events/example.jpg'  s3://{SourceBucketName}
 ```
 
 Run the following command to check that a new version of the image has been created in the destination bucket.
