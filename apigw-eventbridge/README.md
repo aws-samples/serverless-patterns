@@ -2,7 +2,7 @@
 
 This pattern deploys an API Gateway HTTP API with a custom domain configuration and permissions to publish HTTP requests as an events to EventBridge.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigateway-eventbridge](https://serverlessland.com/patterns/apigateway-eventbridge)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigateway-http-eventbridge-custom](https://serverlessland.com/patterns/apigateway-http-eventbridge-custom)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
