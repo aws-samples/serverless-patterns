@@ -2,6 +2,8 @@
 
 This project contains a sample AWS CDK template for invoking AWS Lambda from an Amazon EventBridge Rule. It also creates a CloudWatch Log Group for the Lambda function for observation of incoming events, with a retention and removal policy.
 
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-lambda-cdk.
+
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
