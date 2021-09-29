@@ -1,6 +1,6 @@
 # Lambda function calling AppSync GraphQl API
 
-This project contains a sample AWS CDK template for calling [AWS AppSync](https://aws.amazon.com/appsync/) from an [AWS Lambda](https://aws.amazon.com/function/).
+This project contains a sample AWS CDK template for calling [AWS AppSync](https://aws.amazon.com/appsync/) from an [AWS Lambda](https://aws.amazon.com/lambda/).
 
 In this pattern, AWS AppSync provides a a schema that allows you to manage and read todos. A Lambda function is implemented that can interact with the GraphQL API. This function can create todos by using the codegen generated from the schema by the [Amplify CLI codegen](https://docs.amplify.aws/cli). The codegen provides the operations and the variable types, which makes it simple to interact with the AppSync GraphQL API from the Typescript function. This pattern is useful in event driven design that trigger your AppSync function from the backend. Those changes can they easily be reflected on front-end clients in real time by using AppSync subscriptions.
 
@@ -48,7 +48,7 @@ Make sure you install the Amplify CLI:
 
 You can test creating a new todo from your Lambda function, by visiting the Lambda console, selecting your function, and running a test.
 
-Alternatively, you can test directly from your terminal: 
+Alternatively, you can test directly from your terminal:
 
 ```sh
 # replace <functionName> with the outputs values from `cdk deploy`
