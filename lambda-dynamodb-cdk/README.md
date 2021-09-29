@@ -1,8 +1,8 @@
-# AWS Lambda To Amazon DynamoDB
+# AWS Lambda to Amazon DynamoDB
 
 This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying a Lambda function that makes puts to a DynamoDB table.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-dynamodb-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-dynamodb-cdk.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
