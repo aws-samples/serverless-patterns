@@ -160,7 +160,7 @@ Resources:
         }
       ResponseMappingTemplate: "$util.toJson($ctx.result)"
 
-  #Resolver: Mutations - Delete note
+  # Resolver: Mutations - Delete note
   AppSyncDeleteNoteMutationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: AppSyncSchema
