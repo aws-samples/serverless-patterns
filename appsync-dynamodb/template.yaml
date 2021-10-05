@@ -96,7 +96,7 @@ Resources:
         TableName: !Ref DynamoDBNotesTable
         AwsRegion: !Sub ${AWS::Region}
 
-  # Resolver: Qiery - Get All Notes
+  # Resolver: Query - Get All Notes
   AppSyncAllNotesQueryResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: AppSyncSchema
@@ -118,7 +118,7 @@ Resources:
           "nextToken": $util.toJson(${ctx.args.nextToken})
         }
 
-  # Resolver: Qyuery - get one note
+  # Resolver: Query - get one note
   AppSyncGetNoteQueryResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: AppSyncSchema
