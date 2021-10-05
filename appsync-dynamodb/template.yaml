@@ -52,7 +52,7 @@ Resources:
   # API Key for external access
   AppSyncApiKey:
     Type: AWS::AppSync::ApiKey
-    Properties: 
+    Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
 
   # AppSync Schema
