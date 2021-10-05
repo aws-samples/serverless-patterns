@@ -39,10 +39,9 @@ Resources:
                   - dynamodb:Scan
                 Resource: !GetAtt DynamoDBNotesTable.Arn
 
-  # AppSync API
+  # AppSync API - The GraphQL API for the Notes App
   AppSyncApi:
     Type: "AWS::AppSync::GraphQLApi"
-    Description: "The GraphQL API for the Notes App"
     Properties:
       Name: NotesApi
       AuthenticationType: "AMAZON_COGNITO_USER_POOLS"
