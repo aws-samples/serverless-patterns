@@ -1,4 +1,4 @@
-# Amazon API Gateway Websocket API to Amazon SQS To AWS Lambda
+# Amazon API Gateway Websocket API to Amazon SQS to AWS Lambda
 
 This pattern creates an Amazon API Gateway WebSocket API which sends inbound messages to an Amazon SQS FIFO queue. The queue is processed by an AWS Lambda function to return a result.
 
