@@ -1,0 +1,14 @@
+{
+    "prefix": "WAFAPIGateway",
+    "description": "A VPC Lambda to get request from API Gateway protected by WAF",
+    "api": {
+      "handler": "ProxyLambda"
+    },
+    "headers": {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      "tags": [
+        {"key": "Key", "value": "Value"},
+        {"key": "Project", "value": "APIGatewayWAF"}
+      ]
+  } 
