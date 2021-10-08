@@ -1,8 +1,8 @@
-# Amazon IOT Events to AWS Lambda
+# AWS IOT to AWS Lambda
 
 The SAM template deploys a Lambda function, an IoT thing, and the least IAM resources required to run the application.
 
-When a IoT event is sent to a IoT topic, a Lambda will be invoked. This pattern configures a Lambda function to poll this event. The function is invoked with a payload containing the contents of the message event.
+When an IoT event is sent to an IoT topic, a Lambda function is invoked. This pattern configures a Lambda function to poll this event. The function is invoked with a payload containing the contents of the message event.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-lambda.
 
