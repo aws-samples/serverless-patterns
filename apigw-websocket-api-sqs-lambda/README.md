@@ -4,7 +4,7 @@ This pattern creates an Amazon API Gateway WebSocket API which sends inbound mes
 
 The queue acts as a buffer to alleviate traffic spikes and ensure your workload can sustain the arriving load by buffering all the requests durably. It also helps downstream consumers to process the incoming requests at a consistent pace. A FIFO (First-In-First-Out) queue is used to ensure that evens are processed in order of arrival.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-websocket-api-sqs-lambda.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-websocket-sqs-lambda.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
