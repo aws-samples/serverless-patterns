@@ -65,27 +65,20 @@ aws events put-events --entries file://event.json
 ```
 
 2. Retrieve the Message from SQS, referencing the SQS Queue URL from the Outputs section of the deployed Stack, to see a Message matching this example:
+
+```sh
+aws sqs receive-message --queue-url <SQS Queue URL>
+```
 ```json
 {
-  "Messages": [
-    {
-      "Body": "My first message.",
-      "ReceiptHandle": "AQEB6nR4...HzlvZQ==",
-      "MD5OfBody": "1000f835...a35411fa",
-      "MD5OfMessageAttributes": "b8e89563...e088e74f",
-      "MessageId": "d6790f8d-d575-4f01-bc51-40122EXAMPLE",
-      "Attributes": {
-        "SenderId": "AIDAIAZKMSNQ7TEXAMPLE",
-        "SentTimestamp": "1442428276921"
-      },
-      "MessageAttributes": {
-        "PostalCode": {
-          "DataType": "String",
-          "StringValue": "ABC123"
+    "Messages": [
+        {
+            "MessageId": "db759882-e6fe-4d50-8c19-c09f1ae8c87e",
+            "ReceiptHandle": "AQEBwhNNAlv...Sgd0VL",
+            "MD5OfBody": "ad70b8...123f",
+            "Body": "{\"version\":\"0\",\"id\":\"def5aa42-ab94-bc96-0794-3f2bcd143e76\",\"detail-type\":\"message-for-queue\",\"source\":\"my-cdk-application\",\"account\":\"123456789012\",\"time\":\"2021-10-08T18:43:15Z\",\"region\":\"us-west-2\",\"resources\":[],\"detail\":{\"message\":\"Hello CDK world!\"}}"
         }
-      }
-    }
-  ]
+    ]
 }
 ```
 
