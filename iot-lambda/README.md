@@ -1,8 +1,10 @@
-# AWS Amazon S3 to AWS Lambda - Create a Lambda function that resizes images uploaded to S3
+# AWS IOT to AWS Lambda
 
-The SAM template deploys a Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image and creates a thumbail version of the image in the same bucket.
+The SAM template deploys a Lambda function, an IoT thing, and the least IAM resources required to run the application.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-lambda](https://serverlessland.com/patterns/s3-lambda)
+When an IoT event is sent to an IoT topic, a Lambda function is invoked. This pattern configures a Lambda function to poll this event. The function is invoked with a payload containing the contents of the message event.
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-lambda.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,11 +23,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd s3-lambda
+    cd iot-lambda
     ```
-1. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
-    sam build
     sam deploy --guided
     ```
 1. During the prompts:
@@ -39,25 +40,37 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-* Use the AWS CLI upload an image to S3
-* If the object is a .jpg or a .png, the code creates a thumbnail and saves it to the target bucket. 
-* The code assumes that the destination bucket exists and its name is a concatenation of the source bucket name followed by the string -resized
-
-==============================================
+When message events are sent to a IoT topic, this event will trigger a Lambda function. This pattern configures a Lambda function to read this event. The function is invoked with a payload containing the contents of the event sent.
 
 ## Testing
 
-Run the following S3 CLI  command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the S3 Bucket. This is provided in the stack outputs.
+The easiest way to test is using the MQTT test client.
 
-```bash
-aws s3 cp './events/example.jpg'  s3://{SourceBucketName}
-```
+1. In the [AWS IoT console](https://console.aws.amazon.com/iot/home), in the left menu, choose Test.
 
-Run the following command to check that a new version of the image has been created in the destination bucket.
+![AWS IoT console](images/choose-test.png)
 
-```bash
-aws s3 ls s3://{DestinationBucketName}
-```
+2. In the MQTT test client page, select the **Publish to a topic** tab and add the created topic name: `$aws/things/MyIotThing/*`
+
+![MQTT Test client](images/mqtt-test-client.png)
+
+3. Add a message payload or use the the default one, the payload need to be in the JSON format. 
+    ```bash
+    {
+    "message": "Hello from AWS IoT console"
+    }
+   ``` 
+
+
+4. Click in **Publish** to send the event. After the event has been sent, the created Lambda will be triggered.
+
+
+5. Go to the [Cloudwatch Log Groups](https://console.aws.amazon.com/cloudwatch/home?#logsV2:log-groups) page and search for the function Lambda name created. The SAM deployment process outputs will print the value for the **IOTProcessEventFunction**. If you are using the default one, the function name will be something like `STACK_NAME-IOTProcessEventFunction-*`, and the log group will be `/aws/lambda/STACK_NAME-IOTProcessEventFunction-*`
+
+6. If you are able to see the logs with the sent payload, everything is working properly.
+
+![Cloudwatch](images/cloudwatch-logs.png)
+
 
 ## Cleanup
  

@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS IoT trigger that logs events sent to the thing topic.
+Resources:
+
+  # Define the publisher Lambda function with permissions
+  IOTProcessEventFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: app.handler
+      Runtime: nodejs14.x
+      CodeUri: src/
+      Description: A Lambda function that logs the IoT events sent to a IoT Thing topic.
+      MemorySize: 128
+      Timeout: 3
+      Events:
+        MyIotThing:
+          Type: IoTRule
+          Properties:
+            Sql:  SELECT * FROM "$aws/things/MyIotThing/*"
+  
+  # Define the IoT thing
+  MyIotThing:
+    Type: AWS::IoT::Thing
+    Properties:
+      ThingName: MyIotThing
+      AttributePayload:
+        Attributes:
+          myAttributeA: AttributeAValue
+
+Outputs:
+  IOTProcessEventFunction:
+    Description: IOTProcessEventFunction function name
+    Value: !Ref IOTProcessEventFunction

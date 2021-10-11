@@ -1,11 +1,11 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 Description: Serverless patterns - AppSync to DynamoDB
 
 Resources:
   # Define a DynamoDB table
   DynamoDBNotesTable:
-    Type: "AWS::Serverless::SimpleTable"
+    Type: AWS::Serverless::SimpleTable
     Properties:
       PrimaryKey:
         Name: NoteId
@@ -39,25 +39,23 @@ Resources:
                   - dynamodb:Scan
                 Resource: !GetAtt DynamoDBNotesTable.Arn
 
-  # AppSync API
+  # AppSync API - The GraphQL API for the Notes App
   AppSyncApi:
-    Type: "AWS::AppSync::GraphQLApi"
-    Description: "The GraphQL API for the Notes App"
+    Type: AWS::AppSync::GraphQLApi
     Properties:
       Name: NotesApi
-      AuthenticationType: "AMAZON_COGNITO_USER_POOLS"
       XrayEnabled: true
       AuthenticationType: API_KEY
 
   # API Key for external access
   AppSyncApiKey:
     Type: AWS::AppSync::ApiKey
-    Properties: 
+    Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
 
   # AppSync Schema
   AppSyncSchema:
-    Type: "AWS::AppSync::GraphQLSchema"
+    Type: AWS::AppSync::GraphQLSchema
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
       Definition: |
@@ -85,7 +83,7 @@ Resources:
 
   # AppSync Data Source for DynamoDB
   AppSyncNotesTableDataSource:
-    Type: "AWS::AppSync::DataSource"
+    Type: AWS::AppSync::DataSource
     Properties:
       Name: NotesDataSource
       ApiId: !GetAtt AppSyncApi.ApiId
@@ -96,9 +94,9 @@ Resources:
         TableName: !Ref DynamoDBNotesTable
         AwsRegion: !Sub ${AWS::Region}
 
-  # Resolver: Qiery - Get All Notes
+  # Resolver: Query - Get All Notes
   AppSyncAllNotesQueryResolver:
-    Type: "AWS::AppSync::Resolver"
+    Type: AWS::AppSync::Resolver
     DependsOn: AppSyncSchema
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
@@ -118,9 +116,9 @@ Resources:
           "nextToken": $util.toJson(${ctx.args.nextToken})
         }
 
-  # Resolver: Qyuery - get one note
+  # Resolver: Query - get one note
   AppSyncGetNoteQueryResolver:
-    Type: "AWS::AppSync::Resolver"
+    Type: AWS::AppSync::Resolver
     DependsOn: AppSyncSchema
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
@@ -139,7 +137,7 @@ Resources:
 
   # Resolver: Mutation - Save note
   AppSyncSaveNoteMutationResolver:
-    Type: "AWS::AppSync::Resolver"
+    Type: AWS::AppSync::Resolver
     DependsOn: AppSyncSchema
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
@@ -160,9 +158,9 @@ Resources:
         }
       ResponseMappingTemplate: "$util.toJson($ctx.result)"
 
-  #Resolver: Mutations - Delete note
+  # Resolver: Mutations - Delete note
   AppSyncDeleteNoteMutationResolver:
-    Type: "AWS::AppSync::Resolver"
+    Type: AWS::AppSync::Resolver
     DependsOn: AppSyncSchema
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId

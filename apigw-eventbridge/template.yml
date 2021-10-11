@@ -1,0 +1,144 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless pattern API Gateway to EventBridge
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+  Service:
+    Type: String
+    Default: apigw2eb
+  SubDomainName:
+    Type: String
+    # Create a custom domain name at
+    # https://<REGION>.console.aws.amazon.com/apigateway/main/publish/domain-names
+    Default: dev-events
+  DomainName:
+    Type: String
+    # Replace example.com with your domain
+    Default: example.com
+
+# Resources declares the AWS resources that you want to include in the stack
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Resources:
+  # Resource creates or updates a partner event bus or custom event bus
+  # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-events-eventbus.html
+  ApplicationEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub ${Service}-${Stage}
+
+  # Resource reates an API
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub ${Service}-http-api-${Stage}
+      ProtocolType: HTTP
+      DisableExecuteApiEndpoint: true
+
+  # Resource creates an API mapping
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-apimapping.html
+  HttpApiMapping:
+    DependsOn:
+      - HttpApiStage
+    Type: AWS::ApiGatewayV2::ApiMapping
+    Properties:
+      ApiId:
+        Ref: HttpApi
+      DomainName: !Sub ${SubDomainName}.${DomainName}
+      Stage: !Sub ${Stage}
+      ApiMappingKey: !Sub ${Service}
+
+  # Resource updates a stage for an API
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html
+  HttpApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId:
+        Ref: HttpApi
+      StageName: !Sub ${Stage}
+      AutoDeploy: true
+
+  # Resource creates a route for an API
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-route.html
+  HttpApiRoute:
+    DependsOn:
+      - HttpApiIntegrationEventBridge
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId:
+        Ref: HttpApi
+      RouteKey: POST /{source}/{detailType}
+      Target:
+        Fn::Join:
+          - /
+          - - integrations
+            - Ref: HttpApiIntegrationEventBridge
+
+  # Resource creates an integration for an API
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-integration.html
+  HttpApiIntegrationEventBridge:
+    DependsOn:
+      - HttpApiIntegrationEventBridgeRole
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId:
+        Ref: HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationSubtype: EventBridge-PutEvents
+      CredentialsArn:
+        Fn::GetAtt: [HttpApiIntegrationEventBridgeRole, Arn]
+      RequestParameters:
+        # Replace `mycompany` with your needs
+        Source: com.mycompany.$request.path.source
+        DetailType: $request.path.detailType
+        Detail: $request.body
+        EventBusName:
+          Fn::GetAtt: [ApplicationEventBus, Arn]
+      PayloadFormatVersion: "1.0"
+      TimeoutInMillis: 10000
+
+  # Resource creates a new role for your AWS account
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+  HttpApiIntegrationEventBridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${Service}-${Stage}-eventBridge
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:*'
+                Resource:
+                  Fn::GetAtt: [ApplicationEventBus, Arn]
+      RoleName:
+        Fn::Join:
+          - "-"
+          - - !Sub ${Service}-${Stage}
+            - Ref: AWS::Region
+            - eventBridgeRole
+
+Outputs:
+  ApplicationEventBusName:
+    Description: Application EventBus Name
+    Value:
+      Ref: ApplicationEventBus
+
+  ApplicationEventBusArn:
+    Description: Application EventBus ARN
+    Value:
+      Fn::GetAtt:
+        - ApplicationEventBus
+        - Arn

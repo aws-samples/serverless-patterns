@@ -1,8 +1,10 @@
-# AWS Amazon S3 to AWS Lambda - Create a Lambda function that resizes images uploaded to S3
+# AWS DynamoDB to AWS Kinesis Data Streams
 
-The SAM template deploys a Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image and creates a thumbail version of the image in the same bucket.
+The SAM template deploys a DynamoDB table and a Kinesis Data Stream.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-lambda](https://serverlessland.com/patterns/s3-lambda)
+When new items are added to the DynamoDB table, the item-level changes in the table will be streamed to the Kinesis Data Stream.
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-kinesis
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,11 +23,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd s3-lambda
+    cd dynamodb-kinesis
     ```
-1. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
-    sam build
     sam deploy --guided
     ```
 1. During the prompts:
@@ -33,31 +34,17 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-* Use the AWS CLI upload an image to S3
-* If the object is a .jpg or a .png, the code creates a thumbnail and saves it to the target bucket. 
-* The code assumes that the destination bucket exists and its name is a concatenation of the source bucket name followed by the string -resized
-
-==============================================
+When new items are added to the DynamoDB table, a payload with item-level changes will be streamed to the Kinesis Data Stream.
 
 ## Testing
 
-Run the following S3 CLI  command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the S3 Bucket. This is provided in the stack outputs.
-
-```bash
-aws s3 cp './events/example.jpg'  s3://{SourceBucketName}
-```
-
-Run the following command to check that a new version of the image has been created in the destination bucket.
-
-```bash
-aws s3 ls s3://{DestinationBucketName}
-```
+After deployment, add an item to the DynamoDB table. Go to the CloudWatch Metrics for the deployed Kinesis Data Stream. You will see incoming record metrics for the item data.
 
 ## Cleanup
  

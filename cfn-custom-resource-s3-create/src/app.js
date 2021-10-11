@@ -3,8 +3,10 @@
  */
 
 // Lambda function used as CloudFormation custom resource to create an S3 object.
-const AWS = require("aws-sdk");
-const S3 = new AWS.S3();
+//const AWS = require("aws-sdk");
+//const S3 = new AWS.S3();
+const { S3 } = require("aws-sdk");
+const s3 = new S3();
 const response = require("./cfn-response.js");
 
 exports.handler = async (event, context) => {
@@ -23,7 +25,7 @@ exports.handler = async (event, context) => {
         Bucket: event.ResourceProperties.Bucket,
         Key: event.ResourceProperties.Key,
       };
-      await S3.deleteObject(params).promise();
+      await s3.deleteObject(params).promise();
     } catch (error) {
       console.error("Error during S3 delete:\n", error);
     }
@@ -37,7 +39,7 @@ exports.handler = async (event, context) => {
         ContentType: event.ResourceProperties.ContentType,
         Body: event.ResourceProperties.Body,
       };
-      const s3Upload = await S3.upload(params).promise();
+      const s3Upload = await s3.upload(params).promise();
       // Response data that is sent back to CloudFormation:
       responseData = { ObjectKey: s3Upload.Key };
       responseStatus = response.SUCCESS;
