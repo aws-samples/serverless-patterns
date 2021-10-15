@@ -3,7 +3,7 @@
 
 This pattern in CDK offers a example to generate an Amazon API Gateway with a greedy proxy ("{proxy+}") and "ANY" method from the specified path, meaning it will accept by default any method and any path. The VPC Lambda function provided in JavaScript only returns the path.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apig-waf
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-waf-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
