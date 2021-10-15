@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  lambda-cloudwatch
+
+  Sample SAM Template for lambda-cloudwatch
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  PutMetricFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      # SAM Managed Policy for inserting custom CloudWatch Metrics
+      Policies:
+        - CloudWatchPutMetricPolicy: {}
+
+Outputs:
+  PutMetricFunction:
+    Description: "Put Metric Lambda Function ARN"
+    Value: !GetAtt PutMetricFunction.Arn
+  PutMetricFunctionIamRole:
+    Description: "Implicit IAM Role created for Put Metric function"
+    Value: !GetAtt PutMetricFunctionRole.Arn
