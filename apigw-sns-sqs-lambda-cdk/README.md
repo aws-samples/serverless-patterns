@@ -3,7 +3,7 @@
 This CDK application demonstrates how to set up a topic-queue-chaining pattern using Amazon SNS and Amazon SQS behind an Amazon API Gateway. 
 This architecture helps in setting up a highly scalable API that can consume messages/events, fan them out and process them asynchronously. 
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sns-sqs-lambda-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sns-sqs-cdk.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
