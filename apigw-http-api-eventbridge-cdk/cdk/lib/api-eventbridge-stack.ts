@@ -57,7 +57,7 @@ export class ApiEventbridgeStack extends cdk.Stack {
         requestParameters: {
           Source: 'WebApp',
           DetailType: 'MyDetailType', 
-          Detail: '$request.body.Detail',
+          Detail: '$request.body',
           EventBusName: eventBus.eventBusArn,
         },
         payloadFormatVersion: '1.0',
