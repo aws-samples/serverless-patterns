@@ -4,7 +4,7 @@ The CDK stack deploys a Lambda function, a DynamoDB table, and the minimum IAM r
 
 When items are written or updated in the DynamoDB table, the changes are sent to a stream. This pattern configures a Lambda function to poll this stream. The function is invoked with a payload containing the contents of the table item that changed.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-lambda-cdk.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -38,13 +38,9 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-## How it works
-
-Explain how the service interaction works.
-
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Add an item to the DynamoDB table and confirm the resulting Lambda invocation in CloudWatch Logs.
 
 ## Cleanup
  
