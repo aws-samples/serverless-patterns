@@ -1,0 +1,5 @@
+aws-cdk.aws-iot
+aws-cdk.aws-lambda
+aws-cdk.aws-logs
+aws-cdk.aws-iam
+aws-cdk.core
