@@ -9,5 +9,8 @@ export class CdkStack extends cdk.Stack {
       partitionKey: {name:'ID', type: AttributeType.STRING},
       billingMode: BillingMode.PAY_PER_REQUEST
     });
+
+    // Outputs
+    new cdk.CfnOutput(this, 'DynamoDbTableName', { value: dynamoTable.tableName });
   }
 }
