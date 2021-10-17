@@ -187,3 +187,5 @@ Note: EventBridge does not guarantee "only once event delivery" but the client c
 6. https://www.youtube.com/watch?v=J0qfMYRmQcc
 
 7. https://docs.aws.amazon.com/wellarchitected/latest/serverless-applications-lens/serverless-event-submission-with-status-updates.html
+
+8. https://www.youtube.com/watch?v=CeeoFqE2OU0&t=335s
