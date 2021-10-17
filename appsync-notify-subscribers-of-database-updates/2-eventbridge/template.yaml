@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Notify subscribers of database updates via EventBridge
+
+Parameters:
+  AppSyncEndpoint:
+    Type: String
+  AppSyncApiKey:
+    Type: String
+
+Resources:
+  OrdersEventBus: ## EventBridge Event Bus for processing orders
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: orders
+
+  ApiDestination:  ## EventBridge API destination pointing to AppSync API
+    Type: AWS::Events::ApiDestination
+    Properties:
+      ConnectionArn: !GetAtt ApiDestinationConnection.Arn
+      HttpMethod: POST
+      InvocationEndpoint: !Ref AppSyncEndpoint
+
+  ApiDestinationConnection:  ## Connection for EventBridge API Destination
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: x-api-key
+          ApiKeyValue: !Ref AppSyncApiKey
+
+  RouteToAppSyncRule:  ## Route order status updates to AppSync endpoint
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !GetAtt OrdersEventBus.Name
+      EventPattern:
+        source:
+          - orders.system
+        detail-type:
+          - Order Status Update
+      Targets:
+        - Id: appsync-order-status-update
+          Arn: !GetAtt ApiDestination.Arn
+          RoleArn: !GetAtt EventBridgeRole.Arn
+          DeadLetterConfig:
+            Arn: !GetAtt DLQ.Arn
+          InputTransformer:
+            InputPathsMap:
+              orderId: "$.detail.order-id"
+              status: "$.detail.status"
+              prevStatus: "$.detail.previous-status"
+              updatedAt: "$.time"
+            InputTemplate: |
+              {
+                "query": "mutation PublishStatusUpdate($orderId:ID!, $status:Status!, $prevStatus:Status, $updatedAt:AWSDateTime!) { publishStatusUpdate(orderId:$orderId, status:$status, prevStatus:$prevStatus, updatedAt:$updatedAt) { orderId status prevStatus updatedAt } }",
+                "operationName": "PublishStatusUpdate",
+                "variables": {
+                  "orderId": "<orderId>",
+                  "status": "<status>",
+                  "prevStatus": "<prevStatus>",
+                  "updatedAt": "<updatedAt>"
+                }
+              }
+
+  DLQ:
+    Type: AWS::SQS::Queue
+
+  DLQPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref DLQ
+      PolicyDocument:
+        Statement:
+          - Action: "sqs:SendMessage"
+            Effect: Allow
+            Resource: !GetAtt DLQ.Arn
+            Principal:
+              Service: events.amazonaws.com
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt RouteToAppSyncRule.Arn
+
+  EventBridgeRole:  ## Service role to invoke Api Destination
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: /
+      Policies:
+        - PolicyName: eventbridge-invoke-api-destination
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: events:InvokeApiDestination
+                Resource:
+                  - !Sub "arn:aws:events:${AWS::Region}:${AWS::AccountId}:api-destination/${ApiDestination}/*"
+
+Outputs:
+  OrdersEventBusArn:
+    Value: !GetAtt OrdersEventBus.Arn
+    Description: The ARN of OrdersEventBus
+
+  OrdersEventBusName:
+    Value: !GetAtt OrdersEventBus.Name
+    Description: The Name OrdersEventBus
