@@ -22,6 +22,9 @@ export class CdkStack extends cdk.Stack {
       desiredCount: 1,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../src/')),
+        environment: {
+          "name": "Serverless Fargate",
+        },
       },
       memoryLimitMiB: 2048,
     });

@@ -6,7 +6,7 @@ const port = 80;
 const server = http.createServer((req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World Serverless');
+  res.end(`Hello World ${process.env.name}`);
 });
 
 server.listen(port, hostname, () => {
