@@ -1,6 +1,6 @@
 # AWS Fargate
 
-This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) with an Application Load Balancer in-front. This builds on the tutorial at [AWS CDK Creating an AWS Fargate service using the AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/ecs_example.html) by showing how to add a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built `ecs.ContainerImage.fromAsset` method. The custom image used is a simple hello world Node Js application. This can be changed to other images that suit your use case, simply make changes to the codes found in the `src` directory.
+This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) with an Application Load Balancer in-front. This builds on the tutorial at [AWS CDK Creating an AWS Fargate service using the AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/ecs_example.html) by showing how to add a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built `ecs.ContainerImage.fromAsset` method. The custom image used is a simple hello world Node Js application. This project also provides an example of how to pass an environment variable to the image. Note that the image can be changed to other images that suit your use case by changing the codes found in the `src` directory.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/fargate-cdk.
 
@@ -47,11 +47,11 @@ Warning: As of this writing, there are known issues with the images built on App
 - The image is then automatically pushed to Amazon ECR
 - The ECS cluster is then created
 - Networking resources are then created
-- Finally the Fargate Service and the Task Definitions are created
+- Finally the Fargate Service and the Task Definitions are created. This also passes the environment variable to the image.
 
 ## Testing
 
-Retrieve the Fargate Service endpoint from the `cdk deploy` output to view the `hello world serverless` response from the browser.
+Retrieve the Fargate Service endpoint from the `cdk deploy` output to view the `hello world Serverless Fargate` response from the browser.
 
 ## Cleanup
 
