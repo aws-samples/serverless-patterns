@@ -46,7 +46,7 @@ This pattern deploys an Amazon API Gateway WebSocket API with a $connect route, 
 
 ## Testing
 
-Once the application is deployed, retrieve the WebSocketURL value from CloudFormation Outputs. To test the WebSocket API, you can use [wscat](https://github.com/websockets/wscat) which is an open-source command line tool. 
+Once the application is deployed, retrieve the WebSocketURL value from CloudFormation Outputs. To test the WebSocket API, you can use [wscat](https://github.com/websockets/wscat) which is an open-source command line tool.
 
 1. [Install NPM](https://www.npmjs.com/get-npm).
 
