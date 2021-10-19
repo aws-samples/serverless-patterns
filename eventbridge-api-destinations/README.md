@@ -16,6 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * To run example #1, an account with [Webhook.site](https://webhook.site/)
 * To run example #2, an account with [Slack](http://slack.com). Follow the instructions at [Create a bot for your workspace](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) and note the bot's token (this code begins with xoxb) and the channel ID. You need both of these values to deploy the solution.
+* To run example #3, an account with [sumologic](https://sumologic.com). Follow the instructions at [Create an HTTP Source ](https://help.sumologic.com/03Send-Data/Sources/02Sources-for-Hosted-Collectors/HTTP-Source) and note the unique URL for your HTTP Source you need this value to deploy the solution.
 
 ## Deployment Instructions
 
@@ -30,6 +31,7 @@ Important: this application uses various AWS services and there are costs associ
 1. There are two examples in this directory.
 - To run the Webhook.test open API example, cd to `1-webhook-site`.
 - To run the Slack authenticated API example, cd to `2-slack`.
+- To run the sumologic HTTP Source collector example, cd to `3-sumologic`.
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
@@ -37,7 +39,7 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
-    * Enter the parameters, such as Webhook.site URL or Slack bot token and Channel ID.
+    * Enter the parameters, such as Webhook.site URL, Slack bot token and Channel ID, or sumo logic HTTP Source URL.
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -51,6 +53,10 @@ aws events put-events --entries file://testEvent.json
 ```
 2. In the Webhook.site example, the API call appears in the dashboard.
 3. In the Slack example, a message appears in the specified Slack channel ("Payment failed").
+4. For the sumo logic example use the testEvent.json within the 3-sumologic directory
+```
+aws events put-events --entries file://3-sumologic/testEvent.json
+```
 
 ## Cleanup
  
