@@ -36,7 +36,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates an Amazon API Gateway REST API that integrates with an Amazon DynamoDB table. The API integrates directly with the DynamoDB API and supports [PutItem](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html) and [Query](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html) actions.
+This pattern creates an Amazon API Gateway REST API that integrates with an Amazon DynamoDB table. The API integrates directly with the DynamoDB API and supports [PutItem](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html) and [Query](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html) actions. The API Integration has read and write access to the DynamoDB. There is no authentication on the API endpoint
 
 ## Testing
 
@@ -51,7 +51,7 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 1. Invoke the DynamoDB **PutItem** action to add a new item to the DynamoDB table:
 	* Enter the API URL with the **prod** stage as the path:.
 	```
-	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod
+	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/id
 	```
 	* Select **POST** as the HTTP method from the drop-down list to the left of the address bar.
 	* Choose the **Body** tab. Choose **raw** and select **JSON** from the drop-down list. Enter the following into the text box: 
@@ -66,10 +66,10 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 	* Change the values for `pk` or `data` in the POST body and repeat this process to add multiple items to the DynamoDB table.
 
 1. Invoke the DynamoDB **Query** action to query items by artist in the DynamoDB table:
-	* Enter the Invoke URL in the address bar. Add **/prod/anything** to the URL path.
+	* Enter the Invoke URL in the address bar. Add **/prod/foo** to the URL path.
 	* Add **/foo** to the URL path. This defines the ID that you want to query.
 	```
-	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/foo
+	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/${pk}
 	```
 	* Select **GET** as the HTTP method from the drop-down list to the left of the address bar.
 	* Choose the **Body** tab. Choose **none**.
