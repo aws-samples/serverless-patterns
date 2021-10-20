@@ -18,7 +18,7 @@ export class ApiDynamoStack extends cdk.Stack {
     const restApi = new RestApi(this, 'ApiDynamoRestApi')
     const resource = restApi.root.addResource('{id}')
 
-    // Allow the RestApi to access DynamoDb by assigning the integration this role
+    // Allow the RestApi to access DynamoDb by assigning this role to the integration
     const integrationRole = new Role(this, 'IntegrationRole', {
       assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
     })
