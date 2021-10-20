@@ -9,22 +9,53 @@ export class ApiDynamoStack extends cdk.Stack {
 
     // DynamoDB Table
     const ddbTable = new Table(this, 'ApiDynamoTable', {
-      partitionKey: {name:'PK', type: AttributeType.STRING},
-      billingMode: BillingMode.PAY_PER_REQUEST
+      partitionKey: {name:'pk', type: AttributeType.STRING},
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     // RestApi
     const restApi = new RestApi(this, 'ApiDynamoRestApi')
     const resource = restApi.root.addResource('{id}')
 
-    // Allow the RestApi to access DynamoDb
+    // Allow the RestApi to access DynamoDb by assigning the integration this role
     const integrationRole = new Role(this, 'IntegrationRole', {
       assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
     })
-    ddbTable.grantReadData(integrationRole)
+    ddbTable.grantReadWriteData(integrationRole)
 
-    // Integration with DynamoDb
-    const dynamoIntegration = new AwsIntegration({
+    // POST Integration to DynamoDb
+    const dynamoPutIntegration = new AwsIntegration({
+      service: 'dynamodb',
+      action: 'PutItem',
+      options: {
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+        credentialsRole: integrationRole,
+        requestTemplates: {
+          'application/json': JSON.stringify({
+              'TableName': ddbTable.tableName,
+              'Item': {
+                'pk': {'S': "$input.path('$.pk')"},
+                'data': {'S': "$input.path('$.data')"},
+              }
+          }),
+        },
+        integrationResponses: [
+          {
+            statusCode: '200',
+            responseTemplates: {
+              'application/json': JSON.stringify({})
+            }
+          }
+        ],
+      }
+    })
+    resource.addMethod('POST', dynamoPutIntegration, {
+      methodResponses: [{statusCode: '200'}],
+    })
+
+    // GET Integration with DynamoDb
+    const dynamoQueryIntegration = new AwsIntegration({
       service: 'dynamodb',
       action: 'Query',
       options: {
@@ -36,7 +67,7 @@ export class ApiDynamoStack extends cdk.Stack {
         requestTemplates: {
           'application/json': JSON.stringify({
               'TableName': ddbTable.tableName,
-              'KeyConditionExpression': 'PK = :v1',
+              'KeyConditionExpression': 'pk = :v1',
               'ExpressionAttributeValues': {
                   ':v1': {'S': "$input.params('id')"}
               }
@@ -45,9 +76,7 @@ export class ApiDynamoStack extends cdk.Stack {
         integrationResponses: [{ statusCode: '200' }],
       }
     })
-
-    // GET data from DynamoDB
-    resource.addMethod('GET', dynamoIntegration, {
+    resource.addMethod('GET', dynamoQueryIntegration, {
       methodResponses: [{ statusCode: '200' }],
       requestParameters: {
         'method.request.path.id': true

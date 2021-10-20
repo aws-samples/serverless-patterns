@@ -36,52 +36,59 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how thThis pattern creates an Amazon API Gateway REST API that integrates with an Amazon DynamoDB table named "Music". The API includes an API key and usage plan. The DynamoDB table includes a Global Secondary Index named "Artist-Index". The API integrates directly with the DynamoDB API and supports [PutItem](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html) and [Query](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html) actions.e service interaction works.
+This pattern creates an Amazon API Gateway REST API that integrates with an Amazon DynamoDB table. The API integrates directly with the DynamoDB API and supports [PutItem](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html) and [Query](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html) actions.
 
 ## Testing
 
+Upon deployment, you will see the API endpoint URL in the output. It will take the format:
+
+`https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com`
+
 Once the application is deployed, use [Postman](https://www.postman.com/) to test the API using the following instructions.
 
-1. Launch the AWS Management Console and open the API Gateway console. Select the API named "api-music".
-	* In the Stages section, copy the Invoke URL from the stage named "v1".
-	* In the API Keys section, copy the API key named "api-music-apikey".
 1. Launch Postman
-1. Choose the **Authorization** tab. Choose **API Key** for the authorization type. Enter **x-api-key** as the Key name. Enter the API key as the Value.
+
 1. Invoke the DynamoDB **PutItem** action to add a new item to the DynamoDB table:
-	* Enter the Invoke URL in the address bar. Add the **/music** path to the URL.
+	* Enter the API URL with the **prod** stage as the path:.
 	```
-	https://{ApiId}.execute-api.{Region}.amazonaws.com/v1/music
+	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod
 	```
 	* Select **POST** as the HTTP method from the drop-down list to the left of the address bar.
 	* Choose the **Body** tab. Choose **raw** and select **JSON** from the drop-down list. Enter the following into the text box: 
 	```
 	{
-		"artist": "The Beatles",
-		"album": "Abbey Road"
+		"pk": "foo",
+		"data": "blah blah blah"
 	}
 	```
 	* Choose **Send** to submit the request and receive a "200 OK" response.
-	* Open the DynamoDB console and select the table named "Music" to confirm that the item has been added.
-	* Change the values for artist or album and repeat this process to add multiple items to the DynamoDB table.
+	* Open the DynamoDB console and select the table which was created to confirm that the item has been added.
+	* Change the values for `pk` or `data` in the POST body and repeat this process to add multiple items to the DynamoDB table.
+
 1. Invoke the DynamoDB **Query** action to query items by artist in the DynamoDB table:
-	* Enter the Invoke URL in the address bar. Add **/music** to the URL path.
-	* Add **/The+Beatles** to the URL path. This defines the artist name that you want to query. The **+** represents a space.
+	* Enter the Invoke URL in the address bar. Add **/prod/anything** to the URL path.
+	* Add **/foo** to the URL path. This defines the ID that you want to query.
 	```
-	https://{ApiId}.execute-api.{Region}.amazonaws.com/v1/music/The+Beatles
+	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/foo
 	```
 	* Select **GET** as the HTTP method from the drop-down list to the left of the address bar.
 	* Choose the **Body** tab. Choose **none**.
 	* Choose **Send** to submit the request and receive a "200 OK" response with a list of the matching results. Example: 
 	```
-	{
-		"music": [
-			{
-				"id": "9cd966d3-b161-45cf-ab07-ce39178c05b5",
-				"artist": "The Beatles",
-				"album": "Abbey Road"
-			}
-		]
-	}
+		{
+			"Count": 1,
+			"Items": [
+				{
+					"pk": {
+						"S": "foo"
+					},
+					"data": {
+						"S": "blah blah blah"
+					}
+				}
+			],
+			"ScannedCount": 1
+		}
 	```
 ## Documentation
 - [Tutorial: Build an API Gateway REST API with AWS integration](https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html)
