@@ -2,7 +2,7 @@
 
 This pattern creates an AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-aurora
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -16,7 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
+    ```
     git clone https://github.com/aws-samples/serverless-patterns
     ```
 1. Change directory to the pattern directory:
@@ -74,7 +74,7 @@ Response:
 - [Function Environment Variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html)
 
 ## Cleanup
- 
+
 1. Delete the stack
     ```bash
     aws cloudformation delete-stack --stack-name STACK_NAME

@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon API Gateway WebSocket API and an AWS Lambda function.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-websocket-api-lambda
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -46,7 +46,7 @@ This pattern deploys an Amazon API Gateway WebSocket API with a $connect route, 
 
 ## Testing
 
-Once the application is deployed, retrieve the WebSocketURL value from CloudFormation Outputs. To test the WebSocket API, you can use [wscat](https://github.com/websockets/wscat) which is an open-source command line tool. 
+Once the application is deployed, retrieve the WebSocketURL value from CloudFormation Outputs. To test the WebSocket API, you can use [wscat](https://github.com/websockets/wscat) which is an open-source command line tool.
 
 1. [Install NPM](https://www.npmjs.com/get-npm).
 

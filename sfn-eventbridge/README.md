@@ -1,8 +1,8 @@
 # AWS Step Functions to Amazon EventBridge
 
-This pattern creates a Step Functions workflow that publishes events to EventBridge. 
+This pattern creates a Step Functions workflow that publishes events to EventBridge.
 
-Learn more about this pattern at the Serverless Land Patterns Collection: << Add the live URL here >>
+Learn more about this pattern at the Serverless Land Patterns Collection: https://serverlessland.com/patterns/sfn-eventbridge
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
@@ -18,7 +18,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
+    ```
     git clone https://github.com/aws-samples/serverless-patterns
     ```
 1. Change directory to the pattern directory:
@@ -58,7 +58,7 @@ aws logs tail ENTER_YOUR_CLOUDWATCH_LOG_GROUP
 ```
 You should see an event that was delivered to the event bus:
 ```bash
-2021-06-03T00:55:46+00:00 551720c6-1832-3700-8172-b6c584ac6d6c 
+2021-06-03T00:55:46+00:00 551720c6-1832-3700-8172-b6c584ac6d6c
 {
   "version":"0",
   "id":"99c02ee9-53b9-ae01-87cb-18c59081ce73",
@@ -78,7 +78,7 @@ You should see an event that was delivered to the event bus:
 ```
 
 ## Cleanup
- 
+
 1. Delete the stack
     ```bash
     aws cloudformation delete-stack --stack-name STACK_NAME
