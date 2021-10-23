@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd _patterns-model
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use CDK to deploy the AWS resources for the pattern as specified in eventbridge-scheduled-lambda-cdk.ts file:
     ```
     cdk deploy --context interval_in_minutes=<number>
     example: cdk deploy --context interval_in_minutes=5
