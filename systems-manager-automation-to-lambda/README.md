@@ -83,12 +83,10 @@ Provide steps to trigger the integration and show what should be observed if suc
 
 1. Delete the stack
     ```
-    bash
     aws cloudformation delete-stack --stack-name STACK_NAME
     ```
 1. Confirm the stack has been deleted
     ```
-    bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
