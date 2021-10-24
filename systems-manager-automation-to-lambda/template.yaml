@@ -1,0 +1,161 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Systems Manager Automation to AWS lambda
+
+Resources:
+##########################################################################
+#   IAM Role to be assumed by the Systems Manager Automation Document                                                       #
+##########################################################################
+  AutomationExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::AccountId}-ServerlessLandAuotomationExecutionRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ssm.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: automation-invoke-lambda-execution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt LambdaFunction.Arn
+    DependsOn: LambdaFunction
+
+##########################################################################
+#  DynamoDB table that is going to be used in this pattern for testing                                                      #
+##########################################################################
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::AccountId}-ServerlessLandTestTable"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      AttributeDefinitions:
+        -
+          AttributeName: "Album"
+          AttributeType: "S"
+        -
+          AttributeName: "Artist"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "Album"
+          KeyType: "HASH"
+        -
+          AttributeName: "Artist"
+          KeyType: "RANGE"
+      Tags:
+        - Key: "namespace"
+          Value: "development"
+
+#######################################################################################################################################
+  #lambda function to be created that gets invoked by an SSM automation document which passes the documnet parameters as input payload.
+  #This lamba function handles updating a dynamoDB table(s)
+#######################################################################################################################################
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.handler
+      CodeUri: ./src
+      Runtime: python3.7
+      Timeout: 60
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - 'DynamoDB:UpdateTable'
+              - 'DynamoDB:PutItem'
+            Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DynamoDBTable}'
+
+
+###################################################################################################################
+#SSM document of type "Automation" that is used to invoke a lambda function by passing in the Automation document's
+#execution time paramenter values to the function's payload data
+###################################################################################################################
+  SsmAutomationDocument:
+    Type: AWS::SSM::Document
+    DependsOn: LambdaFunction
+    Properties:
+      Name: !Sub "${AWS::AccountId}_serverlessland_automation"
+      DocumentType: Automation
+      Content:
+        schemaVersion: "0.3"
+        assumeRole: !GetAtt AutomationExecutionRole.Arn
+        description: "Automation document for the invoking a lambda function"
+        parameters:
+          DocumentInputTableName:
+            type: String
+          PartitonKeyInput:
+            type: String
+          SortKeyInput:
+            type: String
+
+        mainSteps:
+        - name: lambda_invoke
+          action: 'aws:invokeLambdaFunction'
+          onFailure: Abort
+          inputs:
+            FunctionName: !Ref LambdaFunction
+            Payload: |
+              {
+               "ssm_automation_parameters":
+                 {
+                   "table_name": "{{DocumentInputTableName}}",
+                   "partition_key_input": "{{PartitonKeyInput}}",
+                   "sort_key_input":"{{SortKeyInput}}"
+                 }
+              }
+
+##########################################################################
+#  Sample DynamoDB table that will be used to test this serverless pattern                                                      #
+##########################################################################
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::AccountId}-ServerlessLandTestTable"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      AttributeDefinitions:
+        -
+          AttributeName: "Album"
+          AttributeType: "S"
+        -
+          AttributeName: "Artist"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "Album"
+          KeyType: "HASH"
+        -
+          AttributeName: "Artist"
+          KeyType: "RANGE"
+      Tags:
+        - Key: "namespace"
+          Value: "development"
+
+
+Outputs:
+#######################################################################
+#CF stack Output to Store the Systems Manger Automation Document's Name
+#######################################################################
+  SystemsManagerAutomationDocumentName:
+    Description: Automation document name
+    Value: !Ref SsmAutomationDocument
+
+#######################################################################
+#CF stack Output to Store the Systems Manger Automation Document's Name
+#######################################################################
+  DynamoDBTableName:
+    Description: Name of the sample DynamoDb table used.
+    Value: !Ref DynamoDBTable
