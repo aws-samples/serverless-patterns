@@ -50,7 +50,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-When the Systems Manger Automation Document is invoked, the execution parameters are sent as payload to invoke lambda function which updates the dynamoDB table with the execution parameters from the Automation execution
+When the Systems Manger Automation Document is invoked, the execution parameters are sent as payload to invoke lambda function which updates the dynamoDB table's items with the parameters from the Automation execution.
 
 ## Testing
 
