@@ -77,8 +77,6 @@ When the Systems Manger Automation Document is invoked, the execution parameters
     aws dynamodb scan --table-name <$DynamoDBTableName>
     ```
 
-Provide steps to trigger the integration and show what should be observed if successful.
-
 ## Cleanup
 
 1. Delete the stack
