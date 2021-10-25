@@ -3,6 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: AWS Systems Manager Automation to AWS lambda
 
 Resources:
+
 ##########################################################################
 #   IAM Role to be assumed by the Systems Manager Automation Document                                                       #
 ##########################################################################
@@ -77,7 +78,6 @@ Resources:
               - 'DynamoDB:PutItem'
             Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DynamoDBTable}'
 
-
 ###################################################################################################################
 #SSM document of type "Automation" that is used to invoke a lambda function by passing in the Automation document's
 #execution time paramenter values to the function's payload data
@@ -116,36 +116,9 @@ Resources:
                  }
               }
 
-##########################################################################
-#  Sample DynamoDB table that will be used to test this serverless pattern                                                      #
-##########################################################################
-  DynamoDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Sub "${AWS::AccountId}-ServerlessLandTestTable"
-      ProvisionedThroughput:
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5"
-      AttributeDefinitions:
-        -
-          AttributeName: "Album"
-          AttributeType: "S"
-        -
-          AttributeName: "Artist"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "Album"
-          KeyType: "HASH"
-        -
-          AttributeName: "Artist"
-          KeyType: "RANGE"
-      Tags:
-        - Key: "namespace"
-          Value: "development"
-
 
 Outputs:
+
 #######################################################################
 #CF stack Output to Store the Systems Manger Automation Document's Name
 #######################################################################
