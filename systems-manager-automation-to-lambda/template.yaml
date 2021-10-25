@@ -127,7 +127,7 @@ Outputs:
     Value: !Ref SsmAutomationDocument
 
 #######################################################################
-#CF stack Output to Store the Systems Manger Automation Document's Name
+#CF stack Output to Store the DynamoDB Table's Name
 #######################################################################
   DynamoDBTableName:
     Description: Name of the sample DynamoDb table used.
