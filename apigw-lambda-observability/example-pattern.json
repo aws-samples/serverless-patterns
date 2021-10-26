@@ -19,7 +19,7 @@
   "deploy": {
     "text": [
       "npm install",
-      "sam build --use-container",
+      "sam build",
       "sam deploy --guided"
     ]
   },
