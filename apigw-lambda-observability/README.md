@@ -58,9 +58,8 @@ Once the CloudFormation stack is deployed get its outputs either in AWS Manageme
 
 To test this pattern deployment please navigate to the API endpoint URL available in the stack outputs. You should see API Gateway request payload returned by the Lambda function. Repeat this request few times. 
 
-After a few API requests, open CloudWatch dashboard created by this application using URL present in the stack outputs. It should show select API Gateway and Lambda metrics, application custom metrics, alarm statuses and last 100 AWS Lambda errors (if any) over dashboard time range.
+After a few API requests, open CloudWatch dashboard created by this application using URL present in the stack outputs. It should show select API Gateway and Lambda metrics, application custom metrics, alarm statuses and the last 100 AWS Lambda errors (if any) over dashboard time range.
 
-*Please note, that you can use AWS CLI to get stack outputs:*
 
 ## Cleanup
 
