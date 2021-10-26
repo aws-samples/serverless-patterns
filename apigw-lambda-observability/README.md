@@ -1,4 +1,4 @@
-# API Gateway to Lambda observability
+# Amazon API Gateway to AWS Lambda with observability features
 
 This pattern shows how to add observability to your serverless appliocation stack - alarms, logs, custom metrics, dashboards
 
