@@ -1,0 +1,9 @@
+{
+    "name": "apigw-lambda-observability",
+    "description": "API Gateway/Lambda integration with observability",
+    "version": "1.0.0",
+    "private": true,
+    "dependencies": {
+        "aws-embedded-metrics": "^2.0.4"
+    }
+}
