@@ -4,7 +4,7 @@ This project contains a sample AWS Cloud Development Kit (AWS CDK) template for 
 
 This project also shows how to set up a S3 Gateway Endpoint to the VPC and configure additional bucket policies that require actions to come from the S3 Gateway Endpoint. This is in addition to the built-in `grantReadWrite` that CDK provides.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/fargate-s3-cdk.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cdk-fargate-s3.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
