@@ -38,6 +38,7 @@ export class CdkStack extends cdk.Stack {
           region: process.env.CDK_DEFAULT_REGION!
         },
       },
+      assignPublicIp: false,
       memoryLimitMiB: 2048,
     });
 
