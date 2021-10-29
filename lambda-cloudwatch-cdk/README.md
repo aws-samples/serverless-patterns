@@ -1,6 +1,6 @@
 # AWS Lambda to AWS CloudWatch with CDK
 
-This CDK deploys a Lambda function that inserts custom metric data into AWS Cloudwatch. The CDK deploys the resources and the IAM permissions required to run the application.
+This CDK template deploys a Lambda function that inserts custom metric data into AWS CloudWatch. The CDK deploys the resources and the IAM permissions required to run the application.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-cloudwatch-cdk.
 
