@@ -1,8 +1,10 @@
-# How do I notify AWS AppSync subscribers of external database updates that aren't performed by client-side mutations?
+# Notifying AWS AppSync subscribers of external database updates that aren't performed by client-side mutations
 
 The SAM template deploys a nested stack with authentication configured using Cognito. It also deploys an AppSync configured with AMAZON_COGNITO_USER_POOLS, API_KEY and IAM for authorization.
 
 Note: when deploying this pattern, both *CAPABILITY_AUTO_EXPAND* and *CAPABILITY_IAM* are required.
+
+Learn more about this pattern at: https://serverlessland.com/patterns/appsync-lambda-graphql.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -151,7 +153,7 @@ Event detail:
 
 ![plot](./imgs/2-eventbridge/eb.gif)
 
-## Testing Part 3 - notify via lambda
+## Testing Part 3 - notify via Lambda
 3.1 - Open AppSync, log in using Cognito User Pool and created user, launch subscription (see a picture from step 1.3).
 
 3.2 - Open lambda in AWS console, create test event (dummy event), click test.
