@@ -1,6 +1,6 @@
 # AWS EventBridge to AWS Lambda
 
-This CDK pattern deploys an infrastructure on AWS with Custom Scheduled EventBridge Rule that trigger a lambda function that get as environment variable the value assigned to the interval (in minutes) that the lambda will run
+This CDK pattern deploys a custom scheduled EventBridge rule that triggers a Lambda function. An environment variable contains the value assigned to the interval (in minutes) that the Lambda function will run.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
