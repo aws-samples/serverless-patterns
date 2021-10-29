@@ -1,0 +1,38 @@
+type Mutation {
+  publishStatusUpdate(
+    orderId: ID!
+    status: Status!
+    prevStatus: Status
+    updatedAt: AWSDateTime!
+  ): StatusUpdate @aws_api_key @aws_iam
+}
+
+type Query {
+  getStatus(orderId: ID!): Boolean
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  SHIPPED
+  DELIVERED
+  COMPLETE
+}
+
+type StatusUpdate @aws_api_key @aws_iam {
+  orderId: ID!
+  status: Status!
+  prevStatus: Status
+  updatedAt: AWSDateTime!
+}
+
+type Subscription {
+  onStatusUpdate(orderId: ID!): StatusUpdate
+    @aws_subscribe(mutations: ["publishStatusUpdate"])
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}

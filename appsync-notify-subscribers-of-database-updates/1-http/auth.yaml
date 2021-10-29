@@ -1,0 +1,72 @@
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cognito user pool with hosted domain
+
+Parameters:
+  ClientDomain:
+    Type: String
+    Description: Domain allowed to use this UserPool
+
+Resources:
+  # Create a Cognito User pool foruser management
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+
+  # Create an application for authentication
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      SupportedIdentityProviders:
+        - COGNITO
+      CallbackURLs:
+        - !Ref ClientDomain
+      LogoutURLs:
+        - !Ref ClientDomain
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+
+  # Create a hosted domain for users to signup and login
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub myauth${AWS::AccountId}
+      UserPoolId: !Ref UserPool
+
+Outputs:
+    UserPoolId:
+      Description: "User pool ID"
+      Value: !Ref UserPool
+
+    UserPoolClientId:
+      Description: "Application client ID"
+      Value: !Ref UserPoolClient
+
+    AuthUrl:
+      Description: "URL used for authentication"
+      Value: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/login
+
+    Issuer:
+      Description: "Url used for issuer on HTTP API JWT tokens"
+      Value: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}

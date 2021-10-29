@@ -1,0 +1,18 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "external dependencies for lambda",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-appsync": "^4.1.2",
+    "axios": "^0.22.0",
+    "graphql": "^15.6.1",
+    "graphql-tag": "^2.12.5",
+    "isomorphic-fetch": "^3.0.0"
+  }
+}
