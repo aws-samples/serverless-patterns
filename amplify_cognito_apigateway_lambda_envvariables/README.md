@@ -1,8 +1,8 @@
 # Integration of Amplify Frontend, Cognito, API Gateway, Lambda
 
-This pattern explain how to deploy a SAM application that includes AWS Amplify Frondend, Cognito, API Gateway and Lambda Function and set environmental variables to be used by Amplify and Lambda Function
+This pattern explains how to deploy a SAM application that includes an AWS Amplify Frontend, Cognito, API Gateway and Lambda Function and set environmental variables to be used by Amplify and the Lambda function.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/amplify-apigw-lambda.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
