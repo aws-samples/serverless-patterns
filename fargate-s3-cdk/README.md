@@ -37,11 +37,12 @@ Warning: As of this writing, there are known issues with the images built on App
    cdk bootstrap 1111111111/us-east-1
    cdk bootstrap --profile test 1111111111/us-east-1
    ```
-5. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `lib/cdk-stack.ts` file:
+5. Ensure that the bucket name is unique in [cdk-stack.ts](./cdk/lib/cdk-stack.ts)
+6. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `lib/cdk-stack.ts` file:
    ```bash
    cdk deploy
    ```
-6. Note the outputs from the CDK deployment process. This contains the service endpoint that is used to make the GET and POST requests to the various endpoints.
+7. Note the outputs from the CDK deployment process. This contains the service endpoint that is used to make the GET and POST requests to the various endpoints.
 
 ## How it works
 
