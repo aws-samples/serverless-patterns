@@ -63,6 +63,10 @@ Retrieve the Fargate Service endpoint from the `cdk deploy` output. Example of t
 CdkStack.MyFargateServiceServiceURL1234567D = http://CdkSt-MyFar-123456789ABC-123456789.ap-southeast-2.elb.amazonaws.com
 ```
 
+For reference:
+
+<img src="./docs/01-cdk-deploy-output.png" alt="cdk-deploy-output" width="70%"/>
+
 There are 3 endpoints that integrate with the S3 Bucket.
 
 The first endpoint requires a POST request. This adds a file with string contents to the bucket. For example:
@@ -106,6 +110,10 @@ curl --location --request GET '<REPLACE WITH FARGATE SERVICE URL>/listobjects'
 # Example
 curl --location --request GET 'http://CdkSt-MyFar-123456789ABC-123456789.ap-southeast-2.elb.amazonaws.com/listobjects'
 ```
+
+Running all the requests above should produce the following output:
+
+<img src="./docs/02-example-requests.png" alt="example-requests" width="70%"/>
 
 ## Cleanup
 
