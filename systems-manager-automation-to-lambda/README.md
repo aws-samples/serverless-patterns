@@ -1,11 +1,12 @@
 # AWS Systems Manager Automation to AWS Lambda
 
-This SAM template deploys an AWS Systems Manger Automation Document that consumes input parameters at execution time and invokes a lambda function by passing the parameters as input payload for the lambda function. The template also deploys the lambda function, required IAM permissions to execute the automation and a sample DynamoDB table used to test the pattern
-(**Note**: DynamoDB is used in this repo just for demonstration purpose, you may use this pattern across multiple services as needed)
+This SAM template deploys an AWS Systems Manger Automation Document that consumes input parameters at execution time and invokes a Lambda function by passing the parameters as input payload for the Lambda function. The template also deploys the Lambda function, required IAM permissions to execute the automation and a sample DynamoDB table used to test the pattern.
 
-This Systems Manager Automation Document used in this pattern contains one step that invokes the lambda function. However, you can use this in documents with multiple steps as well. To learn more about Systems Manger Documents, refer to https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-ssm-docs.html
+(**Note**: DynamoDB is used in this repo just for demonstration purposes. You may use this pattern across multiple services as needed.)
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/systems-manager-automation-to-lambda
+This Systems Manager Automation Document used in this pattern contains one step that invokes the Lambda function. However, you can use this in documents with multiple steps as well. To learn more about Systems Manger Documents, refer to https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-ssm-docs.html
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/ssm-lambda.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -50,11 +51,11 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-When the Systems Manger Automation Document is invoked, the execution parameters are sent as payload to invoke lambda function which updates the dynamoDB table's items with the parameters from the Automation execution.
+When the Systems Manger Automation Document is invoked, the execution parameters are sent as a payload to invoke the Lambda function, which updates the DynamoDB table's items with the parameters from the automation execution.
 
 ## Testing
 
-1. After the stack is deployed, run this command to scan the dynamoDB table for items. This should be empty initially
+1. After the stack is deployed, run this command to scan the DynamoDB table for items. This should be empty initially.
 
    ```
    aws dynamodb scan --table-name <$DynamoDBTableName>
@@ -65,7 +66,7 @@ When the Systems Manger Automation Document is invoked, the execution parameters
     ```
     aws ssm start-automation-execution --document-name <$SystemsManagerAutomationDocumentName> --parameters "DocumentInputTableName=<$DynamoDBTableName>, PartitonKeyInput=<$album_name>, SortKeyInput=<$artist_name>"
     ```  
-3. Get the value of the `AutomationExecutionId` from the previous step's output and run the following command to verify the execution ran successfully
+3. Get the value of the `AutomationExecutionId` from the previous step's output and run the following command to verify the execution ran successfully.
 
     ```
     aws ssm get-automation-execution --automation-execution-id <$AutomationExecutionId> --query '[AutomationExecution][0].AutomationExecutionStatus'
