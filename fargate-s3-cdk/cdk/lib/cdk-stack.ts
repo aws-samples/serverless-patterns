@@ -9,6 +9,7 @@ export class CdkStack extends cdk.Stack {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       bucketName: 'demo-bucket-serverless-patterns',
       encryption: s3.BucketEncryption.KMS_MANAGED,
+      enforceSSL: true,
       publicReadAccess: false,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       versioned: false,  // turn off versioning to make cdk destroy easier
