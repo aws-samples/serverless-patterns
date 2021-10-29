@@ -1,0 +1,226 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless Solution
+  Cognito / Api Gateway / Lambda Function / Amplify
+  Environmental Variables on Amplify
+  Environmental Variables on Lambda Function
+
+#################### PARAMETERS #############################
+
+Parameters:
+
+  AmplifyFrontendRepository:
+    Type: String
+    Description: 'Amplify Frontend Repository in the format: https://<GitProviderDomain>/<user>/<repository>'
+    Default: ''
+
+  OauthToken:
+    Type: String
+    Description: 'Access token for git provider repository'
+    NoEcho: true
+    Default: ''
+
+########################### RESOURCES ################################
+Resources: 
+
+      ##################### API #######################
+
+  myAPI:
+    Type: AWS::Serverless::Api
+    Description: Main API
+    Properties:
+      StageName: dev
+      Cors:
+        AllowMethods: "'GET, OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+        MaxAge: "'500'"
+      Auth:
+        AddDefaultAuthorizerToCorsPreflight: false
+        DefaultAuthorizer: MyCognitoAuthorizer
+        Authorizers:
+          MyCognitoAuthorizer:
+              UserPoolArn: !GetAtt rUserPool.Arn
+
+##################### FUNCTIONS ################################
+
+  ################### LAMBDA ELASTICSEARCH ######################
+
+  myFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdaExample/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        EmyFunction:
+          Type: Api
+          Properties:
+            Path: /lambdaExample
+            Method: get
+            RestApiId:
+              Ref: myAPI
+      Environment: 
+        Variables: 
+          cognito_region: !Ref AWS::Region
+          user_pools_id: !Ref rUserPool
+          user_pools_web_client_id: !Ref rAmplifyCognitoClient
+
+# INTEGRATION WITH FRONTEND ################################################################
+
+  ## COGNITO - USER POOL / USER POOL CLIENT
+
+  rUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      AutoVerifiedAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Mutable: true
+          Name: given_name
+          Required: true
+        - AttributeDataType: String
+          Mutable: true
+          Name: family_name
+          Required: true
+        - AttributeDataType: String
+          Mutable: false
+          Name: email
+          Required: true
+      UsernameAttributes:
+        - email
+      UsernameConfiguration:
+        CaseSensitive: false
+
+  rAmplifyCognitoClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AccessTokenValidity: 1
+      AllowedOAuthFlows:
+        - implicit
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+        - aws.cognito.signin.user.admin
+      CallbackURLs:
+        - "http://localhost"
+      EnableTokenRevocation: true
+      ExplicitAuthFlows:
+        - ALLOW_ADMIN_USER_PASSWORD_AUTH
+        - ALLOW_CUSTOM_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      IdTokenValidity: 1
+      LogoutURLs:
+        - "http://localhost"
+      PreventUserExistenceErrors: ENABLED
+      ReadAttributes:
+        - given_name
+        - family_name
+        - email
+        - email_verified
+      RefreshTokenValidity: 1
+      SupportedIdentityProviders:
+        - COGNITO
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+      UserPoolId: !Ref rUserPool
+
+
+#################################################################
+
+#################################################################
+# AMPLIFY
+
+  rAmplifyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      # RoleName: !Sub '${AWS::StackName}'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - amplify.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: Amplify
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "amplify:*"
+                Resource: "*"
+
+  rAmplifyApp:
+    Type: AWS::Amplify::App
+    Properties:
+      Name: 
+        !Sub '${AWS::StackName}'
+      Description: Matching Tool
+      CustomRules:
+        - Source: '</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf)$)([^.]+$)/>'
+          Target: '/index.html'
+          Status: '200'
+      EnvironmentVariables:
+      #   - Name: PROJECT_NAME
+      #     Value: !Ref pProjectName
+        - Name: cognito_region
+          Value: !Ref AWS::Region
+        - Name: user_pools_id
+          Value: !Ref rUserPool
+        - Name: user_pools_web_client_id
+          Value: !Ref rAmplifyCognitoClient
+        - Name: APIURL
+          Value: !Sub "https://${myAPI}.execute-api.${AWS::Region}.amazonaws.com/dev"
+      Repository: !Ref AmplifyFrontendRepository
+      OauthToken: !Ref OauthToken
+     
+      IAMServiceRole: !GetAtt rAmplifyRole.Arn
+
+  rAmplifyBranch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      BranchName: 'main'
+      AppId: !GetAtt rAmplifyApp.AppId
+      Description: Branch
+      EnableAutoBuild: true
+
+# OUTPUTS #################################################################
+
+Outputs:
+  CognitoRegion:
+    Description: Cognito Region
+    Value: !Ref AWS::Region
+    Export:
+      Name: CognitoRegion
+
+  CognitoUserPool:
+    Description: Cognito User Pool
+    Value: !Ref rUserPool
+    Export:
+      Name: CognitoUserPool
+
+  CognitoUserPoolClient:
+    Description: Cognito User Pool Client
+    Value: !Ref rAmplifyCognitoClient
+    Export:
+      Name: CognitoUserPoolClient
+
+  APIurl:
+    Description: API url
+    Value: !Sub "https://${myAPI}.execute-api.${AWS::Region}.amazonaws.com/dev"
+    Export:
+      Name: APIurl
