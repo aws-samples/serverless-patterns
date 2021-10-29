@@ -23,6 +23,10 @@ export class CdkStack extends cdk.Stack {
       maxAzs: 3
     });
 
+    const s3GatewayEndpoint = vpc.addGatewayEndpoint('s3GatewayEndpoint', {
+      service: ec2.GatewayVpcEndpointAwsService.S3
+    });
+
     const cluster = new ecs.Cluster(this, 'MyCluster', {
       vpc: vpc
     });
