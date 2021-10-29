@@ -35,25 +35,23 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-After the deployment is complete the lambda function will run on interval of minutes you passed as --context.
-You can check the lambda configuration / environment variables
-you can also see the lambda trigger
+After the deployment is complete, the Lambda function will run on an interval of minutes you passed as --context.
+You can check the Lambda configuration / environment variables. You can also see the Lambda trigger.
 
 ![Lambda Config](lambda_config.png)
 
-on the monitor tab / Logs you can see recent invocations inteval
+On the monitor tab / Logs, you can see recent invocations inteval:
 
 ![interval](interval.png)
 
-On View logs in CloudWatch you can see the lambda output as defined in our lambda code using:
+On View logs in CloudWatch, you can see the Lambda output as defined in our Lambda code using:
 console.log("This function runs every " + interval_in_minutes + " minutes")
 
 ![view logs](viewlogsincloudwatch.png)
 
-
 ## Testing
 
-check the Lambda logs. You should see the following message in the log:
+Check the Lambda logs. You should see the following message in the log:
 "This function runs every x minutes"
 
 ![cloudwatch](cloudwatchlogs.png)
