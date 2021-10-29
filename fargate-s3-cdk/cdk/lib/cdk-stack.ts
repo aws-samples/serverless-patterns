@@ -3,15 +3,18 @@ import * as s3 from '@aws-cdk/aws-s3';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
+import { AnyPrincipal, Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import path = require('path');
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const BUCKET_NAME = 'demo-bucket-serverless-patterns'
+
     const demoBucket = new s3.Bucket(this, 'demoBucket', {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      bucketName: 'demo-bucket-serverless-patterns',
+      bucketName: BUCKET_NAME,
       encryption: s3.BucketEncryption.KMS_MANAGED,
       enforceSSL: true,
       publicReadAccess: false,
@@ -26,6 +29,44 @@ export class CdkStack extends cdk.Stack {
     const s3GatewayEndpoint = vpc.addGatewayEndpoint('s3GatewayEndpoint', {
       service: ec2.GatewayVpcEndpointAwsService.S3
     });
+
+    // Add bucket policy to restrict access to VPCE
+    demoBucket.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.DENY,
+        resources: [
+          demoBucket.bucketArn,
+        ],
+        actions: [
+          's3:ListBucket'
+        ],
+        principals: [new AnyPrincipal()],
+        conditions: {
+          "StringNotEquals": {
+            "aws:sourceVpce": [s3GatewayEndpoint.vpcEndpointId]
+          }
+        }
+      })
+    );
+
+    demoBucket.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.DENY,
+        resources: [
+          demoBucket.arnForObjects('*')
+        ],
+        actions: [
+          's3:PutObject',
+          's3:GetObject'
+        ],
+        principals: [new AnyPrincipal()],
+        conditions: {
+          "StringNotEquals": {
+            "aws:sourceVpce": [s3GatewayEndpoint.vpcEndpointId]
+          }
+        }
+      })
+    );
 
     const cluster = new ecs.Cluster(this, 'MyCluster', {
       vpc: vpc
