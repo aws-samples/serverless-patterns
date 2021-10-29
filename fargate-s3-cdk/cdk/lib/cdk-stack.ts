@@ -19,7 +19,8 @@ export class CdkStack extends Stack {
       enforceSSL: true,
       publicReadAccess: false,
       removalPolicy: RemovalPolicy.DESTROY,
-      versioned: false,  // turn off versioning to make cdk destroy easier
+      versioned: false,
+      autoDeleteObjects: true
     });
 
     const vpc = new Vpc(this, 'MyVpc', {
