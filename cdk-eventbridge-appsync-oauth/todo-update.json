@@ -1,0 +1,8 @@
+[
+  {
+    "EventBusName": "todos",
+    "Source": "todos.system",
+    "DetailType": "todos update",
+    "Detail": "{ \"todo-id\": \"todo-id-123\", \"name\": \"my todo\", \"description\": \"update from event-bridge\" }"
+  }
+]
