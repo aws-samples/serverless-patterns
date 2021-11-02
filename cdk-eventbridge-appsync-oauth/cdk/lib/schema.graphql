@@ -1,4 +1,4 @@
-type Todo {
+type Todo @aws_lambda {
   id: ID!
   name: String!
   description: String
