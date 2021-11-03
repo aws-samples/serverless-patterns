@@ -18,15 +18,15 @@ export class CdkStack extends Stack {
     });
 
     const fargate = new ApplicationLoadBalancedFargateService(this, 'MyFargateService', {
+      assignPublicIp: false,
       cluster: cluster,
       cpu: 512,
       desiredCount: 1,
+      memoryLimitMiB: 2048,
+      publicLoadBalancer: false,
       taskImageOptions: {
         image: ContainerImage.fromAsset(path.join(__dirname, '../src/')),
       },
-      assignPublicIp: false,
-      memoryLimitMiB: 2048,
-      publicLoadBalancer: false,
     });
 
     const httpVpcLink = new CfnResource(this, 'HttpVpcLink', {
