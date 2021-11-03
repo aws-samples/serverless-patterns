@@ -10,6 +10,8 @@ EventBridge API Destinations uses [AWS Secrets Manager](https://aws.amazon.com/s
 
 EventBridge will cache the JWT access token returned by the API Destination authorization endpoint. The authorization endpoint must return a 401 or 403 HTTP response for EventBridge to renew the access token. This can be seen in the Lambda Authorizer included in this pattern. Your authorization endpoint must return the proper unauthorized error code for the access token to be refreshed.
 
+Learn more about this pattern at: https://serverlessland.com/patterns/eventbridge-api-appsync-cdk.
+
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
