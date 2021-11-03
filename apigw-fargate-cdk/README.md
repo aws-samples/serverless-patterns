@@ -54,7 +54,7 @@ Warning: As of this writing, there are known issues with the images built on App
 
 ## Testing
 
-Retrieve the Fargate Service endpoint from the `cdk deploy` output. Example of the output is:
+Retrieve the API Gateway URL from the `cdk deploy` output. Example of the output is:
 
 ```
 CdkStack.APIGatewayUrl = https://abcd123efg.execute-api.ap-southeast-2.amazonaws.com/
