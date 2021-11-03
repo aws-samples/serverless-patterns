@@ -1,13 +1,17 @@
-import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
+import { expect as expectCDK, haveResource } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
-import * as Cdk from '../lib/cdk-stack';
+import { CdkStack } from '../lib/cdk-stack';
 
-test('Empty Stack', () => {
-    const app = new cdk.App();
-    // WHEN
-    const stack = new Cdk.CdkStack(app, 'MyTestStack');
-    // THEN
-    expectCDK(stack).to(matchTemplate({
-      "Resources": {}
-    }, MatchStyle.EXACT))
+test('Validate stack resources', () => {
+  const app = new cdk.App();
+  const stack = new CdkStack(app, 'MyTestStack');
+
+  expectCDK(stack).to(haveResource('AWS::ECS::Cluster'));
+  expectCDK(stack).to(haveResource('AWS::ECS::Service'));
+  expectCDK(stack).to(haveResource('AWS::ECS::TaskDefinition'));
+  expectCDK(stack).to(haveResource('AWS::ElasticLoadBalancingV2::LoadBalancer'));
+  expectCDK(stack).to(haveResource('AWS::ApiGatewayV2::Api'));
+  expectCDK(stack).to(haveResource('AWS::ApiGatewayV2::Integration'));
+  expectCDK(stack).to(haveResource('AWS::ApiGatewayV2::Route'));
+  expectCDK(stack).to(haveResource('AWS::ApiGatewayV2::VpcLink'));
 });
