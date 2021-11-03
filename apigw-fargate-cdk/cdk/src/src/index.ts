@@ -7,7 +7,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.status(200).send("Hello world!");
+  res.status(200).send("Hello Serverless APIGW with Application Load-Balanced Fargate Service!");
 });
 
 app.listen(port, () => {
