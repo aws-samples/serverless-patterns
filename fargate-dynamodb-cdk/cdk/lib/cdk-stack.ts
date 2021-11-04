@@ -42,7 +42,7 @@ export class CdkStack extends cdk.Stack {
       memoryLimitMiB: 2048,
     });
 
-    // Gateway endpoint policy to allow only PutItem action
+    // Allow PutItem action from the Fargate Task Definition only
     dynamoGatewayEndpoint.addToPolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
@@ -52,7 +52,12 @@ export class CdkStack extends cdk.Stack {
         ],
         resources: [
           `${dynamoTable.tableArn}`
-        ]
+        ],
+        conditions: {
+          'ArnEquals': {
+            'aws:PrincipalArn': `${fargate.taskDefinition.taskRole.roleArn}`
+          }
+        }
     }));
 
     // Write permissions for Fargate
