@@ -3,6 +3,7 @@ import { Table, BillingMode, AttributeType } from '@aws-cdk/aws-dynamodb';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
+import { AnyPrincipal, Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import path = require('path');
 
 export class CdkStack extends cdk.Stack {
@@ -40,6 +41,19 @@ export class CdkStack extends cdk.Stack {
       },
       memoryLimitMiB: 2048,
     });
+
+    // Gateway endpoint policy to allow only PutItem action
+    dynamoGatewayEndpoint.addToPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new AnyPrincipal()],
+        actions: [
+          'dynamodb:PutItem',
+        ],
+        resources: [
+          `${dynamoTable.tableArn}`
+        ]
+    }));
 
     // Write permissions for Fargate
     dynamoTable.grantWriteData(fargate.taskDefinition.taskRole);
