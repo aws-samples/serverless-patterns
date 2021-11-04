@@ -11,7 +11,8 @@ export class CdkStack extends cdk.Stack {
 
     const dynamoTable = new Table(this, 'DynamoTable', {
       partitionKey: {name:'ID', type: AttributeType.STRING},
-      billingMode: BillingMode.PAY_PER_REQUEST
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY
     });
 
     const vpc = new ec2.Vpc(this, 'MyVpc', {
