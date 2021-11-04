@@ -2,6 +2,8 @@
 
 This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) cluster with an Application Load Balancer in-front. The AWS Fargate service makes puts to a DynamoDB table. This template uses a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built `ecs.ContainerImage.fromAsset` method. The custom image has a base route `/` for health checks and `/additem` for adding items. Environment variables like the DynamoDB table name and AWS region are passed to the image to enable it to put items to the DynamoDB table.
 
+This project also shows how to set up a DynamoDB Gateway Endpoint to the VPC. A VPC Endpoint policy is created to only allow the Fargate task definition to perform `PutItem` actions through the VPC endpoint.
+
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/fargate-dynamodb-cdk.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
