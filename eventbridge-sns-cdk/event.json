@@ -1,0 +1,8 @@
+[
+  {
+    "EventBusName": "test-bus-cdk",
+    "Source": "my-application",
+    "DetailType": "message",
+    "Detail": "{\"message\":\"Hello from EventBridge to SNS Topic!\"}"
+  }
+]
