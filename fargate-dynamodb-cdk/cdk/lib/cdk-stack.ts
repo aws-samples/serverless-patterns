@@ -1,33 +1,39 @@
-import * as cdk from '@aws-cdk/core';
+import { CfnOutput, Construct, RemovalPolicy, Stack, StackProps} from '@aws-cdk/core';
 import { Table, BillingMode, AttributeType } from '@aws-cdk/aws-dynamodb';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as ecs from '@aws-cdk/aws-ecs';
-import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
+import { GatewayVpcEndpointAwsService, Vpc } from '@aws-cdk/aws-ec2';
+import { Cluster, ContainerImage } from '@aws-cdk/aws-ecs';
+import { ApplicationLoadBalancedFargateService } from '@aws-cdk/aws-ecs-patterns';
+import { AnyPrincipal, Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import path = require('path');
 
-export class CdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class CdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     const dynamoTable = new Table(this, 'DynamoTable', {
       partitionKey: {name:'ID', type: AttributeType.STRING},
-      billingMode: BillingMode.PAY_PER_REQUEST
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY
     });
 
-    const vpc = new ec2.Vpc(this, 'MyVpc', {
+    const vpc = new Vpc(this, 'MyVpc', {
       maxAzs: 3
     });
 
-    const cluster = new ecs.Cluster(this, 'MyCluster', {
+    const dynamoGatewayEndpoint = vpc.addGatewayEndpoint('dynamoGatewayEndpoint', {
+      service: GatewayVpcEndpointAwsService.DYNAMODB
+    });
+
+    const cluster = new Cluster(this, 'MyCluster', {
       vpc: vpc
     });
 
-    const fargate = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MyFargateService', {
+    const fargate = new ApplicationLoadBalancedFargateService(this, 'MyFargateService', {
       cluster: cluster,
       cpu: 512,
       desiredCount: 1,
       taskImageOptions: {
-        image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../src/')),
+        image: ContainerImage.fromAsset(path.join(__dirname, '../src/')),
         environment: {
           databaseTable: dynamoTable.tableName,
           region: process.env.CDK_DEFAULT_REGION!
@@ -36,10 +42,29 @@ export class CdkStack extends cdk.Stack {
       memoryLimitMiB: 2048,
     });
 
+    // Allow PutItem action from the Fargate Task Definition only
+    dynamoGatewayEndpoint.addToPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new AnyPrincipal()],
+        actions: [
+          'dynamodb:PutItem',
+        ],
+        resources: [
+          `${dynamoTable.tableArn}`
+        ],
+        conditions: {
+          'ArnEquals': {
+            'aws:PrincipalArn': `${fargate.taskDefinition.taskRole.roleArn}`
+          }
+        }
+      })
+    );
+
     // Write permissions for Fargate
     dynamoTable.grantWriteData(fargate.taskDefinition.taskRole);
 
     // Outputs
-    new cdk.CfnOutput(this, 'DynamoDbTableName', { value: dynamoTable.tableName });
+    new CfnOutput(this, 'DynamoDbTableName', { value: dynamoTable.tableName });
   }
 }
