@@ -58,7 +58,8 @@ export class CdkStack extends Stack {
             'aws:PrincipalArn': `${fargate.taskDefinition.taskRole.roleArn}`
           }
         }
-    }));
+      })
+    );
 
     // Write permissions for Fargate
     dynamoTable.grantWriteData(fargate.taskDefinition.taskRole);
