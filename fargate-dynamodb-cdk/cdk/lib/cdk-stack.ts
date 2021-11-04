@@ -19,6 +19,10 @@ export class CdkStack extends cdk.Stack {
       maxAzs: 3
     });
 
+    const dynamoGatewayEndpoint = vpc.addGatewayEndpoint('dynamoGatewayEndpoint', {
+      service: ec2.GatewayVpcEndpointAwsService.DYNAMODB
+    });
+
     const cluster = new ecs.Cluster(this, 'MyCluster', {
       vpc: vpc
     });
