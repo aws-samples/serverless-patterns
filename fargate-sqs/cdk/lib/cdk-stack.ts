@@ -1,6 +1,6 @@
 import * as cdk from '@aws-cdk/core';
 import * as sqs from '@aws-cdk/aws-sqs';
-import { Vpc } from '@aws-cdk/aws-ec2';
+import { InterfaceVpcEndpointAwsService, Vpc } from '@aws-cdk/aws-ec2';
 import { Cluster, ContainerImage } from '@aws-cdk/aws-ecs';
 import { ApplicationLoadBalancedFargateService } from '@aws-cdk/aws-ecs-patterns';
 import path = require('path');
@@ -15,6 +15,10 @@ export class CdkStack extends cdk.Stack {
 
     const sqsQueue = new sqs.Queue(this, 'Queue', {
       encryption: sqs.QueueEncryption.KMS_MANAGED,
+    });
+
+    const sqsEndpoint = vpc.addInterfaceEndpoint('SqsInterfaceEndpoint', {
+      service: InterfaceVpcEndpointAwsService.SQS,
     });
 
     const cluster = new Cluster(this, 'Cluster', {
