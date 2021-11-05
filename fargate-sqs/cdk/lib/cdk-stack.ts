@@ -1,21 +1,21 @@
-import * as cdk from '@aws-cdk/core';
-import * as sqs from '@aws-cdk/aws-sqs';
+import { Construct, Stack, StackProps } from '@aws-cdk/core';
+import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { InterfaceVpcEndpointAwsService, Vpc } from '@aws-cdk/aws-ec2';
 import { Cluster, ContainerImage } from '@aws-cdk/aws-ecs';
 import { ApplicationLoadBalancedFargateService } from '@aws-cdk/aws-ecs-patterns';
 import { AnyPrincipal, Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import path = require('path');
 
-export class CdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class CdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     const vpc = new Vpc(this, 'Vpc', {
       maxAzs: 3
     });
 
-    const sqsQueue = new sqs.Queue(this, 'Queue', {
-      encryption: sqs.QueueEncryption.KMS_MANAGED,
+    const sqsQueue = new Queue(this, 'Queue', {
+      encryption: QueueEncryption.KMS_MANAGED,
     });
 
     const sqsEndpoint = vpc.addInterfaceEndpoint('SqsInterfaceEndpoint', {
