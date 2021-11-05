@@ -11,7 +11,7 @@ export class CdkStack extends Stack {
     super(scope, id, props);
 
     const vpc = new Vpc(this, 'Vpc', {
-      maxAzs: 3
+      maxAzs: 3,
     });
 
     const sqsQueue = new Queue(this, 'Queue', {
@@ -23,7 +23,7 @@ export class CdkStack extends Stack {
     });
 
     const cluster = new Cluster(this, 'Cluster', {
-      vpc: vpc
+      vpc: vpc,
     });
 
     const fargate = new ApplicationLoadBalancedFargateService(this, 'FargateService', {
@@ -34,7 +34,7 @@ export class CdkStack extends Stack {
         image: ContainerImage.fromAsset(path.join(__dirname, '../src/')),
         environment: {
           queueUrl: sqsQueue.queueUrl,
-          region: process.env.CDK_DEFAULT_REGION!
+          region: process.env.CDK_DEFAULT_REGION!,
         },
       },
       assignPublicIp: false,
@@ -46,18 +46,13 @@ export class CdkStack extends Stack {
       new PolicyStatement({
         effect: Effect.ALLOW,
         principals: [new AnyPrincipal()],
-        actions: [
-          'sqs:SendMessage',
-          'sqs:ReceiveMessage'
-        ],
-        resources: [
-          sqsQueue.queueArn
-        ],
+        actions: ['sqs:SendMessage', 'sqs:ReceiveMessage'],
+        resources: [sqsQueue.queueArn],
         conditions: {
-          'ArnEquals': {
-            'aws:PrincipalArn': `${fargate.taskDefinition.taskRole.roleArn}`
-          }
-        }
+          ArnEquals: {
+            'aws:PrincipalArn': `${fargate.taskDefinition.taskRole.roleArn}`,
+          },
+        },
       })
     );
 
@@ -69,19 +64,14 @@ export class CdkStack extends Stack {
     sqsQueue.addToResourcePolicy(
       new PolicyStatement({
         effect: Effect.DENY,
-        resources: [
-          sqsQueue.queueArn,
-        ],
-        actions: [
-          'sqs:SendMessage',
-          'sqs:ReceiveMessage'
-        ],
+        resources: [sqsQueue.queueArn],
+        actions: ['sqs:SendMessage', 'sqs:ReceiveMessage'],
         principals: [new AnyPrincipal()],
         conditions: {
-          "StringNotEquals": {
-            "aws:sourceVpce": [sqsEndpoint.vpcEndpointId]
-          }
-        }
+          StringNotEquals: {
+            'aws:sourceVpce': [sqsEndpoint.vpcEndpointId],
+          },
+        },
       })
     );
   }
