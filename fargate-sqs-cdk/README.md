@@ -82,7 +82,7 @@ curl --location --request POST 'http://CdkSt-MyFar-123456789ABC-123456789.ap-sou
 }'
 ```
 
-Make a GET request to the `/readmessage` endpoint. For example:
+Make a GET request to the `/readmessage` endpoint. This retrieves the message from the queue. For example:
 
 ```bash
 curl --location --request GET '<REPLACE WITH FARGATE SERVICE URL>/readmessage'
