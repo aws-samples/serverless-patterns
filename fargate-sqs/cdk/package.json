@@ -24,6 +24,7 @@
     "@aws-cdk/aws-ec2": "^1.130.0",
     "@aws-cdk/aws-ecs": "^1.130.0",
     "@aws-cdk/aws-ecs-patterns": "^1.130.0",
+    "@aws-cdk/aws-iam": "^1.130.0",
     "@aws-cdk/aws-sqs": "^1.130.0",
     "@aws-cdk/core": "1.130.0",
     "source-map-support": "^0.5.16"
