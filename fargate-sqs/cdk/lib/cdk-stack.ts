@@ -61,8 +61,28 @@ export class CdkStack extends cdk.Stack {
       })
     );
 
-    // Read and Write permissions for Fargate
+    // Read and Write permissions to SQS queue for Fargate
     sqsQueue.grantSendMessages(fargate.taskDefinition.taskRole);
     sqsQueue.grantConsumeMessages(fargate.taskDefinition.taskRole);
+
+    // SQS policy to deny access if it isn't from a VPC endpoint
+    sqsQueue.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.DENY,
+        resources: [
+          sqsQueue.queueArn,
+        ],
+        actions: [
+          'sqs:SendMessage',
+          'sqs:ReceiveMessage'
+        ],
+        principals: [new AnyPrincipal()],
+        conditions: {
+          "StringNotEquals": {
+            "aws:sourceVpce": [sqsEndpoint.vpcEndpointId]
+          }
+        }
+      })
+    );
   }
 }
