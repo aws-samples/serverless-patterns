@@ -3,6 +3,7 @@ import * as sqs from '@aws-cdk/aws-sqs';
 import { InterfaceVpcEndpointAwsService, Vpc } from '@aws-cdk/aws-ec2';
 import { Cluster, ContainerImage } from '@aws-cdk/aws-ecs';
 import { ApplicationLoadBalancedFargateService } from '@aws-cdk/aws-ecs-patterns';
+import { AnyPrincipal, Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import path = require('path');
 
 export class CdkStack extends cdk.Stack {
@@ -39,6 +40,26 @@ export class CdkStack extends cdk.Stack {
       assignPublicIp: false,
       memoryLimitMiB: 2048,
     });
+
+    // Allow read and write actions from the Fargate Task Definition only
+    sqsEndpoint.addToPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new AnyPrincipal()],
+        actions: [
+          'sqs:SendMessage',
+          'sqs:ReceiveMessage'
+        ],
+        resources: [
+          sqsQueue.queueArn
+        ],
+        conditions: {
+          'ArnEquals': {
+            'aws:PrincipalArn': `${fargate.taskDefinition.taskRole.roleArn}`
+          }
+        }
+      })
+    );
 
     // Read and Write permissions for Fargate
     sqsQueue.grantSendMessages(fargate.taskDefinition.taskRole);
