@@ -1,4 +1,4 @@
-import { Construct, Stack, StackProps } from '@aws-cdk/core';
+import { CfnOutput, Construct, Stack, StackProps } from '@aws-cdk/core';
 import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { InterfaceVpcEndpointAwsService, Vpc } from '@aws-cdk/aws-ec2';
 import { Cluster, ContainerImage } from '@aws-cdk/aws-ecs';
@@ -74,5 +74,7 @@ export class CdkStack extends Stack {
         },
       })
     );
+
+    new CfnOutput(this, 'SqsQueueUrl', { value: sqsQueue.queueUrl });
   }
 }
