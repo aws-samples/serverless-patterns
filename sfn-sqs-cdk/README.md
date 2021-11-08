@@ -1,5 +1,5 @@
 
-# Create an AWS Step Functions workflow to integrate with Amazon SQS with CDK.
+# Create an AWS Step Functions workflow to integrate with Amazon SQS using CDK.
 
 
 
