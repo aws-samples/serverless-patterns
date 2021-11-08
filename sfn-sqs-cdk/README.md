@@ -55,7 +55,7 @@ $ cdk deploy
 Run the following AWS CLI command to send a 'start-execution` command to start the Step Functions workflow. Note, you must edit the {StateMachineExpressSynctoLambda} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs.
 
 ```bash
-aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMachinetoSQS}" --input "{\"message\": {\"hello\" : \"world\" } }"
+aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMachineArn}" --input "{\"message\": {\"hello\" : \"world\" } }"
 ```
 
 ### output:
@@ -96,7 +96,7 @@ aws stepfunctions describe-execution --execution-arn  "{executionArn}"
 Once the `status` is `SUCCEEDED`, we can verify if the message got delivered to the SQS or not by running the below command
 
 ```bash
-aws sqs receive-message --queue-url  "{MyQueueURL}"
+aws sqs receive-message --queue-url  "{QueueUrl}"
 ```
 
 ### Queue Message output:
