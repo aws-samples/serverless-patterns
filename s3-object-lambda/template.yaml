@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: S3 Object Lambda
+
+Resources:
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  S3BucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: '*'
+            Effect: Allow
+            Resource:
+              - !GetAtt S3Bucket.Arn
+              - !Sub
+                  - '${varS3BucketArn}/*'
+                  - varS3BucketArn: !GetAtt S3Bucket.Arn
+            Principal:
+              AWS: '*'
+            Condition:
+              StringEquals:
+                's3:DataAccessPointAccount': !Sub ${AWS::AccountId}
+
+  # S3 Access Point (Network origin: Internet)
+  S3AccessPoint:
+    Type: 'AWS::S3::AccessPoint'
+    Properties:
+      Bucket: !Ref S3Bucket
+      Name: 'resize-ap'
+
+  # S3 Object Lambda Access Point
+  S3ObjectLambdaAccessPoint:
+    Type: 'AWS::S3ObjectLambda::AccessPoint'
+    Properties: 
+      Name: 'resize-olap'
+      ObjectLambdaConfiguration: 
+          SupportingAccessPoint: !Sub 'arn:aws:s3:${AWS::Region}:${AWS::AccountId}:accesspoint/${S3AccessPoint}'
+          TransformationConfigurations: 
+          - Actions: 
+              - GetObject
+            ContentTransformation: 
+              AwsLambda:
+                FunctionArn: !GetAtt ResizeFunction.Arn
+                FunctionPayload: 'test-payload'
+
+  # Lambda function
+  ResizeFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      MemorySize: 2048
+      # The function needs permission to call back to the S3 Object Lambda Access Point with the WriteGetObjectResponse.
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref S3Bucket
+        - Statement:
+          - Effect: Allow
+            Action: 's3-object-lambda:WriteGetObjectResponse'
+            Resource: '*'
+   
+Outputs:
+  S3BucketName:
+    Value: !Ref S3Bucket
+    Description: S3 Bucket for object storage.
+  S3AccessPointArn:
+    Value: !Ref S3AccessPoint
+    Description: Name of the S3 access point.
+  S3ObjectLambdaAccessPointArn:
+    Value: !GetAtt S3ObjectLambdaAccessPoint.Arn
+    Description: ARN of the S3 Object Lambda access point.
+  ResizeFunctionArn:
+    Value: !Ref ResizeFunction
+    Description: ResizeFunction ARN.

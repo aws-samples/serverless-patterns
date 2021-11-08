@@ -1,0 +1,258 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - API Gateway/Lambda with observability
+
+
+Globals:
+  # Default values for the Lambda function configuration
+  Function:
+    Runtime: nodejs14.x
+    MemorySize: 128
+    Timeout: 100
+    Tracing: Active
+
+
+Resources:
+  # Lambda function that is used as integration target for all API requests
+  SampleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/app.handler
+      Description: Sample handler for all API operations
+      Environment:
+        Variables:
+          AWS_EMF_NAMESPACE: !Sub ${AWS::StackName}
+      Events:
+        AllEvents:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /
+            Method: GET 
+      Tags:
+        Stack: !Sub "${AWS::StackName}-Function"
+
+  # Override default Lambda logs group to add retention period
+  SampleFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${SampleFunction}"
+      RetentionInDays: 30
+
+  # API Gateway endpoint
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      FailOnWarnings: True
+      AccessLogSettings:
+        DestinationArn: !GetAtt AccessLogs.Arn
+        Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","routeKey":"$context.routeKey", "status":"$context.status","protocol":"$context.protocol", "integrationStatus": $context.integrationStatus, "integrationLatency": $context.integrationLatency, "responseLength":"$context.responseLength" }'
+      Tags:
+        Name: !Sub "${AWS::StackName}-API"
+        Stack: !Sub "${AWS::StackName}"
+
+  # API Gateway access logs group with retention period
+  AccessLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Sub "/${AWS::StackName}/APIAccessLogs"
+
+  # SNS topic for the alarms by various components. Subscribe your email to receive messages.
+  AlarmsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      KmsMasterKeyId: !Ref AlarmsKMSKey
+      Tags:
+        - Key: "Stack" 
+          Value: !Sub "${AWS::StackName}"
+  
+  # KMS key to be used to encrypt SNS messages at rest
+  AlarmsKMSKey:
+    Type: AWS::KMS::Key
+    Properties: 
+      Description: CMK for SNS alarms topic
+      Enabled: true
+      EnableKeyRotation: True
+      KeyPolicy: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: 
+              Service: 
+                - "cloudwatch.amazonaws.com"
+                - "sns.amazonaws.com"
+            Action:
+              - "kms:GenerateDataKey*"
+              - "kms:Decrypt"
+            Resource: "*"
+          - Effect: Allow
+            Principal: 
+              AWS: 
+                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action:
+              - "kms:*"
+            Resource: "*"
+      KeySpec: SYMMETRIC_DEFAULT
+      KeyUsage: ENCRYPT_DECRYPT
+      PendingWindowInDays: 30
+      Tags: 
+        - Key: "Stack" 
+          Value: !Sub "${AWS::StackName}"
+
+  # Alarm for any API Gateway error
+  HttpApiErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - !Ref AlarmsTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: ApiName
+          Value: !Ref HttpApi
+      EvaluationPeriods: 1
+      MetricName: 5XXError
+      Namespace: AWS/ApiGateway
+      Period: 60
+      Statistic: Sum
+      Threshold: 1.0
+
+  # Alarm for any Lambda error
+  SampleFunctionErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - !Ref AlarmsTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref SampleFunction
+      EvaluationPeriods: 1
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Period: 60
+      Statistic: Sum
+      Threshold: 1.0
+
+  # Dashboard for API Gateway, Lambda and custom metrics
+  ApplicationDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub "${AWS::StackName}-Dashboard"
+      DashboardBody: 
+        Fn::Sub: >
+          {
+            "widgets": [
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 6,
+                    "x": 6,
+                    "type": "metric",
+                    "properties": {
+                        "metrics": [
+                            [ "AWS/Lambda", "Invocations", "FunctionName", "${SampleFunction}" ],
+                            [ ".", "Errors", ".", "." ],
+                            [ ".", "Throttles", ".", "." ],
+                            [ ".", "Duration", ".", ".", { "stat": "Average" } ],
+                            [ ".", "ConcurrentExecutions", ".", ".", { "stat": "Maximum" } ]
+                        ],
+                        "view": "timeSeries",
+                        "region": "${AWS::Region}",
+                        "stacked": false,
+                        "title": "Lambda",
+                        "period": 60,
+                        "stat": "Sum"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 6,
+                    "x": 0,
+                    "type": "metric",
+                    "properties": {
+                        "metrics": [
+                            [ "AWS/ApiGateway", "4xx", "ApiId", "${HttpApi}", { "yAxis": "right" } ],
+                            [ ".", "5xx", ".", ".", { "yAxis": "right" } ],
+                            [ ".", "DataProcessed", ".", ".", { "yAxis": "left" } ],
+                            [ ".", "Count", ".", ".", { "label": "Count", "yAxis": "right" } ],
+                            [ ".", "IntegrationLatency", ".", ".", { "stat": "Average" } ],
+                            [ ".", "Latency", ".", ".", { "stat": "Average" } ]
+                        ],
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "region": "${AWS::Region}",
+                        "period": 60,
+                        "stat": "Sum",
+                        "title": "API Gateway"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 12,
+                    "y": 0,
+                    "x": 0,
+                    "type": "metric",
+                    "properties": {
+                        "metrics": [
+                            [ "${AWS::StackName}", "ProcessedRequests", "ServiceName", "${SampleFunction}", "LogGroup", "${SampleFunction}", "ServiceType", "AWS::Lambda::Function", "Service", "Sample Service", { "label": "Processed Requests"} ]
+                        ],
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "title": "Business Metrics",
+                        "region": "${AWS::Region}",
+                        "period": 60,
+                        "stat": "Sum"
+                    }
+                },
+                {
+                    "type": "alarm",
+                    "x": 0,
+                    "y": 12,
+                    "width": 12,
+                    "height": 2,
+                    "properties": {
+                        "title": "Application Alarms",
+                        "alarms": [
+                            "${SampleFunctionErrorsAlarm.Arn}",
+                            "${HttpApiErrorsAlarm.Arn}"
+                        ]
+                    }
+                },
+                {
+                    "type": "log",
+                    "x": 0,
+                    "y": 14,
+                    "width": 12,
+                    "height": 6,
+                    "properties": {
+                        "query": "SOURCE '${SampleFunctionLogGroup}' | fields @message, ispresent(errorMessage) as errorPresent\n| filter errorPresent != 0\n| sort @timestamp desc\n| display @message\n| limit 100\n",
+                        "region": "${AWS::Region}",
+                        "stacked": false,
+                        "title": "Lambda Errors",
+                        "view": "table"
+                    }
+                }
+            ]
+          }
+
+
+Outputs:
+  APIEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+
+  DashboardURL:
+    Description: "Dashboard URL"
+    Value: !Sub "https://console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=${ApplicationDashboard}"
+  
+  AlarmsTopic:
+    Description: "SNS Topic to be used for the alarms subscriptions"
+    Value: !Ref AlarmsTopic
+
+  AccessLogs:
+    Description: "CloudWatch Logs group for API Gateway access logs"
+    Value: !Ref AccessLogs
+
+

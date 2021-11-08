@@ -1,0 +1,117 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Centralized API
+
+Parameters:
+  ApiKeyValue:
+    Type: String
+    Description: Value for the API keys
+
+Resources:
+  ## Centralized primary API
+  PrimaryApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Description: Centralized API
+      StageName: Prod
+      EndpointConfiguration:
+        Type: REGIONAL
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './api.yaml'
+        
+  ## Reporting application API Endpoint
+  ReportingApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: Reporting API
+      StageName: Prod
+      EndpointConfiguration:
+        Type: REGIONAL
+      Auth:
+        ApiKeyRequired: true
+                  
+  ## User management application API Endpoint
+  UserManagementApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: User Management API
+      StageName: Prod
+      EndpointConfiguration:
+        Type: REGIONAL
+      Auth:
+        ApiKeyRequired: true
+
+  ApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Value: !Ref ApiKeyValue
+      Enabled: true
+
+  UsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn:
+      - ReportingApiProdStage
+      - UserManagementApiProdStage
+    Properties:
+      ApiStages:
+        - ApiId: !Ref ReportingApi
+          Stage: Prod
+        - ApiId: !Ref UserManagementApi
+          Stage: Prod
+
+  UsagePlanMapReporting:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties: 
+      KeyId: !Ref ApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref UsagePlan
+                  
+  ## Reporting application Lambda function
+  ReportingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.handler
+      Runtime: nodejs14.x
+      CodeUri: src
+      Environment:
+        Variables:
+          LOCATION: "Response from reporting application"
+      Events:
+        RestApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReportingApi
+            Method: GET
+            Path: /
+                  
+  ## User management Lambda function
+  UserManagementFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.handler
+      Runtime: nodejs14.x
+      CodeUri: src
+      Environment:
+        Variables:
+          LOCATION: "Response from user management application"
+      Events:
+        RestApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref UserManagementApi
+            Method: GET
+            Path: /
+  
+Outputs:
+  ReportingEndpoint:
+    Description: Reporting API endpoint
+    Value: !Sub "https://${ReportingApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  UserManagementEndpoint:
+    Description: User management API endpoint
+    Value: !Sub "https://${UserManagementApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  PrimaryApiEndpoint:
+    Description: Primary API endpoint
+    Value: !Sub "https://${PrimaryApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"

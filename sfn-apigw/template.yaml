@@ -10,7 +10,7 @@ Resources:
   StateMachinetoAPIGW:
     Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
     Properties:
-      DefinitionUri: statemachine/StateMachine.asl.json
+      DefinitionUri: statemachine/stateMachine.asl.json
       DefinitionSubstitutions:
          DefaultPath: '/'
          APIEndPoint: !Sub "${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
@@ -62,16 +62,6 @@ Resources:
             Action: "sts:AssumeRole"
       Path: "/"
       Policies:
-        - PolicyName: StatesExecutionPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "cloudwatch:*"
-                  - "logs:*"
-                Resource: "*"
-
         - PolicyName: LambdaExecute
           PolicyDocument:
             Version: "2012-10-17"
@@ -80,6 +70,15 @@ Resources:
                 Action:
                   - "lambda:InvokeFunction"
                 Resource: !GetAtt ExampleLambdaFunction.Arn
+        -  PolicyName: LogPermissions
+           PolicyDocument:
+             Version: "2012-10-17"
+             Statement:
+              - Effect: Allow
+                Action:
+                  - "cloudwatch:*"
+                  - "logs:*"
+                Resource: "*"
 ##########################################################################
 #   Outputs                                                              #
 ##########################################################################

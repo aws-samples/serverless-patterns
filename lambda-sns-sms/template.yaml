@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Lambda to SNS
+Parameters:
+  phoneNumber:
+    Type: String
+    Description: "Recipient phone nmuber"
+  tenDLC:
+    Type: String
+    Description: "10DLC origination number"
+
+Resources:
+  # Define the publisher Lambda function with permissions
+  SMSPublisherFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+      MemorySize: 128
+      Environment:
+        Variables:
+          phoneNumber: !Ref phoneNumber
+          tenDLC: !Ref tenDLC
+      Policies:
+        ## Read more about SAM Policy templates at:
+        ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+        ## policy allowing only to publish to SMS and denying publishing to topics and applications (push notifications)
+        - Statement:
+          - Effect: Deny
+            Action:
+            - sns:Publish
+            Resource: arn:aws:sns:*:*:*
+          - Effect: Allow
+            Action:
+            - sns:Publish
+            Resource: "*"
+
+            
+Outputs:
+  SMSPublisherFunction:
+    Description: SMSPublisherFunction function name
+    Value: !Ref SMSPublisherFunction

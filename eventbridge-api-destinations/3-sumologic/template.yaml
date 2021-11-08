@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EventBridge to sumologic integration example
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  pEndpoint:
+    Type: String
+Resources:
+  sumologicRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: '/service-role/'
+      Policies:
+        - PolicyName: eventbridge-api-destinations
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - events:InvokeApiDestination
+                Resource: !GetAtt sumologicDestination.Arn
+  sumologicBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: MyEventBus
+  sumologicConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: dummy-key
+          ApiKeyValue: dummy-value
+  sumologicDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      ConnectionArn: !GetAtt sumologicConnection.Arn
+      HttpMethod: POST
+      InvocationEndpoint: !Ref pEndpoint
+      InvocationRateLimitPerSecond: 10
+  sumologicRule:
+    Type: AWS::Events::Rule
+    Properties:
+      State: ENABLED
+      EventBusName: !Ref sumologicBus
+      EventPattern:
+        detail:
+          Log_Dest: ["sumo"]
+      Targets:
+        - Id: sumologic-destination
+          Arn: !GetAtt sumologicDestination.Arn
+          RoleArn: !GetAtt sumologicRole.Arn
+Outputs:
+  outRole:
+    Value: !GetAtt sumologicRole.Arn
+  outBus:
+    Value: !GetAtt sumologicBus.Arn
+  outConnection:
+    Value: !GetAtt sumologicConnection.Arn
+  outDestination:
+    Value: !GetAtt sumologicDestination.Arn
+  outRule:
+    Value: !GetAtt sumologicRule.Arn

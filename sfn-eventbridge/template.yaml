@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Step Functions to EventBridge
+
+Resources:
+
+  MyEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub '${AWS::StackName}-EventBus'
+  
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Role: !GetAtt WorkflowExecutionRole.Arn
+      Definition:
+        StartAt: SendCustomEvent
+        States:
+          SendCustomEvent:
+            Type: Task
+            Resource: 'arn:aws:states:::events:putEvents'
+            Parameters:
+              Entries:
+                - Detail:
+                    Message: 'Hello from Step Functions!'
+                  DetailType: 'MyTestMessage'
+                  Source: 'MyTestApp'
+                  EventBusName: !Ref MyEventBus
+            End: True
+
+  WorkflowExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AllowEventBridgePutEvents
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: events:PutEvents
+                Resource: !GetAtt MyEventBus.Arn
+
+  MyLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/events/${AWS::StackName}'
+
+  EventBusLogRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Send all events to CloudWatch Logs
+      EventBusName: !Ref MyEventBus
+      EventPattern:
+        source:
+          - prefix: ""
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt MyLogGroup.Arn
+          Id: CloudWatchLogTarget
+    DependsOn: MyEventBus
+
+Outputs:
+  MyStateMachineArn:
+    Value: !Ref MyStateMachine
+  MyLogGroup:
+    Value: !Ref MyLogGroup

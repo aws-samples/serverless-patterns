@@ -1,0 +1,18 @@
+{
+    "Comment": "An example of the Amazon States Language using AWS SNS",
+    "StartAt": "SendSNSMessage",
+    "States": {
+        "SendSNSMessage": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::sns:publish",
+            "Parameters": {
+              "Message": {
+                "Input": "You just received a message from the state machine!",
+                "Message.$": "$.message"
+              },
+              "TopicArn": "${StateMachineSNSTopic}"
+            },
+            "End": true
+          }
+    }
+}

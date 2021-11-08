@@ -1,7 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Serverless patterns - Lambda to EventBridge
-  
+
+Parameters:
+  EventBusName:
+    Type: String
+    Description: Event bus name
+    Default: 'default'
+    
 Resources:
   # Define the publisher Lambda function 
   PublisherFunction:
@@ -10,14 +16,10 @@ Resources:
       CodeUri: src/
       Handler: app.handler
       Timeout: 3
-      Runtime: nodejs12.x
+      Runtime: nodejs14.x
       Policies:
-        - Statement:
-          - Effect: Allow
-            # Can be scoped to an individual event bus
-            Resource: '*'
-            Action:
-              - events:PutEvents      
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref EventBusName
 
 Outputs:
   PublisherFunction:

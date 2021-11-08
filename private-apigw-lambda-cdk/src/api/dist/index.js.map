@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../lambda/index.ts", "../lambda/api-handler.ts"],
+  "sourcesContent": ["export { handler as ProxyLambda } from \"./api-handler\";", "\nimport { Handler } from \"aws-lambda\";\nimport config from \"../config.json\";\n\nexport const handler: Handler = async (event) => {\n  return {\n    body: `Success for path: \"${event.path}\"`,\n    headers: config.headers,\n    statusCode: 200,\n  };\n};"],
+  "mappings": ";;;;;;;;AAAA;AAAA;AAAA;AAAA;;;;;;;;;;;;;;;;;;;;;;;;ACIO,IAAM,UAAmB,OAAO,UAAU;AAC/C,SAAO;AAAA,IACL,MAAM,sBAAsB,MAAM;AAAA,IAClC,SAAS,eAAO;AAAA,IAChB,YAAY;AAAA;AAAA;",
+  "names": []
+}

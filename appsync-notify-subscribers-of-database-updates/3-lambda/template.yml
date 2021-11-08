@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Notify subscribers of database updates
+
+Globals:
+  Function:
+    CodeUri: src/
+    Runtime: nodejs12.x
+    Timeout: 10
+    MemorySize: 128
+    Layers:
+      - !Ref ExternalDepsLayerForLambda
+
+Parameters:
+  GraphQLApiEndpoint:
+    Type: String
+    Description: The https endpoint of an AppSync API
+  AppSyncApiKey:
+    Type: String
+    Description: The apikey of an AppSync API
+  GraphQLApiId:
+    Type: String
+    Description: The id of an AppSync API
+  OrdersEventBusName:
+    Type: String
+    Default: "orders"
+    Description: The Name of OrdersEventBus
+  OrdersEventBusArn:
+    Type: String
+    Description: The ARN of OrdersEventBus
+
+Resources:
+  ExternalDepsLayerForLambda:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "${AWS::StackName}-ExternalDepsLayerForLambda"
+      ContentUri: externalDepsLayer/nodejs
+      Description: Layer to use nodejs packages.
+      # delete old version of layer
+      RetentionPolicy: Delete
+    Metadata:
+      BuildMethod: nodejs12.x
+
+  AppSyncLambdaUseIAM:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Description: Lambda uses IAM role to access AppSync
+      Handler: lambdaUsesIAM.handler
+      Role: !GetAtt AppSyncLambdaRole.Arn
+      Environment:
+        Variables:
+          APPSYNC_ENDPOINT: !Ref GraphQLApiEndpoint
+
+  AppSyncLambdaUseApiKey:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Description: Lambda uses API_KEY to access AppSync
+      Handler: lambdaUsesApiKey.handler
+      Environment:
+        Variables:
+          APPSYNC_APIKEY: !Ref AppSyncApiKey
+          APPSYNC_ENDPOINT: !Ref GraphQLApiEndpoint
+
+
+  AppSyncLambdaUseEventBridge:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Description: Lambda uses EventBridge to access AppSync
+      Handler: lambdaUsesEventBridge.handler
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref OrdersEventBusName
+      Environment:
+        Variables:
+          EVENT_BUS_ARN: !Ref OrdersEventBusArn
+
+  AppSyncLambdaRole: # for lambda which uses IAM to have access to AppSync
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: AppSyncLambdaPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Resource: arn:aws:logs:*
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          - Effect: Allow
+            Resource:
+            - !Sub 'arn:aws:appsync:${AWS::Region}:${AWS::AccountId}:apis/${GraphQLApiId}/*'
+            Action:
+            - appsync:GraphQL

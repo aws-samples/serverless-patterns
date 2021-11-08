@@ -1,0 +1,8 @@
+[
+    {
+        "DetailType": "MyTestMessage",
+        "EventBusName": "MyEventBus",
+        "Source": "MyTestApp",
+        "Detail": "{\"Log_Dest\":\"sumo\"}"
+    }
+  ]

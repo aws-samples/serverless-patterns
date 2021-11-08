@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway REST API with IAM authorizer
+    
+Resources:
+
+  # IAM user with sufficient privileges to call endpoint
+  AuthorizedUser:
+    Type: AWS::IAM::User
+    Properties:
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: execute-api:Invoke
+                Resource: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${AppApi}/Prod/*"
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt AppFunction.Arn
+
+  # IAM user missing required privilege to invoke Lambda function
+  UnauthorizedUser: 
+    Type: AWS::IAM::User
+    Properties:
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: execute-api:Invoke
+                Resource: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*"
+
+  # REST API using IAM as Authorizer
+  AppApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Description: IAM authorizer REST API demo
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+                
+  # Dummy function
+  AppFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs14.x
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AppApi
+            Path: /
+            Method: get
+
+Outputs:
+
+  # API Gateway endpoint to be used during tests
+  AppApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+
+  # IAM username to test an authorized call
+  AuthorizedUserUsername:
+    Description: Username for authorized user
+    Value: !Ref AuthorizedUser
+
+  # IAM username to test an unauthorized call
+  UnauthorizedUser:
+    Description: Username for unauthorized user
+    Value: !Ref UnauthorizedUser

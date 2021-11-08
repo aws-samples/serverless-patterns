@@ -1,0 +1,47 @@
+openapi: "3.0.1"
+info:
+  title: "Primary API Gateway"
+paths:
+  /admin/reports:
+    get:
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        httpMethod: "GET"
+        uri: {"Fn::Sub": "https://${ReportingApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"}
+        responses:
+          default:
+            statusCode: "200"
+        requestParameters:
+          integration.request.header.x-api-key: {"Fn::Sub":["'${APIHeader}'",{"APIHeader": { "Ref": "ApiKeyValue"}}]}
+        passthroughBehavior: "when_no_match"
+        type: "http_proxy"
+  /admin/users:
+    get:
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        httpMethod: "GET"
+        uri: {"Fn::Sub": "https://${UserManagementApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"}
+        responses:
+          default:
+            statusCode: "200"
+        requestParameters:
+          integration.request.header.x-api-key: {"Fn::Sub":["'${APIHeader}'",{"APIHeader": { "Ref": "ApiKeyValue"}}]}
+        passthroughBehavior: "when_no_match"
+        type: "http_proxy"
+components:
+  schemas:
+    Empty:
+      title: "Empty Schema"
+      type: "object"

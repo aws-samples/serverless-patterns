@@ -25,41 +25,23 @@ Resources:
       Name: !Ref SSMParameterName
       Type: String
       Value: "{\"key1\":\"value1\"}"
-  FunctionExecutionRole:
-    Type: 'AWS::IAM::Role'
-    DependsOn:
-      - SSMParameter
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - 'sts:AssumeRole'
-            Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-      Policies:
-        - PolicyName: SSMParameterPolicy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'ssm:GetParameter'
-                  - 'ssm:PutParameter'
-                Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SSMParameterName}'
   # Lambda Function - uses Globals to define additional configuration values
   LambdaFunction:
     Type: 'AWS::Serverless::Function'
+    DependsOn:
+      - SSMParameter
     Properties:
       Handler: app.handler
-      Role: !GetAtt FunctionExecutionRole.Arn
       Environment:
         Variables:
           SSMParameterName: !Ref SSMParameterName
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - 'ssm:GetParameter'
+              - 'ssm:PutParameter'
+            Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SSMParameterName}'
 
 Outputs:
   LambdaFunctionName:

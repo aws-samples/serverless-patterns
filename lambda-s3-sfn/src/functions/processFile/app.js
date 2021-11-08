@@ -18,7 +18,7 @@ exports.handler = async (event) => {
   const processedPayload = payload.toLocaleUpperCase()
   
   
-  const processedPayloadKey = `${Key.replace("originalPayload", "processedPayload")}`
+  const processedPayloadKey = `${Key.replace("initialPayload", "processedPayload")}`
   const uploadParams = { 
     Bucket: Bucket,
     Key: processedPayloadKey,

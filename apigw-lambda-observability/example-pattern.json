@@ -1,0 +1,55 @@
+{
+  "title": "API Gateway to Lambda with observability",
+  "description": "Create an API with metrics, alerts, traces, logs, and dashboard.",
+  "language": "Node.js",
+  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/apigw-lambda-observability.png",
+  "videoId": "",
+  "level":"200",
+  "framework": "SAM",
+  "services": {
+    "from": "api",
+    "to": "lambda"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys Amazon API Gateway HTTP API with a single route that is integrated with and AWS Lambda function written in Node.js. Pattern uses Amazon CloudWatch logs, metrics, alerts, dashboards, Embedded Metrics Format, AWS X-Ray, Amazon SNS."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-observability",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/apigw-lambda-observability/template.yaml",
+      "readmeURL": ""
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Extended examples of this pattern implementation",
+        "link": "https://github.com/aws-samples/serverless-samples/tree/main/serverless-rest-api"
+      } 
+    ]
+  },
+  "author": {
+    "headline": "Presented by Giedrius Praspaliauskas, Sr. Solutions Architect, Serverless",
+    "name": "Giedrius Praspaliauskas",
+    "imageURL": "",
+    "linkedin": "https://www.linkedin.com/in/gpraspaliauskas/",
+    "bio": "Giedrius is a senior solutions architect focusing on serverless at Amazon Web Services based in the US. "
+  }
+}

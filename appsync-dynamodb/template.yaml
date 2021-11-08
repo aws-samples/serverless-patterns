@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - AppSync to DynamoDB
+
+Resources:
+  # Define a DynamoDB table
+  DynamoDBNotesTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: NoteId
+        Type: String
+
+  # AppSync Role
+  DynamoDBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+      Policies:
+        - PolicyName: DDBAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt DynamoDBNotesTable.Arn
+
+  # AppSync API - The GraphQL API for the Notes App
+  AppSyncApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: NotesApi
+      XrayEnabled: true
+      AuthenticationType: API_KEY
+
+  # API Key for external access
+  AppSyncApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+
+  # AppSync Schema
+  AppSyncSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Definition: |
+        type Note {
+          NoteId: ID!
+          title: String
+          content: String
+        }
+        type PaginatedNotes {
+          notes: [Note!]!
+          nextToken: String
+        }
+        type Query {
+          allNotes(limit: Int, nextToken: String): PaginatedNotes!
+          getNote(NoteId: ID!): Note
+        }
+        type Mutation {
+          saveNote(NoteId: ID!, title: String!, content: String!): Note
+          deleteNote(NoteId: ID!): Note
+        }
+        type Schema {
+          query: Query
+          mutation: Mutation
+        }
+
+  # AppSync Data Source for DynamoDB
+  AppSyncNotesTableDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      Name: NotesDataSource
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Description: "The Notes Table AppSync Data Source"
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt DynamoDBRole.Arn
+      DynamoDBConfig:
+        TableName: !Ref DynamoDBNotesTable
+        AwsRegion: !Sub ${AWS::Region}
+
+  # Resolver: Query - Get All Notes
+  AppSyncAllNotesQueryResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: AppSyncSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Query
+      FieldName: allNotes
+      DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "operation": "Scan",
+          "limit": $util.defaultIfNull(${ctx.args.limit},20),
+          "nextToken": $util.toJson(${ctx.args.nextToken})
+        }
+      ResponseMappingTemplate: |
+        {
+          "notes": $util.toJson($ctx.result.items),
+          "nextToken": $util.toJson(${ctx.args.nextToken})
+        }
+
+  # Resolver: Query - get one note
+  AppSyncGetNoteQueryResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: AppSyncSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Query
+      FieldName: getNote
+      DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2018-05-29",
+          "operation": "GetItem",
+          "key": {
+            "NoteId": $util.dynamodb.toDynamoDBJson($ctx.args.NoteId)
+          }
+        }
+      ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+  # Resolver: Mutation - Save note
+  AppSyncSaveNoteMutationResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: AppSyncSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Mutation
+      FieldName: saveNote
+      DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2018-05-29",
+          "operation": "PutItem",
+          "key": {
+            "NoteId": $util.dynamodb.toDynamoDBJson($ctx.args.NoteId)
+          },
+          "attributeValues": {
+            "title": $util.dynamodb.toDynamoDBJson($ctx.args.title),
+            "content": $util.dynamodb.toDynamoDBJson($ctx.args.content)
+          }
+        }
+      ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+  # Resolver: Mutations - Delete note
+  AppSyncDeleteNoteMutationResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: AppSyncSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Mutation
+      FieldName: deleteNote
+      DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2018-05-29",
+          "operation": "DeleteItem",
+          "key": {
+            "NoteId": $util.dynamodb.toDynamoDBJson($ctx.args.NoteId)
+          }
+        }
+      ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+Outputs:
+  GraphQLApiEndpoint:
+    Description: The URL to the GraphQL Endpoint
+    Value: !GetAtt AppSyncApi.GraphQLUrl
+  APIKey:
+    Description: API Key for using the GraphQL endpoint. (header key name 'x-api-key')
+    Value: !GetAtt AppSyncApiKey.ApiKey

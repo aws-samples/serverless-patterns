@@ -1,0 +1,98 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    CodeUri: ./src
+    Runtime: nodejs14.x
+    MemorySize: 128
+    Timeout: 30
+
+Parameters:
+  DBClusterName:
+    Description: Aurora DB cluster name.
+    Type: String
+    Default: aurora-test-cluster
+  DatabaseName:
+    Description: Aurora database name.
+    Type: String
+    Default: aurora_test_db
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9_]*'
+    ConstraintDescription: Must begin with a letter and only contain alphanumeric characters.
+  DBAdminUserName:
+    Description: The admin user name.
+    Type: String
+    Default: admin_user
+    MinLength: '2'
+    MaxLength: '16'
+    AllowedPattern: '[a-zA-Z0-9_]+'
+    ConstraintDescription: Must be between 2 to 16 alphanumeric characters.
+
+Resources:
+  # Secrets Manager secret
+  DBSecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: !Sub '${DBClusterName}-AuroraUserSecret'
+      Description: RDS database auto-generated user password
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username": "${DBAdminUserName}"}'
+        GenerateStringKey: password
+        PasswordLength: 30
+        ExcludeCharacters: '"@/\'
+  # Aurora Serverless DB Cluster with Data API
+  AuroraCluster:
+    Type: 'AWS::RDS::DBCluster'
+    Properties:
+      DBClusterIdentifier: !Ref DBClusterName
+      MasterUsername: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:username}}'
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:password}}'
+      DatabaseName: !Ref DatabaseName
+      Engine: aurora
+      EngineMode: serverless
+      # Enable the Data API for Aurora Serverless
+      EnableHttpEndpoint: true
+      ScalingConfiguration:
+        AutoPause: true
+        MinCapacity: 1
+        MaxCapacity: 2
+        SecondsUntilAutoPause: 3600
+  # Lambda Function - uses Globals to define additional configuration values
+  LambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: !Sub '${DBClusterName}-function'
+      Handler: app.handler
+      # Function environment variables
+      Environment:
+        Variables:
+          DBClusterArn: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
+          DBName: !Ref DatabaseName
+          SecretArn: !Ref DBSecret
+      # Creates an IAM Role that defines the services the function can access and which actions the function can perform
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref DBSecret
+        - Statement:
+          - Effect: Allow
+            Action: 'rds-data:ExecuteStatement'
+            Resource: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
+
+Outputs:
+  DBClusterArn:
+    Description: Aurora DB Cluster Resource ARN
+    Value: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBClusterName}'
+  DBClusterEndpoint:
+    Description: Aurora DB Cluster Endpoint Address
+    Value: !GetAtt AuroraCluster.Endpoint.Address
+  DBName:
+    Description: Aurora Database Name
+    Value: !Ref DatabaseName
+  DBAdminUserName:
+    Description: Aurora Database Admin User
+    Value: !Ref DBAdminUserName
+  SecretArn:
+    Description: Secrets Manager Secret ARN
+    Value: !Ref DBSecret

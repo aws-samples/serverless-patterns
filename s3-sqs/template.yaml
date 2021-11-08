@@ -1,44 +1,44 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
+Transform: 'AWS::Serverless-2016-10-31'
 Description: Sends notifications from S3 to SQS when an object is created
 
 Parameters:
   SourceBucketName:
     Type: String
-    
+
 Resources:
   ## S3 bucket
   SourceBucket:
-    Type: AWS::S3::Bucket
+    Type: 'AWS::S3::Bucket'
     DependsOn:
-      - StandardQueue
       - QueuePolicy
     Properties:
       BucketName: !Ref SourceBucketName
       NotificationConfiguration:
         QueueConfigurations:
-          - Event: s3:ObjectCreated:*
+          - Event: 's3:ObjectCreated:*'
             Queue: !GetAtt StandardQueue.Arn
-            
+
   QueuePolicy:
-    Type: AWS::SQS::QueuePolicy
-    DependsOn:
-      - StandardQueue
+    Type: 'AWS::SQS::QueuePolicy'
     Properties:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Principal:
-              AWS: '*'
+            Principal: 
+              Service: "s3.amazonaws.com"
             Action:
-              - SQS:SendMessage
+              - 'SQS:SendMessage'
             Resource: !GetAtt StandardQueue.Arn
             Condition:
               ArnLike:
                 aws:SourceArn: !Join ["",['arn:aws:s3:::',!Ref SourceBucketName]]
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
       Queues:
         - !Ref StandardQueue
 
   StandardQueue:
     Type: AWS::SQS::Queue
+

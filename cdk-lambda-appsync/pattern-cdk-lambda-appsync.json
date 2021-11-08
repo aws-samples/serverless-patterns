@@ -1,0 +1,50 @@
+{
+  "title": "Lambda to AppSync",
+  "description": "Create a Lambda function that calls an AppSync GraphQL API",
+  "language": "Node.js",
+  "architectureURL": "pattern-cdk-lambda-appsync.png",
+  "level": "100",
+  "framework": "CDK",
+  "services": {
+    "from": "lambda",
+    "to": "appsync"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In this pattern, AWS AppSync provides a a schema that allows you to manage and read todos. A Lambda function is implemented that can interact with the GraphQL API. This function can create todos by using the codegen generated from the schema by the [Amplify CLI codegen](https://docs.amplify.aws/cli). The codegen provides the operations and the variable types, which makes it simple to interact with the AppSync GraphQL API from the Typescript function. This pattern is useful in event driven design that trigger your AppSync function from the backend. Those changes can they easily be reflected on front-end clients in real time by using AppSync subscriptions."
+    ]
+  },
+  "deploy": {
+    "text": ["See the Github repo for detailed instructions"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-lambda-appsync",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/cdk-lambda-appsync/cdk/lib/main.ts",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-lambda-appsync/README.md"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Exporting AppSync operations to a Lambda layer for easy reuse",
+        "link": "https://docs.amplify.aws/guides/functions/appsync-operations-to-lambda-layer/q/platform/js"
+      },
+      {
+        "text": "Simplify access to multiple microservices with AWS AppSync and AWS Amplify",
+        "link": "https://aws.amazon.com/blogs/mobile/appsync-microservices/"
+      },
+      {
+        "text": "Exporting AppSync operations to a Lambda layer for easy reuse",
+        "link": "https://docs.amplify.aws/guides/functions/appsync-operations-to-lambda-layer/q/platform/js"
+      }
+    ]
+  },
+  "author": {
+    "headline": "Presented by Brice Pellé",
+    "name": "Brice Pellé",
+    "bio": "Principal Solution Architect - AppSync @ AWS"
+  }
+}

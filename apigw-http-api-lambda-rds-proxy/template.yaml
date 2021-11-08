@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  apigw-http-api-lambda-rds-proxy
+
+  Sample SAM Template for apigw-http-api-lambda-rds-proxy
+
+Parameters:
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: "Subnets Ids where function will be deployed. Provide at least two"
+  RdsProxyEndpoint:
+    Type: String
+    Description: "RDS Proxy endpoint configured. This should be Read/Write endpoint. Proxy instance should force IAM authentication"
+  Port:
+    Type: Number
+    Description: "Database  port. For Mysql 3306 is default."
+    Default: 3306
+  SecretArn:
+    Type: String
+    Description: "Secret ARN where database credentials are stored."
+  ProxyResourceId:
+    Type: String
+    Description: "RDS Proxy resource id. This is last part of RDS proxy ARN, ex: prx-<hash>. Its required to configure needed permission by the lambda functions."
+  LambdaSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: "Security group id for lambda function. Make sure traffic from this SG is allowed by database and proxy security group."
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    CodeUri: ./src
+    Runtime: python3.9
+    MemorySize: 128
+    Timeout: 30
+
+Resources:
+  # API Gateway HTTP API
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+
+  # Lambda function which talks to RDS Aurora via RDS proxy endpoint.
+  RdsProxyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroupId
+        SubnetIds: !Ref Subnets
+      Policies:
+        - Statement:
+            - Sid: AllowDbConnect
+              Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource:
+                - !Sub arn:aws:rds-db:${AWS::Region}:${AWS::AccountId}:dbuser:${ProxyResourceId}/*
+      Environment:
+        Variables:
+          region: !Ref AWS::Region
+          rds_endpoint: !Ref RdsProxyEndpoint
+          port: !Ref Port
+          username: !Sub "{{resolve:secretsmanager:${SecretArn}:SecretString:username}}"
+      Events:
+        Proxy:
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: get
+            ApiId: !Ref HttpApi
+
+Outputs:
+  ApiBasePath:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+
+  RdsProxyApiPath:
+    Description: "API Gateway endpoint URL for rds proxy function"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/"

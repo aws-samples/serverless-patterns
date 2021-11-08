@@ -4,7 +4,7 @@ The AWS SAM template deploys an SQS queue that is triggered by an EventBridge ru
 
 In this example, the EventBridge rule specified in `template.yaml` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see "Example event payload from EventBridge to SQS" in the README) to the SQS queue.
 
-Learn more about this pattern at Serverless Land Patterns: TBD
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-sqs.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

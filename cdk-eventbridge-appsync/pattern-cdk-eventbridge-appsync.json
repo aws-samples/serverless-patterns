@@ -1,0 +1,46 @@
+{
+  "title": "EventBridge to AppSync",
+  "description": "Create a EventBridge bus and destination that can trigger an AppSync GraphQL API",
+  "language": "Node.js",
+  "architectureURL": "pattern-cdk-eventbridge-appsync.png",
+  "level": "200",
+  "framework": "CDK",
+  "services": {
+    "from": "eventbridge",
+    "to": "appsync"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In this pattern, AWS AppSync is configured with a a schema to manage and read todos. The pattern uses an event bridge bus and an EventBridge [API destination](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-destinations.html) to trigger the AppSync GraphQL `updateTodo` mutation when an event that matches the defined rule is received. The AppSync [API KEY](https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html#api-key-authorization) is used as the mode of authorization."
+    ]
+  },
+  "deploy": {
+    "text": ["See the Github repo for detailed instructions"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-eventbridge-appsync",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/cdk-eventbridge-appsync/cdk/lib/main.ts",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-eventbridge-appsync/README.md"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Simplify out of band AWS AppSync real-time subscriptions with Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/mobile/appsync-eventbridge/"
+      },
+      {
+        "text": "Real-Time Data",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/aws-appsync-real-time-data.html"
+      }
+    ]
+  },
+  "author": {
+    "headline": "Presented by Josh Khan",
+    "name": "Josh Khan",
+    "bio": "Principal Solution Architect - AWS"
+  }
+}

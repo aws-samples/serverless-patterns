@@ -11,7 +11,7 @@ Resources:
   StateMachineExpressSync:
     Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
     Properties:
-      DefinitionUri: statemachine/StateMachine.asl.json
+      DefinitionUri: statemachine/stateMachine.asl.json
       Policies:
         -  Version: "2012-10-17"
            Statement:

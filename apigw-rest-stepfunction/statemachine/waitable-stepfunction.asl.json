@@ -1,0 +1,76 @@
+{
+    "Comment": "An example of the Amazon States Language using wait states",
+    "StartAt": "SetInitialStatus",
+    "States": {
+        "SetInitialStatus": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::dynamodb:putItem",
+            "Parameters": {
+                "TableName": "${DDBTable}",
+                "Item": {
+                    "Id": {
+                        "S.$": "$.Id"
+                    },
+                    "ProcessStatus": {
+                        "S": "STARTING"
+                    },
+                    "LastUpdated": {
+                        "S.$": "$$.State.EnteredTime"
+                    }
+                }
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "IntervalSeconds": 20,
+                    "MaxAttempts": 5,
+                    "BackoffRate": 10
+                }
+            ],
+            "Next": "WaitUntil",
+            "ResultPath": null,
+            "OutputPath": "$"
+        },
+        "WaitUntil": {
+            "Type": "Wait",
+            "TimestampPath": "$.StartTimestamp",
+            "Next": "SetFinalStatus",
+            "OutputPath": "$"
+        },
+        "SetFinalStatus": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::dynamodb:updateItem",
+            "Parameters": {
+                "TableName": "${DDBTable}",
+                "Key": {
+                    "Id": {
+                        "S.$": "$.Id"
+                    }
+                },
+                "UpdateExpression": "SET ProcessStatus = :newStatus, LastUpdated = :newTimestamp",
+                "ExpressionAttributeValues": {
+                    ":newStatus": {
+                        "S": "COMPLETED"
+                    },
+                    ":newTimestamp": {
+                        "S.$": "$$.State.EnteredTime"
+                    }
+                }
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "IntervalSeconds": 20,
+                    "MaxAttempts": 5,
+                    "BackoffRate": 10
+                }
+            ],
+            "ResultPath": null,
+            "End": true
+        }
+    }
+}

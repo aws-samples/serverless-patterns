@@ -1,0 +1,11 @@
+type Response {
+  MessageId: String!
+  MD5OfMessageBody: String!
+  MD5OfMessageAttributes: String
+  MD5OfMessageSystemAttributes: String
+  SequenceNumber: String
+}
+
+type Query {
+  sendMessage(action: String, message: String): Response
+}

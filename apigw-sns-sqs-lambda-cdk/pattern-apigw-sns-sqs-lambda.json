@@ -1,0 +1,57 @@
+
+{
+    "title": "API Gateway to SNS, SQS and Lambda",
+    "description": "Create an Amazon API Gateway REST API that integrates with Amazon SNS and Amazon SQS to implement Topic-Queue-Chaining pattern",
+    "language": "TypeScript",
+    "architectureURL": "apigw-sns-sqs-lambda-arch-diagram.png",
+    "videoId": "",
+    "level":"100",
+    "framework": "CDK",
+    "services": {
+      "from": "apigw",
+      "to": "sns, sqs and lambda"
+    },
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This CDK application deploys an Amazon API Gateway REST API that publishes requests to an SNS Topic. The SNS topic fans out these requests to 2 SQS Queues. Requests in each of these queues are processed by Lambda functions. These functions log the requests to the console."
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cd cdk && npm run build && npm install && cdk deploy"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sns-sqs-lambda-cdk",
+        "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/apigw-sns-sqs-lambda-cdk/cdk/bin/cdk-apigw-sns-sqs-lambda.ts",
+        "readmeURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/apigw-sns-sqs-lambda-cdk/README.md"
+      },
+      "payloads": [
+        {
+          "headline": "",
+          "payloadURL": ""
+        }
+      ]
+    },
+    "resources": {
+      "headline": "Additional resources",
+      "bullets": [
+        {
+          "text": "Application integration patterns for microservices: Fan-out strategies",
+          "link": "https://aws.amazon.com/blogs/compute/application-integration-patterns-for-microservices-fan-out-strategies/"
+        },
+        {
+          "text": "Workshop: Topic-Queue-Chaining & Load Balancing",
+          "link": "https://async-messaging.workshop.aws/topic-queue-chaining-and-load-balancer.html"
+        }
+      ]
+    },
+    "author": {
+      "headline": "Presented by Hariram Ronda",
+      "name": "Hariram Ronda",
+      "imageURL": "https://www.linkedin.com/in/hariram-ronda",
+      "bio": "Senior Cloud Application Architect @ AWS Professional Services"
+    }
+  }

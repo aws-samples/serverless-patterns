@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Notify subscribers of database updates
+
+Parameters:
+  CognitoUserPoolName:
+    Type: String
+    Default: "ServerlessPatternsCognitoUserPool"
+  CognitoUserPoolClientName:
+    Type: String
+    Default: "ServerlessPatternsCognitoUserPoolClient"
+  AppSyncName:
+    Type: String
+    Default: "ServerlessPatternsAppsync"
+
+  # AuthStack parameters
+  Client:
+    Description: Client website for authentication redirects and cors (must start with https://)
+    Type: String
+    Default: https://myapp.com
+
+Resources:
+  # Creates a nested stack with the required Cognito requirements
+  AuthStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./auth.yaml
+      Parameters:
+        ClientDomain: !Ref Client
+
+  GraphQLApi:  ## AppSync API
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: !Ref AppSyncName
+      AuthenticationType: AMAZON_COGNITO_USER_POOLS
+      UserPoolConfig:
+        UserPoolId: !GetAtt AuthStack.Outputs.UserPoolId
+        AwsRegion: !Sub "${AWS::Region}"
+        DefaultAction: ALLOW
+      AdditionalAuthenticationProviders:
+        - AuthenticationType: API_KEY
+        - AuthenticationType: AWS_IAM
+
+  GraphQLApiKey:  ## API Key for AppSync
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+
+  GraphQLSchema:  ## Schema for sample backend for frontend
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      DefinitionS3Location: "./schema.graphql"
+
+  NoneDataSource:  ## Local data source for AppSync
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: NoneDataSource
+      Type: NONE
+
+  PublishStatusUpdateMutationResolver:  ## Resolver for putStatusUpdate mutation
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: publishStatusUpdate
+      DataSourceName: !GetAtt NoneDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2018-05-29",
+          "payload": $util.toJson($ctx.args)
+        }
+      ResponseMappingTemplate: |
+        $util.toJson($ctx.result)
+
+Outputs:
+  AppSyncEndpoint:
+    Value: !GetAtt GraphQLApi.GraphQLUrl
+    Description: The https endpoint of an AppSync API
+
+  AppSyncApiId:
+    Value: !GetAtt GraphQLApi.ApiId
+    Description: The id of an AppSync API
+
+  AppSyncApiKey:
+    Value: !GetAtt GraphQLApiKey.ApiKey
+    Description: The apikey of an AppSync API

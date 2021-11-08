@@ -1,0 +1,18 @@
+{
+   "Comment": "Start an execution of another state machine",
+   "StartAt": "StartStateMachine",
+   "States": {
+       "StartStateMachine": {  
+         "Type":"Task",
+         "Resource":"arn:aws:states:::states:startExecution",
+         "Parameters":{  
+            "Input":{
+              "IsHelloWorldExample": "True",
+              "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id"
+             },
+            "StateMachineArn":"${ChildStateMachineArn}"
+         },
+         "End":true
+      }
+   }
+}

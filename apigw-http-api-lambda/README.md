@@ -96,6 +96,9 @@ Response:
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
+
+This pattern was contributed by Greg Davis.
+
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
