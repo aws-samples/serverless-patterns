@@ -46,7 +46,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
     ```
 6. Deploy the CDK App. 
     ```bash
-    cdk deploy --parameters notificationemailaddress=validEmailAddress@hostingProvider.com --parameters profiling=TRUE --parameters tracing=TRUE --parameters trustedadvisorrefreshminutes=7
+    cdk deploy --parameters notificationemailaddress=email@example.com --parameters profiling=TRUE --parameters tracing=TRUE --parameters trustedadvisorrefreshminutes=7
     ```
    **Parameter Definitions:**
    * **notificationemailaddress:** **[Required]** The E-mail address you wish to send notifications to when a WARN or ERROR flag is identified
