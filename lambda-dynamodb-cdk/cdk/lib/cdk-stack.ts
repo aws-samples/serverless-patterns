@@ -15,20 +15,16 @@ export class CdkStack extends cdk.Stack {
     });
 
     // Lambda function
-    const lambdaPutDynamoDB = new NodejsFunction(
-      this,
-      'lambdaPutDynamoDBHandler',
-      {
-        runtime: lambda.Runtime.NODEJS_12_X,
-        memorySize: 1024,
-        timeout: cdk.Duration.seconds(3),
-        entry: path.join(__dirname, '../src/app.ts'),
-        handler: 'main',
-        environment: {
-          DatabaseTable: dynamoTable.tableName
-        }
+    const lambdaPutDynamoDB = new NodejsFunction(this, 'lambdaPutDynamoDBHandler', {
+      runtime: lambda.Runtime.NODEJS_12_X,
+      memorySize: 1024,
+      timeout: cdk.Duration.seconds(3),
+      entry: path.join(__dirname, '../src/app.ts'),
+      handler: 'main',
+      environment: {
+        DatabaseTable: dynamoTable.tableName
       }
-    );
+    });
 
     // Write permissions for Lambda
     dynamoTable.grantWriteData(lambdaPutDynamoDB);
