@@ -2,7 +2,7 @@
 
 This pattern utilizes AWS Trusted Advisor to execute an AWS Lambda Function via Amazon EventBridge, to remove public access to an S3 Bucket once it has been flagged as public. 
 Incorrectly configured S3 buckets can be the source of a data leak in your organization. After deploying this serverless pattern, you will be automating the lock-down of your 
-s3 buckets to prevent any accidental data leaks. If an S3 bucket meets the use-case for being open to the public, simply "Exclude & Refresh" the specific resource in 
+S3 buckets to prevent any accidental data leaks. If an S3 Bucket meets the use-case for being open to the public, simply "Exclude & Refresh" the specific resource in 
 the [AWS Trusted Advisor Console](https://console.aws.amazon.com/trustedadvisor/home) and they will be ignored by the 'S3 Bucket Privatizer'. 
 
 The 'Amazon S3 Bucket Permissions' Trusted Advisor check is only available to AWS Accounts subscribed to [Business or Enterprise support plans](https://aws.amazon.com/premiumsupport/plans/)
@@ -16,7 +16,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * [Python 3.6 or later](https://www.python.org/downloads/)
 * [pip and virtualenv](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html#python-prerequisites)
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
@@ -99,7 +99,7 @@ wait for the trusted advisor check to refresh based on the cdk parameter of trus
    1. If you wish to manually trigger the trusted Advisor Check Refresh, click the circular refresh icon to the right of the
    Trusted Advisor check labeled "Amazon S3 Bucket Permissions". If the Last refreshed time is less than 5 minutes, you 
    will need to wait until 5 minutes has passed since the last refresh.
-6. After the Trusted Advisor check refreshes, you will see the open bucket policy removed, and recieve an e-amil to the notification e-mail address
+6. After the Trusted Advisor check refreshes, you will see the open bucket policy removed, and receive an e-amil to the notification e-mail address
 
 
 ## Cleanup
