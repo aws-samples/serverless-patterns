@@ -1,10 +1,13 @@
 {
   "name": "express-typescript",
   "version": "1.0.0",
-  "description": "",
+  "description": "deploys a typescript express app that interacts with S3",
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aws-samples/serverless-patterns.git"
+  },
   "scripts": {
-    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "tsc",
     "prestart": "npm run build",
     "start": "node .",
@@ -28,7 +31,6 @@
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.2.1",
-    "tslint": "^6.1.3",
     "typescript": "^4.4.4"
   }
 }
