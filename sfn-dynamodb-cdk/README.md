@@ -123,9 +123,7 @@ Additionally, you can also verify if the item is stored in DynamoDB by running t
     ```
 
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
-SPDX-License-Identifier: MIT-0
 
 ## Useful commands
 
@@ -135,4 +133,8 @@ SPDX-License-Identifier: MIT-0
  * `cdk diff`        compare deployed stack with current state
  * `cdk docs`        open CDK documentation
 
-Enjoy!
+
+-----
+Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
