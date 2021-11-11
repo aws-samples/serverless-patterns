@@ -4,7 +4,7 @@ This pattern creates a Lambda function that puts an object to S3 and starts a sy
 
 This pattern is useful when processing uploaded files larger than the current [task execution limits](https://docs.aws.amazon.com/step-functions/latest/dg/limits.html#service-limits-task-executions).
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-s3-sfn.
+Learn more about this pattern at Serverlessland Patterns: https://serverlessland.com/patterns/lambda-s3-sfn.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -42,13 +42,13 @@ Important: this application uses various AWS services and there are costs associ
 
 * Invoke SavePayloadAndStartStateMachineFunction Lambda function with a "payload" string in the input payload
 * SavePayloadAndStartStateMachineFunction stores the payload in S3 and starts an Express Workflow passing the bucket and key
-* Express Workflow calls the ProcessFileFunction, retrieves the uploaded json the using the bucket/key, converts to uppercase, and returns it
-* Express Workflow calls the AddFooterFunction, function adds a footer and returns it
+* Express Workflow calls the ProcessFileFunction, retrieves the uploaded json using the bucket/key, converts to uppercase, and returns it
+* Express Workflow calls the AddFooterFunction function, adds a footer and returns it
 * Express Workflow ends and returns the result to the client
 
 ## Testing
 
-Run the following AWS CLI command to invoke function comand to start the Step Functions workflow. Note, you must edit the {SavePayloadAndStartStateMachineFunction} placeholder with the ARN of the deployed lambda function. This is provided in the stack outputs.
+Run the following AWS CLI command to invoke function to start the Step Functions workflow. Note, you must edit the {SavePayloadAndStartStateMachineFunction} placeholder with the ARN of the deployed lambda function. This is provided in the stack outputs.
 You can also replace payload with something that is bigger than the current task execution limit (262kb).
 ```bash
 aws lambda invoke --function-name {SavePayloadAndStartStateMachineFunction}  --payload '{ "payload": "hello world"}' --cli-binary-format raw-in-base64-out response.json
