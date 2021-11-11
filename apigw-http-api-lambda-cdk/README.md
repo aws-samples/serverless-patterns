@@ -4,7 +4,7 @@ This pattern creates an Amazon API Gateway HTTP API and an AWS Lambda function u
 Python. This template also has a sample CORS configuration. The sample application was developed in Python and it shows some
 context, event and environment variables properties.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-http-api-lambda-cdk.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-http-lambda-cdk.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier
 usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs
