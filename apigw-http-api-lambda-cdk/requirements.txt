@@ -1,0 +1,3 @@
+aws-cdk.aws-apigatewayv2
+aws-cdk.aws-apigatewayv2-integrations
+aws-cdk.aws-lambda
