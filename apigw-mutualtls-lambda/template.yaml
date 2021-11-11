@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An Amazon API Gateway HTTP API, API custom domain name with mutual TLS, and a AWS Lambda function.
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    CodeUri: ./src
+    Runtime: nodejs14.x
+    MemorySize: 128
+    Timeout: 15
+
+# Parameter values that should be given as inputs while stack creation
+Parameters:
+  AppName:
+    Description: Name of Application
+    Type: String
+    Default: apigw-mutualtls-lambda
+  CustomDomainName:
+    Description: Name of Custom Domain Name
+    Type: String
+    Default: api.example.com
+  CertArn:
+    Description: ARN of certificate from AWS certificate manager
+    Type: String
+    Default: certificatearn-domainname
+  S3TruststoreURI:
+    Description: S3 uri store for mutual TLS certificates
+    Type: String
+    Default: s3://testbucket/teststore.pem
+  PublicHostedZoneId:
+    Description: Public Hosted zone id where record should be created for API custom domain name
+    Type: String
+    Default: publichostzone-id
+
+Resources:
+  # API Gateway HTTP API
+  HttpApi:
+    Type: 'AWS::ApiGatewayV2::Api'
+    Properties:
+      Name: !Ref AppName
+      Description: An Amazon API Gateway HTTP API with mutual TLS and an AWS Lambda function.
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+          - POST
+      DisableExecuteApiEndpoint: true
+      Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaFunction}/invocations
+  #API Gateway custom domain name with mutual TLS enabled
+  CustDomainName:
+    Type: 'AWS::ApiGatewayV2::DomainName'
+    Properties:
+      DomainName: !Ref CustomDomainName
+      DomainNameConfigurations:
+        - EndpointType: REGIONAL
+          CertificateArn: !Ref CertArn
+      MutualTlsAuthentication:
+        TruststoreUri: !Ref S3TruststoreURI
+  #API mapping for custom domain name
+  HTTPApiMapping:
+    Type: 'AWS::ApiGatewayV2::ApiMapping'
+    Properties:
+      DomainName: !Ref CustomDomainName
+      ApiId: !Ref HttpApi
+      Stage: $default
+  #Route53 Recordset for API Custom Domain Name
+  ApiDNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId : !Ref PublicHostedZoneId
+      Name: !Ref CustomDomainName
+      AliasTarget:
+        HostedZoneId: !GetAtt CustDomainName.RegionalHostedZoneId
+        DNSName: !GetAtt CustDomainName.RegionalDomainName
+        EvaluateTargetHealth: true
+      Type: A
+  # Lambda Function - uses Globals to define additional configuration values
+  LambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: !Sub '${AppName}-function'
+      Handler: app.handler
+  # Function permissions grant an AWS service or another account permission to use a function
+  FunctionResourcePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref LambdaFunction
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*'
+
+Outputs:
+  HttpApiEndpoint:
+    Description: The default endpoint for the HTTP API.
+    Value: !GetAtt HttpApi.ApiEndpoint
+  HttpApiCustomDomainName:
+    Description: The custom domain name for the HTTP API.
+    Value: !Ref CustomDomainName
