@@ -2,7 +2,7 @@
 # Create an AWS Step Functions workflow to integrate with Amazon DynamoDB
 
 The CDK application deploys a Step Functions workflow, that takes in a payload and puts the item in DynamoBb. Additionally, this workflow also shows how to read an item directly from the DynamoDB table. The CDK application contains the minimum IAM resources required to run the application.
-
+You can find the SAM template for the same pattern [here](https://serverlessland.com/patterns/sfn-dynamodb) 
 
 To manually create a virtualenv on MacOS and Linux:
 
@@ -53,9 +53,9 @@ command.
 
 ## Testing
 
-Run the following AWS CLI command to send a 'start-execution` command to start the Step Functions workflow. Note, you must edit the {StateMachineExpressSynctoLambda} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs.
+Run the following AWS CLI command to send a 'start-execution` command to start the Step Functions workflow. Note, you must edit the {StateMachineArn} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs.
 ```bash
-aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMachinetoDDBArn}" --input "{\"id\":  \"12345\" }"
+aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMachineArn}" --input "{\"id\":  \"12345\" }"
 ```
 
 ### output:
@@ -106,10 +106,10 @@ Additionally, you can also verify if the item is stored in DynamoDB by running t
 {
     "Item": {
         "id": {
-            "S": "1234"
+            "S": "12345"
         },
         "description": {
-            "S": "Hello, my id is 1234"
+            "S": "Hello, my id is 12345"
         }
     }
 }
