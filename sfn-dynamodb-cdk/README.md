@@ -4,6 +4,8 @@
 The CDK application deploys a Step Functions workflow, that takes in a payload and puts the item in DynamoBb. Additionally, this workflow also shows how to read an item directly from the DynamoDB table. The CDK application contains the minimum IAM resources required to run the application.
 You can find the SAM template for the same pattern [here](https://serverlessland.com/patterns/sfn-dynamodb) 
 
+Learn more about this pattern at: https://serverlessland.com/patterns/sfn-dynamodb-cdk.
+
 To manually create a virtualenv on MacOS and Linux:
 
 ```
