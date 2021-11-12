@@ -27,6 +27,7 @@ class SfnSqsCdkStack(cdk.Stack):
             timeout=core.Duration.minutes(5)
         )
 
+
         core.CfnOutput(scope=self, id='StateMachineArn',
                        value=state_machine.state_machine_arn)
         core.CfnOutput(scope=self, id='QueueUrl',
