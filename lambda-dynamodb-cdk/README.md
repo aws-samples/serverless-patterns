@@ -51,11 +51,20 @@ This is similar to the `lambda-dynamodb` example but is implemented in CDK.
 
 ## Testing
 
-Run the following Lambda CLI invoke command to invoke the function. Note, you must edit the {LambdFunctionArn} placeholder with the ARN of the deployed Lambda function. This is provided in the stack outputs.
+Run the following Lambda CLI invoke command to invoke the function. Note, you must edit the {LambdFunctionArn} placeholder with the ARN of the deployed Lambda function. This is provided in the stack outputs. Note that this requires AWS CLI v2.
 
 ```bash
-aws lambda invoke --function-name {LambdFunctionArn} --invocation-type Event \
---payload '{ "Metadata": "Hello" }' \ response.json --cli-binary-format raw-in-base64-out
+aws lambda invoke --function-name "LAMBDA_FUNCTION_ARN" \
+--invocation-type Event \
+--payload '{ "Metadata": "Hello" }' \
+--cli-binary-format raw-in-base64-out \
+response.json
+# Example
+aws lambda invoke --function-name "arn:aws:lambda:ap-southeast-2:123456789123:function:CdkStack-lambdaPutDynamoDBHandler1A123456-fooBarBazFoo" \
+--invocation-type Event \
+--payload '{ "Metadata": "Hello" }' \
+--cli-binary-format raw-in-base64-out \
+response.json
 ```
 
 ## Cleanup

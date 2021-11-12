@@ -20,6 +20,9 @@ setuptools.setup(
 
     install_requires=[
         "aws-cdk.core==1.129.0",
+        "aws-cdk.aws-stepfunctions-tasks==1.129.0",
+        "aws-cdk.aws-stepfunctions==1.129.0",
+        "aws-cdk.aws-sqs==1.129.0"
     ],
 
     python_requires=">=3.6",

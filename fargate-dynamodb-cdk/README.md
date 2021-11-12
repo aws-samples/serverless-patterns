@@ -83,6 +83,8 @@ curl --location --request POST 'http://CdkSt-MyFar-123456789ABC-123456789.ap-sou
    cdk destroy
    ```
 
+2. Navigate to ECR in the AWS console and delete the container images created
+
 ---
 
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.

@@ -123,6 +123,8 @@ Running all the requests above should produce the following output:
    cdk destroy
    ```
 
+2. Navigate to ECR in the AWS console and delete the container images created
+
 ---
 
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.

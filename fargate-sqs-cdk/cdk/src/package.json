@@ -1,8 +1,12 @@
 {
   "name": "express-typescript",
   "version": "1.0.0",
-  "description": "",
+  "description": "deploys a typescript express app that interacts with SQS",
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aws-samples/serverless-patterns.git"
+  },
   "scripts": {
     "build": "tsc",
     "prestart": "npm run build",
