@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless Pattern - IoT rule with custom lambda authorizer forwarding events to SQS for post iot event processing
+Parameters:
+  VPC:
+    Type: AWS::EC2::VPC::Id
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+Resources:
+  IotEventQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: iot-events 
+  ProcessorSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: iot-events-processor
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+  Processor:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: iot-events-processor
+      Handler: app.handler
+      Runtime: nodejs14.x
+      Timeout: 29
+      CodeUri: src/
+      Events:
+        IotEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt IotEventQueue.Arn
+            BatchSize: 10000
+            MaximumBatchingWindowInSeconds: 5
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref ProcessorSecurityGroup
+        SubnetIds: !Ref Subnets
+  TopicRuleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: iot-topic-forwarder
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - iot.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: iot-topic-forwarder-policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - sqs:SendMessage
+            Resource: !GetAtt IotEventQueue.Arn 
+  SQSRule:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      RuleName: device_events
+      TopicRulePayload:
+        Sql: SELECT * 
+        Actions:
+          - Sqs: 
+              QueueUrl: !Ref IotEventQueue
+              RoleArn: !GetAtt TopicRuleRole.Arn
+  LambdaAuthorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: iot-publish-authorizer
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = function(event, context, callback) { 
+          var deviceId = event.protocolData.http.headers["x-device-id"];
+          callback(null, generateAuthResponse(deviceId)); 
+        };
+
+        var generateAuthResponse = function(deviceId) {
+          var response = {};
+          response.isAuthenticated = true;
+          response.principalId = deviceId;
+          var policy = {};
+          policy.Version = '2012-10-17';
+          policy.Statement = [];
+          var publishStatement = {}; 
+          var connectStatement = {};
+          connectStatement.Action = ["iot:Connect"];
+          connectStatement.Effect = 'Allow';
+          connectStatement.Resource = ["*"];
+          publishStatement.Action = ["iot:Publish"]; 
+          publishStatement.Effect = 'Allow'; 
+          publishStatement.Resource = ["arn:aws:iot:us-east-2:722442000886:topic/*"]; 
+          policy.Statement[0] = connectStatement;
+          policy.Statement[1] = publishStatement; 
+          response.policyDocuments = [policy];
+          response.disconnectAfterInSeconds = 3600;
+          response.refreshAfterInSeconds = 300;
+          
+          return response;
+        };
+
+  CustomAuthorizer:
+    Type: AWS::IoT::Authorizer
+    Properties:
+      AuthorizerName: anonymous-authorizer
+      Status: ACTIVE
+      SigningDisabled: true
+      AuthorizerFunctionArn: !GetAtt LambdaAuthorizer.Arn
+  IotLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaAuthorizer.Arn
+      Principal: iot.amazonaws.com
+      Action: lambda:InvokeFunction
+
+          
+      

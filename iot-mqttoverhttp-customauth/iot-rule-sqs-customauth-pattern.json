@@ -1,0 +1,54 @@
+{
+  "title": "Iot Rule with custom authorizer",
+  "description": "Create an IoT rule that uses lambda custom authorizer to process iot events with lambda function",
+  "language": "Node.js",
+  "videoId": "",
+  "level":"100",
+  "framework": "SAM",
+  "services": {
+    "from": "iot",
+    "to": "sqs"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a Iot Rule that forwards events to SQS to be processed by a lambda function. It also deploys a custom lambda authorizer to create your own autorizer to send events to AWS IoT through mqtt over https."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-mqttoverhttp-customauth",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/liot-mqttoverhttp-customauth/template.yaml",
+      "readmeURL": ""
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "IoT Rule",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-rules.html"
+      },
+      {
+        "text": "Understanding the custom authentication workflow",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/custom-authorizer.html"
+      }      
+    ]
+  },
+  "author": {
+    "headline": "Presented by Enoch Tsai, Cloud Adaption Advocate",
+    "name": "Enoch Tsai",
+    "bio": "Enoch Tsai is a cloud application architect advocate for Serverless Applications at Amazon Web Services based in the US. Prior to joining AWS Ben worked in a number of different technical roles specializing in native cloud development for enterprise system."
+  }
+}
