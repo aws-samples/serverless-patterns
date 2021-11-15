@@ -50,7 +50,7 @@ $ aws iam create-access-key --user-name apigw-iam-AuthorizedUser-xxxxxxxxx
 
 Take note of `AccessKeyId` and `SecretAccessKey`. Now configure postman authorization as follows:
 
-![Postman authentication](TBD)
+![Postman authentication](./img/postman-auth.png)
 
 Now repeat the same process, now for the unauthorized user
 
