@@ -80,7 +80,7 @@ curl --location --request POST 'http://CdkSt-Farga-123456789ABC-123456789.ap-sou
 }'
 ```
 
-Make a GET request to the `/showtables` endpoint. This retrieves the message from the queue. For example:
+Make a GET request to the `/showtables` endpoint. This retrieves the tables from the database. For example:
 
 ```bash
 curl --location --request GET '<REPLACE WITH FARGATE SERVICE URL>/showtables'
