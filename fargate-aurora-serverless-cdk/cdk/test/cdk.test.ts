@@ -1,17 +1,16 @@
-// import { Template } from '@aws-cdk/assertions';
-// import * as cdk from '@aws-cdk/core';
-// import * as Cdk from '../lib/cdk-stack';
+import { Template } from '@aws-cdk/assertions';
+import * as cdk from '@aws-cdk/core';
+import * as Cdk from '../lib/cdk-stack';
 
-// example test. To run these tests, uncomment this file along with the
-// example resource in lib/cdk-stack.ts
-test('SQS Queue Created', () => {
-//   const app = new cdk.App();
-//     // WHEN
-//   const stack = new Cdk.CdkStack(app, 'MyTestStack');
-//     // THEN
-//   const template = Template.fromStack(stack);
+test('Validate stack resources', () => {
+  const app = new cdk.App();
+  const stack = new Cdk.CdkStack(app, 'MyTestStack');
 
-//   template.hasResourceProperties('AWS::SQS::Queue', {
-//     VisibilityTimeout: 300
-//   });
+  const template = Template.fromStack(stack);
+
+  template.resourceCountIs('AWS::RDS::DBCluster', 1);
+  template.resourceCountIs('AWS::ECS::Cluster', 1);
+  template.resourceCountIs('AWS::ECS::TaskDefinition', 1);
+  template.resourceCountIs('AWS::ECS::Service', 1);
+  template.resourceCountIs('AWS::ElasticLoadBalancingV2::LoadBalancer', 1);
 });
