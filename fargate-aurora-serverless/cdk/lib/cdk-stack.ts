@@ -23,6 +23,7 @@ export class CdkStack extends cdk.Stack {
     });
 
     const auroraServerlessCluster = new rds.ServerlessCluster(this, 'AuroraServerlessCluster', {
+      enableDataApi: true,
       engine: rds.DatabaseClusterEngine.AURORA,
       credentials: rds.Credentials.fromSecret(databaseCredentialsSecret),
       vpc,
