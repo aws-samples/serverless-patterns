@@ -13,4 +13,3 @@ def test_sfn_queue_created():
     stack = SfnComprehendSdkStack(app, "sfn-comprehend-sdk")
     template = assertions.Template.from_stack(stack)
     template.has_resource_properties("AWS::StepFunctions::StateMachine", {})
-    pass
