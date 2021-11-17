@@ -1,22 +1,22 @@
-import * as cdk from '@aws-cdk/core';
-import * as rds from '@aws-cdk/aws-rds';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as secretsmanager from '@aws-cdk/aws-secretsmanager';
+import { Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
+import { AuroraCapacityUnit, Credentials, DatabaseClusterEngine, ServerlessCluster } from '@aws-cdk/aws-rds';
+import { Vpc } from '@aws-cdk/aws-ec2';
+import { Secret } from '@aws-cdk/aws-secretsmanager';
 import { Cluster, ContainerImage } from '@aws-cdk/aws-ecs';
 import { ApplicationLoadBalancedFargateService } from '@aws-cdk/aws-ecs-patterns';
 import path = require('path');
 
-export class CdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class CdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     const DATABASE_NAME = 'aurora_db';
 
-    const vpc = new ec2.Vpc(this, 'Vpc', {
+    const vpc = new Vpc(this, 'Vpc', {
       maxAzs: 3
     });
 
-    const databaseCredentialsSecret = new secretsmanager.Secret(this, 'DBCredentialsSecret', {
+    const databaseCredentialsSecret = new Secret(this, 'DBCredentialsSecret', {
       secretName: 'aurora-user-secret',
       description: 'RDS database auto-generated user password',
       generateSecretString: {
@@ -27,16 +27,16 @@ export class CdkStack extends cdk.Stack {
       }
     });
 
-    const auroraServerlessCluster = new rds.ServerlessCluster(this, 'AuroraServerlessCluster', {
+    const auroraServerlessCluster = new ServerlessCluster(this, 'AuroraServerlessCluster', {
       defaultDatabaseName: DATABASE_NAME,
       enableDataApi: true,
-      engine: rds.DatabaseClusterEngine.AURORA,
-      credentials: rds.Credentials.fromSecret(databaseCredentialsSecret),
+      engine: DatabaseClusterEngine.AURORA,
+      credentials: Credentials.fromSecret(databaseCredentialsSecret),
       vpc,
       scaling: {
-        autoPause: cdk.Duration.minutes(10),
-        minCapacity: rds.AuroraCapacityUnit.ACU_1,
-        maxCapacity: rds.AuroraCapacityUnit.ACU_2,
+        autoPause: Duration.minutes(10),
+        minCapacity: AuroraCapacityUnit.ACU_1,
+        maxCapacity: AuroraCapacityUnit.ACU_2,
       }
     });
 
