@@ -54,7 +54,6 @@ export class CdkStack extends cdk.Stack {
           secretArn: databaseCredentialsSecret.secretArn,
           dbClusterArn: auroraServerlessCluster.clusterArn,
           dbName: DATABASE_NAME,
-          region: process.env.CDK_DEFAULT_REGION!,
         },
       },
       assignPublicIp: false,
