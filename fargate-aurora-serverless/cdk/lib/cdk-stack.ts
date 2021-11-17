@@ -60,5 +60,9 @@ export class CdkStack extends cdk.Stack {
       assignPublicIp: false,
       memoryLimitMiB: 2048,
     });
+
+    // Grant the given identity to access to the Data API, including
+    // read access to the secret attached to the cluster if present.
+    auroraServerlessCluster.grantDataApiAccess(fargate.taskDefinition.taskRole);
   }
 }
