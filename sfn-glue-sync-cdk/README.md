@@ -57,8 +57,8 @@ Step Functions supports AWS Glue through the service integration pattern.
 You can call the `StartJobRun` API from a Task state with
 [Run a Job (.sync)](https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-sync) integration pattern.
 
-Task `GlueStartJobRun` defined in the app.py, triggers glue job and wait for glue job completion before transitioning to next step.
-python-shell glue job is defined with `glue.CfnJob` in app.py which triggers a python script `hello.py`
+Task `GlueStartJobRun` defined in the `app.py` triggers a glue job and wait for job completion before transitioning to next step.
+Python-shell glue job is defined with `glue.CfnJob` in `app.py` which triggers a python script `hello.py`
  
 ## Steps for Testing
 
@@ -73,7 +73,7 @@ Run the following AWS CLI command to send a 'start-execution` command to start t
 ```bash
 aws stepfunctions start-execution --state-machine-arn "{StateMachineArn}" --input "{\"message\": \"Hello from sfn glue step\"}"
 ```
-Note - Account Number is masked in all the outputs.
+:information_source: Account Number is masked in all the outputs.
 
 ### output:
 
@@ -157,7 +157,7 @@ aws logs tail "/aws-glue/python-jobs/output"
 
 Re-run the following CLI command to get the latest status of the staefunction execution and confirm the  `status` is `SUCCEEDED`.
 
-Note - It may take few seconds more for statefunction execution to complete after glue job is completed.
+:information_source: It might take some time for the statefunction execution to complete after glue job is completed.
 
 ```bash
 aws stepfunctions describe-execution --execution-arn  "{executionArn}"
@@ -188,7 +188,7 @@ aws stepfunctions describe-execution --execution-arn  "{executionArn}"
  
 1. Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted. 
     
-    :warning: This will delete S3 bucket defind as part of this CDK stack(S3 bucket name is This is provided in the stack outputs)!
+    :warning: This will delete S3 bucket defind as part of this CDK stack(S3 bucket name is provided in the CDK stack outputs)!
 
     ```bash
     cdk destroy
