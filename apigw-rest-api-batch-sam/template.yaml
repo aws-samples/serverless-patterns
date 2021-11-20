@@ -27,7 +27,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - 'batch:*'
+                  - 'batch:SubmitJob'
                 Resource:
                   - !Ref JobQueue
                   - !Join
