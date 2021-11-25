@@ -62,7 +62,7 @@ Resources:
           - prefix: ""
       State: ENABLED
       Targets:
-        - Arn: !GetAtt MyLogGroup.Arn
+        - Arn: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${MyLogGroup}"
           Id: CloudWatchLogTarget
     DependsOn: MyEventBus
 
