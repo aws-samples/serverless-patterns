@@ -15,7 +15,7 @@ Resources:
       Timeout: 3
       Policies:
         - StepFunctionsExecutionPolicy:
-            StateMachineName: !GetAtt StateMachine.StateMachineName
+            StateMachineName: !GetAtt StateMachine.Name
       Environment:
         Variables:
           StateMachineArn: !GetAtt StateMachine.Arn
@@ -52,9 +52,9 @@ Resources:
         
 Outputs:
   StateMachine:
-    Value: !Ref StateMachine
+    Value: !GetAtt StateMachine.Arn
     Description: Statemachine Arn
 
   LambdaFuncton:
     Value: !Ref LambdaProxy
-    Description: Lambda Function ARN
+    Description: Lambda Function Name
