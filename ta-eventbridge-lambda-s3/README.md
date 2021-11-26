@@ -33,7 +33,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
     ```
 3. From the command line, set Environment variables for your account and region:
     ```bash
-    export CDK_DEFAULT_ACCOUNT=850816134691
+    export CDK_DEFAULT_ACCOUNT=123456789012
     export CDK_DEFAULT_REGION=us-east-1
     ```
 4. Create new Python Virtual Environment:
@@ -56,7 +56,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
     ```
 9. Deploy the CDK App. 
     ```bash
-    cdk deploy --parameters notificationemailaddress=seandall@amazon.com --parameters profiling=TRUE --parameters tracing=TRUE --parameters trustedadvisorrefreshminutes=5
+    cdk deploy --parameters notificationemailaddress=email@example.com --parameters profiling=TRUE --parameters tracing=TRUE --parameters trustedadvisorrefreshminutes=7
     ```
    **Parameter Definitions:**
    * **notificationemailaddress:** **[Required]** The E-mail address you wish to send notifications to when a WARN or ERROR flag is identified
