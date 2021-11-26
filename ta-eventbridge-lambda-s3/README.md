@@ -64,7 +64,9 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
    * **trustedadvisorrefreshminutes:** Integer value between 5 and 1440. The number of minutes you wish to schedule a Trusted Advisor Check Refresh for S3 Bucket Permissions. **Default:** 7
    
 
-7. When Asked: ```Do you wish to deploy these changes (y/n)?``` , Type ```y```, then press "Return"
+9. When Asked: ```Do you wish to deploy these changes (y/n)?``` , Type ```y```, then press "Return"
+10. You will now receive an e-mail with the subject "AWS Notification - Subscription Confirmation". Open this e-mail and
+    click the link for "Confirm subscription"
 ## How it works
 
 [AWS Trusted Advisor](https://aws.amazon.com/premiumsupport/technology/trusted-advisor/) periodically evaluates resources in your AWS accounts. 
