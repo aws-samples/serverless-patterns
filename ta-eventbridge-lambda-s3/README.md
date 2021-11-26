@@ -48,13 +48,12 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
    ```bash
    pip install -r requirements.txt
    ```
-7. 
-8. Bootstrap your CDK environment in the destination account [Learn More about bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-howto-cli)
+7. Bootstrap your CDK environment in the destination account [Learn More about bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-howto-cli)
     ```bash
     export CDK_NEW_BOOTSTRAP=1
     cdk bootstrap
     ```
-9. Deploy the CDK App. 
+8. Deploy the CDK App. 
     ```bash
     cdk deploy --parameters notificationemailaddress=email@example.com --parameters profiling=TRUE --parameters tracing=TRUE --parameters trustedadvisorrefreshminutes=7
     ```
