@@ -19,6 +19,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * [Python 3.6 or later](https://www.python.org/downloads/)
 * [pip and virtualenv](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html#python-prerequisites)
+* [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
 ## Deployment Instructions
