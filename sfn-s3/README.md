@@ -1,8 +1,8 @@
-# AWS Step Functions to Amazon EventBridge
+# AWS Step Functions to Amazon S3
 
-This pattern creates a Step Functions workflow that publishes events to EventBridge.
+This pattern creates a Step Functions workflow that publishes a file to an S3 bucket.
 
-Learn more about this pattern at the Serverless Land Patterns Collection: https://serverlessland.com/patterns/sfn-eventbridge
+Learn more about this pattern at the Serverless Land Patterns Collection: https://serverlessland.com/patterns/sfn-s3
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
@@ -44,7 +44,7 @@ The AWS SAM template deploys a Step Functions workflow that publishes an event t
 
 ## Testing
 
-Use the [AWS CLI](https://aws.amazon.com/cli/) to execute the Step Functions workflow and observe events published to the EventBridge event bus:
+Use the [AWS CLI](https://aws.amazon.com/cli/) to execute the Step Functions workflow and observe the file published to S3:
 
 1. Execute the Step Functions workflow:
 
