@@ -33,20 +33,30 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
     ```
 3. From the command line, set Environment variables for your account and region:
     ```bash
-    export CDK_DEFAULT_ACCOUNT=123456789012
+    export CDK_DEFAULT_ACCOUNT=850816134691
     export CDK_DEFAULT_REGION=us-east-1
     ```
-4. Activate your virtual environment by running the following command from the command line.
+4. Create new Python Virtual Environment:
+   ```bash
+   python3 -m venv .venv
+   ```
+5. Activate your virtual environment by running the following command from the command line.
     ```bash
     source .venv/bin/activate
     ```
-5. Bootstrap your CDK environment in the destination account [Learn More about bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-howto-cli)
+6. Install Python Requirements:
+   ```bash
+   pip install -r requirements.txt
+   ```
+7. 
+8. Bootstrap your CDK environment in the destination account [Learn More about bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-howto-cli)
     ```bash
+    export CDK_NEW_BOOTSTRAP=1
     cdk bootstrap
     ```
-6. Deploy the CDK App. 
+9. Deploy the CDK App. 
     ```bash
-    cdk deploy --parameters notificationemailaddress=email@example.com --parameters profiling=TRUE --parameters tracing=TRUE --parameters trustedadvisorrefreshminutes=7
+    cdk deploy --parameters notificationemailaddress=seandall@amazon.com --parameters profiling=TRUE --parameters tracing=TRUE --parameters trustedadvisorrefreshminutes=5
     ```
    **Parameter Definitions:**
    * **notificationemailaddress:** **[Required]** The E-mail address you wish to send notifications to when a WARN or ERROR flag is identified
