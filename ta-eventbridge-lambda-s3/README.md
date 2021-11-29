@@ -41,8 +41,8 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
     ```
    **Windows:**
    ```powershell
-   Set-Alias python3 py
-   .\cdk-deploy-to <account_id> <aws_region>
+   set CDK_DEFAULT_ACCOUNT=123456789012
+   set CDK_DEFAULT_REGION=us-east-1
    ```
 4. Create new Python Virtual Environment:
 
