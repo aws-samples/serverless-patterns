@@ -33,36 +33,62 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
     cd ta-eventbridge-lambda-s3
     ```
 3. From the command line, set Environment variables for your account and region:
+   
+   **Linux/Mac:**
     ```bash
     export CDK_DEFAULT_ACCOUNT=123456789012
     export CDK_DEFAULT_REGION=us-east-1
     ```
+   **Windows:**
+   ```powershell
+   Set-Alias python3 py
+   .\cdk-deploy-to <account_id> <aws_region>
+   ```
 4. Create new Python Virtual Environment:
+
    ```bash
    python3 -m venv .venv
    ```
-5. Activate your virtual environment by running the following command from the command line.
-    ```bash
+   
+   
+7. Activate your virtual environment by running the following command from the command line.
+   
+   **Linux/Mac:** 
+   ```bash
     source .venv/bin/activate
     ```
-6. Install Python Requirements:
+   
+   **Windows:**
+   ```powershell
+   .\source
+   ```
+   
+8. Install Python Requirements:
    ```bash
    pip install -r requirements.txt
    ```
-7. Bootstrap your CDK environment in the destination account [Learn More about bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-howto-cli)
-    ```bash
+9. Bootstrap your CDK environment in the destination account [Learn More about bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-howto-cli)
+   
+   **Linux/Mac:** 
+   ```bash
     export CDK_NEW_BOOTSTRAP=1
     cdk bootstrap
     ```
-8. Deploy the CDK App. 
-    ```bash
-    cdk deploy --parameters notificationemailaddress=email@example.com --parameters profiling=TRUE --parameters tracing=TRUE --parameters trustedadvisorrefreshminutes=7
-    ```
-   **Parameter Definitions:**
-   * **notificationemailaddress:** **[Required]** The E-mail address you wish to send notifications to when a WARN or ERROR flag is identified
-   * **profiling:** TRUE or FALSE. If set to true, [CodeGuru Profiler](https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html) will be enabled. **Default:** FALSE
-   * **tracing:** TRUE or FALSE. If set to true, [AWS X-Ray Tracing](https://aws.amazon.com/xray/) will be enabled. **Default:** FALSE
-   * **trustedadvisorrefreshminutes:** Integer value between 5 and 1440. The number of minutes you wish to schedule a Trusted Advisor Check Refresh for S3 Bucket Permissions. **Default:** 7
+   **Windows:**
+   ```powershell
+   set CDK_NEW_BOOTSTRAP=1
+   cdk bootstrap
+   ```
+   
+12. Deploy the CDK App. 
+     ```bash
+     cdk deploy --parameters notificationemailaddress=email@example.com --parameters profiling=TRUE --parameters tracing=TRUE --parameters trustedadvisorrefreshminutes=7
+     ```
+    **Parameter Definitions:**
+    * **notificationemailaddress:** **[Required]** The E-mail address you wish to send notifications to when a WARN or ERROR flag is identified
+    * **profiling:** TRUE or FALSE. If set to true, [CodeGuru Profiler](https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html) will be enabled. **Default:** FALSE
+    * **tracing:** TRUE or FALSE. If set to true, [AWS X-Ray Tracing](https://aws.amazon.com/xray/) will be enabled. **Default:** FALSE
+    * **trustedadvisorrefreshminutes:** Integer value between 5 and 1440. The number of minutes you wish to schedule a Trusted Advisor Check Refresh for S3 Bucket Permissions. **Default:** 7
    
 
 9. When Asked: ```Do you wish to deploy these changes (y/n)?``` , Type ```y```, then press "Return"
