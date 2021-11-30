@@ -1,4 +1,5 @@
 # AWS SAM Pattern: AWS Glue Job call from AWS Step Functions 
+
 ![glue-step-functions](glue-to-sf.drawio.png)
 
 This patters deploys a Step Functions that includes a Glue Job as one of its steps. The Glue Job may be used to process data from S3 or other AWS storage services. 
@@ -8,6 +9,18 @@ The SAM template deploys:
     * An EventBridge rule that triggers the Step Functions every 2 days
     * A Glue Job
     * IAM roles required to run the application.
+
+
+## Download
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+```bash
+> git clone https://github.com/NicoliAraujo/serverless-patterns.git
+```
+
+2. Change directory to the pattern directory:
+```bash
+> cd sfn-glue-sam/
+```
 
 
 ## Deploy
@@ -20,7 +33,10 @@ The SAM template deploys:
 2. Build and deploy stack: 
 
 ```bash
+
 > sam build --template code/cloudformation/stack.yaml
+
+
 > sam deploy --guided
 ```
 
