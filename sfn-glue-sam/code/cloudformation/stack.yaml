@@ -34,7 +34,7 @@ Resources:
             GlueVersion: "1.0"
             MaxCapacity: 1
             MaxRetries: 0
-            Name: "Customers Feature Engineering"
+            Name: "Feature Engineering"
             Role: !GetAtt GlueExecutionRole.Arn
 
     ETLStepFunctions:
@@ -42,7 +42,7 @@ Resources:
         Properties:
             DefinitionUri: ../step_functions/statemachine.asl.json
             DefinitionSubstitutions:
-                FEPurchases: !Sub "${FEPurchases}"
+                FeatureEngineering: !Sub "${FeatureEngineering}"
             Events:
                 TriggerPersonalizeTrain:
                     Type: Schedule
@@ -84,7 +84,7 @@ Resources:
                       - "glue:BatchStopJobRun"
                       - "glue:GetJobRuns"
                     Resource: 
-                        - !Sub "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:job/${FECustomers}"
+                        - !Sub "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:job/${FeatureEngineering}"
                         
                         
   
@@ -146,3 +146,10 @@ Resources:
                                 - "ssm:GetParameter"
                                 - "ssm:PutParameter"
                             Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ETLParametersPath}"
+
+Outputs:
+    ETLStepFunctionsARN:
+        Value: !GetAtt ETLStepFunctions.Arn
+    GlueJobName:
+        Value: !Ref FeatureEngineering
+
