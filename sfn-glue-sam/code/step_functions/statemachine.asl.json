@@ -1,0 +1,15 @@
+{
+    "Comment": "ETL",
+    "StartAt": "Customers Feature Engineering",
+    "States": {
+        "Customers Feature Engineering": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::glue:startJobRun.sync",
+            "Parameters": {
+                "JobName": "${FECustomers}"
+            },
+            "ResultPath": "$.glue_job_result",
+            "End": true
+        }
+    }
+}
