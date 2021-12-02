@@ -1,10 +1,11 @@
 
 # Amazon SQS to Amazon DynamoDB
 
-This CDK application deploys a SQS Queue, a Lambda Function and a DynamoDB Table. The SQS Queue has Lambda Function attached and listening to events. When a new message arrives, the Lambda Function gets the body from the payload and does a batch write in DynamoDb, putting all received items to the table. The CDK application contains the minimum IAM resources required to run the application. 
+This pattern deploys a SQS Queue, a Lambda Function and a DynamoDB allowing batch writes from SQS messages to a DynamoDb Table. The CDK application contains the minimum IAM resources required to run the application. 
 
-Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda-dynamodb-cdk.
+Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda-dynamodb-cdk
 
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
@@ -13,6 +14,14 @@ Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) (AWS CDK >= 1.124.0) Installed
 
+## Language
+Python
+
+## Framework
+CDK
+
+## Services From/To
+Amazon SQS to AWS Lambda to Amazon DynamoDb
 
 ## Deployment Instructions
 
@@ -53,7 +62,7 @@ Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda
     ```
 1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-1. Run code tests to confirm your infrastructure is created:
+1. Run unit tests:
 
     ````bash
     python3 -m pytest
@@ -64,7 +73,7 @@ Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda
 
 The CDK stack deploys the resources and the IAM permissions required to run the application.
 
-The SQS Queue specified in the stack vsam_to_dynamo_stack.py has a Lambda Function responding to the events. The function extracts the body from the message payload and performs a batch write in DynamoDB. The body content must comply with json format expected by DynamoDb (see example below). Messages containing more than 25 itens are not processed by dynamodb.batch_write as limited by DynamoDb.
+The SQS Queue specified in the stack vsam_to_dynamo_stack.py has a Lambda Function responding to the events. The function extracts the body from the message payload and performs a batch write in DynamoDB. The body content must comply with json format expected by DynamoDb (see example below). Messages containing more than 25 itens are not processed by dynamodb.batch_write() as it is limited by DynamoDB.
 
 ```
 {"CLIENT": [
@@ -114,7 +123,7 @@ The SQS Queue specified in the stack vsam_to_dynamo_stack.py has a Lambda Functi
 ```
 
 
-## How to test
+## Testing
 
 Tests can be done using aws-cli or directly on the console. Follow the steps below to test from the command line. A file containing a payload with sample records has been provided in the project's root folder, example-message.json.
 
@@ -122,6 +131,13 @@ Tests can be done using aws-cli or directly on the console. Follow the steps bel
 
 ````
 aws sqs get-queue-url --queue-name VsamToDynamoQueue
+````
+
+Response
+````
+{
+    "QueueUrl": "https://sqs.<your region>.amazonaws.com/<your account>/VsamToDynamoQueue"
+}
 ````
 
 2. Send a message to the queue passing the example file as the message-body parameter value:
@@ -135,6 +151,19 @@ aws sqs send-message --queue-url <Replace by QueueUrl value> --message-body file
 ````
 aws dynamodb scan --table-name CLIENT
 ````
+
+## Cleanup
+ 
+1. Delete the stack
+    ```bash
+    aws cloudformation delete-stack --stack-name STACK_NAME
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    ```
+
+
 
 ## Tutorial  
 See [this useful workshop](https://cdkworkshop.com/30-python.html) on working with the AWS CDK for Python projects.
