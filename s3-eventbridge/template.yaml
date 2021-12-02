@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Send S3 events to EventBridge using AWS CloudTrail
+
+Parameters:
+  BucketNameForImages:
+    Type: String
+
+  BucketNameForCloudTrailLogs:
+    Type: String
+
+Resources:
+  # Bucket in S3
+  BucketForImages:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketNameForImages
+
+  # Enable s3 data event logging on cloudtrail (Image push event is a data event)
+  CloudTrail:
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: CloudTrailForS3ImagePushEvents
+      IsLogging: true
+      IsMultiRegionTrail: true
+      IncludeGlobalServiceEvents: true
+      EnableLogFileValidation: true
+      EventSelectors:
+        - DataResources:
+            - Type: AWS::S3::Object
+              Values:
+                - !Sub 'arn:aws:s3:::${BucketNameForImages}/'
+          ReadWriteType: WriteOnly
+      S3BucketName: !Ref BucketForCloudTrailLogs
+    DependsOn: CloudTrailBucketPolicy
+
+  # When CloudTrail is enabled for S3 data events then the cloudtrail will be sent to this bucket
+  BucketForCloudTrailLogs:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketNameForCloudTrailLogs
+
+  # Allow CloudTrail to use an S3 bucket for storing trails
+  CloudTrailBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BucketForCloudTrailLogs
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowCheckingForPermissionsOnCloudTrailBucket
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: s3:GetBucketAcl
+            Resource: !GetAtt BucketForCloudTrailLogs.Arn
+          - Sid: AllowCloudTrailToWriteToBucket
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub 'arn:aws:s3:::${BucketNameForCloudTrailLogs}/AWSLogs/${AWS::AccountId}/*'
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: "bucket-owner-full-control"
+
+  # Event Rule for new event in AWS EventBridge
+  S3NewImageEvent:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Description: This rule will trigger lambda when an image is uploaded into S3
+      EventPattern:
+        source:
+          - aws.s3
+        detail-type:
+          - AWS API Call via CloudTrail
+        detail:
+          eventSource:
+            - s3.amazonaws.com
+          eventName:
+            - PutObject
+            - CopyObject
+            - CompleteMultipartUpload
+          requestParameters:
+            bucketName:
+              - !Ref BucketForImages
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt NewImageEventQueue.Arn
+          Id: S3NewImageEvent
+
+  # TO TEST that event was generated successfully, let's send it to an SQS and monitor it
+  NewImageEventQueue:
+    Type: AWS::SQS::Queue
+
+  # Allow Publishing event into SQS
+  AllowPublishToSQS:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: SQS:SendMessage
+            Resource:  !GetAtt NewImageEventQueue.Arn
+      Queues:
+        - Ref: NewImageEventQueue
+
+Outputs:
+  queue:
+    Description: "SQS queue where S3 new image events are sent"
+    Value:
+      Ref: NewImageEventQueue
+    Export:
+      Name: queue
