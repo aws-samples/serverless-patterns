@@ -43,15 +43,23 @@ export class RdsProxySequelizeStack extends cdk.Stack {
       }
     });
 
-    const lambdaToRDSProxySecurityGroup = new ec2.SecurityGroup(this, 'Lambda to RDS Proxy Connection', {
+    // Create a security group to be used on the lambda functions
+    const lambdaSecurityGroup = new ec2.SecurityGroup(this, 'Lambda Security Group', {
       vpc
     });
-    const dbConnectionSecurityGroup = new ec2.SecurityGroup(this, 'Proxy to DB Connection', {
-      vpc
-    });
-    dbConnectionSecurityGroup.addIngressRule(dbConnectionSecurityGroup, ec2.Port.tcp(5432), 'allow db connection');
-    dbConnectionSecurityGroup.addIngressRule(lambdaToRDSProxySecurityGroup, ec2.Port.tcp(5432), 'allow lambda connection');
 
+    // Create a security group to be used on the RDS proxy
+    const rdsProxySecurityGroup = new ec2.SecurityGroup(this, 'Only Allow Access From Lambda', {
+      vpc
+    });
+    rdsProxySecurityGroup.addIngressRule(lambdaSecurityGroup, ec2.Port.tcp(5432), 'allow lambda connection to rds proxy');
+
+    // Create a security group to be used on the RDS instances
+    const rdsSecurityGroup = new ec2.SecurityGroup(this, 'Only Allow Access From RDS Proxy', {
+      vpc
+    });
+    rdsSecurityGroup.addIngressRule(rdsProxySecurityGroup, ec2.Port.tcp(5432), 'allow db connections from the rds proxy');
+    
     const rdsCredentials = rds.Credentials.fromSecret(rdsSecret);
 
     const dbName = 'nflstadiums';
@@ -63,7 +71,7 @@ export class RdsProxySequelizeStack extends cdk.Stack {
           subnetType: ec2.SubnetType.PRIVATE_ISOLATED
         },
         instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MEDIUM),
-        securityGroups: [ dbConnectionSecurityGroup ]
+        securityGroups: [ rdsSecurityGroup ]
       },
       clusterIdentifier: 'RDSProxyExampleCluster',
       engine: rds.DatabaseClusterEngine.auroraPostgres({
@@ -78,7 +86,7 @@ export class RdsProxySequelizeStack extends cdk.Stack {
 
     const rdsProxy = postgreSql.addProxy('rdsProxyExample', {
       secrets: [ rdsSecret ],
-      securityGroups: [ dbConnectionSecurityGroup ],
+      securityGroups: [ rdsProxySecurityGroup ],
       debugLogging: true,
       iamAuth: true,
       vpc
@@ -92,7 +100,7 @@ export class RdsProxySequelizeStack extends cdk.Stack {
       entry: path.join(__dirname, '../lambda/populate.ts'),
       vpc: vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
-      securityGroups: [ dbConnectionSecurityGroup ],
+      securityGroups: [ lambdaSecurityGroup ],
       environment: {
         PGHOST: rdsProxy.endpoint,
         PGDATABASE: dbName,
@@ -113,7 +121,7 @@ export class RdsProxySequelizeStack extends cdk.Stack {
       entry: path.join(__dirname, '../lambda/getData.ts'),
       vpc: vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
-      securityGroups: [ dbConnectionSecurityGroup ],
+      securityGroups: [ lambdaSecurityGroup ],
       environment: {
         PGHOST: rdsProxy.endpoint,
         PGDATABASE: dbName,
