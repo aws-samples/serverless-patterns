@@ -1,0 +1,212 @@
+SQS Message example 
+The name of the table ("CLIENT") is been used as defined in app.py. Max number of itens is 25 as limited by DynamoDB.
+
+{"CLIENT": [
+{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "0|0"
+            },
+            "CLIENT-RECORD-COUNT": {
+                "N": "220"
+            },
+            "FILLER_3": {
+                "S": ""
+            }
+        }
+    }
+}
+,{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "1|1"
+            },
+            "CLIENT-NAME": {
+                "S": "HERBERT MOHAMED"
+            },
+            "CLIENT-BDATE": {
+                "S": "1958-08-31"
+            },
+            "CLIENT-ED-LVL": {
+                "S": "BACHELOR"
+            },
+            "CLIENT-INCOME": {
+                "N": "0010000.00"
+            },
+            "FILLER_1": {
+                "S": ""
+            }
+        }
+    }
+}
+,{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "1|2"
+            },
+            "CLIENT-ADDR-NUMBER": {
+                "N": "36"
+            },
+            "CLIENT-ADDR-STREET": {
+                "S": "THE ROE AVENUE"
+            },
+            "FILLER_2": {
+                "S": ""
+            }
+        }
+    }
+}
+,{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "2|1"
+            },
+            "CLIENT-NAME": {
+                "S": "JAYLEN GEORGE"
+            },
+            "CLIENT-BDATE": {
+                "S": "1969-05-29"
+            },
+            "CLIENT-ED-LVL": {
+                "S": "ELEMENTARY"
+            },
+            "CLIENT-INCOME": {
+                "N": "0020000.00"
+            },
+            "FILLER_1": {
+                "S": ""
+            }
+        }
+    }
+}
+,{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "2|2"
+            },
+            "CLIENT-ADDR-NUMBER": {
+                "N": "365"
+            },
+            "CLIENT-ADDR-STREET": {
+                "S": "HEATHFIELD ESPLANADE"
+            },
+            "FILLER_2": {
+                "S": ""
+            }
+        }
+    }
+}
+,{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "3|1"
+            },
+            "CLIENT-NAME": {
+                "S": "MIKAEEL WEBER"
+            },
+            "CLIENT-BDATE": {
+                "S": "1982-02-17"
+            },
+            "CLIENT-ED-LVL": {
+                "S": "MASTER"
+            },
+            "CLIENT-INCOME": {
+                "N": "0030000.00"
+            },
+            "FILLER_1": {
+                "S": ""
+            }
+        }
+    }
+}
+,{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "3|2"
+            },
+            "CLIENT-ADDR-NUMBER": {
+                "N": "4555"
+            },
+            "CLIENT-ADDR-STREET": {
+                "S": "MORRISON STRAND"
+            },
+            "FILLER_2": {
+                "S": ""
+            }
+        }
+    }
+}
+,{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "4|1"
+            },
+            "CLIENT-NAME": {
+                "S": "APRIL BARRERA"
+            },
+            "CLIENT-BDATE": {
+                "S": "1967-01-12"
+            },
+            "CLIENT-ED-LVL": {
+                "S": "DOCTOR"
+            },
+            "CLIENT-INCOME": {
+                "N": "0030000.00"
+            },
+            "FILLER_1": {
+                "S": ""
+            }
+        }
+    }
+}
+,{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "4|2"
+            },
+            "CLIENT-ADDR-NUMBER": {
+                "N": "1311"
+            },
+            "CLIENT-ADDR-STREET": {
+                "S": "MARMION PARK"
+            },
+            "FILLER_2": {
+                "S": ""
+            }
+        }
+    }
+}
+,{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "5|1"
+            },
+            "CLIENT-NAME": {
+                "S": "ALEEZA PLANT"
+            },
+            "CLIENT-BDATE": {
+                "S": "1985-03-01"
+            },
+            "CLIENT-ED-LVL": {
+                "S": "BACHELOR"
+            },
+            "CLIENT-INCOME": {
+                "N": "0008000.00"
+            },
+            "FILLER_1": {
+                "S": ""
+            }
+        }
+    }
+}
+]}
