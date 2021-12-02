@@ -1,58 +1,140 @@
 
-# Welcome to your CDK Python project!
+# Amazon SQS to Amazon DynamoDB
 
-You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`vsam_to_dynamo_stack`)
-which contains an Amazon SQS queue that is subscribed to an Amazon SNS topic.
+This CDK application deploys a SQS Queue, a Lambda Function and a DynamoDB Table. The SQS Queue has Lambda Function attached and listening to events. When a new message arrives, the Lambda Function gets the body from the payload and does a batch write in DynamoDb, putting all received items to the table. The CDK application contains the minimum IAM resources required to run the application. 
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda-dynamodb-cdk.
 
-This project is set up like a standard Python project.  The initialization process also creates
-a virtualenv within this project, stored under the .venv directory.  To create the virtualenv
-it assumes that there is a `python3` executable in your path with access to the `venv` package.
-If for any reason the automatic creation of the virtualenv fails, you can create the virtualenv
-manually once the init process completes.
 
-To manually create a virtualenv on MacOS and Linux:
+## Requirements
+
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) (AWS CDK >= 1.124.0) Installed
+
+
+## Deployment Instructions
+
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ```bash 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+1. Change directory to the pattern directory:
+    ```bash
+    cd sqs-lambda-dynamodb-cdk
+    ```
+1. Create a virtual environment for python:
+    ```bash
+    python3 -m venv .venv
+    ```
+1. Activate the virtual environment:
+    ```bash
+    source .venv/bin/activate
+    ```
+    
+    If you are in Windows platform, you would activate the virtualenv like this:
+
+    ```
+    % .venv\Scripts\activate.bat
+    ```
+    
+1. Install python modules:
+    ```bash
+    python3 -m pip install -r requirements.txt
+    ```
+1. From the command line, use CDK to synthesize the CloudFormation template and check for errors:
+    ```bash
+    cdk synth
+    ```
+1. From the command line, use CDK to deploy the stack:
+    ```bash
+    cdk deploy
+    ```
+1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
+
+1. Run code tests to confirm your infrastructure is created:
+
+    ````bash
+    python3 -m pytest
+    ````
+    
+
+## How it works
+
+The CDK stack deploys the resources and the IAM permissions required to run the application.
+
+The SQS Queue specified in the stack vsam_to_dynamo_stack.py has a Lambda Function responding to the events. The function extracts the body from the message payload and performs a batch write in DynamoDB. The body content must comply with json format expected by DynamoDb (see example below). Messages containing more than 25 itens are not processed by dynamodb.batch_write as limited by DynamoDb.
 
 ```
-$ python3 -m venv .venv
+{"CLIENT": [
+{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "1|0"
+            },
+            "CLIENT-NAME": {
+                "S": "ALBERT EINSTEIN"
+            },
+            "CLIENT-RECORD-COUNT": {
+                "N": "220"
+            },
+            "FILLER_3": {
+                "S": ""
+            }
+        }
+    }
+}
+,{
+    "PutRequest": {
+        "Item": {
+            "CLIENT-KEY": {
+                "S": "1|1"
+            },
+            "CLIENT-NAME": {
+                "S": "HERBERT MOHAMED"
+            },
+            "CLIENT-BDATE": {
+                "S": "1958-08-31"
+            },
+            "CLIENT-ED-LVL": {
+                "S": "BACHELOR"
+            },
+            "CLIENT-INCOME": {
+                "N": "0010000.00"
+            },
+            "FILLER_1": {
+                "S": ""
+            }
+        }
+    }
+}
+]}
 ```
 
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
 
-```
-$ source .venv/bin/activate
-```
+## How to test
 
-If you are a Windows platform, you would activate the virtualenv like this:
+Tests can be done using aws-cli or directly on the console. Follow the steps below to test from the command line. A file containing a payload with sample records has been provided in the project's root folder, example-message.json.
 
-```
-% .venv\Scripts\activate.bat
-```
+1. After sucessfully deploying the stack, get the SQS Queue url:
 
-Once the virtualenv is activated, you can install the required dependencies.
+````
+aws sqs get-queue-url --queue-name VsamToDynamoQueue
+````
 
-```
-$ pip install -r requirements.txt
-```
+2. Send a message to the queue passing the example file as the message-body parameter value:
 
-At this point you can now synthesize the CloudFormation template for this code.
+````
+aws sqs send-message --queue-url <Replace by QueueUrl value> --message-body file://example-message.json
+````
 
-```
-$ cdk synth
-```
+3. Scan your table to confirm that items have been recorded:
 
-You can now begin exploring the source code, contained in the hello directory.
-There is also a very trivial test included that can be run like this:
-
-```
-$ pytest
-```
-
-To add additional dependencies, for example other CDK libraries, just add to
-your requirements.txt file and rerun the `pip install -r requirements.txt`
-command.
+````
+aws dynamodb scan --table-name CLIENT
+````
 
 ## Tutorial  
 See [this useful workshop](https://cdkworkshop.com/30-python.html) on working with the AWS CDK for Python projects.
@@ -64,5 +146,6 @@ See [this useful workshop](https://cdkworkshop.com/30-python.html) on working wi
  * `cdk deploy`      deploy this stack to your default AWS account/region
  * `cdk diff`        compare deployed stack with current state
  * `cdk docs`        open CDK documentation
+
 
 Enjoy!
