@@ -37,9 +37,9 @@ Important: this application uses various AWS services and there are costs associ
 
 This pattern sets up API Gateway HTTP API using AWS Lambda function as an integration which talks to RDS Aurora(Postgres) via RDS Proxy with IAM Authentication enabled. The Lambda function will only be using short-lived credentials to authenticate through RDS proxy via IAM authentication using the popular JavaScript ORM [sequelize](https://sequelize.org).
 
-RDS Proxy has to exist in the same VPC as your database and it cannot be public. Security groups are configured to [only allow communication from the lambda functions to RDS proxy](./src/lib/rds-proxy-sequelize-stack.ts#L), and [from the RDS proxy to the Aurora database itself]().
+RDS Proxy has to exist in the same VPC as your database and it cannot be public. Security groups are configured to [only allow communication from the lambda functions to RDS proxy](./src/lib/rds-proxy-sequelize-stack.ts#L55), and [from the RDS proxy to the Aurora database](./src/lib/rds-proxy-sequelize-stack.ts#L61).
 
-[The lambda functions are granted the ability to connect to the RDS proxy using the provided username](). 
+[The lambda functions are granted the ability to connect to the RDS proxy using the provided username](./src/lib/rds-proxy-sequelize-stack.ts#L137). 
 
 While the lambda authenticates to your proxy using IAM authentication, RDS proxy still connects to your database using native database authentication. Therefore, a new set of RDS credentials are created in secrets manager which allow RDS proxy to connect to the database. See [the connecting to a database through RDS Proxy documentation](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-proxy-setup.html#rds-proxy-iam-setup) for more information.
 
