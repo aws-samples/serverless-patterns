@@ -1,0 +1,9 @@
+[
+  {
+    "DetailType": "AWS API Call via CloudTrail",
+    "Source": "simulated.aws.s3",
+    "Detail": "{\"eventSource\":\"s3.amazonaws.com\",\"eventName\":\"PutObject\",\"requestParameters\": {\"bucketName\":\"lambda-rekognition-asdfg\",\"Host\":\"lambda-rekognition-asdfg.s3.us-west-2.amazonaws.com\",\"key\":\"helloworld1.png\"}}"
+  }
+]
+
+

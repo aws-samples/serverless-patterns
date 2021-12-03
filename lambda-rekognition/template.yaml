@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Image Processing service - Find text in images
+
+Parameters:
+  BucketNameForImages:
+    Type: String
+
+Resources:
+
+  # Event Rule for new event in AWS EventBridge
+  S3NewImageEvent:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Description: This rule will trigger lambda when an image is uploaded into S3
+      EventPattern:
+        source:
+          - aws.s3
+          - simulated.aws.s3
+        detail-type:
+          - AWS API Call via CloudTrail
+        detail:
+          eventSource:
+            - s3.amazonaws.com
+          eventName:
+            - PutObject
+            - CopyObject
+            - CompleteMultipartUpload
+          requestParameters:
+            bucketName: [!Sub "${BucketNameForImages}"]
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt TextRecognitionLambda.Arn
+          Id: !Sub 'TextRecognitionLambdaFunction'
+
+  # Role for Lambda
+  TextRecognitionLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:DescribeLogGroups
+                  - logs:CreateLogStream
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                Effect: Allow
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+              - Action:
+                  - 's3:GetObject'
+                Effect: Allow
+                Resource: 'arn:aws:s3:::*'
+              - Action:
+                  - rekognition:DetectText
+                Effect: Allow
+                Resource: "*"
+            Version: '2012-10-17'
+          PolicyName: TextRecognitionLambdaPolicy
+      RoleName: TextRecognitionLambdaRole
+
+  # Lambda
+  TextRecognitionLambda:
+    Type: AWS::Serverless::Function
+    DependsOn: TextRecognitionLambdaRole
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Description: Lambda function that will recieve CloudWatch events and will trigger
+        CodeBuild build job.
+      FunctionName: 'TextRecognitionLambdaFunction'
+      Role: !GetAtt TextRecognitionLambdaRole.Arn
+      Timeout: 250
+
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref TextRecognitionLambda
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt S3NewImageEvent.Arn
+      
