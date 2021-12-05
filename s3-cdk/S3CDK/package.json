@@ -22,6 +22,7 @@
   "dependencies": {
     "@aws-cdk/assert": "^2.0.0",
     "@aws-cdk/assertions": "^1.134.0",
+    "@aws-cdk/aws-rds": "^1.134.0",
     "@aws-cdk/aws-s3": "^1.134.0",
     "@aws-cdk/core": "^1.134.0",
     "aws-cdk-lib": "2.0.0",

@@ -1,6 +1,6 @@
-# AWS  S3
+# AWS  S3, VPC, Subnets, Aurora Serverless, Secrets Manager
 
-This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an S3 Bucket.
+This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an S3 Bucket, an Aurora Serverless db Cluster, a Secret Manager, and required VPC with subnets.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -40,8 +40,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-- The S3 bucket is created when `cdk deploy` is executed
-- The S3 bucket is removed when `cdk destroy` is executed
+- The S3 bucket, VPC, Subnets, Aurora Serverless Cluster is created when `cdk deploy` is executed
+- The complete stack is removed when `cdk destroy` is executed
 
 
 ## Testing
