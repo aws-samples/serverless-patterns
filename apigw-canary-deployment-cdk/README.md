@@ -1,6 +1,6 @@
 # Amazon API Gateway Canary Deployment
 
-This pattern creates an Amazon [API Gateway RESTful API(https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html), an AWS [Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html), and then creates an [APIGW Canary Deployment](https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html) using the AWS Cloud Development Kit (AWS CDK) in Python.
+This pattern creates an Amazon [API Gateway RESTful API](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html), an AWS [Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html), and then creates an [APIGW Canary Deployment](https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html) using the AWS Cloud Development Kit (AWS CDK) in Python.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-canary-deployment-cdk](https://serverlessland.com/patterns/apigw-canary-deployment-cdk).
 
