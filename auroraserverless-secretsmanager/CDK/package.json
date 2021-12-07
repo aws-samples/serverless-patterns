@@ -1,8 +1,8 @@
 {
-  "name": "s3cdk",
+  "name": "cdk",
   "version": "0.1.0",
   "bin": {
-    "s3cdk": "bin/s3cdk.js"
+    "cdk": "bin/cdk.js"
   },
   "scripts": {
     "build": "tsc",

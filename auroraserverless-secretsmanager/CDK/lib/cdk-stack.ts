@@ -1,14 +1,12 @@
-import { CfnOutput, Construct, RemovalPolicy, Stack, StackProps} from '@aws-cdk/core';
-import { BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
+import { CfnOutput, Construct, Stack, StackProps} from '@aws-cdk/core';
 import * as sm from "@aws-cdk/aws-secretsmanager";
 import { CfnDBCluster, CfnDBSubnetGroup } from '@aws-cdk/aws-rds';
 import { SubnetType, Vpc } from '@aws-cdk/aws-ec2';
 
-export class S3CdkStack extends Stack {
+export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const BUCKET_NAME = 'demo-bucket-serverless-patterns'
     const service = 'demordsservice'
     const stage = 'demostage'
     const username = 'demousername'
@@ -26,16 +24,6 @@ export class S3CdkStack extends Stack {
      dbSubnetGroupName: 'aurora-serverless-subnet-group',
      subnetIds
   });
-  //S3 Bucket
-    var bucket = new Bucket(this, 'demoBucket', {
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      bucketName: BUCKET_NAME,
-      enforceSSL: true,
-      publicReadAccess: false,
-      removalPolicy: RemovalPolicy.DESTROY,
-      versioned: false,
-      autoDeleteObjects: true
-    });
     //Secret Manager
     const secret = new sm.Secret(this, "RelationalDBStackSecret", {
       secretName: `${service}-${stage}-credentials`,
@@ -69,11 +57,6 @@ export class S3CdkStack extends Stack {
 
 
     // Outputs
-    new CfnOutput(this, BUCKET_NAME, {
-      value: bucket.bucketName,
-      description: 'The name of the s3 bucket',
-    });
-
     new CfnOutput(this, 'VpcSubnetIds', {
       value: JSON.stringify(subnetIds)
     });
