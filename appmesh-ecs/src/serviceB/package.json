@@ -1,0 +1,16 @@
+{
+  "name": "multiplesvc",
+  "version": "0.0.1",
+  "description": "SAM app for testing multiple services with circuit breaker",
+  "main": "src/serviceA/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "JJ Johnson <mthojoh@amazon.com>",
+  "license": "ISC",
+  "dependencies": {
+    "aws-xray-sdk": "^3.3.3",
+    "axios": "^0.21.1",
+    "express": "^4.17.1"
+  }
+}

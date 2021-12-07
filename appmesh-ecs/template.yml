@@ -1,0 +1,1336 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for creating an App Mesh
+
+###
+# Metadata
+###
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: KeyPairs for EC2
+        Parameters:
+          - pPrivateKeyName
+    ParameterLabels:
+      pPrivateKeyName:
+        default: Keypair name for Bastion
+      pStageName:
+        default: Stage name
+
+###
+# Globals
+###
+Globals:
+  Function:
+    Timeout: 30
+  Api:
+    BinaryMediaTypes:
+      - '*/*'
+
+###
+# Parameters
+###
+Parameters:
+  pEnvironmentName:
+    Type: String
+    Description: Environment name that joins all the stacks
+    AllowedPattern: ^[A-Za-z]*$
+    Default: Test
+  pInstanceType:
+    Description: Which instance type should we use to build the ECS cluster?
+    Type: String
+    Default: t3.medium
+  pECSServiceLogGroupRetentionInDays:
+    Type: String
+    AllowedPattern: ^[0-9]*$
+    Description: Number of days to keep logs
+    Default: 3
+  pAppMeshMeshName:
+    Type: String
+    Description: Name of mesh
+    AllowedPattern: ^[A-Za-z]*$
+    Default: TechMesh
+  pECSServicesDomain:
+    Type: String
+    Description: DNS namespace used by services e.g. default.svc.cluster.local
+    AllowedPattern: ^[A-Za-z\.]*$
+    Default: services.local
+  pEnvoyImage:
+    Type: String
+    Description: The image to use for the Envoy container
+    AllowedPattern: ^[A-Za-z0-9\-\.\/\:]*$
+    Default: 840364872350.dkr.ecr.us-east-1.amazonaws.com/aws-appmesh-envoy:v1.19.0.0-prod
+  pServiceBImage:
+    Type: String
+    Description: Docker Container for ServiceB
+    AllowedPattern: ^[A-Za-z]*$
+    Default: serviceb
+  pServiceBName:
+    Type: String
+    Description: Name for ServiceB
+    AllowedPattern: ^[A-Za-z]*$
+    Default: serviceB
+  pServiceBPort:
+    Type: String
+    Description: App port for ServiceB
+    AllowedPattern: ^[0-9]*$
+    Default: 3001
+  pServiceCImage:
+    Type: String
+    Description: Docker Container for ServiceC
+    AllowedPattern: ^[A-Za-z]*$
+    Default: servicec
+  pServiceCName:
+    Type: String
+    Description: Name for ServiceB
+    AllowedPattern: ^[A-Za-z]*$
+    Default: serviceC
+  pServiceCPort:
+    Type: String
+    Description: App port for ServiceC
+    AllowedPattern: ^[0-9]*$
+    Default: 3001
+  pPrivateKeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: bastionkey
+    AllowedPattern: ^[A-Za-z0-9]*$
+    Description: Keypair name that already exists which will be used for the EC2 bastion instance
+  pLoadBalancerCertificateArn:
+    Type: String
+    Default: arn:aws:acm:us-east-2:954260157019:certificate/14a30f03-99a0-45f3-9b05-eb1b2216fb7d
+    AllowedPattern: ^[A-Za-z0-9\-\.\/\:]*$
+    Description: ARN for the Load Balancer Certificate
+
+###
+# Mappings
+###
+Mappings:
+  mSubnetConfig:
+    VPC:
+      CIDR: 10.0.0.0/16
+    PublicAZ1:
+      CIDR: 10.0.1.0/24
+    PublicAZ2:
+      CIDR: 10.0.2.0/24
+    PrivateECSAZ1:
+      CIDR: 10.0.3.0/24
+    PrivateDBAZ1:
+      CIDR: 10.0.4.0/24
+    PrivateECSAZ2:
+      CIDR: 10.0.5.0/24
+    PrivateDBAZ2:
+      CIDR: 10.0.6.0/24
+
+###
+# Resources
+###
+Resources:
+  rVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock:
+        Fn::FindInMap:
+          - mSubnetConfig
+          - VPC
+          - CIDR
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: VPC for ${AWS::StackName}
+  rInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Internet Gateway for ${AWS::StackName}
+  rGatewayToInternet:
+    Type: AWS::EC2::VPCGatewayAttachment
+    DependsOn:
+      - rInternetGateway
+      - rVPC
+    Properties:
+      VpcId:
+        Ref: rVPC
+      InternetGatewayId:
+        Ref: rInternetGateway
+  rPublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    DependsOn: rVPC
+    Properties:
+      VpcId:
+        Ref: rVPC
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-public
+  rPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn:
+      - rPublicRouteTable
+      - rInternetGateway
+    Properties:
+      RouteTableId:
+        Ref: rPublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId:
+        Ref: rInternetGateway
+  rPublicSubnetAZ1Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn:
+      - rPublicSubnetAZ1
+      - rPublicRouteTable
+    Properties:
+      SubnetId:
+        Ref: rPublicSubnetAZ1
+      RouteTableId:
+        Ref: rPublicRouteTable
+  rPublicSubnetAZ2Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn:
+      - rPublicSubnetAZ2
+      - rPublicRouteTable
+    Properties:
+      SubnetId:
+        Ref: rPublicSubnetAZ2
+      RouteTableId:
+        Ref: rPublicRouteTable
+  rPublicSubnetAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs:
+              Ref: AWS::Region
+      VpcId:
+        Ref: rVPC
+      CidrBlock:
+        Fn::FindInMap:
+          - mSubnetConfig
+          - PublicAZ1
+          - CIDR
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Public Subnet AZ1 for ${AWS::StackName}
+  rPublicSubnetAZ2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs:
+              Ref: AWS::Region
+      VpcId:
+        Ref: rVPC
+      CidrBlock:
+        Fn::FindInMap:
+          - mSubnetConfig
+          - PublicAZ2
+          - CIDR
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Public Subnet AZ2 for ${AWS::StackName}
+  rNatGatewayAZ1Attachment:
+    Type: AWS::EC2::EIP
+    DependsOn: rGatewayToInternet
+    Properties:
+      Domain: rVPC
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Nat Gateway attachment for AZ1 for ${AWS::StackName}
+  rNatGatewayAZ2Attachment:
+    Type: AWS::EC2::EIP
+    DependsOn: rGatewayToInternet
+    Properties:
+      Domain: rVPC
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Nat Gateway attachment for AZ2 for ${AWS::StackName}
+  rNatGatewayAZ1:
+    Type: AWS::EC2::NatGateway
+    DependsOn: rNatGatewayAZ1Attachment
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - rNatGatewayAZ1Attachment
+          - AllocationId
+      SubnetId:
+        Ref: rPublicSubnetAZ1
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Nat Gateway to AZ1 for ${AWS::StackName}
+  rNatGatewayAZ2:
+    Type: AWS::EC2::NatGateway
+    DependsOn: rNatGatewayAZ2Attachment
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - rNatGatewayAZ2Attachment
+          - AllocationId
+      SubnetId:
+        Ref: rPublicSubnetAZ2
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Nat Gateway to AZ2 for ${AWS::StackName}
+  rPrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    DependsOn: rVPC
+    Properties:
+      VpcId:
+        Ref: rVPC
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Private Route Table for ${AWS::StackName}
+  rPrivateRoute:
+    Type: AWS::EC2::Route
+    DependsOn:
+      - rPrivateRouteTable
+      - rNatGatewayAZ1
+    Properties:
+      RouteTableId:
+        Ref: rPrivateRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId:
+        Ref: rNatGatewayAZ1
+  rPrivateECSAZ1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn:
+      - rPrivateSubnetECSAZ1
+      - rPrivateRouteTable
+    Properties:
+      SubnetId:
+        Ref: rPrivateSubnetECSAZ1
+      RouteTableId:
+        Ref: rPrivateRouteTable
+  rPrivateECSAZ2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn:
+      - rPrivateSubnetECSAZ2
+      - rPrivateRouteTable
+    Properties:
+      SubnetId:
+        Ref: rPrivateSubnetECSAZ2
+      RouteTableId:
+        Ref: rPrivateRouteTable
+  rPrivateSubnetECSAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs:
+              Ref: AWS::Region
+      VpcId:
+        Ref: rVPC
+      CidrBlock:
+        Fn::FindInMap:
+          - mSubnetConfig
+          - PrivateECSAZ1
+          - CIDR
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Private Subnet for ECS AZ1 for ${AWS::StackName}
+  rPrivateSubnetECSAZ2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs:
+              Ref: AWS::Region
+      VpcId:
+        Ref: rVPC
+      CidrBlock:
+        Fn::FindInMap:
+          - mSubnetConfig
+          - PrivateECSAZ2
+          - CIDR
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Private Subnet ECS AZ2 for ${AWS::StackName}
+  rInternalAccessSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: rVPC
+    Properties:
+      GroupDescription: Instance to instance access in VPC
+      VpcId:
+        Ref: rVPC
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Security Group to control instance access for ${AWS::StackName}
+  rInternalAccessSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: rInternalAccessSecurityGroup
+    Properties:
+      GroupId:
+        Ref: rInternalAccessSecurityGroup
+      IpProtocol: '-1'
+      SourceSecurityGroupId:
+        Ref: rInternalAccessSecurityGroup
+  rEC2SecGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn:
+      - rVPC
+      - rPublicSubnetAZ1
+      - rPublicSubnetAZ2
+    Properties:
+      GroupDescription: SG for EC2
+      VpcId:
+        Ref: rVPC
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: EC2 SG for ${AWS::StackName}
+  rECSSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn:
+      - rVPC
+      - rPrivateSubnetECSAZ1
+      - rPrivateSubnetECSAZ2
+    Properties:
+      GroupDescription: SG for ECS
+      VpcId:
+        Ref: rVPC
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS SG for ${AWS::StackName}
+  rSSHSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn:
+      - rVPC
+      - rPrivateSubnetECSAZ1
+      - rPrivateSubnetECSAZ2
+    Properties:
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId:
+            Ref: rEC2SecGroup
+      GroupDescription: Allow SSH
+      VpcId:
+        Ref: rVPC
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: SSH SG for ${AWS::StackName}
+
+  rECSCluster:
+    Type: AWS::ECS::Cluster
+    DependsOn:
+      - rVPC
+      - rPrivateSubnetECSAZ1
+      - rPrivateSubnetECSAZ2
+    Properties:
+      ClusterName: !Ref pEnvironmentName
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS Cluster for ${AWS::StackName}
+  rECSInstancesSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security group for the instances"
+      VpcId:
+        !Ref rVPC
+      SecurityGroupIngress:
+        - CidrIp:
+            Fn::FindInMap:
+              - mSubnetConfig
+              - VPC
+              - CIDR
+          IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS Instances SG for ${AWS::StackName}
+
+  rECSServiceDiscoveryNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Vpc: !Ref rVPC
+      Name: !Sub "${pECSServicesDomain}"
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: DNS Based VPC Private Namespace for ${AWS::StackName}
+  rECSServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security group for the service"
+      VpcId:
+        !Ref rVPC
+      SecurityGroupIngress:
+        - CidrIp:
+            Fn::FindInMap:
+              - mSubnetConfig
+              - VPC
+              - CIDR
+          IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS Instances Service SG for ${AWS::StackName}
+  rTaskIamRoleECS:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument: |
+        {
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": { "Service": [ "ecs-tasks.amazonaws.com" ]},
+                "Action": [ "sts:AssumeRole" ]
+            }]
+        }
+      Policies:
+        - PolicyName: ACMExportCertificateAccess
+          PolicyDocument: |
+            {
+              "Statement": [{
+                "Effect": "Allow",
+                "Action": ["acm:ExportCertificate"],
+                "Resource": ["*"]
+              }]
+            }
+        - PolicyName: ACMCertificateAuthorityAccess
+          PolicyDocument: |
+            {
+              "Statement": [{
+                "Effect": "Allow",
+                "Action": ["acm-pca:GetCertificateAuthorityCertificate"],
+                "Resource": ["*"]
+              }]
+            }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+        - arn:aws:iam::aws:policy/AWSAppMeshPreviewEnvoyAccess
+        - arn:aws:iam::aws:policy/AWSAppMeshEnvoyAccess
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS Task IAM Role for ${AWS::StackName}
+
+  rTaskExecutionIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument: |
+        {
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": { "Service": [ "ecs-tasks.amazonaws.com" ]},
+                "Action": [ "sts:AssumeRole" ]
+            }]
+        }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Task Execution IAM Role for ${AWS::StackName}
+
+  rECSServiceLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays:
+        Ref: pECSServiceLogGroupRetentionInDays
+  rECSServiceDiscoveryNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Vpc:
+        !Ref rVPC
+      Name: !Sub "${pECSServicesDomain}"
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: DNS Based VPC Private Namespace for ${AWS::StackName}
+  rECSTaskIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument: |
+        {
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": { "Service": [ "ecs-tasks.amazonaws.com" ]},
+                "Action": [ "sts:AssumeRole" ]
+            }]
+        }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+        - arn:aws:iam::aws:policy/AWSAppMeshEnvoyAccess
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS Task IAM Role for ${AWS::StackName}
+  rServiceBTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities:
+        - 'FARGATE'
+      Family: !Sub '${pEnvironmentName}-serviceB'
+      NetworkMode: 'awsvpc'
+      Cpu: 256
+      Memory: 512
+      TaskRoleArn: !GetAtt rTaskIamRoleECS.Arn
+      ExecutionRoleArn: !GetAtt rTaskExecutionIamRole.Arn
+      ProxyConfiguration:
+        Type: 'APPMESH'
+        ContainerName: 'envoy'
+        ProxyConfigurationProperties:
+          - Name: 'IgnoredUID'
+            Value: '1337'
+          - Name: 'ProxyIngressPort'
+            Value: '15000'
+          - Name: 'ProxyEgressPort'
+            Value: '15001'
+          - Name: 'AppPorts'
+            Value: !Sub "${pServiceBPort}"
+          - Name: 'EgressIgnoredIPs'
+            Value: '169.254.170.2,169.254.169.254'
+      ContainerDefinitions:
+        - Name: 'app'
+          Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${pServiceBImage}'
+          Essential: true
+          DependsOn:
+            - ContainerName: 'envoy'
+              Condition: 'HEALTHY'
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Ref rECSServiceLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'envoy'
+          PortMappings:
+            - ContainerPort: !Sub "${pServiceBPort}"
+              Protocol: 'http'
+          Environment:
+            - Name: 'SERVER_PORT'
+              Value: !Sub "${pServiceBPort}"
+        - Name: envoy
+          Image: !Ref pEnvoyImage
+          Essential: true
+          User: '1337'
+          Ulimits:
+            - Name: "nofile"
+              HardLimit: 15000
+              SoftLimit: 15000
+          PortMappings:
+            - ContainerPort: 9901
+              Protocol: 'tcp'
+            - ContainerPort: 15000
+              Protocol: 'tcp'
+            - ContainerPort: 15001
+              Protocol: 'tcp'
+          HealthCheck:
+            Command:
+              - 'CMD-SHELL'
+              - 'echo hello'
+            Interval: 5
+            Timeout: 2
+            Retries: 3
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Ref rECSServiceLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: !Sub '${pServiceBName}-envoy'
+          Environment:
+            - Name: 'APPMESH_VIRTUAL_NODE_NAME'
+              Value: !Sub 'mesh/${pAppMeshMeshName}/virtualNode/servicebnode'
+            - Name: 'ENABLE_ENVOY_XRAY_TRACING'
+              Value: '1'
+        - Name: 'xray-daemon'
+          Image: 'public.ecr.aws/xray/aws-xray-daemon:latest'
+          Essential: true
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group:
+                !Ref rECSServiceLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'serviceb'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS Service B Task Definition for ${AWS::StackName}
+  rServiceBServiceDiscoveryRecord:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: "serviceb"
+      DnsConfig:
+        NamespaceId:
+          !Ref rECSServiceDiscoveryNamespace
+        DnsRecords:
+          - Type: A
+            TTL: 300
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Service B Discovery for ${AWS::StackName}
+  rServiceBService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref rECSCluster
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DesiredCount: 1
+      LaunchType: FARGATE
+      ServiceRegistries:
+        - RegistryArn: !GetAtt rServiceBServiceDiscoveryRecord.Arn
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref rECSServiceSecurityGroup
+          Subnets:
+            - !Ref rPrivateSubnetECSAZ1
+            - !Ref rPrivateSubnetECSAZ2
+      TaskDefinition: !Ref rServiceBTaskDefinition
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS Service B for ${AWS::StackName}
+  rServiceCTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities:
+        - 'FARGATE'
+      Family: !Sub '${pEnvironmentName}-serviceC'
+      NetworkMode: 'awsvpc'
+      Cpu: 256
+      Memory: 512
+      TaskRoleArn: !GetAtt rTaskIamRoleECS.Arn
+      ExecutionRoleArn: !GetAtt rTaskExecutionIamRole.Arn
+      ProxyConfiguration:
+        Type: 'APPMESH'
+        ContainerName: 'envoy'
+        ProxyConfigurationProperties:
+          - Name: 'IgnoredUID'
+            Value: '1337'
+          - Name: 'ProxyIngressPort'
+            Value: '15000'
+          - Name: 'ProxyEgressPort'
+            Value: '15001'
+          - Name: 'AppPorts'
+            Value: !Sub "${pServiceCPort}"
+          - Name: 'EgressIgnoredIPs'
+            Value: '169.254.170.2,169.254.169.254'
+      ContainerDefinitions:
+        - Name: 'app'
+          Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${pServiceCImage}'
+          Essential: true
+          DependsOn:
+            - ContainerName: 'envoy'
+              Condition: 'HEALTHY'
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Ref rECSServiceLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'servicec'
+          PortMappings:
+            - ContainerPort: !Sub "${pServiceCPort}"
+              Protocol: 'http'
+          Environment:
+            - Name: 'SERVER_PORT'
+              Value: !Sub "${pServiceCPort}"
+        - Name: envoy
+          Image: !Ref pEnvoyImage
+          Essential: true
+          User: '1337'
+          Ulimits:
+            - Name: "nofile"
+              HardLimit: 15000
+              SoftLimit: 15000
+          PortMappings:
+            - ContainerPort: 9901
+              Protocol: 'tcp'
+            - ContainerPort: 15000
+              Protocol: 'tcp'
+            - ContainerPort: 15001
+              Protocol: 'tcp'
+          HealthCheck:
+            Command:
+              - 'CMD-SHELL'
+              - 'echo hello'
+            Interval: 5
+            Timeout: 2
+            Retries: 3
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Ref rECSServiceLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: !Sub '${pServiceCName}-envoy'
+          Environment:
+            - Name: 'APPMESH_VIRTUAL_NODE_NAME'
+              Value: !Sub 'mesh/${pAppMeshMeshName}/virtualNode/servicecnode'
+            - Name: 'ENABLE_ENVOY_XRAY_TRACING'
+              Value: '1'
+        - Name: 'xray-daemon'
+          Image: 'public.ecr.aws/xray/aws-xray-daemon:latest'
+          Essential: true
+          User: '1337'
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group:
+                !Ref rECSServiceLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'servicec'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS service C Task Definition for ${AWS::StackName}
+  rServiceCServiceDiscoveryRecord:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: "servicec"
+      DnsConfig:
+        NamespaceId: !Ref rECSServiceDiscoveryNamespace
+        DnsRecords:
+          - Type: A
+            TTL: 300
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS Service C Discovery for ${AWS::StackName}
+  rServiceCService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref rECSCluster
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DesiredCount: 1
+      LaunchType: FARGATE
+      ServiceRegistries:
+        - RegistryArn: !GetAtt rServiceCServiceDiscoveryRecord.Arn
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref rECSServiceSecurityGroup
+          Subnets:
+            - !Ref rPrivateSubnetECSAZ1
+            - !Ref rPrivateSubnetECSAZ2
+      TaskDefinition: !Ref rServiceCTaskDefinition
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ECS Service C for ${AWS::StackName}
+  rMainGatewayTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities:
+        - 'FARGATE'
+      Family: !Sub '${pEnvironmentName}-cmaingateway'
+      NetworkMode: 'awsvpc'
+      Cpu: 256
+      Memory: 512
+      TaskRoleArn: !GetAtt rTaskIamRoleECS.Arn
+      ExecutionRoleArn: !GetAtt rTaskExecutionIamRole.Arn
+      ContainerDefinitions:
+        - Name: 'app'
+          Image: !Ref pEnvoyImage
+          Essential: true
+          Ulimits:
+            - Name: "nofile"
+              HardLimit: 15000
+              SoftLimit: 15000
+          PortMappings:
+            - ContainerPort: 9901
+              Protocol: 'tcp'
+            - ContainerPort: !Sub "${pServiceBPort}"
+              Protocol: 'tcp'
+          HealthCheck:
+            Command:
+              - 'CMD-SHELL'
+              - 'echo hello'
+            Interval: 5
+            Timeout: 2
+            Retries: 3
+            StartPeriod: 60
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group:
+                !Ref rECSServiceLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'gateway-envoy'
+          Environment:
+            - Name: 'APPMESH_VIRTUAL_NODE_NAME'
+              Value: !Sub 'mesh/${pAppMeshMeshName}/virtualGateway/maingateway-vg'
+            - Name: 'ENABLE_ENVOY_STATS_TAGS'
+              Value: '1'
+            - Name: 'ENABLE_ENVOY_DOG_STATSD'
+              Value: '1'
+            - Name: 'STATSD_PORT'
+              Value: '8125'
+            - Name: 'ENABLE_ENVOY_XRAY_TRACING'
+              Value: '1'
+        - Name: 'xray-daemon'
+          Image: 'public.ecr.aws/xray/aws-xray-daemon:latest'
+          Essential: true
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group:
+                !Ref rECSServiceLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'gateway-agent'
+        - Name: 'cw-agent'
+          Image: 'public.ecr.aws/cloudwatch-agent/cloudwatch-agent:latest'
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8125
+              Protocol: 'udp'
+          Environment:
+            - Name: CW_CONFIG_CONTENT
+              Value:
+                Fn::Sub:
+                  - "{ \"metrics\": { \"namespace\":\"${MetricNamespace}\", \"metrics_collected\": { \"statsd\": { \"metrics_aggregation_interval\": 0}}}}"
+                  - MetricNamespace:
+                      Fn::Join:
+                        - '/'
+                        - - !Ref pEnvironmentName
+                          - gateway-envoy
+                          - StatsD
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group:
+                !Ref rECSServiceLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'gateway-agent'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Main Gateway Task Definition for ${AWS::StackName}
+  rMainGatewayServiceDiscoveryRecord:
+    Type: AWS::ServiceDiscovery::Service
+    DependsOn:
+      - rMainGatewayTaskDefinition
+    Properties:
+      Name: "gateway"
+      DnsConfig:
+        NamespaceId: !Ref rECSServiceDiscoveryNamespace
+        DnsRecords:
+          - Type: A
+            TTL: 300
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Main Gateway Service Discovery Record for ${AWS::StackName}
+  rMainGatewayService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - rPublicLoadBalancerListener
+    Properties:
+      Cluster: !Ref rECSCluster
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DesiredCount: 1
+      LaunchType: FARGATE
+      ServiceRegistries:
+        - RegistryArn: !GetAtt rMainGatewayServiceDiscoveryRecord.Arn
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref rECSServiceSecurityGroup
+          Subnets:
+            - !Ref rPrivateSubnetECSAZ1
+            - !Ref rPrivateSubnetECSAZ2
+      TaskDefinition: !Ref rMainGatewayTaskDefinition
+      LoadBalancers:
+        - ContainerName: app
+          ContainerPort: 3001
+          TargetGroupArn: !Ref rWebTargetGroup
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Main Gateway Service for ${AWS::StackName}
+
+  rPublicLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    DependsOn: rECSCluster
+    Properties:
+      Scheme: internet-facing
+      Subnets:
+        - !Ref rPublicSubnetAZ1
+        - !Ref rPublicSubnetAZ2
+      Type: network
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Public Elastic Load Balancer for ${AWS::StackName}
+
+  rWebTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: rPublicLoadBalancer
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPort: 3001
+      HealthCheckProtocol: TCP
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 3
+      TargetType: ip
+      Name: !Sub "${pEnvironmentName}-web"
+      Port: 443
+      Protocol: TLS
+      UnhealthyThresholdCount: 3
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 120
+      VpcId:
+        !Ref rVPC
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: Public Load Balancer Target Group for ${AWS::StackName}
+
+  rPublicLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - rPublicLoadBalancer
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref rWebTargetGroup
+          Type: 'forward'
+      LoadBalancerArn: !Ref rPublicLoadBalancer
+      Port: 443
+      Protocol: TLS
+      Certificates:
+        - CertificateArn: !Sub '${pLoadBalancerCertificateArn}'
+  rAppMesh:
+    Type: AWS::AppMesh::Mesh
+    Properties:
+      MeshName: !Sub "${pAppMeshMeshName}"
+      Spec:
+        EgressFilter:
+          Type: 'ALLOW_ALL'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: AppMesh for ${AWS::StackName}
+  rVirtualGateway:
+    Type: AWS::AppMesh::VirtualGateway
+    DependsOn:
+      - rAppMesh
+    Properties:
+      MeshName: !Sub "${pAppMeshMeshName}"
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: 3001
+              Protocol: 'http'
+            TLS:
+              Certificate:
+                ACM:
+                  CertificateArn: !Ref pLoadBalancerCertificateArn
+              Mode: 'PERMISSIVE'
+      VirtualGatewayName: 'maingateway-vg'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: AppMesh Virtual Gateway for ${AWS::StackName}
+  rVirtualRouterServiceB:
+    Type: AWS::AppMesh::VirtualRouter
+    DependsOn:
+      - rAppMesh
+    Properties:
+      MeshName: !Sub "${pAppMeshMeshName}"
+      VirtualRouterName: 'serviceb'
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: 3001
+              Protocol: 'http'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: AppMesh Virtual Router B for ${AWS::StackName}
+  rVirtualRouterServiceC:
+    Type: AWS::AppMesh::VirtualRouter
+    DependsOn:
+      - rAppMesh
+    Properties:
+      MeshName: !Sub "${pAppMeshMeshName}"
+      VirtualRouterName: 'servicec'
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: 3001
+              Protocol: 'http'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: AppMesh Virtual Router C for ${AWS::StackName}
+  rVirtualNodeServiceB:
+    Type: AWS::AppMesh::VirtualNode
+    DependsOn:
+      - rAppMesh
+    Properties:
+      MeshName: !Sub "${pAppMeshMeshName}"
+      VirtualNodeName: 'servicebnode'
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: 3001
+              Protocol: 'http'
+            HealthCheck:
+              HealthyThreshold: 2
+              IntervalMillis: 5000
+              Path: '/health'
+              Protocol: 'http'
+              TimeoutMillis: 2000
+              UnhealthyThreshold: 2
+        ServiceDiscovery:
+          DNS:
+            Hostname: 'serviceb.services.local'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: AppMesh Virtual Node B for ${AWS::StackName}
+  rVirtualNodeServiceC:
+    Type: AWS::AppMesh::VirtualNode
+    DependsOn:
+      - rAppMesh
+    Properties:
+      MeshName: !Sub "${pAppMeshMeshName}"
+      VirtualNodeName: 'servicecnode'
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: 3001
+              Protocol: 'http'
+            HealthCheck:
+              HealthyThreshold: 2
+              IntervalMillis: 5000
+              Path: '/health'
+              Protocol: 'http'
+              TimeoutMillis: 2000
+              UnhealthyThreshold: 2
+        ServiceDiscovery:
+          DNS:
+            Hostname: 'servicec.services.local'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: AppMesh Virtual Node C for ${AWS::StackName}
+  rVirtualServiceB:
+    Type: AWS::AppMesh::VirtualService
+    DependsOn:
+      - rAppMesh
+      - rVirtualRouterServiceB
+    Properties:
+      MeshName: !Sub "${pAppMeshMeshName}"
+      VirtualServiceName: 'servicebservice'
+      Spec:
+        Provider:
+          VirtualRouter:
+            VirtualRouterName: 'serviceb'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: AppMesh Virtual Service B for ${AWS::StackName}
+  rVirtualServiceC:
+    Type: AWS::AppMesh::VirtualService
+    DependsOn:
+      - rAppMesh
+      - rVirtualRouterServiceC
+    Properties:
+      MeshName: !Sub "${pAppMeshMeshName}"
+      VirtualServiceName: 'servicecservice'
+      Spec:
+        Provider:
+          VirtualRouter:
+            VirtualRouterName: 'servicec'
+     Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: AppMesh Virtual Service C for ${AWS::StackName}
+  rVirtualRouteB:
+    Type: AWS::AppMesh::Route
+    DependsOn:
+      - rAppMesh
+      - rVirtualNodeServiceB
+    Properties:
+      MeshName: !Sub "${pAppMeshMeshName}"
+      RouteName: 'service-b-route'
+      VirtualRouterName: 'serviceb'
+      Spec:
+        HttpRoute:
+          Action:
+            WeightedTargets:
+              - VirtualNode: 'servicebnode'
+                Weight: 1
+          Match:
+            Path:
+              Exact: '/'
+          RetryPolicy:
+            HttpRetryEvents:
+              - 'server-error'
+              - 'gateway-error'
+            MaxRetries: 2
+            PerRetryTimeout:
+              Unit: 'ms'
+              Value: 2000
+     Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: AppMesh Route B for ${AWS::StackName}
+  rVirtualRouteC:
+    Type: AWS::AppMesh::Route
+    DependsOn:
+      - rAppMesh
+      - rVirtualNodeServiceC
+    Properties:
+      MeshName: !Sub "${pAppMeshMeshName}"
+      RouteName: 'service-b-route'
+      VirtualRouterName: 'servicec'
+      Spec:
+        HttpRoute:
+          Action:
+            WeightedTargets:
+              - VirtualNode: 'servicecnode'
+                Weight: 1
+          Match:
+            Path:
+              Exact: '/'
+          RetryPolicy:
+            HttpRetryEvents:
+              - 'server-error'
+              - 'gateway-error'
+            MaxRetries: 2
+            PerRetryTimeout:
+              Unit: 'ms'
+              Value: 2000
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: AppMesh Route C for ${AWS::StackName}
+  rGatewayRouterB:
+    Type: AWS::AppMesh::GatewayRoute
+    DependsOn:
+      - rVirtualGateway
+      - rVirtualServiceB
+    Properties:
+      GatewayRouteName: 'broute'
+      MeshName: !Sub "${pAppMeshMeshName}"
+      VirtualGatewayName: 'maingateway-vg'
+      Spec:
+        HttpRoute:
+          Action:
+            Target:
+              VirtualService:
+                VirtualServiceName: 'servicebservice'
+          Match:
+            Method: 'GET'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: GatewayRouter B for ${AWS::StackName}
+  rGatewayRouterC:
+    Type: AWS::AppMesh::GatewayRoute
+    DependsOn:
+      - rVirtualGateway
+      - rVirtualServiceB
+    Properties:
+      GatewayRouteName: 'croute'
+      MeshName: !Sub "${pAppMeshMeshName}"
+      VirtualGatewayName: 'maingateway-vg'
+      Spec:
+        HttpRoute:
+          Action:
+            Target:
+              VirtualService:
+                VirtualServiceName: 'servicecservice'
+          Match:
+            Method: 'GET'
+    Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: GatewayRouter C for ${AWS::StackName}
+
+###
+# Outputs
+###
+Outputs:
+  oServiceAppEndpoint:
+    Description: Public endpoint for App service
+    Value: !Join [ '', [ 'https://', !GetAtt 'rPublicLoadBalancer.DNSName' ] ]
+  oECSCluster:
+    Description: A reference to the ECS cluster
+    Value: !Ref rECSCluster
+    Export:
+      Name: !Sub "${pEnvironmentName}:rECSCluster"
+  oECSServiceDiscoveryNamespace:
+    Description: A SDS namespace that will be used by all services in this cluster
+    Value: !Ref rECSServiceDiscoveryNamespace
+    Export:
+      Name: !Sub "${pEnvironmentName}:rECSServiceDiscoveryNamespace"
+  oVPCId:
+    Description: The ID of the VPC
+    Value:
+      Ref: rVPC
+    Export:
+      Name:
+        Fn::Sub: ${AWS::StackName}:VPCId
+  oPublicSubnetAZ1:
+    Description: Public subnet
+    Value:
+      Ref: rPublicSubnetAZ1
+    Export:
+      Name:
+        Fn::Sub: ${AWS::StackName}:PublicSubnetAZ1
+  oPublicSubnetAZ2:
+    Description: Public subnet
+    Value:
+      Ref: rPublicSubnetAZ2
+    Export:
+      Name:
+        Fn::Sub: ${AWS::StackName}:PublicSubnetAZ2
+  oPrivateSubnetECSAZ1:
+    Description: Private subnet one
+    Value:
+      Ref: rPrivateSubnetECSAZ1
+    Export:
+      Name:
+        Fn::Sub: ${AWS::StackName}:PrivateSubnetECSAZ1
+  oPrivateSubnetECSAZ2:
+    Description: Private subnet one
+    Value:
+      Ref: rPrivateSubnetECSAZ2
+    Export:
+      Name:
+        Fn::Sub: ${AWS::StackName}:PrivateSubnetECSAZ2
