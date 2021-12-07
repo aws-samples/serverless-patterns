@@ -2,13 +2,13 @@
 
 ![glue-step-functions](glue-to-sf.drawio.png)
 
-This patters deploys a Step Functions that includes a Glue Job as one of its steps. The Glue Job may be used to process data from S3 or other AWS storage services. 
+This pattern deploys a Step Functions that includes a Glue Job as one of its steps. The Glue Job may be used to process data from S3 or other AWS storage services. Learn more at: https://serverlessland.com/patterns/sfn-glue.
 
 The SAM template deploys:
-    * A Step Functions State Machine
-    * An EventBridge rule that triggers the Step Functions every 2 days
-    * A Glue Job
-    * IAM roles required to run the application.
+* A Step Functions State Machine
+* An EventBridge rule that triggers the Step Functions every 2 days
+* A Glue Job
+* IAM roles required to run the application.
 
 
 ## Download
