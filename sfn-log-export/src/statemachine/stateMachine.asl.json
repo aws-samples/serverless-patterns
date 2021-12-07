@@ -1,0 +1,84 @@
+{
+  "Comment": "Cloudwatch Log Archive Workflow",
+  "StartAt": "QueryTags",
+  "States": {
+    "QueryTags": {
+      "Type": "Task",
+      "Resource": "${FunctionQueryLogGroupsArn}",
+      "ResultPath": "$.queryTagsResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.Timeout",
+            "Lambda.Unknown",
+            "States.TaskFailed"
+          ],
+          "MaxAttempts": 3,
+          "IntervalSeconds": 180
+        }
+      ],
+      "Next": "ExportLogGroups"
+    },
+    "ExportLogGroups": {
+      "Type": "Map",
+      "InputPath": "$",
+      "ItemsPath": "$.queryTagsResult.logGroups",
+      "Next": "Done",
+      "MaxConcurrency": 1,
+      "Iterator": {
+        "StartAt": "ExportLogGroup",
+        "States": {
+          "ExportLogGroup": {
+            "Type": "Task",
+            "Resource": "${FunctionCloudWatchSnapshotArn}",
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "States.Timeout",
+                  "Lambda.Unknown",
+                  "States.TaskFailed",
+                  "LimitExceededException"
+                ],
+                "MaxAttempts": 3,
+                "IntervalSeconds": 30
+              }
+            ],
+            "ResultPath": "$.exportLogGroupResult",
+            "Next": "WaitForExportToComplete"
+          },
+          "WaitForExportToComplete": {
+            "Type": "Wait",
+            "Seconds": 5,
+            "Next": "QueryExportStatus"
+          },
+          "QueryExportStatus": {
+            "Type": "Task",
+            "Resource": "${FunctionCloudWatchExportStatusCheckArn}",
+            "Parameters": {
+              "taskId": "$.exportLogGroupResult.taskId"
+            },
+            "ResultPath": "$.queryExportStatusResult",
+            "Next": "IsExportCompleted"
+          },
+          "IsExportCompleted": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.queryExportStatusResult.Status",
+                "StringEquals": "NOT_RUNNING",
+                "Next": "ExportComplete"
+              }
+            ],
+            "Default": "WaitForExportToComplete"
+          },
+          "ExportComplete": {
+            "Type": "Succeed"
+          }
+        }
+      }
+    },
+    "Done": {
+      "Type": "Succeed"
+    }
+  }
+}
