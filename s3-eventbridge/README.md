@@ -2,7 +2,7 @@
 
 
 
-Learn more about this pattern at the Serverless Land Patterns Collection: https://serverlessland.com/patterns/s3-eventbridge
+Learn more about this pattern at the Serverless Land Patterns Collection: https://serverlessland.com/patterns/s3-cloudtrail-eventbridge
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
