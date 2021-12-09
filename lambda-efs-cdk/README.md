@@ -1,9 +1,8 @@
 # Amazon API Gateway to Lambda to Amazon EFS
 
-TThis is a pattern from Danilo Poccia that attaches an EFS file system to your lambda function to give it expandable, persistent storage. Having this level of storage in a Lambda Function opens the door to many new possibilities (multiple functions can even use the same file system)
+This pattern attaches an EFS file system to your Lambda function to give it expandable, persistent storage. Having this level of storage in a Lambda function opens the door to many new possibilities (multiple functions can even use the same file system)
 
-
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/ambda-efs-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-http-api-lambda-efs-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
