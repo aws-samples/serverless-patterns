@@ -17,6 +17,7 @@ Resources:
       BucketName: !Ref BucketNameForImages
   
     # Enforce HTTPS only access to S3 bucket #
+  BucketForImagePolicy:
     Type: AWS::S3::BucketPolicy
     Properties: 
       Bucket: !Ref BucketNameForImages
@@ -55,6 +56,9 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref BucketNameForCloudTrailLogs
+
+
+
 
   # Allow CloudTrail to use an S3 bucket for storing trails
   CloudTrailBucketPolicy:
