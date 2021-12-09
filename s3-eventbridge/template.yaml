@@ -15,6 +15,22 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref BucketNameForImages
+  
+    # Enforce HTTPS only access to S3 bucket #
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: !Ref BucketNameForImages
+      PolicyDocument: 
+        Statement:
+        - Action: s3:*
+          Effect: Deny
+          Principal: "*"
+          Resource:
+          - !Sub "arn:aws:s3:::${bucketname}/*"
+          - !Sub "arn:aws:s3:::${bucketname}"
+          Condition:
+            Bool:
+              aws:SecureTransport: false    
 
   # Enable s3 data event logging on cloudtrail (Image push event is a data event)
   CloudTrail:
