@@ -51,7 +51,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
    ```
    
    
-7. Activate your virtual environment by running the following command from the command line.
+5. Activate your virtual environment by running the following command from the command line.
    
    **Linux/Mac:** 
    ```bash
@@ -63,11 +63,11 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
    .\source
    ```
    
-8. Install Python Requirements:
+6. Install Python Requirements:
    ```bash
    pip install -r requirements.txt
    ```
-9. Bootstrap your CDK environment in the destination account [Learn More about bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-howto-cli)
+7. Bootstrap your CDK environment in the destination account [Learn More about bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-howto-cli)
    
    **Linux/Mac:** 
    ```bash
@@ -80,7 +80,11 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
    cdk bootstrap
    ```
    
-12. Deploy the CDK App. 
+8. Install Boto3 as a Layer
+    ```bash
+    pip install boto3==1.18.7 --target lambda_functions/dependencies_layer/python/
+    ```
+11. Deploy the CDK App. 
      ```bash
      cdk deploy --parameters notificationemailaddress=email@example.com --parameters profiling=TRUE --parameters tracing=TRUE --parameters trustedadvisorrefreshminutes=7
      ```

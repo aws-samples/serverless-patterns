@@ -15,3 +15,4 @@ deploy.sh
 diff.sh
 activate.sh
 upgrade-cdk.sh
+/lambda_functions/dependencies_layer/python/*
