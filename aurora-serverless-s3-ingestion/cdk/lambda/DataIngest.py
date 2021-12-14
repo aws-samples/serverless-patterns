@@ -54,6 +54,8 @@ def lambda_handler(event, context):
     
     wake_aurora()
     
+    create_table()
+
     for record in event['Records']:
         source_bucket = record['s3']['bucket']['name']
         key = record['s3']['object']['key']
