@@ -1,0 +1,217 @@
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Fargate ECS Cluster
+
+
+###############################################################################
+# Parameters 
+###############################################################################  
+
+Parameters:
+
+  pVpcId:
+    Description: VPC where the resources will be created.
+    Type: AWS::EC2::VPC::Id
+  pPrivateSubnetIds:
+    Description: Subnets where the NLB will be launched.
+    Type: List<AWS::EC2::Subnet::Id>
+  pCustomSecurityGroup:
+    Description: Custom Security Group that allows access to ALB from NLB IP addresses
+    Type: String
+
+
+###############################################################################
+# Resources 
+###############################################################################  
+
+Resources:
+
+####################### Fargate ECS Cluster ############################
+
+  # Load balancer security group.
+  # This should permit only the NLB IP addresses so that clients don't bypass authentication set in API Gateway
+
+  ApplicationLoadBalancerSG:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: >-
+        LoadBalancer Security Group
+      # No ingress rules added here as we will attach the custom security group allowing the NLB IP addresses.
+      # SecurityGroupIngress:
+      #   - CidrIp: 0.0.0.0/0
+      #     Description: Allow from anyone on port 80
+      #     FromPort: 80
+      #     IpProtocol: tcp
+      #     ToPort: 80
+      VpcId: !Ref pVpcId
+
+  # Load balancer security group egress rule to ECS cluster security group.
+  LoadBalancerSGEgressToECSSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroupEgress'
+    Properties:
+      GroupId: !GetAtt 
+        - ApplicationLoadBalancerSG
+        - GroupId
+      IpProtocol: tcp
+      Description: Target group egress
+      DestinationSecurityGroupId: !GetAtt 
+        - ECSSecurityGroup
+        - GroupId
+      FromPort: 80
+      ToPort: 80
+
+  # ECS cluster security group.
+  ECSSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: >-
+        ECS Security Group
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: '-1'
+      VpcId: !Ref pVpcId
+
+  # ECS cluster security group ingress from the load balancer.
+  ECSSecurityGroupIngressFromLoadBalancer:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      IpProtocol: tcp
+      Description: Ingress from Load Balancer
+      FromPort: 80
+      GroupId: !GetAtt 
+        - ECSSecurityGroup
+        - GroupId
+      SourceSecurityGroupId: !GetAtt 
+        - ApplicationLoadBalancerSG
+        - GroupId
+      ToPort: 80
+
+  # Create the internal application load balancer (ALB) in the private subnets.
+  ApplicationLoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Scheme: internal
+      SecurityGroups:
+        - !GetAtt 
+          - ApplicationLoadBalancerSG
+          - GroupId
+        - !Ref pCustomSecurityGroup
+      Subnets: !Ref pPrivateSubnetIds
+      Type: application
+
+  # Create the ALB target group for ECS.
+  LoadBalancerListenerTargetGroupECS:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !Ref pVpcId
+
+  # Create the ALB listener with the target group.
+  ApplicationLoadBalancerListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref LoadBalancerListenerTargetGroupECS
+          Type: forward
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  # Create the ECS Cluster and Fargate launch type service in the private subnets
+  ECSFargateCluster:
+    Type: 'AWS::ECS::Cluster'
+  ECSService:
+    Type: 'AWS::ECS::Service'
+    Properties:
+      Cluster: !Ref ECSFargateCluster
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      DesiredCount: 2
+      EnableECSManagedTags: false
+      HealthCheckGracePeriodSeconds: 60
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: web
+          ContainerPort: 80
+          TargetGroupArn: !Ref LoadBalancerListenerTargetGroupECS
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !GetAtt 
+              - ECSSecurityGroup
+              - GroupId
+          Subnets: !Ref pPrivateSubnetIds
+      TaskDefinition: !Ref ECSServiceTaskDefinition
+    DependsOn:
+      - LoadBalancerListenerTargetGroupECS
+      - ApplicationLoadBalancerListener
+
+  # Create the ECS Service task definition. 
+  # 'nginx' image is being used in the container definition.
+  # This image is pulled from the docker hub which is the default image repository.
+  # ECS task execution role and the task role is used which can be attached with additional IAM policies to configure the required permissions.
+
+  ECSServiceTaskDefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      ContainerDefinitions:
+        - Essential: true
+          Image: nginx
+          Name: web
+          PortMappings:
+            - ContainerPort: 80
+              Protocol: tcp
+      Cpu: '512'
+      ExecutionRoleArn: !GetAtt 
+        - ECSTaskExecutionRole
+        - Arn
+      Memory: '1024'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn: !GetAtt 
+        - ECSTaskRole
+        - Arn
+
+  ECSTaskExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: 2012-10-17
+
+  ECSTaskRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: 2012-10-17
+  
+  
+#####################################################
+################## OUTPUTS ##########################
+#####################################################
+
+Outputs:
+
+  oApplicationLoadBalancerArn:
+    Description: Application Load Balancer ARN
+    Value: !Ref ApplicationLoadBalancer
+    Export:
+      Name: !Sub '${AWS::StackName}-ApplicationLoadBalancerArn'

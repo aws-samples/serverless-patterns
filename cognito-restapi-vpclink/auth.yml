@@ -1,0 +1,96 @@
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cognito resources
+
+ 
+###############################################################################
+# Resources 
+###############################################################################  
+
+Resources:
+
+###################### COGNITO ######################
+
+  rCognitoUserPool:
+    Type: 'AWS::Cognito::UserPool'
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true # Disable self-registration
+        InviteMessageTemplate:
+          EmailSubject: !Sub '${AWS::StackName}: temporary password'
+          EmailMessage: 'Your username is {username} and temporary password is {####}.'
+          SMSMessage: 'Your username is {username} and temporary password is {####}.'
+      AliasAttributes: 
+        - email
+      AutoVerifiedAttributes:
+      - email
+      UserPoolName: !Sub '${AWS::StackName}-Serverless Pattern User Pool'
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: false
+          RequireNumbers: false
+          RequireSymbols: false
+          RequireUppercase: false
+          TemporaryPasswordValidityDays: 7
+
+
+  rCognitoUserPoolDomain: # Provides Cognito Login Page
+    Type: 'AWS::Cognito::UserPoolDomain'
+    Properties:
+      UserPoolId: !Ref rCognitoUserPool
+      Domain: !Select [2, !Split ['/', !Ref 'AWS::StackId']] # Generates a unique domain name
+
+
+  rCognitoUserPoolClient:
+    Type: 'AWS::Cognito::UserPoolClient'
+    Properties:
+
+      AllowedOAuthFlows:
+      - code
+      AllowedOAuthFlowsUserPoolClient: false
+      AllowedOAuthScopes:
+      - email
+      - openid
+      - profile
+      - aws.cognito.signin.user.admin
+      CallbackURLs:
+      - "http://localhost"     #  Add your own domains
+      ExplicitAuthFlows:
+        - ALLOW_CUSTOM_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      LogoutURLs:
+        - "http://localhost"
+      SupportedIdentityProviders: # Optional: add providers for identity federation
+      - COGNITO
+      UserPoolId: !Ref rCognitoUserPool
+      
+
+#####################################################
+################## OUTPUTS ##########################
+#####################################################
+
+Outputs:
+
+  oCognitoUserPool:
+    Description: Cognito User Pool
+    Value: !Ref rCognitoUserPool
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPool'
+
+  oCognitoUserPoolArn:
+    Description: Cognito User Pool ARN
+    Value: !GetAtt rCognitoUserPool.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPoolArn'
+
+  oCognitoUserPoolClient:
+    Description: Cognito User Pool Client
+    Value: !Ref rCognitoUserPoolClient
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPoolClient'

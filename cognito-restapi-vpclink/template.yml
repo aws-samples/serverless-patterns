@@ -1,0 +1,262 @@
+#  Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved. https://aws.amazon.com/agreement
+#  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
+#  the License. A copy of the License is located at
+#      http://aws.amazon.com/apache2.0/
+#  or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+#  CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and
+#  limitations under the License.
+
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Serverless pattern - API Gateway private REST API to private resource using VPC link.
+  This pattern shows how to add Cognito authentication to private resources using API Gateway private REST API and VPC link.
+
+
+###############################################################################
+# Parameters 
+###############################################################################  
+
+Parameters:
+
+  pVpcId:
+    Description: VPC where the resources will be created.
+    Type: AWS::EC2::VPC::Id
+  pPrivateSubnetIds:
+    Description: Subnets where the NLB will be launched.
+    Type: List<AWS::EC2::Subnet::Id>
+  pCIDRRange:
+    Description: IP address range that is allowed to connect to the API.
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 10.0.0.0/8
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+
+###############################################################################
+# Resources 
+###############################################################################  
+
+Resources:
+
+  NetworkStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./network.yml
+      Parameters:
+        pVpcId: !Ref pVpcId
+        pPrivateSubnetIds: !Join [ ',', !Ref pPrivateSubnetIds ]
+        pCIDRRange: !Ref pCIDRRange
+
+  FargateStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./ecs.yml
+      Parameters:
+        pVpcId: !Ref pVpcId
+        pPrivateSubnetIds: !Join [ ',', !Ref pPrivateSubnetIds ]
+        pCustomSecurityGroup: !GetAtt NetworkStack.Outputs.oCustomSecurityGroup
+
+  TargetGroupStack:
+    DependsOn:
+    - FargateStack
+    - NetworkStack
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./targetgroup.yml
+      Parameters:
+        pVpcId: !Ref pVpcId
+        pApplicationLoadBalancerArn: !GetAtt FargateStack.Outputs.oApplicationLoadBalancerArn
+        pNetworkLoadBalancerArn: !GetAtt NetworkStack.Outputs.oNetworkLoadBalancerArn
+
+  AuthStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./auth.yml
+
+################ VPC LINK FOR REST API ##########################
+
+  rVPCLink:
+    DependsOn:
+    - NetworkStack
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Description: VPC link for REST API
+      Name: PrivateAPI-VPCLink
+      TargetArns:
+        - !GetAtt NetworkStack.Outputs.oNetworkLoadBalancerArn
+
+################ REST API (Private API with private integration) ##########################
+
+  rApiGateway:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: "Serverless Pattern private REST API"
+      Description: "API for authorization purposes"
+      EndpointConfiguration:
+        Types:
+        - PRIVATE
+        VpcEndpointIds: 
+        - !GetAtt NetworkStack.Outputs.oVpcEndpointId 
+      Policy:
+        !Sub |
+          {
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+                      "Effect": "Allow",
+                      "Principal": "*",
+                      "Action": "execute-api:Invoke",
+                      "Resource": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*",
+                      "Condition": {
+                          "StringEquals": {
+                              "aws:sourceVpce": ["${NetworkStack.Outputs.oVpcEndpointId}"]
+                          }
+                      }
+                  }
+              ]
+          }
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName} - API Gateway REST API'
+
+##################### ANY method for Root resource (/) #####################
+
+  rApiGatewayRootMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      AuthorizationType: "COGNITO_USER_POOLS"
+      AuthorizerId: !Ref CognitoAuthorizer
+      HttpMethod: ANY
+      Integration:
+        IntegrationHttpMethod: "ANY"
+        Type: "HTTP_PROXY" # All the requests to the API gateway are forwarded straight to the backend instance via the VPC Link/NLB & the response is sent from the instance. No modifications to the request (query params, body, variables) by API Gateway.
+        Uri: !Sub "http://${NetworkStack.Outputs.oNetworkLoadBalancerDNSName}/"   # Modify uri and add port if necessary
+        ConnectionId: !Ref rVPCLink
+        ConnectionType: VPC_LINK
+      ResourceId: !GetAtt rApiGateway.RootResourceId
+      RestApiId: !Ref rApiGateway
+
+##################### Proxy resource (/{proxy}) #####################
+
+  rAPIGatewayProxyResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      ParentId: !GetAtt rApiGateway.RootResourceId
+      RestApiId: !Ref rApiGateway
+      PathPart: '{proxy+}'
+
+##################### ANY method for Proxy resource (/{proxy}) #####################
+
+  rApiGatewayProxyMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      AuthorizationType: "COGNITO_USER_POOLS"
+      AuthorizerId: !Ref CognitoAuthorizer
+      HttpMethod: ANY
+      Integration:
+        IntegrationHttpMethod: "ANY"
+        Type: "HTTP_PROXY" # All the requests to the API gateway are forwarded straight to the backend instance via the VPC Link/NLB & the response is sent from the instance. No modifications to the request (query params, body, variables) by API Gateway.
+        Uri: !Sub "http://${NetworkStack.Outputs.oNetworkLoadBalancerDNSName}/{proxy}"   # Modify uri and add port if necessary
+        ConnectionId: !Ref rVPCLink
+        ConnectionType: VPC_LINK
+        # IntegrationResponses: # Not required because the method type is HTTP_PROXY and the responses are passed directly from the backend.
+        #   - StatusCode: # "${aws_api_gateway_method_response.RestAPIMethodResponse.status_code}"
+        RequestParameters:
+          integration.request.path.proxy: 'method.request.path.proxy'
+      # MethodResponses: Not required because the method type is HTTP_PROXY and the responses are passed directly from the backend
+      #   - status_code = "200"
+      ResourceId: !Ref rAPIGatewayProxyResource
+      RestApiId: !Ref rApiGateway
+      RequestParameters:
+        method.request.path.proxy: true
+
+
+############ CORS ################
+
+# Configuration of OPTIONS method for CORS.
+# The OPTIONS method will reply to preflight requests from browsers.
+# Whenever the API is called from a browser, for example using GET or POST, an OPTIONS request will be sent first 
+# by the browser to verify that the specified method and headers are allowed from cross-origin requests.
+
+# OPTIONS method for the Root resource was omitted for simplicity. It can be added if needed.
+##################### OPTIONS method for Proxy resource (/{proxy}) #####################
+
+  rApiGatewayOPTIONSMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      AuthorizationType: "NONE"
+      HttpMethod: OPTIONS
+      Integration:
+        Type: "MOCK"
+        IntegrationResponses:
+          - StatusCode: "200"
+            ResponseParameters: 
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Origin: "'*'" # Can be modified to specific URLs or domains for increased security
+            ResponseTemplates: 
+              application/json: ""
+            SelectionPattern: ""
+        RequestTemplates: 
+          application/json: "{\n \"statusCode\": 200\n}"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels: 
+            application/json: Empty
+          ResponseParameters: 
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      ResourceId: !Ref rAPIGatewayProxyResource
+      RestApiId: !Ref rApiGateway
+
+
+  rApiGatewayDeployment:
+    Type: "AWS::ApiGateway::Deployment"
+    DependsOn:
+      - rApiGatewayRootMethod
+      - rApiGatewayProxyMethod
+      - rApiGatewayOPTIONSMethod
+      - rVPCLink
+    Properties:
+      RestApiId: !Ref "rApiGateway"
+      StageName: api
+
+
+  CognitoAuthorizer:
+    Type: 'AWS::ApiGateway::Authorizer'
+    Properties:
+      IdentitySource: "method.request.header.Authorization"
+      ProviderARNs: 
+        - !GetAtt AuthStack.Outputs.oCognitoUserPoolArn
+      Type: COGNITO_USER_POOLS
+      Name: CognitoAuthorizer
+      RestApiId: !Ref rApiGateway
+
+
+#####################################################
+################## OUTPUTS ##########################
+#####################################################
+
+Outputs:
+
+  oCognitoUserPoolID:
+    Description: Cognito User Pool ID
+    Value: !GetAtt AuthStack.Outputs.oCognitoUserPool
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPoolID'
+
+  oCognitoUserPoolClientID:
+    Description: Cognito User Pool Client ID
+    Value: !GetAtt AuthStack.Outputs.oCognitoUserPoolClient
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPoolClientID'
+
+  oApiGatewayInvokeURL:
+    Description: API Gateway Endpoint
+    Value: !Sub "https://${rApiGateway}-${NetworkStack.Outputs.oVpcEndpointId}.execute-api.${AWS::Region}.amazonaws.com/api"
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiGatewayInvokeURL'
