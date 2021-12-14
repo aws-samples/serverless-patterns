@@ -16,6 +16,14 @@ def insert_rows(values):
     sql_stm = f"""insert into movies values {values}"""
     return(sql_stm)
 
+def create_table():
+    response = rdsdata.execute_statement (
+    resourceArn = my_resource_arn,
+    secretArn = my_secret_arn,
+    database = my_database,
+    sql = 'Create table IF NOT EXISTS movies (Year int(4),Length int(5),Title varchar(150),Subject varchar(250),Actor varchar(150),Actress varchar(150),Director varchar(150),Popularity int(5),Awards varchar(150),Image varchar(250))'
+    )
+
 def wake_aurora():
     delay = 5
     max_attempts = 10

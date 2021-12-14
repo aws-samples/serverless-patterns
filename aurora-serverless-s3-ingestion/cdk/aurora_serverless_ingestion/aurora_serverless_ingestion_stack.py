@@ -1,12 +1,13 @@
 from constructs import Construct
 from aws_cdk import (
-    Duration,
     Stack,
+    Duration,
     aws_iam as iam,
     aws_s3 as s3,
     aws_ec2 as ec2,
     aws_rds as rds,
     aws_lambda as _lambda,
+    # core
 )
 from aws_cdk.aws_lambda_event_sources import S3EventSource
 
