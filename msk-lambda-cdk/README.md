@@ -1,4 +1,4 @@
-# S3 to Lambda
+# MSK to Lambda
 
 This CDK stack deploys a Lambda function, an Amazon MSK topic, and the minimum IAM resources required to run the application.
 
