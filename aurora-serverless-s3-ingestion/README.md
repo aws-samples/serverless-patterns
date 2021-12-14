@@ -23,17 +23,23 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd aurora-serverless-s3-ingestion/cdk
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. Create a virtual environment for python:
     ```
-    npm install
+    python3 -m venv .venv
     ```
-1. From the command line, configure AWS CDK: 
+1. Activate the virtual environment: 
    ```
-    * cdk bootstrap ACCOUNT-NUMBER/REGION # e.g.
-    * cdk bootstrap 1111111111/us-east-1
-    * cdk bootstrap --profile test 1111111111/us-east-1
+   source .venv/bin/activate
     ```
-2. From the command line, use AWS CDK to deploy the AWS resources:
+2. Install python modules:
+    ```
+    python3 -m pip install -r requirements.txt
+    ```
+2. From the command line, use CDK to synthesize the CloudFormation template and check for errors:
+    ```
+    cdk synth
+    ```
+2. From the command line, use CDK to deploy the stack:
     ```
     cdk deploy
     ```
@@ -51,7 +57,17 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-After deploy retrieve the S3 Bucket Name 
+After deploy retrieve the S3 Bucket Name and transfer the movies.csv to the S3 Bucket.
+
+```
+aws s3 cp movies.csv s3://<New-Bucket>
+```
+
+Use the Aurora Serverless Query Console to query the new table:
+
+```
+select count(*) from movies
+```
 
 ## Cleanup
  
