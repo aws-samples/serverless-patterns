@@ -136,3 +136,8 @@ package-lock.json
 # CDK
 cdk.out
 dist/*
+/.idea/vcs.xml
+/.idea/modules.xml
+/.idea/aws.xml
+/.idea/misc.xml
+/.idea/serverless-patterns.iml

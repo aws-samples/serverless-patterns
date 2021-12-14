@@ -1,0 +1,18 @@
+*.swp
+package-lock.json
+__pycache__
+.pytest_cache
+.venv
+.idea
+*.egg-info
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+#helper shell scripts
+deploy.sh
+diff.sh
+activate.sh
+upgrade-cdk.sh
+/lambda_functions/dependencies_layer/python/*
