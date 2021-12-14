@@ -1,8 +1,9 @@
-# AWS S3 Aurora Serverless data ingestion from S3
+# Amazon Aurora Serverless data ingestion from Amazon S3
 
 This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template to deploying an Aurora Serverless Cluster Database, a AWS Secrets Manager entry, a S3 bucket and a lambda function. The lambda function is triggered by a S3 put object and the handler ingest the .CSV file to the AWS Aurora Serverless. At this pattern an Aurora Table called movies is created at the first lambda call and the .CSV is designed according to the movies table.
 
-Learn more about this pattern at Serverless Land Patterns: https://github.com/aws-samples/serverless-patterns/aurora-serverless-s3-ingestion
+Learn more about this pattern at Serverless Land Patterns: 
+[Amazon Aurora Serverless data ingestion from S3](https://github.com/aws-samples/serverless-patterns/aurora-serverless-s3-ingestion)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
