@@ -50,6 +50,12 @@ This pattern in CDK offers a boilerplate to generate an Amazon API Gateway REST 
   * if the item 'README.md' is in 'apig-demo' bucket, then use {base url}/apig-demo/README.md
   * if the item 'README.md' is in a folder 'docs' under 'apig-demo' bucket, then use {base url}/apig-demo/docs%2FREADME.md 
 
+## Documentation
+- [Tutorial: Create a REST API as an Amazon S3 proxy in API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-s3.html)
+- [How do I use API Gateway as a proxy for another AWS service?](https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-proxy-integrate-service/)
+- [Amazon API Gateway API request and response data mapping reference](https://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html)
+- [API Gateway mapping template and access logging variable reference](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html)
+
 ## Cleanup
  
 1. From the command line, use the following in the source folder
@@ -57,3 +63,9 @@ This pattern in CDK offers a boilerplate to generate an Amazon API Gateway REST 
     cdk destroy
     ```
 2. Confirm the removal and wait for the resource deletion to complete.
+
+
+----
+Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
