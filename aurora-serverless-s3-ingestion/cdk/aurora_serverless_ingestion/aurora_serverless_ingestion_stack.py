@@ -1,5 +1,6 @@
 from constructs import Construct
 from aws_cdk import (
+    CfnOutput,
     Stack,
     Duration,
     aws_iam as iam,
@@ -44,59 +45,14 @@ class AuroraServerlessIngestionStack(Stack):
             default_database_name = "mydatabase",
             security_groups = [aurora_sg]
         )
-
-        # Creates a IAM policy to be used by lambda
-        my_custom_policy = iam.PolicyDocument(
-            statements=[iam.PolicyStatement(
-            actions=["s3-object-lambda:GetObject",
-                    "s3-object-lambda:ListBucketMultipartUploads",
-                    "s3-object-lambda:GetObjectRetention",
-                    "s3-object-lambda:GetObjectLegalHold",
-                    "s3-object-lambda:GetObjectAcl",
-                    "s3-object-lambda:GetObjectTagging",
-                    "s3-object-lambda:ListBucket",
-                    "s3-object-lambda:GetObjectVersion",
-                    "s3-object-lambda:ListBucketVersions",
-                    "s3:ListBucketMultipartUploads",
-                    "s3:ListAccessPoints",
-                    "s3:ListJobs",
-                    "s3:GetObject",
-                    "s3:ListBucket",
-                    "s3:ListBucketVersions",
-                    "s3:ListAccessPointsForObjectLambda",
-                    "rds-data:*",
-                    "secretsmanager:GetResourcePolicy",
-                    "secretsmanager:DescribeSecret",
-                    "secretsmanager:GetSecretValue",      
-                    "secretsmanager:ListSecretVersionIds",
-                    "secretsmanager:GetRandomPassword",
-                    "secretsmanager:ListSecrets",
-                    "ec2:DescribeNetworkInterfaces",
-                    "ec2:CreateNetworkInterface",
-                    "ec2:DeleteNetworkInterface",
-                    "ec2:DescribeInstances",
-                    "ec2:AttachNetworkInterface"
-            ],
-            resources=["*"]
-            )]
-        )
-
-        lambda_role = iam.Role(self, "LambdaDataIngestionRole",
-            assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Role to be assumed by lambda data ingestion",
-            inline_policies = [my_custom_policy]
-        )
-
+                
         # Creates a lambda function to ingest data from S3 to Aurora
-
         fn = _lambda.Function(self, "Function",
             code=_lambda.Code.from_asset('./lambda'),
             runtime = _lambda.Runtime.PYTHON_3_9,
             handler = 'DataIngest.lambda_handler',
             vpc = vpc,
             timeout = Duration.seconds(600),
-            role = lambda_role,
-            # security_group =
             environment = {
                 "BUCKET": s3bucketarn,
                 "CLUSTER_ARN": cluster.cluster_arn,
@@ -104,9 +60,15 @@ class AuroraServerlessIngestionStack(Stack):
                 "DATABASE": "mydatabase"
             }
         )
-
+        
+        s3bucket.grant_read(fn)
+        cluster.grant_data_api_access(fn);
+        
         # Add a S3 event to lambda
         fn.add_event_source(
             S3EventSource(s3bucket,
             events=[s3.EventType.OBJECT_CREATED]
         ))
+
+        CfnOutput(self, "S3UploadFileCommand", value="aws s3 cp ../movies.csv s3://" + s3bucket.bucket_name)
+        CfnOutput(self, "QueryDatabaseCommand", value='aws rds-data execute-statement --resource-arn "' + cluster.cluster_arn + '" --database "mydatabase" --secret-arn "' + cluster.secret.secret_arn + '" --sql "select count(1) from movies"')

@@ -12,6 +12,10 @@ my_resource_arn = os.environ.get('CLUSTER_ARN')
 my_secret_arn = os.environ.get('SECRET_ARN')
 my_database = 'mydatabase'
 
+def count_rows():
+    sql_stm = f"""select count(1) from movies"""
+    return(sql_stm)
+
 def insert_rows(values):
     sql_stm = f"""insert into movies values {values}"""
     return(sql_stm)
@@ -83,4 +87,3 @@ def lambda_handler(event, context):
                         database = my_database,
                         sql = sql_stm
                         )
-
