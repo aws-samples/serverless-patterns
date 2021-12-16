@@ -59,16 +59,16 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-After deploy retrieve the S3 Bucket Name and transfer the movies.csv to the S3 Bucket.
+After deploying this pattern CDK will output two lines:
+1. Copy the raw data to Amazon S3 Bucket.
+2. Query the database to confirm the data was consumed by Amazon Aurora Serverless.
+
+Example:
 
 ```
-aws s3 cp movies.csv s3://<New-Bucket>
-```
+aurora-serverless-ingestion.S3UploadFileCommand = aws s3 cp ../movies.csv s3://<new_bucket_arn>
 
-Use the Aurora Serverless Query Console to query the new table:
-
-```
-select count(*) from movies
+aurora-serverless-ingestion.QueryDatabaseCommand = aws rds-data execute-statement --resource-arn "arn:aws:rds:us-west-1:xxxx:cluster:<auro_cluster_arn>" --database "mydatabase" --secret-arn "arn:aws:secretsmanager:us-west-1:xxxxx:secret:<secret_arn>" --sql "select count(1) from movies"
 ```
 
 ## Cleanup
