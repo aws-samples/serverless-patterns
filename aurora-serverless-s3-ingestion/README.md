@@ -75,7 +75,7 @@ select count(*) from movies
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    cdk destroy
     ```
 1. Confirm the stack has been deleted
     ```bash
