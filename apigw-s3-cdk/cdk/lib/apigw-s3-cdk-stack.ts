@@ -194,7 +194,7 @@ export class ApigwS3CdkStack extends cdk.Stack {
       }
     });
 
-    //GetObject method options
+    //PutObject method options
     const putObjectMethodOptions = {
       authorizationType: apigw.AuthorizationType.IAM,
       requestParameters: {

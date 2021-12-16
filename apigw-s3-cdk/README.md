@@ -47,8 +47,8 @@ This pattern in CDK offers a boilerplate to generate an Amazon API Gateway REST 
 7. To upload an object to an Amazon S3 bucket, send a PUT request to {base url}/{bucketName}/{item}. Make sure a body is present with the request.
 8. To get object metadata in an Amazon S3 bucket,  send a HEAD request to {base url}/{bucketName}/{item}
 * {item} is the path to the object. For example, 
-* * if the item 'README.md' is in 'apig-demo' bucket, then use {base url}/apig-demo/README.md
-* * if the item 'README.md' is in a folder 'docs' under 'apig-demo' bucket, then use {base url}/apig-demo/docs%2FREADME.md 
+  * if the item 'README.md' is in 'apig-demo' bucket, then use {base url}/apig-demo/README.md
+  * if the item 'README.md' is in a folder 'docs' under 'apig-demo' bucket, then use {base url}/apig-demo/docs%2FREADME.md 
 
 ## Cleanup
  
