@@ -72,10 +72,10 @@ Amazon SQS to AWS Lambda
     SqsLambdaCdkStack
 
     Outputs:
-    SqsLambdaCdkStack.FunctionNameOutput = SqsLambdaCdkStack-MyLambdaFunction67CCA873-OsINMhWgMsXV
-    SqsLambdaCdkStack.QueueArnOutput = arn:aws:sqs:us-east-1:xxxxxxxxxxxxx:SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
-    SqsLambdaCdkStack.QueueNameOutput = SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
-    SqsLambdaCdkStack.QueueUrlOutput = https://sqs.us-east-1.amazonaws.com/xxxxxxxxxxxxx/SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
+    SqsLambdaCdkStack.FunctionName = SqsLambdaCdkStack-MyLambdaFunction67CCA873-OsINMhWgMsXV
+    SqsLambdaCdkStack.QueueArn = arn:aws:sqs:us-east-1:xxxxxxxxxxxxx:SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
+    SqsLambdaCdkStack.QueueName = SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
+    SqsLambdaCdkStack.QueueUrl = https://sqs.us-east-1.amazonaws.com/xxxxxxxxxxxxx/SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
     ```
 
 1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
@@ -95,7 +95,7 @@ aws sqs send-message --queue-url ENTER_YOUR_SQS_QUEUE_URL --message-body "Test m
 List the log streams for that log group:
 
 ```bash
-aws logs describe-log-streams --log-group-name '/aws/lambda/YOUR_FUNCTION_NAME' --query logStreams[*].logStreamName
+aws logs describe-log-streams --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --query logStreams[*].logStreamName
 ```
 
 Expected result:
@@ -110,7 +110,7 @@ Expected result:
 Get the log events for that stream:
 
 ```bash
-aws logs get-log-events --log-group-name '/aws/lambda/MyFunction' --log-stream-name '2021/12/17/[$LATEST]6922e90439514d8195e455360917eaa9'
+aws logs get-log-events --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --log-stream-name '2021/12/17/[$LATEST]6922e90439514d8195e455360917eaa9'
 ```
 
 Expected result:
