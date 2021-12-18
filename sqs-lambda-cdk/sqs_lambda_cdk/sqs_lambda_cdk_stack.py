@@ -43,22 +43,22 @@ class SqsLambdaCdkStack(Stack):
         #Configure the Amazon SQS queue to trigger the AWS Lambda function
         lambda_function.add_event_source(_event.SqsEventSource(queue))
 
-        CfnOutput(self, "FunctionNameOutput",
+        CfnOutput(self, "FunctionName",
             value = lambda_function.function_name,
             export_name = 'FunctionName',
             description = 'Function name')
 
-        CfnOutput(self, "QueueNameOutput",
+        CfnOutput(self, "QueueName",
             value = queue.queue_name,
             export_name = 'QueueName',
             description = 'SQS queue name')
 
-        CfnOutput(self, "QueueArnOutput",
+        CfnOutput(self, "QueueArn",
             value = queue.queue_arn,
             export_name = 'QueueArn',
             description = 'SQS queue ARN')
 
-        CfnOutput(self, "QueueUrlOutput",
+        CfnOutput(self, "QueueUrl",
             value = queue.queue_url,
             export_name = 'QueueUrl',
             description = 'SQS queue URL')
