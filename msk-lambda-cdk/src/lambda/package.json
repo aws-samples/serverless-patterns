@@ -1,0 +1,13 @@
+{
+  "name": "transaction-handler",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.77",
+    "@types/cfn-response": "^1.0.4"
+  },
+  "dependencies": {
+    "cfn-response": "^1.0.1",
+    "dayjs": "1.10.4",
+    "kafkajs": "1.15.0"
+  }
+}
