@@ -80,12 +80,6 @@ Amazon SQS to AWS Lambda
 
 1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-1. Run unit tests:
-
-    ````bash
-    python3 -m pytest
-    ````
-
 ### Testing
 
 Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queue and observe the event delivered to the Lambda function:
