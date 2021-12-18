@@ -69,7 +69,7 @@ Amazon SQS to AWS Lambda
     Expected result:
 
     ```bash
- ✅  SqsLambdaCdkStack
+    SqsLambdaCdkStack
 
     Outputs:
     SqsLambdaCdkStack.FunctionNameOutput = SqsLambdaCdkStack-MyLambdaFunction67CCA873-OsINMhWgMsXV
