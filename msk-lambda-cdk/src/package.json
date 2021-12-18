@@ -2,7 +2,7 @@
   "name": "s3-to-lambda-cdk",
   "version": "0.1.0",
   "bin": {
-    "s3-to-lambda-cdk": "bin/s3-to-lambda-cdk.js"
+    "msk-to-lambda-cdk": "bin/msk-to-lambda-cdk.js"
   },
   "scripts": {
     "build": "tsc",
@@ -22,9 +22,14 @@
   },
   "dependencies": {
     "@aws-cdk/aws-lambda": "^1.95.1",
-    "@aws-cdk/aws-lambda-nodejs": "^1.95.1",
-    "@aws-cdk/aws-s3": "^1.95.1",
     "@aws-cdk/aws-lambda-event-sources": "^1.95.1",
-    "@aws-cdk/core": "^1.95.1"
+    "@aws-cdk/aws-lambda-nodejs": "^1.95.1",
+    "@aws-cdk/aws-msk": "^1.135.0",
+    "@aws-cdk/aws-s3": "^1.95.1",
+    "@aws-cdk/core": "^1.95.1",
+    "aws-cdk-lib": "^2.1.0",
+    "constructs": "^10.0.0",
+    "dayjs": "^1.10.7",
+    "kafkajs": "^1.15.0"
   }
 }
