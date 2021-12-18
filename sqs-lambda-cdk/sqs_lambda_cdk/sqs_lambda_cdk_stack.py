@@ -1,6 +1,7 @@
 from aws_cdk import (
     Duration,
     Stack,
+    CfnOutput,
     RemovalPolicy,
     aws_sqs as _sqs,
     aws_lambda as _lambda,
@@ -19,7 +20,7 @@ class SqsLambdaCdkStack(Stack):
             visibility_timeout=Duration.seconds(300)
             )
 
-        # Create the Lambda function to subscribe to SQS
+        # Create the AWS Lambda function to subscribe to Amazon SQS queue
         # The source code is in './lambda' directory
         lambda_function = _lambda.Function(
             self, "MyLambdaFunction",
@@ -36,8 +37,28 @@ class SqsLambdaCdkStack(Stack):
             removal_policy = RemovalPolicy.DESTROY,
             retention = logs.RetentionDays.ONE_DAY
         )
-        #Grant permission to Lambda function to consume messages from the SQS queue
+        #Grant permission to AWS Lambda function to consume messages from the Amazon SQS queue
         queue.grant_consume_messages(lambda_function)
 
-        #Configure the SQS queue to trigger the AWS Lambda function
+        #Configure the Amazon SQS queue to trigger the AWS Lambda function
         lambda_function.add_event_source(_event.SqsEventSource(queue))
+
+        CfnOutput(self, "FunctionNameOutput",
+            value = lambda_function.function_name,
+            export_name = 'FunctionName',
+            description = 'Function name')
+
+        CfnOutput(self, "QueueNameOutput",
+            value = queue.queue_name,
+            export_name = 'QueueName',
+            description = 'SQS queue name')
+
+        CfnOutput(self, "QueueArnOutput",
+            value = queue.queue_arn,
+            export_name = 'QueueArn',
+            description = 'SQS queue ARN')
+
+        CfnOutput(self, "QueueUrlOutput",
+            value = queue.queue_url,
+            export_name = 'QueueUrl',
+            description = 'SQS queue URL')
