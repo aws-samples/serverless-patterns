@@ -47,7 +47,9 @@ def handler(event, context):
 
     qUrl = os.environ['QUEUE_URL']
 
+    #change this value according to the limits of your downstream service
     max_jobs_to_submit = 5
+
     totalJobsScheduled = 0
     i = 0
     hitLimit = False

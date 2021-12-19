@@ -1,8 +1,15 @@
 # Amazon SQS to AWS Lambda
 
-This pattern deploys deploys a Lambda function and an SQS queue. SQS invokes the Lambda function when new messages are available. The CDK application contains the minimum IAM resources required to run the application.
+This pattern deploys deploys a Lambda function and an SQS queue.
+The Lambda function is used to submit a job to a downstream service for each message in an Amazon SQS queue.
+We may need to control the number of concurrent job executions due to a business requirement or due to scalability limitation of the downstream service. We are controlling the MAX number of concurrent executions by using a SQS queue. An Amazon EventBridge rule triggers an AWS Lambda function every 2 minutes to submit new executions until we hit the MAX executions for our downstream service.
+We’re not using the [SQS trigger for Lambda](https://aws.amazon.com/blogs/aws/aws-lambda-adds-amazon-simple-queue-service-to-supported-event-sources/) because the purpose is to slow down the creation of new executions. Whereas the Amazon SQS trigger would push messages to our AWS Lambda function eagerly.
 
-Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda-cdk
+An AWS Lambda function sample is provided with all the boiler plate. You just need to add the code to call you downstream service.
+
+The CDK application contains the minimum IAM resources required to run the application.
+
+Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda-eb-cdk-python
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -85,7 +92,7 @@ Amazon SQS to AWS Lambda
 
 Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queue and observe the event delivered to the Lambda function:
 
-1. Send the SQS message:
+1. Send several SQS messages by executing the following command several times:
 
 ```bash
 aws sqs send-message --queue-url ENTER_YOUR_SQS_QUEUE_URL --message-body "Test message"
@@ -120,33 +127,103 @@ Expected result:
 {
     "events": [
         {
-            "timestamp": 1639828317813,
-            "message": "START RequestId: bd3f036b-3bf1-5300-8b05-595cf662119c Version: $LATEST\n",
-            "ingestionTime": 1639828322765
+            "timestamp": 1639924111885,
+            "message": "START RequestId: 3fd21ffd-4a8b-4d08-9435-89717282b90a Version: $LATEST\n",
+            "ingestionTime": 1639924120949
         },
         {
-            "timestamp": 1639828317815,
+            "timestamp": 1639924111888,
             "message": "Lambda function invoked\n",
-            "ingestionTime": 1639828322765
+            "ingestionTime": 1639924120949
         },
         {
-            "timestamp": 1639828317815,
-            "message": "{\"Records\": [{\"messageId\": \"e9671b5f-06d2-413d-98ef-8654e551936c\", \"receiptHandle\": \"AQEBA7X2pC+hls8kgKo9fJF5YBMmw1RIUCOWot6Qk5n3jjRmWBn1L3cMq4N4ZNgBE2qEOUTTFb9lK/p0SDrE60rKgVpO5y/5yXnM9gZN3szzDFJ5LA5y7kN8d0vcjTOZSWquX7mMRkZKkDW6VF0xNldxxKavIbjiBE7jYMLmFbipwyGdQ03qGNJSeVW9S04AnOl38VjRO2UbC3HSkFAIQifma3fDuxsifnVa+x64E5hy9OTmjAS4vkA+e9YdOaS0GUmvMFyiHRokrdGNGwilACl10Rf71vZQOKmX6FLGhLGvO2SCKqDA2WJuQLf3aDJaqSOla3ya+RiY+ZGB0giees+zp4mkR3iCMRMlAfcgNjJpTf9niv3yLzT9U6NvmXQiCRzlxQFekkWo0axrLz32K+jmzebBS6v4DbS1YkrQ3r7ELBpylKW7cqj6bWa91Y+5O40s\", \"body\": \"Test message\", \"attributes\": {\"ApproximateReceiveCount\": \"1\", \"SentTimestamp\": \"1639828317543\", \"SenderId\": \"AROAIQIEPWCCGQ4X4VMOK:azertrezza\", \"ApproximateFirstReceiveTimestamp\": \"1639828317550\"}, \"messageAttributes\": {}, \"md5OfBody\": \"82dfa5549ebc9afc168eb7931ebece5f\", \"eventSource\": \"aws:sqs\", \"eventSourceARN\": \"arn:aws:sqs:us-east-1:xxxxxxxxxxxx:SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB\", \"awsRegion\": \"us-east-1\"}]}\n",
-            "ingestionTime": 1639828322765
+            "timestamp": 1639924111888,
+            "message": "{\"version\": \"0\", \"id\": \"dc17d87c-1f64-f72e-44df-20a7fe0dbe1e\", \"detail-type\": \"Scheduled Event\", \"source\": \"aws.events\", \"account\": \"xxxxxxxxxxx\", \"time\": \"2021-12-19T14:28:21Z\", \"region\": \"us-east-1\", \"resources\": [\"arn:aws:events:us-east-1:xxxxxxxxxxx:rule/SqsLambdaEbCdkStack-Rule4C995B7F-1F0HUZBIE414V\"], \"detail\": {}}\n",
+            "ingestionTime": 1639924120949
         },
         {
-            "timestamp": 1639828317815,
-            "message": "END RequestId: bd3f036b-3bf1-5300-8b05-595cf662119c\n",
-            "ingestionTime": 1639828322765
+            "timestamp": 1639924112038,
+            "message": "Total messages: 1\n",
+            "ingestionTime": 1639924120949
         },
         {
-            "timestamp": 1639828317815,
-            "message": "REPORT RequestId: bd3f036b-3bf1-5300-8b05-595cf662119c\tDuration: 1.35 ms\tBilled Duration: 2 ms\tMemory Size: 128 MB\tMax Memory Used: 37 MB\tInit Duration: 105.23 ms\t\n",
-            "ingestionTime": 1639828322765
+            "timestamp": 1639924112038,
+            "message": "Submitting job to downstream service...\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112050,
+            "message": "Deleted item from queue...\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112070,
+            "message": "Total messages: 1\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112070,
+            "message": "Submitting job to downstream service...\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112110,
+            "message": "Deleted item from queue...\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112130,
+            "message": "Total messages: 1\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112130,
+            "message": "Submitting job to downstream service...\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112170,
+            "message": "Deleted item from queue...\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112190,
+            "message": "Total messages: 1\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112190,
+            "message": "Submitting job to downstream service...\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112230,
+            "message": "Deleted item from queue...\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112284,
+            "message": "No messages in queue.\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112284,
+            "message": "Started 4 jobs.\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112285,
+            "message": "END RequestId: 3fd21ffd-4a8b-4d08-9435-89717282b90a\n",
+            "ingestionTime": 1639924120949
+        },
+        {
+            "timestamp": 1639924112285,
+            "message": "REPORT RequestId: 3fd21ffd-4a8b-4d08-9435-89717282b90a\tDuration: 397.75 ms\tBilled Duration: 398 ms\tMemory Size: 128 MB\tMax Memory Used: 65 MB\t\n",
+            "ingestionTime": 1639924120949
         }
     ],
-    "nextForwardToken": "f/36569393484927409957930658349900755958289816616951021572/s",
-    "nextBackwardToken": "b/36569393484882808467533597103617684521744519893939060736/s"
+    "nextForwardToken": "f/36571529772994308243753387311916838477425035126096068626/s",
+    "nextBackwardToken": "b/36571529764074010164341138055302551168365690523703902208/s"
 }
 ```
 

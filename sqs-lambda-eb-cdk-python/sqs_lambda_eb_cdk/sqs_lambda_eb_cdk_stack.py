@@ -43,6 +43,7 @@ class SqsLambdaEbCdkStack(Stack):
         )
 
         #Event Bridge rule
+        #Change the rate according to your needs
         rule = events.Rule(self, 'Rule',
            description = "Trigger Lambda function every 2 minutes",
            schedule = events.Schedule.expression('rate(2 minutes)')
