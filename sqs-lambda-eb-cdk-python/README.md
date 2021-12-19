@@ -5,15 +5,15 @@ The Lambda function is used to submit a job to a downstream service for each mes
 We may need to control the number of concurrent job executions due to a business requirement or due to scalability limitation of the downstream service. We are controlling the MAX number of concurrent executions by using a SQS queue. An Amazon EventBridge rule triggers an AWS Lambda function every 2 minutes to submit new executions until we hit the MAX executions for our downstream service.
 We’re not using the [SQS trigger for Lambda](https://aws.amazon.com/blogs/aws/aws-lambda-adds-amazon-simple-queue-service-to-supported-event-sources/) because the purpose is to slow down the creation of new executions. Whereas the Amazon SQS trigger would push messages to our AWS Lambda function eagerly.
 
-An AWS Lambda function sample is provided with all the boiler plate. You just need to add the code to call you downstream service.
+![Pattern architecture](img/architecture.png)
+
+An AWS Lambda function sample is provided with all the boiler plate. You just need to add the code to call your downstream service.
 
 The CDK application contains the minimum IAM resources required to run the application.
 
 Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda-eb-cdk-python
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
-
-![Architecture](img/architecture.png | width=400)
 
 ## Requirements
 
