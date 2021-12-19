@@ -73,3 +73,8 @@ class SqsLambdaEbCdkStack(Stack):
             value = queue.queue_url,
             export_name = 'QueueUrl',
             description = 'SQS queue URL')
+
+        CfnOutput(self, "RuleName",
+            value = rule.rule_name,
+            export_name = 'RuleName',
+            description = 'EventBridge rule name')

@@ -86,6 +86,7 @@ Amazon SQS to AWS Lambda
     SqsLambdaCdkStack.QueueArn = arn:aws:sqs:us-east-1:xxxxxxxxxxxxx:SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
     SqsLambdaCdkStack.QueueName = SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
     SqsLambdaCdkStack.QueueUrl = https://sqs.us-east-1.amazonaws.com/xxxxxxxxxxxxx/SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
+    SqsLambdaEbCdkStack.RuleName = SqsLambdaEbCdkStack-Rule4C995B7F-1F0HUZBIE414V
     ```
 
 1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
