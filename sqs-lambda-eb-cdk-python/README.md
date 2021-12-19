@@ -1,9 +1,9 @@
 # Amazon SQS to AWS Lambda
 
-This pattern deploys deploys a Lambda function and an SQS queue.
+This pattern deploys deploys a Lambda function, an SQS queue and an EventBridge rule.
 
 The Lambda function is used to submit a job to a downstream service for each message in an Amazon SQS queue.
-We may need to control the number of concurrent job executions due to a business requirement or due to scalability limitation of the downstream service. We are controlling the MAX number of concurrent executions by using a SQS queue. An Amazon EventBridge rule triggers an AWS Lambda function every 2 minutes to submit new executions until we hit the MAX executions for our downstream service.
+We may need to control the number of concurrent job executions due to a business requirement or due to scalability limitation of the downstream service. We are controlling the max number of concurrent executions by using a SQS queue. An Amazon EventBridge rule triggers an AWS Lambda function every 2 minutes to submit new executions until we hit the max executions for our downstream service.
 
 We’re not using the [SQS trigger for Lambda](https://aws.amazon.com/blogs/aws/aws-lambda-adds-amazon-simple-queue-service-to-supported-event-sources/) because the purpose is to slow down the creation of new executions. Whereas the Amazon SQS trigger would push messages to our AWS Lambda function eagerly.
 
