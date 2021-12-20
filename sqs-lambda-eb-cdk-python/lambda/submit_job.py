@@ -50,23 +50,23 @@ def handler(event, context):
     #change this value according to the limits of your downstream service
     max_jobs_to_submit = 5
 
-    totalJobsScheduled = 0
+    total_jobs_scheduled = 0
     i = 0
-    hitLimit = False
-    totalMessages = 0
+    hit_limit = False
+    total_messages = 0
 
     while(i < max_jobs_to_submit):
         messages = getMessagesFromQueue(qUrl)
         if(messages):
 
-            totalMessages = len(messages)
-            print("Total messages: {}".format(totalMessages))
+            total_messages = len(messages)
+            print("Total messages: {}".format(total_messages))
 
             for message in messages:
                 receipt_handle = message['ReceiptHandle']
 
                 try:
-                    if(hitLimit):
+                    if(hit_limit):
                         changeVisibility(qUrl, receipt_handle)
                     else:
                         #SUBMIT JOB TO THE DOWNSTREAM SERVICE
@@ -77,7 +77,7 @@ def handler(event, context):
 
                         # Delete received message from queue
                         deleteMessagesFromQueue(qUrl, receipt_handle)
-                        totalJobsScheduled += 1
+                        total_jobs_scheduled += 1
                         i += 1
                 except Exception as e:
                     print("Error while starting job: {}".format(e))
@@ -88,18 +88,18 @@ def handler(event, context):
                     #IF ERROR, THE DOWNSTREAM SERVICE CANNOT ACCEPT ANY JOBS ANYMORE -> STOP SUBMITTING AND STOP THE WHILE LOOP
                     if(e.__class__.__name__ == 'LimitExceededException'
                         or e.__class__.__name__ == "ProvisionedThroughputExceededException"):
-                        hitLimit = True
+                        hit_limit = True
                         i = max_jobs_to_submit
 
         else:
             i = max_jobs_to_submit
 
 
-    output = "Started {} jobs.".format(totalJobsScheduled)
-    if(hitLimit):
+    output = "Started {} jobs.".format(total_jobs_scheduled)
+    if(hit_limit):
         output += " Hit limit."
 
-    if hitLimit or (totalJobsScheduled > 0) :
+    if hit_limit or (total_jobs_scheduled > 0) :
         print(output)
 
     return {
