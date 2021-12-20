@@ -103,16 +103,39 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queu
 
     Expected result:
 
-    ```bash
+    ```json
     {
         "executionArn": "arn:aws:states:us-east-1:xxxxxxxxxx:execution:StepFunction1F935F84-n8RLIkg3Z8z3:0f8e9656-4165-4060-b124-0be35488f0c0",
         "startDate": "2021-12-20T17:45:56.042000+01:00"
     }
     ```
+1. Check the execution status of the Step Function using the executionArn from previous step
+
+    ```bash
+    aws stepfunctions describe-execution --execution-arn ENTER_YOUR_STEP_FUNCTION_EXECUTION_ARN
+    ```
+
+    Expected result:
+
+    ```json
+    {
+        "executionArn": "arn:aws:states:us-east-1:867201269000:execution:StepFunction1F935F84-n8RLIkg3Z8z3:235b67e0-9131-479f-ae1c-c75a41a0f1c0",
+        "stateMachineArn": "arn:aws:states:us-east-1:867201269000:stateMachine:StepFunction1F935F84-n8RLIkg3Z8z3",
+        "name": "235b67e0-9131-479f-ae1c-c75a41a0f1c0",
+        "status": "RUNNING",
+        "startDate": "2021-12-20T18:59:33.992000+01:00",
+        "input": "{\"name\" : \"serverless-pattern\"}",
+        "inputDetails": {
+            "included": true
+        }
+    }
+    ```
 
 1. Retrieve the message from the SQS queue, using the queue URL from the AWS CDK deployment outputs:
 
-    List the log streams for that log group:
+    ```bash
+    aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STEP_FUNCTION_ARN --input "{\"name\" : \"serverless-pattern\"}"
+    ```
 
     ```bash
     aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
@@ -189,6 +212,28 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queu
     Token sent to the Step Function
     END RequestId: 31c1842b-5948-4f5b-a1ff-dad295bb4f1b
     REPORT RequestId: 31c1842b-5948-4f5b-a1ff-dad295bb4f1b	Duration: 191.02 ms	Billed Duration: 192 ms	Memory Size: 128 MB	Max Memory Used: 65 MB
+    ```
+
+1. Check the execution status of the Step Function
+
+    ```bash
+    aws stepfunctions describe-execution --execution-arn ENTER_YOUR_STEP_FUNCTION_EXECUTION_ARN
+    ```
+
+    Expected result:
+
+    ```json
+    {
+        "executionArn": "arn:aws:states:us-east-1:867201269000:execution:StepFunction1F935F84-n8RLIkg3Z8z3:235b67e0-9131-479f-ae1c-c75a41a0f1c0",
+        "stateMachineArn": "arn:aws:states:us-east-1:867201269000:stateMachine:StepFunction1F935F84-n8RLIkg3Z8z3",
+        "name": "235b67e0-9131-479f-ae1c-c75a41a0f1c0",
+        "status": "SUCCEEDED",
+        "startDate": "2021-12-20T18:59:33.992000+01:00",
+        "input": "{\"name\" : \"serverless-pattern\"}",
+        "inputDetails": {
+            "included": true
+        }
+    }
     ```
 
 ## Cleanup
