@@ -134,10 +134,6 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queu
 1. Retrieve the message from the SQS queue, using the queue URL from the AWS CDK deployment outputs:
 
     ```bash
-    aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STEP_FUNCTION_ARN --input "{\"name\" : \"serverless-pattern\"}"
-    ```
-
-    ```bash
     aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
     ```
 
@@ -188,7 +184,7 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queu
 
     ```bash
     [
-        "2021/12/17/[$LATEST]6922e90439514d8195e455360917eaa9"
+        "2021/12/20/[$LATEST]6922e90439514d8195e455360917eaa9"
     ]
 
     ```
@@ -196,7 +192,7 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queu
     Get the log events for that stream:
 
     ```bash
-    aws logs get-log-events --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --log-stream-name '2021/12/17/[$LATEST]6922e90439514d8195e455360917eaa9'
+    aws logs get-log-events --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --log-stream-name '2021/12/20/[$LATEST]6922e90439514d8195e455360917eaa9'
     ```
 
     Expected result:
