@@ -2,7 +2,7 @@
 
 This pattern shows how to integrate Step Functions workflows with external systems using Sqs and Lambda.
 
-This pattern deploys deploys a Step Function, a Lambda function and an SQS queue.
+This pattern deploys a Step Function, a Lambda function and an SQS queue.
 
 The Step Function has one task which will send a message to the SQS queue and waits for a token to be send back. The message contains the input of the task and a token.
 The Lambda function is used to call to Step Functions API with the token.
@@ -10,7 +10,7 @@ Between the SQS queue and the Lambda function we imagine having an external serv
 
 Learn more about Step Functions callbacks https://aws.amazon.com/blogs/compute/integrating-aws-step-functions-callbacks-and-external-systems
 
-![Architecture](img/step_function_callback_cdk_python.drawio.png)
+![Architecture](img/step_function_callback.drawio.png)
 
 The CDK application contains the minimum IAM resources required to run the application.
 
