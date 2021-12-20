@@ -35,7 +35,7 @@ CDK
 
 ## Services From/To
 
-Amazon SQS to AWS Lambda
+AWS Step Functions to Amazon SQS / AWS Lambda to AWS Step Functions
 
 ## Deployment Instructions
 
@@ -97,99 +97,99 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queu
 
 1. Start execution of the Step Function, using the Step Function Arn from the AWS CDK deployment outputs:
 
-```bash
-aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STEP_FUNCTION_ARN --input "{\"name\" : \"serverless-pattern\"}"
-```
+    ```bash
+    aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STEP_FUNCTION_ARN --input "{\"name\" : \"serverless-pattern\"}"
+    ```
 
-Expected result:
+    Expected result:
 
-```bash
-{
-    "executionArn": "arn:aws:states:us-east-1:xxxxxxxxxx:execution:StepFunction1F935F84-n8RLIkg3Z8z3:0f8e9656-4165-4060-b124-0be35488f0c0",
-    "startDate": "2021-12-20T17:45:56.042000+01:00"
-}
-```
+    ```bash
+    {
+        "executionArn": "arn:aws:states:us-east-1:xxxxxxxxxx:execution:StepFunction1F935F84-n8RLIkg3Z8z3:0f8e9656-4165-4060-b124-0be35488f0c0",
+        "startDate": "2021-12-20T17:45:56.042000+01:00"
+    }
+    ```
 
 1. Retrieve the message from the SQS queue, using the queue URL from the AWS CDK deployment outputs:
 
-List the log streams for that log group:
+    List the log streams for that log group:
 
-```bash
-aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
-```
+    ```bash
+    aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
+    ```
 
-Expected result:
+    Expected result:
 
-```bash
-{
-    "Messages": [
-        {
-            "MessageId": "af1576d9-39a8-4b43-93f0-95bf9b98d649",
-            "ReceiptHandle": "AQEBGieGiswxcnQdOO+l9iF2xiqsBUJFnkAH19VPnXYyXBA6RHMXd0jx5emns2K07dDb0cwWLZOGCbCEo54pjVC9UQ7AM9zSSjyY46UTKC6MVdD9enw7Uz2vyGCbfGx1ND7usOaIGlXTavLEhE+Uk4VWuX/F+Co2FwXoPdceyacb/LkjIn7REO2lyBbds82ATz36AVrGxu7UmpKD6dZVnJruqYacnEW88GCy5+nexAx0/pq5lE5o4/3Lg5J27DTBOUnIWTyxKW1/zVoRpG63mh8rJwOCcvjYZuzrHXtoXMCJpOcm9V5icBTNit9kKMl2o3isrIkjuBZ0IqNKbSb1Y74rFGQ1T+AzeyStvSitwP8zACMtLUTUptEkCjUnSqgoFhCKEAXN4GBVdav77IDYFVXLHst+VuhF3SwNvjIkMXPI13nX8ttkm71JX3zJUO7/+OXZ",
-            "MD5OfBody": "7b2bbf5552c02df61a808bbc99c8d5bb",
-            "Body": "{\"input\":{\"name\":\"serverless-pattern\"},\"token\":\"AAAAKgAAAAIAAAAAAAAAATI4DHzC3fME20tXGZeGnZjfp0HtAdK8gshkk31hr5xzF32DKNyKcrSYmIlj3COSsZfhWDKXfiUt90sUyhyOqNB0CO8BiEglPahMLrCmUYxTxs9YrN4gIOMsAjN8KZZvUn5q275WZVPxl32TMQIdtG1UHUt3zkSDhuxa9qIv0PYMHWIQ08rBcMGAObPZLBW9gilXtQu123No/R8Ga5NRixknkJpoBVuTU+/kcFb0Qcf5i8ahECRcu6Lk0bvgJ+TW/omFHk2YbBzlxb7eFAsAYyj4djTwJalnTW6DYafa4Ll0k5Bp6nlEIfAKFM4BHehxWS945owiXyThvAx2MIHltRG/y3XkQIKuKQXWjgdo6IxXwU1Mog//tPG8ZI80qpnRrqnpIOrCngYb7hX2DccA3XwrsYiO/jqWRGuGMj1FeooMAP+CiQNLLHaF2dTvOIgwu6ZpR4pG7Ka0Gt81gL8q7/YzzUo3G3x7iZfSgyxX5YqvzNap2Fu7S492BYNVzngiI9Q9f0A8wt/NdrCmMfF9TV0U6qFcPqCTx/XqSbAWNQeTM3+VtgCSyMzghRR8vYEHYP3TDbr8KOdKxgd9wM4q4FQxPzsoZK1wb+gjk3+v0O9aCReTbiFJdd1ItjmaCG1jtQ==\"}"
-        }
-    ]
-}
-```
+    ```bash
+    {
+        "Messages": [
+            {
+                "MessageId": "af1576d9-39a8-4b43-93f0-95bf9b98d649",
+                "ReceiptHandle": "AQEBGieGiswxcnQdOO+l9iF2xiqsBUJFnkAH19VPnXYyXBA6RHMXd0jx5emns2K07dDb0cwWLZOGCbCEo54pjVC9UQ7AM9zSSjyY46UTKC6MVdD9enw7Uz2vyGCbfGx1ND7usOaIGlXTavLEhE+Uk4VWuX/F+Co2FwXoPdceyacb/LkjIn7REO2lyBbds82ATz36AVrGxu7UmpKD6dZVnJruqYacnEW88GCy5+nexAx0/pq5lE5o4/3Lg5J27DTBOUnIWTyxKW1/zVoRpG63mh8rJwOCcvjYZuzrHXtoXMCJpOcm9V5icBTNit9kKMl2o3isrIkjuBZ0IqNKbSb1Y74rFGQ1T+AzeyStvSitwP8zACMtLUTUptEkCjUnSqgoFhCKEAXN4GBVdav77IDYFVXLHst+VuhF3SwNvjIkMXPI13nX8ttkm71JX3zJUO7/+OXZ",
+                "MD5OfBody": "7b2bbf5552c02df61a808bbc99c8d5bb",
+                "Body": "{\"input\":{\"name\":\"serverless-pattern\"},\"token\":\"AAAAKgAAAAIAAAAAAAAAATI4DHzC3fME20tXGZeGnZjfp0HtAdK8gshkk31hr5xzF32DKNyKcrSYmIlj3COSsZfhWDKXfiUt90sUyhyOqNB0CO8BiEglPahMLrCmUYxTxs9YrN4gIOMsAjN8KZZvUn5q275WZVPxl32TMQIdtG1UHUt3zkSDhuxa9qIv0PYMHWIQ08rBcMGAObPZLBW9gilXtQu123No/R8Ga5NRixknkJpoBVuTU+/kcFb0Qcf5i8ahECRcu6Lk0bvgJ+TW/omFHk2YbBzlxb7eFAsAYyj4djTwJalnTW6DYafa4Ll0k5Bp6nlEIfAKFM4BHehxWS945owiXyThvAx2MIHltRG/y3XkQIKuKQXWjgdo6IxXwU1Mog//tPG8ZI80qpnRrqnpIOrCngYb7hX2DccA3XwrsYiO/jqWRGuGMj1FeooMAP+CiQNLLHaF2dTvOIgwu6ZpR4pG7Ka0Gt81gL8q7/YzzUo3G3x7iZfSgyxX5YqvzNap2Fu7S492BYNVzngiI9Q9f0A8wt/NdrCmMfF9TV0U6qFcPqCTx/XqSbAWNQeTM3+VtgCSyMzghRR8vYEHYP3TDbr8KOdKxgd9wM4q4FQxPzsoZK1wb+gjk3+v0O9aCReTbiFJdd1ItjmaCG1jtQ==\"}"
+            }
+        ]
+    }
+    ```
 
-Note the value of the token field, we will use this to pass it as payload to our Lambda function.
+    Note the value of the token field, we will use this to pass it as payload to our Lambda function.
 
 1. Execute the Lambda function with the token as payload:
 
-```bash
-aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME \
---cli-binary-format raw-in-base64-out \
---invocation-type Event \
---payload "{ \"token\": \"AAAAKgAAAAIAAAAAAAAAATI4DHzC3fME20tXGZeGnZjfp0HtAdK8gshkk31hr5xzF32DKNyKcrSYmIlj3COSsZfhWDKXfiUt90sUyhyOqNB0CO8BiEglPahMLrCmUYxTxs9YrN4gIOMsAjN8KZZvUn5q275WZVPxl32TMQIdtG1UHUt3zkSDhuxa9qIv0PYMHWIQ08rBcMGAObPZLBW9gilXtQu123No/R8Ga5NRixknkJpoBVuTU+/kcFb0Qcf5i8ahECRcu6Lk0bvgJ+TW/omFHk2YbBzlxb7eFAsAYyj4djTwJalnTW6DYafa4Ll0k5Bp6nlEIfAKFM4BHehxWS945owiXyThvAx2MIHltRG/y3XkQIKuKQXWjgdo6IxXwU1Mog//tPG8ZI80qpnRrqnpIOrCngYb7hX2DccA3XwrsYiO/jqWRGuGMj1FeooMAP+CiQNLLHaF2dTvOIgwu6ZpR4pG7Ka0Gt81gL8q7/YzzUo3G3x7iZfSgyxX5YqvzNap2Fu7S492BYNVzngiI9Q9f0A8wt/NdrCmMfF9TV0U6qFcPqCTx/XqSbAWNQeTM3+VtgCSyMzghRR8vYEHYP3TDbr8KOdKxgd9wM4q4FQxPzsoZK1wb+gjk3+v0O9aCReTbiFJdd1ItjmaCG1jtQ==\" }" \
-response.json
-```
+    ```bash
+    aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME \
+    --cli-binary-format raw-in-base64-out \
+    --invocation-type Event \
+    --payload "{ \"token\": \"AAAAKgAAAAIAAAAAAAAAATI4DHzC3fME20tXGZeGnZjfp0HtAdK8gshkk31hr5xzF32DKNyKcrSYmIlj3COSsZfhWDKXfiUt90sUyhyOqNB0CO8BiEglPahMLrCmUYxTxs9YrN4gIOMsAjN8KZZvUn5q275WZVPxl32TMQIdtG1UHUt3zkSDhuxa9qIv0PYMHWIQ08rBcMGAObPZLBW9gilXtQu123No/R8Ga5NRixknkJpoBVuTU+/kcFb0Qcf5i8ahECRcu6Lk0bvgJ+TW/omFHk2YbBzlxb7eFAsAYyj4djTwJalnTW6DYafa4Ll0k5Bp6nlEIfAKFM4BHehxWS945owiXyThvAx2MIHltRG/y3XkQIKuKQXWjgdo6IxXwU1Mog//tPG8ZI80qpnRrqnpIOrCngYb7hX2DccA3XwrsYiO/jqWRGuGMj1FeooMAP+CiQNLLHaF2dTvOIgwu6ZpR4pG7Ka0Gt81gL8q7/YzzUo3G3x7iZfSgyxX5YqvzNap2Fu7S492BYNVzngiI9Q9f0A8wt/NdrCmMfF9TV0U6qFcPqCTx/XqSbAWNQeTM3+VtgCSyMzghRR8vYEHYP3TDbr8KOdKxgd9wM4q4FQxPzsoZK1wb+gjk3+v0O9aCReTbiFJdd1ItjmaCG1jtQ==\" }" \
+    response.json
+    ```
 
-Expected result:
+    Expected result:
 
-```bash
-{
-    "StatusCode": 202
-}
-```
+    ```bash
+    {
+        "StatusCode": 202
+    }
+    ```
 
 1. Retrieve the logs from the Lambda function:
 
-List the log streams for that log group:
+    List the log streams for that log group:
 
-```bash
-aws logs describe-log-streams --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --query logStreams[*].logStreamName
-```
+    ```bash
+    aws logs describe-log-streams --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --query logStreams[*].logStreamName
+    ```
 
-Expected result:
+    Expected result:
 
-```bash
-[
-    "2021/12/17/[$LATEST]6922e90439514d8195e455360917eaa9"
-]
+    ```bash
+    [
+        "2021/12/17/[$LATEST]6922e90439514d8195e455360917eaa9"
+    ]
 
-```
+    ```
 
-Get the log events for that stream:
+    Get the log events for that stream:
 
-```bash
-aws logs get-log-events --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --log-stream-name '2021/12/17/[$LATEST]6922e90439514d8195e455360917eaa9'
-```
+    ```bash
+    aws logs get-log-events --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --log-stream-name '2021/12/17/[$LATEST]6922e90439514d8195e455360917eaa9'
+    ```
 
-Expected result:
+    Expected result:
 
-```bash
-START RequestId: 31c1842b-5948-4f5b-a1ff-dad295bb4f1b Version: $LATEST
-Lambda function invoked
-{
-    "token": "AAAAKgAAAAIAAAAAAAAAATI4DHzC3fME20tXGZeGnZjfp0HtAdK8gshkk31hr5xzF32DKNyKcrSYmIlj3COSsZfhWDKXfiUt90sUyhyOqNB0CO8BiEglPahMLrCmUYxTxs9YrN4gIOMsAjN8KZZvUn5q275WZVPxl32TMQIdtG1UHUt3zkSDhuxa9qIv0PYMHWIQ08rBcMGAObPZLBW9gilXtQu123No/R8Ga5NRixknkJpoBVuTU+/kcFb0Qcf5i8ahECRcu6Lk0bvgJ+TW/omFHk2YbBzlxb7eFAsAYyj4djTwJalnTW6DYafa4Ll0k5Bp6nlEIfAKFM4BHehxWS945owiXyThvAx2MIHltRG/y3XkQIKuKQXWjgdo6IxXwU1Mog//tPG8ZI80qpnRrqnpIOrCngYb7hX2DccA3XwrsYiO/jqWRGuGMj1FeooMAP+CiQNLLHaF2dTvOIgwu6ZpR4pG7Ka0Gt81gL8q7/YzzUo3G3x7iZfSgyxX5YqvzNap2Fu7S492BYNVzngiI9Q9f0A8wt/NdrCmMfF9TV0U6qFcPqCTx/XqSbAWNQeTM3+VtgCSyMzghRR8vYEHYP3TDbr8KOdKxgd9wM4q4FQxPzsoZK1wb+gjk3+v0O9aCReTbiFJdd1ItjmaCG1jtQ=="
-}
+    ```bash
+    START RequestId: 31c1842b-5948-4f5b-a1ff-dad295bb4f1b Version: $LATEST
+    Lambda function invoked
+    {
+        "token": "AAAAKgAAAAIAAAAAAAAAATI4DHzC3fME20tXGZeGnZjfp0HtAdK8gshkk31hr5xzF32DKNyKcrSYmIlj3COSsZfhWDKXfiUt90sUyhyOqNB0CO8BiEglPahMLrCmUYxTxs9YrN4gIOMsAjN8KZZvUn5q275WZVPxl32TMQIdtG1UHUt3zkSDhuxa9qIv0PYMHWIQ08rBcMGAObPZLBW9gilXtQu123No/R8Ga5NRixknkJpoBVuTU+/kcFb0Qcf5i8ahECRcu6Lk0bvgJ+TW/omFHk2YbBzlxb7eFAsAYyj4djTwJalnTW6DYafa4Ll0k5Bp6nlEIfAKFM4BHehxWS945owiXyThvAx2MIHltRG/y3XkQIKuKQXWjgdo6IxXwU1Mog//tPG8ZI80qpnRrqnpIOrCngYb7hX2DccA3XwrsYiO/jqWRGuGMj1FeooMAP+CiQNLLHaF2dTvOIgwu6ZpR4pG7Ka0Gt81gL8q7/YzzUo3G3x7iZfSgyxX5YqvzNap2Fu7S492BYNVzngiI9Q9f0A8wt/NdrCmMfF9TV0U6qFcPqCTx/XqSbAWNQeTM3+VtgCSyMzghRR8vYEHYP3TDbr8KOdKxgd9wM4q4FQxPzsoZK1wb+gjk3+v0O9aCReTbiFJdd1ItjmaCG1jtQ=="
+    }
 
-Token received: AAAAKgAAAAIAAAAAAAAAATI4DHzC3fME20tXGZeGnZjfp0HtAdK8gshkk31hr5xzF32DKNyKcrSYmIlj3COSsZfhWDKXfiUt90sUyhyOqNB0CO8BiEglPahMLrCmUYxTxs9YrN4gIOMsAjN8KZZvUn5q275WZVPxl32TMQIdtG1UHUt3zkSDhuxa9qIv0PYMHWIQ08rBcMGAObPZLBW9gilXtQu123No/R8Ga5NRixknkJpoBVuTU+/kcFb0Qcf5i8ahECRcu6Lk0bvgJ+TW/omFHk2YbBzlxb7eFAsAYyj4djTwJalnTW6DYafa4Ll0k5Bp6nlEIfAKFM4BHehxWS945owiXyThvAx2MIHltRG/y3XkQIKuKQXWjgdo6IxXwU1Mog//tPG8ZI80qpnRrqnpIOrCngYb7hX2DccA3XwrsYiO/jqWRGuGMj1FeooMAP+CiQNLLHaF2dTvOIgwu6ZpR4pG7Ka0Gt81gL8q7/YzzUo3G3x7iZfSgyxX5YqvzNap2Fu7S492BYNVzngiI9Q9f0A8wt/NdrCmMfF9TV0U6qFcPqCTx/XqSbAWNQeTM3+VtgCSyMzghRR8vYEHYP3TDbr8KOdKxgd9wM4q4FQxPzsoZK1wb+gjk3+v0O9aCReTbiFJdd1ItjmaCG1jtQ==
-Token sent to the Step Function
-END RequestId: 31c1842b-5948-4f5b-a1ff-dad295bb4f1b
-REPORT RequestId: 31c1842b-5948-4f5b-a1ff-dad295bb4f1b	Duration: 191.02 ms	Billed Duration: 192 ms	Memory Size: 128 MB	Max Memory Used: 65 MB
-```
+    Token received: AAAAKgAAAAIAAAAAAAAAATI4DHzC3fME20tXGZeGnZjfp0HtAdK8gshkk31hr5xzF32DKNyKcrSYmIlj3COSsZfhWDKXfiUt90sUyhyOqNB0CO8BiEglPahMLrCmUYxTxs9YrN4gIOMsAjN8KZZvUn5q275WZVPxl32TMQIdtG1UHUt3zkSDhuxa9qIv0PYMHWIQ08rBcMGAObPZLBW9gilXtQu123No/R8Ga5NRixknkJpoBVuTU+/kcFb0Qcf5i8ahECRcu6Lk0bvgJ+TW/omFHk2YbBzlxb7eFAsAYyj4djTwJalnTW6DYafa4Ll0k5Bp6nlEIfAKFM4BHehxWS945owiXyThvAx2MIHltRG/y3XkQIKuKQXWjgdo6IxXwU1Mog//tPG8ZI80qpnRrqnpIOrCngYb7hX2DccA3XwrsYiO/jqWRGuGMj1FeooMAP+CiQNLLHaF2dTvOIgwu6ZpR4pG7Ka0Gt81gL8q7/YzzUo3G3x7iZfSgyxX5YqvzNap2Fu7S492BYNVzngiI9Q9f0A8wt/NdrCmMfF9TV0U6qFcPqCTx/XqSbAWNQeTM3+VtgCSyMzghRR8vYEHYP3TDbr8KOdKxgd9wM4q4FQxPzsoZK1wb+gjk3+v0O9aCReTbiFJdd1ItjmaCG1jtQ==
+    Token sent to the Step Function
+    END RequestId: 31c1842b-5948-4f5b-a1ff-dad295bb4f1b
+    REPORT RequestId: 31c1842b-5948-4f5b-a1ff-dad295bb4f1b	Duration: 191.02 ms	Billed Duration: 192 ms	Memory Size: 128 MB	Max Memory Used: 65 MB
+    ```
 
 ## Cleanup
 
