@@ -133,9 +133,9 @@ Expected result:
 }
 ```
 
-1. Note the value of the token field, we will use this to pass it as payload to our Lambda function.
+Note the value of the token field, we will use this to pass it as payload to our Lambda function.
 
-1. Execute the Lambda function to send the token to the Step Function:
+1. Execute the Lambda function with the token as payload:
 
 ```bash
 aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME \
@@ -153,7 +153,7 @@ Expected result:
 }
 ```
 
-2. Retrieve the logs from the Lambda function:
+1. Retrieve the logs from the Lambda function:
 
 List the log streams for that log group:
 
