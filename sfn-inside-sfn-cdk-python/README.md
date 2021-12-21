@@ -5,7 +5,7 @@ This sample project demonstrates how to use an AWS Step Functions state machine 
 
 An outer Step Function is used to orchestrate several inner Step Functions. Each inner Step Function produces an output identical with the input and each one can be used to do a specific job (a synchronous or asynchronous job).
 
-Having the output identical with the output makes it a interlocking block and allows to assemble together these blocks, in any order, to produce the required output like the options showed in the image below.
+Having the output identical with the output makes it a interlocking block and allows to assemble multiple blocks together, in any order, to produce the required output like the 3 options showed in the image below.
 
 ![Concept](img/concept.drawio.png)
 
