@@ -40,10 +40,9 @@ Important: this application uses various AWS services and there are costs associ
 1. Finally, use AWS CDK to deploy the AWS resources for the pattern as specified in the `lib/msk-to-lambda-cdk-stack.ts` file:
 
    ```sh
+   cdk bootstrap aws://accountnumber/region
    cdk deploy
    ```
-
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
@@ -73,7 +72,7 @@ The Lambda function’s event payload contains an array of records. Each array i
 
 ## Testing
 
-1. In a Cloud9 environment
+1. In a [Client Machine](https://docs.aws.amazon.com/msk/latest/developerguide/create-client-machine.html) 
 
 2. Install required softwares
 
