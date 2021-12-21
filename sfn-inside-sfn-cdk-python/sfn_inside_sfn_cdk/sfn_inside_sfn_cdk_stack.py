@@ -1,6 +1,7 @@
 from aws_cdk import (
     Duration,
     Stack,
+    CfnOutput,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as tasks,
 )
@@ -58,3 +59,8 @@ class SfnInsideSfnCdkStack(Stack):
                 definition=task1.next(task2).next(task3),
                 timeout=Duration.minutes(60)
         )
+
+        CfnOutput(self, "StepFunctionArn",
+            value = outer_sfn.state_machine_arn,
+            export_name = 'OuterStepFunctionArn',
+            description = 'Outer Step Function arn')

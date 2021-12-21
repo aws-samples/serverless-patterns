@@ -37,7 +37,7 @@ CDK
 
 ## Services From/To
 
-Amazon SQS to AWS Lambda
+AWS Step Functions
 
 ## Deployment Instructions
 
@@ -82,85 +82,67 @@ Amazon SQS to AWS Lambda
     Expected result:
 
     ```bash
-    SqsLambdaCdkStack
+    SfnInsideSfnCdkStack
 
     Outputs:
-    SqsLambdaCdkStack.FunctionName = SqsLambdaCdkStack-MyLambdaFunction67CCA873-OsINMhWgMsXV
-    SqsLambdaCdkStack.QueueArn = arn:aws:sqs:us-east-1:xxxxxxxxxxxxx:SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
-    SqsLambdaCdkStack.QueueName = SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
-    SqsLambdaCdkStack.QueueUrl = https://sqs.us-east-1.amazonaws.com/xxxxxxxxxxxxx/SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB
+    SfnInsideSfnCdkStack.StepFunctionArn = arn:aws:states:us-east-1:xxxxxxxxxx:stateMachine:OuterStepFunction0C0262E4-W34IrZoiJqEe
     ```
 
 1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ### Testing
 
-Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queue and observe the event delivered to the Lambda function:
+1. Start execution of the Step Function, using the Step Function Arn from the AWS CDK deployment outputs:
 
-1. Send the SQS message:
-
-```bash
-aws sqs send-message --queue-url ENTER_YOUR_SQS_QUEUE_URL --message-body "Test message"
-```
-
-2. Retrieve the logs from the Lambda function:
-
-List the log streams for that log group:
-
-```bash
-aws logs describe-log-streams --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --query logStreams[*].logStreamName
-```
-
-Expected result:
-
-```bash
-[
-    "2021/12/17/[$LATEST]6922e90439514d8195e455360917eaa9"
-]
-
-```
-
-Get the log events for that stream:
-
-```bash
-aws logs get-log-events --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --log-stream-name '2021/12/17/[$LATEST]6922e90439514d8195e455360917eaa9'
-```
-
-Expected result:
-
-```json
-{
-    "events": [
+    We want to send the following input
+    ```json
         {
-            "timestamp": 1639828317813,
-            "message": "START RequestId: bd3f036b-3bf1-5300-8b05-595cf662119c Version: $LATEST\n",
-            "ingestionTime": 1639828322765
-        },
-        {
-            "timestamp": 1639828317815,
-            "message": "Lambda function invoked\n",
-            "ingestionTime": 1639828322765
-        },
-        {
-            "timestamp": 1639828317815,
-            "message": "{\"Records\": [{\"messageId\": \"e9671b5f-06d2-413d-98ef-8654e551936c\", \"receiptHandle\": \"AQEBA7X2pC+hls8kgKo9fJF5YBMmw1RIUCOWot6Qk5n3jjRmWBn1L3cMq4N4ZNgBE2qEOUTTFb9lK/p0SDrE60rKgVpO5y/5yXnM9gZN3szzDFJ5LA5y7kN8d0vcjTOZSWquX7mMRkZKkDW6VF0xNldxxKavIbjiBE7jYMLmFbipwyGdQ03qGNJSeVW9S04AnOl38VjRO2UbC3HSkFAIQifma3fDuxsifnVa+x64E5hy9OTmjAS4vkA+e9YdOaS0GUmvMFyiHRokrdGNGwilACl10Rf71vZQOKmX6FLGhLGvO2SCKqDA2WJuQLf3aDJaqSOla3ya+RiY+ZGB0giees+zp4mkR3iCMRMlAfcgNjJpTf9niv3yLzT9U6NvmXQiCRzlxQFekkWo0axrLz32K+jmzebBS6v4DbS1YkrQ3r7ELBpylKW7cqj6bWa91Y+5O40s\", \"body\": \"Test message\", \"attributes\": {\"ApproximateReceiveCount\": \"1\", \"SentTimestamp\": \"1639828317543\", \"SenderId\": \"AROAIQIEPWCCGQ4X4VMOK:azertrezza\", \"ApproximateFirstReceiveTimestamp\": \"1639828317550\"}, \"messageAttributes\": {}, \"md5OfBody\": \"82dfa5549ebc9afc168eb7931ebece5f\", \"eventSource\": \"aws:sqs\", \"eventSourceARN\": \"arn:aws:sqs:us-east-1:xxxxxxxxxxxx:SqsLambdaCdkStack-MyQueueE6CA6235-1F31KU17V75YB\", \"awsRegion\": \"us-east-1\"}]}\n",
-            "ingestionTime": 1639828322765
-        },
-        {
-            "timestamp": 1639828317815,
-            "message": "END RequestId: bd3f036b-3bf1-5300-8b05-595cf662119c\n",
-            "ingestionTime": 1639828322765
-        },
-        {
-            "timestamp": 1639828317815,
-            "message": "REPORT RequestId: bd3f036b-3bf1-5300-8b05-595cf662119c\tDuration: 1.35 ms\tBilled Duration: 2 ms\tMemory Size: 128 MB\tMax Memory Used: 37 MB\tInit Duration: 105.23 ms\t\n",
-            "ingestionTime": 1639828322765
+            "name": "serverless-land",
+            "value": "idem"
         }
-    ],
-    "nextForwardToken": "f/36569393484927409957930658349900755958289816616951021572/s",
-    "nextBackwardToken": "b/36569393484882808467533597103617684521744519893939060736/s"
-}
-```
+    ```bash
+
+    ```bash
+    aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STEP_FUNCTION_ARN --input "{ \"Output\": { \"input\": {\"name\" : \"serverless-pattern\", \"value\": \"block\" }}}"
+    ```
+
+    Expected result:
+
+    ```json
+    {
+        "executionArn": "arn:aws:states:us-east-1:xxxxxxxxxx:execution:OuterStepFunction0C0262E4-W34IrZoiJqEe:c62465d7-6833-4560-af8b-3f1c7df7cf4b",
+        "startDate": "2021-12-21T18:12:57.283000+01:00"
+    }
+    ```
+
+1. Check the execution status of the Step Function using the executionArn from previous step
+
+    ```bash
+    aws stepfunctions describe-execution --execution-arn ENTER_YOUR_STEP_FUNCTION_EXECUTION_ARN
+    ```
+
+    Expected result:
+
+    ```json
+    {
+        "executionArn": "arn:aws:states:us-east-1:867201269000:execution:OuterStepFunction0C0262E4-W34IrZoiJqEe:c62465d7-6833-4560-af8b-3f1c7df7cf4b",
+        "stateMachineArn": "arn:aws:states:us-east-1:867201269000:stateMachine:OuterStepFunction0C0262E4-W34IrZoiJqEe",
+        "name": "c62465d7-6833-4560-af8b-3f1c7df7cf4b",
+        "status": "SUCCEEDED",
+        "startDate": "2021-12-21T18:12:57.283000+01:00",
+        "stopDate": "2021-12-21T18:13:03.509000+01:00",
+        "input": "{ \"Output\": { \"input\": {\"name\" : \"serverless-pattern\", \"value\": \"block\" }}}",
+        "inputDetails": {
+            "included": true
+        },
+        "output": "{\"Output\":{\"input\":{\"name\":\"serverless-pattern\",\"value\":\"block\"}}}",
+        "outputDetails": {
+            "included": true
+        }
+    }
+    ```
+
+1. Note the input and the output.
 
 ## Cleanup
 
