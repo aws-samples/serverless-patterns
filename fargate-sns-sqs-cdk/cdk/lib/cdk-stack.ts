@@ -17,28 +17,13 @@ export class CdkStack extends Stack {
       maxAzs: 3,
     });
 
-    const kmsKey = new Key(this, 'SnsKmsKey', {
-      description: 'KMS Key used for SNS',
-      alias: 'alias/SnsKmsKey',
+    const kmsKey = new Key(this, 'SnsSqsKmsKey', {
+      description: 'KMS Key used for SNS and SQS',
+      alias: 'alias/SnsSqsKmsKey',
       enableKeyRotation: true,
       enabled: true,
       removalPolicy: RemovalPolicy.DESTROY
     });
-
-    kmsKey.addToResourcePolicy( new PolicyStatement({
-      actions: [
-        'kms:Decrypt',
-        'kms:DescribeKey',
-        'kms:Encrypt',
-        'kms:GenerateDataKey*'
-      ],
-      effect: Effect.ALLOW,
-      resources: ['*'],
-      principals: [
-        new ServicePrincipal('sns.amazonaws.com'),
-        new ServicePrincipal('sqs.amazonaws.com')
-      ]
-    }));
 
     const snsTopic = new Topic(this, 'SnsTopic', {
       masterKey: kmsKey
@@ -89,7 +74,7 @@ export class CdkStack extends Stack {
       })
     )
 
-    // Allow read and write actions from the Fargate Task Definition only
+    // Allow publish action from the Fargate Task Definition only
     snsEndpoint.addToPolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
