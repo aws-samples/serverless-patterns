@@ -9,7 +9,7 @@ Having the output identical with the output makes it a interlocking block and al
 
 ![Concept](img/concept.drawio.png)
 
-To learn about how to embed an asynchronous process in a one inner Step Function and make it a synchronous step for the outer Step Function, have a look at this [serverless pattern](https://serverlessland.com/patterns/step-function-callback-cdk-python)
+To learn about how to embed an asynchronous process in a inner Step Function and make it a synchronous step for the outer Step Function, have a look at this [serverless pattern](https://serverlessland.com/patterns/step-function-callback-cdk-python).
 
 This pattern deploys 4 AWS Step Functions.
 
