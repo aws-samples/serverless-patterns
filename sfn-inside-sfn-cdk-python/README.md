@@ -94,12 +94,12 @@ AWS Step Functions
 
 This is the input we will send to our Step Function:
 
-    ```json
-        {
-            "name": "serverless-land",
-            "value": "idem"
-        }
-    ```
+```json
+{
+    "name": "serverless-land",
+    "value": "idem"
+}
+```
 
 1. Start execution of the Step Function, using the Step Function Arn from the AWS CDK deployment outputs:
 
