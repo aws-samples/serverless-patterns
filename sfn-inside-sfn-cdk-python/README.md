@@ -92,7 +92,7 @@ AWS Step Functions
 
 ### Testing
 
-This is the input we will send to our Step Function:
+This is the input we want send to our Step Function:
 
 ```json
 {
@@ -101,7 +101,7 @@ This is the input we will send to our Step Function:
 }
 ```
 
-To make it work with the definition or our inner/outer Step Function we need to send our input with the following format
+To make it work with the definition of our inner/outer Step Function we need to send our input with the following format:
 
 ```json
 {
@@ -129,7 +129,7 @@ To make it work with the definition or our inner/outer Step Function we need to 
     }
     ```
 
-1. Check the execution status of the Step Function using the executionArn from previous step
+1. Check the execution status of the Step Function using the executionArn from previous step:
 
     ```bash
     aws stepfunctions describe-execution --execution-arn ENTER_YOUR_STEP_FUNCTION_EXECUTION_ARN
@@ -158,7 +158,7 @@ To make it work with the definition or our inner/outer Step Function we need to 
 
 1. Note the input and the output.
 
-1. On the AWS Console, check the input and the output of each inner Step Function.
+1. On the AWS Console, check the input and the output of each inner Step Function:
 
     Expected result:
 
