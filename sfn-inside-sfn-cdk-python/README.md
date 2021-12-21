@@ -147,9 +147,9 @@ This is the input we will send to our Step Function:
 
 1. On the AWS Console, check the input and the output of each inner Step Function.
 
-You should see something like this:
+    Expected result:
 
-![Inner Step Function](img/step_function_console.png)
+    ![Inner Step Function](img/step_function_console.png)
 
 ## Cleanup
 
