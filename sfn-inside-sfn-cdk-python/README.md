@@ -139,8 +139,8 @@ To make it work with the definition of our inner/outer Step Function we need to 
 
     ```json
     {
-        "executionArn": "arn:aws:states:us-east-1:867201269000:execution:OuterStepFunction0C0262E4-W34IrZoiJqEe:c62465d7-6833-4560-af8b-3f1c7df7cf4b",
-        "stateMachineArn": "arn:aws:states:us-east-1:867201269000:stateMachine:OuterStepFunction0C0262E4-W34IrZoiJqEe",
+        "executionArn": "arn:aws:states:us-east-1:xxxxxxxxxx:execution:OuterStepFunction0C0262E4-W34IrZoiJqEe:c62465d7-6833-4560-af8b-3f1c7df7cf4b",
+        "stateMachineArn": "arn:aws:states:us-east-1:xxxxxxxxxx:stateMachine:OuterStepFunction0C0262E4-W34IrZoiJqEe",
         "name": "c62465d7-6833-4560-af8b-3f1c7df7cf4b",
         "status": "SUCCEEDED",
         "startDate": "2021-12-21T18:12:57.283000+01:00",
