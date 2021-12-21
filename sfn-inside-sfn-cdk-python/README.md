@@ -1,24 +1,18 @@
 
 # Modular building system using AWS Step Functions
 
-This sample project demonstrates how to use an AWS Step Functions state machine to orchestrate multiple Step Functions.
-Each inner Step Function will produce an output identical with the input.
-With this the following scenario can be implemented:
-
-- to have each inner Step Function doing a specific job (that can be a synchronous or asynchronous).
-- having the output identical with the output makes this inner Step Function a block that can be assembled with other blocks, in any order, to produce the required output
+This sample project demonstrates how to use an AWS Step Functions state machine to build a modular system.
+An outer Step Function is used to orchestrate several inner Step Functions. Each inner Step Function produces an output identical with the input and each one can be used to do a specific job (a synchronous or asynchronous job).
+Having the output identical with the output makes it a interlocking block and allows to assemble together these blocks, in any order, to produce the required output.
 
 ![Concept](img/concept.drawio.png)
 
- To learn about how to integrate an asynchronous process with a Step Function and make is a synchronous step have a look at this [serverless pattern](https://serverlessland.com/patterns/step-function-callback-cdk-python)
+To learn about how to embed an asynchronous process in a one inner Step Function and make it a synchronous step for the outer Step Function, have a look at this [serverless pattern](https://serverlessland.com/patterns/step-function-callback-cdk-python)
 
+This pattern deploys 4 AWS Step Functions.
 
-To demonstrate the concept. ...As a sample, the inner Step Function contains a single step of type Pass which means it will pass as output the input received.
-
-
-This pattern 4 AWS Step Functions.
-
-Lambda function and an SQS queue. SQS invokes the Lambda function when new messages are available. The CDK application contains the minimum IAM resources required to run the application.
+The outer Step Function will trigger the inner Step Functions, one by one, and waits for each one to finish before continuing.
+A sample inner Step Function is provided which has a single task of type [Pass](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-pass-state.html). Replace it with your own Step Function.
 
 Learn more about this pattern at: https://serverlessland.com/patterns/sfn-inside-sfn-cdk-python
 
