@@ -1,0 +1,272 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Log archival service
+
+Parameters:
+  LogGroupTags:
+    Type: "String"
+    Default: "Application=MyApp,Environment=Dev"
+  ArchiveBucketName:
+    Type: "String"
+  ArchiveBucketPrefix:
+    Type: "String"
+
+Resources:
+  ##########################################################################
+  #   Archive Bucket                                                       #
+  ##########################################################################
+
+  CloudWatchLogArchiveBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref ArchiveBucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  ##########################################################################
+  #   Policy                                                               #
+  ##########################################################################
+
+  CloudWatchLogArchiveBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: CloudWatchLogArchiveBucket
+      PolicyDocument:
+        Statement:
+          - Effect: "Allow"
+            Action: "s3:GetBucketAcl"
+            Principal:
+              Service: !Sub 'logs.${AWS::Region}.amazonaws.com'
+            Resource: !GetAtt CloudWatchLogArchiveBucket.Arn
+          - Effect: "Allow"
+            Action: "s3:PutObject"
+            Principal:
+              Service: !Sub 'logs.${AWS::Region}.amazonaws.com'
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref ArchiveBucketName
+                - /*
+            Condition:
+              StringEquals:
+                "s3:x-amz-acl": "bucket-owner-full-control"
+
+  ##########################################################################
+  #   Roles                                                               #
+  ##########################################################################
+
+  RoleQueryLogGroups:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        -
+          PolicyName: "QueryLogGroupsPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "lambda:ListTags"
+                Resource: "*"
+              - Effect: "Allow"
+                Action: "tag:GetResources"
+                Resource: "*"
+
+  RoleCreateLogGroupExport:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        -
+          PolicyName: "CreateLogGroupExportPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "logs:CreateExportTask"
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*"
+
+  RoleCloudWatchExportStatus:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: "CreateLogGroupExportPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "logs:DescribeExportTasks"
+                Resource: "*"
+
+  RoleExportCloudWatchLogsWorkflow:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub 'states.${AWS::Region}.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: lambda
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: 'lambda:InvokeFunction'
+                Resource:
+                  - !GetAtt 'FunctionQueryLogGroups.Arn'
+                  - !GetAtt 'FunctionCloudWatchSnapshot.Arn'
+                  - !GetAtt 'FunctionCloudWatchExportStatusCheck.Arn'
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogDelivery'
+                  - 'logs:GetLogDelivery'
+                  - 'logs:UpdateLogDelivery'
+                  - 'logs:DeleteLogDelivery'
+                  - 'logs:ListLogDeliveries'
+                  - 'logs:PutResourcePolicy'
+                  - 'logs:DescribeResourcePolicies'
+                  - 'logs:DescribeLogGroups'
+                Resource:
+                  - "*"
+
+  ##########################################################################
+  #  Lambda function                                                       #
+  ##########################################################################
+
+  FunctionQueryLogGroups:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          EXPORT_TAGS: !Ref LogGroupTags
+      CodeUri: src/functions/query_log_groups/
+      Handler: index.handler
+      Role: !GetAtt RoleQueryLogGroups.Arn
+      Runtime: python3.8
+      Timeout: 15
+
+
+  FunctionCloudWatchSnapshot:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/cloudwatch_snapshot/
+      Handler: index.handler
+      Role: !GetAtt RoleCreateLogGroupExport.Arn
+      Runtime: python3.8
+      Timeout: 15
+      Environment:
+        Variables:
+          ARCHIVE_BUCKET: !Ref ArchiveBucketName
+          BUCKET_PREFIX: !Ref ArchiveBucketPrefix
+
+  FunctionCloudWatchExportStatusCheck:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/export_status_check/
+      Handler: index.handler
+      Role: !GetAtt RoleCloudWatchExportStatus.Arn
+      Runtime: python3.8
+      Timeout: 15
+
+
+  ##########################################################################
+  #   State Machine Workflow                                               #
+  ##########################################################################
+
+  ArchiveLogsStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: src/statemachine/StateMachine.asl.json
+      DefinitionSubstitutions:
+        FunctionQueryLogGroupsArn: !GetAtt FunctionQueryLogGroups.Arn
+        FunctionCloudWatchSnapshotArn: !GetAtt FunctionCloudWatchSnapshot.Arn
+        FunctionCloudWatchExportStatusCheckArn: !GetAtt FunctionCloudWatchExportStatusCheck.Arn
+      Role:
+        Fn::GetAtt: [ RoleExportCloudWatchLogsWorkflow, Arn ]
+
+
+  ##########################################################################
+  #   Event Rule Configuration                                             #
+  ##########################################################################
+  MonthlyExportEventTrigger:
+    Type: AWS::Events::Rule
+    Properties:
+      # start 5 minutes past midnight, on 1st of every month
+      Description: "Monthly CloudWatch Log export"
+      ScheduleExpression: "cron(5, 0, 1, *, ?, *)"
+      State: "ENABLED"
+      Targets:
+        -
+          Arn: !Ref ArchiveLogsStateMachine
+          RoleArn: !GetAtt ScheduledExportPermission.Arn
+          Id: "MonthlyExportEventTriggerTrigger1"
+
+  ScheduledExportPermission:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - Fn::Sub: "events.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        -
+          PolicyName: StateMachineExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: "states:StartExecution"
+                Resource:
+                  - !Ref ArchiveLogsStateMachine
+
+##########################################################################
+#   Outputs                                                              #
+##########################################################################
+
+Outputs:
+  ArchiveLogsStateMachine:
+    Description: "ArchiveLogsStateMachine Arn"
+    Value: !GetAtt ArchiveLogsStateMachine.Arn
+
