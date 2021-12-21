@@ -1,4 +1,4 @@
-# AWS Step Functions callback task integration pattern
+# AWS Step Functions callback integration pattern
 
 This pattern shows how to integrate Step Functions workflows with external systems using Sqs and Lambda.
 
