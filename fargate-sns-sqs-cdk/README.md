@@ -1,4 +1,4 @@
-# AWS Fargate to Amazon SQS
+# AWS Fargate to Amazon SNS to Amazon SQS
 
 This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) cluster with an Application Load Balancer in-front. The AWS Fargate service makes `publish` call to an Amazon Simple Notification Service (SNS) and `receiveMessage` call to an Amazon Simple Queue Service (SQS) queue which is subscribed to the SNS topic that the template creates. This template uses a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built `ecs.ContainerImage.fromAsset` method. The custom image has a base route `/` for health checks, `/publishmessage` for adding to the queue and `/readmessage` for reading messages from the queue. Environment variables like the SQS Queue URL, SNS Topic ARN and AWS region are passed to the image to enable it to perform actions on the SNS Topic and SQS Queue.
 
