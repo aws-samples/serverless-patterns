@@ -105,7 +105,7 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queu
 
     ```json
     {
-        "executionArn": "arn:aws:states:us-east-1:xxxxxxxxxx:execution:StepFunction1F935F84-n8RLIkg3Z8z3:0f8e9656-4165-4060-b124-0be35488f0c0",
+        "executionArn": "arn:aws:states:us-east-1:xxxxxxxxxxx:execution:StepFunction1F935F84-n8RLIkg3Z8z3:0f8e9656-4165-4060-b124-0be35488f0c0",
         "startDate": "2021-12-20T17:45:56.042000+01:00"
     }
     ```
@@ -119,8 +119,8 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queu
 
     ```json
     {
-        "executionArn": "arn:aws:states:us-east-1:867201269000:execution:StepFunction1F935F84-n8RLIkg3Z8z3:235b67e0-9131-479f-ae1c-c75a41a0f1c0",
-        "stateMachineArn": "arn:aws:states:us-east-1:867201269000:stateMachine:StepFunction1F935F84-n8RLIkg3Z8z3",
+        "executionArn": "arn:aws:states:us-east-1:xxxxxxxxxxx:execution:StepFunction1F935F84-n8RLIkg3Z8z3:235b67e0-9131-479f-ae1c-c75a41a0f1c0",
+        "stateMachineArn": "arn:aws:states:us-east-1:xxxxxxxxxxx:stateMachine:StepFunction1F935F84-n8RLIkg3Z8z3",
         "name": "235b67e0-9131-479f-ae1c-c75a41a0f1c0",
         "status": "RUNNING",
         "startDate": "2021-12-20T18:59:33.992000+01:00",
@@ -220,8 +220,8 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queu
 
     ```json
     {
-        "executionArn": "arn:aws:states:us-east-1:867201269000:execution:StepFunction1F935F84-n8RLIkg3Z8z3:235b67e0-9131-479f-ae1c-c75a41a0f1c0",
-        "stateMachineArn": "arn:aws:states:us-east-1:867201269000:stateMachine:StepFunction1F935F84-n8RLIkg3Z8z3",
+        "executionArn": "arn:aws:states:us-east-1:xxxxxxxxxxx:execution:StepFunction1F935F84-n8RLIkg3Z8z3:235b67e0-9131-479f-ae1c-c75a41a0f1c0",
+        "stateMachineArn": "arn:aws:states:us-east-1:xxxxxxxxxxx:stateMachine:StepFunction1F935F84-n8RLIkg3Z8z3",
         "name": "235b67e0-9131-479f-ae1c-c75a41a0f1c0",
         "status": "SUCCEEDED",
         "startDate": "2021-12-20T18:59:33.992000+01:00",
