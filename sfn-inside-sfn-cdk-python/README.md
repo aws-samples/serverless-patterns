@@ -92,15 +92,15 @@ AWS Step Functions
 
 ### Testing
 
-1. Start execution of the Step Function, using the Step Function Arn from the AWS CDK deployment outputs:
-
-    We want to send the following input
+This is the input we will send to our Step Function:
     ```json
         {
             "name": "serverless-land",
             "value": "idem"
         }
     ```
+
+1. Start execution of the Step Function, using the Step Function Arn from the AWS CDK deployment outputs:
 
     ```bash
     aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STEP_FUNCTION_ARN --input "{ \"Output\": { \"input\": {\"name\" : \"serverless-pattern\", \"value\": \"block\" }}}"
