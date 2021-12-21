@@ -31,7 +31,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 1. Change directory to the pattern directory:
    ```sh
-   cd msk-lambda-cdk/src
+   cd msk-lambda-cdk
    ```
 1. From the command line, use npm to install dependencies:
    ```sh
@@ -116,9 +116,7 @@ bootstrapBroker=`aws kafka get-bootstrap-brokers --region $REGION --output text 
 - [Using Lambda with Amazon MSK](https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html)
 - [Using Amazon MSK as an event source for AWS Lambda](https://aws.amazon.com/blogs/compute/using-amazon-msk-as-an-event-source-for-aws-lambda/)
 
-#TODO: ## Add image showing cloudwatch logs
-
-<!-- ![Cloudwatch](images/cloudwatch-logs.png) -->
+![Cloudwatch](images/cloudwatch-logs.png)
 
 ## Cleanup
 
