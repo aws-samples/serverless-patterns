@@ -101,6 +101,19 @@ This is the input we will send to our Step Function:
 }
 ```
 
+To make it work with the definition or our inner/outer Step Function we need to send our input with the following format
+
+```json
+{
+  "Output": {
+    "input": {
+      "name": "serverless-land",
+      "value": "idem"
+    }
+  }
+}
+```
+
 1. Start execution of the Step Function, using the Step Function Arn from the AWS CDK deployment outputs:
 
     ```bash
