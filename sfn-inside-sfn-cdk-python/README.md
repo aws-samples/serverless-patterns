@@ -100,7 +100,7 @@ AWS Step Functions
             "name": "serverless-land",
             "value": "idem"
         }
-    ```bash
+    ```
 
     ```bash
     aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STEP_FUNCTION_ARN --input "{ \"Output\": { \"input\": {\"name\" : \"serverless-pattern\", \"value\": \"block\" }}}"
