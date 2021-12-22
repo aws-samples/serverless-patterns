@@ -26,7 +26,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 2. Change directory to the pattern directory:
 
 ```
-cd s3-eventbridge
+cd serverless-patterns/s3-eventbridge
 ```
 
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
