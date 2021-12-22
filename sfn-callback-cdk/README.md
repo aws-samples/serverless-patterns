@@ -1,6 +1,6 @@
 # AWS Step Functions callback integration pattern
 
-This pattern shows how to integrate Step Functions workflows with external systems using Sqs and Lambda.
+This pattern shows how to integrate Step Functions workflows with external systems using Sqs and Lambda. Learn more about this pattern at: https://serverlessland.com/patterns/sfn-callback-cdk.
 
 This pattern deploys a Step Function, a Lambda function and an SQS queue.
 
