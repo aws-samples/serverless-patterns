@@ -52,7 +52,7 @@ Create a new local branch for each serverless pattern or modification being made
 
 Now is the time to create your new serverless pattern or modify existing code.
 
-1. If you are creating a new serverless pattern, copy the folder named "_pattern-model" to start with a template: `cp _pattern-model {new-folder-name}`
+1. If you are creating a new serverless pattern, copy the folder named "_pattern-model" to start with a template: `cp -r _pattern-model {new-folder-name}`
 1. If you are modifying existing code, make your code changes now.
 1. When your code is complete, stage the changes to your local branch: `git add .`
 1. Commit the changes to your local branch: `git commit -m 'Comment here'`
