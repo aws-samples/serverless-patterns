@@ -1,0 +1,178 @@
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Network Load Balancer, VPC Endpoint and auxiliary functions
+
+
+###############################################################################
+# Parameters 
+###############################################################################  
+
+Parameters:
+
+  pVpcId:
+    Description: VPC where the resources will be created.
+    Type: AWS::EC2::VPC::Id
+  pPrivateSubnetIds:
+    Description: Subnets where the NLB will be launched.
+    Type: List<AWS::EC2::Subnet::Id>
+  pCIDRRange:
+    Description: IP address range that is allowed to connect to the API.
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+
+###############################################################################
+# Resources 
+###############################################################################  
+
+Resources:
+
+################ NETWORK LOAD BALANCER (Necessary for VPC Link for REST API) ##########################
+
+  rNetworkLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internal 
+      Type: network
+      Subnets: !Ref pPrivateSubnetIds
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName} - NLB for API Gateway VPC Link'
+
+################ VPC ENDPOINT FOR API GATEWAY ##########################
+
+  rVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      PrivateDnsEnabled: true
+      SecurityGroupIds: 
+        - !GetAtt rVPCEndpointSecurityGroup.GroupId
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.execute-api'
+      SubnetIds: !Ref pPrivateSubnetIds
+      VpcEndpointType: "Interface"
+      VpcId: !Ref pVpcId
+
+################ SECURITY GROUP FOR VPC ENDPOINT ##########################
+
+  rVPCEndpointSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow HTTPS inbound traffic to API Gateway Endpoint.
+      VpcId: !Ref pVpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: !Ref pCIDRRange # ["10.0.0.0/8"] # This should include not only the VPC CIDR but also the on-prem network
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName} - Security group allowing HTTPS inbound traffic to API Gateway Endpoint'
+
+################################################################################################
+
+# Auxiliary Lambda function to get the NLB IP addresses
+
+  rLambdaFunctionNLBIPAddresses:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: AuxLambdaFunctionNLB/
+      Description: Look up info from NLB
+      Handler: index.handler
+      MemorySize: 128
+      Runtime: python3.6
+      Timeout: 30
+      Tags:
+        Name: !Sub '${AWS::StackName} - Function to get additional data from NLB'  
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17' 
+          Statement:
+            - Effect: Allow
+              Action:
+              - ec2:DescribeVpcs
+              - ec2:DescribeNetworkInterfaces
+              Resource: "*"
+
+  rNlbInfo:
+    Type: Custom::NlbInfo
+    DependsOn:
+      - rNetworkLoadBalancer
+    Properties:
+      ServiceToken: !GetAtt rLambdaFunctionNLBIPAddresses.Arn
+      NameFilter: !GetAtt rNetworkLoadBalancer.LoadBalancerFullName
+
+######## Auxiliary Lambda function to create custom security group with source private IP addresses from NLB.
+# It has to be custom, as we don't know how many addresses the NLB will have (one per subnet provided)
+
+  rLambdaFunctionSecurityGroup:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - rNlbInfo
+    Properties:
+      CodeUri: AuxLambdaFunctionSecGrp/
+      Description: Create custom security group with NLB IP addresses as source
+      Handler: index.lambda_handler
+      MemorySize: 128
+      Runtime: python3.6
+      Timeout: 30
+      Tags:
+        Name: !Sub '${AWS::StackName} - Function to create custom security group'
+      Environment: 
+        Variables: 
+          WhiteList: !GetAtt rNlbInfo.IpAddresses
+          VpcId: !Ref pVpcId
+          StackName: !Ref 'AWS::StackName'
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17' 
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'ec2:CreateSecurityGroup'
+                - 'ec2:AuthorizeSecurityGroupIngress'
+                - 'ec2:DeleteSecurityGroup'
+              Resource: '*'                  
+
+  rCustomSG:
+    Type: "Custom::CustomSG"
+    Properties:
+      ServiceToken: !GetAtt rLambdaFunctionSecurityGroup.Arn
+      Ports: 80
+      GroupName: MyCustomSecGroup
+      GroupDescription: Allows connections to port 80 from NLB private IP addresses
+      
+
+#####################################################
+################## OUTPUTS ##########################
+#####################################################
+
+Outputs:
+
+  oNetworkLoadBalancerArn:
+    Description: Network Load Balancer ARN
+    Value: !Ref rNetworkLoadBalancer
+    Export:
+      Name: !Sub '${AWS::StackName}-NetworkLoadBalancerArn'
+
+  oNetworkLoadBalancerDNSName:
+    Description: Network Load Balancer DNS Name
+    Value: !GetAtt rNetworkLoadBalancer.DNSName
+    Export:
+      Name: !Sub '${AWS::StackName}-NetworkLoadBalancerDNSName'
+
+  oVpcEndpointId:
+    Description: VPC Endpoint Id
+    Value: !Ref rVPCEndpoint
+    Export:
+      Name: !Sub '${AWS::StackName}-VPCEndpoint'
+
+  oCustomSecurityGroup:
+    Value: !GetAtt rCustomSG.SecGroupId
+    Export:
+      Name: !Sub '${AWS::StackName}-CustomSecurityGroup'
