@@ -8,7 +8,7 @@ The backend API to be protected is simulated by an ECS Fargate cluster running n
 
 Note: when deploying this pattern, both *CAPABILITY_AUTO_EXPAND* and *CAPABILITY_IAM* are required.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/cognito-httpapi](https://serverlessland.com/patterns/cognito-httpapi)
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-vpclink-fargate
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
