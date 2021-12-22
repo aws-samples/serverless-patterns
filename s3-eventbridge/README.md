@@ -4,7 +4,7 @@
 
 Learn more about this pattern at the Serverless Land Patterns Collection: https://serverlessland.com/patterns/s3-cloudtrail-eventbridge
 
-Note that from December 2021, S3 now publishes events directly to EventBridge [LINK](https://serverlessland.com/patterns/s3-eventbridge). This approach can be useful in cases where event monitoring/logging is also required. 
+Note: From December 2021, S3 allows publishing events directly to EventBridge [LINK](https://serverlessland.com/patterns/s3-eventbridge). The approach in current pattern can be useful in cases where event auditing/monitoring/logging is additionally required. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
