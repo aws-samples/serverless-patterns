@@ -16,7 +16,7 @@ This pattern deploys 4 AWS Step Functions.
 The outer Step Function will trigger the inner Step Functions, one by one, and waits for each one to finish before continuing.
 A sample inner Step Function is provided which has a single task of type [Pass](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-pass-state.html). Replace it with your own Step Function.
 
-Learn more about this pattern at: https://serverlessland.com/patterns/sfn-inside-sfn-cdk-python
+Learn more about this pattern at: https://serverlessland.com/patterns/sfn-sfn-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
