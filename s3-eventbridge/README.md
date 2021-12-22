@@ -92,13 +92,15 @@ below are snippets from the sqs message:
 
 ## Cleanup
 
-1. Delete the stack
+1. Navigate to the S3 buckets in AWS console and delete all artifacts so that buckets become empty. 
+
+2. Delete the stack
    
     ```bash
     aws cloudformation delete-stack --stack-name STACK_NAME
     ```
    
-1. Confirm the stack has been deleted
+3. Confirm the stack has been deleted
    
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
