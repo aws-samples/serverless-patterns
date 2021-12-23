@@ -1,6 +1,6 @@
 # MSK to Lambda
 
-This CDK stack deploys a Lambda function, an Amazon MSK topic, and the minimum IAM resources required to run the application.
+This CDK stack deploys a Lambda function, an Amazon MSK topic, and the minimum IAM resources required to run the application. Learn more about this pattern at https://serverlessland.com/patterns/msk-lambda-cdk.
 
 When items are published to the Amazon MSK topic, the changes are sent to a stream. This pattern configures a Lambda function to poll this stream, and log some information to CloudWatch. The function is invoked with a payload containing the information of the event.
 
