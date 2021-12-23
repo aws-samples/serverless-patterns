@@ -1,0 +1,207 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Backup CodeCommit to S3 using EventBridge and CodeBuild
+
+Resources:
+
+  # Bucket that will store the CodeCommit backups
+  CodeCommitBackupBucket:
+    Type: 'AWS::S3::Bucket'
+    Description: Bucket to store CodeCommit code
+    Properties:
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+
+  # Role with permisions for the CodeBuild project
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+            - Effect: Allow
+              Principal:
+                  Service:
+                    - codebuild.amazonaws.com
+              Action:
+                - sts:AssumeRole
+      Description: !Sub "IAM Role for ${AWS::StackName}"
+      Path: '/'
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - codecommit:GitPull
+                  - s3:Get*
+                  - s3:List*
+                  - s3:PutObject
+                Effect: Allow
+                Resource: '*'
+
+  # Project that clones the CodeCommit repository, compress the files in a .zip and uploads to S3              
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Description: CodeBuild project to sync CodeCommit repositories to S3 on backup account
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        EnvironmentVariables:
+          - Name: BUCKET
+            Value: !Ref CodeCommitBackupBucket
+            Type: PLAINTEXT
+          - Name: ACCOUNT
+            Value: !Sub ${AWS::AccountId}
+            Type: PLAINTEXT
+      Source:
+        Location: !Join
+          - ''
+          - - !Ref CodeCommitBackupBucket
+            - '/codebuild-source/'
+        Type: S3
+      TimeoutInMinutes: 10
+
+  # Lambda function to create the buildspec.yml in the CodeCommitBackupBucket 
+  CreateBuildspec:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.9
+      # Python inline code to create a buildspec.yml file in the backup bucket to run CodeBuild
+      InlineCode: |
+        import boto3
+        import os
+        import cfnresponse
+
+        def handler(event, context):
+            filename = "buildspec.yml"
+            # buildspec.yml code inside the string
+            string = """
+        version: 0.2
+        phases:
+          install:
+            commands:
+              - pip install git-remote-codecommit
+          build:
+            commands:
+              - git clone -b $REFERENCE_NAME codecommit::$REPO_REGION://$REPOSITORY_NAME
+              - dt=$(date '+%d-%m-%Y-%H:%M:%S');
+              - echo "$dt" 
+              - zip -r $dt-$REPOSITORY_NAME-backup.zip $REPOSITORY_NAME
+              - timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+              - aws s3 cp $dt-$REPOSITORY_NAME-backup.zip s3://$BUCKET/repositories/"""
+
+            encoded_string = string.encode("utf-8")
+            bucket_name = os.environ['bucket']
+            s3_path = "codebuild-source/" + filename
+            s3 = boto3.resource("s3")
+            responseData = {}
+            try:
+                print("Creating buildspec file")
+                s3.Bucket(bucket_name).put_object(Key=s3_path, Body=encoded_string)
+                print("File created")
+                responseData['Data'] = "File created"
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+            except Exception as e:
+                print("There was an error creating the file")
+                log_exception()
+                responseData['Data'] = e
+                cfnresponse.send(event, context, cfnresponse.FAILED, responseData)
+            return
+      Environment:
+        Variables:
+          bucket: !Ref CodeCommitBackupBucket
+      Policies:
+        - AWSLambdaExecute
+        - Version: '2012-10-17' 
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+              Resource: !Join                                                                                       
+                - ''
+                - - 'arn:aws:s3:::'
+                  - !Ref CodeCommitBackupBucket
+                  - '/*'
+
+  # Custom resource to trigger the Lambda function at deployment time
+  TriggerBuildspecCreation:
+    Type: AWS::CloudFormation::CustomResource
+    DependsOn: CreateBuildspec
+    Version: "1.0"
+    Properties:
+      ServiceToken: !GetAtt CreateBuildspec.Arn
+
+  # Role for the event 
+  EventRole:
+    Description: IAM role to allow Amazon CloudWatch Events to trigger AWS CodeBuild build
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - events.amazonaws.com
+          Sid: 1
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - codebuild:StartBuild
+            Effect: Allow
+            Resource: !GetAtt 'CodeBuildProject.Arn'
+        PolicyName: !Join
+          - '-'
+          - - !Ref 'AWS::StackName'
+            - CloudWatchEventPolicy
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - CloudWatchEventRule
+    Type: AWS::IAM::Role
+
+  # Event that triggers the CodeBuild when the content of a CodeCommit repository is modified 
+  EventRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: "EventRule"
+      EventPattern:
+        source:
+        - aws.codecommit
+        detail-type:
+        - CodeCommit Repository State Change
+        detail:
+          event:
+          - referenceCreated
+          - referenceUpdated
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt 'CodeBuildProject.Arn'
+          Id: CodeCommit2S3
+          RoleArn: !GetAtt 'EventRole.Arn'
+          InputTransformer:
+            InputPathsMap: 
+              "referenceType": "$.detail.referenceType"
+              "region": "$.region"
+              "repositoryName": "$.detail.repositoryName"
+              "account": "$.account"
+              "referenceName": "$.detail.referenceName"
+            InputTemplate: |
+              {"environmentVariablesOverride": [{"name": "REFERENCE_NAME","value": <referenceName>},{"name": "REFERENCE_TYPE","value": <referenceType>},{"name": "REPOSITORY_NAME","value": <repositoryName>},{"name": "REPO_REGION","value": <region>},{"name": "ACCOUNT_ID","value": <account>}]}
+
+Outputs:
+  CodeCommitBackupBucket:
+    Description: "Bucket to store the CodeCommit backup files"
+    Value:
+      Ref: CodeCommitBackupBucket              
