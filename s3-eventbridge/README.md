@@ -4,6 +4,8 @@
 
 Learn more about this pattern at the Serverless Land Patterns Collection: https://serverlessland.com/patterns/s3-cloudtrail-eventbridge
 
+Note: From December 2021, S3 allows publishing events directly to EventBridge [LINK](https://serverlessland.com/patterns/s3-eventbridge). The approach in current pattern can be useful in cases where event auditing/monitoring/logging is additionally required. 
+
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
 You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -26,7 +28,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 2. Change directory to the pattern directory:
 
 ```
-cd s3-eventbridge
+cd serverless-patterns/s3-eventbridge
 ```
 
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
@@ -90,13 +92,15 @@ below are snippets from the sqs message:
 
 ## Cleanup
 
-1. Delete the stack
+1. Navigate to the S3 buckets in AWS console and delete all artifacts so that buckets become empty. 
+
+2. Delete the stack
    
     ```bash
     aws cloudformation delete-stack --stack-name STACK_NAME
     ```
    
-1. Confirm the stack has been deleted
+3. Confirm the stack has been deleted
    
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"

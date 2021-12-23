@@ -57,24 +57,6 @@ Resources:
     Properties:
       BucketName: !Ref BucketNameForCloudTrailLogs
 
-  # Enforce HTTPS only access to S3 bucket #
-  BucketForImagePolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref BucketForCloudTrailLogs
-      PolicyDocument:
-        Statement:
-        - Action: s3:*
-          Effect: Deny
-          Principal: "*"
-          Resource:
-          - !Sub "arn:aws:s3:::${BucketNameForCloudTrailLogs}/*"
-          - !Sub "arn:aws:s3:::${BucketNameForCloudTrailLogs}"
-          Condition:
-            Bool:
-              aws:SecureTransport: false
-
-
   # Allow CloudTrail to use an S3 bucket for storing trails
   CloudTrailBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -83,6 +65,16 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
+          - Sid: AllowHTTPSOnlyAccessToS3
+            Action: s3:*
+            Effect: Deny
+            Principal: "*"
+            Resource:
+              - !Sub "arn:aws:s3:::${BucketNameForCloudTrailLogs}/*"
+              - !Sub "arn:aws:s3:::${BucketNameForCloudTrailLogs}"
+            Condition:
+              Bool:
+                aws:SecureTransport: false
           - Sid: AllowCheckingForPermissionsOnCloudTrailBucket
             Effect: Allow
             Principal:
