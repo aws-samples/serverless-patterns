@@ -1,0 +1,4 @@
+aws-cdk.core
+aws-cdk.aws-lambda
+aws-cdk.aws-logs
+aws-cdk.aws-sns
