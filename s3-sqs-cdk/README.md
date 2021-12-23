@@ -1,4 +1,4 @@
-# AWS S3 to AWS SQS 
+# Amazon S3 to AWS SQS 
 
 Sends notifications from S3 to SQS when an object is created
 
