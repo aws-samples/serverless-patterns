@@ -46,7 +46,6 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy
     ```
 
-
 ## How it works
 
 -   The VPC and Subnets are created;
