@@ -1,6 +1,6 @@
 # Amazon Aurora Serverless data ingestion from Amazon S3
 
-This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template to deploying an Aurora Serverless Cluster Database, a AWS Secrets Manager entry, a S3 bucket and a lambda function. The lambda function is triggered by a S3 put object and the handler ingest the .CSV file to the AWS Aurora Serverless. At this pattern an Aurora Table called movies is created at the first lambda call and the .CSV is designed according to the movies table.
+This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template to deploying an Aurora Serverless Cluster Database, a AWS Secrets Manager entry, a S3 bucket and a lambda function. The Lambda function is triggered by a S3 put object and the handler ingest the .CSV file to AWS Aurora Serverless. With this pattern, an Aurora table called *movies* is created at the first Lambda call and the .CSV is designed according to the movies table.
 
 Learn more about this pattern at Serverless Land Patterns: 
 [Amazon Aurora Serverless data ingestion from S3](https://github.com/aws-samples/serverless-patterns/aurora-serverless-s3-ingestion)
@@ -51,10 +51,10 @@ Important: this application uses various AWS services and there are costs associ
 -   The VPC and Subnets are created;
 -   A RDS security group is created to allow connections at 3306 port from all VPC CIDR range;
 -   The Amazon Aurora Serverless Cluster Database is created;
--   An IAM Policy to be used by the lambda function is created;
+-   An IAM Policy to be used by the Lambda function is created;
 -   An IAM Role is created;
 -   An S3 Bucket is created and is used as stage to raw data;
--   A lambda function is create using the same VPC as Amazon Aurora Serverless, with 10 minutes timeout and is triggered by S3 create put on the raw S3 bucket.
+-   A Lambda function is create using the same VPC as Amazon Aurora Serverless, with 10 minutes timeout and is triggered by S3 create put on the raw S3 bucket.
 
 ## Testing
 
