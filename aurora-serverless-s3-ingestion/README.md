@@ -50,12 +50,12 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 -   The VPC and Subnets are created;
--   A RDS security group is created to allow conections at 3306 port from all VPC CIDR range;
+-   A RDS security group is created to allow connections at 3306 port from all VPC CIDR range;
 -   The Amazon Aurora Serverless Cluster Database is created;
 -   An IAM Policy to be used by the lambda function is created;
 -   An IAM Role is created;
 -   An S3 Bucket is created and is used as stage to raw data;
--   A lambda function is create using the same VPC as Amazon Aurora Serverless, with 10 minutes timeout and is triggered by S3 creat put on the raw S3 bucket.
+-   A lambda function is create using the same VPC as Amazon Aurora Serverless, with 10 minutes timeout and is triggered by S3 create put on the raw S3 bucket.
 
 ## Testing
 
