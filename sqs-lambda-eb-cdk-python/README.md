@@ -1,6 +1,6 @@
 # Back pressure control pattern using Amazon SQS and AWS Lambda
 
-This pattern deploys deploys a Lambda function, an SQS queue and an EventBridge rule.
+This pattern deploys a Lambda function, an SQS queue and an EventBridge rule.
 
 The Lambda function is used control how many jobs to submit to a downstream service for each incoming message in an Amazon SQS queue.
 We may need to control the number of concurrent job executions due to a business requirement or due to scalability limitation of the downstream service. We are controlling the max number of concurrent executions by using a SQS queue. An Amazon EventBridge rule triggers an AWS Lambda function every 2 minutes to pick messages from SQS queue, one by one, until until we hit the max executions of our downstream service.

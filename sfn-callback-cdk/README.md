@@ -14,8 +14,6 @@ Learn more about Step Functions callbacks https://aws.amazon.com/blogs/compute/i
 
 The CDK application contains the minimum IAM resources required to run the application.
 
-Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda-cdk
-
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
