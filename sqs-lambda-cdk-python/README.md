@@ -1,7 +1,7 @@
 
 # Amazon SQS to AWS Lambda
 
-This pattern deploys deploys a Lambda function and an SQS queue. SQS invokes the Lambda function when new messages are available. The CDK application contains the minimum IAM resources required to run the application.
+This pattern deploys a Lambda function and an SQS queue. SQS invokes the Lambda function when new messages are available. The CDK application contains the minimum IAM resources required to run the application.
 
 Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda-cdk
 
