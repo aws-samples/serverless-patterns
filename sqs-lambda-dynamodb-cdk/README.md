@@ -1,9 +1,9 @@
 
 # Amazon SQS to Amazon DynamoDB
 
-This pattern deploys a SQS Queue, a Lambda Function and a DynamoDB allowing batch writes from SQS messages to a DynamoDb Table. The CDK application contains the minimum IAM resources required to run the application. 
+This pattern deploys a SQS Queue, a Lambda Function and a DynamoDB allowing batch writes from SQS messages to a DynamoDb Table. The CDK application contains the minimum IAM resources required to run the application.
 
-Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda-dynamodb-cdk
+Learn more about this pattern at: https://serverlessland.com/patterns/sqs-lambda-ddb-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -26,7 +26,7 @@ Amazon SQS to AWS Lambda to Amazon DynamoDb
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ```bash 
+    ```bash
     git clone https://github.com/aws-samples/serverless-patterns
     ```
 1. Change directory to the pattern directory:
@@ -41,13 +41,13 @@ Amazon SQS to AWS Lambda to Amazon DynamoDb
     ```bash
     source .venv/bin/activate
     ```
-    
+
     If you are in Windows platform, you would activate the virtualenv like this:
 
     ```
     % .venv\Scripts\activate.bat
     ```
-    
+
 1. Install python modules:
     ```bash
     python3 -m pip install -r requirements.txt
@@ -67,7 +67,7 @@ Amazon SQS to AWS Lambda to Amazon DynamoDb
     ````bash
     python3 -m pytest
     ````
-    
+
 
 ## How it works
 
@@ -153,7 +153,7 @@ aws dynamodb scan --table-name CLIENT
 ````
 
 ## Cleanup
- 
+
 1. Delete the stack
     ```bash
     aws cloudformation delete-stack --stack-name STACK_NAME
@@ -165,7 +165,7 @@ aws dynamodb scan --table-name CLIENT
 
 
 
-## Tutorial  
+## Tutorial
 See [this useful workshop](https://cdkworkshop.com/30-python.html) on working with the AWS CDK for Python projects.
 
 ## Useful commands

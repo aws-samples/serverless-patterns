@@ -22,14 +22,16 @@ This SAM template deploys resources needed to send iot events to IoT Core servic
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
-    sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
+    sam deploy --guided --capabilities CAPABILITY_NAMED_IAM CAPABILITY_NAMED_IAM 
     ```
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
+    * Enter VPC Id
+    * Enter Subnet Id
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy --guided --capabilities CAPABILITY_NAMED_IAM CAPABILITY_NAMED_IAM` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy --guided --capabilities CAPABILITY_NAMED_IAM CAPABILITY_NAMED_IAM` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
@@ -39,7 +41,13 @@ Explain how the service interaction works.
 
 ## Testing
 
-Use your choise of http client for testing against this endpoint: POST ${IoT Core Data Endpoint}/topics/$aws/rules/device_events with json body and http header 'x-amz-customauthorizer-name: anonymous-authorizer'.
+Use your choise of http client for testing against this endpoint: POST ${IoT Core Data Endpoint}/topics/$aws/rules/device_events with json body (any json data that your device would have sent) and http header 'x-amz-customauthorizer-name: anonymous-authorizer'.
+
+1. where to find IoT core data endpoint
+    * go to AWS IoT Core console
+    * click on settings on the left panel
+    * you will find Endpoint under "Device Data Endpoint section
+2. Test example: curl -X POST -v -H 'x-amz-customauthorizer-name: anonymous-authorizer' https://<replace with your iot data endpoint>topics/$aws/rules/device_events
 
 ## Cleanup
  
