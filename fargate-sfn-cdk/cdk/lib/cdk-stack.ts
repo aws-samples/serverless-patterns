@@ -1,5 +1,8 @@
 import { Duration, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { Vpc } from 'aws-cdk-lib/aws-ec2';
+import { Cluster, ContainerImage } from 'aws-cdk-lib/aws-ecs';
+import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
 import {
   Choice,
   Condition,
@@ -10,6 +13,7 @@ import {
   Wait,
   WaitTime
 } from 'aws-cdk-lib/aws-stepfunctions';
+import path = require('path');
 
 export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -43,9 +47,35 @@ export class CdkStack extends Stack {
         .when(Condition.booleanEquals('$.IsHelloWorldExample', true), successState)
         .when(Condition.booleanEquals('$.IsHelloWorldExample', false), failStateParallel));
 
-    new StateMachine(this, 'StateMachine', {
+    const stateMachine = new StateMachine(this, 'StateMachine', {
       definition,
       timeout: Duration.minutes(5),
     });
+
+    // Fargate definition
+    const vpc = new Vpc(this, 'Vpc', {
+      maxAzs: 3,
+    });
+
+    const cluster = new Cluster(this, 'Cluster', {
+      vpc: vpc,
+    });
+
+    const fargate = new ApplicationLoadBalancedFargateService(this, 'FargateService', {
+      cluster: cluster,
+      cpu: 512,
+      desiredCount: 1,
+      taskImageOptions: {
+        image: ContainerImage.fromAsset(path.join(__dirname, '../src/')),
+        environment: {
+          region: process.env.CDK_DEFAULT_REGION!,
+          stateMachineArn: stateMachine.stateMachineArn,
+        },
+      },
+      assignPublicIp: false,
+      memoryLimitMiB: 2048,
+    });
+
+    stateMachine.grantStartExecution(fargate.taskDefinition.taskRole);
   }
 }
