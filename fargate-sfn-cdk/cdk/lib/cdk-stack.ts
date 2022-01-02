@@ -1,8 +1,9 @@
 import { Duration, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { Vpc } from 'aws-cdk-lib/aws-ec2';
+import { InterfaceVpcEndpointAwsService, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Cluster, ContainerImage } from 'aws-cdk-lib/aws-ecs';
 import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import {
   Choice,
   Condition,
@@ -77,5 +78,25 @@ export class CdkStack extends Stack {
     });
 
     stateMachine.grantStartExecution(fargate.taskDefinition.taskRole);
+
+    // Interface endpoint
+    const sfnEndpoint = vpc.addInterfaceEndpoint('SfnInterfaceEndpoint', {
+      service: InterfaceVpcEndpointAwsService.STEP_FUNCTIONS,
+    });
+
+    // Allow start execution action from the Fargate Task Definition only
+    sfnEndpoint.addToPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new AnyPrincipal()],
+        actions: ['states:StartExecution'],
+        resources: [stateMachine.stateMachineArn],
+        conditions: {
+          ArnEquals: {
+            'aws:PrincipalArn': `${fargate.taskDefinition.taskRole.roleArn}`,
+          },
+        },
+      })
+    );
   }
 }
