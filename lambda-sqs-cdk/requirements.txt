@@ -1,0 +1,5 @@
+aws-cdk.assertions==1.134.0
+aws-cdk.aws_iam==1.134.0
+aws-cdk.aws-lambda==1.134.0
+aws-cdk.aws_sqs==1.134.0
+aws-cdk.core==1.134.0

@@ -73,12 +73,18 @@ Resources:
           - Sqs: 
               QueueUrl: !Ref IotEventQueue
               RoleArn: !GetAtt TopicRuleRole.Arn
+
+
+
   LambdaAuthorizer:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: iot-publish-authorizer
       Handler: index.handler
       Runtime: nodejs14.x
+      Environment:
+        Variables:
+          AWS_ACCOUNTID: !Ref AWS::AccountId
       InlineCode: |
         exports.handler = function(event, context, callback) { 
           var deviceId = event.protocolData.http.headers["x-device-id"];
@@ -99,7 +105,7 @@ Resources:
           connectStatement.Resource = ["*"];
           publishStatement.Action = ["iot:Publish"]; 
           publishStatement.Effect = 'Allow'; 
-          publishStatement.Resource = ["arn:aws:iot:us-east-2:722442000886:topic/*"]; 
+          publishStatement.Resource = [`arn:aws:iot:${process.env.AWS_REGION}:${process.env.AWS_ACCOUNTID}:topic/*`]; 
           policy.Statement[0] = connectStatement;
           policy.Statement[1] = publishStatement; 
           response.policyDocuments = [policy];
