@@ -66,7 +66,7 @@ For reference:
 
 <img src="./docs/01-cdk-deploy-output.png" alt="cdk-deploy-output" width="80%"/>
 
-There are 2 endpoints that integrate with the SQS queue.
+There are 2 endpoints that integrate with the SNS topic and SQS queue.
 
 Make a POST request to the `/publishmessage` endpoint. This publishes a message to the SNS topic. For example:
 
