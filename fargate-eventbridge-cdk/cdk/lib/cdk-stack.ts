@@ -1,9 +1,10 @@
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { Vpc } from 'aws-cdk-lib/aws-ec2';
+import { InterfaceVpcEndpointAwsService, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Cluster, ContainerImage } from 'aws-cdk-lib/aws-ecs';
 import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
 import { EventBus } from 'aws-cdk-lib/aws-events';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import path = require('path');
 
 export class CdkStack extends Stack {
@@ -38,6 +39,25 @@ export class CdkStack extends Stack {
     });
 
     bus.grantPutEventsTo(fargate.taskDefinition.taskRole);
+
+    const ebEndpoint = vpc.addInterfaceEndpoint('EbInterfaceEndpoint', {
+      service: InterfaceVpcEndpointAwsService.CLOUDWATCH_EVENTS,
+    });
+
+    // Allow putEvents action from the Fargate Task Definition only
+    ebEndpoint.addToPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new AnyPrincipal()],
+        actions: ['events:PutEvents'],
+        resources: [bus.eventBusArn],
+        conditions: {
+          ArnEquals: {
+            'aws:PrincipalArn': `${fargate.taskDefinition.taskRole.roleArn}`,
+          },
+        },
+      })
+    );
 
     new CfnOutput(this, 'EventBusName', { value: bus.eventBusName });
   }
