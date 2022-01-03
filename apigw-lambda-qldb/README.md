@@ -1,6 +1,6 @@
 # Amazon API Gateway to AWS Lambda to Amazon QLDB
 
-This pattern shows how to deploy a SAM template with Amazon API Gateway, AWS Lambda and Amazon Quantum Ledger Database (QLDB). The API Gateway exposes a REST API with a number of methods. Each API method uses a Lambda proxy integration to invoke a separate AWS Lambda function that interacts with a ledger in Amazon QLDB. This allows you to create a new Person record, update the record, view the current state of the record, and view the entire revision history.
+This pattern shows how to deploy a SAM template with Amazon API Gateway, AWS Lambda and Amazon Quantum Ledger Database (QLDB). The API Gateway exposes a REST API with a number of methods. Each API method uses a Lambda proxy integration to invoke a separate AWS Lambda function that interacts with a ledger in Amazon QLDB. This allows you to create a new Person record, update the record, delete the record, view the current state of the record, and view the entire revision history.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -160,6 +160,17 @@ This will return all document revisions. Each document consists of four parts. T
     ...
 ]
 ```
+
+### Delete Person record
+
+Delete the Person record by making an HTTP DELETE call to the endpoint which ends `/Prod/person/<personId>`. The `curl` command for this is shown below:
+
+```code
+curl --location --request DELETE <your API endpoint> \
+--header 'Content-Type: application/json'
+```
+
+This will delete the record from the current state view, but you will still be able to view the full revision history.
 
 ## Cleanup
  

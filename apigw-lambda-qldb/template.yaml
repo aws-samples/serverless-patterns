@@ -41,9 +41,6 @@ Resources:
       CodeUri: src
       Handler: create-person.handler
       Runtime: nodejs14.x
-      Environment:
-        Variables:
-          LEDGER_NAME: !Ref QldbLedger
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: 2012-10-17
@@ -119,7 +116,7 @@ Resources:
             Path: '/person/history/{personid}'
             Method: get
 
-  # Create Lambda function to update Person record
+  # Create Lambda function to update Person record  
   UpdatePerson:
     Type: AWS::Serverless::Function
     Properties:
@@ -146,6 +143,35 @@ Resources:
           Properties:
             Path: '/person/{personid}'
             Method: post
+
+
+  # Create Lambda function to delete Person record  
+  DeletePerson:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src
+      Handler: delete-person.handler
+      Runtime: nodejs14.x
+      MemorySize: 512
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow 
+              Action:
+                - qldb:SendCommand
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}
+            - Effect: Allow 
+              Action:
+                - qldb:PartiQLDelete
+                - qldb:PartiQLSelect
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}/*
+      Events:
+        HttpPost:
+          Type: Api
+          Properties:
+            Path: '/person/{personid}'
+            Method: delete
 
 
 # List all common outputs for usage
