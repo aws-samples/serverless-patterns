@@ -1,9 +1,8 @@
-# AWS State Functions (SFN) integration with AWS VPC Lambda
+# AWS Step Functions (SFN) integration with AWS Lambda with VPC access.
 
-This pattern in CDK offers a example to generate an Amazon State Machine which
-consumes AWS Lambda function which is deployed inside AWS VPC.
+This pattern in CDK offers a example to generate an AWS Step Functions state machine which consumes an AWS Lambda function with AWS VPC access.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/vpc-lambda-sfn
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-lambda-vpc-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
