@@ -46,7 +46,7 @@ Warning: As of this writing, there are known issues with the images built on App
 - The image is constructed directly from sources on disk when `cdk deploy` is executed
 - The image is automatically pushed to Amazon ECR
 - Networking resources are created
-- The Aurara Serverless Cluster is created
+- The Aurora Serverless Cluster is created
 - The ECS cluster is created
 - Finally the Fargate Service and the Task Definitions are created. This also passes the environment variables (database name, secrets ARN, and Aurora Serverless Cluster ARN) to the image
 
