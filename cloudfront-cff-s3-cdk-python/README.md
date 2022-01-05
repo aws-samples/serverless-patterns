@@ -1,4 +1,4 @@
-# Random A/B at the edge using Amazon CloudFront and Amazon CloudFront Functions
+# Random A/B testing at the edge using Amazon CloudFront and Amazon CloudFront Functions
 
 This pattern deploys an Amazon Cloudfront distribution, an Amazon Cloudfront Function and a Amazon S3 Bucket and demonstrates how to implement an A/B testing solution.
 
