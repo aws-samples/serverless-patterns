@@ -37,7 +37,7 @@ CDK
 
 ## Services From/To
 
-Amazon Cloudfront to Amazon Cloudfront Functions to Amazon S3
+Amazon Cloudfront to AWS Lambda@Edge
 
 ## Deployment Instructions
 
