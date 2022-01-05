@@ -1,6 +1,6 @@
 # Lambda to Pinpoint
 
-This pattern demonstrates a Lambda function sending SMS via Pinpoint.
+This pattern demonstrates a Lambda function sending SMS via Pinpoint. Deploying the pattern will create 1 Lambda function and 1 Pinpoint project.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
