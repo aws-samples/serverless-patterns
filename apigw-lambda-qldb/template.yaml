@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon QLDB
+
+# Comment on each global 
+Globals:
+
+  # Enable X-Ray tracing on API Gateway and prevent default Stage being created
+  Api:
+    TracingEnabled: true
+    OpenApiVersion: 3.0.1
+
+  # Set default values for all Lambda functions
+  Function:
+    Tracing: Active
+    Timeout: 6
+    Environment:
+      Variables:
+        LEDGER_NAME: !Ref QldbLedger
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+
+Resources:
+
+  # Create a new QLDB Ledger
+  QldbLedger:
+    Type: AWS::QLDB::Ledger
+    Properties:
+      Name: qldb-serverless-pattern
+      DeletionProtection: false
+      PermissionsMode: STANDARD
+      Tags:
+        - 
+          Key: name
+          Value: qldb-serverless-pattern
+
+  # Create Lambda function to create Person record
+  CreatePerson:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src
+      Handler: create-person.handler
+      Runtime: nodejs14.x
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow 
+              Action:
+                - qldb:SendCommand
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}
+            - Effect: Allow 
+              Action:
+                - qldb:PartiQLInsert
+                - qldb:PartiQLUpdate
+                - qldb:PartiQLSelect
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}/*
+      Events:
+        HttpPost:
+          Type: Api
+          Properties:
+            Path: '/person'
+            Method: post
+
+  # Create Lambda function to retrieve latest Person details
+  GetPerson:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src
+      Handler: get-person.handler
+      Runtime: nodejs14.x
+      MemorySize: 512
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow 
+              Action:
+                - qldb:SendCommand
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}
+            - Effect: Allow 
+              Action:
+                - qldb:PartiQLSelect
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}/*
+      Events:
+        HttpPost:
+          Type: Api
+          Properties:
+            Path: '/person/{personid}'
+            Method: get
+
+  # Create Lambda function to retrieve Person history
+  GetPersonHistory:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src
+      Handler: get-person-history.handler
+      Runtime: nodejs14.x
+      MemorySize: 512
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow 
+              Action:
+                - qldb:SendCommand
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}
+            - Effect: Allow 
+              Action:
+                - qldb:PartiQLHistoryFunction
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}/*
+      Events:
+        HttpPost:
+          Type: Api
+          Properties:
+            Path: '/person/history/{personid}'
+            Method: get
+
+  # Create Lambda function to update Person record  
+  UpdatePerson:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src
+      Handler: update-person.handler
+      Runtime: nodejs14.x
+      MemorySize: 512
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow 
+              Action:
+                - qldb:SendCommand
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}
+            - Effect: Allow 
+              Action:
+                - qldb:PartiQLSelect
+                - qldb:PartiQLUpdate
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}/*
+      Events:
+        HttpPost:
+          Type: Api
+          Properties:
+            Path: '/person/{personid}'
+            Method: post
+
+
+  # Create Lambda function to delete Person record  
+  DeletePerson:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src
+      Handler: delete-person.handler
+      Runtime: nodejs14.x
+      MemorySize: 512
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow 
+              Action:
+                - qldb:SendCommand
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}
+            - Effect: Allow 
+              Action:
+                - qldb:PartiQLDelete
+                - qldb:PartiQLSelect
+              Resource: !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}/*
+      Events:
+        HttpPost:
+          Type: Api
+          Properties:
+            Path: '/person/{personid}'
+            Method: delete
+
+
+# List all common outputs for usage
+Outputs:
+
+  PersonApi:
+    Description: "API Gateway endpoint URL for Prod stage for Person functions"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/person/"
+
+  PersonLedger:
+    Description: QLDB Ledger for the sample application
+    Value: !Ref QldbLedger
+    Export:
+      Name: qldb-serverless-pattern
