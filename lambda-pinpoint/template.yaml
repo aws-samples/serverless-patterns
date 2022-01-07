@@ -29,8 +29,8 @@ Resources:
       Environment:
         Variables:
           PINPOINT_PROJECT_ID: !Ref PinpointApp
-          ORIGINATION_NUMBER: "+18334221083"
-          DESTINATION_NUMBER: "+12484620038"
+          ORIGINATION_NUMBER: "+XXXXXXXXXX"
+          DESTINATION_NUMBER: "+XXXXXXXXXX"
   PinpointApp:
     Type: AWS::Pinpoint::App
     Properties: 
