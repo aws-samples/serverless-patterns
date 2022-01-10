@@ -17,19 +17,15 @@ Use the model template located at https://github.com/aws-samples/serverless-patt
 
 ## Language: (optional e.g. "Python", if you have a Lambda function in your example)
 
-## YouTube videoId (optional e.g. "VI79XQW4dIM")
-
 ## Framework (currently we support SAM or CDK)
 
-## Services from/to (e.g. "Lambda to EventBridge)
+## Services used (e.g. "Lambda to EventBridge)
 
-## Description (this must include a throughout explanation of the pattern together with details of IAM permissioning)
+## Description (this must include a detailed explanation of the pattern together with details of IAM permissioning)
 
 ## Deployment commands
 
 ## GitHub PR for template: 
-
-## Payload example (e.g. Lambda event payload from source service).
 
 ## Additional resources (optional: link and anchor text, up to 5 resources)
 
