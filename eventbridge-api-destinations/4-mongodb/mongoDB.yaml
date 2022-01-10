@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create an API destination in EventBridge - open API using MongoDB.com
+
+Parameters:
+  MyMongoDBURL:
+    Type: String
+    Default: '<<ENTER YOUR UNIQUE URL HERE>>'
+  MyAPIKeyName:
+    Type: String
+    Default: '<<Enter your APIKeyName>>'
+  MyAPIKeyValue:
+    Type: String
+    Default: '<<Enter your APIKeyValue>>' 
+
+Resources:
+  MyEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "MyMongoDBEventBus"
+
+  MyConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      Description: 'My connection with an API key'
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: !Ref MyAPIKeyName
+          ApiKeyValue: !Ref MyAPIKeyValue
+        InvocationHttpParameters:
+          BodyParameters:
+            - Key: 'api-key'
+              Value: !Ref MyAPIKeyValue
+              IsValueSecret: false
+
+  MyApiDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'MyMongoDBTest'
+      ConnectionArn: !GetAtt MyConnection.Arn
+      InvocationEndpoint: !Ref MyMongoDBURL
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+
+  EventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt MyApiDestination.Arn
+  MyDLQueue: 
+    Type: AWS::SQS::Queue
+
+  EventRule: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      State: "ENABLED"
+      EventBusName: !Ref MyEventBus
+      EventPattern: 
+        source:
+          - "MyTestApp"
+        detail-type:
+          - "MyTestMessage"       
+      Targets: 
+        - Arn: !GetAtt MyApiDestination.Arn
+          RoleArn: !GetAtt EventBridgeTargetRole.Arn
+          Id: "MyAPIdestination"
+          InputTransformer:
+            InputPathsMap:
+              "api" : "$.detail.api-key"
+              "body" : "$.detail.message"
+            InputTemplate: |
+              {
+                "body" : <body>,
+                "api-key" : <api>
+              }
+          DeadLetterConfig:
+            Arn: !GetAtt MyDLQueue.Arn
+
+Outputs:
+  MyEventBusName:
+    Description: Application EventBus Name
+    Value: !Ref MyEventBus
+
+  MyEventBusArn:
+    Description: Application EventBus ARN
+    Value: !GetAtt MyEventBus.Arn
+
+  MyConnectionName:
+    Value: !Ref MyConnection
+  MyConnectionArn:
+    Value: !GetAtt MyConnection.Arn        
+
+  MyApiDestinationName:
+    Value: !Ref MyApiDestination
+  MyApiDestinationArn:
+    Value: !GetAtt MyApiDestination.Arn
+
+  EventBridgeTargetRoleArn:
+    Value: !GetAtt EventBridgeTargetRole.Arn
+
+  MyDLQueue:
+    Value: !GetAtt MyDLQueue.Arn

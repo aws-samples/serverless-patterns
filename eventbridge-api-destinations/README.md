@@ -17,6 +17,7 @@ Important: this application uses various AWS services and there are costs associ
 * To run example #1, an account with [Webhook.site](https://webhook.site/)
 * To run example #2, an account with [Slack](http://slack.com). Follow the instructions at [Create a bot for your workspace](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) and note the bot's token (this code begins with xoxb) and the channel ID. You need both of these values to deploy the solution.
 * To run example #3, an account with [sumologic](https://sumologic.com). Follow the instructions at [Create an HTTP Source ](https://help.sumologic.com/03Send-Data/Sources/02Sources-for-Hosted-Collectors/HTTP-Source) and note the unique URL for your HTTP Source you need this value to deploy the solution.
+* To run example #4, an account with [mongodb](https://www.mongodb.com/). Follow the instructions at [Create an HTTPS Endpoint](https://docs.mongodb.com/realm/endpoints/) and note the unique URL for your API destination endpoint to deploy the solution.
 
 ## Deployment Instructions
 
@@ -32,6 +33,7 @@ Important: this application uses various AWS services and there are costs associ
 - To run the Webhook.test open API example, cd to `1-webhook-site`.
 - To run the Slack authenticated API example, cd to `2-slack`.
 - To run the sumologic HTTP Source collector example, cd to `3-sumologic`.
+- To run the mongoDB API destination example, cd to `4-mongodb`.
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
@@ -54,6 +56,7 @@ aws events put-events --entries file://testEvent.json
 2. In the Webhook.site example, the API call appears in the dashboard.
 3. In the Slack example, a message appears in the specified Slack channel ("Payment failed").
 4. For the sumo logic example use the testEvent.json within the 3-sumologic directory
+5. For the mongoDB example use the testEvent.json within the 4-mongodb directory
 ```
 aws events put-events --entries file://3-sumologic/testEvent.json
 ```
