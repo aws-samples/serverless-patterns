@@ -25,13 +25,13 @@ class LambdaLayerXRayStackStack(Stack):
         bucket = s3.Bucket(self, 
                             id='SourceBucket',
                             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
-                            bucket_name='thumbnail-upload-372'
+                            bucket_name='<your-name>-thumbnail-upload-372'
                         ) 
 
         ResizedBucket = s3.Bucket(self, 
                             id='ResizedBucket',
                             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
-                            bucket_name='thumbnail-upload-372-resized'
+                            bucket_name='<your-name>-thumbnail-upload-372-resized'
                         )
 
         # -------------------------------------------------------------------------------------
