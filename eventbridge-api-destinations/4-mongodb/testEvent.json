@@ -1,0 +1,8 @@
+[
+    {
+        "DetailType": "MyTestMessage",
+        "EventBusName": "MyMongoDBEventBus",
+        "Source": "MyTestApp",
+        "Detail": "{\"message\":\"<message>\"}"
+    }
+  ]
