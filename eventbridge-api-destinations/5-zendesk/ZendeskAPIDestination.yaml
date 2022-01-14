@@ -57,7 +57,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: 'events:InvokeApiDestination'
-                Resource: '*'
+                Resource: !GetAtt PutTicketsAPIDestination.Arn
 
 
   MyDLQueue: 
