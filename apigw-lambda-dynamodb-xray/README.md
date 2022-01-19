@@ -50,20 +50,16 @@ This CDK application deploys an Amazon API Gateway REST API that uses a Lambda f
 ## Testing
 
 Retrieve the API Gateway URL from the `cdk deploy` output. It should look something like this
-
     ```
     ApigwLambdaDynamodbCdkTsStack.RestAPIEndpointB14C3C54 = https://abcd123efg.execute-api.us-west-2.amazonaws.com/prod/
-
     ```
 To make the GET request to scan your Dynamodb table, run:
-
     ```
     curl <your-restapi-endpoint-url>/scan
     # example
     curl https://abcd123efg.execute-api.us-west-2.amazonaws.com/prod/scan
     ```
 You will receive a response as follows because there is currently no items in the Dynamodb table:
-
     ```
     {"Items":[],"Count":0,"ScannedCount":0}
     ```
@@ -74,11 +70,9 @@ Now, you can navigate to the [Amazon Cloudwatch console](https://console.aws.ama
 ## Cleanup
 
 Delete the stack
-
     ```
     cdk destroy
     ```
-
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
