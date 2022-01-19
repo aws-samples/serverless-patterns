@@ -41,7 +41,7 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy
     ```
    Once deployment completes, you will see the REST API endpoint as an output. You will use this URL for testing/ making GET request.
-   
+
 
 ## How it works
 
@@ -66,7 +66,7 @@ This CDK application deploys an Amazon API Gateway REST API that uses a Lambda f
     ```
 4. Now, you can navigate to the [Amazon Cloudwatch console](https://console.aws.amazon.com/cloudwatch). Under **X-Ray traces**, you will see the service map that shows the entire journey of the GET request.
 
-<img src="./docs/xray-service-map.png" alt="xray-service-map" width="90%"/>
+   <img src="./docs/xray-service-map.png" alt="xray-service-map" width="90%"/>
 
 ## Cleanup
 
