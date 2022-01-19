@@ -41,6 +41,7 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy
     ```
    Once deployment completes, you will see the REST API endpoint as an output. You will use this URL for testing/ making GET request.
+   
 
 ## How it works
 
@@ -49,30 +50,31 @@ This CDK application deploys an Amazon API Gateway REST API that uses a Lambda f
 
 ## Testing
 
-Retrieve the API Gateway URL from the `cdk deploy` output. It should look something like this
+1. Retrieve the API Gateway URL from the `cdk deploy` output. It should look something like this
     ```
     ApigwLambdaDynamodbCdkTsStack.RestAPIEndpointB14C3C54 = https://abcd123efg.execute-api.us-west-2.amazonaws.com/prod/
     ```
-To make the GET request to scan your Dynamodb table, run:
+2. To make the GET request to scan your Dynamodb table, run:
     ```
     curl <your-restapi-endpoint-url>/scan
     # example
     curl https://abcd123efg.execute-api.us-west-2.amazonaws.com/prod/scan
     ```
-You will receive a response as follows because there is currently no items in the Dynamodb table:
+3. You will receive a response as follows because there is currently no items in the Dynamodb table:
     ```
     {"Items":[],"Count":0,"ScannedCount":0}
     ```
-Now, you can navigate to the [Amazon Cloudwatch console](https://console.aws.amazon.com/cloudwatch). Under **X-Ray traces**, you will see the service map that shows the entire journey of the GET request.
+4. Now, you can navigate to the [Amazon Cloudwatch console](https://console.aws.amazon.com/cloudwatch). Under **X-Ray traces**, you will see the service map that shows the entire journey of the GET request.
 
 <img src="./docs/xray-service-map.png" alt="xray-service-map" width="90%"/>
 
 ## Cleanup
 
 Delete the stack
-    ```
-    cdk destroy
-    ```
+
+```
+cdk destroy
+```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
