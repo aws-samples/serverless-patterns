@@ -1,0 +1,56 @@
+{
+  "title": "Observing into Lambda downstreams with X-Ray SDK",
+  "description": "Create a REST API with X-Ray SDK integrated Lambda backend that scans a DynamoDB with enhanced observability.",
+  "language": "Typescript",
+  "architectureURL": "",
+  "videoId": "",
+  "level":"200",
+  "framework": "CDK",
+  "services": {
+    "from": "apigw",
+    "to": "lambda, dynamodb and xray"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application deploys an Amazon API Gateway REST API that uses a Lambda function as the backend integration to scan a Dynamodb table. The REST API and Lambda function both have X-Ray tracing enabled. X-Ray SDK is also integrated in the Lambda function to observe into the API call to the downstream Dynamodb table."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd cdk && npm run prebuild && cdk deploy"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-dynamodb-xray",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/apigw-lambda-dynamodb-xray/cdk/lib/apigw-lambda-dynamodb-cdk-ts.ts",
+      "readmeURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/apigw-lambda-dynamodb-xray/README.md"
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Integrating AWS X-Ray to Observe Into Your Lambda Function",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/nodejs-tracing.html"
+      },
+      {
+        "text": "Using AWS X-Ray service maps and trace views with API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-using-xray-maps.html"
+      }      
+    ]
+  },
+  "author": {
+    "headline": "Presented by Guyu Ye",
+    "name": "Guyu Ye",
+    "imageURL": "https://phonetool.amazon.com/users/guyye",
+    "bio": "Sustainability App Architect @ AWS"
+  }
+}
