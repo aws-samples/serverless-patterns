@@ -1,0 +1,133 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon QLDB
+
+# Comment on each global 
+Globals:
+
+  # Enable X-Ray tracing on API Gateway and prevent default Stage being created
+  Api:
+    TracingEnabled: true
+    OpenApiVersion: 3.0.1
+
+  # Set default values for all Lambda functions
+  Function:
+    Tracing: Active
+    Timeout: 6
+    Environment:
+      Variables:
+        TABLE_NAME: qldb-person
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+Resources:
+
+  # Create Lambda function to consume from Kinesis and write to DynamoDB table or SQS error queue
+  QldbStreamsDynamoDBLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src
+      Handler: qldb-streams-dynamodb.handler
+      Runtime: nodejs14.x
+      MemorySize: 1024
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17 
+          Statement: 
+            - Effect: Allow 
+              Action:
+                - kinesis:ListStreams 
+                - kinesis:DescribeStream 
+                - kinesis:GetRecords 
+                - kinesis:GetShardIterator
+                - kinesis:PutRecord
+              Resource: !GetAtt QLDBDynamoDBKinesis.Arn 
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:Scan
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+              Resource: !GetAtt PersonTable.Arn
+            - Effect: "Allow"
+              Action:
+                - "sqs:SendMessage"
+              Resource:
+                Fn::GetAtt: [StreamsFailureQueue, Arn]
+
+  # Create DynamoDB table
+  PersonTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    Properties:
+      TableName: qldb-person
+      AttributeDefinitions:
+        - AttributeName: "pk"
+          AttributeType: S
+      KeySchema:
+        - AttributeName: "pk"
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  # Create Kinesis Data Stream
+  QLDBDynamoDBKinesis:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: LicenceStreamKinesis
+      RetentionPeriodHours: 168
+      ShardCount: 1
+
+  # Create IAM Role used by QLDB service to write to Kinesis Data Streams
+  QLDBDynamoDBKinesisRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: qldb.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: QLDBDynamoDBKinesisPermissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kinesis:ListShards
+                  - kinesis:DescribeStream
+                  - kinesis:PutRecord*
+                Resource: !GetAtt QLDBDynamoDBKinesis.Arn
+
+  # Create QLDB Stream hooking up QLDB Ledger to Kinesis Data Stream
+  PersonQLDBStream:
+    Type: AWS::QLDB::Stream
+    Properties:
+      InclusiveStartTime: "2020-05-29T00:00:00Z"
+      KinesisConfiguration:
+        AggregationEnabled: true
+        StreamArn: !GetAtt QLDBDynamoDBKinesis.Arn
+      LedgerName: !ImportValue qldb-serverless-pattern
+      RoleArn: !GetAtt QLDBDynamoDBKinesisRole.Arn
+      StreamName: qldb-licence-dynamodb-sam
+
+  # Create SQS queue as a failure queue
+  StreamsFailureQueue:
+    Type: AWS::SQS::Queue
+
+  # Create Event Source Mapping between Kinesis Data Stream and Lambda function
+  MyEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 50
+      BisectBatchOnFunctionError: true
+      DestinationConfig: 
+        OnFailure: 
+          Destination: !GetAtt StreamsFailureQueue.Arn
+      Enabled: true
+      EventSourceArn: !GetAtt QLDBDynamoDBKinesis.Arn
+      FunctionName: !GetAtt QldbStreamsDynamoDBLambdaFunction.Arn
+      MaximumRetryAttempts: 1
+      StartingPosition: "TRIM_HORIZON"

@@ -27,7 +27,7 @@ module.exports.handler = async (event) => {
         } else {
           person = JSON.parse(JSON.stringify(resultList));
         }
-    }, () => Log.info("Retrying due to OCC conflict..."));
+    }, () => console.log("Retrying due to OCC conflict..."));
 
     console.log(`PERSON: ${person}`);
     return {
