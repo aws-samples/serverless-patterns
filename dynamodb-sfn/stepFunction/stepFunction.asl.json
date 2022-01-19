@@ -1,15 +1,11 @@
 {
-    "Comment": "A Hello World example of the Amazon States Language using Pass states",
-    "StartAt": "Hello",
+    "Comment": "An example of inserting Data into DynamoDB via Lambda function",
+    "StartAt": "HelloWorld",
     "States": {
-        "Hello": {
-            "Type": "Pass",
-            "Next": "World"
-        },
-        "World": {
-            "Type": "Pass",
-            "Result": "World",
-            "End": true
-        }
+      "HelloWorld": {
+        "Type": "Task",
+        "Resource": "${LambdaFunctionArn}",
+        "End": true
+      }
     }
-}
+  }

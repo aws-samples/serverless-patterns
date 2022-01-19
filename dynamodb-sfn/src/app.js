@@ -1,23 +1,12 @@
 const AWS = require('aws-sdk');
 
 exports.handler =  async (event) => {
-    const 
-    const stepFunctionARN = process.env.StateMachineArn
+    var docClient = new AWS.DynamoDB.DocumentClient()
     const params = {
-        stateMachineArn: sfnArn,
-        input: JSON.stringify(event),
-    };
-
-    const stepfunctions = new AWS.StepFunctions();
-    let res
-    try {
-     res = await stepfunctions.startExecution(params).promise()
-    }catch(err){
-    console.error(err)
+        TableName: process.env.TableName,
+        Item: {
+            "transaction_id": event.transaction_id
+        }
     }
-
-    return {
-    "Started": res
-    };
-
+    await docClient.put(params).promise()
 }

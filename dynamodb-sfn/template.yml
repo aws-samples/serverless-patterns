@@ -1,127 +1,76 @@
-
-   
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
-Description: An Amazon DynamoDB trigger that logs the updates made to a table.
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Invoke a StepFunction state machine from a DynamoDB streams via Lambda function
 Resources:
-  DynamoDBProcessStreamFunction:
-    Type: 'AWS::Serverless::Function'
+##########################################################################
+#   DynamoDB Table                                                      #
+##########################################################################
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
     Properties:
-      Handler: app.handler
-      Runtime: nodejs14.x
-      CodeUri: src/
-      Description: An Amazon DynamoDB trigger that logs the updates made to a table.
-      MemorySize: 128
-      Timeout: 3
-      Events:
-        MyDynamoDBtable:
-          Type: DynamoDB
-          Properties:
-            Stream: !GetAtt MyDynamoDBtable.StreamArn
-            StartingPosition: TRIM_HORIZON
-            BatchSize: 100
-  MyDynamoDBtable:
-    Type: 'AWS::DynamoDB::Table'
-    Properties:
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
+        - AttributeName: transaction_id
+          AttributeType: "S" 
       KeySchema:
-        - AttributeName: id
+        - AttributeName: transaction_id
           KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
-      StreamSpecification:
-        StreamViewType: NEW_IMAGE
-  MyStateMachineLogGroup:
-    Type: AWS::Logs::LogGroup
+      
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  LambdaFunction:
     Properties:
-      RetentionInDays: 14
-      LogGroupName: !Sub "/statemachines/MyStateMachineLogGroup"
-  MyStateMachine:
+      CodeUri: src/
+      Environment:
+        Variables:
+          TableName: !Ref DynamoDBTable
+      FunctionName: MyLamdaFunction
+      Handler: app.handler
+      MemorySize: 3008
+      Policies:
+        - CloudWatchLogsFullAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
+      Runtime: nodejs12.x
+      Timeout: 30
+      Tracing: Active
+    Type: AWS::Serverless::Function
+
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+  StateMachine:
     Type: AWS::Serverless::StateMachine
     Properties:
       DefinitionUri: stepFunction/stepFunction.asl.json
+      DefinitionSubstitutions:
+        LambdaFunctionArn: !GetAtt LambdaFunction.Arn
       Logging:
         Destinations:
           - CloudWatchLogsLogGroup:
-              LogGroupArn: !GetAtt MyStateMachineLogGroup.Arn
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
         IncludeExecutionData: false
         Level: ERROR
       Policies:
         - CloudWatchLogsFullAccess
+        - LambdaInvokePolicy:
+            FunctionName: !Ref LambdaFunction
 
+##########################################################################
+#  STEP FUNCTION LOG GROUP                                               #
+##########################################################################
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", StateMachine]]
+        
+Outputs:
+  StateMachine:
+    Value: !Ref StateMachine
+    Description: Statemachine Arn
 
-# AWSTemplateFormatVersion: '2010-09-09'
-# Transform: 'AWS::Serverless-2016-10-31'
-# Description: An AWS DynamoDB triggers a AWS Step Function via AWS Lambda.
-# Resources:
-#   ########################### STEP FUNCTION ###########################
-
-#   MyStateMachineLogGroup:
-#     Type: AWS::Logs::LogGroup
-#     Properties:
-#       RetentionInDays: 14
-#       LogGroupName: !Sub "/statemachines/MyStateMachineLogGroup"
-
-#   ### Step Function to iterate over stores and retrieve updates
-#   MyStateMachine:
-#     Type: AWS::Serverless::StateMachine
-#     Properties:
-#       DefinitionUri: stepFunction/stepFunction.asl.json
-#       Logging:
-#         Destinations:
-#           - CloudWatchLogsLogGroup:
-#               LogGroupArn: !GetAtt MyStateMachineLogGroup.Arn
-#         IncludeExecutionData: false
-#         Level: ERROR
-#       Policies:
-#         - CloudWatchLogsFullAccess
-
-#   ########################### LAMBDA FUNCTION ###########################
-#   MyStepFunction:
-#     Type: AWS::Serverless::Function
-#     Properties:
-#       CodeUri: src
-#       Environment:
-#         Variables:
-#           STEP_FUNCTION_ARN: !GetAtt MyStateMachine.Arn
-#       Events:
-#         MyDynamoDBtableEvent:
-#           Type: DynamoDB
-#           Properties:
-#             Stream: !GetAtt MyDynamoDBtable.StreamArn
-#             StartingPosition: TRIM_HORIZON
-#             BatchSize: 100
-#       Handler: processItemsPerStore.processItems
-#       MemorySize: 128
-#       Policies:
-#         - CloudWatchLogsFullAccess
-#         - StepFunctionsExecutionPolicy:
-#             StateMachineName: !GetAtt MyStateMachine.Name
-#       Runtime: nodejs14.x
-#       Timeout: 15
-  
-#   MyStepFunctionLogGroup:
-#     Type: AWS::Logs::LogGroup
-#     Properties:
-#       LogGroupName: !Sub "lambda/MyStepFunctionLogGroup"
-#       RetentionInDays: 14
- 
-#   ########################### DYNAMODB TABLE ###########################
-#   MyDynamoDBTable:
-#     Type: 'AWS::DynamoDB::Table'
-#     Properties:
-#       AttributeDefinitions:
-#         - AttributeName: id
-#           AttributeType: N
-#       KeySchema:
-#         - AttributeName: id
-#           KeyType: HASH
-#       ProvisionedThroughput:
-#         ReadCapacityUnits: 5
-#         WriteCapacityUnits: 5
-#       StreamSpecification:
-#         StreamViewType: NEW_IMAGE
-  
+  LambdaFuncton:
+    Value: !Ref LambdaFunction
+    Description: Lambda Function ARN
