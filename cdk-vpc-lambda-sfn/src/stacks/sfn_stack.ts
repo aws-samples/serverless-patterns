@@ -1,4 +1,4 @@
-import { Stack, App, RemovalPolicy } from '@aws-cdk/core';
+import { Stack, Construct, RemovalPolicy } from '@aws-cdk/core';
 import { LambdaInvoke } from '@aws-cdk/aws-stepfunctions-tasks';
 import { StateMachine, LogLevel, IStateMachine } from '@aws-cdk/aws-stepfunctions';
 import { LogGroup } from '@aws-cdk/aws-logs';
@@ -10,7 +10,7 @@ export class sfnStack extends Stack {
 
     public readonly testMachine: IStateMachine;
 
-    constructor(scope: App, id: string, props: lambdaProps) {
+    constructor(scope: Construct, id: string, props: lambdaProps) {
         super(scope, id, props);
         const prefix = 'test-';
 
