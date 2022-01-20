@@ -2,7 +2,8 @@
 
 # Overview
 
-CDK example to set up AWS X-Ray on a Python Lambda that uses Python Lambda Layers. The example demonstrates the use of lambda layer python foder structure, use of constructs for deploying and using the lambda layers and X-Ray.  
+This CDK example sets up AWS X-Ray for a Lambda function that uses Lambda Layers. The example demonstrates the use of the folder structure for a Lambda layer written in Python, and using constructs for deploying and using the layer and X-Ray.
+
 
 # Python Setup
 
