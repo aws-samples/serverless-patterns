@@ -9,9 +9,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res
-    .status(200)
-    .send(`Hello from AWS AppRunner running in region ${process.env.region} !`);
+  res.status(200).send({
+    message: `Hello from AWS AppRunner service running in region ${process.env.region} !`,
+  });
 });
 
 app.listen(port, () => {

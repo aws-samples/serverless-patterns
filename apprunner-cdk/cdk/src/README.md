@@ -11,5 +11,5 @@ npm run start
 
 ```bash
 docker build . -t tsexpress
-docker run -d -p 80:80 --env queueUrl=<SQS_QUEUE_URL> --env snsTopicArn=<SNS_TOPIC_ARN> --name ts-app tsexpress
+docker run -d -p 80:80 --env region=<AWS_REGION> --name ts-app tsexpress
 ```
