@@ -52,12 +52,9 @@ export class AthenaStack extends Stack {
               databaseName: props.gDB.databaseName
             },
             resultConfiguration: {
-              encryptionConfiguration: {
-                encryptionOption: EncryptionOption.S3_MANAGED,
-              },
               outputLocation: {
                 bucketName: props.s3aQuery.bucketName,
-                objectKey: 'v_',
+                objectKey: 'v_'
               },
             },
             workGroup: workgroup.name,
@@ -70,6 +67,8 @@ export class AthenaStack extends Stack {
             stateMachineName: 'test-QueryFlows',
             timeout: Duration.minutes(5)
         });
+
+        props.s3aQuery.grantReadWrite(sViewsFlow);
         this.sViewsMachine = sViewsFlow;
     }
 }

@@ -9,7 +9,7 @@ export const config = {
     region: '',
     CDK_CLI_VERSION: '1.132.0',
     branchName: 'main',
-    databaseName: 'EmployeeRoster',
+    databaseName: 'employeeroster',
     empMaster: 'emp_master',
     empDetails: 'emp_details',
     s3EmpMaster: `s3empaster${prefix}`,
