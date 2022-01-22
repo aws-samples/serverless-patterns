@@ -1,11 +1,11 @@
-# AWS AppRunner Service
+# AWS App Runner Service
 
 AWS App Runner is an AWS service that provides a fast, simple, and cost-effective way to deploy from source code or a container image directly to a scalable and secure web application in the AWS Cloud. You don't need to learn new technologies, decide which compute service to use, or know how to provision and configure AWS resources.
 
 App Runner connects directly to your code or image repository. It provides an automatic integration and delivery pipeline with fully managed operations, high performance, scalability, and security.
 
-This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS AppRunner service. 
-This template showes how to add a custom image for AWS AppRunner service to use without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built `apprunner.Source.fromAsset` method.
+This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS App Runner service. 
+This template showes how to add a custom image for AWS App Runner service to use without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built `apprunner.Source.fromAsset` method.
 The custom image used is a simple hello world Node Js application. This project also provides an example of how to pass an environment variable to the image. Note that the image can be changed to other images that suit your use case by changing the codes found in the src directory.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cdk-app-runner.
@@ -49,11 +49,11 @@ Important: this application uses various AWS services and there are costs associ
 
 - The image is constructed directly from sources on disk when `cdk deploy` is executed
 - The image is automatically pushed to Amazon ECR
-- An AWS AppRunner service is created using the image pushed to ECR
+- An AWS App Runner service is created using the image pushed to ECR
 
 ## Testing
 
-Retrieve the AppRunner Service URL from the `cdk deploy` output. Example of the output is:
+Retrieve the App Runner Service URL from the `cdk deploy` output. Example of the output is:
 
 ```
 CdkStack-apprunner.AppRunnerServiceURL = https://abcde12345.us-east-1.awsapprunner.com
@@ -87,5 +87,5 @@ Running the request above should produce the following output:
 
 
 ## Documentation and useful references
-- [AWS AppRunner Documentation](https://docs.aws.amazon.com/apprunner/latest/dg/what-is-apprunner.html)
-- [AWS AppRunner CDK](https://docs.aws.amazon.com/cdk/api/v1/docs/aws-apprunner-readme.html)
+- [AWS App Runner Documentation](https://docs.aws.amazon.com/apprunner/latest/dg/what-is-apprunner.html)
+- [AWS App Runner CDK](https://docs.aws.amazon.com/cdk/api/v1/docs/aws-apprunner-readme.html)
