@@ -1,5 +1,4 @@
-'use strict';
-exports.handler = async (event) => {
+exports.lambdaHandler = async (event) => {
     // TODO implement
     const response = {
         statusCode: 200,

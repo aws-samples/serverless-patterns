@@ -141,3 +141,6 @@ dist/*
 /.idea/aws.xml
 /.idea/misc.xml
 /.idea/serverless-patterns.iml
+
+# Visual Code debugging assets directory
+.vscode/

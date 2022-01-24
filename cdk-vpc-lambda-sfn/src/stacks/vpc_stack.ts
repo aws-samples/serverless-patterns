@@ -1,4 +1,4 @@
-import { Stack, StackProps, Aspects, Tag, App } from '@aws-cdk/core';
+import { Stack, StackProps, Aspects, Tag, Construct } from '@aws-cdk/core';
 import {
     InterfaceVpcEndpointAwsService,
     ISecurityGroup, ISubnet, SecurityGroup, SubnetType, Vpc, Peer, Port, IVpc
@@ -12,7 +12,7 @@ export class vpcStack extends Stack {
     public readonly privateSubNet: ISubnet[];
     public readonly iSecurityGroup: ISecurityGroup;
 
-    constructor(scope: App, id: string, props?: StackProps) {
+    constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
         const prefix = 'test-';
         const vpc = new Vpc(this, `${prefix}VPC`, {

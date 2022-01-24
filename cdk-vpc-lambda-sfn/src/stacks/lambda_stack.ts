@@ -1,16 +1,16 @@
 import { Function, IFunction, Code, Architecture, Runtime } from '@aws-cdk/aws-lambda';
 import { Policy, Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import { RetentionDays } from '@aws-cdk/aws-logs';
-import { Stack, App, StackProps } from '@aws-cdk/core';
+import { Stack, StackProps, Construct } from '@aws-cdk/core';
 
 import * as path from 'path';
-import { vpcProps } from './vpc_stack';
+import { vpcProps, vpcStack } from './vpc_stack';
 
 export class lambdaStack extends Stack {
     public readonly testLambda: IFunction;
 
-    constructor(scope: App, id: string, props: vpcProps) {
-        super(scope, id);
+    constructor(scope: Construct, id: string, props: vpcProps) {
+        super(scope, id, props);
         const prefix = 'test-';
 
         const testLambda = new Function(this, 'testLambda', {
