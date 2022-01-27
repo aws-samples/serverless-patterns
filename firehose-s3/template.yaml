@@ -44,9 +44,9 @@ Resources:
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
+            Action: sts:AssumeRole
             Principal:
               Service: firehose.amazonaws.com
-            Action: sts:AssumeRole
       Policies:
         - PolicyName: delivery
           PolicyDocument:
@@ -61,3 +61,8 @@ Resources:
                   - s3:PutObject
                 Resource:
                   - Fn::GetAtt: [ DestinationBucket, Arn ]
+
+Outputs:
+  DeliveryStream:
+    Description: Firehose Delivery Stream
+    Value: !Ref DeliveryStream
