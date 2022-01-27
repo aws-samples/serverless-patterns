@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Kinesis Firehose Delivery Steam to S3 Bucket with dynamic partitioning enabled
+
+Parameters:
+  DestinationBucketName:
+    Type: String
+
+Resources:
+  DestinationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DestinationBucketName
+
+  DeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamType: DirectPut
+      ExtendedS3DestinationConfiguration:
+        Prefix: type=!{partitionKeyFromQuery:type}/
+        ErrorOutputPrefix: failed/!{firehose:error-output-type}/
+        CompressionFormat: UNCOMPRESSED
+        RoleARN:
+          Fn::GetAtt: [ DeliveryRole, Arn ]
+        BufferingHints:
+          intervalInSeconds: 60
+        DynamicPartitioningConfiguration:
+          Enabled: true
+          RetryOptions:
+            DurationInSeconds: 300
+        ProcessingConfiguration:
+          Enabled: true
+          Processors:
+            - Type: MetadataExtraction
+              Parameters:
+                - ParameterName: MetadataExtractionQuery
+                  ParameterValue: "{type: .detail.type}"
+                - ParameterName: JsonParsingEngine
+                  ParameterValue: JQ-1.6
+
+  DeliveryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: delivery
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:AbortMultipartUpload
+                  - s3:GetBucketLocation
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:ListBucketMultipartUploads
+                  - s3:PutObject
+                Resource:
+                  - Fn::GetAtt: [ DestinationBucket, Arn ]
