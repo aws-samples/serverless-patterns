@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Setup Cloudwatch RUM using Cognito IdentityPool for specified application and domain
+Parameters:
+  ApplicationName:
+    Description: The name of the service
+    Type: String
+  ApplicationDomain:
+    Description: The top-level internet domain name
+    Type: String
+
+Resources:
+  CWRumIdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties: 
+      IdentityPoolName: !Ref ApplicationName
+      AllowUnauthenticatedIdentities: true
+
+  CWRumIdentityPoolRoles:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref CWRumIdentityPool
+      Roles:
+        unauthenticated: !GetAtt CWRumClientRole.Arn
+
+  CWRumClientRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated:
+                - cognito-identity.amazonaws.com
+            Action:
+              - sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref CWRumIdentityPool
+              ForAnyValue:StringLike: 
+                cognito-identity.amazonaws.com:amr: unauthenticated
+      Description: Unauthenticated Role for AWS RUM Clients
+      Path: /
+      Policies:
+        - PolicyName: AWSRumClientPut
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "rum:PutRumEvents"
+                Resource: !Sub arn:aws:rum:${AWS::Region}:${AWS::AccountId}:appmonitor/${ApplicationName}
+
+  CWRumAppMonitor:
+    Type: AWS::RUM::AppMonitor
+    Properties:
+      AppMonitorConfiguration:
+        AllowCookies: false
+        EnableXRay: false
+        IdentityPoolId: !Ref CWRumIdentityPool
+        GuestRoleArn: !GetAtt CWRumClientRole.Arn
+        SessionSampleRate: 0.1
+        Telemetries:
+          - errors
+          - performance
+          - http
+      Domain: !Ref ApplicationDomain
+      Name: !Ref ApplicationName
+
+Outputs:
+  CWRumAppMonitor:
+    Description: The Cloud Watch RUM App Monitor Name
+    Value: !Ref CWRumAppMonitor
