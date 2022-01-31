@@ -1,0 +1,11 @@
+{
+    "Comment": "An example of inserting Data into DynamoDB via Lambda function",
+    "StartAt": "HelloWorld",
+    "States": {
+      "HelloWorld": {
+        "Type": "Task",
+        "Resource": "${LambdaFunctionArn}",
+        "End": true
+      }
+    }
+  }
