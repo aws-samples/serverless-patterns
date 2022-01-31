@@ -1,0 +1,1 @@
+CREATE OR REPLACE VIEW emp_roster AS SELECT emp_master.emp_id, emp_name, emp_department, emp_manager FROM emp_details INNER JOIN emp_master ON emp_master.emp_id = emp_details.emp_id
