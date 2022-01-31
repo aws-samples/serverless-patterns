@@ -26,7 +26,7 @@ module.exports.handler = async (event) => {
           throw existsError;
         }
         
-    }, () => Log.info("Retrying due to OCC conflict..."));
+    }, () => console.log("Retrying due to OCC conflict..."));
     return {
         'statusCode': 200,
         'body': JSON.stringify({'message': 'Address successfully updated'})

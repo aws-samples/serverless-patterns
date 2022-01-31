@@ -25,7 +25,7 @@ module.exports.handler = async (event) => {
 
         } 
 
-    }, () => Log.info("Retrying due to OCC conflict..."));
+    }, () => console.log("Retrying due to OCC conflict..."));
 
     return {
       statusCode: 200,
