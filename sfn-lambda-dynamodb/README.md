@@ -1,7 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# Create a Step Functions workflow that invokes Lambda and DynamoDB
+
 This pattern passes event data from a State Machine to a DynamoDB table after the data is processed by a Lambda function. 
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-lambda-ddb
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
