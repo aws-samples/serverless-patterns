@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Change the working directory to this pattern's directory
     ```
-    cd s3=sqs-dotnet-cdk
+    cd s3-sqs-dotnet-cdk
     ```
 
 1. Build the .NET CDK project
