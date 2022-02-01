@@ -7,11 +7,13 @@ Parameters:
     Type: String
     Default: 'https://<<EnterWorkspaceHere>>.zendesk.com/api/v2/tickets.json'
   MyZendeskUsername:
+    NoEcho: true
     Type: String
-    Default: '<<Enter your Username>>'
+    Default: ''
   MyZendeskPassword:
+    NoEcho: true
     Type: String
-    Default: '<<Enter your Password>>' 
+    Default: '' 
 
 Resources:
   MyZendeskEventBus:
