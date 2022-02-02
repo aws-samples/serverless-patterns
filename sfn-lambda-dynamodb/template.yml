@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Invoke a StepFunction state machine from a DynamoDB streams via Lambda function
+Resources:
+##########################################################################
+#   DynamoDB Table                                                      #
+##########################################################################
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: transaction_id
+          AttributeType: "S" 
+      KeySchema:
+        - AttributeName: transaction_id
+          KeyType: HASH
+      
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  LambdaFunction:
+    Properties:
+      CodeUri: src/
+      Environment:
+        Variables:
+          TableName: !Ref DynamoDBTable
+      FunctionName: MyLamdaFunction
+      Handler: app.handler
+      MemorySize: 3008
+      Policies:
+        - CloudWatchLogsFullAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
+      Runtime: nodejs12.x
+      Timeout: 30
+      Tracing: Active
+    Type: AWS::Serverless::Function
+
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: stepFunction/stepFunction.asl.json
+      DefinitionSubstitutions:
+        LambdaFunctionArn: !GetAtt LambdaFunction.Arn
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+        IncludeExecutionData: false
+        Level: ERROR
+      Policies:
+        - CloudWatchLogsFullAccess
+        - LambdaInvokePolicy:
+            FunctionName: !Ref LambdaFunction
+
+##########################################################################
+#  STEP FUNCTION LOG GROUP                                               #
+##########################################################################
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", StateMachine]]
+        
+Outputs:
+  StateMachine:
+    Value: !Ref StateMachine
+    Description: Statemachine Arn
+
+  LambdaFuncton:
+    Value: !Ref LambdaFunction
+    Description: Lambda Function ARN

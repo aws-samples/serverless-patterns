@@ -1,0 +1,14 @@
+{
+  "name": "lambda-pinpoint",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-pinpoint": "^3.45.0"
+  }
+}

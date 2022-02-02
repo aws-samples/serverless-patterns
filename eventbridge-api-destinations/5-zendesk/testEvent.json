@@ -1,0 +1,8 @@
+[
+    {
+        "DetailType": "MyTestMessage",
+        "EventBusName": "MyZendeskEventBus",
+        "Source": "MyTestApp",
+        "Detail": "{\"ticket\":{\"comment\":{\"body\": \"The printer started a fire again! We did not install the newest patch.\"},\"priority\":\"urgent\", \"subject\":\"Code Red: Printer on Fire\"}}}"
+    }
+  ]

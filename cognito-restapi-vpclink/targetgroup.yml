@@ -1,0 +1,59 @@
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Target group and NLB listener
+
+
+###############################################################################
+# Parameters 
+###############################################################################  
+
+Parameters:
+
+  pVpcId:
+    Description: VPC where the resources will be created.
+    Type: AWS::EC2::VPC::Id
+  pApplicationLoadBalancerArn:
+    Description: Application Load Balancer ARN.
+    Type: String
+  pNetworkLoadBalancerArn:
+    Description: Network Load Balancer ARN.
+    Type: String
+
+
+###############################################################################
+# Resources 
+###############################################################################  
+
+Resources:
+
+################ NLB TARGET GROUP ##########################
+
+  rTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: TCP
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName} - TargetGroup'
+      TargetType: alb
+      Targets:
+        - Id: !Ref pApplicationLoadBalancerArn  # Either the ALB if using ECS Fargate or the IP address if using an EC2 instance as the target      
+          Port: 80
+      VpcId: !Ref pVpcId
+
+################ NLB LISTENER ##########################
+
+  rNetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn:
+          Ref: rTargetGroup
+      LoadBalancerArn: !Ref pNetworkLoadBalancerArn
+      Port: '80'
+      Protocol: TCP

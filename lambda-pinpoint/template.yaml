@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  lambda-pinpoint
+
+  Sample SAM Template for lambda-pinpoint
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  lambdaPinpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.handler
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Timeout: 100
+      Description: A simple example of sending an SMS with Pinpoint
+      Policies:
+        - Statement:
+          - Sid: PinpointSendMessagesPolicy
+            Effect: Allow
+            Action:
+            - mobiletargeting:SendMessages
+            Resource: !Sub "arn:aws:mobiletargeting:${AWS::Region}:${AWS::AccountId}:apps/${PinpointApp}/messages"
+      Environment:
+        Variables:
+          PINPOINT_PROJECT_ID: !Ref PinpointApp
+          ORIGINATION_NUMBER: "+XXXXXXXXXX"
+          DESTINATION_NUMBER: "+XXXXXXXXXX"
+  PinpointApp:
+    Type: AWS::Pinpoint::App
+    Properties: 
+      Name: Lambda-Pinpoint
+  PinpointChannel:
+    Type: AWS::Pinpoint::SMSChannel
+    Properties: 
+      ApplicationId: !Ref PinpointApp
+      Enabled: True

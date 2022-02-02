@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Service to Service description
+
+Parameters:
+  ApiGatewayId:
+    Type: String
+    AllowedPattern: "^[A-Za-z0-9]*$"
+    Description: ID for an existing API Gateway
+  StageName:
+    Type: String
+    Description: Stage name that for the API Gateway
+    AllowedPattern: ^[A-Za-z]*$
+    Default: prod
+
+# Comment each resource section to explain usage
+Resources:
+  DemoApiGatewayWebACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: 'demo-apigateway-webacl'
+      Scope: 'REGIONAL'
+      Description: 'This is a WebACL for Auth API Gateway'
+      DefaultAction:
+        Block: {}
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: 'demo-APIWebACL'
+      Rules:
+        - Name: 'demo-rateLimitRule'
+          Priority: 0
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: false
+            CloudWatchMetricsEnabled: true
+            MetricName: 'demo-rateLimitRule'
+          Statement:
+            RateBasedStatement:
+              AggregateKeyType: 'IP'
+              Limit: 100
+        - Name: 'demo-api-auth-gateway-geolocation-rule'
+          Priority: 30
+          Action:
+            Allow: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: false
+            CloudWatchMetricsEnabled: true
+            MetricName: 'demo-AuthAPIGeolocationUS'
+          Statement:
+            GeoMatchStatement:
+              CountryCodes:
+                - 'US'
+        - Name: 'demo-api-auth-gateway-sqli-rule'
+          Priority: 40
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: false
+            CloudWatchMetricsEnabled: true
+            MetricName: 'demo-APIAuthGatewaySqliRule'
+          Statement:
+            OrStatement:
+              Statements:
+                - SqliMatchStatement:
+                    FieldToMatch:
+                      AllQueryArguments: {}
+                    TextTransformations:
+                      - Priority: 1
+                        Type: 'URL_DECODE'
+                      - Priority: 2
+                        Type: 'HTML_ENTITY_DECODE'
+                - SqliMatchStatement:
+                      FieldToMatch:
+                        Body: {}
+                      TextTransformations:
+                        - Priority: 1
+                          Type: 'URL_DECODE'
+                        - Priority: 2
+                          Type: 'HTML_ENTITY_DECODE'
+                - SqliMatchStatement:
+                      FieldToMatch:
+                        UriPath: {}
+                      TextTransformations:
+                        - Priority: 1
+                          Type: 'URL_DECODE'
+        - Name: 'demo-detect-xss'
+          Priority: 60
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: false
+            CloudWatchMetricsEnabled: true
+            MetricName: 'demo-detect-xss'
+          Statement:
+            OrStatement:
+              Statements:
+                - XssMatchStatement:
+                      FieldToMatch:
+                        UriPath: {}
+                      TextTransformations:
+                        - Priority: 1
+                          Type: 'URL_DECODE'
+                        - Priority: 2
+                          Type: 'HTML_ENTITY_DECODE'
+                - XssMatchStatement:
+                      FieldToMatch:
+                        AllQueryArguments: {}
+                      TextTransformations:
+                        - Priority: 1
+                          Type: 'URL_DECODE'
+                        - Priority: 2
+                          Type: 'HTML_ENTITY_DECODE'
+
+  APIGatewayWebACLAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      WebACLArn: !GetAtt DemoApiGatewayWebACL.Arn
+      ResourceArn: !Sub "arn:aws:apigateway:${AWS::Region}::/restapis/${ApiGatewayId}/stages/${StageName}"

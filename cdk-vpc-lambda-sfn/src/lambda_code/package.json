@@ -1,0 +1,19 @@
+{
+  "name": "sample_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "author": "SAM CLI",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "scripts": {
+    "test": "mocha tests/unit/",
+    "debug": "node --inspect=5859 app.js",
+    "locally": "node app.js"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1"
+  }
+}

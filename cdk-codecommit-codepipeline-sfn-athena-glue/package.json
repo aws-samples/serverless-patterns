@@ -1,0 +1,33 @@
+{
+  "name": "cdk-codecommit-codepipeline-sfn-athena-glue",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@aws-cdk/assertions": "^1.132.0",
+    "@types/jest": "^26.0.10",
+    "@types/node": "10.17.27",
+    "aws-cdk": "^1.132.0",
+    "ts-jest": "^26.2.0",
+    "ts-node": "^9.0.0",
+    "typescript": "~3.9.7"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-athena": "^1.132.0",
+    "@aws-cdk/aws-codecommit": "^1.132.0",
+    "@aws-cdk/aws-codepipeline": "^1.132.0",
+    "@aws-cdk/aws-codepipeline-actions": "^1.132.0",
+    "@aws-cdk/aws-glue": "^1.132.0",
+    "@aws-cdk/aws-iam": "^1.132.0",
+    "@aws-cdk/aws-logs": "^1.132.0",
+    "@aws-cdk/aws-s3": "^1.132.0",
+    "@aws-cdk/aws-stepfunctions": "^1.132.0",
+    "@aws-cdk/aws-stepfunctions-tasks": "^1.132.0",
+    "@aws-cdk/core": "^1.132.0",
+    "@aws-cdk/pipelines": "^1.132.0",
+    "source-map-support": "^0.5.16"
+  }
+}

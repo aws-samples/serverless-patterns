@@ -1,0 +1,111 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create an API destination in EventBridge for Zendesk Put Ticket API
+
+Parameters:
+  MyPutTicketsAPI:
+    Type: String
+    Default: 'https://<<EnterWorkspaceHere>>.zendesk.com/api/v2/tickets.json'
+  MyZendeskUsername:
+    NoEcho: true
+    Type: String
+    Default: ''
+  MyZendeskPassword:
+    NoEcho: true
+    Type: String
+    Default: '' 
+
+Resources:
+  MyZendeskEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "MyZendeskEventBus"
+
+  MyZendeskConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: BASIC
+      Description: 'My connection with a username and password'
+      AuthParameters:
+        BasicAuthParameters :
+          Username : !Ref MyZendeskUsername 
+          Password : !Ref MyZendeskPassword 
+
+  PutTicketsAPIDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'PutTicketsAPIDestination'
+      ConnectionArn: !GetAtt MyZendeskConnection.Arn
+      InvocationEndpoint: !Ref MyPutTicketsAPI
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+
+  EventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt PutTicketsAPIDestination.Arn
+
+
+  MyDLQueue: 
+    Type: AWS::SQS::Queue
+
+  EventRuleCreateTicket: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      State: "ENABLED"
+      EventBusName: !Ref MyZendeskEventBus
+      EventPattern: 
+        source:
+          - "MyTestApp"
+        detail-type:
+          - "MyTestMessage"       
+      Targets: 
+        - Arn: !GetAtt PutTicketsAPIDestination.Arn
+          RoleArn: !GetAtt EventBridgeTargetRole.Arn
+          Id: "PutTickets"
+          InputTransformer:
+            InputPathsMap:
+              "body" : "$.detail.ticket"
+            InputTemplate:
+              '{"ticket" : <body>}'
+          DeadLetterConfig:
+            Arn:  !GetAtt MyDLQueue.Arn
+
+Outputs:
+  MyZendeskEventBusName:
+    Description: Application EventBus Name
+    Value: !Ref MyZendeskEventBus
+
+  MyZendeskEventBusArn:
+    Description: Application EventBus ARN
+    Value: !GetAtt MyZendeskEventBus.Arn
+
+  MyZendeskConnectionName:
+    Value: !Ref MyZendeskConnection
+  MyZendeskConnectionArn:
+    Value: !GetAtt MyZendeskConnection.Arn        
+
+  PutTicketsAPIDestinationnName:
+    Value: !Ref PutTicketsAPIDestination
+  PutTicketsAPIDestinationn:
+    Value: !GetAtt PutTicketsAPIDestination.Arn
+
+  EventBridgeTargetRoleArn:
+    Value: !GetAtt EventBridgeTargetRole.Arn

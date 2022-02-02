@@ -1,0 +1,23 @@
+{
+  "name": "qldb-kinesis-lambda-dynamodb",
+  "version": "1.0.0",
+  "description": "install dependencies for qldb - kinesis - lambda - dynamodbb",
+  "main": "qldb-streams-dynamodb.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matt Lewis",
+  "license": "MIT",
+  "dependencies": {
+    "amazon-qldb-driver-nodejs": "^2.2.0",
+    "aws-kinesis-agg": "^4.2.2",
+    "aws-sdk": "^2.1058.0",
+    "aws-xray-sdk": "^3.3.4",
+    "aws-xray-sdk-core": "^3.3.4",
+    "ion-js": "^4.2.1",
+    "jsbi": "^4.1.0"
+  }
+}

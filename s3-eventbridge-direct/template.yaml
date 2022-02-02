@@ -8,7 +8,8 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       NotificationConfiguration:
-        EventBridgeConfiguration: true
+        EventBridgeConfiguration:
+          EventBridgeEnabled: True        
 
   # Enforce HTTPS only access to S3 bucket #
   BucketForImagePolicy:

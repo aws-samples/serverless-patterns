@@ -1,0 +1,19 @@
+{
+    "name": "index-nodejs",
+    "version": "1.0.0",
+    "private": true,
+    "devDependencies": {
+        "aws-sdk": "latest",
+        "jest": "25.4.0",
+        "aws-lambda": "^1.0.7",
+        "@types/aws-lambda": "^8.10.51"
+
+    },
+    "dependencies": {
+        "aws-xray-sdk": "^3.3.4",
+        "aws-xray-sdk-core": "^3.3.4"
+    },
+    "scripts": {
+        "test": "jest"
+    }
+}

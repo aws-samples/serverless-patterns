@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  A Step Functions Standard Workflow doing PUT and GET operations directly on DynamoDb
+  A Step Functions Standard Workflow doing PUT and GET operations directly on DynamoDB
 
 Parameters:
   DdbTableName:
