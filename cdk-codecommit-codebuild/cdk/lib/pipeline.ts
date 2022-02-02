@@ -1,11 +1,11 @@
-import * as targets from "@aws-cdk/aws-events-targets";
-import * as iam from "@aws-cdk/aws-iam";
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as codecommit from '@aws-cdk/aws-codecommit';
-import * as cdk from "@aws-cdk/core";
 import * as events from "@aws-cdk/aws-events";
-import * as nodeJSlambda from "@aws-cdk/aws-lambda-nodejs";
+import * as targets from "@aws-cdk/aws-events-targets";
 import * as lambda from "@aws-cdk/aws-lambda";
+import * as nodeJSlambda from "@aws-cdk/aws-lambda-nodejs";
+import * as iam from "@aws-cdk/aws-iam";
+import * as cdk from "@aws-cdk/core";
 import * as path from "path";
 
 export interface PipelineProps extends cdk.StackProps {
@@ -13,10 +13,9 @@ export interface PipelineProps extends cdk.StackProps {
 }
 
 /**
- * Static site infrastructure, which deploys site content to an S3 bucket.
- *
- * The site redirects from HTTP to HTTPS, using a CloudFront distribution,
- * Route53 alias record, and ACM certificate.
+ *  This Stack allow you to run codebuild on Pull Request to validate before merging to main branch
+ *  It deploy a codebuildProject that will run the buildspec.yml build.
+ *  Then a comment will be added the the PullRequest with a link to the logs.
  */
 export class PipelineStack extends cdk.Stack {
     constructor(scope: cdk.Construct, name: string, props: PipelineProps) {
@@ -79,7 +78,7 @@ export class PipelineStack extends cdk.Stack {
                 externalModules: ['aws-sdk', '@aws-sdk/client-codecommit']
             },
             entry: path.join(__dirname, `/../src/commentLambda.ts`),
-            initialPolicy: [    new iam.PolicyStatement({
+            initialPolicy: [ new iam.PolicyStatement({
                 actions: ['codecommit:PostCommentForPullRequest'],
                 resources: [repository.repositoryArn],
             })],

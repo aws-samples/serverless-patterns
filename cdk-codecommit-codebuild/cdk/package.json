@@ -11,15 +11,12 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@aws-cdk/assertions": "^1.141.0",
     "@aws-cdk/aws-codebuild": "^1.141.0",
     "@aws-cdk/aws-codecommit": "^1.141.0",
     "@aws-cdk/aws-events": "^1.141.0",
     "@aws-cdk/aws-events-targets": "^1.141.0",
     "@aws-cdk/aws-lambda": "^1.141.0",
     "@aws-cdk/aws-lambda-nodejs": "^1.141.0",
-    "@aws-cdk/aws-route53-targets": "^1.141.0",
-    "@aws-cdk/aws-s3-deployment": "^1.141.0",
     "@types/node": "17.0.13",
     "aws-cdk": "^1.141.0",
     "esbuild": "^0.14.14",

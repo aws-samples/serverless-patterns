@@ -8,6 +8,6 @@ const staticSite = new PipelineStack(app, "codebuildOnPR", {
 });
 
 // example of adding a tag - please refer to AWS best practices for ideal usage
-cdk.Tags.of(staticSite).add("Project", "blog");
+cdk.Tags.of(staticSite).add("Project", "codecommit-codebuild-pipeline");
 
 app.synth();
