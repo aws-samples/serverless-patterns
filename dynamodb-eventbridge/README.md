@@ -1,10 +1,12 @@
 # AWS DynamoDB Streams to Event Bridge
-
+![Pattern](images/Pattern.png)
 The SAM template deploys a DynamoDB Streams to capture changed data and push to EventBridge routing rules.
 
-When new items are added, updated or deleted on the DynamoDB table, the item-level changes in the table will be streamed to EventBridge bus.
+When new items are added, updated or deleted on the DynamoDB table, the item-level changes in the table will be streamed to EventBridge bus where given routing rules for different types of changes are applied. 
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-kinesis
+For example, insert events and deleted events are routed to different targets by EventBridge rules.
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-lambda-eventbridge
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
