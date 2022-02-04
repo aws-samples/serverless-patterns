@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: AWS-SAM-APIGW-Lambda-DDB
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+  Api:
+    OpenApiVersion: '3.0.1'
+
+Resources:
+  #Ticket API Gateway
+  #Stage name: dev
+  ticketAPIGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Name: ticket-api-gateway
+
+  #Ticket Lambda Function
+  ticketLambdaPublisher:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ticketPublisher
+      Handler: com.example.TicketFunction::handleRequest
+      CodeUri: target/ticketPublisher.zip
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ticketDDBTable
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /ticket
+            Method: POST
+            RestApiId: !Ref ticketAPIGateway
+
+  #Ticket DynamoDB table
+  ticketDDBTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: tickets
+      PrimaryKey:
+        Name: ticketId
+        Type: String
