@@ -3,9 +3,12 @@
 
 This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.
 
-With Amazon Athena you can get [up to 1000 results](https://docs.aws.amazon.com/athena/latest/APIReference/API_GetQueryResults.html) per invocation of the `GetQueryResults` method and this is the reason why the Step Function has a loop to get more results. The results are sent to a `Map` which can be configured to handle the items in parallel or one by one by modifying the `max_concurrency` parameter.
+With Amazon Athena you can get [up to 1000 results](https://docs.aws.amazon.com/athena/latest/APIReference/API_GetQueryResults.html) per invocation of the `GetQueryResults` method and this is the reason why the Step Function has a loop to get more results. The results are sent to a `Map` which can be configured to handle (the `DoSomething` state) the items in parallel or one by one by modifying the `max_concurrency` parameter.
 
 ![Concept](img/definition.png)
+
+This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database.
+
 
 Learn more about this pattern at: https://serverlessland.com/patterns/sfn-athena-cdk-python
 

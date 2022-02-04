@@ -24,6 +24,7 @@ class SfnAthenaCdkPythonStack(Stack):
         #S3 bucket where Athena will put the results
         athena_results = s3.Bucket(self, "AthenaResultsBucket")
 
+        #create an Athena database
         glue_database_name = "serverlessland_database"
         myDatabase = glue.CfnDatabase(
             self,
@@ -35,7 +36,7 @@ class SfnAthenaCdkPythonStack(Stack):
             )
         )
 
-
+        #define a table with the structure of CloudFront Logs https://docs.aws.amazon.com/athena/latest/ug/cloudfront-logs.html
         athena_table = glue.CfnTable(self,
             id='cfaccesslogs',
             catalog_id=account,
@@ -97,10 +98,10 @@ class SfnAthenaCdkPythonStack(Stack):
             )
         )
 
-
+        #submit the query and wait for the results
         start_query_execution_job = tasks.AthenaStartQueryExecution(self, "Start Athena Query",
-            query_string="SELECT uri FROM cf_access_logs limit 11",
-            integration_pattern=sf.IntegrationPattern.RUN_JOB,
+            query_string="SELECT uri FROM cf_access_logs limit 10",
+            integration_pattern=sf.IntegrationPattern.RUN_JOB, #executes the command in SYNC mode
             query_execution_context=tasks.QueryExecutionContext(
                 database_name=glue_database_name
             ),
@@ -112,11 +113,13 @@ class SfnAthenaCdkPythonStack(Stack):
             )
         )
 
+        #get the results
         get_query_results_job = tasks.AthenaGetQueryResults(self, "Get Query Results",
             query_execution_id=sf.JsonPath.string_at("$.QueryExecution.QueryExecutionId"),
             result_path=sf.JsonPath.string_at("$.GetQueryResults"),
         )
 
+        #prepare the query to see if more results are available (up to 1000 can be retrieved)
         prepare_next_params = sf.Pass(self, "Prepare Next Query Params",
             parameters={
                 "QueryExecutionId.$": "$.StartQueryParams.QueryExecutionId",
@@ -125,13 +128,15 @@ class SfnAthenaCdkPythonStack(Stack):
             result_path=sf.JsonPath.string_at("$.StartQueryParams")
         )
 
+        #check to see if more results are available
         has_more_results = sf.Choice(self, "Has More Results?").when(
                     sf.Condition.is_present("$.GetQueryResults.NextToken"),
                     prepare_next_params.next(get_query_results_job)
                 ).otherwise(sf.Succeed(self, "Done"))
 
 
-        #save_to_dynamodb
+        #do something with each result
+        #here add your own logic
         map = sf.Map(self, "Map State",
             max_concurrency=1,
             input_path=sf.JsonPath.string_at("$.GetQueryResults.ResultSet.Rows[1:]"),
@@ -145,7 +150,6 @@ class SfnAthenaCdkPythonStack(Stack):
             definition=start_query_execution_job.next(get_query_results_job).next(map).next(has_more_results),
             timeout=Duration.minutes(60)
         )
-
 
         CfnOutput(self, "Logs",
             value=cf_access_logs.bucket_name, export_name='LogsBucket')
