@@ -7,6 +7,8 @@ Resources:
   DestinationBucket:
     Type: AWS::S3::Bucket
     Properties:
+      VersioningConfiguration:
+        Status: Enabled    
       BucketName: 'my-sfn-bucket-destination'
 
   MyStateMachine:
