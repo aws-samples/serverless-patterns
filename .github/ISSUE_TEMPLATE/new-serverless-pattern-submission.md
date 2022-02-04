@@ -11,26 +11,16 @@ To submit a template to the Serverless Patterns Collection, submit an issue with
 
 **To learn more about submitting a pattern, read the [publishing guidelines page](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md).**
 
-Use the model template located at https://github.com/aws-samples/serverless-patterns/tree/main/_pattern-model to set up a README, template and any associated code.
+1. Use the model template located at https://github.com/aws-samples/serverless-patterns/tree/main/_pattern-model to set up a README, template and any associated code.
 
-## Description (mid-length e.g. "Create a Lambda function that sends events to EventBridge.")
+2. THIS PROCESS HAS BEEN SIMPLIFIED. All the information below must be provided in the "example-pattern.json" file cloned from the model **
 
-## Language: (optional e.g. "Python", if you have a Lambda function in your example)
+Note the following information for the model:
+- Description (intro.text) should be a 300-500 word explanation of how the pattern works.
+- Resources should like to AWS documentation and AWS blogs related to the post (1-5 maximum).
+- Framework: currently, we support SAM or CDK.
+- Author bio may include a LinkedIn and/or Twitter reference and a 1-sentence bio.
 
-## Framework (currently we support SAM or CDK)
+You must ensure that the sections of the model README.me are completed in full.
 
-## Services used (e.g. "Lambda to EventBridge)
-
-## Description (this must include a detailed explanation of the pattern together with details of IAM permissioning)
-
-## Deployment commands
-
-## GitHub PR for template: 
-
-## Additional resources (optional: link and anchor text, up to 5 resources)
-
-## Author bio 
-Name:
-Photo URL:
-Twitter handle:
-Description (up to 255 chars):
+## GitHub PR for template:
