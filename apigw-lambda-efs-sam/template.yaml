@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless pattern API Gateway(HTTP API) to AWS Lambda to Amazon EFS
+
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  EfsLambdaVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+  EfsLambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "EFS + Lambda on SAM Security Group"
+      VpcId: !Ref EfsLambdaVpc
+      SecurityGroupEgress:
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 0
+          ToPort: 65535
+          IpProtocol: tcp
+      SecurityGroupIngress:
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 0
+          ToPort: 65535
+          IpProtocol: tcp
+  EfsLambdaSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref EfsLambdaVpc
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      MapPublicIpOnLaunch: false
+      CidrBlock: "10.0.0.0/24"
+  EfsLambdaSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref EfsLambdaVpc
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      MapPublicIpOnLaunch: false
+      CidrBlock: "10.0.1.0/24"
+  EfsFileSystem:
+    Type: AWS::EFS::FileSystem
+  MountTargetA:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EfsFileSystem
+      SubnetId: !Ref EfsLambdaSubnetA
+      SecurityGroups:
+        - !Ref EfsLambdaSecurityGroup
+  MountTargetB:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EfsFileSystem
+      SubnetId: !Ref EfsLambdaSubnetB
+      SecurityGroups:
+        - !Ref EfsLambdaSecurityGroup
+  AccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref EfsFileSystem
+      PosixUser:
+        Gid: "1000"
+        Uid: "1000"
+      RootDirectory:
+        Path: "/lambda"
+        CreationInfo:
+          OwnerGid: "1000"
+          OwnerUid: "1000"
+          Permissions: "755"
+  HelloEfsFunction:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - MountTargetA
+      - MountTargetB
+    Properties:
+      CodeUri: hello_efs/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Architectures:
+        - x86_64
+      Policies:
+        - EFSWriteAccessPolicy:
+            FileSystem: !Ref EfsFileSystem
+            AccessPoint: !Ref AccessPoint
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref EfsLambdaSecurityGroup
+        SubnetIds:
+          - !Ref EfsLambdaSubnetA
+          - !Ref EfsLambdaSubnetB
+      FileSystemConfigs:
+        - Arn: !GetAtt AccessPoint.Arn
+          LocalMountPath: /mnt/msg
+      Events:
+        API:
+          Type: HttpApi
+
+
+Outputs:
+  HttpApiUrl:
+    Description: URL of your API endpoint
+    Value:
+      Fn::Sub: 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/'
