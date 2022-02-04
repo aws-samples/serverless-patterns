@@ -2,6 +2,8 @@
 
 This pattern explains how to deploy a SAM application that includes an API Gateway, Lambda Function and Amazon EFS. 
 
+Learn more about this pattern at: https://serverlessland.com/patterns?services=efs.
+
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
