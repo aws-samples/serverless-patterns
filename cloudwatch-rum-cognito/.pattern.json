@@ -1,0 +1,81 @@
+{
+  "title": "CloudWatch RUM with Cognito Identity Pool",
+  "description": "Create a CloudWatch RUM application monitor and an associated Cognito Identity Pool.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a CloudWatch RUM application monitor and an associated Cognito Identity Pool.",
+      "The Cognito Identity Pool is configured to allow unauthenticated access to the CloudWatch RUM web client in order to publish generated events.",
+      "The stack creates a single IAM role used by the Cognito IdentityPool to allow the rum:PutRumEvents action to send events to CloudWatch RUM application monitor."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudwatch-rum-cognito",
+      "templateURL": "serverless-patterns/cloudwatch-rum-cognito",
+      "projectFolder": "cloudwatch-rum-cognito",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Use CloudWatch RUM",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM.html"
+      },
+      {
+        "text": "Real-User Monitoring for Amazon CloudWatch",
+        "link": "https://aws.amazon.com/blogs/aws/cloudwatch-rum/"
+      }
+    ]
+  },
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "cognito",
+      "label": "Amazon Cognito"
+    },
+    "icon2": {
+      "x": 80,
+      "y": 50,
+      "service": "cloudwatch",
+      "label": "Amazon CloudWatch"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2",
+      "label": "Unauthenticated access"
+    }
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Paul Mowat",
+      "image": "ext-paul-mowat.jpg",
+      "twitter": "paul_mowat",
+      "linkedin": "",
+      "bio": "Paul is a Principal DevOps Architect for Advanced based in the UK."
+    }
+  ]
+}
