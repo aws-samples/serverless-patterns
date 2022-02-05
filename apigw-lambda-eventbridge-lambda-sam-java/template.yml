@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: AWS-SAM-Lambda-EventBridge-Lambda
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+  Api:
+    OpenApiVersion: '3.0.1'
+
+Resources:
+
+  TicketAPIGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Name: TicketAPIGateway
+
+  TicketPublisher:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: TicketPublisher
+      Handler: com.example.publisher.TicketPublisher::handleRequest
+      CodeUri: target/ticketPubSub.zip
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref TicketEventBus
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /tickets
+            Method: POST
+            RestApiId: !Ref TicketAPIGateway
+
+  TicketSubscriber:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: TicketSubscriber
+      Handler: com.example.subscriber.TicketSubscriber::handleRequest
+      CodeUri: target/ticketPubSub.zip
+
+  TicketEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: TicketEventBus
+
+  TicketEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: TicketRule
+      EventBusName: !GetAtt TicketEventBus.Arn
+      Targets:
+        - Arn: !GetAtt TicketSubscriber.Arn
+          Id: "TicketEventRule"
+      EventPattern:
+        source:
+          - "com.example"
+
+  TicketEventBridgeInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref TicketSubscriber
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt TicketEventRule.Arn
