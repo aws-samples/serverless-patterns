@@ -32,7 +32,8 @@ The SAM template contains all the information to deploy AWS resources(an API Gat
 You will be able to create and delete the CloudFormation stack using the CLI commands.
 
 After the stack is created you can send an JSON object using curl or Postman to the URL provided by the API Gateway,
-the request will be intercepted by the Lambda function which will persist the object into a DynamoDB table.
+the request will be intercepted by the Lambda function which will publish an event to the EventBridge. The event Rule will 
+send the event with the payload to the second lamnda function, the subscriber.
 
 You can see the event received by the subscriber Lambda function in the CloudWatch Logs of the function.
 
