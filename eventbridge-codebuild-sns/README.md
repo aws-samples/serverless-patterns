@@ -57,10 +57,12 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 It's a common pattern to use an EventBridge rule to trigger a Lambda function, and then use the Lambda function to publish a message to a SNS topic upon its completion. 
-    <img src="./docs/eventbridge-lambda-sns.png" alt="eventbridge-lambda-sns" width="60%"/>
+    
+<img src="./docs/eventbridge-lambda-sns.png" alt="eventbridge-lambda-sns" width="60%"/>
 
 This CDK application deploys a CodeBuild project that is triggered by an EventBridge rule scheduled for every hour. The CodeBuild project downloads the long-running script from S3, and execute it with a timeout limit configured at 1 hour. Once the Build project completes (either with a state of "SUCCEEDED", "FAILED" or "STOPPED"), another EventBridge rule will send this event to a SNS topic. To view the messages, you can subscribe to the topic with your email address or Lambda functions. 
-    <img src="./docs/eventbridge-codebuild-sns.png" alt="eventbridge-codebuild-sns" width="60%"/>
+    
+<img src="./docs/eventbridge-codebuild-sns.png" alt="eventbridge-codebuild-sns" width="60%"/>
 
 
 ## Testing
