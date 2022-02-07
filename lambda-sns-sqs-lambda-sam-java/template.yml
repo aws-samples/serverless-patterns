@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: aws-lambda-sns-sqs-lambda
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+Resources:
+  OrderProducer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: OrderProducer
+      Handler: com.example.producer.OrderProducer::handleRequest
+      CodeUri: target/sourceCode.zip
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - sns:ListTopics
+              Resource: arn:aws:sns:*:*:*
+            - Effect: Allow
+              Action:
+                - sns:Publish
+              Resource: "*"
+
+  OrderConsumer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: OrderConsumer
+      Handler: com.example.consumer.OrderConsumer::handleRequest
+      CodeUri: target/sourceCode.zip
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt OrdersSqsQueue.Arn
+      Policies:
+        - CloudWatchPutMetricPolicy: { }
+
+  OrderSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: Orders
+      Subscription:
+        - Protocol: sqs
+          Endpoint: !GetAtt OrdersSqsQueue.Arn
+
+  OrdersSqsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: Orders
+
+  SnsToSqsPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal:
+              Service: "sns.amazonaws.com"
+            Resource: !GetAtt OrdersSqsQueue.Arn
+            Action: SQS:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref OrderSNSTopic
+      Queues:
+        - Ref: OrdersSqsQueue
