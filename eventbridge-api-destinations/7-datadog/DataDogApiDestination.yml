@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create an API destination in EventBridge for DataDog Put Logs API
+
+Parameters:
+  MyDataDogAPIKey:
+    NoEcho: true
+    Type: String
+    Default: '' 
+
+Resources:
+  MyDataDogEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "MyDataDogEventBus"
+
+  MyDataDogConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      Description: 'My connection with an API key'
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: "DD-API-KEY"
+          ApiKeyValue: !Ref MyDataDogAPIKey
+
+  SendLogAPIDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'SendLogAPIDestination'
+      ConnectionArn: !GetAtt MyDataDogConnection.Arn
+      InvocationEndpoint: "https://http-intake.logs.datadoghq.com/api/v2/logs"
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+
+  EventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt SendLogAPIDestination.Arn
+
+
+  MyDLQueue: 
+    Type: AWS::SQS::Queue
+
+  EventRuleSendLog: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      State: "ENABLED"
+      EventBusName: !Ref MyDataDogEventBus
+      EventPattern: 
+        source:
+          - "MyDataDogApp"       
+      Targets: 
+        - Arn: !GetAtt SendLogAPIDestination.Arn
+          RoleArn: !GetAtt EventBridgeTargetRole.Arn
+          Id: "SendLogs"
+          InputTransformer:
+            InputPathsMap:
+              "detail" : "$.detail"
+            InputTemplate:
+              '{"message" : <detail>}'
+          DeadLetterConfig:
+            Arn:  !GetAtt MyDLQueue.Arn
+
+Outputs:
+  MyDataDogEventBusName:
+    Description: Application EventBus Name
+    Value: !Ref MyDataDogEventBus
+
+  MyDataDogEventBusArn:
+    Description: Application EventBus ARN
+    Value: !GetAtt MyDataDogEventBus.Arn
+
+  MyDataDogConnectionName:
+    Value: !Ref MyDataDogConnection
+  MyDataDogConnectionArn:
+    Value: !GetAtt MyDataDogConnection.Arn        
+
+  SendLogAPIDestinationName:
+    Value: !Ref SendLogAPIDestination
+  SendLogAPIDestinationArn:
+    Value: !GetAtt SendLogAPIDestination.Arn
+
+  EventBridgeTargetRoleArn:
+    Value: !GetAtt EventBridgeTargetRole.Arn
