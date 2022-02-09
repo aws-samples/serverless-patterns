@@ -65,10 +65,10 @@ aws lambda invoke --function-name OrderEvent --cli-binary-format raw-in-base64-o
 ```
 ##Step Functions
 ##invocation #1 Happy Path
-<img src="SFN-happy-path.png" alt="topology" width="100%"/>
+<img src="SFN-happy-path.png" alt="topology" width="50%"/>
 
 ##invocation #2 Error Path
-<img src="SFN-error.png" alt="topology" width="100%"/>
+<img src="SFN-error.png" alt="topology" width="50%"/>
 
 
 ## Cleanup
