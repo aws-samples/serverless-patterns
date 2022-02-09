@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Lambda function that calls Amazon Comprehend for sentiment analysis
+
+Resources:
+  ComprehendLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python3.9
+      CodeUri: src/
+      MemorySize: 128
+      Timeout: 60
+      Policies: 
+       - ComprehendBasicAccessPolicy: {}
+Outputs:
+  LambdaFunctionName:
+    Description: Lambda Function Name
+    Value: !Ref ComprehendLambdaFunction
