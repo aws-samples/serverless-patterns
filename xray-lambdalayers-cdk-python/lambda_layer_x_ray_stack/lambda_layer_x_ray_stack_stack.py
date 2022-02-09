@@ -1,3 +1,4 @@
+from importlib.resources import Package
 from aws_cdk import (
     Stack,
     RemovalPolicy,
@@ -7,7 +8,6 @@ from aws_cdk import (
     aws_lambda_event_sources as eventsources
 )
 from constructs import Construct
-from aws_xray_sdk.core.recorder import TRACING_NAME_KEY
 import os
 
 class LambdaLayerXRayStackStack(Stack):
@@ -16,7 +16,7 @@ class LambdaLayerXRayStackStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         # Change pillow arn to latest version in your region. See https://github.com/keithrozario/Klayers/tree/master/deployments/python3.8/arns
-        layerpillow = lambda_.LayerVersion.from_layer_version_arn(self, 'pillowlayerversion', 'arn:aws:lambda:us-east-2:770693421928:layer:Klayers-python38-Pillow:14')
+        layerpillow = lambda_.LayerVersion.from_layer_version_arn(self, 'pillowlayerversion', 'Your_Region_Pillow_ARN')
 
          # --------------------------------------------------------
         # Create buckets for thumbnail 
