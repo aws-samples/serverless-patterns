@@ -30,12 +30,13 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd eventbridge-api-destinations
     ```
-1. There are two examples in this directory.
+1. There are several examples in this directory.
 - To run the Webhook.test open API example, cd to `1-webhook-site`.
 - To run the Slack authenticated API example, cd to `2-slack`.
 - To run the sumologic HTTP Source collector example, cd to `3-sumologic`.
 - To run the mongoDB API destination example, cd to `4-mongodb`.
 - To run the Zendesk API Destination example, cd to `5-zendesk`.
+- To run the Datadog API Destination example, cd to `7-datadog`.
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
