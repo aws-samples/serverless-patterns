@@ -20,7 +20,7 @@ The AWS services used in this pattern are
 
 Topology
 
-<img src="topology.png" alt="topology" width="100%"/>
+<img src="topology.png" alt="topology" width="70%"/>
 
 
 ## Description
@@ -65,10 +65,13 @@ aws lambda invoke --function-name OrderEvent --cli-binary-format raw-in-base64-o
 ```
 ##Step Functions
 ##invocation #1 Happy Path
-<img src="SFN-happy-path.png" alt="topology" width="50%"/>
+
+<img src="SFN-happy-path.png" alt="topology" width="40%"/>
+
 
 ##invocation #2 Error Path
-<img src="SFN-error.png" alt="topology" width="50%"/>
+
+<img src="SFN-error.png" alt="topology" width="40%"/>
 
 
 ## Cleanup
