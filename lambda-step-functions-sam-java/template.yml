@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: lambda-step-functions-sam
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+Resources:
+
+  OrderEvent:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: OrderEvent
+      Handler: com.example.event.OrderEvent::handleRequest
+      CodeUri: target/sourceCode.zip
+      Policies:
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: !GetAtt StateMachine.Name
+      Environment:
+        Variables:
+          StateMachineArn: !GetAtt StateMachine.Arn
+
+  ProcessOrder:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ProcessOrder
+      Handler: com.example.order.ProcessOrder::handleRequest
+      CodeUri: target/sourceCode.zip
+
+  ProcessPayment:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ProcessPayment
+      Handler: com.example.payment.ProcessPayment::handleRequest
+      CodeUri: target/sourceCode.zip
+
+  ReserveInventory:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ReserveInventory
+      Handler: com.example.inventory.ReserveInventory::handleRequest
+      CodeUri: target/sourceCode.zip
+
+  CancelOrder:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CancelOrder
+      Handler: com.example.cancel.CancelOrder::handleRequest
+      CodeUri: target/sourceCode.zip
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: sfn-definition.asl.json
+      DefinitionSubstitutions:
+        ProcessOrder: !GetAtt ProcessOrder.Arn
+        ProcessPayment: !GetAtt ProcessPayment.Arn
+        ReserveInventory: !GetAtt ReserveInventory.Arn
+        CancelOrder: !GetAtt CancelOrder.Arn
+      Name: ProcessOrder
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "cloudwatch:*"
+                - "logs:*"
+                - "lambda:InvokeFunction"
+              Resource: "*"
