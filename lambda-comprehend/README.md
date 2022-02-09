@@ -52,7 +52,7 @@ Replace "{LambdaFunctionName}" with the function name as seen in the output of t
 aws lambda invoke --function-name {LambdaFunctionName} --invocation-type RequestResponse --cli-binary-format raw-in-base64-out --payload "{\"text\":\"I am very happy\"}" response.json
 ```
 
-The command above returns the following output:
+The command above returns the following output and saves it in response.json:
 
 ```bash
 {
