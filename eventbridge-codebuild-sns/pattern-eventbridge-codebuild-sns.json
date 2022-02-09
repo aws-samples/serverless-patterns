@@ -1,0 +1,58 @@
+{
+    "title": "Executing Long-Running Scripts in a Serverless Application Using AWS CodeBuild",
+    "description": "Create a CodeBuild project triggered by a scheduled EventBridge rule that executes a python script which takes more than 15 minutes to run.",
+    "language": "Python",
+    "architectureURL": "",
+    "videoId": "",
+    "level":"200",
+    "framework": "CDK",
+    "services": {
+      "from": "eventbridge",
+      "to": "codebuild, sns"
+    },
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "Developers sometimes encounter the 15-minute timeout limit for Lambda functions. This pattern demonstrates how to use AWS CodeBuild to run long-running scripts (scripts that run for more than 15 minutes) in a serverless application. This examples creates a CodeBuild project that runs a sample script triggered by a scheduled EventBridge rule, and a SNS topic to inform the completion of the CodeBuild project. A S3 bucket is also created to upload sample script."
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cd cdk",
+        "cdk deploy"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-codebuild-sns",
+        "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/eventbridge-codebuild-sns/cdk/app.py",
+        "readmeURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/eventbridge-codebuild-sns/README.md"
+      },
+      "payloads": [
+        {
+          "headline": "",
+          "payloadURL": ""
+        }
+      ]
+    },
+    "resources": {
+      "headline": "Additional resources",
+      "bullets": [
+        {
+          "text": "AWS Lambda enables functions that can run up to 15 minutes",
+          "link": "https://aws.amazon.com/about-aws/whats-new/2018/10/aws-lambda-supports-functions-that-can-run-up-to-15-minutes/"
+        },
+        {
+          "text": "Using AWS CodeBuild to execute administrative tasks",
+          "link": "https://aws.amazon.com/blogs/devops/using-aws-codebuild-to-execute-administrative-tasks/"
+        }      
+      ]
+    },
+    "author": {
+      "headline": "Presented by Guyu Ye",
+      "name": "Guyu Ye",
+      "imageURL": "https://phonetool.amazon.com/users/guyye",
+      "bio": "Sustainability App Architect @ AWS"
+    }
+  }
+  
