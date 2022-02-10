@@ -17,7 +17,7 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-comprehend",
-      "templateURL": "https://github.com/aws-samples/serverless-patterns/main/lambda-comprehend/template.yaml",
+      "templateURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-comprehend/template.yaml",
       "projectFolder": "lambda-comprehend",
       "templateFile": "lambda-comprehend/template.yaml"
     }
