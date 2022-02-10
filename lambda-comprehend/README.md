@@ -49,7 +49,7 @@ Important: this application uses various AWS services and there are costs associ
 Replace "{LambdaFunctionName}" with the function name as seen in the output of the CloudFormation template
 
 ```bash
-aws lambda invoke --function-name {LambdaFunctionName} --invocation-type RequestResponse --cli-binary-format raw-in-base64-out --payload "{\"text\":\"I am very happy\"}" response.json
+aws lambda invoke --function-name "{LambdaFunctionName}" --invocation-type RequestResponse --cli-binary-format raw-in-base64-out --payload "{\"text\":\"I am very happy\"}" response.json
 ```
 
 The command above returns the following output and saves it in response.json:
