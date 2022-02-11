@@ -40,8 +40,6 @@ Important: this application uses various AWS services and there are costs associ
 
 * Use the AWS CLI to asynchronously invoke the Lambda function.
 
-==============================================
-
 ## Testing
 
 ### Success Testing
