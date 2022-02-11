@@ -42,8 +42,6 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-### Success Testing
-
 Replace "{LambdaFunctionName}" with the function name as seen in the output of the CloudFormation template
 
 ```bash
