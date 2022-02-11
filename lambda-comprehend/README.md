@@ -1,6 +1,6 @@
 # AWS Lambda to Amazon Comprehend
 
-The SAM template creates an AWS Lambda function that calls Amazon Comprehend for do sentiment analysis.
+The SAM template creates an AWS Lambda function that calls Amazon Comprehend for sentiment analysis.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
