@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: lambda-eventbridge-stepfunctions
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+#Lambda Functions
+Resources:
+  OrderPublisher:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: OrderPublisher
+      Handler: com.example.OrderPublisher::handleRequest
+      CodeUri: target/sourceCode.zip
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref OrdersEventBus
+
+  OrderState:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: OrderState
+      Handler: com.example.OrderState::handleRequest
+      CodeUri: target/sourceCode.zip
+
+  #EventBridge custom Event Bus
+  OrdersEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: OrdersEventBus
+
+  #EventBridge Event Rule
+  OrdersEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: OrdersEventRule
+      EventBusName: !GetAtt OrdersEventBus.Arn
+      EventPattern:
+        source:
+          - "com.example"
+      Targets:
+        - Arn: !GetAtt StateMachine.Arn
+          Id: "OrdersEventRule"
+          RoleArn: !GetAtt EventBridgeIAMrole.Arn
+
+  EventBridgeIAMrole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                !Sub events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: PutEventsDestinationBus
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - states:StartExecution
+                Resource:
+                  - !GetAtt StateMachine.Arn
+
+  ## Step Function
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: sfn-definition.asl.yml
+      DefinitionSubstitutions:
+        OrderState: !GetAtt OrderState.Arn
+      Name: ProcessOrders
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "cloudwatch:*"
+                - "logs:*"
+                - "lambda:InvokeFunction"
+              Resource: "*"
