@@ -7,7 +7,7 @@ and a Step Functions Workflow using AWS SAM and Java 11.
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 ## Language:
-####This is a Maven project which uses Java 11 and AWS SDK
+#### This is a Maven project which uses Java 11 and AWS SDK
 
 ## Framework
 
