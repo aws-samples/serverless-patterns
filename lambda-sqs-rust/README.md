@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd lambda-sqs-rust
     ```
-3. Install dependencies and build (docker required)
+3. Install dependencies and build (docker and cross build are required):
     ```
     make build
     ```
