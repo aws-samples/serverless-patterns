@@ -18,4 +18,4 @@ deploy:
 	fi
 
 delete:
-	sam delet
+	sam delete
