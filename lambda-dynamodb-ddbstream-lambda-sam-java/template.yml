@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: lambda-dynamodb-ddbstream-lambda
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+Resources:
+  #OrderPublisher Lambda Function
+  OrderPublisher:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: OrderPublisher
+      Handler: com.example.OrderPublisher::handleRequest
+      CodeUri: target/sourceCode.zip
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersDDBTable
+
+  #OrderSubscriber Lambda Function
+  OrderSubscriber:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: OrderSubscriber
+      Handler: com.example.OrderSubscriber::handleRequest
+      CodeUri: target/sourceCode.zip
+      Events:
+        OrdersDDBTable:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt OrdersDDBTable.StreamArn
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 100
+
+  #Orders DynamoDB table and DynamoDB Streams
+  OrdersDDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: Orders
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
