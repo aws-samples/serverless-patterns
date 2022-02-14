@@ -5,8 +5,9 @@ Description: Serverless patterns - SQS to Lambda
 Globals:
   Function:
     MemorySize: 128
-    Handler: bootstrap.is.real.handler
-    Runtime: provided
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
     Timeout: 30
     Environment:
       Variables:

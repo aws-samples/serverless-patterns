@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd sqs-lambda-rust
     ```
-3. Install dependencies and build
+3. Install dependencies and build (docker and cross build are required):
     ```
     make build
     ```
@@ -38,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
 
     Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
    
 ## Example event payload from SQS to Lambda
 
