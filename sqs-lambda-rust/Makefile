@@ -1,21 +1,21 @@
 FUNCTIONS := handler
-ARCH := x86_64-unknown-linux-musl
+ARCH := aarch64-unknown-linux-gnu
 
 build:
-	rm -rf ./build
 	cross build --release --target $(ARCH)
+	rm -rf ./build
 	mkdir -p ./build
 	${MAKE} ${MAKEOPTS} $(foreach function,${FUNCTIONS}, build-${function})
 
 build-%:
 	mkdir -p ./build/$*
 	cp -v ./target/$(ARCH)/release/$* ./build/$*/bootstrap
-build-%:
-	mkdir -p ./build/$*
-	cp -v ./target/$(ARCH)/release/$* ./build/$*/bootstrap
 
 deploy:
-	sam deploy --guided
+	if [ -f samconfig.toml ]; \
+		then sam deploy; \
+		else sam deploy -g; \
+	fi
 
 delete:
 	sam delete
