@@ -43,9 +43,13 @@ To test the endpoint first send data using the following command. Be sure to upd
 ```
 curl --location --request POST '<your api endpoint>' --header 'Content-Type: application/json' \
 --data-raw '{
-    "Detail":{
-        "message": "This is my test"
-    }
+    "items":[
+        {
+            "Detail":"{\"data\":\"Order is created\"}",
+            "DetailType":"Test",
+            "Source":"com.inv.order"
+        }
+    ]
 }'
 ```
 
