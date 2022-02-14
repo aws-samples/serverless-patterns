@@ -2,7 +2,7 @@
 
 This SAM template creates a Lambda function that writes to an S3 bucket when invoked.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-s3
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-s3-rust
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -19,22 +19,26 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
-    cd lambda-s3
+    cd lambda-s3-rust
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. Install dependencies and build (docker and cross build are required):
     ```
-    sam deploy --guided
+    make build
     ```
-1. During the prompts:
+4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+    ```
+    make deploy
+    ```
+5. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
@@ -50,7 +54,7 @@ You can test the solution by accessing the Lambda console, finding your Lambda f
     ```bash
     aws cloudformation delete-stack --stack-name STACK_NAME
     ```
-1. Confirm the stack has been deleted
+2. Confirm the stack has been deleted
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
