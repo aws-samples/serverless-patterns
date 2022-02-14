@@ -37,7 +37,7 @@ Important: This application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates an Amazon API gateway HTTP API endpoint. The endpoint uses service integrations to directly connect to Amazon EventBridge. An EventBridge rule sends all events to Cloudwatch Logs.
+This pattern creates an Amazon API gateway HTTP API endpoint. The endpoint uses service integrations to directly connect to Amazon SNS, SNS fans out the message to Amazon SQS and an Lambda subscribes to the queue.
 
 ## Testing
 
@@ -67,4 +67,3 @@ cdk destroy
 
 ----
 Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
