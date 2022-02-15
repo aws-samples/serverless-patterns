@@ -4,7 +4,7 @@ The SAM template deploys an S3 bucket that publishes events to Amazon EventBridg
 
 EventBridge consumes events directly from S3 buckets when the NoticationConfiguration is enabled, as shown in the template. Learn more about this setting in the documentation at https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-event-notifications-eventbridge.html.
 
-Learn more about this pattern at Serverless Land Patterns:
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-eventbridge.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
