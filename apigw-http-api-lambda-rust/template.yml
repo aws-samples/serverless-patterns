@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An Amazon API Gateway HTTP API and an AWS Lambda function.
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Parameters:
+  AppName:
+    Description: Name of Application
+    Type: String
+    Default: apigw-http-api-lambda
+
+Resources:
+##########################################################################
+#  API Gateway HTTP API                                                  #
+##########################################################################
+  HttpApi:
+    Type: 'AWS::ApiGatewayV2::Api'
+    Properties:
+      Name: !Ref AppName
+      Description: An Amazon API Gateway HTTP API and an AWS Lambda function.
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+          - POST
+      Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaFunction}/invocations
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  LambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ./build/handler
+  # Function permissions grant an AWS service or another account permission to use a function
+  FunctionResourcePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref LambdaFunction
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*'
+
+Outputs:
+  HttpApiEndpoint:
+    Description: The default endpoint for the HTTP API.
+    Value: !GetAtt HttpApi.ApiEndpoint
