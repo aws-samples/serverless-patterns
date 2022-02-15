@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An Amazon REST API gateway with request validator to validate querystring, header, and body, and integrated with a AWS Lambda function.
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    CodeUri: ./src
+    Runtime: nodejs14.x
+    MemorySize: 128
+    Timeout: 15
+
+# Parameter values that should be given as input while stack creation
+Parameters:
+  AppName:
+    Description: Name of the API Gateway
+    Type: String
+    Default: apigw-validator-lambda
+
+Resources:
+  # Lambda Function - uses Globals to define additional configuration values
+  LambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: !Sub '${AppName}-function'
+      Handler: app.handler
+
+  # API Gateway REST API
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Ref AppName
+      Description: An Amazon API Gateway HTTP API with mutual TLS and an AWS Lambda function.
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # Request Validator for the REST API
+  RestApiRequestValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: MyAPIRequestValidator
+        RestApiId: !Ref RestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: true
+
+  # Request model for the REST API
+  RestApiModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      Name: MyRequestModel
+      ContentType: 'application/json'
+      RestApiId: !Ref RestApi
+      Schema: {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "title": "Person",
+          "type": "object",
+          "required": [ "firstName", "lastName" ],
+          "properties": {
+            "firstName": {
+              "type": "string",
+              "description": "The person's first name."
+              },
+              "lastName": {
+                "type": "string",
+                "description": "The person's last name."
+              }
+            }
+        }
+
+  # POST method for the REST API
+  RestApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      RequestModels:
+        $default: !Ref RestApiModel
+      # QueryString and Header for the REST Api
+      RequestParameters:
+        method.request.querystring.myQueryString: true
+        method.request.header.myHeader: true
+      RequestValidatorId: !GetAtt RestApiRequestValidator.RequestValidatorId
+      MethodResponses:
+        - ResponseModels:
+            application/json : 'Empty'
+          StatusCode: 200
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations'
+          - lambdaArn: !GetAtt LambdaFunction.Arn
+      ResourceId: !GetAtt RestApi.RootResourceId
+      RestApiId: !Ref RestApi
+
+  # REST API Deployment
+  RestApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: RestApiMethod
+    Properties:
+      Description: Lambda Rest API Deployment
+      RestApiId: !Ref RestApi
+
+  # Stage for REST API Deployment
+  RestApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref RestApiDeployment
+      Description: Lambda API Stage
+      RestApiId: !Ref RestApi
+      StageName: prod
+
+  # Function permissions grant an AWS service
+  FunctionResourcePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref LambdaFunction
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*'
+
+Outputs:
+  RestApiEndpoint:
+    Description: The endpoint for the REST API Gateway.
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
