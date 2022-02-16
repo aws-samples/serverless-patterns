@@ -1,0 +1,18 @@
+[package]
+name = "lambda-sfn-rust"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "handler"
+path = "src/bin/handler.rs"
+
+[dependencies]
+aws-config = "0.6.0"
+aws-types = "0.6.0"
+aws-sdk-eventbridge = "0.6"
+lambda_runtime = "0.4.1"
+serde = {version = "1.0", features = ["derive"] }
+serde_json = "1.0.68"
+tokio = { version = "1", features = ["full"] }
