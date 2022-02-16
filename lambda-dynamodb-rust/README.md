@@ -61,7 +61,7 @@ aws lambda invoke --function-name {LambdaPutDynamoDBArn} --invocation-type Event
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    make delete
     ```
 2. Confirm the stack has been deleted
     ```bash
