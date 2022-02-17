@@ -64,7 +64,7 @@ For testing purposes, we put an event into EventBridge that is similar to S3 put
 1. Run the following S3 CLI command to upload an object to the S3 bucket. Note, you must edit the *SourceBucketName* placeholder with the name of the S3 Bucket. This is provided in the stack outputs
 
 ```bash
-aws s3 cp './image/helloworld1.png' s3://sam-app-sourcebucket-1111rqp5jlkhz 
+aws s3 cp './image/helloworld1.png' s3://*SourceBucketName*
 ```
 
 2. Run the following command to check to get the logs from the deployed Lambda function (use the function name from the stack output):
