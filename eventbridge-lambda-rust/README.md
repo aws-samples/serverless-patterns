@@ -14,6 +14,8 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Rust](https://www.rust-lang.org/) 1.56.0 or higher
+* [cargo-zigbuild](https://github.com/messense/cargo-zigbuild) and [Zig](https://ziglang.org/) for cross-compilation
 
 ## Deployment Instructions
 
@@ -25,7 +27,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd eventbridge-lambda-rust
     ```
-3. Install dependencies and build (docker and cross build are required):
+3. Install dependencies and build:
     ```
     make build
     ```
