@@ -1,5 +1,5 @@
 [package]
-name = "sqs-lambda-rust"
+name = "s3-eventbridge-direct-rust"
 version = "0.1.0"
 edition = "2021"
 
