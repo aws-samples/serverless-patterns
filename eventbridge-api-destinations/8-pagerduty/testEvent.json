@@ -1,0 +1,8 @@
+[
+    {
+    "EventBusName": "PagerDutyEventBus",
+    "DetailType": "ATestMessage",
+    "Source": "PagerDutyDemo",
+    "Detail": "{\"summary\":\"Sample Event From AWS\",\"source\":\"EventBridge Demo\"}" 
+    }
+]
