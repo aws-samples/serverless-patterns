@@ -48,7 +48,7 @@ aws s3 mb s3://RANDOM_CHARACTERS
 aws s3 cp target/sourceCode.zip s3://RANDOM_CHARACTERS
 
 # SAM will deploy the CloudFormation stack described in the template.yml file:
-sam deploy --s3-bucket jd33js2dc4rfwd --stack-name transformer --capabilities CAPABILITY_IAM
+sam deploy --s3-bucket RANDOM_CHARACTERS --stack-name transformer --capabilities CAPABILITY_IAM
 
 ````
 
