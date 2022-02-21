@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon API Gateway REST API with Request Validator and an AWS Lambda function.
 
-Learn more about this pattern at: https://serverlessland.com/patterns/apigw-lambda-request-validator.
+Learn more about this pattern at: https://serverlessland.com/patterns/apigw-lambda-validator.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
