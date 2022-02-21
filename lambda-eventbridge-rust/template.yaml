@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Lambda to EventBridge
+
+Parameters:
+  EventBusName:
+    Type: String
+    Description: Event bus name
+    Default: 'default'
+
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 30
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+    
+Resources:
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  PublisherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./build/handler
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref EventBusName
+      Environment:
+        Variables:
+          EVENT_BUS_NAME: !Ref EventBusName
+
+Outputs:
+  PublisherFunction:
+    Description: PublisherFunction function name
+    Value: !Ref PublisherFunction
