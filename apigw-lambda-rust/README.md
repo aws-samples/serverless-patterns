@@ -1,6 +1,6 @@
-# Amazon API Gateway HTTP API to AWS Lambda
+# Amazon API Gateway REST API to AWS Lambda
 
-This pattern creates an Amazon API Gateway HTTP API and an AWS Lambda function.
+This pattern creates an Amazon API Gateway REST API and an AWS Lambda function.
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-lambda-rust).
 
@@ -45,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern deploys an Amazon API Gateway HTTP API with a default route and basic CORS configuration. The default route is integrated with an AWS Lambda function written in Node.js. The function logs the incoming API event (v2) and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller.
+This pattern deploys an Amazon API Gateway HTTP API API with a default route and basic CORS configuration. The default route is integrated with an AWS Lambda function written in Rust. The function logs the incoming API event and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller.
 
 ## Testing
 
