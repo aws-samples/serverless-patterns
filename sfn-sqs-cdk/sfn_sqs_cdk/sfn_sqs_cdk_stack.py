@@ -1,16 +1,16 @@
-from aws_cdk import core as cdk
-
 from aws_cdk import (
+    Stack,
+    Duration,
+    CfnOutput,
     aws_stepfunctions as sfn,
     aws_sqs as sqs,
-    aws_stepfunctions_tasks as sfn_tasks,
-    core
+    aws_stepfunctions_tasks as sfn_tasks
 )
+from constructs import Construct
 
+class SfnSqsCdkStack(Stack):
 
-class SfnSqsCdkStack(cdk.Stack):
-
-    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         my_queue = sqs.Queue(self, "queue-from-cdk")
@@ -24,11 +24,11 @@ class SfnSqsCdkStack(cdk.Stack):
         state_machine = sfn.StateMachine(
             self, "SQSWorkflowStateMachine",
             definition=definition,
-            timeout=core.Duration.minutes(5)
+            timeout=Duration.minutes(5)
         )
 
 
-        core.CfnOutput(scope=self, id='StateMachineArn',
+        CfnOutput(scope=self, id='StateMachineArn',
                        value=state_machine.state_machine_arn)
-        core.CfnOutput(scope=self, id='QueueUrl',
+        CfnOutput(scope=self, id='QueueUrl',
                        value=my_queue.queue_url)
