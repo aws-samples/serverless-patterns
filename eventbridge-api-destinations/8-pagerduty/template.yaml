@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: ---
+
+Parameters:
+  PagerDutyAPIKey: 
+    Type: String
+    Description: API Key for the PagerDuty Environment
+    NoEcho: True
+  IntegrationKey:
+    Type: String
+    Description: Integration Key for PagerDuty Service or Ruleset
+
+Resources:
+  MyEventBus: 
+      Type: AWS::Events::EventBus
+      Properties: 
+          Name: "PagerDutyEventBus"
+
+  MyConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      Description: Connection to PagerDuty API
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: PagerDuty Authorization
+          ApiKeyValue: !Ref PagerDutyAPIKey
+
+
+  MyEventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt MyApiDestination.Arn
+
+  MyApiDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      ConnectionArn: !GetAtt MyConnection.Arn
+      Description: API Destination to send events to PagerDuty
+      HttpMethod: POST
+      InvocationEndpoint: https://events.pagerduty.com/v2/enqueue
+
+  MyTriggerEventRule: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EC2 Instant Stopped Rule"
+      State: "ENABLED"
+      EventBusName: !Ref MyEventBus
+      EventPattern: 
+        source:
+          - "PagerDutyDemo"
+      Targets: 
+        - Arn: !GetAtt MyApiDestination.Arn
+          RoleArn: !GetAtt MyEventBridgeTargetRole.Arn
+          Id: "APIdestination"
+          InputTransformer:  
+            InputPathsMap: 
+              summary : $.detail.summary
+              source : $.detail.source
+            InputTemplate: !Sub
+              - >
+                {
+                    "payload": {
+                      "summary": "<summary>",
+                      "source": "Sent From: <source>",
+                      "severity": "info"
+                    },
+                    "routing_key": "${integrationkey}",
+                    "event_action": "trigger"
+                }
+              - { integrationkey: !Ref IntegrationKey }
