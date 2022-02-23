@@ -1,13 +1,15 @@
 from aws_cdk import (
+    App,
+    Stack,
+    CfnOutput,
     aws_s3 as s3,
     aws_sqs as sqs,
-    aws_s3_notifications as s3n,
-    core as cdk,
+    aws_s3_notifications as s3n
 )
+from constructs import Construct
 
-
-class S3SQSStack(cdk.Stack):
-    def __init__(self, app: cdk.App, id: str) -> None:
+class S3SQSStack(Stack):
+    def __init__(self, app: App, id: str) -> None:
         super().__init__(app, id)
 
         
@@ -19,14 +21,14 @@ class S3SQSStack(cdk.Stack):
 
         
         # Output information about the created resources
-        cdk.CfnOutput(self, 'sqsQueueUrl',
+        CfnOutput(self, 'sqsQueueUrl',
                       value=queue.queue_url,
                       description='The URL of the SQS queue')
-        cdk.CfnOutput(self, 'bucketName',
+        CfnOutput(self, 'bucketName',
                       value=bucket.bucket_name,
                       description='The name of the bucket created')
 
 
-app = cdk.App()
+app = App()
 S3SQSStack(app, "S3SQSStackExample")
 app.synth()
