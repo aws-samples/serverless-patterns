@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-import os
-
-from aws_cdk import core
+from aws_cdk import App
 
 from lambda_sqs_cdk.lambda_sqs_cdk_stack import LambdaSqsCdkStack
 
 
-app = core.App()
+app = App()
 LambdaSqsCdkStack(app, "LambdaSqsCdkStack")
 
 app.synth()
