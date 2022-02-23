@@ -1,16 +1,19 @@
 import os
 import json
 from aws_cdk import (
+    App,
+    Stack,
+    Duration,
+    RemovalPolicy,
     aws_lambda as _lambda,
     aws_logs as logs,
     aws_iam as iam,
-    aws_iot as iot,
-    core as cdk,
+    aws_iot as iot
 )
+from constructs import Construct
 
-
-class IoTLambdaStack(cdk.Stack):
-    def __init__(self, app: cdk.App, id: str) -> None:
+class IoTLambdaStack(Stack):
+    def __init__(self, app: App, id: str) -> None:
         super().__init__(app, id)
 
 
@@ -22,7 +25,7 @@ class IoTLambdaStack(cdk.Stack):
             self, "IoTTriggerLambda",
             code=_lambda.InlineCode(handler_code),
             handler="index.main",
-            timeout=cdk.Duration.seconds(10),
+            timeout=Duration.seconds(10),
             runtime=_lambda.Runtime.PYTHON_3_9,
         )
 
@@ -31,7 +34,7 @@ class IoTLambdaStack(cdk.Stack):
             self,
             'logs',
             log_group_name = f"/aws/lambda/{lambdaFn.function_name}",
-            removal_policy = cdk.RemovalPolicy.DESTROY,
+            removal_policy = RemovalPolicy.DESTROY,
             retention = logs.RetentionDays.ONE_DAY
         )
         
@@ -64,6 +67,6 @@ class IoTLambdaStack(cdk.Stack):
         )
 
 
-app = cdk.App()
+app = App()
 IoTLambdaStack(app, "IoTLambdaStackExample")
 app.synth()
