@@ -1,5 +1,5 @@
 from aws_cdk import (
-        core,
+        App,
         assertions
     )
 
@@ -8,7 +8,7 @@ from lambda_sqs_cdk.lambda_sqs_cdk_stack import LambdaSqsCdkStack
 # example tests. To run these tests, uncomment this file along with the example
 # resource in lambda_sqs_cdk/lambda_sqs_cdk_stack.py
 def test_sqs_queue_created():
-    app = core.App()
+    app = App()
     stack = LambdaSqsCdkStack(app, "lambda-sqs-cdk")
     template = assertions.Template.from_stack(stack)
 
@@ -17,7 +17,7 @@ def test_sqs_queue_created():
     })
 
 def test_lambda_function_created():
-    app = core.App()
+    app = App()
     stack = LambdaSqsCdkStack(app, "lambda-sqs-cdk")
     template = assertions.Template.from_stack(stack)
 
