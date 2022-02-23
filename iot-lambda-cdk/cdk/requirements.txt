@@ -1,5 +1,2 @@
-aws-cdk.aws-iot
-aws-cdk.aws-lambda
-aws-cdk.aws-logs
-aws-cdk.aws-iam
-aws-cdk.core
+aws-cdk-lib==2.13.0
+constructs>=10.0.0,<11.0.0
