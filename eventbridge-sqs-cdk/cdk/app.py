@@ -1,13 +1,15 @@
 from aws_cdk import (
+    App,
+    Stack,
+    CfnOutput,
     aws_events as events,
     aws_events_targets as targets,
-    aws_sqs as sqs,
-    core as cdk,
+    aws_sqs as sqs
 )
+from constructs import Construct
 
-
-class EventBridgeSQSStack(cdk.Stack):
-    def __init__(self, app: cdk.App, id: str) -> None:
+class EventBridgeSQSStack(Stack):
+    def __init__(self, app: App, id: str) -> None:
         super().__init__(app, id)
 
         # SQS Queue
@@ -34,12 +36,12 @@ class EventBridgeSQSStack(cdk.Stack):
 
 
         # Stack Outputs
-        cdk.CfnOutput(
+        CfnOutput(
             self, "QueueURL",
             description="URL of SQS Queue",
             value=queue.queue_url
         )
 
-app = cdk.App()
+app = App()
 EventBridgeSQSStack(app, "EventBridgeSQSExample")
 app.synth() 
