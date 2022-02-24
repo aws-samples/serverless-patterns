@@ -1,10 +1,2 @@
-aws-cdk.core==1.134.0
-aws-cdk.aws_iam==1.134.0
-aws-cdk.aws_sqs==1.134.0
-aws-cdk.aws_sns==1.134.0
-aws-cdk.aws_sns_subscriptions==1.134.0
-aws-cdk.aws_s3==1.134.0
-aws-cdk.assertions==1.134.0
-aws-cdk.aws-dynamodb==1.134.0
-aws-cdk.aws-lambda==1.134.0
-aws-cdk.aws_lambda_event_sources==1.134.0
+aws-cdk-lib==2.13.0
+constructs>=10.0.0,<11.0.0

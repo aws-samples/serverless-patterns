@@ -1,20 +1,24 @@
 from aws_cdk import (
+    Stack,
+    Duration,
+    RemovalPolicy,
+    CfnOutput,
     aws_iam as _iam,
     aws_sqs as _sqs,
     aws_dynamodb as _dyn,
     aws_lambda as _lambda,
-    aws_lambda_event_sources as _event,
-    core
+    aws_lambda_event_sources as _event
 )
+from constructs import Construct
 
-class VsamToDynamoStack(core.Stack):
+class VsamToDynamoStack(Stack):
 
-    def __init__(self, scope: core.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         queue = _sqs.Queue(
             self, "VsamToDynamoQueue",
-            visibility_timeout=core.Duration.seconds(300),
+            visibility_timeout=Duration.seconds(300),
             queue_name='VsamToDynamoQueue')
 
 

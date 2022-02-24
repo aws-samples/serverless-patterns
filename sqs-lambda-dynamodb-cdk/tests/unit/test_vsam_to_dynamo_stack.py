@@ -1,5 +1,5 @@
 from aws_cdk import (
-        core,
+        App,
         assertions
     )
 
@@ -7,7 +7,7 @@ from vsam_to_dynamo.vsam_to_dynamo_stack import VsamToDynamoStack
 
 
 def test_sqs_queue_created():
-    app = core.App()
+    app = App()
     stack = VsamToDynamoStack(app, "vsam-to-dynamo")
     template = assertions.Template.from_stack(stack)
 
@@ -17,7 +17,7 @@ def test_sqs_queue_created():
 
 
 def test_lambda_function_created():
-    app = core.App()
+    app = App()
     stack = VsamToDynamoStack(app, "vsam-to-dynamo")
     template = assertions.Template.from_stack(stack)
 
@@ -25,7 +25,7 @@ def test_lambda_function_created():
 
 
 def test_dynamodb_table_created():
-    app = core.App()
+    app = App()
     stack = VsamToDynamoStack(app, "vsam-to-dynamo")
     template = assertions.Template.from_stack(stack)
 
