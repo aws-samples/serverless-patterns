@@ -1,39 +1,41 @@
-const cdk = require('@aws-cdk/core');
-const { Metric } = require('@aws-cdk/aws-cloudwatch');
-const { NodejsFunction, NODEJS_14_X } = require('@aws-cdk/aws-lambda-nodejs');
-const { PolicyDocument, PolicyStatement, Effect } = require('@aws-cdk/aws-iam');
+const { Construct } = require('constructs');
+const { Stack, Duration, StackProps, CfnOutput } = require('aws-cdk-lib');              // core constructs
+const cloudwatch = require('aws-cdk-lib/aws-cloudwatch');
+const iam = require('aws-cdk-lib/aws-iam');
+const lambda = require('aws-cdk-lib/aws-lambda');
+const lambdajs = require('aws-cdk-lib/aws-lambda-nodejs');
 const path = require('path');
 
-class LambdaCloudWatchCdkStack extends cdk.Stack {
+class LambdaCloudWatchCdkStack extends Stack {
   /**
    *
-   * @param {cdk.Construct} scope
+   * @param {Construct} scope
    * @param {string} id
-   * @param {cdk.StackProps=} props
+   * @param {StackProps=} props
    */
   constructor(scope, id, props) {
     super(scope, id, props);
 
     // The code that defines your stack goes here
-    const policyStatement = new PolicyStatement({
-      effect: Effect.ALLOW,
+    const policyStatement = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
       actions: ['cloudwatch:PutMetricData'],
       resources: ['*']
     });
 
-    const metric = new Metric({
+    const metric = new cloudwatch.Metric({
       namespace: 'MyNamespace',
       metricName: 'MyMetric'
     });
 
 
-    const lambdaCloudWatch = new NodejsFunction(
+    const lambdaCloudWatch = new lambdajs.NodejsFunction(
       this,
       'lambdaCloudWatch',
       {
-        runtime: NODEJS_14_X,
+        runtime: lambda.Runtime.NODEJS_14_X,
         memorySize: 1024,
-        timeout: cdk.Duration.seconds(3),
+        timeout: Duration.seconds(3),
         entry: path.join(__dirname, '../src/app.js'),
         handler: 'main',
         environment: {
@@ -43,7 +45,7 @@ class LambdaCloudWatchCdkStack extends cdk.Stack {
       }
     );
 
-    new cdk.CfnOutput(this, 'LambdFunctionArn', { value: lambdaCloudWatch.functionArn });
+    new CfnOutput(this, 'LambdFunctionArn', { value: lambdaCloudWatch.functionArn });
   }
 }
 
