@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-const cdk = require('@aws-cdk/core');
+const { App } = require('aws-cdk-lib');       
 const { LambdaCloudWatchCdkStack } = require('../lib/lambda-cloudwatch-cdk-stack');
 
-const app = new cdk.App();
+const app = new App();
 new LambdaCloudWatchCdkStack(app, 'LambdaCloudWatchCdkStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
