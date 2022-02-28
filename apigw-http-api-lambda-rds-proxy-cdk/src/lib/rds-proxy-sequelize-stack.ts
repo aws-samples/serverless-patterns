@@ -1,18 +1,19 @@
-import * as apigw from '@aws-cdk/aws-apigatewayv2';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as rds from '@aws-cdk/aws-rds';
-import * as secretsmanager from '@aws-cdk/aws-secretsmanager';
 import * as path from 'path';
 
-import { HttpMethod } from '@aws-cdk/aws-apigatewayv2';
-import { LambdaProxyIntegration } from '@aws-cdk/aws-apigatewayv2-integrations';
-import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { CfnOutput, Duration, RemovalPolicy } from '@aws-cdk/core';
+import { Stack, StackProps, CfnOutput, Duration, RemovalPolicy } from 'aws-cdk-lib';
+import { aws_ec2 as ec2 } from 'aws-cdk-lib';
+import { aws_secretsmanager as secretsmanager } from 'aws-cdk-lib';
+import { aws_rds as rds } from 'aws-cdk-lib';
+import { aws_lambda as lambda } from 'aws-cdk-lib';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { Construct } from 'constructs';
+import * as apigw from '@aws-cdk/aws-apigatewayv2-alpha';
+import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 
-export class RdsProxySequelizeStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+
+
+export class RdsProxySequelizeStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     const vpc = new ec2.Vpc(this, "RdsProxyExampleVpc", {
@@ -94,7 +95,7 @@ export class RdsProxySequelizeStack extends cdk.Stack {
 
     const rdsProxyPopulateLambda: NodejsFunction = new NodejsFunction(this, id+'-populateLambda', {
       memorySize: 1024,
-      timeout: cdk.Duration.seconds(5),
+      timeout: Duration.seconds(5),
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'handler',
       entry: path.join(__dirname, '../lambda/populate.ts'),
@@ -115,7 +116,7 @@ export class RdsProxySequelizeStack extends cdk.Stack {
 
     const rdsProxyGetDataLambda: NodejsFunction = new NodejsFunction(this, id+'-getDataLambda', {
       memorySize: 1024,
-      timeout: cdk.Duration.seconds(5),
+      timeout: Duration.seconds(5),
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'handler',
       entry: path.join(__dirname, '../lambda/getData.ts'),
@@ -139,17 +140,13 @@ export class RdsProxySequelizeStack extends cdk.Stack {
 
     const httpApi: apigw.HttpApi = new apigw.HttpApi(this, 'HttpApi');
 
-    const populateLambdaIntegration = new LambdaProxyIntegration({
-      handler: rdsProxyPopulateLambda
-    });
+    const populateLambdaIntegration = new HttpLambdaIntegration('rdsProxyPopulateLambda', rdsProxyPopulateLambda );
 
-    const getDataLambdaIntegration = new LambdaProxyIntegration({
-      handler: rdsProxyGetDataLambda
-    });
+    const getDataLambdaIntegration = new HttpLambdaIntegration('rdsProxyGetDataLambda', rdsProxyGetDataLambda);
 
     httpApi.addRoutes({
       path: '/populate',
-      methods: [HttpMethod.POST],
+      methods: [apigw.HttpMethod.POST],
       integration: populateLambdaIntegration
     });
 
@@ -160,7 +157,7 @@ export class RdsProxySequelizeStack extends cdk.Stack {
 
     httpApi.addRoutes({
       path: '/',
-      methods: [HttpMethod.GET],
+      methods: [apigw.HttpMethod.GET],
       integration: getDataLambdaIntegration
     });
 
