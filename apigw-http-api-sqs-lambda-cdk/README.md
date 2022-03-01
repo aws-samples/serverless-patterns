@@ -1,6 +1,6 @@
 # Amazon API Gateway HTTP API to AWS Simple Queue Service (SQS) to Lambda
 
-This pattern creates an HTTP API endpoint that send message to SQS and trigger a Lambda function to process the message.
+This pattern creates an Amazon API Gateway HTTP API with a ```send``` route that send message to a SQS queue. The  Amazon API Gateway HTTP API has basic CORS configured. Upon receiving message, SQS will trigger a Lambda function to process the message. The function will only ```print``` the message only. The function written in Python.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-http-api-sqs-lambda-cdk
 
@@ -41,13 +41,13 @@ Important: this application uses various AWS services and there are costs associ
     cdk synth
     ```
 
-## Useful CDK commands
+    ## Useful CDK commands
 
- * `cdk ls`          list all stacks in the app
- * `cdk synth`       emits the synthesized CloudFormation template
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk docs`        open CDK documentation
+    * `cdk ls`          list all stacks in the app
+    * `cdk synth`       emits the synthesized CloudFormation template
+    * `cdk deploy`      deploy this stack to your default AWS account/region
+    * `cdk diff`        compare deployed stack with current state
+    * `cdk docs`        open CDK documentation
 
 1. Deploy CDK stack
     ```

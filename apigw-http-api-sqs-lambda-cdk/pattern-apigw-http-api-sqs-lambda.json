@@ -7,9 +7,10 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The API Gateway handles the incoming API requests and send the ```$request.body.MessageBody``` as a message to SQS queue.", 
-      "A Lambda function will be trigger upon the message arraived.",
-      "Processing the message in Lambda function based on your need."
+      "This pattern creates an Amazon API Gateway HTTP API with a <code>send</code> route that send message to a SQS queue.",
+      "The  Amazon API Gateway HTTP API has basic CORS configured. ",
+      "Upon receiving message, SQS will trigger a Lambda function to process the message.", 
+      "The function will only <code>print</code> the message only. The function written in Python."
     ]
   },
   "gitHub": {
@@ -50,6 +51,7 @@
   "authors": [
     {
       "name": "Paul Lu",
+      "bio":"I am an AWS Solution Architect from Taipei, Taiwan.",
       "linkedin": "https://www.linkedin.com/in/paul-lu-7336b433/"
     }
   ]
