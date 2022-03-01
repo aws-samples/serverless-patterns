@@ -1,11 +1,12 @@
-import * as cdk from '@aws-cdk/core';
-import { GraphqlApi, Schema, FieldLogLevel, AuthorizationType, MappingTemplate } from '@aws-cdk/aws-appsync';
-import { Role, ServicePrincipal, PolicyStatement } from "@aws-cdk/aws-iam";
-import {EventBus} from "@aws-cdk/aws-events";
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { GraphqlApi, Schema, FieldLogLevel, AuthorizationType, MappingTemplate } from '@aws-cdk/aws-appsync-alpha';
+import { Role, ServicePrincipal, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import {EventBus} from "aws-cdk-lib/aws-events";
 import { join } from 'path';
 
-export class AppsyncEventbridgeStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class AppsyncEventbridgeStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     const eventBus = new EventBus(this, 'bus', {
@@ -45,9 +46,9 @@ export class AppsyncEventbridgeStack extends cdk.Stack {
       responseMappingTemplate: MappingTemplate.fromFile(join(__dirname, 'response.vtl'))
     })
 
-    new cdk.CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
-    new cdk.CfnOutput(this, 'apiKey', { value: api.apiKey! })
-    new cdk.CfnOutput(this, 'apiId', { value: api.apiId })
-    new cdk.CfnOutput(this, 'eventBus', {value: eventBus.eventBusArn})
+    new CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
+    new CfnOutput(this, 'apiKey', { value: api.apiKey! })
+    new CfnOutput(this, 'apiId', { value: api.apiId })
+    new CfnOutput(this, 'eventBus', {value: eventBus.eventBusArn})
   }
 }
