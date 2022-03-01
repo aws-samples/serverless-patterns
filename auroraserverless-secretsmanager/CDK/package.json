@@ -15,17 +15,12 @@
     "@types/node": "16.11.11",
     "jest": "^27.4.3",
     "ts-jest": "^27.1.0",
-    "aws-cdk": "2.0.0",
+    "aws-cdk": "^2.13.0",
     "ts-node": "^10.4.0",
     "typescript": "~4.5.2"
   },
   "dependencies": {
-    "@aws-cdk/assert": "^2.0.0",
-    "@aws-cdk/assertions": "^1.134.0",
-    "@aws-cdk/aws-rds": "^1.134.0",
-    "@aws-cdk/aws-s3": "^1.134.0",
-    "@aws-cdk/core": "^1.134.0",
-    "aws-cdk-lib": "2.0.0",
+    "aws-cdk-lib": "^2.13.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }
