@@ -1,7 +1,9 @@
-import * as sns from '@aws-cdk/aws-sns'
-import * as cdk from '@aws-cdk/core'
-import * as appsync from '@aws-cdk/aws-appsync'
-import { join } from 'path'
+
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_sns as sns } from "aws-cdk-lib";
+import * as appsync from '@aws-cdk/aws-appsync-alpha';
+import { join } from 'path';
 
 const REQUEST_TEMPLATE = `
 #set ($topicArn = $util.urlEncode("__TOPIC_ARN__"))
@@ -35,11 +37,11 @@ const RESPONSE_TEMPLATE = `
 #end
 `
 
-export class CdkAppSyncSnSStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+export class CdkAppSyncSnSStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
 
-    const region = cdk.Stack.of(this).region
+    const region = Stack.of(this).region
 
     const api = new appsync.GraphqlApi(this, 'Api', {
       name: 'ToSnSApi',
@@ -62,9 +64,9 @@ export class CdkAppSyncSnSStack extends cdk.Stack {
       responseMappingTemplate: appsync.MappingTemplate.fromString(RESPONSE_TEMPLATE),
     })
 
-    new cdk.CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
-    new cdk.CfnOutput(this, 'apiKey', { value: api.apiKey! })
-    new cdk.CfnOutput(this, 'apiId', { value: api.apiId })
-    new cdk.CfnOutput(this, 'topicName', { value: topic.topicName })
+    new CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
+    new CfnOutput(this, 'apiKey', { value: api.apiKey! })
+    new CfnOutput(this, 'apiId', { value: api.apiId })
+    new CfnOutput(this, 'topicName', { value: topic.topicName })
   }
 }
