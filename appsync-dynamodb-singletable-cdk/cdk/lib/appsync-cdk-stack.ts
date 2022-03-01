@@ -1,10 +1,13 @@
-import * as cdk from '@aws-cdk/core';
+import { Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { Table, BillingMode, AttributeType } from 'aws-cdk-lib/aws-dynamodb';
+import { GraphqlApi, MappingTemplate, Schema } from '@aws-cdk/aws-appsync-alpha';
 import { join } from 'path';
-import { GraphqlApi, MappingTemplate, Schema } from '@aws-cdk/aws-appsync'
-import { Table, BillingMode, AttributeType } from '@aws-cdk/aws-dynamodb'
 
-export class AppsyncCdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+
+
+export class AppsyncCdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     // DynamoDB Table
