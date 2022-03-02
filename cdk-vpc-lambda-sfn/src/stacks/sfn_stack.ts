@@ -1,8 +1,9 @@
-import { Stack, Construct, RemovalPolicy } from '@aws-cdk/core';
-import { LambdaInvoke } from '@aws-cdk/aws-stepfunctions-tasks';
-import { StateMachine, LogLevel, IStateMachine } from '@aws-cdk/aws-stepfunctions';
-import { LogGroup } from '@aws-cdk/aws-logs';
-import { RetentionDays } from '@aws-cdk/aws-logs';
+import { Stack, RemovalPolicy } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { LambdaInvoke } from 'aws-cdk-lib/aws-stepfunctions-tasks';
+import { StateMachine, LogLevel, IStateMachine } from 'aws-cdk-lib/aws-stepfunctions';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 
 import { lambdaProps } from './lambda_stack';
 
