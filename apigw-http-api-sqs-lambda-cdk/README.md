@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon API Gateway HTTP API with a ```send``` route that send message to a SQS queue. The  Amazon API Gateway HTTP API has basic CORS configured. Upon receiving message, SQS will trigger a Lambda function to process the message. The function will only ```print``` the message only. The function written in Python.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-http-api-sqs-lambda-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-http-sqs-lambda-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
