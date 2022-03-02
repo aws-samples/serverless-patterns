@@ -1,8 +1,9 @@
-import * as cdk from '@aws-cdk/core'
-import { GraphqlApi, Schema, MappingTemplate, AuthorizationType } from '@aws-cdk/aws-appsync'
-import * as Events from '@aws-cdk/aws-events'
-import * as IAM from '@aws-cdk/aws-iam'
-import { join } from 'path'
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { GraphqlApi, Schema, MappingTemplate, AuthorizationType } from '@aws-cdk/aws-appsync-alpha';
+import { aws_events as Events } from 'aws-cdk-lib';
+import {aws_iam as IAM } from 'aws-cdk-lib';
+import { join } from 'path';
 
 const requestTemplate = `
 #set( $createdAt = $util.time.nowISO8601() )
@@ -15,8 +16,8 @@ $util.qr($context.args.put("updatedAt", $createdAt))
 
 const responseTemplate = `$util.toJson($context.result)`
 
-export class MainStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class MainStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
 
     const api = new GraphqlApi(this, 'Api', {
@@ -42,9 +43,9 @@ export class MainStack extends cdk.Stack {
     const connection = new Events.CfnConnection(this, 'connection', {
       authorizationType: 'API_KEY',
       authParameters: {
-        ApiKeyAuthParameters: {
-          ApiKeyName: 'x-api-key',
-          ApiKeyValue: api.apiKey!,
+        apiKeyAuthParameters: {
+          apiKeyName: 'x-api-key',
+          apiKeyValue: api.apiKey!,
         },
       },
     })
@@ -103,10 +104,10 @@ export class MainStack extends cdk.Stack {
     })
     rule.addDependsOn(bus)
 
-    new cdk.CfnOutput(this, 'apiId', { value: api.apiId })
-    new cdk.CfnOutput(this, 'apiName', { value: api.name })
-    new cdk.CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
-    new cdk.CfnOutput(this, 'apiKey', { value: api.apiKey! })
-    new cdk.CfnOutput(this, 'busName', { value: bus.attrName })
+    new CfnOutput(this, 'apiId', { value: api.apiId })
+    new CfnOutput(this, 'apiName', { value: api.name })
+    new CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
+    new CfnOutput(this, 'apiKey', { value: api.apiKey! })
+    new CfnOutput(this, 'busName', { value: bus.attrName })
   }
 }
