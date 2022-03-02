@@ -1,5 +1,5 @@
-import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
-import * as cdk from '@aws-cdk/core';
+import { Template } from 'aws-cdk-lib/assertions';
+import * as cdk from 'aws-cdk-lib';
 import * as CdkEventbridgeStepfunction from '../lib/cdk-eventbridge-stepfunction-stack';
 
 test('Empty Stack', () => {
@@ -7,7 +7,6 @@ test('Empty Stack', () => {
     // WHEN
     const stack = new CdkEventbridgeStepfunction.CdkEventbridgeStepfunctionStack(app, 'MyTestStack');
     // THEN
-    expectCDK(stack).to(matchTemplate({
-      "Resources": {}
-    }, MatchStyle.EXACT))
+    Template.fromStack(stack).hasResource("AWS::Lambda::Function", {})
+
 });
