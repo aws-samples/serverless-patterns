@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create an API destination in EventBridge for Shopify Create Product API
+
+Parameters:
+  MyCreateProductAPI:
+    Type: String
+    Default: 'https://<<EnterStoreNameHere>>.myshopify.com/admin/api/2022-01/products.json'
+  MyShopifyAdminKey:
+    NoEcho: true
+    Type: String
+    Default: ''
+
+Resources:
+  MyShopifyEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "MyShopifyEventBus"
+
+  MyShopifyConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      Description: 'My connection with an API key'
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: "X-Shopify-Access-Token"
+          ApiKeyValue: !Ref MyShopifyAdminKey
+
+  CreateProductAPIDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'CreateProductAPIDestination'
+      ConnectionArn: !GetAtt MyShopifyConnection.Arn
+      InvocationEndpoint: !Ref MyCreateProductAPI
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+
+  EventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt CreateProductAPIDestination.Arn
+
+
+  MyDLQueue: 
+    Type: AWS::SQS::Queue
+
+  EventRuleCreateProduct: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      State: "ENABLED"
+      EventBusName: !Ref MyShopifyEventBus
+      EventPattern: 
+        source:
+          - "MyShopifyApp"      
+      Targets: 
+        - Arn: !GetAtt CreateProductAPIDestination.Arn
+          RoleArn: !GetAtt EventBridgeTargetRole.Arn
+          Id: "CreateProduct"
+          InputPath: $.detail
+          DeadLetterConfig:
+            Arn:  !GetAtt MyDLQueue.Arn
+
+Outputs:
+  MyShopifyEventBusName:
+    Description: Application EventBus Name
+    Value: !Ref MyShopifyEventBus
+
+  MyShopifyEventBusArn:
+    Description: Application EventBus ARN
+    Value: !GetAtt MyShopifyEventBus.Arn
+
+  MyShopifyConnectionName:
+    Value: !Ref MyShopifyConnection
+  MyShopifyConnectionArn:
+    Value: !GetAtt MyShopifyConnection.Arn        
+
+  CreateProductAPIDestinationName:
+    Value: !Ref CreateProductAPIDestination
+  CreateProductAPIDestination:
+    Value: !GetAtt CreateProductAPIDestination.Arn
+
+  EventBridgeTargetRoleArn:
+    Value: !GetAtt EventBridgeTargetRole.Arn
