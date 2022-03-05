@@ -1,4 +1,6 @@
-use lambda_http::{service_fn, Error, IntoResponse, Request, Response, http::StatusCode, RequestExt};
+use lambda_http::{
+    http::StatusCode, service_fn, Error, IntoResponse, Request, RequestExt, Response,
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -15,21 +17,22 @@ async fn main() -> Result<(), Error> {
 
 pub async fn execute(event: Request) -> Result<impl IntoResponse, Error> {
     println!("EVENT {:?}", event);
-    let ip_address = get_ip_address(&event)
-                              .unwrap_or("stranger".to_string());
+    let ip_address = get_ip_address(&event).unwrap_or("stranger".to_string());
 
-    let mut body = format!( "hello {}", ip_address);
-    if let Some(allowed_query_string_param) = event.query_string_parameters().first("allowed_query_string_param") {
-      body = format!( "hello {} ip: {}", allowed_query_string_param, ip_address);
+    let mut body = format!("hello {}", ip_address);
+    if let Some(allowed_query_string_param) = event
+        .query_string_parameters()
+        .first("allowed_query_string_param")
+    {
+        body = format!("hello {} ip: {}", allowed_query_string_param, ip_address);
     }
 
     let response = Response::builder()
-            .status(StatusCode::OK)
-            .header("Content-Type", "application/json")
-            .body(body)
-            .unwrap();
-    
-    
+        .status(StatusCode::OK)
+        .header("Content-Type", "application/json")
+        .body(body)
+        .unwrap();
+
     Ok(response)
 }
 
@@ -40,4 +43,4 @@ fn get_ip_address(event: &Request) -> Option<String> {
         return Some(ips[0].to_string());
     }
     None
-} 
+}
