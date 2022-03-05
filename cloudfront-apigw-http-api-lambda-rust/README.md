@@ -68,7 +68,7 @@ Example GET Request: https://{DistributionDomainName}.execute-api.{region}.amazo
 
 Response:
 ```
-hello  Daniele ip: {IP}
+hello Daniele ip: {IP}
 ```
 
 If you check the headers back from the call you will see:
