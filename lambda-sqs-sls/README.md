@@ -1,6 +1,6 @@
 # AWS Lambda to Amazon SQS Using the Serverless Framework
 
-The Serverless Framework project deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. The Lambda function publishes a message to the SQS queue when invoked.
+This Serverless Framework project deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. The Lambda function publishes a message to the SQS queue when invoked.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs-sls/
 
@@ -13,15 +13,6 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Serverless Framework](https://www.serverless.com/) installed
 * [Serverless Framework Plugin Python Requirements](https://www.serverless.com/plugins/serverless-python-requirements) installed
-
-Install boto3 into python
-npm init
-npm install --save serverless-python-requirements
-Add to serverless.yaml:
-
-plugins:
-  - serverless-python-requirements
-
 
 ## Deployment Instructions
 
@@ -63,9 +54,9 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to invoke the Lambda function. Th
 1. Invoke the Lambda function to publish a message to the SQS queue:
 
 ```bash
-aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME response.json
+serverless invoke --function ENTER_YOUR_FUNCTION_NAME
 ```
-2. Retrieve the message from the SQS queue, using the queue URL from the AWS SAM deployment outputs:
+2. Retrieve the message from the SQS queue, using the queue URL from the Serverless Framework deployment outputs:
 ```bash
 aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
 ```
@@ -74,11 +65,11 @@ aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    serverless remove
     ```
 1. Confirm the stack has been deleted
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    serverless info
     ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
