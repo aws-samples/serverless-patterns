@@ -1,0 +1,7 @@
+[
+  {
+    "DetailType": "message",
+    "Source": "demo.logs",
+    "Detail": "{\"message\":\"Hello From EventBridge!\"}"
+  }
+]
