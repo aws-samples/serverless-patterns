@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: sqs-lambda-dynamodb
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+Resources:
+  OrderConsumer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: OrderConsumer
+      Handler: com.example.OrderConsumer::handleRequest
+      CodeUri: target/sourceCode.zip
+      Environment:
+        Variables:
+          QUEUE_URL: !Sub 'https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/OrdersQueue'
+          REGION: !Sub '${AWS::Region}'
+          TABLE_NAME: !Ref OrdersTable
+      Policies:
+        - AWSLambdaSQSQueueExecutionRole
+        - AmazonDynamoDBFullAccess
+
+  OrdersQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: OrdersQueue
+
+  OrdersTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: OrdersTable
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
