@@ -8,7 +8,8 @@
     "headline": "How it works",
     "text": [
       "This sample project demonstrates how to use a Lambda function to parse messages when they are received by an SQS queue."
-      "This pattern creates the following resources: SQS queue, Lambda function, CloudWatch Log group, IAM role and IAM policy with least privileges"
+      "This pattern creates the following resources: SQS queue, Lambda function, CloudWatch Log group, IAM role and IAM policy with least privileges."
+      "The Lambda function uses lambda-powertools-python layer for best logging practices."
     ]
   },
   "gitHub": {
