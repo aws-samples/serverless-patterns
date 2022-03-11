@@ -2,7 +2,7 @@
 
 This pattern help you to deploy a CDK stack with API Gateway, Lambda and S3 bucket. For an HTTP GET request with the querystring of an object key to the APIGateway Endpoint backed by AWS Lambda Function will generate the PresignedURL for the object available in the S3 Bucket.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
