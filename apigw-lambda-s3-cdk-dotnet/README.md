@@ -23,22 +23,20 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
-    cd apigw-lambda-s3-cdk-dotnet
+    cd apigw-lambda-s3-cdk-dotnet/cdk
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. Install dependencies
     ```
-    sam deploy --guided
+    dotnet restore
     ```
-1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-
-1. The output contains the APIGateway Endpoint url.
+4. Deploy the stack to your default AWS account and region. The output of this command should give you the HTTP API URL.
+    ```
+    cdk deploy
+    ```
+5. The output contains the APIGateway Endpoint url.
 
 ## How it works
 
