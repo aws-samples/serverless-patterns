@@ -29,7 +29,7 @@
   },
   "deploy": {
     "text": [
-      "See the Github repo for detailed deployment instructions."
+      "terraform init && terraform apply --auto-approve."
     ]
   },
   "testing": {
@@ -39,7 +39,7 @@
   },
   "cleanup": {
     "text": [
-      "See the Github repo for detailed cleanup instructions."
+      "terraform destroy --auto-approve."
     ]
   },
   "authors": [
