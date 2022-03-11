@@ -1,6 +1,6 @@
 # Amazon SQS to AWS Lambda with Terraform
 
-The Terraform stack deploys a Lambda function, an SQS queue, a CloudWatch Log group and the IAM permissions required to run the application. SQS invokes the Lambda function when new messages are available.
+This pattern contains a Lambda function, an SQS queue, a CloudWatch Log group and the IAM permissions required to run the application. SQS invokes the Lambda function when new messages are available.
 
 Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sqs-lambda](https://serverlessland.com/patterns/sqs-lambda)
 
@@ -43,7 +43,7 @@ Important: this application uses various AWS services and there are costs associ
             "attributes": {
                 "ApproximateReceiveCount": "1",
                 "SentTimestamp": "1612966720445",
-                "SenderId": "AIDA3DTKMG1234567890",
+                "SenderId": "AIDACKCEVSQ6C2EXAMPLE",
                 "ApproximateFirstReceiveTimestamp": "1612966720455"
             },
             "messageAttributes": {},
@@ -56,7 +56,12 @@ Important: this application uses various AWS services and there are costs associ
 }
 
 ```
-### Testing
+
+## How it works
+
+When a message is received by the SQS queue, the Lambda function is triggered to read and parse the message. For the sake of the pattern, the Lambda function pushes the message body in CloudWatchLogs.
+
+## Testing
 
 Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queue and observe the event delivered to the Lambda function:
 
