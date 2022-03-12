@@ -1,4 +1,4 @@
-# AWS S3 to AWS SNS
+# Amazon S3 to Amazon SNS
 
 This pattern sends notifications from S3 to SNS when an object is created
 
