@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: AWS-SAM-APIGW-Lambda-DDB
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+Resources:
+  CommandService:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CommandService
+      Handler: com.example.commandService.CommandService::handleRequest
+      CodeUri: target/sourceCode.zip
+      Environment:
+        Variables:
+          REGION: !Sub '${AWS::Region}'
+          COMMAND_TABLE_NAME: !Ref CommandDDBTable
+      Policies:
+        - AmazonDynamoDBFullAccess
+
+  QueryService:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: QueryService
+      Handler: com.example.queryService.QueryService::handleRequest
+      CodeUri: target/sourceCode.zip
+      Environment:
+        Variables:
+          REGION: !Sub '${AWS::Region}'
+          QUERY_TABLE_NAME: !Ref QueryDDBTable
+      Policies:
+        - AmazonDynamoDBFullAccess
+
+  DataTransfer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: DataTransfer
+      Handler: com.example.dataTransfer.DataTransfer::handleRequest
+      CodeUri: target/sourceCode.zip
+      Environment:
+        Variables:
+          REGION: !Sub '${AWS::Region}'
+          QUERY_TABLE_NAME: !Ref QueryDDBTable
+      Policies:
+        - AmazonDynamoDBFullAccess
+      Events:
+        CommandTicketDDBTable:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt CommandDDBTable.StreamArn
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 100
+
+  CommandDDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: CommandDDBTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+  QueryDDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: QueryDDBTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
