@@ -22,16 +22,15 @@ resource "aws_s3_bucket" "MyS3Bucket" {
 }
 
 # Create a new SNS topic
-resource "aws_sns_topic" "MySNStopic" {
+resource "aws_sns_topic" "MySNSTopic" {
 }
 
 # Allow the S3 bucket to publish to the SNS topic
-resource "aws_sns_topic_policy" "test" {
-  arn    = aws_sns_topic.MySNStopic.arn
+resource "aws_sns_topic_policy" "MySNSTopicPolicy" {
+  arn    = aws_sns_topic.MySNSTopic.arn
   policy = <<POLICY
 {
   "Version": "2012-10-17",
-  "Id": "snspolicy",
   "Statement": [
     {
       "Effect": "Allow",
@@ -39,7 +38,7 @@ resource "aws_sns_topic_policy" "test" {
         "Service": "s3.amazonaws.com"
       },
       "Action": "sns:Publish",
-      "Resource": "${aws_sns_topic.MySNStopic.arn}",
+      "Resource": "${aws_sns_topic.MySNSTopic.arn}",
       "Condition": {
         "ArnEquals": {
           "aws:SourceArn": "${aws_s3_bucket.MyS3Bucket.arn}"
@@ -52,10 +51,10 @@ POLICY
 }
 
 # Create a new notification for the SNS topic when a new object is created and set the SNS as target
-resource "aws_s3_bucket_notification" "bucket_notification" {
+resource "aws_s3_bucket_notification" "MyS3BucketNotification" {
   bucket = aws_s3_bucket.MyS3Bucket.id
   topic {
-    topic_arn = aws_sns_topic.MySNStopic.arn
+    topic_arn = aws_sns_topic.MySNSTopic.arn
     events    = ["s3:ObjectCreated:*"]
   }
 }
@@ -65,7 +64,7 @@ output "S3-Bucket" {
   value       = aws_s3_bucket.MyS3Bucket.id
   description = "The S3 Bucket"
 }
-output "SNS-Topic" {
-  value       = aws_sns_topic.MySNStopic.id
-  description = "The SNS Topic"
+output "SNS-Topic-ARN" {
+  value       = aws_sns_topic.MySNSTopic.arn
+  description = "The SNS Topic ARN"
 }
