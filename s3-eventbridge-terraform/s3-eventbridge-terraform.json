@@ -1,0 +1,60 @@
+{
+  "title": "S3 to EventBridge",
+  "description": "Publish events directly from S3 to EventBridge and send notifications to SNS when an object is created.",
+  "language": "",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This creates an S3 bucket, EventBridge rule and SNS topic. S3 publishes events directly to EventBridge and sends a notification to the SNS topic when an object is created in the bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-terraform",
+      "templateURL": "serverless-patterns/s3-eventbridge-terraform",
+      "projectFolder": "s3-eventbridge-terraform",
+      "templateFile": "s3-eventbridge-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Use Amazon S3 Event Notifications with Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/aws/new-use-amazon-s3-event-notifications-with-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. Change directory: `s3-eventbridge-terraform`.",
+      "2. Delete all files from the S3 bucket.",
+      "3. Delete the stack: `terraform destroy`.",
+      "4. Confirm the stack has been deleted: `terraform show`."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Joahna Abelgas",
+      "image": "https://avatars.githubusercontent.com/u/86153724?v=4",
+      "bio": "Cloud Engineer",
+      "linkedin": "https://linkedin.com/in/joahna/",
+      "twitter": "https://twitter.com/heyjoahna"
+    }
+  ]
+}
