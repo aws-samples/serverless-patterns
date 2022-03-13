@@ -14,7 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <name>ticketExpert-publisher</name>
+    <name>cqrs-pattern</name>
     <dependencyManagement>
         <dependencies>
             <dependency>
