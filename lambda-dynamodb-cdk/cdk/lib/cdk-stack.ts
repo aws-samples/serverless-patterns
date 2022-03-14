@@ -1,7 +1,8 @@
-import { CfnOutput, Construct, Duration, RemovalPolicy, Stack, StackProps} from '@aws-cdk/core';
-import { Table, BillingMode, AttributeType } from '@aws-cdk/aws-dynamodb';
-import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { Runtime } from '@aws-cdk/aws-lambda';
+import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { Table, BillingMode, AttributeType } from 'aws-cdk-lib/aws-dynamodb';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import path = require('path');
 
 export class CdkStack extends Stack {
