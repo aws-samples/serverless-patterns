@@ -12,8 +12,8 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [.Net Core](https://dotnet.microsoft.com/en-us/download/dotnet)
-    - 3.1 for the CDK Stack
-    - 6.0 for the Lambda Function
+    - 3.1 for the CDK Stack - https://dotnet.microsoft.com/en-us/download/dotnet/3.1
+    - 6.0 for the Lambda Function - https://dotnet.microsoft.com/en-us/download/dotnet/6.0
 * [Docker](https://docs.docker.com/get-docker/) installed and running
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
