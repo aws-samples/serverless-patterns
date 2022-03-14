@@ -11,6 +11,11 @@ namespace lambda;
 
 public class Function
 {
+    private const string envBucketName = "BUCKET_NAME";
+    private const string envQueryStringKey = "QUERYSTRING_KEY";
+    private const string responseForKeyNotFound = "Object key not found in the request";
+
+
     IAmazonS3 S3Client { get; set; }
 
     /// <summary>
@@ -41,29 +46,45 @@ public class Function
     /// <returns></returns>
     public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest apirequest, ILambdaContext context)
     {
-        context.Logger.Log(Environment.GetEnvironmentVariable("BUCKET_NAME"));
+        var bucketName = Environment.GetEnvironmentVariable(envBucketName);
+        var objectKey = apirequest.QueryStringParameters != null && apirequest.QueryStringParameters.ContainsKey(Environment.GetEnvironmentVariable(envQueryStringKey)) ?
+                                    apirequest.QueryStringParameters[Environment.GetEnvironmentVariable(envQueryStringKey)] : string.Empty;
+        context.Logger.Log(bucketName);
 
         try
         {
-            context.Logger.Log(string.Join(Environment.NewLine, apirequest.QueryStringParameters));
-
-            var request = new GetPreSignedUrlRequest()
+            if (!string.IsNullOrWhiteSpace(objectKey))
             {
-                BucketName = Environment.GetEnvironmentVariable("BUCKET_NAME"),
-                Key = apirequest.QueryStringParameters["key"],
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                //Checking for Key Exists - if not throw error
+                var file_response = S3Client.GetObjectMetadataAsync(bucketName, objectKey);
+                context.Logger.LogInformation(file_response.Result.HttpStatusCode.ToString());
+                context.Logger.Log(string.Join(Environment.NewLine, apirequest.QueryStringParameters));
 
-            };
+                var request = new GetPreSignedUrlRequest()
+                {
+                    BucketName = bucketName,
+                    Key = objectKey,
+                    Expires = DateTime.UtcNow.AddMinutes(1),
+                };
 
-            return new APIGatewayProxyResponse()
+                return new APIGatewayProxyResponse()
+                {
+                    StatusCode = 200,
+                    Body = S3Client.GetPreSignedURL(request)
+                };
+            }
+            else
             {
-                StatusCode = 200,
-                Body = S3Client.GetPreSignedURL(request)
-            };
+                return new APIGatewayProxyResponse()
+                {
+                    StatusCode = 404,
+                    Body = responseForKeyNotFound
+                };
+            }
         }
         catch (Exception e)
         {
-            context.Logger.LogInformation($"Error getting signedURL. Make sure the key exist in your bucket.");
+            context.Logger.LogInformation("Error getting signedURL. Make sure the key exist in your bucket.");
             context.Logger.LogInformation(e.Message);
             context.Logger.LogInformation(e.StackTrace);
             throw;
