@@ -12,30 +12,30 @@ namespace Cdk
     {
         internal CdkStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
-            // S3 Bucket - for the files
-            var fileshare_bucket = new Bucket(this, "filebucketshare", new BucketProps
-            {
-                Versioned = true
-            });
-
             // Sample Json file content
-            IDictionary<string, object> sampleJson = new Dictionary<string, object> {
+            var sampleJson = new Dictionary<string, object> {
                 { "key1", "value1" },
                 { "key2", "value2" }
             };
 
             // File Names for reuse
-            var string_file = "string-file.txt";
-            var json_file = "json-file.json";
+            var stringFile = "string-file.txt";
+            var jsonFile = "json-file.json";
+
+             // S3 Bucket - for the files
+            var fileshareBucket = new Bucket(this, "filebucketshare", new BucketProps
+            {
+                Versioned = true
+            });
 
             // S3 Bucket Deployment for the sample files for read
             new BucketDeployment(this, "DeployFiles", new BucketDeploymentProps()
             {
                 Sources = new[] {
-                    Source.Data(string_file, "This sample Text!!!"),
-                    Source.JsonData(json_file, sampleJson )
+                    Source.Data(stringFile, "This sample Text!!!"),
+                    Source.JsonData(jsonFile, sampleJson )
                     },
-                DestinationBucket = fileshare_bucket
+                DestinationBucket = fileshareBucket
             });
 
 
@@ -48,15 +48,17 @@ namespace Cdk
                 new DockerImageFunctionProps()
                 {
                     Code = dockerImageCode,
-                    Description = ".NET 5 Docker Lambda function",
+                    Description = ".NET 6 Docker Lambda function",
                     Environment = new Dictionary<string, string>
-                {
-                    { "BUCKET_NAME", fileshare_bucket.BucketName}
-                }
+                    {
+                        { "BUCKET_NAME", fileshareBucket.BucketName},
+                        {"QUERYSTRING_KEY", "key"}
+                    },
+                    Timeout = Duration.Minutes(1)
                 });
 
             // Lambda Permission
-            fileshare_bucket.GrantReadWrite(dockerImageFunction);
+            fileshareBucket.GrantReadWrite(dockerImageFunction);
 
             // APIGateway 
             var apiGateway = new RestApi(this, "cdkApi", new RestApiProps()
@@ -77,12 +79,12 @@ namespace Cdk
             // CDK - Output
             new CfnOutput(this, "TextFile-Test-URL", new CfnOutputProps
             {
-                Value = apiGateway.Url + "?key=" + string_file
+                Value = apiGateway.Url + "?key=" + stringFile
             });
-            
+
             new CfnOutput(this, "JsonFile-Test-URL", new CfnOutputProps
             {
-                Value = apiGateway.Url + "?key=" + json_file
+                Value = apiGateway.Url + "?key=" + jsonFile
             });
         }
     }
