@@ -1,7 +1,4 @@
-﻿using Amazon.CDK;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Amazon.CDK;
 
 namespace Cdk
 {
