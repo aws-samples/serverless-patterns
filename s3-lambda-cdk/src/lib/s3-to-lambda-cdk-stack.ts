@@ -1,10 +1,11 @@
-import * as cdk from '@aws-cdk/core';
-import * as s3 from '@aws-cdk/aws-s3';
-import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { S3EventSource} from '@aws-cdk/aws-lambda-event-sources';
+import { Stack, StackProps, CfnOutput, RemovalPolicy } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_s3 as s3 } from 'aws-cdk-lib';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { S3EventSource} from 'aws-cdk-lib/aws-lambda-event-sources';
 
-export class S3ToLambdaCdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class S3ToLambdaCdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
     
     //Change this if desired
@@ -16,7 +17,7 @@ export class S3ToLambdaCdkStack extends cdk.Stack {
        * The following properties ensure the bucket is properly 
        * deleted when we run cdk destroy */
       autoDeleteObjects: true,
-      removalPolicy: cdk.RemovalPolicy.DESTROY
+      removalPolicy: RemovalPolicy.DESTROY
     });
 
 
@@ -36,7 +37,7 @@ export class S3ToLambdaCdkStack extends cdk.Stack {
     lambdaReadStream.addEventSource(s3PutEventSource);
 
     // Outputs
-    new cdk.CfnOutput(this, 'BucketArn', { value: bucket.bucketArn });
-    new cdk.CfnOutput(this, 'LambdaFunctionArn', { value: lambdaReadStream.functionArn });
+    new CfnOutput(this, 'BucketArn', { value: bucket.bucketArn });
+    new CfnOutput(this, 'LambdaFunctionArn', { value: lambdaReadStream.functionArn });
   }
 }
