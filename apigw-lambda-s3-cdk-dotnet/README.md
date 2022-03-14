@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Amazon API Gateway API to AWS Lambda for S3 Presigned URL
 
 This pattern help you to deploy a CDK stack with API Gateway, Lambda and S3 bucket. For an HTTP GET request with the querystring of an object key to the APIGateway Endpoint backed by AWS Lambda Function will generate the PresignedURL for the object available in the S3 Bucket.
 
