@@ -1,13 +1,13 @@
-import { Role } from "@aws-cdk/aws-iam";
-import { Construct } from "@aws-cdk/core";
-import { Artifact } from "@aws-cdk/aws-codepipeline";
+import { Role } from "aws-cdk-lib/aws-iam";
+import { Construct } from 'constructs';
+import { Artifact } from "aws-cdk-lib/aws-codepipeline";
 import { 
   ComputeType, 
   PipelineProject, 
   BuildSpec, 
   LinuxBuildImage 
-} from "@aws-cdk/aws-codebuild";
-import { CodeBuildAction } from "@aws-cdk/aws-codepipeline-actions";
+} from "aws-cdk-lib/aws-codebuild";
+import { CodeBuildAction } from "aws-cdk-lib/aws-codepipeline-actions";
 
 
 export const getEndToEndTestsActions = (
