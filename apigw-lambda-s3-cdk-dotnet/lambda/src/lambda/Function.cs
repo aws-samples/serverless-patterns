@@ -84,10 +84,14 @@ public class Function
         }
         catch (Exception e)
         {
+            return new APIGatewayProxyResponse()
+                {
+                    StatusCode = 500,
+                    Body = "Make sure the key exist in your bucket"
+                };
             context.Logger.LogInformation("Error getting signedURL. Make sure the key exist in your bucket.");
             context.Logger.LogInformation(e.Message);
             context.Logger.LogInformation(e.StackTrace);
-            throw;
         }
     }
 }
