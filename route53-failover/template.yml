@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  Route53HostedZoneId:
+    Type: String
+  Route53DomainName:
+    Type: String
+  ApiPrimaryHostedZoneId:
+    Type: String
+  ApiPrimaryDomainName:
+    Type: String
+  ApiPrimaryEndpoint:
+    Type: String
+  ApiSecondaryHostedZoneId:
+    Type: String
+  ApiSecondaryDomainName:
+    Type: String
+
+Resources:
+##########################################################################
+#  Health Check                                                          #
+##########################################################################
+  HealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Properties:
+      HealthCheckConfig:
+        FullyQualifiedDomainName: !Ref ApiPrimaryEndpoint
+        Port: 443
+        RequestInterval: 10
+        FailureThreshold: 3
+        ResourcePath: /api
+        Type: HTTPS
+        Regions:
+          - eu-west-1 #Ireland
+          - ap-southeast-2 #Sydney
+          - us-west-1 #California
+      HealthCheckTags:
+      - Key: Name
+        Value: !Ref ApiPrimaryEndpoint
+
+##########################################################################
+#  Route53                                                               #
+##########################################################################
+  FailOverGroup:    
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref Route53HostedZoneId
+      RecordSets: 
+        - Name:
+            !Ref Route53DomainName
+          Type: A
+          Failover: PRIMARY
+          SetIdentifier: Primary
+          HealthCheckId: !Ref HealthCheck
+          AliasTarget:
+            HostedZoneId: !Ref ApiPrimaryHostedZoneId
+            DNSName: !Ref ApiPrimaryDomainName
+            EvaluateTargetHealth: True
+        - Name:
+            !Ref Route53DomainName
+          Type: A
+          Failover: SECONDARY
+          SetIdentifier: Secondary
+          AliasTarget:
+            HostedZoneId: !Ref ApiSecondaryHostedZoneId
+            DNSName: !Ref ApiSecondaryDomainName
+            EvaluateTargetHealth: False
