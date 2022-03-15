@@ -1,4 +1,4 @@
-import * as cdk from "@aws-cdk/core";
+import * as cdk from 'aws-cdk-lib';
 import { PipelineStack } from "./app/pipeline-stack";
 
 const app = new cdk.App();
