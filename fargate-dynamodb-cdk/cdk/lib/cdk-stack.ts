@@ -1,9 +1,10 @@
-import { CfnOutput, Construct, RemovalPolicy, Stack, StackProps} from '@aws-cdk/core';
-import { Table, BillingMode, AttributeType } from '@aws-cdk/aws-dynamodb';
-import { GatewayVpcEndpointAwsService, Vpc } from '@aws-cdk/aws-ec2';
-import { Cluster, ContainerImage } from '@aws-cdk/aws-ecs';
-import { ApplicationLoadBalancedFargateService } from '@aws-cdk/aws-ecs-patterns';
-import { AnyPrincipal, Effect, PolicyStatement } from '@aws-cdk/aws-iam';
+import { Stack, StackProps, CfnOutput, RemovalPolicy } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { Table, BillingMode, AttributeType } from 'aws-cdk-lib/aws-dynamodb';
+import { GatewayVpcEndpointAwsService, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { Cluster, ContainerImage } from 'aws-cdk-lib/aws-ecs';
+import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import path = require('path');
 
 export class CdkStack extends Stack {
