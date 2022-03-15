@@ -1,5 +1,6 @@
-import { Stack, Construct, StackProps } from '@aws-cdk/core';
-import { Schema, Database, Table, IDatabase, ITable, CfnTable, DataFormat } from '@aws-cdk/aws-glue';
+import { Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { Schema, Database, Table, IDatabase, ITable, DataFormat } from '@aws-cdk/aws-glue-alpha';
 
 import { config } from '../config';
 import { s3BucketProps } from '../helpers/interfaces';
