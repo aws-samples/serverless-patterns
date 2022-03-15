@@ -1,7 +1,8 @@
-import { Function, IFunction, Code, Architecture, Runtime } from '@aws-cdk/aws-lambda';
-import { Policy, Effect, PolicyStatement } from '@aws-cdk/aws-iam';
-import { RetentionDays } from '@aws-cdk/aws-logs';
-import { Stack, StackProps, Construct } from '@aws-cdk/core';
+import { Function, IFunction, Code, Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { Policy, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 
 import * as path from 'path';
 import { vpcProps, vpcStack } from './vpc_stack';
