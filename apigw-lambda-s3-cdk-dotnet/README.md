@@ -52,6 +52,7 @@ Open the enbdpoint in the browser and click or copy paste the generated url in a
 Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
 ```
 cdk destroy
+```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
