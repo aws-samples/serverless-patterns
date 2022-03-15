@@ -1,6 +1,6 @@
 # Amazon API Gateway API to AWS Lambda for S3 Presigned URL
 
-This pattern help you to deploy a CDK stack with API Gateway, Lambda and S3 bucket. For an HTTP GET request with the querystring of an object key to the APIGateway Endpoint backed by AWS Lambda Function will generate the PresignedURL for the object available in the S3 Bucket.
+This pattern helps you to deploy a CDK stack with API Gateway, Lambda, and S3 bucket. For an HTTP GET request with the query string of an object key to the APIGateway Endpoint backed by AWS Lambda Function will generate the PresignedURL for the object available in the S3 Bucket.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns
 
@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
     dotnet restore/src
     ```
 
-4. Deploy the stack to your default AWS account and region. The output of this command should give you the HTTP API URL.
+4. Deploy the stack to your default AWS account and region.
     ```
     cdk deploy
     ```
