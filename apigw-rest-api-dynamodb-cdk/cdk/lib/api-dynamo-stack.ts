@@ -1,17 +1,18 @@
-import * as cdk from '@aws-cdk/core';
-import { AwsIntegration, RestApi, PassthroughBehavior } from '@aws-cdk/aws-apigateway'
-import { Table, BillingMode, AttributeType } from '@aws-cdk/aws-dynamodb'
-import { Role, ServicePrincipal} from '@aws-cdk/aws-iam'
+import { Stack, StackProps, RemovalPolicy } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { AwsIntegration, RestApi, PassthroughBehavior } from 'aws-cdk-lib/aws-apigateway'
+import { Table, BillingMode, AttributeType } from 'aws-cdk-lib/aws-dynamodb'
+import { Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam'
 
-export class ApiDynamoStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class ApiDynamoStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     // DynamoDB Table
     const ddbTable = new Table(this, 'ApiDynamoTable', {
       partitionKey: {name:'pk', type: AttributeType.STRING},
       billingMode: BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: RemovalPolicy.DESTROY,
     });
 
     // RestApi

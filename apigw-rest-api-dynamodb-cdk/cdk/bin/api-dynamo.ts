@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
 import { ApiDynamoStack } from '../lib/api-dynamo-stack';
 
 const app = new cdk.App();
