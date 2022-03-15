@@ -1,7 +1,9 @@
-import * as sqs from '@aws-cdk/aws-sqs'
-import * as cdk from '@aws-cdk/core'
-import * as appsync from '@aws-cdk/aws-appsync'
-import { join } from 'path'
+
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import {aws_sqs as sqs } from 'aws-cdk-lib';
+import * as appsync from '@aws-cdk/aws-appsync-alpha';
+import { join } from 'path';
 
 const REQUEST_TEMPLATE = (accountId: String, queue: sqs.Queue) => {
   return `
@@ -37,12 +39,12 @@ const RESPONSE_TEMPLATE = `
 #end
 `
 
-export class CdkAppSyncSqSStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+export class CdkAppSyncSqSStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
 
-    const region = cdk.Stack.of(this).region
-    const account = cdk.Stack.of(this).account
+    const region = Stack.of(this).region
+    const account = Stack.of(this).account
 
     const api = new appsync.GraphqlApi(this, 'Api', {
       name: 'ToSqSApi',
@@ -63,9 +65,9 @@ export class CdkAppSyncSqSStack extends cdk.Stack {
       responseMappingTemplate: appsync.MappingTemplate.fromString(RESPONSE_TEMPLATE),
     })
 
-    new cdk.CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
-    new cdk.CfnOutput(this, 'apiKey', { value: api.apiKey! })
-    new cdk.CfnOutput(this, 'apiId', { value: api.apiId })
-    new cdk.CfnOutput(this, 'queueUrl', { value: queue.queueUrl })
+    new CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
+    new CfnOutput(this, 'apiKey', { value: api.apiKey! })
+    new CfnOutput(this, 'apiId', { value: api.apiId })
+    new CfnOutput(this, 'queueUrl', { value: queue.queueUrl })
   }
 }
