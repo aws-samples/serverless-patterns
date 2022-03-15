@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
 import { ApigwS3CdkStack } from '../lib/apigw-s3-cdk-stack';
 
 const app = new cdk.App();
