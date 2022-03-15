@@ -49,14 +49,9 @@ Open the enbdpoint in the browser and click or copy paste the generated url in a
 
 ## Cleanup
  
-1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
+Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
+```
+cdk destroy
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
