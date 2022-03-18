@@ -158,6 +158,6 @@ build/
 Cargo.lock
 
 # Terraform
-**/*.terraform
+**/*.terraform*
 **/terraform.tfstate*
 
