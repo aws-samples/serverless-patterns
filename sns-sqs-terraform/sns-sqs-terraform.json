@@ -9,7 +9,7 @@
     "text": [
       "This sample project demonstrates how to use a SQS queue to receive messages published on a SNS topic."
       "This pattern creates the following resources: SNS topic, SQS queue, SNS topic subscription with SQS protocol, SQS queue resource policy for SNS to push messages."
-      "This pattern can combined with any pattern using SQS as source to build the infrastructure answering the desired goal, for example SQS to Lambda pattern"
+      "This pattern can combined with any pattern using SQS as source to build the infrastructure answering the desired goal, for example SQS to Lambda pattern."
     ]
   },
   "gitHub": {
