@@ -57,7 +57,7 @@ When a message is received by the SNS topic, the message is sent to the SQS queu
 
 Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SNS topic and observe the message received by SQS (using values from Terraform output):
 
-1. Send the message to SNS:
+1. Send a message to SNS:
 ```bash
 aws sns publish --topic-arn ENTER_YOUR_SNS_TOPIC_ARN --subject testSubject --message testMessage
 ```
