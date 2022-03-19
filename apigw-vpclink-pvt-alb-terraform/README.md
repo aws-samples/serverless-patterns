@@ -13,10 +13,6 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-## How it works
-
-This pattern allows integration of public API gateway endpoint to a private Application Load Balancer with an ECS Fargate cluster behind it. It allows to build a secure pattern without exposing the private subnet resources and can be accessed only via a VPC Link.
-
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
@@ -46,10 +42,13 @@ This pattern allows integration of public API gateway endpoint to a private Appl
     ```
     Deploy:
     ```
-    terraform apply
+    terraform apply --auto-approve
     ```
 5. Note the output from the Terraform deployment process. These contain the resource names and/or ARNs which are used for testing.
 
+## How it works
+
+This pattern allows integration of public API gateway endpoint to a private Application Load Balancer with an ECS Fargate cluster behind it. It allows to build a secure pattern without exposing the private subnet resources and can be accessed only via a VPC Link.
 
 ## Testing
 
@@ -70,7 +69,7 @@ curl -s -o /dev/null -w "%{http_code}" <API endpoint> ; echo
     ```bash
     terraform destroy
     ```
-3. Enter 'yes' when prompted.
+3. Enter 'yes' hen prompted.
 
 4. Check if all the resources were deleted successfully.
     ```bash
