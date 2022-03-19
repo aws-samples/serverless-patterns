@@ -1,13 +1,12 @@
-import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
-import * as cdk from '@aws-cdk/core';
+import { Template } from 'aws-cdk-lib/assertions';
+import * as cdk from 'aws-cdk-lib';
 import * as AppsyncCdk from '../lib/appsync-cdk-stack';
 
-test('Empty Stack', () => {
+test('Testing Stack', () => {
     const app = new cdk.App();
     // WHEN
     const stack = new AppsyncCdk.AppsyncCdkStack(app, 'MyTestStack');
     // THEN
-    expectCDK(stack).to(matchTemplate({
-      "Resources": {}
-    }, MatchStyle.EXACT))
+    Template.fromStack(stack).hasResource("AWS::DynamoDB::Table", {})
+
 });

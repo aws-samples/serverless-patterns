@@ -1,9 +1,10 @@
-import * as cdk from '@aws-cdk/core'
-import { GraphqlApi, Schema, MappingTemplate, AuthorizationType } from '@aws-cdk/aws-appsync'
-import { PythonFunction } from '@aws-cdk/aws-lambda-python'
-import { Runtime } from '@aws-cdk/aws-lambda'
-import * as Events from '@aws-cdk/aws-events'
-import * as IAM from '@aws-cdk/aws-iam'
+import { Stack, StackProps, CfnParameter, CfnOutput } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { GraphqlApi, Schema, MappingTemplate, AuthorizationType } from '@aws-cdk/aws-appsync-alpha'
+import { PythonFunction } from '@aws-cdk/aws-lambda-python-alpha'
+import { Runtime } from 'aws-cdk-lib/aws-lambda'
+import { aws_events as Events } from 'aws-cdk-lib'
+import { aws_iam as IAM } from 'aws-cdk-lib'
 import { join } from 'path'
 import { Auth } from './auth'
 
@@ -18,11 +19,11 @@ $util.qr($context.args.put("updatedAt", $createdAt))
 
 const responseTemplate = `$util.toJson($context.result)`
 
-export class MainStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class MainStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
 
-    const authDomainParameter = new cdk.CfnParameter(this, "authDomainName", {
+    const authDomainParameter = new CfnParameter(this, "authDomainName", {
       type: "String",
       description: "Unique domain name for auth"
     })
@@ -79,18 +80,18 @@ export class MainStack extends cdk.Stack {
     const connection = new Events.CfnConnection(this, 'connection', {
       authorizationType: "OAUTH_CLIENT_CREDENTIALS",
       authParameters: {
-        OAuthParameters: {
-          AuthorizationEndpoint: `${auth.authEndpoint}/oauth2/token`,
-          ClientParameters: {
-            ClientID: auth.destinationClientId,
-            ClientSecret: auth.destinationClientSecret
+        oAuthParameters: {
+          authorizationEndpoint: `${auth.authEndpoint}/oauth2/token`,
+          clientParameters: {
+            clientId: auth.destinationClientId,
+            clientSecret: auth.destinationClientSecret
           },
-          HttpMethod: "POST",
-          OAuthHttpParameters: {
-            BodyParameters: [
+          httpMethod: "POST",
+          oAuthHttpParameters: {
+            bodyParameters: [
               {
-                Key: "grant_type",
-                Value: "client_credentials"
+                key: "grant_type",
+                value: "client_credentials"
               }
             ]
           }
@@ -152,9 +153,9 @@ export class MainStack extends cdk.Stack {
     })
     rule.addDependsOn(bus)
 
-    new cdk.CfnOutput(this, 'apiId', { value: api.apiId })
-    new cdk.CfnOutput(this, 'apiName', { value: api.name })
-    new cdk.CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
-    new cdk.CfnOutput(this, 'apiKey', { value: api.apiKey! })
+    new CfnOutput(this, 'apiId', { value: api.apiId })
+    new CfnOutput(this, 'apiName', { value: api.name })
+    new CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
+    new CfnOutput(this, 'apiKey', { value: api.apiKey! })
   }
 }

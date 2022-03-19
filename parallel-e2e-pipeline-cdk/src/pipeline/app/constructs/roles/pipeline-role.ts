@@ -4,8 +4,8 @@ import {
   Effect,
   Role,
   ServicePrincipal
-} from "@aws-cdk/aws-iam";
-import { Construct } from "@aws-cdk/core";
+} from "aws-cdk-lib/aws-iam";
+import { Construct } from 'constructs';
 
 
 interface PipelineRoleProps { 

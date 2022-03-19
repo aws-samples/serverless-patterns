@@ -1,6 +1,7 @@
-import * as cdk from '@aws-cdk/core'
-import { GraphqlApi, Schema, MappingTemplate, AuthorizationType } from '@aws-cdk/aws-appsync'
-import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs'
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { GraphqlApi, Schema, MappingTemplate, AuthorizationType } from '@aws-cdk/aws-appsync-alpha'
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { join } from 'path'
 
 const requestTemplate = `
@@ -15,8 +16,8 @@ $util.qr($context.args.put("updatedAt", $createdAt))
 
 const responseTemplate = `$util.toJson($context.result)`
 
-export class MainStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class MainStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
 
     const api = new GraphqlApi(this, 'Api', {
@@ -51,9 +52,9 @@ export class MainStack extends cdk.Stack {
     })
     api.grantMutation(lambda)
 
-    new cdk.CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
-    new cdk.CfnOutput(this, 'apiId', { value: api.apiId })
-    new cdk.CfnOutput(this, 'functionArn', { value: lambda.functionArn })
-    new cdk.CfnOutput(this, 'functionName', { value: lambda.functionName })
+    new CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
+    new CfnOutput(this, 'apiId', { value: api.apiId })
+    new CfnOutput(this, 'functionArn', { value: lambda.functionArn })
+    new CfnOutput(this, 'functionName', { value: lambda.functionName })
   }
 }

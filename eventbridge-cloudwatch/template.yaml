@@ -48,7 +48,7 @@ Resources:
                 "${logArn}"
               ],
               "Condition": {
-                "ArnEquals": {"aws:SourceArn": "${ruleArn}"}
+                "ArnEquals": {"AWS:SourceArn": "${ruleArn}"}
               }
             }
           ]

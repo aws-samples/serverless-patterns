@@ -1,24 +1,24 @@
 /*! Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: MIT-0
  */
-
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as msk from "@aws-cdk/aws-msk"
-import {NodejsFunction} from "@aws-cdk/aws-lambda-nodejs";
-import {Runtime} from "@aws-cdk/aws-lambda";
-
-import * as ec2 from '@aws-cdk/aws-ec2';
-
-import { ManagedKafkaEventSource } from "@aws-cdk/aws-lambda-event-sources";
+import { Stack, StackProps, Duration } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_iam as iam } from 'aws-cdk-lib';
+import { aws_lambda as lambda } from 'aws-cdk-lib';
+import * as msk from '@aws-cdk/aws-msk-alpha';
+import { aws_ec2 as ec2 } from 'aws-cdk-lib';
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
+import { ManagedKafkaEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 
 import path = require('path');
 
-import * as iam from '@aws-cdk/aws-iam';
 
-import * as cdk from '@aws-cdk/core';
 
-export class MskLambdaCdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+
+
+export class MskLambdaCdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     let topicName: string;
@@ -44,7 +44,7 @@ export class MskLambdaCdkStack extends cdk.Stack {
       handler: 'handler',
       vpc: vpc,
       functionName: 'TransactionHandler',
-      timeout: cdk.Duration.minutes(1),
+      timeout: Duration.minutes(1),
     });
 
     
