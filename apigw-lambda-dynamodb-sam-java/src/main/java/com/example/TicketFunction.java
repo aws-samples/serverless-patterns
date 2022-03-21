@@ -17,6 +17,7 @@ public class TicketFunction implements RequestHandler<APIGatewayProxyRequestEven
 
     Logger logger = LoggerFactory.getLogger(TicketFunction.class);
     ObjectMapper mapper = new ObjectMapper();
+    DDBUtils ddbUtils = new DDBUtils();
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
@@ -30,14 +31,13 @@ public class TicketFunction implements RequestHandler<APIGatewayProxyRequestEven
             logger.info("[ticket userId] " + ticket.getUserId());
             logger.info("[ticket description] " + ticket.getDescription());
 
-            ticketId = DDBUtils.persistTicket(ticket);
+            ticketId = ddbUtils.persistTicket(ticket);
 
             response.setBody(mapper.writeValueAsString(ticketId));
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-
         return response;
     }
 }
