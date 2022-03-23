@@ -3,7 +3,7 @@
 The Terraform template in this pattern deploys the following resources. It requires a VPC id and private subnet ids as inputs. It is assumed that the VPC and subnets are already configured with the required network routes.
 
 ### Deployed resources:
-* Requried Security Groups
+* Required Security Groups
 * ECS Fargate cluster with service and task definitions
 * Private Application Load Balancer with appropriate listener and target group
 * VPC Link
