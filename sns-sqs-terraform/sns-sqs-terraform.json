@@ -1,0 +1,62 @@
+{
+  "title": "SNS to SQS",
+  "description": "Creates a SQS queue which receives messages published on a SNS topic.",
+  "language": "None",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use a SQS queue to receive messages published on a SNS topic."
+      "This pattern creates the following resources: SNS topic, SQS queue, SNS topic subscription with SQS protocol, SQS queue resource policy for SNS to push messages."
+      "This pattern can combined with any pattern using SQS as source to build the infrastructure answering the desired goal, for example SQS to Lambda pattern."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-terraform",
+      "templateURL": "serverless-patterns/sns-sqs-terraform",
+      "projectFolder": "sns-sqs-terrafom",
+      "templateFile": "sns-sqs-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "SNS fanout to SQS queues",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html"
+      },
+      {
+        "text": "Choosing between messaging services for serverless applications",
+        "link": "https://aws.amazon.com/fr/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply --auto-approve."
+    ]
+  },
+  "testing": {
+    "text": [
+      "Send a message to SNS:"
+      "aws sns publish --topic-arn ENTER_YOUR_SNS_TOPIC_ARN --subject testSubject --message testMessage"
+      "Retrieve the message from SQS queue:"
+      "aws sqs receive-message --queue-url ENTER_YOUR_SQS_QUEUE_URL"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy --auto-approve."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nicolas Diez",
+      "image": "",
+      "bio": "AWS Proserve Consultant.",
+      "linkedin": "https://www.linkedin.com/in/nicolasdiez/",
+      "twitter": "https://twitter.com/claque2000"
+    }
+  ]
+}
