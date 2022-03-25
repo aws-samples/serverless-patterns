@@ -1,8 +1,8 @@
 # Amazon Cloudfront distribution on front of an Amazon API Gateway HTTP API to AWS Lambda
 
-This pattern creates an Amazon Cloudfront distribution on front of an Amazon API Gateway HTTP API and an AWS Lambda function.
+This pattern creates an Amazon Cloudfront failover distribution on front of an Amazon API Gateway HTTP API and an AWS Lambda function in two different regions.
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/cloudfront-apigw-http-lambda-rust).
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/cloudfront-failover-apigw-http-lambda-rust).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -23,15 +23,15 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cloudfront-apigw-http-lambda-rust
+    cd cloudfront-failover-apigw-http-lambda-rust
     ```
 3. Install dependencies and build:
     ```
     make build
     ```
-4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+4. Deploy the api on the PrimaryRegion region.
     ```
-    make deploy
+    sam deploy --guided --region {PrimaryRegion} --stack-name sam-api-primary --template-file api.yml
     ```
 5. During the prompts:
     * Enter a stack name
@@ -41,17 +41,43 @@ Important: this application uses various AWS services and there are costs associ
     Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+
+7. Deploy the api on the SecondaryRegion region.
+    ```
+    sam deploy --guided --region {SecondaryRegion} --stack-name sam-api-primary --template-file api.yml
+    ```
+8. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region
+    * Allow SAM CLI to create IAM roles with the required permissions.
+
+    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+
+9. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+
+10. Deploy CloudFront with failvoer policy.
+    ```
+    sam deploy --guided --region {PrimaryRegion} --stack-name sam-cf-primary --template-file cloudfront.yml --parameter-overrides PrimaryEndpoint={HTTP_API_ID}.execute-api.{PrimaryRegion}.amazonaws.com SecondaryEndpoint={HTTP_API_ID}.execute-api.{SecondaryRegion}.amazonaws.com
+    ```
+11. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region
+    * Allow SAM CLI to create IAM roles with the required permissions.
+
+    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+
+12. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
    
 
 ## How it works
 
-This pattern deploys an Amazon Cloudfront distribution, an Amazon API Gateway HTTP API with a default route and basic CORS configuration. The default route is integrated with an AWS Lambda function written in Rust. The function logs the incoming API event (v2) and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller.
+This pattern deploys an Amazon Cloudfront distribution on front of two Amazon API Gateway HTTP API with a default route and basic CORS configuration in different regions. The default route is integrated with an AWS Lambda function written in Rust. The function logs the incoming API event (v2) and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller.
 
 ## Testing
 
 Once the application is deployed, retrieve the CloudFront value from CloudFormation Outputs. Either browse to the endpoint in a web browser or call the endpoint from Postman.
 
-Example GET Request: https://{DistributionDomainName}/mypath
+Example GET Request: https://{DistributionDomainName}/api
 
 Response:
 ```
@@ -64,7 +90,7 @@ X-Cache: Miss from cloudfront
 If you try again:
 X-Cache: Hit from cloudfront
 
-Example GET Request: https://{DistributionDomainName}/mypath?allowed_query_string_param=Daniele
+Example GET Request: https://{DistributionDomainName}/api?allowed_query_string_param=Daniele
 
 Response:
 ```
@@ -105,3 +131,4 @@ X-Cache: Hit from cloudfront
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
+

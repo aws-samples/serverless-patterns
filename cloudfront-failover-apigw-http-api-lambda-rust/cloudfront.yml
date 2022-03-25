@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  PrimaryEndpoint:
+    Type: String
+  SecondaryEndpoint:
+    Type: String
+
+Resources:
+##########################################################################
+#  CloudFront::CachePolicy                                               #
+##########################################################################
+  1hCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Comment: Cache for 1h
+        Name: !Ref AWS::StackName
+        DefaultTTL: 360
+        MaxTTL: 360
+        MinTTL: 360
+        Name: 1h
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingBrotli: false
+          EnableAcceptEncodingGzip: false
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - x-forwarded-for
+          QueryStringsConfig:
+            QueryStringBehavior: whitelist
+            QueryStrings:
+              - allowed_query_string_param
+
+##########################################################################
+#  CloudFront::Distribution                                              #
+##########################################################################
+  CloudfrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        #  CNAMEs: # Aliases A complex type that contains information about CNAMEs (alternate domain names), if any, for this distribution.
+        PriceClass: PriceClass_100
+        IPV6Enabled: true
+        HttpVersion: http2
+        OriginGroups: #https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/high_availability_origin_failover.html
+          Items:
+            - Id: Failover
+              FailoverCriteria: 
+                StatusCodes: #403, 404, 500, 502, 503, 504
+                  Items:
+                    - 502 # Bad Gateway Exception
+                    - 503 # Service Unavailable Exception
+                    - 504 # Endpoint Request Timed-out Exception
+                  Quantity: 3
+              Members: 
+                Items: 
+                  - OriginId: Primary
+                  - OriginId: Secondary
+                Quantity: 2
+          Quantity: 1
+        Origins:
+          - Id: Primary
+            DomainName: !Ref PrimaryEndpoint
+            OriginPath: /api
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: 
+                - TLSv1.2
+          - Id: Secondary
+            DomainName: !Ref SecondaryEndpoint
+            OriginPath: /api
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: 
+                - TLSv1.2
+        Enabled: true
+        CacheBehaviors:
+          - AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+            Compress: true
+            PathPattern: /api
+            TargetOriginId: Failover
+            ViewerProtocolPolicy: redirect-to-https
+            CachePolicyId: !Ref 1hCachePolicy
+          - AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+            Compress: true
+            PathPattern: /api/?allowed_query_string_param*
+            TargetOriginId: Failover
+            ViewerProtocolPolicy: redirect-to-https
+            CachePolicyId: !Ref 1hCachePolicy
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          TargetOriginId: Primary
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: !Ref 1hCachePolicy
+
+Outputs:
+  DistributionDomainName:
+    Description: "Distribution domain name"
+    Value: !GetAtt CloudfrontDistribution.DomainName
+    Export:
+      Name: DistributionDomainName
