@@ -1,0 +1,61 @@
+{
+    "title": "API Gateway to Private ALB and ECS Cluster via VPC Link",
+    "description": "Creates an API Gateway endpoint, Private Application Load Balancer, VPC Link, ECS Fargate cluster, and required Security Groups and IAM roles. API gateway integration between the API endpoint and the private ALB via the VPC Link",
+    "language": "HCL",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates an integration pattern that allows configuring a public API Gateway endpoint to a private Application Load Balancer with an ECS Fargate cluster behind it."
+        "It allows to build a secure pattern without exposing the private subnet resources and can be accessed only via a VPC Link."
+        "This pattern creates the following resources: Requried Security Groups, ECS Fargate cluster with service and task definitions, Private Application Load Balancer with appropriate listener and target group, VPC Link. API gateway integration between the API endpoint and the private ALB via the VPC Link."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-vpclink-pvt-alb-terraform",
+        "templateURL": "serverless-patterns/apigw-vpclink-pvt-alb-terraform",
+        "projectFolder": "apigw-vpclink-pvt-alb-terraform",
+        "templateFile": "apigw-vpclink-pvt-alb-terraform/main.tf"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "HTTP API private integration using VPC link",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-private.html"
+        },
+        {
+          "text": "Configuring private integrations with Amazon API Gateway HTTP APIs",
+          "link": "https://aws.amazon.com/blogs/compute/configuring-private-integrations-with-amazon-api-gateway-http-apis/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "terraform init && terraform apply --auto-approve"
+      ]
+    },
+    "testing": {
+      "text": [
+        "The stack creates and outputs the API endpoint. Open a browser and try out the generated API endpoint. You should see the Nginx home page."
+        "Or, run the below command with the appropriate API endpoint. You should get a 200 response code."
+        "curl -s -o /dev/null -w "%{http_code}" <API endpoint> ; echo"
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "terraform destroy --auto-approve"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Bideep Bezbaruah",
+        "image": "https://www.linkedin.com/in/bideep/",
+        "bio": "Principal Engineer | Architect | Product and Platform Engineering",
+        "linkedin": "https://www.linkedin.com/in/bideep/",
+        "twitter": "https://twitter.com/bbideep"
+      }
+    ]
+  }
