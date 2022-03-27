@@ -2,7 +2,7 @@
 
 This pattern shows how to deploy a Lambda Function that has a layer added to it.
 
-The SAM template deploys two Lambda functions. Both Lambda functions attempt to import the `PyMySQL` package. However, only one of the Lambda functions has the layer which allows it to import the package successfully. This pattern tests both Lambdas to illustrate the difference when there is a layer added to a Lambda function.
+The SAM template deploys two Lambda functions. Both Lambda functions attempt to import the `PyMySQL` package. However, only one of the Lambda functions has the layer which allows it to import the package successfully. This pattern tests both Lambdas to illustrate the difference when there is a layer added to a Lambda function. For more information on Lambda Layers, please refer to [AWS Lambda Developer Guide: Creating and sharing Lambda layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html)
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-layer
 
