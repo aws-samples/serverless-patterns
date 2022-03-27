@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An Application Load Balancer and an AWS Lambda function.
+
+Parameters:
+  VpcId:
+      Type: AWS::EC2::VPC::Id
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  MyLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ./build/handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Tags:
+        name: !Ref AWS::StackName
+
+  MyLambdaFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt MyLambdaFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com
+
+##########################################################################
+#  Application Load Balancer                                             #
+##########################################################################
+  MyLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: internet-facing 
+      IpAddressType: dualstack
+      Subnets: !Ref Subnets      
+      SecurityGroups: [!Ref MySecurityGroup]
+      Tags: 
+        - Key: name
+          Value: !Ref AWS::StackName
+
+  MyTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: MyLambdaFunctionPermission
+    Properties:
+      TargetType: lambda
+      Targets:
+        - Id: !GetAtt MyLambdaFunction.Arn
+      Tags: 
+        - Key: name
+          Value: !Ref AWS::StackName
+
+  MyHttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref MyLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - TargetGroupArn: !Ref MyTargetGroup
+          Type: forward
+  
+  # MyHttpsListener: #A certificate must be specified for HTTPS listeners
+  #   Type: AWS::ElasticLoadBalancingV2::Listener
+  #   Properties:
+  #     LoadBalancerArn: !Ref MyLoadBalancer
+  #     Port: 443
+  #     Protocol: HTTPS
+  #     Certificates:
+  #       - !GetAtt MyListenerCertificate.Arn
+  #     DefaultActions:
+  #       - TargetGroupArn: !Ref MyTargetGroup
+  #         Type: forward
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Ref AWS::StackName
+      GroupDescription: Allow http on port 80 and 443
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        # - IpProtocol: tcp #A certificate must be specified for HTTPS listeners
+        #   FromPort: 443
+        #   ToPort: 443
+        #   CidrIp: 0.0.0.0/0
+      Tags: 
+        - Key: name
+          Value: !Ref AWS::StackName
+
+Outputs:
+  DNSName:
+    Value: !GetAtt MyLoadBalancer.DNSName
