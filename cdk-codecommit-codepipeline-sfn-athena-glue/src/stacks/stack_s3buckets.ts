@@ -1,5 +1,6 @@
-import { Construct, RemovalPolicy, Stack, StackProps } from '@aws-cdk/core';
-import { BlockPublicAccess, Bucket, IBucket } from '@aws-cdk/aws-s3';
+import { RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { BlockPublicAccess, Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
 import { config } from '../config';
 
 

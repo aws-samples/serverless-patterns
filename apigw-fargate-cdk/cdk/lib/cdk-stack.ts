@@ -1,8 +1,10 @@
-import { CfnOutput, CfnResource, Construct, Stack, StackProps } from '@aws-cdk/core';
-import { Vpc } from '@aws-cdk/aws-ec2';
-import { Cluster, ContainerImage } from '@aws-cdk/aws-ecs';
-import { ApplicationLoadBalancedFargateService } from '@aws-cdk/aws-ecs-patterns';
-import { CfnIntegration, CfnRoute, HttpApi } from '@aws-cdk/aws-apigatewayv2';
+import { CfnOutput, CfnResource, Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { Vpc } from 'aws-cdk-lib/aws-ec2';
+import { Cluster, ContainerImage } from 'aws-cdk-lib/aws-ecs';
+import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
+import { CfnIntegration, CfnRoute } from 'aws-cdk-lib/aws-apigatewayv2';
+import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
 import path = require('path');
 
 export class CdkStack extends Stack {

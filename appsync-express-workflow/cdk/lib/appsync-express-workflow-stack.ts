@@ -1,7 +1,8 @@
-import * as cdk from '@aws-cdk/core';
-import {Pass, StateMachine, StateMachineType} from '@aws-cdk/aws-stepfunctions';
-import { GraphqlApi, Schema, FieldLogLevel, AuthorizationType, MappingTemplate } from '@aws-cdk/aws-appsync';
-import { Role, ServicePrincipal, PolicyStatement } from "@aws-cdk/aws-iam";
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import {Pass, StateMachine, StateMachineType} from 'aws-cdk-lib/aws-stepfunctions';
+import { GraphqlApi, Schema, FieldLogLevel, AuthorizationType, MappingTemplate } from '@aws-cdk/aws-appsync-alpha';
+import { Role, ServicePrincipal, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { join } from 'path';
 
 const START_EXECUTION_REQUEST_TEMPLATE = (stateMachineArn: String) => {
@@ -41,8 +42,8 @@ const RESPONSE_TEMPLATE = `
 #end
 `
 
-export class AppsyncExpressWorkflowStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class AppsyncExpressWorkflowStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     // The code that defines your stack goes here
@@ -90,9 +91,9 @@ export class AppsyncExpressWorkflowStack extends cdk.Stack {
     })
 
 
-    new cdk.CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
-    new cdk.CfnOutput(this, 'apiKey', { value: api.apiKey! })
-    new cdk.CfnOutput(this, 'apiId', { value: api.apiId })
-    new cdk.CfnOutput(this, 'stateMachine', {value: stateMachine.stateMachineArn})
+    new CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
+    new CfnOutput(this, 'apiKey', { value: api.apiKey! })
+    new CfnOutput(this, 'apiId', { value: api.apiId })
+    new CfnOutput(this, 'stateMachine', {value: stateMachine.stateMachineArn})
   }
 }

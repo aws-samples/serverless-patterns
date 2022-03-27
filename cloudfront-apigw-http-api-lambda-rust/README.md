@@ -51,7 +51,7 @@ This pattern deploys an Amazon Cloudfront distribution, an Amazon API Gateway HT
 
 Once the application is deployed, retrieve the CloudFront value from CloudFormation Outputs. Either browse to the endpoint in a web browser or call the endpoint from Postman.
 
-Example GET Request: https://{DistributionDomainName}.execute-api.{region}.amazonaws.com/mypath
+Example GET Request: https://{DistributionDomainName}/mypath
 
 Response:
 ```
@@ -64,7 +64,7 @@ X-Cache: Miss from cloudfront
 If you try again:
 X-Cache: Hit from cloudfront
 
-Example GET Request: https://{DistributionDomainName}.execute-api.{region}.amazonaws.com/mypath?allowed_query_string_param=Daniele
+Example GET Request: https://{DistributionDomainName}/mypath?allowed_query_string_param=Daniele
 
 Response:
 ```

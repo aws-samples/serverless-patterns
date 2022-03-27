@@ -1,0 +1,55 @@
+{
+  "title": "SQS to Lambda",
+  "description": "Create a Lambda function to parse message received by an SQS queue.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use a Lambda function to parse messages when they are received by an SQS queue."
+      "This pattern creates the following resources: SQS queue, Lambda function, CloudWatch Log group, IAM role and IAM policy with least privileges."
+      "The Lambda function uses lambda-powertools-python layer for best logging practices."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-terraform-python",
+      "templateURL": "serverless-patterns/sqs-lambda-terraform-python",
+      "projectFolder": "sqs-lambda-terrafom-python",
+      "templateFile": "sqs-lambda-terraform-python/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "SQS to Lambda pattern",
+        "link": "https://serverlessland.com/patterns/sqs-lambda"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply --auto-approve."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy --auto-approve."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nicolas Diez",
+      "image": "",
+      "bio": "AWS Proserve Consultant.",
+      "linkedin": "https://www.linkedin.com/in/nicolasdiez/",
+      "twitter": "https://twitter.com/claque2000"
+    }
+  ]
+}

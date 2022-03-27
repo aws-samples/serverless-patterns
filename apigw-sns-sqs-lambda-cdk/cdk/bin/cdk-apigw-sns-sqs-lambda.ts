@@ -5,7 +5,7 @@
  */
 
 import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
 import { CdkApigwSnsSqsLambdaStack } from '../lib/cdk-apigw-sns-sqs-lambda-stack';
 
 const app = new cdk.App();

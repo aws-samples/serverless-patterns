@@ -1,6 +1,7 @@
-import { Construct, Stack, StackProps } from '@aws-cdk/core';
-import { Repository } from '@aws-cdk/aws-codecommit';
-import { CodePipeline, ShellStep, CodePipelineSource } from "@aws-cdk/pipelines";
+import { Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { Repository } from 'aws-cdk-lib/aws-codecommit';
+import { CodePipeline, ShellStep, CodePipelineSource } from "aws-cdk-lib/pipelines";
 
 import { config } from '../config';
 

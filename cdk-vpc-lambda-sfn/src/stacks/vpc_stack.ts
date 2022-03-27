@@ -1,8 +1,9 @@
-import { Stack, StackProps, Aspects, Tag, Construct } from '@aws-cdk/core';
+import { Stack, StackProps, Aspects, Tag } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import {
     InterfaceVpcEndpointAwsService,
     ISecurityGroup, ISubnet, SecurityGroup, SubnetType, Vpc, Peer, Port, IVpc
-} from '@aws-cdk/aws-ec2';
+} from 'aws-cdk-lib/aws-ec2';
 
 
 export class vpcStack extends Stack {

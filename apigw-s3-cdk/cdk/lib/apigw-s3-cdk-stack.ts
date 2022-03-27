@@ -1,12 +1,13 @@
-import * as cdk from '@aws-cdk/core';
+import { Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 //import * as s3 from "@aws-cdk/aws-s3";
-import * as apigw from "@aws-cdk/aws-apigateway";
-import * as iam from "@aws-cdk/aws-iam";
+import { aws_apigateway as apigw } from "aws-cdk-lib";
+import { aws_iam as iam } from "aws-cdk-lib";
 
-export class ApigwS3CdkStack extends cdk.Stack {
+export class ApigwS3CdkStack extends Stack {
   public readonly apiGatewayRole: iam.Role;
 
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
     
     //Create REST API
