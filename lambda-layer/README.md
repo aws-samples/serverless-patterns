@@ -55,3 +55,34 @@ The AWS SAM template deploys the following resources:
 
 ==============================================
 
+## Testing
+
+Test the Lambda Function that has the layer - it executes successfully
+
+1. Navigate to the Lambda console and select the `PyMySQLLayerLambdaFunction`, then choose `Test`
+
+    <img src="./docs/03-test-pymysql-with-layer.png" alt="test-pymysql-with-lambda-layer" width="100%"/>
+
+
+2. Give the test an `Event name` and choose `Save`
+
+    <img src="./docs/04-configure-test-event.png" alt="configure-test-event" width="100%"/>
+
+3. Then choose `Test` again from the console. The `Execution results` shows that the Lambda Function has run succesfully.
+
+    <img src="./docs/05-execution-results-success.png" alt="execution-result-successful" width="100%"/>
+
+Test the Lambda Function that does not have the layer - it results in an error
+
+1. Navigate to the Lambda console and select the `PyMySQLNoLayerLambdaFunction`, then choose `Test`
+
+    <img src="./docs/06-test-pymysql-without-layer.png" alt="test-pymysql-without-lambda-layer" width="100%"/>
+
+
+2. Give the test an `Event name` and choose `Save`
+
+    <img src="./docs/04-configure-test-event.png" alt="configure-test-event" width="100%"/>
+
+3. Then choose `Test` again from the console. The `Execution results` shows that there is an error of `Unable to import module 'app': No module named 'pymysql'`. This is expected since this Lambda function does not have the layer with `pymysql`
+
+    <img src="./docs/07-execution-results-failed.png" alt="execution-result-faile" width="100%"/>
