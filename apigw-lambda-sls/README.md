@@ -1,6 +1,6 @@
 # Amazon API Gateway REST API with AWS Lambda proxy integration
 
-This pattern in Serverless Framework offers a boilerlate to generate an Amazon API Gateway REST API endpoint with a a greedy proxy ("{proxy+}") and "ANY" method from the specified path, meaning it will accept by default any method and any path. The Lambda function, provided in TypeScript, only returns the path.
+This pattern in Serverless Framework offers a boilerlate to generate an Amazon API Gateway REST API endpoint with a greedy proxy ("{proxy+}") and "ANY" method from the specified path, meaning it will accept by default any method and any path. The Lambda function, provided in TypeScript, only returns the path.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-lambda-cdk](https://serverlessland.com/patterns/apigw-lambda-cdk).
 

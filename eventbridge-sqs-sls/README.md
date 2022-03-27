@@ -2,8 +2,6 @@
 
 The AWS SAM template deploys an SQS queue that is triggered by an EventBridge rule. The SQS queue policy provides the permission for EventBridge to send messages to the SQS queue.
 
-In this example, the EventBridge rule specified in `serverless.yml` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see "Example event payload from EventBridge to SQS" in the README) to the SQS queue.
-
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-sqs.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -43,6 +41,12 @@ serverless deploy --verbose --region us-west-2
 ```
 
 1. Note the `SQSqueueURL` output from the deployment process. You will use this value for testing.
+
+## How it works
+
+The `serverless.yml` template defines the resources and the IAM permissions required to run the application.
+
+In this example, the EventBridge rule specified in `serverless.yml` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see "Example event payload from EventBridge to SQS" in the README) to the SQS queue.
 
 ## Testing
 
