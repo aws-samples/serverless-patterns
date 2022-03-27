@@ -86,3 +86,27 @@ Test the Lambda Function that does not have the layer - it results in an error
 3. Then choose `Test` again from the console. The `Execution results` shows that there is an error of `Unable to import module 'app': No module named 'pymysql'`. This is expected since this Lambda function does not have the layer with `pymysql`
 
     <img src="./docs/07-execution-results-failed.png" alt="execution-result-faile" width="100%"/>
+
+## Cleanup
+
+1. Delete the stack. Replace `STACK_NAME` and `REGION` accordingly
+    ```bash
+    sam delete --stack-name <STACK_NAME> --no-prompts --region <REGION>
+    # Example
+    sam delete --stack-name serverless-pattern-lambda-layer --no-prompts --region ap-southeast-2
+    ```
+
+    <img src="./docs/08-sam-delete.png" alt="sam-delete" width="100%"/>
+
+2. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    # Example
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'serverless-pattern-lambda-layer')].StackStatus"
+    ```
+
+    <img src="./docs/09-sam-delete.png" alt="sam-delete" width="100%"/>
+----
+Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
