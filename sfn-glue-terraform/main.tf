@@ -11,8 +11,8 @@ terraform {
 }
 
 provider "aws" {
-  profile = "hms"
-  region  = "us-west-2"
+  profile = "default"
+  region  = "us-east-1"
 }
 
 # Variables
