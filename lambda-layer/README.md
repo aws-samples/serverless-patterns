@@ -14,3 +14,27 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+
+## Deployment Instructions
+
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ```bash
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+2. Change directory to the pattern directory:
+    ```bash
+    cd lambda-layer
+    ```
+3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+    ```bash
+    sam deploy --stack-name <STACK_NAME> \
+      --resolve-s3 \
+      --capabilities CAPABILITY_IAM
+    # Example
+    sam deploy --stack-name serverless-pattern-lambda-layer \
+      --resolve-s3 \
+      --capabilities CAPABILITY_IAM
+    ```
+    <img src="./docs/01-sam-deploy.png" alt="sam-deploy-command" width="100%"/>
+
+    <img src="./docs/02-sam-deploy.png" alt="sam-deploy-output" width="100%"/>
