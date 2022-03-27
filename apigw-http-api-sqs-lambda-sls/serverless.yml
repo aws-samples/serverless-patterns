@@ -1,0 +1,83 @@
+service: apigw-http-api-sqs-lambda-sls
+frameworkVersion: '^3' # require serverless v3 or later
+
+plugins:
+  - serverless-plugin-typescript # enable TypeScript support for Lambda functions
+
+provider:
+  name: aws
+
+  # common configuration for all Lambda functions in this stack
+  runtime: nodejs14.x
+  architecture: arm64 # use Graviton for running all Lambda functions
+
+  # use --region option value or the default - us-east-1
+  region: ${opt:region, "us-east-1"}
+
+  # override the default stage (dev), although we are not using it in the script below
+  stage: ${opt:stage, "prod"}
+
+  # optional, Lambda function's memory size in MB, default is 1024
+  memorySize: 256
+
+# Lambda function triggered with events from the default EventBridge topic
+functions:
+  logEvent:
+    handler: src/handler.logEvent
+    memorySize: 256 # optional, in MB, default is 1024
+    events:
+      - sqs:
+          arn: !GetAtt MySqsQueue.Arn
+
+resources:
+  # Override the default description
+  Description: API Gateway HTTP API to SQS, triggering a Lambda function (Serverless Framework).
+
+  Resources:
+    # Define SQS queue
+    MySqsQueue:
+      Type: AWS::SQS::Queue
+
+    # Create an API Gateway HTTP API
+    MyHttpApi:
+      Type: AWS::ApiGatewayV2::Api
+      Properties:
+        Body: ${file(./api.json)}
+
+    # Create the default stage and configure it to automatically deploy
+    MyHttpApiStage:
+      Type: AWS::ApiGatewayV2::Stage    
+      Properties:
+        ApiId: !Ref MyHttpApi
+        # we use default stage, instead of the stage name for simplicity.
+        # Use ${sls:stage} to get the stage name.
+        StageName: '$default'
+        AutoDeploy: true
+
+    # Create the role for API Gateway access to SQS
+    MyHttpApiRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "apigateway.amazonaws.com"
+              Action: 
+                - "sts:AssumeRole"
+        Policies:
+          - PolicyName: ApiDirectWriteEventBridge
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                Action:
+                - sqs:SendMessage
+                Effect: Allow
+                Resource:
+                  - !GetAtt MySqsQueue.Arn
+
+  Outputs:
+    ApiEndpoint:
+      Description: "HTTP API endpoint URL"
+      Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
