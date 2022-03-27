@@ -10,7 +10,7 @@
         "This sample project demonstrates how to deploy a Lambda Function that has a layer added to it.",
         "The SAM template provided deploys two Lambda functions. Both Lambda functions attempt to import the `PyMySQL` package.",
         "However, only one of the Lambda functions has the `PyMySQL` layer which allows it to import the package successfully.",
-        "This pattern tests both Lambdas to illustrate the difference when there is a layer added to a Lambda function.",
+        "This pattern tests both Lambda functions to illustrate the difference when there is a layer added to a Lambda function.",
         "One use case for Lambda layers is to have packages like `PyMySQL` shared across various Lambda functions that require connections to RDS MySQL.",
         "Using layers reduces the size of uploaded deployment archives and makes it faster to deploy your code."
       ]
