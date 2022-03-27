@@ -38,3 +38,20 @@ Important: this application uses various AWS services and there are costs associ
     <img src="./docs/01-sam-deploy.png" alt="sam-deploy-command" width="100%"/>
 
     <img src="./docs/02-sam-deploy.png" alt="sam-deploy-output" width="100%"/>
+
+## How it works
+
+The AWS SAM template deploys the following resources:
+
+| Logical ID                   | Type                      |
+| ---------------------------- | ------------------------- |
+| LambdaRole                   | AWS::IAM::Role            |
+| PyMySQLLayer                 | AWS::Lambda::LayerVersion |
+| PyMySQLLayerLambdaFunction   | AWS::Lambda::Function     |
+| PyMySQLNoLayerLambdaFunction | AWS::Lambda::Function     |
+
+- `PyMySQLLayerLambdaFunction` is a Lambda function that imports the `pymysql` package and also has `PyMySQLLayer` layer added.
+- `PyMySQLNoLayerLambdaFunction` is a Lambda function that imports the `pymysql` package but does not have the `PyMySQLLayer` layer added.
+
+==============================================
+
