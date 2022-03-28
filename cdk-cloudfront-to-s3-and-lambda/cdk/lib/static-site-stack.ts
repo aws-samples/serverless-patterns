@@ -1,16 +1,16 @@
-import * as cdk from "@aws-cdk/core";
-import * as lambda from "@aws-cdk/aws-lambda";
-import * as lambdaNode from "@aws-cdk/aws-lambda-nodejs";
+import { Stack, StackProps, Duration, CfnOutput } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_lambda as  lambda } from 'aws-cdk-lib';
+import { aws_lambda_nodejs as lambdaNode } from 'aws-cdk-lib';
+import { aws_iam as iam } from 'aws-cdk-lib';
+import { aws_cloudfront as cloudfront } from 'aws-cdk-lib';
+import { aws_s3 as s3 } from 'aws-cdk-lib';
+import { aws_s3_deployment as s3Deployment } from 'aws-cdk-lib';
+import { aws_apigateway as apigw } from 'aws-cdk-lib';
 import * as path from "path";
-import * as apigw from "@aws-cdk/aws-apigateway";
-import * as s3 from "@aws-cdk/aws-s3";
-import * as s3Deployment from "@aws-cdk/aws-s3-deployment";
-import * as cloudfront from "@aws-cdk/aws-cloudfront";
-import * as iam from "@aws-cdk/aws-iam";
-import {Duration} from "@aws-cdk/core";
 
-export class StaticSiteStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class StaticSiteStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     const apiDefaultHandler = new lambdaNode.NodejsFunction(
@@ -71,8 +71,8 @@ export class StaticSiteStack extends cdk.Stack {
     const staticBucket = new s3.Bucket(this, "staticBucket", {
       encryption: s3.BucketEncryption.S3_MANAGED,
       lifecycleRules: [
-        { abortIncompleteMultipartUploadAfter: cdk.Duration.days(7) },
-        { noncurrentVersionExpiration: cdk.Duration.days(7) },
+        { abortIncompleteMultipartUploadAfter: Duration.days(7) },
+        { noncurrentVersionExpiration: Duration.days(7) },
       ],
       blockPublicAccess: {
         blockPublicAcls: true,
@@ -137,8 +137,8 @@ export class StaticSiteStack extends cdk.Stack {
         {
           customOriginSource: {
             domainName: `${apiGateway.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
+            originPath: `/${apiGateway.deploymentStage.stageName}`
           },
-          originPath: `/${apiGateway.deploymentStage.stageName}`,
           behaviors: [
             {
               lambdaFunctionAssociations: [
@@ -172,6 +172,6 @@ export class StaticSiteStack extends cdk.Stack {
         },
       ],
     });
-    new cdk.CfnOutput(this, "distributionDomainName", { value: distribution.distributionDomainName });
+    new CfnOutput(this, "distributionDomainName", { value: distribution.distributionDomainName });
   }
 }

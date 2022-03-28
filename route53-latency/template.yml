@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  Route53HostedZoneId:
+    Type: String
+  Route53DomainName:
+    Type: String
+
+  ApiGermanyHostedZoneId:
+    Type: String
+  ApiGermanyDomainName:
+    Type: String
+  ApiGermanyEndpoint:
+    Type: String
+
+  ApiIrelandHostedZoneId:
+    Type: String
+  ApiIrelandDomainName:
+    Type: String
+  ApiIrelandEndpoint:
+    Type: String
+
+Resources:
+##########################################################################
+#  Health Check                                                          #
+##########################################################################
+  HealthCheckGermany:
+    Type: AWS::Route53::HealthCheck
+    Properties:
+      HealthCheckConfig:
+        FullyQualifiedDomainName: !Ref ApiGermanyEndpoint
+        Port: 443
+        RequestInterval: 10 #sec
+        FailureThreshold: 3
+        ResourcePath: /api
+        Type: HTTPS
+        Regions:
+          - eu-west-1 #Ireland
+          - ap-southeast-2 #Sydney
+          - us-west-1 #California
+      HealthCheckTags:
+      - Key: Name
+        Value: !Ref ApiGermanyEndpoint
+
+  HealthCheckIreland:
+    Type: AWS::Route53::HealthCheck
+    Properties:
+      HealthCheckConfig:
+        FullyQualifiedDomainName: !Ref ApiIrelandEndpoint
+        Port: 443
+        RequestInterval: 10 #sec
+        FailureThreshold: 3
+        ResourcePath: /api
+        Type: HTTPS
+        Regions:
+          - eu-west-1 #Ireland
+          - ap-southeast-2 #Sydney
+          - us-west-1 #California
+      HealthCheckTags:
+      - Key: Name
+        Value: !Ref ApiIrelandEndpoint
+
+
+##########################################################################
+#  Route53                                                               #
+##########################################################################
+  DNSARecordGroup:    
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref Route53HostedZoneId
+      RecordSets: 
+        - Name:
+            !Ref Route53DomainName
+          Type: A
+          Region: eu-central-1
+          SetIdentifier: Germany
+          HealthCheckId: !Ref HealthCheckGermany
+          AliasTarget:
+            HostedZoneId: !Ref ApiGermanyHostedZoneId
+            DNSName: !Ref ApiGermanyDomainName
+            EvaluateTargetHealth: True
+        - Name:
+            !Ref Route53DomainName
+          Type: A
+          Region: eu-west-1
+          SetIdentifier: Ireland
+          HealthCheckId: !Ref HealthCheckIreland
+          AliasTarget:
+            HostedZoneId: !Ref ApiIrelandHostedZoneId
+            DNSName: !Ref ApiIrelandDomainName
+            EvaluateTargetHealth: True

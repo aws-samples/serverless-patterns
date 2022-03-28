@@ -1,12 +1,13 @@
-import { CfnOutput, Construct, Stack, StackProps, RemovalPolicy } from '@aws-cdk/core';
-import { Topic } from '@aws-cdk/aws-sns';
-import { SqsSubscription } from '@aws-cdk/aws-sns-subscriptions';
-import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
-import { InterfaceVpcEndpointAwsService, Vpc } from '@aws-cdk/aws-ec2';
-import { Cluster, ContainerImage } from '@aws-cdk/aws-ecs';
-import { ApplicationLoadBalancedFargateService } from '@aws-cdk/aws-ecs-patterns';
-import { AnyPrincipal, Effect, PolicyStatement, ServicePrincipal } from '@aws-cdk/aws-iam';
-import { Key } from '@aws-cdk/aws-kms';
+import { CfnOutput, Stack, StackProps, RemovalPolicy } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { Topic } from 'aws-cdk-lib/aws-sns';
+import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
+import { Queue, QueueEncryption } from 'aws-cdk-lib/aws-sqs';
+import { InterfaceVpcEndpointAwsService, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { Cluster, ContainerImage } from 'aws-cdk-lib/aws-ecs';
+import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
+import { AnyPrincipal, Effect, PolicyStatement, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { Key } from 'aws-cdk-lib/aws-kms';
 import path = require('path');
 
 export class CdkStack extends Stack {

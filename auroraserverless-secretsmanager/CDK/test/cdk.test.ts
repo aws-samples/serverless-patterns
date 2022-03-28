@@ -1,6 +1,6 @@
 import { CdkStack } from '../lib/cdk-stack';
-import * as cdk from '@aws-cdk/core';
-import { Template } from "@aws-cdk/assertions";
+import * as cdk from 'aws-cdk-lib';
+import { Template } from "aws-cdk-lib/assertions";
 
 
 test('Validate stack resources', () => {

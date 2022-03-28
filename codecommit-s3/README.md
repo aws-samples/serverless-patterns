@@ -2,7 +2,7 @@
 
 This pattern implements the solution outlined on the ["Automate event-driven backups from CodeCommit to Amazon S3 using CodeBuild and CloudWatch Events" Presciptive Guidance](https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/automate-event-driven-backups-from-codecommit-to-amazon-s3-using-codebuild-and-cloudwatch-events.html#automate-event-driven-backups-from-codecommit-to-amazon-s3-using-codebuild-and-cloudwatch-events-tools). 
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/codecomit-s3.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/codecommit-s3.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

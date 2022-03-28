@@ -1,5 +1,5 @@
-import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
-import * as cdk from '@aws-cdk/core';
+import { Template } from 'aws-cdk-lib/assertions';
+import * as cdk from 'aws-cdk-lib';
 import * as DynamodbKinesisCdk from '../lib/dynamodb-kinesis-cdk-stack';
 
 test('Empty Stack', () => {
@@ -7,7 +7,5 @@ test('Empty Stack', () => {
     // WHEN
     const stack = new DynamodbKinesisCdk.DynamodbKinesisCdkStack(app, 'MyTestStack');
     // THEN
-    expectCDK(stack).to(matchTemplate({
-      "Resources": {}
-    }, MatchStyle.EXACT));
+    Template.fromStack(stack).hasResource("AWS::DynamoDB::Table", {});
 });

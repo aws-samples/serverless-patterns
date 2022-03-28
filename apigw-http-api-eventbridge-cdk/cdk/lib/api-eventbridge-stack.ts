@@ -1,13 +1,15 @@
-import * as cdk from '@aws-cdk/core';
-import { EventBus, Rule } from '@aws-cdk/aws-events';
-import { CfnIntegration, CfnRoute, HttpApi } from '@aws-cdk/aws-apigatewayv2';
-import { Effect, PolicyStatement, Role, ServicePrincipal } from '@aws-cdk/aws-iam';
-import { LogGroup } from '@aws-cdk/aws-logs';
-import { CloudWatchLogGroup } from '@aws-cdk/aws-events-targets';
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
+import { CfnIntegration, CfnRoute } from 'aws-cdk-lib/aws-apigatewayv2';
+import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
+import { Effect, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { CloudWatchLogGroup } from 'aws-cdk-lib/aws-events-targets';
 
 
-export class ApiEventbridgeStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class ApiEventbridgeStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     const eventBus = new EventBus(this, 'MyEventBus', {
@@ -72,7 +74,7 @@ export class ApiEventbridgeStack extends cdk.Stack {
     });
     
     
-    new cdk.CfnOutput(this, 'apiUrl', { value: httpApi.url!, description: "HTTP API endpoint URL" });
+    new CfnOutput(this, 'apiUrl', { value: httpApi.url!, description: "HTTP API endpoint URL" });
   }
 }
 

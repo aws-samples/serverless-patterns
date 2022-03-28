@@ -21,6 +21,7 @@ Important: this application uses various AWS services and there are costs associ
 * To run example #5, an account with [Zendesk](https://www.zendesk.com). Follow the instructions to  [Enable Password an API key access](https://support.zendesk.com/hc/en-us/articles/4408836402074-Using-the-API-dashboard#enabling_password_or_token_access_).
 * To run example #6, an account with [Freshdesk](https://support.freshdesk.com/support/login). Follow the instructions at [Getting Started](https://developers.freshdesk.com/api/#getting-started) and note the unique URL for your API destination endpoint to deploy the solution.
 * To run example #7, an account with [DataDog](hhttps://www.datadoghq.com). Follow the instructions to [Add an API key or client token](https://docs.datadoghq.com/account_management/api-app-keys/#add-an-api-key-or-client-token) and note the api key.
+* To run example #9, an account with [Shopify](https://www.shopify.com/). Follow the instructions to [Create an app and configure Admin API Access scopes](https://shopify.dev/apps/auth/admin-app-access-tokens#step-1-create-and-install-the-app). Make sure to note the Admin Key.
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -39,6 +40,7 @@ Important: this application uses various AWS services and there are costs associ
 - To run the Zendesk API Destination example, cd to `5-zendesk`.
 - To run the freshdesk API destination example, cd to `6-freshdesk`.
 - To run the Datadog API Destination example, cd to `7-datadog`.
+- To run the Shopify API Destination example, cd to `9-shopify`.
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
@@ -65,6 +67,7 @@ aws events put-events --entries file://testEvent.json
 6. For the zendesk example use the testEvent.json within the 5-zendesk directory
 7. For the freshdesk example use the testEvent.json within the 6-freshdesk directory
 8. For the datadog example use the testEvent.json within the 7-datadog directory
+9. For the shopify example use the testEvent.json within the 9-shopify directory
 ```
 aws events put-events --entries file://3-sumologic/testEvent.json
 ```

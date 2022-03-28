@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import { App, Stack } from '@aws-cdk/core';
-import { StepFunctionInvokeAction } from '@aws-cdk/aws-codepipeline-actions';
-import { PolicyStatement, Effect } from '@aws-cdk/aws-iam';
+
+import { App, Stack } from 'aws-cdk-lib';
+import { StepFunctionInvokeAction } from 'aws-cdk-lib/aws-codepipeline-actions';
+import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
 
 import { DemoPipeline } from './src/stacks/stack_pipeline';
 import { S3GlueStack } from './src/stacks/stack_s3buckets';

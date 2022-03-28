@@ -24,7 +24,7 @@ exports.handler = async (event) => {
   // Resize the image
   // Height is optional, will automatically maintain aspect ratio.
   // withMetadata retains the EXIF data which preserves the orientation of the image.
-  const resized = await sharp(data).resize({ width: 100, height: 100 }).withMetadata().toBuffer();
+  const resized = await sharp(data).resize({ width: 100, height: 100 }).withMetadata();
 
   // Send the resized image back to S3 Object Lambda.
   const params = {

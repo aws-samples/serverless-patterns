@@ -1,9 +1,10 @@
-import { AttributeType, BillingMode, StreamViewType, Table } from '@aws-cdk/aws-dynamodb';
-import * as cdk from '@aws-cdk/core';
-import { Stream } from '@aws-cdk/aws-kinesis';
+import { Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { AttributeType, BillingMode, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { Stream } from 'aws-cdk-lib/aws-kinesis';
 
-export class DynamodbKinesisCdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class DynamodbKinesisCdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     //Kinesis Data Stream

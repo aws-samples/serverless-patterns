@@ -1,0 +1,7 @@
+[
+  {
+    "DetailType": "message",
+    "Source": "demo.sqs",
+    "Detail": "{\"message\":\"Hello From EventBridge!\"}"
+  }
+]
