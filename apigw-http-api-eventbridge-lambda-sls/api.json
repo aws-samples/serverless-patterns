@@ -1,0 +1,29 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "API Gateway HTTP API to EventBridgePI"
+    },
+    "paths": {
+        "/": {
+            "post": {
+                "responses": {
+                    "default": {
+                        "description": "Successful operation"
+                    }                          
+                },
+                "x-amazon-apigateway-integration": {
+                    "integrationSubtype": "EventBridge-PutEvents",
+                    "credentials": { "Fn::GetAtt" : [ "MyHttpApiRole", "Arn" ] },
+                    "requestParameters": {
+                        "Detail": "$request.body.Detail",
+                        "DetailType": "MyDetailType",
+                        "Source": "WebApp"
+                    },
+                    "payloadFormatVersion": "1.0",
+                    "type": "aws_proxy",
+                    "connectionType": "INTERNET"
+                }
+            }
+        }
+    }
+}
