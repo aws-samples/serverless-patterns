@@ -1,0 +1,80 @@
+service: apigw-http-api-eventbridge-lambda-sls
+frameworkVersion: '^3' # require serverless v3 or later
+
+# enable TypeScript support for Lambda functions
+plugins:
+  - serverless-plugin-typescript
+
+provider:
+  name: aws
+
+  # common configuration for all Lambda functions in this stack
+  runtime: nodejs14.x
+  architecture: arm64 # use Graviton for running all Lambda functions
+
+  # override the default stage (dev) to be `prod`, or you can use the `--stage` CLI option
+  stage: ${opt:stage, "prod"}
+
+  # use the `--region` CLI option value or the default (us-east-1)
+  region: ${opt:region, "us-east-1"}
+
+# Lambda function triggered with events from the default EventBridge topic
+functions:
+  logEvent:
+    handler: src/handler.logEvent
+    memorySize: 256 # optional, in MB, default is 1024
+    events:
+      - eventBridge:
+          pattern:
+            source:
+              - "WebApp"
+
+resources:
+  # Override the default description
+  Description: API Gateway HTTP API to EventBridge, triggering a Lambda function (Serverless Framework).
+
+  Resources:
+    # Create an API Gateway HTTP API
+    MyHttpApi:
+      Type: AWS::ApiGatewayV2::Api
+      Properties:
+        Body: ${file(./api.json)}
+
+    # Create the default stage and configure it to automatically deploy
+    MyHttpApiStage:
+      Type: AWS::ApiGatewayV2::Stage    
+      Properties:
+        ApiId: !Ref MyHttpApi
+        # we use default stage, instead of the stage name for simplicity.
+        # Use ${sls:stage} to get the stage name.
+        StageName: '$default'
+        AutoDeploy: true
+
+    # Create the role for API Gateway access to EventBridge
+    MyHttpApiRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "apigateway.amazonaws.com"
+              Action: 
+                - "sts:AssumeRole"
+        Policies:
+          - PolicyName: ApiDirectWriteEventBridge
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                Action:
+                - events:PutEvents
+                Effect: Allow
+                Resource:
+                  - arn:aws:events:${self:provider.region}:${aws:accountId}:event-bus/default
+
+  Outputs:
+    ApiEndpoint:
+      Description: "HTTP API endpoint URL"
+      Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+
