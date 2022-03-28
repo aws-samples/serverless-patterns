@@ -16,31 +16,31 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Deployment Instructions
 
-* Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
 
-``` sh
-git clone https://github.com/aws-samples/serverless-patterns
-```
+    ``` sh
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
 
-* Change directory to the pattern directory:
+1. Change directory to the pattern directory:
 
-``` sh
-cd serverless-patterns/apigw-rest-api-dynamodb-sls
-```
+    ``` sh
+    cd serverless-patterns/apigw-rest-api-dynamodb-sls
+    ```
 
-* From the command line, use Serverless Framework to deploy the AWS resources for the pattern as specified in the serverless.yml file:
+1. From the command line, use Serverless Framework to deploy the AWS resources for the pattern as specified in the serverless.yml file:
 
-``` sh
-serverless deploy --verbose
-```
+    ``` sh
+    serverless deploy --verbose
+    ```
 
-The above command will deploy resources to `us-east-1` region by default. You can override the target region with `--region <region>` CLI option, e.g.
+    The above command will deploy resources to `us-east-1` region by default. You can override the target region with `--region <region>` CLI option, e.g.
 
-``` sh
-serverless deploy --verbose --region us-west-2
-```
+    ``` sh
+    serverless deploy --verbose --region us-west-2
+    ```
 
-* Note the `ApiRootUrl` output from the Serverless Framework deployment process. You will use this value for testing.
+1. Note the `ApiRootUrl` output from the Serverless Framework deployment process. You will use this value for testing.
 
 ## How it works
 
@@ -105,27 +105,27 @@ aws dynamodb scan --table-name Music --region <region>
 
 ## Cleanup
 
-* Delete the stack
+1. Delete the stack
 
-```sh
-serverless remove --verbose
-```
+    ```sh
+    serverless remove --verbose
+    ```
 
-* Confirm the stack has been deleted
+1. Confirm the stack has been deleted
 
-```sh
-aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'apigw-rest-api-dynamodb-sls-v1')].StackStatus"
-```
+    ```sh
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'apigw-rest-api-dynamodb-sls-v1')].StackStatus"
+    ```
 
-Expected output
+    Expected output
 
-```json
-[
-    "DELETE_COMPLETE"
-]
-```
+    ```json
+    [
+        "DELETE_COMPLETE"
+    ]
+    ```
 
-NOTE: You might need to add `--region <region>` option to AWS CLI command if you AWS CLI default region does not match the one, that you used for the Serverless Framework deployment.
+    NOTE: You might need to add `--region <region>` option to AWS CLI command if you AWS CLI default region does not match the one, that you used for the Serverless Framework deployment.
 
 ----
 Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
