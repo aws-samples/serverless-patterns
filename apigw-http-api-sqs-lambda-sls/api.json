@@ -1,0 +1,28 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Using SQS queue to buffer API Gateway HTTP API calls to Lambda"
+    },
+    "paths": {
+        "/": {
+            "post": {
+                "responses": {
+                    "default": {
+                        "description": "Successful operation"
+                    }                          
+                },
+                "x-amazon-apigateway-integration": {
+                    "integrationSubtype": "SQS-SendMessage",
+                    "credentials": { "Fn::GetAtt" : [ "MyHttpApiRole", "Arn" ] },
+                    "requestParameters": {
+                        "MessageBody": "$request.body",
+                        "QueueUrl": { "Ref" : "MySqsQueue" }
+                    },
+                    "payloadFormatVersion": "1.0",
+                    "type": "aws_proxy",
+                    "connectionType": "INTERNET"
+                }
+            }
+        }
+    }
+}
