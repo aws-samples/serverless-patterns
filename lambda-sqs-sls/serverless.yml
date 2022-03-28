@@ -1,0 +1,33 @@
+service: lambda-sqs-sls
+
+frameworkVersion: "3"
+
+custom:
+  queueName: "LambdaSqsSlsQueue"
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "sqs:SendMessage"
+            - "sqs:GetQueueUrl"
+          Resource:
+            Fn::Sub: "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${self:custom.queueName}"
+
+functions:
+  lambda-sqs-sls:
+    handler: handler.handle
+    environment:
+      QUEUE_NAME: ${self:custom.queueName}
+
+resources:
+  Resources:
+    sqsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.queueName}
