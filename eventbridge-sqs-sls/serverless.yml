@@ -1,0 +1,55 @@
+service: eventbridge-sqs-sls
+frameworkVersion: '^3' # require serverless v3 or later
+
+provider:
+  name: aws
+
+  # override the default stage (dev), although we are not using it in the script below
+  stage: ${opt:stage, "prod"}
+
+  # use --region option value or the default - us-east-1
+  region: ${opt:region, "us-east-1"}
+
+
+resources:
+  # Override the default description
+  Description: Serverless patterns - EventBridge to SQS (Serverless Framework).
+
+  Resources:
+
+    # Define the SQS queue
+    MySqsQueue:
+      Type: AWS::SQS::Queue
+
+    # Define the event rule to filter for events
+    EventRule: 
+      Type: AWS::Events::Rule
+      Properties: 
+        Description: "EventRule"
+        EventPattern: 
+          account: 
+            - !Sub '${AWS::AccountId}'
+          source:
+            - "demo.sqs"
+        Targets: 
+          - Arn: !GetAtt MySqsQueue.Arn
+            Id: "SQSqueue"
+
+    # Allow EventBridge to invoke SQS
+    EventBridgeToToSqsPolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: SQS:SendMessage
+            Resource:  !GetAtt MySqsQueue.Arn
+        Queues:
+          - Ref: MySqsQueue
+    
+  Outputs:
+    SQSqueueURL:
+      Description: SQS queue URL
+      Value: !Ref MySqsQueue
