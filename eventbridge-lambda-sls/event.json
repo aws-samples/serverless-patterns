@@ -1,0 +1,8 @@
+[
+    {
+        "EventBusName": "demo-serverless-events",
+        "DetailType": "transaction",
+        "Source": "custom.myApp",
+        "Detail": "{\"location\":\"EUR-\"}"
+    }
+]
