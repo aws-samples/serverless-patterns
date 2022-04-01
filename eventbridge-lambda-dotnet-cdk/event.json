@@ -1,0 +1,8 @@
+[
+    {
+      "DetailType": "transaction",
+      "Source": "cdk.myapp",
+      "EventBusName": "MyEventBus",
+      "Detail": "{\"location\":\"EUR-\"}"
+    }
+  ]
