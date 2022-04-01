@@ -1,6 +1,6 @@
 # Amazon FIFO SNS to Amazon FIFO SQS to AWS Lambda to Amazon Kinesis Firehose to Amazon S3
 
-The Terraform template in this pattern allow you to connect FIFO sqs queue to firehose in order to precess (transform, compress,...) messages sent by a FIFO sns topic and save the result to an S3 bucket using a Lambda function as a bridge to firehose.
+The Terraform template in this pattern allows you to connect an SQS FIFO queue to Firehose to process messages sent by an SNS FIFO topic and save the result to an S3 bucket using a Lambda function as a bridge to Firehose.
 
 ## Topology
 
