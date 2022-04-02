@@ -38,13 +38,11 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-When an HTTP POST request is sent to the Amazon API Gateway endpoint, the AWS Lambda function is invoked and inserts an item into the Amazon DynamoDB table.
+The CDK stack deploys the resources and the IAM permissions required to run the application. The resources include an Amazon EventBridge event bus, an Amazon EventBridge rule, and an AWS Lambda function.
 
-## How it works
+The EventBridge rule filters the events based upon the defined criteria. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload to the Lambda function.
 
-The CDK stack deploys the resources and the IAM permissions required to run the application.
-
-The EventBridge rule called `ConsumerLambdaRule` specified in `EventBridgeLambdaDotnetCdkStack.cs` which filters the events based upon the defined criteria. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload to the Lambda function.
+It also creates a CloudWatch Log Group for the Lambda function for observation of incoming events, with a retention and removal policy.
 
 ## Testing
 

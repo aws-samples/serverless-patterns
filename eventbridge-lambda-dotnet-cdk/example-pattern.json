@@ -1,13 +1,14 @@
 {
   "title": "EventBridge to Lambda",
   "description": "Create an EventBridge rule that invokes a Lambda function.",
-  "language": ".Net",
+  "language": ".NET",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This project contains a sample AWS CDK template for invoking AWS Lambda from an Amazon EventBridge Rule.",
+      "The CDK stack deploys the resources and the IAM permissions required to run the application. The resources include an Amazon EventBridge event bus, an Amazon EventBridge rule, and an AWS Lambda function.",
+      "The EventBridge rule filters the events based upon the defined criteria. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload to the Lambda function.",
       "It also creates a CloudWatch Log Group for the Lambda function for observation of incoming events, with a retention and removal policy."
     ]
   },
@@ -18,8 +19,15 @@
     }
   },
   "resources": {
-    "headline": "Additional resources",
-    "bullets": [    
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
     ]
   },
   "deploy": {
@@ -40,8 +48,10 @@
   "authors": [
     {
       "name": "Amir Khairalomoum",
-      "linkedin": "lamir-khairalomoum",
-      "twitter": "mrark1361"
+      "image": "https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/06/29/Amir-Khairalomoum.jpg",
+      "bio": "Amir is a Sr. Solutions Architect at AWS. He supports customers in their digital transformation and their cloud journey to AWS. He is passionate about serverless technologies.",
+      "linkedin": "amir-khairalomoum",
+      "twitter": "@mrark1361"
     }
   ]
 }
