@@ -31,7 +31,7 @@ Important: this application uses various AWS services and there are costs associ
     dotnet restore src/
     ```
 
-4. Deploy the stack to your default AWS account and region. The output of this command should give you the HTTP API URL.
+4. Deploy the stack to your default AWS account and region
     ```
     cdk deploy
     ```
