@@ -1,0 +1,47 @@
+{
+  "title": "EventBridge to Lambda",
+  "description": "Create an EventBridge rule that invokes a Lambda function.",
+  "language": ".Net",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS CDK template for invoking AWS Lambda from an Amazon EventBridge Rule.",
+      "It also creates a CloudWatch Log Group for the Lambda function for observation of incoming events, with a retention and removal policy."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-dotnet-cdk",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-dotnet-cdk/README.md"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [    
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Amir Khairalomoum",
+      "linkedin": "lamir-khairalomoum",
+      "twitter": "mrark1361"
+    }
+  ]
+}
