@@ -38,11 +38,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The CDK stack deploys the resources and the IAM permissions required to run the application. The resources include an Amazon EventBridge event bus, an Amazon EventBridge rule, and an AWS Lambda function.
+The CDK stack deploys the resources and the IAM permissions required to run the application.
 
 The EventBridge rule filters the events based upon the defined criteria. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload to the Lambda function.
-
-It also creates a CloudWatch Log Group for the Lambda function for observation of incoming events, with a retention and removal policy.
 
 ## Testing
 
