@@ -89,8 +89,7 @@ aws cloudformation delete-stack --stack-name ticket-stack
 
 
 ## Author bio
-Name: Razvan Minciuna
-Photo URL:https://media-exp1.licdn.com/dms/image/C4E03AQEApa102Ad7kQ/profile-displayphoto-shrink_800_800/0/1599982021682?e=1649289600&v=beta&t=Vxvm0F3xD_WSPX0WIwn94BQ1QyE84aBg2M5y4WFN4PE
-Linkedin: https://www.linkedin.com/in/razvanminciuna/
-Description (up to 255 chars): Software Architect
+Razvan Minciuna
+https://www.linkedin.com/in/razvanminciuna/
+Software Architect
 
