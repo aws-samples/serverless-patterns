@@ -50,3 +50,22 @@ resource "aws_lambda_layer_version" "this" {
   # source_code_hash = "${base64sha256(file("lambda_function_payload.zip"))}"
   source_code_hash = filebase64sha256(data.archive_file.layer_zip.output_path)
 }
+
+data "archive_file" "lambda_function" {
+  type        = "zip"
+  source_file = "./src/example-lambda/app.py"
+  output_path = "./src/zipped/lambda_function.zip"
+}
+
+resource "aws_lambda_function" "with_layer" {
+  function_name    = "lambda_with_layer"
+  filename         = data.archive_file.lambda_function.output_path
+  role             = aws_iam_role.this.arn
+  handler          = "app.lambda_handler"
+  runtime          = "python3.8"
+  source_code_hash = filebase64sha256(data.archive_file.lambda_function.output_path)
+
+  layers = [
+    aws_lambda_layer_version.this.arn
+  ]
+}
