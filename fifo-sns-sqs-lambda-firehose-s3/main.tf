@@ -21,9 +21,10 @@ provider "aws" {
 # Local variables
 locals {
   tags = merge({
-    pattern     = "fifo-sqs-lambda-firehose"
+    pattern     = "fifo-sns-sqs-lambda-firehose-s3"
     deployed_by = "terraform"
-    repository  = "https://gitlab.aws.dev/hterkiba/sqs-fifo-lambda-firehose-terraform-python"
+    developed_by = "https://fr.linkedin.com/in/hicham-terkiba-39826259"
+    repository  = "https://github.com/aws-samples/serverless-patterns/tree/main/fifo-sns-sqs-lambda-firehose-s3"
   }, var.tags)
   prefix = "fifo-sns-sqs-lambda-firehose-s3"
 }
@@ -44,7 +45,7 @@ variable "profile" {
 variable "tags" {
   type        = map(string)
   default     = {}
-  description = "Ressource tags."
+  description = "Resource tags."
 }
 
 
