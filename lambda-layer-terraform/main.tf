@@ -69,3 +69,12 @@ resource "aws_lambda_function" "with_layer" {
     aws_lambda_layer_version.this.arn
   ]
 }
+
+resource "aws_lambda_function" "without_layer" {
+  function_name    = "lambda_without_layer"
+  filename         = data.archive_file.lambda_function.output_path
+  role             = aws_iam_role.this.arn
+  handler          = "app.lambda_handler"
+  runtime          = "python3.8"
+  source_code_hash = filebase64sha256(data.archive_file.lambda_function.output_path)
+}
