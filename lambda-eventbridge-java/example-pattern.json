@@ -46,11 +46,8 @@
   },
   "authors": [
     {
-      "name": "James Beswick",
-      "image": "https://serverlessland.com/assets/images/resources/jbes.jpg",
-      "bio": "I am a self-confessed serverless geek and enjoy helping developers build faster with serverless! I have been software developer and product manager before becoming a Developer Advocate. Ask me anything!",
-      "linkedin": "jamesbeswick",
-      "twitter": "@jbesw"
+      "name": "Steven Cook",
+      "bio": "Senior Solutions Architect, AWS"
     }
   ]
 }

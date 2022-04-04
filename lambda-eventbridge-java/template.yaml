@@ -21,6 +21,9 @@ Resources:
         - x86_64
       Timeout: 30
       MemorySize: 512
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 
       Policies:
         - EventBridgePutEventsPolicy:
             EventBusName: !Ref EventBusName
