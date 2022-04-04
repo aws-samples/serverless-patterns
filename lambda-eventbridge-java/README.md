@@ -59,14 +59,19 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a test event to EventBrid
 1. Send an event to EventBridge:
 
 ```bash
-aws lambda invoke --function-name ENTER_YOUR_PUBLISHER_FUNCTION_NAME response.json
+aws lambda invoke \
+    --cli-binary-format raw-in-base64-out \
+    --function-name ENTER_YOUR_PUBLISHER_FUNCTION_NAME \
+    --payload file://input.json \
+     response.json
 ```
 
 2. View the logs from the Lambda function:
 
-You should see a repsonse showing the event delivered to the default event bus:
+You should see a response showing the event delivered to the default event bus:
 ```bash
-2022-04-04T16:00:24.560+10:00 PutEventsResponse(FailedEntryCount=0, Entries=[PutEventsResultEntry(EventId=92b5bee4-cc3b-34db-fd2d-a38c1ac5b600)])
+2022-04-04T20:24:07.738+10:00   Event: {message=Hello from publisher, state=new}
+2022-04-04T20:24:08.173+10:00   PutEventsResponse(FailedEntryCount=0, Entries=[PutEventsResultEntry(EventId=92b5bee4-cc3b-34db-fd2d-a38c1ac5b600)])
 ```
 
 ## Cleanup
