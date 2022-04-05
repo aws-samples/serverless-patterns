@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: choreography-pattern
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 3072
+    Timeout: 30
+
+Resources:
+#Lambda Functions
+  LambdaRequest:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: LambdaRequest
+      Handler: com.example.request.LambdaRequest::handleRequest
+      CodeUri: target/sourceCode.zip
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref LambdaResponse
+      Environment:
+        Variables:
+          RESPONSE_FUNC_NAME: !Ref LambdaResponse
+
+  LambdaResponse:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: LambdaResponse
+      Handler: com.example.response.LambdaResponse::handleRequest
+      CodeUri: target/sourceCode.zip
