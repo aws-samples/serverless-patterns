@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create a Lambda function that logs something to the console from a cron job in EventBridge
+
+Resources:
+  ScheduledFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: EBLambdaFunction
+      Description: Lambda to be invoked by the Event Bridge schedule.
+      CodeUri: EBLambdaFunction
+      Handler: com.example.App::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      Timeout: 30
+      MemorySize: 512
+            
+      Events:
+        ScheduledFunction:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
