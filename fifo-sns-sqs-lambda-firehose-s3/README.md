@@ -15,7 +15,7 @@ The Terraform template in this pattern allows you to connect an SQS FIFO queue t
 * Cloudwatch log group for Lambda function
 * Required roles and policies 
 
-Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/fifo-sns-sqs-lambda-firehose-s3](https://serverlessland.com/patterns/fifo-sns-sqs-lambda-firehose-s3/)
+Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sns-sqs-lambda-firehose-s3-terraform](https://serverlessland.com/patterns/sns-sqs-lambda-firehose-s3-terraform)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
