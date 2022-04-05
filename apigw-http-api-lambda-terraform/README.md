@@ -41,7 +41,7 @@ This pattern deploys an Amazon API Gateway HTTP API with a default route and bas
 
 ## Testing
 
-Once the stack is deployed, retrieve the HttpApiEndpoint value from the outputs of the terraform apply, then call the endpoint using curl or Postman.
+Once the stack is deployed, retrieve the apigwy_url value from the outputs of the terraform apply, then call the endpoint using curl or Postman.
 
 ```
 curl '<your http api endpoint>'
