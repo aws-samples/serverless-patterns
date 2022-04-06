@@ -1,0 +1,199 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An Amazon API Gateway WebSocket API and SQS with a AWS Lambda function.
+
+Resources:
+  APIGWWebsocketSQSLambda:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Description: Send websocket data to SQS which is then processed by a Lambda
+      Name: APIGWWebsocketSQSLambda
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: $request.body.action
+  APIGWWebsocketSQSLambdaProdStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId:
+        Ref: APIGWWebsocketSQSLambda
+      StageName: production
+      AutoDeploy: true
+  SQSWebsocketResponseServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  SQSWebsocketResponseServiceRoleDefaultPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: execute-api:ManageConnections
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:"
+                  - Ref: AWS::Partition
+                  - ":execute-api:"
+                  - Ref: AWS::Region
+                  - ":"
+                  - Ref: AWS::AccountId
+                  - ":"
+                  - Ref: APIGWWebsocketSQSLambda
+                  - /production/POST/*
+          - Action:
+              - sqs:ReceiveMessage
+              - sqs:ChangeMessageVisibility
+              - sqs:GetQueueUrl
+              - sqs:DeleteMessage
+              - sqs:GetQueueAttributes
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - APIGWWebsocketQueue
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: SQSWebsocketResponseServiceRoleDefaultPolicy
+      Roles:
+        - Ref: SQSWebsocketResponseServiceRole
+  SQSWebsocketResponse:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SQSWebsocketResponse
+      Handler: com.example.App::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Timeout: 30
+      Architectures:
+        - x86_64
+      Role:
+        Fn::GetAtt:
+          - SQSWebsocketResponseServiceRole
+          - Arn
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 
+          ApiGatewayEndpoint:
+            Fn::Join:
+              - ""
+              - - "https://"
+                - Ref: APIGWWebsocketSQSLambda
+                - .execute-api.
+                - Ref: AWS::Region
+                - "."
+                - Ref: AWS::URLSuffix
+                - /production
+    DependsOn:
+      - SQSWebsocketResponseServiceRoleDefaultPolicy
+      - SQSWebsocketResponseServiceRole
+  SQSWebsocketResponseSqsEventSourceAWIGWWebsocketSQSLambdaAPIGWWebsocketQueue:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName:
+        Ref: SQSWebsocketResponse
+      Enabled: true
+      EventSourceArn:
+        Fn::GetAtt:
+          - APIGWWebsocketQueue
+          - Arn
+  APIGWWebsocketQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      FifoQueue: true
+      QueueName: APIGWWebsocketQueue.fifo
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+  ApiGatewayWebsocketSQSRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+        Version: "2012-10-17"
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action: sqs:SendMessage
+                Effect: Allow
+                Resource:
+                  Fn::GetAtt:
+                    - APIGWWebsocketQueue
+                    - Arn
+            Version: "2012-10-17"
+          PolicyName: APIGatewaySQSSendMessagePolicy
+  Integration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId:
+        Ref: APIGWWebsocketSQSLambda
+      IntegrationType: AWS
+      ConnectionType: INTERNET
+      CredentialsArn:
+        Fn::GetAtt:
+          - ApiGatewayWebsocketSQSRole
+          - Arn
+      IntegrationMethod: POST
+      IntegrationUri:
+        Fn::Join:
+          - ""
+          - - "arn:aws:apigateway:"
+            - Ref: AWS::Region
+            - :sqs:path/
+            - Ref: AWS::AccountId
+            - /
+            - Fn::GetAtt:
+                - APIGWWebsocketQueue
+                - QueueName
+      PassthroughBehavior: NEVER
+      RequestParameters:
+        integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+      RequestTemplates:
+        $default: Action=SendMessage&MessageGroupId=$input.path('$.MessageGroupId')&MessageDeduplicationId=$context.requestId&MessageAttribute.1.Name=connectionId&MessageAttribute.1.Value.StringValue=$context.connectionId&MessageAttribute.1.Value.DataType=String&MessageAttribute.2.Name=requestId&MessageAttribute.2.Value.StringValue=$context.requestId&MessageAttribute.2.Value.DataType=String&MessageBody=$input.json('$')
+      TemplateSelectionExpression: \$default
+  SQSRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId:
+        Ref: APIGWWebsocketSQSLambda
+      RouteKey: $default
+      Target:
+        Fn::Join:
+          - ""
+          - - integrations/
+            - Ref: Integration
+
+Outputs:
+  WebsocketURI:
+    Description: "API Gateway websocket endpoint URL for Prod stage"
+    Value:
+      Fn::Join:
+        - ""
+        - - wss://
+          - Ref: APIGWWebsocketSQSLambda
+          - .execute-api.
+          - Ref: AWS::Region
+          - "."
+          - Ref: AWS::URLSuffix
+          - /production
+    Export:
+      Name: WebsocketURI
+  queue:
+    Description: "SQS FIFO queue which receives the websocket message events"
+    Value:
+      Ref: APIGWWebsocketQueue
+    Export:
+      Name: queue
