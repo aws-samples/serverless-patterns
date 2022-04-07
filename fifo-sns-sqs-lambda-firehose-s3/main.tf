@@ -23,7 +23,6 @@ locals {
   tags = merge({
     pattern     = "fifo-sns-sqs-lambda-firehose-s3"
     deployed_by = "terraform"
-    developed_by = "https://fr.linkedin.com/in/hicham-terkiba-39826259"
     repository  = "https://github.com/aws-samples/serverless-patterns/tree/main/fifo-sns-sqs-lambda-firehose-s3"
   }, var.tags)
   prefix = "fifo-sns-sqs-lambda-firehose-s3"
