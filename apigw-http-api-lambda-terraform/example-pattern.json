@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway HTTP API to AWS Lambda",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "description": "This pattern creates an Amazon API Gateway HTTP API and an AWS Lambda function.",
   "language": "Python",
   "level": "200",
   "framework": "terraform",
