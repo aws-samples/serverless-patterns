@@ -1,0 +1,1 @@
+This directory contains all the zipped lambda functions that are created after the Terraform `data "archive_file"` is executed
