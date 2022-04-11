@@ -29,10 +29,8 @@ class SqsFargateCdkPythonStack(Stack):
         cluster = ecs.Cluster(self, "SqsFargateCdkPythonCluster", vpc=vpc)
 
         role = iam.Role(self, "SqsFargateCdkPythonRole", assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com"))
-        role.attach_inline_policy(
-            iam.Policy(self, "SqsFargateCdkPythonPolicy",
-                       statements=[iam.PolicyStatement(actions=["sqs:*"], effect=iam.Effect.ALLOW,
-                                                       resources=[queue.queue_arn])]))
+
+        queue.grant_consume_messages(role)
 
         fargate_task_definition = ecs.FargateTaskDefinition(self, "SqsFargateCdkPythonFargateTaskDefinition",
                                                             memory_limit_mib=512, cpu=256,
