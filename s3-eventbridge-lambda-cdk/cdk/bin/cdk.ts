@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CdkStack } from '../s3-eventbridge-lambda-stack';
+import { CdkStack } from '../stack/s3-eventbridge-lambda-stack';
 
 const app = new cdk.App();
 new CdkStack(app, 's3-eventbridge-lambda-stack', {

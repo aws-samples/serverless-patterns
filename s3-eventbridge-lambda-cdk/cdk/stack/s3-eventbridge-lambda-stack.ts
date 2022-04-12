@@ -1,4 +1,4 @@
-import { Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
@@ -57,6 +57,10 @@ export class CdkStack extends Stack {
       maxEventAge: Duration.hours(2),
       retryAttempts: 3
     }));
+
+    new CfnOutput(this, 'S3BucketName', { value: bucket.bucketName });
+    new CfnOutput(this, 'LambdaFunctionARN', { value: lambdaFn.functionArn });
+    new CfnOutput(this, 'EventBridgeRuleARN', { value: rule.ruleArn });
     
   }
 }
