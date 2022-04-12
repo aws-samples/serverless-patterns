@@ -1,6 +1,6 @@
 # AWS S3 to AWS EventBridge to AWS Lambda
 
-This project contains a sample AWS Cloud Development Kit (AWS CDK) template for creating an AWS S3 bucket with AWS EventBridge notifications turned on. All S3 events in this bucket is sent to AWS EventBridge. This CDK template also deploys a AWS Lambda function which will process the event sent to AWS EventBridge and create a tag for the S3 object that was created. An AWS EventBridge rule is also created to send only the `Object Created` event of the bucket to the Lambda function.
+This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template for creating an AWS S3 bucket with AWS EventBridge notifications turned on. All S3 events in this bucket is sent to AWS EventBridge. This CDK template also deploys a AWS Lambda function which will process the event sent to AWS EventBridge and create a tag for the S3 object that was created. An AWS EventBridge rule is also created to send only the `Object Created` event of the bucket to the Lambda function.
 
 Learn more about this pattern at Serverless Land Patterns:: https://serverlessland.com/patterns/s3-eventbridge-lambda
 
@@ -70,3 +70,8 @@ Important: This template uses various AWS services and there are costs associate
 ## Documentation and useful references
 - [AWS S3 Event Notifications with EventBridge](https://aws.amazon.com/blogs/aws/new-use-amazon-s3-event-notifications-with-amazon-eventbridge/)
 - [Using EventBridge with S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html)
+
+----
+Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
