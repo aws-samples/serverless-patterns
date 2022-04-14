@@ -1,0 +1,16 @@
+{
+    "name": "object-tagger",
+    "version": "1.0.0",
+    "description": "",
+    "main": "lambda.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "Arun Thangaraj",
+    "license": "MIT-0",
+    "devDependencies": {
+      "aws-sdk": "^2.1046.0"
+    }
+  }
+  
