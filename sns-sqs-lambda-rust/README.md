@@ -1,6 +1,6 @@
-# Amazon SNS to Amazon SQS
+# Amazon SNS to Amazon SQS to AWS Lambda
 
-The SAM template deploys a SNS topic and an SQS queue. The SQS queue is subscribed to the SNS topic. SNS invokes the SQS queue when new messages are available. When messages are sent to the SNS topic, they are delivered as a JSON event payload to the SQS queue.
+The SAM template deploys a SNS topic and an SQS queue a. The SQS queue is subscribed to the SNS topic. SNS invokes the SQS queue when new messages are available. When messages are sent to the SNS topic, they are delivered as a JSON event payload to the SQS queue. SQS invokes the Lambda function when new messages are available.
 
 Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sns-sqs-lambda-rust](https://serverlessland.com/patterns/sns-sqs-lambda-rust)
 
