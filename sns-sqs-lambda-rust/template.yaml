@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SNS to SQS to Lambda
+
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 30
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#   SQS                                                                  #
+##########################################################################
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+
+##########################################################################
+#   SNS                                                                  #
+##########################################################################
+  MySnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      # Subscribes the SQS queue to the SNS topic
+      Subscription:
+        - Protocol: sqs
+          Endpoint: !GetAtt MySqsQueue.Arn
+
+  # Policy allows SNS to publish to this SQS queue
+  SnsToSqsPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal: 
+              Service: "sns.amazonaws.com"
+            Resource: !GetAtt MySqsQueue.Arn
+            Action: SQS:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref MySnsTopic
+      Queues:
+        - Ref: MySqsQueue
+          
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  MyFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ./build/handler
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MySqsQueue.Arn
+            BatchSize: 10
+
+Outputs:
+  MySqsQueueName:
+    Description: SQS queue name
+    Value: !GetAtt MySqsQueue.QueueName
+  MySqsQueueArn:
+    Description: SQS queue ARN
+    Value: !GetAtt MySqsQueue.Arn
+  MySqsQueueURL:
+    Description: SQS queue URL
+    Value: !Ref MySqsQueue    
+  MySnsTopicName:
+    Description: SNS topic name
+    Value: !GetAtt MySnsTopic.TopicName
+  MySnsTopicArn:
+    Description: SNS topic ARN
+    Value: !Ref MySnsTopic
+
