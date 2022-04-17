@@ -1,0 +1,10 @@
+[
+  {
+    "Id": "1",
+    "MessageBody": "{\"name\":\"Daniele\",\"surname\":\"Frasca\"}"
+  },
+  {
+    "Id": "2",
+    "MessageBody": "{\"to_error\":\"Boom\",\"surname\":\"Kaboom\"}"
+  }
+]
