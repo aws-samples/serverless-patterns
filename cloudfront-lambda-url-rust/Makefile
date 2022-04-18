@@ -22,7 +22,7 @@ build-%:
 deploy:
 	if [ -f samconfig.toml ]; \
 		then sam deploy; \
-		else sam deploy -g --profile test; \
+		else sam deploy -g; \
 	fi
 
 delete:
