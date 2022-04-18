@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An Amazon Cloudfront distribution on front of an Amazon API Gateway HTTP API and an AWS Lambda function.
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  LambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ./build/handler
+      FunctionUrlConfig:
+        AuthType: NONE
+
+# ##########################################################################
+# #  CloudFront::CachePolicy                                               #
+# ##########################################################################
+  3hCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Comment: Cache for 3h
+        Name: !Ref AWS::StackName
+        DefaultTTL: 10800
+        MaxTTL: 10800
+        MinTTL: 10800
+        Name: 3h
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingBrotli: false
+          EnableAcceptEncodingGzip: false
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - x-forwarded-for
+          QueryStringsConfig:
+            QueryStringBehavior: whitelist
+            QueryStrings:
+              - allowed_query_string_param
+
+# ##########################################################################
+# #  CloudFront::Distribution                                              #
+# ##########################################################################
+  CloudfrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        PriceClass: PriceClass_100
+        IPV6Enabled: true
+        HttpVersion: http2 
+        Origins:
+          - Id: MyOrigin
+            DomainName: !Select [2, !Split ["/", !GetAtt LambdaFunctionUrl.FunctionUrl]]
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: 
+                - TLSv1.2
+        Enabled: true
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          TargetOriginId: MyOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: !Ref 3hCachePolicy
+
+Outputs:
+  LambdaFunctionEndpoint:
+    Description: Lambda Function URL Endpoint.
+    Value: !GetAtt LambdaFunctionUrl.FunctionUrl
+  LambdaFunctionDomain:
+    Description: Lambda Function URL domain.
+    Value: !Select [2, !Split ["/", !GetAtt LambdaFunctionUrl.FunctionUrl]]
+  DistributionDomainName:
+    Description: "Distribution domain name"
+    Value: !GetAtt CloudfrontDistribution.DomainName
+    Export:
+      Name: DistributionDomainName
