@@ -1,5 +1,5 @@
 [package]
-name = "cloudfront-apigw-http-api-lambda-rust"
+name = "cloudfront-lambda-url-rust"
 version = "0.1.0"
 edition = "2021"
 
