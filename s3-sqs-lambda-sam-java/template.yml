@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: aws-s3-sqs-lambda
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 3072
+    Timeout: 30
+
+Resources:
+### Lambda Function
+  FileAudit:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: FileAudit
+      Handler: com.ibercode.FileAudit::handleRequest
+      CodeUri: target/sourceCode.zip
+      Events:
+        AuditSQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt AuditQueue.Arn
+
+### S3
+  S3FileBucket:
+    Type: AWS::S3::Bucket
+    DependsOn:
+      - AuditQueuePolicy
+    Properties:
+      BucketName: filebucket89283owef9283
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: "s3:ObjectRemoved:*"
+            Queue: !GetAtt AuditQueue.Arn
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: '.png'
+
+### SQS
+  AuditQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: AuditQueue
+
+### Policies
+  AuditQueuePolicy:
+    Type: "AWS::SQS::QueuePolicy"
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Id: QueuePolicy
+        Statement:
+          - Sid: Allow-SendMessage-To-Queue-From-S3-Event-Notification
+            Effect: Allow
+            Principal:
+              Service: "s3.amazonaws.com"
+            Action:
+              - "sqs:SendMessage"
+            Resource: !GetAtt AuditQueue.Arn
+      Queues:
+        - Ref: AuditQueue
