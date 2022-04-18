@@ -234,6 +234,7 @@ resource "aws_api_gateway_stage" "MyApiGatewayStage" {
   deployment_id = aws_api_gateway_deployment.MyApiGatewayDeployment.id
   rest_api_id   = aws_api_gateway_rest_api.MyApiGatewayRestApi.id
   stage_name    = "v1"
+  depends_on    = [aws_api_gateway_account.ApiGatewayAccountSetting]
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.MyLogGroup.arn
