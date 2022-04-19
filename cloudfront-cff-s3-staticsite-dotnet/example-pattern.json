@@ -14,10 +14,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-cff-s3-staticsite-csharp",
-      "templateURL": "serverless-patterns/cloudfront-cff-s3-staticsite-csharp",
-      "projectFolder": "cloudfront-cff-s3-staticsite-csharp",
-      "templateFile": "cloudfront-cff-s3-staticsite-csharp/MdsiteStack.cs"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-cff-s3-staticsite-dotnet",
+      "templateURL": "serverless-patterns/cloudfront-cff-s3-staticsite-dotnet",
+      "projectFolder": "cloudfront-cff-s3-staticsite-dotnet",
+      "templateFile": "cloudfront-cff-s3-staticsite-dotnet/MdsiteStack.cs"
     }
   },
   "resources": {
