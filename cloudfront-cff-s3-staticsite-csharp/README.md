@@ -1,6 +1,4 @@
-# AWS Service 1 to AWS Service 2
-
-This pattern << explain usage >>
+# AWS S3 Hosting Static Site with CloudFront
 
 This pattern helps you to deploy a CDK stack with CloudFront with Function and S3 bucket with Static Site. I use MKDOCS to generate the static site. 
 
@@ -37,7 +35,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 4. Generate the Mkdocs Build Static Content
     ```
-    cd mycontent && mycontent build
+    cd mycontent && mycontent build && cd ..
     ```
 5. Deploy the stack to your default AWS account and region.
     ```
