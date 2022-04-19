@@ -1,6 +1,6 @@
 # AWS S3 Hosting Static Site with CloudFront
 
-This pattern helps you to deploy a CDK stack with CloudFront with Function and S3 bucket with Static Site. I use MKDOCS to generate the static site. 
+This pattern helps you to deploy a CDK stack of CloudFront with Function and S3 bucket with Static Site. It uses MKDOCS to generate the static site. 
 
 MkDocs is a fast, simple and downright gorgeous static site generator that's geared towards building project documentation. Documentation source files are written in Markdown, and configured with a single YAML configuration file. For more [info](https://www.mkdocs.org/).
 
@@ -35,7 +35,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 4. Generate the Mkdocs Build Static Content
     ```
-    cd mycontent && mycontent build && cd ..
+    cd mycontent && mkdocs build && cd ..
     ```
 5. Deploy the stack to your default AWS account and region.
     ```
