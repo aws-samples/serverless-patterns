@@ -17,7 +17,7 @@ Important: this application uses various AWS services and there are costs associ
     - 3.1 for the CDK Stack - https://dotnet.microsoft.com/en-us/download/dotnet/3.1
 * [Docker](https://docs.docker.com/get-docker/) installed and running
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
-* [MKDOCS](https://www.mkdocs.org/user-guide/installation/) 
+* [MKDOCS](https://www.mkdocs.org/user-guide/installation/) installed
 
 ## Deployment Instructions
 
