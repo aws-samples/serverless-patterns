@@ -27,11 +27,12 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
+    cd serverless-patterns
     cd cloudfront-cff-s3-staticsite-dotnet
     ```
 3. Install dependencies
     ```
-    dotnet restore/src
+    dotnet restore .\src\
     ```
 4. Generate the Mkdocs Build Static Content
     ```
