@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway REST API with Resource Policy
+
+Parameters: 
+  IpRangeBlacklist: 
+    Description: Comma-delimited list of CIDR blocks to blacklist
+    Type: CommaDelimitedList
+    Default: "10.20.30.40, 1.0.0.0/16"
+  IpRangeWhitelist: 
+    Description: Comma-delimited list of CIDR blocks to blacklist
+    Type: CommaDelimitedList
+    Default: "10.20.30.41, 1.1.0.0/16"
+
+Resources:
+
+  # REST API using a Resource Policy
+  AppApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Description: Resource Policy REST API demo
+      StageName: Prod
+      Auth:
+        ResourcePolicy:
+          IpRangeBlacklist: !Ref IpRangeBlacklist
+                
+  # Dummy function
+  AppFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs14.x
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AppApi
+            Path: /
+            Method: get
+
+Outputs:
+
+  # API Gateway endpoint to be used during tests
+  AppApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
