@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: AWS-SAM-kinesis
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 3072
+    Timeout: 25
+
+Resources:
+
+########### LAMBDA ###########
+  DataProducer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: DataProducer
+      Handler: com.example.DataProducer::handleRequest
+      CodeUri: target/sourceCode.zip
+      Environment:
+        Variables:
+          DDB_TABLE: !Ref SourceDDBTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SourceDDBTable
+
+########### DYNAMODB ###########
+  SourceDDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: SourceDDBTable
+      AttributeDefinitions:
+        - AttributeName: sensorId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: sensorId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KinesisStreamSpecification:
+        StreamArn: !GetAtt KinesisDataStreams.Arn
+
+########### KINESIS DATA STREAM ###########
+  KinesisDataStreams:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: "kds-data"
+      RetentionPeriodHours: 24
+      ShardCount: 1
