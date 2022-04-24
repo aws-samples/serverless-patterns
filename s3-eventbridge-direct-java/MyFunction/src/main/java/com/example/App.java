@@ -20,8 +20,8 @@ public class App {
         logger.log(gson.toJson(event));
 
         Map<String, Object> eventDetail = event.getDetail();
-        String bucketName = (String) ((Map)eventDetail.get("bucket")).get("name");
-        String key = (String) ((Map)eventDetail.get("object")).get("key");
+        String bucketName = (String) ((Map<?, ?>)eventDetail.get("bucket")).get("name");
+        String key = (String) ((Map<?, ?>)eventDetail.get("object")).get("key");
 
         logger.log(String.format("Bucket name is %s", bucketName));
         logger.log(String.format("Object key is %s", key));
