@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  lambda-funcurl-dynamodb-go-app
+  
+  SAM Template for lambda-funcurl-dynamodb-go-app
+
+Globals:
+  Function:
+    Timeout: 5
+
+Resources:
+  DemoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: function/
+      Handler: demo
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      FunctionUrlConfig:
+        AuthType: NONE
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow 
+              Action:
+                - dynamodb:PutItem
+              Resource: !GetAtt DDBTable.Arn
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: users
+  DDBTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: users
+      PrimaryKey:
+        Name: email
+        Type: String
+
+Outputs:
+  FunctionURL:
+    Description: "The HTTP URL endpoint for your function"
+    Value: !GetAtt DemoFunctionUrl.FunctionUrl
