@@ -1,6 +1,6 @@
 # Amazon S3 to Amazon EventBridge - Publish events directly from S3
 
-The SAM template deploys an S3 bucket that publishes events to Amazon EventBridge, and sets up a Lambda function to show how to consume these events via an EventBridge rule. It deploys the the IAM resources required to run the application.
+The SAM template deploys an S3 bucket that publishes events to Amazon EventBridge, and sets up a Lambda function to show how to consume these events via an EventBridge rule. It deploys the IAM resources required to run the application.
 
 This version is a Java port of the [original pattern](https://serverlessland.com/patterns/s3-eventbridge).
 
@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd s3-eventbridge-direct
+    cd s3-eventbridge-direct-java
     ```
 1. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
