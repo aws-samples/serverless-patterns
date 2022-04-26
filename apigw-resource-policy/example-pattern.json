@@ -2,7 +2,7 @@
     "title": "Amazon API Gateway with Resource Policy",
     "description": "Create a REST API Gateway with a Resource Policy for access control",
     "language": "Node.js",
-    "level": "100",
+    "level": "200",
     "framework": "SAM",
     "introBox": {
       "headline": "How it works",
@@ -30,7 +30,7 @@
     },
     "deploy": {
       "text": [
-        "<code>sam deploy</code>."
+        "Deploy the stack: <code>sam deploy</code>."
       ]
     },
     "testing": {
@@ -40,14 +40,14 @@
     },
     "cleanup": {
       "text": [
-        "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>."
+        "Delete the stack: <code>sam delete</code>."
       ]
     },
     "authors": [
       {
         "headline": "Presented by Albert Blaya, Solutions Architect",
         "name": "Albert Blaya",
-        "image": "link-to-your-photo.jpg",
+        "image": "https://media-exp1.licdn.com/dms/image/C5603AQEw2HXx9zs7yg/profile-displayphoto-shrink_200_200/0/1600474292127?e=1655942400&v=beta&t=SbeIn9psV0BIFkbROTDRIfPMKMtyrrgBdgt0tRHY0BY",
         "bio": "Albert is a Solutions Architect at Amazon Web Services based in Australia.",
         "linkedin": "albertblaya"
       }
