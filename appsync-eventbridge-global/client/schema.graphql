@@ -1,0 +1,24 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Channel {
+  message: String!
+  name: String!
+}
+
+type Mutation {
+  publish(message: String!, name: String!): Channel
+  publishFromBus(message: String!, name: String!): Channel
+  unsubscribe(name: String!): Channel @aws_iam
+}
+
+type Query {
+  getChannel: Channel
+}
+
+type Subscription {
+  subscribe(name: String!): Channel @aws_subscribe(mutations : ["publishFromBus"])
+}

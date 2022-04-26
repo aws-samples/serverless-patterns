@@ -1,0 +1,43 @@
+{
+  "title": "Multi-region AppSync to EventBridge",
+  "description": "Create an AppSync API with EventBridge as HTTP data source and replicate to a secondary region, enabling bi-directional data flow between clients in different regions via serverless WebSockets.",
+  "language": "TypeScript",
+  "architectureURL": "images/globalWSAPI.png",
+  "videoId": "",
+  "level": "200",
+  "framework": "CDK",
+  "services": {
+    "from": "appsync",
+    "to": "eventbridge"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains CDK templates for deploying two Amazon EventBridge event buses as a HTTP data sources for related AWS AppSync APIs in two regions, enabling bi-directional event data flow between clients in different regions via serverless WebSockets."
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-eventbridge-global",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/appsync-eventbridge-global/cdk/lib/globalSubs-region1-stack.ts",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-eventbridge-global/README.md"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Implement Multi-Region Serverless (and Functionless) WebSocket Pub/Sub APIs with AWS AppSync and Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/mobile/multi-region-websocket-api/"
+      }
+    ]
+  },
+  "author": {
+    "headline": "Presented by Ed Lima",
+    "name": "Ed Lima",
+    "bio": "Senior Product Manager @ AWS"
+  }
+}

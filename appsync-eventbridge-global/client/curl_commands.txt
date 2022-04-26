@@ -1,0 +1,10 @@
+curl 'https://xxxxxxxxxxx.appsync-api.us-west-2.amazonaws.com/graphql' \
+  -H 'content-type: application/json' \
+  -H 'x-api-key: da2-xxxxxxxxxxxx' \
+  --data-raw $'{"query":"mutation publish($message: String\u0021, $name: String\u0021) {\\n  publish(message: $message, name: $name) {\\n    message\\n    name\\n  }\\n}\\n","variables":{"name":"tech","message":"Hello from Oregon!"}}' \
+
+
+curl 'https://xxxxxxxxxxxxx.appsync-api.ap-southeast-2.amazonaws.com/graphql' \
+  -H 'content-type: application/json' \
+  -H 'x-api-key: da2-xxxxxxxxxxxxx' \
+  --data-raw $'{"query":"mutation publish($message: String\u0021, $name: String\u0021) {\\n  publish(message: $message, name: $name) {\\n    message\\n    name\\n  }\\n}\\n","variables":{"name":"tech","message":"Hello from Sydney!"}}' \
