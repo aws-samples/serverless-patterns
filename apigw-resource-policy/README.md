@@ -32,6 +32,8 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Select the desired AWS Region
+    * Enter the desired CIDR blocks to blacklist separated by commas. I.e. 1.1.1.1/16,2.2.2.2 . If no CIDR blocks are provided, the default sample "10.20.30.40, 1.0.0.0/16" will be used.
+    * Choose the desired CIDR blocks to whitelist separated by commas. I.e. 3.3.3.3/24,4.4.4.4 . If no CIDR blocks are provided, the default sample "10.20.30.41, 1.1.0.0/16" will be used.
     * Allow SAM to create roles with the required permissions if needed.
 
     Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
@@ -46,7 +48,7 @@ The stack will output the **api endpoint**. Visit that URL in your browser or ma
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete
     ```
 1. Confirm the stack has been deleted
     ```bash
