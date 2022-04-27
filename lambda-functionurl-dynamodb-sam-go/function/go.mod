@@ -1,6 +1,6 @@
 require (
-	github.com/aws/aws-lambda-go v1.23.0
-	github.com/aws/aws-sdk-go v1.43.45
+	github.com/aws/aws-lambda-go v1.31.0
+	github.com/aws/aws-sdk-go v1.44.1
 	github.com/aws/jsii-runtime-go v1.57.0
 )
 
