@@ -13,8 +13,6 @@ Resources:
 ########### S3 BUCKET ###########
   DeliveryBucket:
     Type: AWS::S3::Bucket
-    Properties:
-      BucketName: deliverybucket-8938249287387
 
 ########### KINESIS DATA STREAM ###########
   KinesisStream:
