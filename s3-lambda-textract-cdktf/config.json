@@ -1,0 +1,15 @@
+{
+  "region": "us-east-1",
+  "tags": {
+    "pattern": "s3-lambda-textract",
+    "deployed_by": "cdktf",
+    "repository": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-textract"
+  },
+  "layers": {
+    "pillow": {
+      "always_refresh": false,
+      "url":"https://files.pythonhosted.org/packages/15/37/45ad6041473ebb803d0bb265cf7e749c4838dc48c3335a03e63d6aad07d8/Pillow-9.1.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "hash": "82283af99c1c3a5ba1da44c67296d5aad19f11c535b551a5ae55328a317ce331"
+    }
+  }
+}

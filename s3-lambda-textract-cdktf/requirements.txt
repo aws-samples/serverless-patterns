@@ -1,0 +1,6 @@
+cdktf==0.10.3
+cdktf-cdktf-provider-aws==7.0.34
+constructs==10.0.127
+cdktf-cdktf-provider-random==0.2.32
+jsonschema==4.4.0
+urllib3==1.26.9

@@ -1,0 +1,74 @@
+{
+  "title": "Extracts text, handwriting, and data from scanned expense documents using Amazon Textract",
+  "description": "Extracts text, handwriting, and data from scanned expense documents using Amazon Textract and save the result to and Amazon S3 bucket",
+  "language": "Python",
+  "level": "200",
+  "framework": "cdktf",
+  "services": {
+      "from": "s3",
+      "to": "lambda, textract"
+    },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Terraform template in this pattern allows you to use Amazon Textract (a machine learning service) to automatically extracts text, handwriting, and data from scanned expense documents and save the result into an output bucket"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-textract-cdktf",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/s3-lambda-textract-cdktf/main.py",
+      "projectFolder": "s3-lambda-textract",
+      "readmeURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/s3-lambda-textract-cdktf/README.md"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Textract",
+        "link": "https://aws.amazon.com/textract/"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Amazon S3",
+        "link": "https://aws.amazon.com/s3/"
+      },
+      {
+        "text": "Amazon Cloudwatch",
+        "link": "https://aws.amazon.com/cloudwatch/"
+      },
+      {
+        "text": "CDK for Terraform",
+        "link": "https://www.terraform.io/cdktf"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdktf deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdktf destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Hicham Terkiba",
+      "image": "https://avatars.githubusercontent.com/u/13402022?s=400&u=b501c0475f8acd994c9ddb7444150845075a479a&v=4",
+      "bio": "AWS Proserv Cloud Infrastructure Architect",
+      "linkedin": "https://www.linkedin.com/in/hicham-terkiba-39826259/",
+      "twitter": ""
+    }
+  ]
+}
+
