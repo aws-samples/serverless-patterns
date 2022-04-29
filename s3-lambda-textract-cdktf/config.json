@@ -3,7 +3,7 @@
   "tags": {
     "pattern": "s3-lambda-textract",
     "deployed_by": "cdktf",
-    "repository": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-textract"
+    "repository": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-textract-cdktf"
   },
   "layers": {
     "pillow": {
