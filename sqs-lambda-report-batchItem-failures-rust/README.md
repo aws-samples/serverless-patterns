@@ -14,6 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Rust](https://www.rust-lang.org/) 1.56.0 or higher
 * [cargo-zigbuild](https://github.com/messense/cargo-zigbuild) and [Zig](https://ziglang.org/) for cross-compilation
+* Make sure to run "rustup target add aarch64-unknown-linux-gnu;"
 
 ## Deployment Instructions
 
