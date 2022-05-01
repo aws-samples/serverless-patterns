@@ -1,0 +1,8 @@
+[
+    {
+      "DetailType": "transaction",
+      "Source": "cdk.myapp",
+      "EventBusName": "MyCloudWatchEventBus",
+      "Detail": "{\"location\":\"EUR-\"}"
+    }
+  ]
