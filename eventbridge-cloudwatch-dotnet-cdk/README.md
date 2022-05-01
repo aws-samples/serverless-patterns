@@ -44,7 +44,7 @@ The EventBridge rule filters the events based upon the defined criteria. When ma
 
 ## Testing
 
-Use the [AWS CLI](https://aws.amazon.com/cli/) to send a test event to EventBridge and observe the event delivered to the Lambda function by reviewing the Amazon CloudWatch Logs associated with the function:
+Use the [AWS CLI](https://aws.amazon.com/cli/) to send a test event to EventBridge and observe the event delivered to the Amazon CloudWatch by reviewing the logs:
 
 1. Send an event to EventBridge:
 
