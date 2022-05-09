@@ -53,7 +53,7 @@ The stack will output the **api endpoint**. Visit that URL in your browser or ma
 curl -i https://12345abcde.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: Bearer allow"
 ```
 
-will successfully return a 200 HTTP code and the event object from the Lambda in the body.
+will successfully return a 200 HTTP code and the event object from the Lambda in the response body.
 
 ```
 curl -i https://12345abcde.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: unauthorized"
