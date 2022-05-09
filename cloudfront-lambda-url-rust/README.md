@@ -1,8 +1,8 @@
-# Amazon Cloudfront distribution on front of an Amazon API Gateway HTTP API to AWS Lambda
+# Amazon CloudFront to AWS Lambda URLs
 
-This pattern creates an Amazon Cloudfront distribution on front of an AWS Lambda function URL.
+This pattern creates an Amazon CloudFront distribution on front of an AWS Lambda function URL.
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/cloudfront-lambda-url-rust).
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/cloudfront-lambda-sam-rust).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
