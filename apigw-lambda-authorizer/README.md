@@ -1,4 +1,4 @@
-# Amazon API Gateway REST API with Resource Policy
+# Amazon API Gateway REST API with Lambda Token Authorizer
 
 The SAM template deploys an Amazon API Gateway REST API endpoint that uses a Lambda Token Authorizer for access control. 
 
@@ -47,7 +47,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-The stack will output the **api endpoint**. Visit that URL in your browser or make an HTTP request to the endpoint using *curl* to test the Resource Policy.
+The stack will output the **api endpoint**. Use *curl* to make a HTTP request to the API Gateway that includes a header with the authorization token to test the Resource Lambda Token Authorizer.
    
 ```
 curl -i https://12345abcde.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: Bearer allow"
