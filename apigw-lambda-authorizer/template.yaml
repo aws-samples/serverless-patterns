@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway REST API with Lambda Token Authorizer
+
+Globals:
+  Function:
+    Runtime: nodejs14.x
+    CodeUri: src/
+
+Resources:
+  
+  # REST API
+  AppApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: apigw-lambda-authorizer
+      Description: Lambda Token Authorizer REST API demo
+
+  # GET Method with Lambda authorizer enabled
+  RootMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref AppApi
+      ResourceId: !GetAtt AppApi.RootResourceId
+      HttpMethod: GET
+      AuthorizationType: CUSTOM
+      AuthorizerId: !Ref AuthorizersLambdaToken
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Join ['', ['arn:aws:apigateway:', !Ref AWS::Region, ':lambda:path/2015-03-31/functions/', !GetAtt AppFunction.Arn, '/invocations']]
+
+  # Lambda Token Authorizer
+  AuthorizersLambdaToken:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: LambdaAuthorizerToken
+      Type: TOKEN
+      RestApiId: !Ref AppApi
+      IdentitySource: method.request.header.authorizationToken
+      AuthorizerUri: !Join ['', ['arn:aws:apigateway:', !Ref AWS::Region, ':lambda:path/2015-03-31/functions/', !GetAtt TokenAuthorizerFunction.Arn, '/invocations']]
+  
+  # Dummy function
+  AppFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.handler
+
+  # Authorizer function
+  TokenAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: tokenauthorizer.handler
+
+  # Permission to allow Lambda invocation from API Gateway
+  AppFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AppFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${AppApi}/*/GET/
+
+  # Permission to allow Lambda authorizer invocation from API Gateway
+  TokenAuthorizerFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref TokenAuthorizerFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${AppApi}/authorizers/${AuthorizersLambdaToken}
+
+  Deployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+    - RootMethodGet
+    Properties:
+      RestApiId: !Ref AppApi
+  
+  Stage:  
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: Prod
+      RestApiId: !Ref AppApi
+      DeploymentId: !Ref Deployment
+
+Outputs:
+
+  # API Gateway endpoint to be used during tests
+  AppApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
