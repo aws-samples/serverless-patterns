@@ -2,12 +2,12 @@
 
 The SAM template deploys an Amazon API Gateway REST API endpoint that uses a Lambda Token Authorizer for access control. 
 
-If the request to the endpoint does not include a 'authorizationToken' header, the Lambda Authorizer will not be invoked and API Gateway will return a 401 Forbidden. 
-If the request to the endpoint includes a 'authorizationToken' header, the Lambda Authorizer will be invoked and its response will depend on the value of the 'authorizationToken' header. 
-If the value of 'authorizationToken' header is 'unauthorized', API Gateway will return a 401 Unauthorized error. 
-If the value of 'authorizationToken' header is 'Bearer deny', API Gateway will return a 403 error. 
-Only if the value of 'authorizationToken' header is 'Bearer allow', API Gateway will successfully invoke the Lambda integration and return a 200. 
-For any other case, API Gateway will return a 500 error.
+* If the request to the endpoint does not include a 'authorizationToken' header, the Lambda Authorizer will not be invoked and API Gateway will return a 401 Forbidden. 
+* If the request to the endpoint includes a 'authorizationToken' header, the Lambda Authorizer will be invoked and its response will depend on the value of the 'authorizationToken' header. 
+* If the value of 'authorizationToken' header is 'unauthorized', API Gateway will return a 401 Unauthorized error. 
+* If the value of 'authorizationToken' header is 'Bearer deny', API Gateway will return a 403 error. 
+* Only if the value of 'authorizationToken' header is 'Bearer allow', API Gateway will successfully invoke the Lambda integration and return a 200. 
+* For any other case, API Gateway will return a 500 error.
 
 Note: when deploying this pattern, *CAPABILITY_IAM* is required.
 
@@ -48,14 +48,18 @@ Important: this application uses various AWS services and there are costs associ
 ## Testing
 
 The stack will output the **api endpoint**. Visit that URL in your browser or make an HTTP request to the endpoint using *curl* to test the Resource Policy.
-    ```
-    curl -i https://12345abcde.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: Bearer allow"
-    ```
-    will successfully return a 200 HTTP code and the event object from the Lambda in the body.
-    ```
-    curl -i https://12345abcde.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: unauthorized"
-    ```
-    will return a 401 Unauthorized error.
+   
+```
+curl -i https://12345abcde.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: Bearer allow"
+```
+
+will successfully return a 200 HTTP code and the event object from the Lambda in the body.
+
+```
+curl -i https://12345abcde.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: unauthorized"
+```
+
+will return a 401 Unauthorized error.
 
 ## Cleanup
  
