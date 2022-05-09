@@ -1,30 +1,34 @@
 {
-    "title": "Amazon API Gateway with Resource Policy",
-    "description": "Create a REST API Gateway with a Resource Policy for access control",
+    "title": "Amazon API Gateway with a Lambda Token Authorizer",
+    "description": "Create a REST API Gateway with a Lambda Token Authorizer for access control",
     "language": "Node.js",
     "level": "200",
     "framework": "SAM",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This pattern deploys an Amazon API Gateway REST API endpoint that uses a Resource Policy for access control.",
-        "The Resource Policy explicitly blacklists a list of IP ranges and also explicitly whitelists another list of IP ranges.",
-        "If allowed by the Resource Policy, API Gateway will forward the request to a Lambda function which will output the received event object."
+        "This pattern deploys an Amazon API Gateway REST API endpoint that uses a Lambda Token Authorizer for access control.",
+        "If the request to the endpoint does not include a 'authorizationToken' header, the Lambda Authorizer will not be invoked and API Gateway will return a 401 Forbidden.",
+        "If the request to the endpoint includes a 'authorizationToken' header, the Lambda Authorizer will be invoked and its response will depend on the value of the 'authorizationToken' header.",
+        "If the value of 'authorizationToken' header is 'unauthorized', API Gateway will return a 401 Unauthorized error.",
+        "If the value of 'authorizationToken' header is 'Bearer deny', API Gateway will return a 403 error.",
+        "Only if the value of 'authorizationToken' header is 'Bearer allow', API Gateway will successfully invoke the Lambda integration and return a 200.",
+        "For any other case, API Gateway will return a 500 error."
       ]
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-resource-policy",
-        "templateURL": "serverless-patterns/apigw-resource-policy",
-        "projectFolder": "apigw-resource-policy",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-authorizer",
+        "templateURL": "serverless-patterns/apigw-lambda-authorizer",
+        "projectFolder": "apigw-lambda-authorizer",
         "templateFile": "template.yaml"
       }
     },
     "resources": {
       "bullets": [
         {
-          "text": "Controlling access to an API with API Gateway resource policies",
-          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies.html"
+          "text": "Controlling access to a REST API with a Lambda Token Authorizer",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
         }
       ]
     },

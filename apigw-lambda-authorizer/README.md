@@ -1,10 +1,17 @@
 # Amazon API Gateway REST API with Resource Policy
 
-The SAM template deploys an Amazon API Gateway REST API endpoint that uses a Resource Policy for access control. The Resource Policy explicitly blacklists a list of IP ranges and also explicitly whitelists another list of IP ranges. If allowed by the Resource Policy, API Gateway will forward the request to a Lambda function which will output the received event object.
+The SAM template deploys an Amazon API Gateway REST API endpoint that uses a Lambda Token Authorizer for access control. 
+
+If the request to the endpoint does not include a 'authorizationToken' header, the Lambda Authorizer will not be invoked and API Gateway will return a 401 Forbidden. 
+If the request to the endpoint includes a 'authorizationToken' header, the Lambda Authorizer will be invoked and its response will depend on the value of the 'authorizationToken' header. 
+If the value of 'authorizationToken' header is 'unauthorized', API Gateway will return a 401 Unauthorized error. 
+If the value of 'authorizationToken' header is 'Bearer deny', API Gateway will return a 403 error. 
+Only if the value of 'authorizationToken' header is 'Bearer allow', API Gateway will successfully invoke the Lambda integration and return a 200. 
+For any other case, API Gateway will return a 500 error.
 
 Note: when deploying this pattern, *CAPABILITY_IAM* is required.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-resource-policy](https://serverlessland.com/patterns/apigw-resource-policy)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-lambda-authorizer](https://serverlessland.com/patterns/apigw-lambda-authorizer)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -23,7 +30,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd apigw-resource-policy
+    cd apigw-lambda-authorizer
     ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -32,8 +39,6 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Select the desired AWS Region
-    * Enter the desired CIDR blocks to blacklist separated by commas. I.e. 1.1.1.1/16,2.2.2.2 . If no CIDR blocks are provided, the default sample "10.20.30.40, 1.0.0.0/16" will be used.
-    * Choose the desired CIDR blocks to whitelist separated by commas. I.e. 3.3.3.3/24,4.4.4.4 . If no CIDR blocks are provided, the default sample "10.20.30.41, 1.1.0.0/16" will be used.
     * Allow SAM to create roles with the required permissions if needed.
 
     Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
@@ -43,6 +48,14 @@ Important: this application uses various AWS services and there are costs associ
 ## Testing
 
 The stack will output the **api endpoint**. Visit that URL in your browser or make an HTTP request to the endpoint using *curl* to test the Resource Policy.
+    ```
+    curl -i https://12345abcde.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: Bearer allow"
+    ```
+    will successfully return a 200 HTTP code and the event object from the Lambda in the body.
+    ```
+    curl -i https://12345abcde.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: unauthorized"
+    ```
+    will return a 401 Unauthorized error.
 
 ## Cleanup
  
