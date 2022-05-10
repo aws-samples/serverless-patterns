@@ -1,0 +1,16 @@
+# action.yml
+name: 'Serverless Patterns Action'
+description: 'Run validation scripts against patterns'
+inputs:
+  modified-files: # list of modified files in the PR
+    description: 'List of files that have been modified'
+    default: ""
+  new-files: # list of new files in the PR
+    description: 'List of files that have been added'
+    default: ""
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.new-files }}
+    - ${{ inputs.modified-files }}
