@@ -35,7 +35,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `**Failed to verify your serverless pattern**
-
-              Please check the GitHub Actions and make the changes required to your template.`
+              body: `**Failed to verify your serverless pattern**: Please check the GitHub Actions and make the changes required to your template.`
             })     
