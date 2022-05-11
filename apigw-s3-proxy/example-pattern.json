@@ -1,6 +1,6 @@
 {
     "title": "Amazon API Gateway with a S3 integration",
-    "description": "Create a REST API Gateway with a S3 read-only integraation",
+    "description": "Create a REST API Gateway with a S3 read-only integration",
     "language": "",
     "level": "200",
     "framework": "SAM",
