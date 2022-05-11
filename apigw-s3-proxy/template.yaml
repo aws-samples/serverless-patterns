@@ -1,0 +1,149 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway REST API with S3 integration
+
+Resources:
+  
+  # REST API
+  AppApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: apigw-s3-proxy
+      Description: S3 integraton REST API demo
+
+  ResourceFolder:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref AppApi
+      ParentId: !GetAtt AppApi.RootResourceId
+      PathPart: '{folder}'
+
+  ResourceItem:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref AppApi
+      ParentId: !Ref ResourceFolder
+      PathPart: '{item}'
+
+  RootMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref AppApi
+      ResourceId: !GetAtt AppApi.RootResourceId
+      HttpMethod: GET
+      AuthorizationType: AWS_IAM
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: GET
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:s3:path//
+        Credentials: !GetAtt ApiGatewayS3ReadOnlyRole.Arn
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Content-Length: integration.response.header.Content-Length
+              method.response.header.Content-Type: integration.response.header.Content-Type
+              method.response.header.Timestamp: integration.response.header.Date
+          - StatusCode: 400
+            SelectionPattern: 4\d{2}
+          - StatusCode: 500
+            SelectionPattern: 5\d{2}
+        PassthroughBehavior: WHEN_NO_MATCH
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Content-Length: true
+            method.response.header.Content-Type: true
+            method.response.header.Timestamp: true
+        - StatusCode: 400
+        - StatusCode: 500
+
+  FolderMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref AppApi
+      ResourceId: !Ref ResourceFolder
+      HttpMethod: GET
+      AuthorizationType: AWS_IAM
+      RequestParameters:
+        method.request.path.folder: true
+        method.request.header.Content-Type: true
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: GET
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:s3:path/{bucket}
+        Credentials: !GetAtt ApiGatewayS3ReadOnlyRole.Arn
+        IntegrationResponses:
+        - StatusCode: 200
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestParameters:
+          integration.request.header.Content-Type: method.request.header.Content-Type
+          integration.request.path.bucket: method.request.path.folder
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+
+  ItemMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref AppApi
+      ResourceId: !Ref ResourceItem
+      HttpMethod: GET
+      AuthorizationType: AWS_IAM
+      RequestParameters:
+        method.request.path.item: true
+        method.request.path.folder: true
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: GET
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:s3:path/{bucket}/{object}
+        Credentials: !GetAtt ApiGatewayS3ReadOnlyRole.Arn
+        IntegrationResponses:
+        - StatusCode: 200
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestParameters:
+          integration.request.path.bucket: method.request.path.folder
+          integration.request.path.object: method.request.path.item
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+
+  Deployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+    - RootMethodGet
+    Properties:
+      RestApiId: !Ref AppApi
+  
+  Stage:  
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: Prod
+      RestApiId: !Ref AppApi
+      DeploymentId: !Ref Deployment
+
+  ApiGatewayS3ReadOnlyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - apigateway.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+
+Outputs:
+
+  # API Gateway endpoint to be used during tests
+  AppApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
