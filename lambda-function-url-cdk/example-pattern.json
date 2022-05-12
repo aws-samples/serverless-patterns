@@ -14,7 +14,7 @@
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-function-url-cdk",
       "templateURL": "serverless-patterns/lambda-function-url-cdk",
-      "projectFolder": "lambda-function-url-cdk",
+      "projectFolder": "lambda-function-url-cdk"
     }
   },
   "resources": {
