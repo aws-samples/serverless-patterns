@@ -1,0 +1,60 @@
+{
+    "title": "Amazon API Gateway with a S3 integration",
+    "description": "Create a REST API Gateway with a S3 read-only integration",
+    "language": "",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern deploys an Amazon API Gateway REST API endpoint with a S3 read-only integration",
+        "The API exposes 3 GET methods:",
+        "Root GET method: it provides a list of the S3 buckets of the account where the stack is deployed.",
+        "{folder} GET method: it provides a list of the objects contained in the bucket {folder}",
+        "{item} GET method: it returns the contents of the object {item}.",
+        "The template also deploys an IAM role with S3 read-only capabilities that is used by API Gateway to integrate with S3.",
+        "Since this is API Gateway effectively acts as a proxy S3, every GET method is protected by IAM authentication to prevent public access."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-s3-proxy",
+        "templateURL": "serverless-patterns/apigw-s3-proxy",
+        "projectFolder": "apigw-s3-proxy",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "REST API with S3 integration",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-s3.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "Deploy the stack: <code>sam deploy</code>."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "headline": "Presented by Albert Blaya, Solutions Architect",
+        "name": "Albert Blaya",
+        "image": "https://media-exp1.licdn.com/dms/image/C5603AQEw2HXx9zs7yg/profile-displayphoto-shrink_200_200/0/1600474292127?e=1655942400&v=beta&t=SbeIn9psV0BIFkbROTDRIfPMKMtyrrgBdgt0tRHY0BY",
+        "bio": "Albert is a Solutions Architect at Amazon Web Services based in Australia.",
+        "linkedin": "albertblaya"
+      }
+    ]
+  }
+  
