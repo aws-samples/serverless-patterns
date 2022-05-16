@@ -44,7 +44,7 @@ In the end, you should have deployed in two different regions:
 
 * 1 SQS
 * 1 Event Bridge Bus
-
+* 1 Global endpoint in the primary region
 ```
 
 ## Testing
