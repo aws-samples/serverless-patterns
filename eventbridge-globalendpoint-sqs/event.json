@@ -1,0 +1,7 @@
+[
+  {
+    "DetailType": "something",
+    "Source": "custom.myApp",
+    "Detail": "{\"location\":\"EUR-\"}"
+  }
+]
