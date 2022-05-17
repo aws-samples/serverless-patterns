@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway Edge Custom Domain Name
+
+Parameters:
+
+  DomainName:
+    Type: String
+
+  CertificateArn:
+    Type: String
+
+  PublicHostedZoneId:
+    Type: String
+  
+  ApiId: 
+    Type: String
+  
+  Stage:
+    Type: String
+
+Resources:
+  
+  CustomDomainEdge:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !Ref DomainName
+      CertificateArn: !Ref CertificateArn
+      SecurityPolicy: TLS_1_2
+      EndpointConfiguration:
+        Types:
+          - EDGE 
+
+  MappingRestEdge:curc
+    Type: AWS::ApiGateway::BasePathMapping
+    DependsOn:
+      - CustomDomainEdge
+    Properties: 
+      DomainName: !Ref DomainName
+      RestApiId: !Ref ApiId
+      Stage: !Ref Stage
+
+  Route53AliasRecordEdge:
+    Type: AWS::Route53::RecordSet
+    DependsOn:
+      - CustomDomainEdge
+    Properties:
+      Name: !Ref DomainName
+      Type: A
+      HostedZoneId: !Ref PublicHostedZoneId
+      AliasTarget:
+        DNSName: !GetAtt CustomDomainEdge.DistributionDomainName
+        HostedZoneId: !GetAtt CustomDomainEdge.DistributionHostedZoneId
+
+Outputs:
+
+  # Edge Custom Domain Name endpoint to be used during tests
+  EdgeCustomDomainNameEndpoint:
+    Description: Edge Custom Domain Name endpoint
+    Value: !Sub "https://${DomainName}"
