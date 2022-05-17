@@ -1,5 +1,6 @@
 // Declare constants reqiured for the signature process
 const crypto = require('crypto');
+const qs = require('querystring');
 const emptyHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 // CloudFront includes the x-amz-cf-id header in the signature for custom origins
 const signedHeadersCustomOrigin = 'host;x-amz-cf-id;x-amz-content-sha256;x-amz-date;x-amz-security-token';
@@ -11,7 +12,7 @@ const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN } = process.
 // Since the function is configured to be executed on origin request events, the handler
 // is executed every time CloudFront needs to go back to the origin, which is S3 here.
 exports.handler = async event => {
-    console.log("event=" + JSON.stringify(event))
+    console.log("xx event=" + JSON.stringify(event))
     // Retrieve the original request that CloudFront was going to send to S3
     const request = event.Records[0].cf.request;
 
@@ -29,6 +30,7 @@ exports.handler = async event => {
     const sigv4Options = {
         method: request.method,
         path: request.origin[originType].path + request.uri,
+        query: request.querystring,
         credentials: {
             accessKeyId: AWS_ACCESS_KEY_ID,
             secretAccessKey: AWS_SECRET_ACCESS_KEY,
@@ -58,8 +60,6 @@ exports.handler = async event => {
 
 
 // Helper functions to sign the request using AWS Signature Version 4
-// This helper only works for S3, using GET/HEAD requests, without query strings
-// https://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
 function signV4(options) {
     // Infer the region from the host header
     // Create the canonical request
@@ -67,15 +67,13 @@ function signV4(options) {
     const date = (new Date()).toISOString().replace(/[:-]|\.\d{3}/g, '');
     let canonicalHeaders = '';
     let signedHeaders = '';
-    //if (options.originType == 's3') {
-    //    canonicalHeaders = ['host:'+options.host, 'x-amz-content-sha256:'+emptyHash, 'x-amz-date:'+date, 'x-amz-security-token:'+options.credentials.sessionToken].join('\n');
-    //    signedHeaders = signedHeadersGeneric;
-    //} else {
     canonicalHeaders = ['host:'+options.host, 'x-amz-cf-id:'+options.xAmzCfId, 'x-amz-content-sha256:'+emptyHash, 'x-amz-date:'+date, 'x-amz-security-token:'+options.credentials.sessionToken].join('\n');
     signedHeaders = signedHeadersCustomOrigin;
-    //}
+    const requestParameters = createCanonicalQS(options.query);
+
     const canonicalURI = encodeRfc3986(encodeURIComponent(decodeURIComponent(options.path).replace(/\+/g, ' ')).replace(/%2F/g, '/'));
-    const canonicalRequest = [options.method, canonicalURI, '', canonicalHeaders + '\n', signedHeaders,emptyHash].join('\n');
+    const canonicalRequest = [options.method, canonicalURI, requestParameters, canonicalHeaders + '\n', signedHeaders,emptyHash].join('\n');
+    console.log("canonicalRequest="+canonicalRequest);
     // Create string to sign
     const credentialScope = [date.slice(0, 8), region, 'execute-api/aws4_request'].join('/');
     const stringToSign = ['AWS4-HMAC-SHA256', date, credentialScope, hash(canonicalRequest, 'hex')].join('\n');
@@ -84,7 +82,7 @@ function signV4(options) {
     // Form the authorization header
     const authorizationHeader = ['AWS4-HMAC-SHA256 Credential=' + options.credentials.accessKeyId + '/' + credentialScope,'SignedHeaders=' + signedHeaders,'Signature=' + signature].join(', ');
 
-    // return required headers for Sigv4 to be added to the request to S3
+    // return required headers for Sigv4 to be added to the request
     return {
         'Authorization': authorizationHeader,
         'X-Amz-Content-Sha256' : emptyHash,
@@ -93,8 +91,23 @@ function signV4(options) {
     };
 }
 
+function createCanonicalQS(input_qs){
+	let canonicalQS='';
+	let qsparsed = qs.parse(input_qs);
+	Object.keys(qsparsed).sort().forEach((param)=>{
+		canonicalQS += encodeQS(param)+'='+encodeQS(qsparsed[param])+'&'
+	});
+	canonicalQS = canonicalQS.slice(0, -1);
+
+	return canonicalQS;
+}
+
+function encodeQS(input_str){
+	return input_str.replace(/[!'()*=]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase())
+}
+
 function encodeRfc3986(urlEncodedStr) {
-  return urlEncodedStr.replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase())
+  return urlEncodedStr.replace(/[!'()*]/g, c => '%25' + c.charCodeAt(0).toString(16).toUpperCase())
 }
 
 function hash(string, encoding) {
