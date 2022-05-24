@@ -3,8 +3,8 @@ const filesToCheck = ['template.yml', 'template.yaml'];
 
 const args = process.argv.slice(2);
 
-const newFiles = args[0].split(',');
-const modifiedFiles = args[1].split(',');
+const newFiles = args[0] ? args[0].split(',') : [];
+const modifiedFiles = args[1] ? args[1].split(',') : [];
 
 const getValidFilesForCfnNag = (files) => files.filter((file) => filesToCheck.some((validFile) => file.includes(validFile)));
 
