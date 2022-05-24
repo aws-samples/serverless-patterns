@@ -1,0 +1,146 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Defines the global endpoint for eventbridge
+
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  StageName:
+    Type: String
+    Default: dev
+  PrimaryRegion:
+    Type: String
+    Default: eu-central-1
+  SecondaryRegion:
+    Type: String
+    Default: eu-west-1
+  HealthCheckName:
+    Description: Name of the health check
+    Type: String
+    Default: LatencyFailuresHealthCheck
+  HighLatencyAlarmPeriod:
+    Description: The period, in seconds, over which the statistic is applied. Valid values are 10, 30, 60, and any multiple of 60.
+    MinValue: 10
+    Type: Number
+    Default: 60
+  MinimumEvaluationPeriod:
+    Description: The number of periods over which data is compared to the specified threshold. You must have at least one evaluation period.
+    MinValue: 1
+    Type: Number
+    Default: 5
+  MinimumThreshold:
+    Description: The value to compare with the specified statistic.
+    Type: Number
+    Default: 30000
+  TreatMissingDataAs:
+    Description: Sets how this alarm is to handle missing data points.
+    Type: String
+    AllowedValues:
+    - breaching
+    - notBreaching
+    - ignore
+    - missing
+    Default: breaching
+
+##########################################################################
+#  Mappings                                                              #
+##########################################################################
+Mappings:
+ InsufficientDataMap:
+  missing:
+    HCConfig: "LastKnownStatus"
+  breaching:
+    HCConfig: "Unhealthy"
+Resources:
+##########################################################################
+#   Global Endpoint Role                                                 #
+##########################################################################
+  GlobalEndpointRole:
+    Type: AWS::IAM::Role
+    Properties:
+      # Path: '/service-role/'  needed if you set ReplicationConfig: State: "ENABLED" in AWS::Events::Endpoint
+      RoleName: !Sub GlobalEndpointRole-${StageName}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: AllowGlobalEndpoint
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "events:PutRule"
+                  - "events:PutTargets"
+                  - "events:DeleteRule"
+                  - "events:RemoveTargets"
+                Resource: !Sub "arn:aws:events:*:${AWS::AccountId}:rule/my-event-bus-${StageName}/GlobalEndpointManagedRule-*"
+              - Effect: Allow
+                Action:
+                  - "events:PutEvents"
+                Resource: !Sub "arn:aws:events:*:${AWS::AccountId}:event-bus/my-event-bus-${StageName}"
+              - Effect: Allow
+                Action:
+                  - "iam:PassRole"
+                Resource: !Sub "arn:aws:iam::${AWS::AccountId}:role/service-role/GlobalEndpointRole-${StageName}*"
+                Condition:
+                  StringLike:
+                     "iam:PassedToService": "events.amazonaws.com"
+
+##########################################################################
+#   Event Endpoint                                                       #
+##########################################################################
+  SampleEndpoint:
+      Type: AWS::Events::Endpoint
+      Properties:
+        Name: !Sub MyEndpoint-${StageName}
+        RoutingConfig:
+          FailoverConfig:
+            Primary:
+              HealthCheck: !Sub "arn:aws:route53:::healthcheck/${LatencyHealthCheck}"
+            Secondary:
+              Route: !Sub ${SecondaryRegion}
+        RoleArn: !GetAtt GlobalEndpointRole.Arn
+        ReplicationConfig:
+          State: "DISABLED"
+        EventBuses:
+          - EventBusArn: !Sub "arn:aws:events:${PrimaryRegion}:${AWS::AccountId}:event-bus/my-event-bus-${StageName}"
+          - EventBusArn: !Sub "arn:aws:events:${SecondaryRegion}:${AWS::AccountId}:event-bus/my-event-bus-${StageName}"
+
+  ##########################################################################
+  #   Health check                                                         #
+  ##########################################################################
+  HighLatencyAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: High Latency in Amazon EventBridge
+      MetricName: !Sub IngestionToInvocationStartLatency-${StageName}
+      Namespace: AWS/Events
+      Statistic: Average
+      Period: !Ref HighLatencyAlarmPeriod
+      EvaluationPeriods: !Ref MinimumEvaluationPeriod
+      Threshold: !Ref MinimumThreshold
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: !Ref TreatMissingDataAs
+
+  LatencyHealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Properties:
+      HealthCheckTags:
+        - Key: Name
+          Value: !Ref HealthCheckName
+      HealthCheckConfig:
+        Type: CLOUDWATCH_METRIC
+        AlarmIdentifier:
+          Name: !Ref HighLatencyAlarm
+          Region: !Ref AWS::Region
+        InsufficientDataHealthStatus: !FindInMap [InsufficientDataMap, !Ref TreatMissingDataAs, HCConfig]
+    
+

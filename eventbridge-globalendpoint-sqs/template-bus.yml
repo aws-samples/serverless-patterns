@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - EventBridge to SQS
+
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  StageName:
+    Type: String
+    Default: dev
+
+Resources:
+##########################################################################
+#   EventBus                                                             #
+##########################################################################
+  MyEventsBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub my-event-bus-${StageName}
+
+##########################################################################
+#   Rules                                                                #
+##########################################################################
+  MyEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: EventRule
+      EventBusName: !Ref MyEventsBus
+      EventPattern:
+        source:
+          - custom.myApp
+        detail-type:
+          - something
+      State: ENABLED
+      Targets:
+        - Arn: 
+            Fn::ImportValue: !Sub MySqsQueueArn-${StageName}
+          InputPath: $.detail
+          Id: !Sub MySqsQueueArn-${StageName}
+
+Outputs:
+  MyEventsBus:
+    Description: MyEventsBus
+    Value: !Ref MyEventsBus
+    Export:
+      Name: !Sub MyEventsBus-Name-${AWS::Region}-${StageName}
+  MyEventsBusArn:
+    Description: MyEventsBus ARN
+    Value: !GetAtt MyEventsBus.Arn
+    Export:
+      Name: !Sub MyEventsBus-Arn-${AWS::Region}-${StageName}
