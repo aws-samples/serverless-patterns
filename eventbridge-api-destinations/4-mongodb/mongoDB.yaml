@@ -10,6 +10,7 @@ Parameters:
     Type: String
     Default: '<<Enter your APIKeyName>>'
   MyAPIKeyValue:
+    NoEcho: True
     Type: String
     Default: '<<Enter your APIKeyValue>>' 
 
@@ -32,7 +33,7 @@ Resources:
           BodyParameters:
             - Key: 'api-key'
               Value: !Ref MyAPIKeyValue
-              IsValueSecret: false
+              IsValueSecret: true
 
   MyApiDestination:
     Type: AWS::Events::ApiDestination
