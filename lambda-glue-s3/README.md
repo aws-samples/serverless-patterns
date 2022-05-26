@@ -15,35 +15,35 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Deployment Instructions
 
-1.Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ```
+ 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-2.Change directory to the pattern directory:
-    ```
-    cd lambda-glue-s3
-    ```
-3.Create a virtual environment for python:
-    ```
-    python3 -m venv .venv
-    ```
-4.Activate the virtual environment:
-    ```
-    source .venv/bin/activate
-    ```
-5.Install python modules:
-    ```
-    python3 -m pip install -r requirements.txt
-    ```
-6.From the command line, use CDK to synthesize the CloudFormation template and check for errors:
-    ```
-    cdk synth
-    ```
-7.From the command line, use CDK to deploy the stack:
-    ```
-    cdk deploy
-    ```
-8.Note the outputs from the CDK deployment process. These contain the lambda ARN , Glue Job Name and S3 Bucket Name which are used for testing.
+ 2. Change directory to the pattern directory:
+     ```
+     cd lambda-glue-s3
+     ```
+ 3. Create a virtual environment for python: 
+     ```
+     python3 -m venv .venv
+     ```
+ 4. Activate the virtual environment: 
+     ```
+     source .venv/bin/activate
+     ```
+ 5. Install python modules:
+     ```
+     python3 -m pip install -r requirements.txt
+     ```
+ 6. From the command line, use CDK to synthesize the CloudFormation template and check for errors:
+     ```
+     cdk synth
+     ```
+ 7. From the command line, use CDK to deploy the stack: 
+     ```
+     cdk deploy
+     ```
+ 8. Note the outputs from the CDK deployment process. These contain the lambda ARN , Glue Job Name and S3 Bucket Name which are used for testing.
 
 ## How it works
 
@@ -55,32 +55,32 @@ Task the glue job needs to perform is documented in script.py where we are conve
 
 ## Testing
 
-Use the [AWS CLI] (https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) to invoke the Lambda function. The function name is in the outputs of the AWS CDK deployment
+Use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) to invoke the Lambda function. The function name is in the outputs of the AWS CDK deployment
 
-1.Invoke the Lambda function to start the AWS Glue job:
-	 ```
+ 1. Invoke the Lambda function to start the AWS Glue job:
+    ```
     aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME --payload '{}' /tmp/response.json
     ```
-2.Check the status of the AWS Glue job and wait for the status to be SUCCEEDED
-    ```
-    aws glue get-job-runs --job-name "ENTER_YOUR_GLUE_JOB_NAME"
-    ```
-3.List down the files present in S3 bucket for find the csv converted file with .parquet format
-    ```
-    aws s3 ls s3://ENTER_YOUR_S3_BUCKET_NAME --recursive --human-readable --summarize
-    ```
-
+ 2. Check the status of the AWS Glue job and wait for the status to be SUCCEEDED
+     ```
+     aws glue get-job-runs --job-name "ENTER_YOUR_GLUE_JOB_NAME"
+     ```
+ 3. List down the files present in S3 bucket for find the csv converted file with .parquet format
+     ```
+     aws s3 ls s3://ENTER_YOUR_S3_BUCKET_NAME --recursive --human-readable --summarize
+     ```
+ 
 ## Cleanup
 
-1.Delete the stack
-	 ```
+ 1. Delete the stack
+    ```
     cdk destroy
     ```
-2.Confirm the stack has been deleted
+ 2. Confirm the stack has been deleted
     ```
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'ENTER_STACK_NAME')].StackStatus"
     ```
-
+ 
 ## Useful commands
 
  * `cdk ls`          list all stacks in the app
