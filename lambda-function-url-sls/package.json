@@ -1,0 +1,24 @@
+{
+  "name": "lambda-function-url-sls",
+  "description": "AWS lambda function URL example using the serverless framework",
+  "version": "1.0.0",
+  "license": "MIT-0",
+  "scripts": {
+    "localGetTest": "sls invoke local --function hellolambda --path test/getHello.json ",
+    "localPostTest": "sls invoke local --function hellolambda --path test/postHello.json ",
+    "localDeleteTest": "sls invoke local --function hellolambda --path test/deleteHello.json "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aws-samples/serverless-patterns.git"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.1",
+    "@types/aws-lambda": "^8.10.93",
+    "serverless-prune-plugin": "^2.0.1",
+    "serverless-bundle": "^5.3.0",
+    "serverless-iam-roles-per-function": "^3.2.0",
+    "ts-loader": "^9.2.8",
+    "typescript": "^4.6.3"
+  }
+}

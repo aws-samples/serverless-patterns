@@ -1,0 +1,37 @@
+{
+  "version": "2.0",
+  "routeKey": "$default",
+  "rawPath": "/mytest",
+  "rawQueryString": "",
+  "headers": {
+    "x-amzn-trace-id": "Root=1-X-XX",
+    "x-forwarded-proto": "https",
+    "postman-token": "XX-XX-XX-XX-XX",
+    "host": "XX.lambda-url.us-east-1.on.aws",
+    "x-forwarded-port": "443",
+    "x-forwarded-for": "1.2.3.4",
+    "accept-encoding": "gzip, deflate, br",
+    "accept": "*/*",
+    "user-agent": "PostmanRuntime/7.29.0"
+  },
+  "requestContext": {
+    "accountId": "anonymous",
+    "apiId": "XX",
+    "domainName": "XX.lambda-url.us-east-1.on.aws",
+    "domainPrefix": "XX",
+    "http": {
+      "method": "POST",
+      "path": "/mytest",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "1.2.3.4",
+      "userAgent": "PostmanRuntime/7.29.0"
+    },
+    "requestId": "X-X-X-X-X",
+    "routeKey": "$default",
+    "stage": "$default",
+    "time": "29/Apr/2022:18:28:33 +0000",
+    "timeEpoch": "1651256913211"
+  },
+  "body": "{ \"greetings\":\"foobar\"}",
+  "isBase64Encoded": "false"
+}
