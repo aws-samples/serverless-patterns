@@ -16,14 +16,14 @@ Important: this application uses various AWS services and there are costs associ
 ## Deployment Instructions
 
  1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
+    ```
     git clone https://github.com/aws-samples/serverless-patterns
     ```
  2. Change directory to the pattern directory:
      ```
      cd cdk-sfn-s3
      ```
- 3. Install dependencies: 
+ 3. Install dependencies:
      ```
      npm install
      ```
@@ -43,9 +43,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The AWS CDK  template deploys a Step Functions workflow that publishes an event to an EventBridge event bus. 
-An IAM Role allows the workflow execution to publish events onto the event bus. 
-An EventBridge rule forwards all events to a CloudWatch Logs log group for easy inspection.
+The AWS CDK  template deploys a Step Functions workflow that performs the specified task of putting the object onto the S3 bucket.
+
 
 ## Testing
 
@@ -60,7 +59,7 @@ Use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2
      aws s3 ls my-sfn-bucket-destination
      2022-06-06 14:53:12         17 filename.txt
      ```
- 
+
 ## Cleanup
 
  1. Delete the stack
@@ -71,7 +70,7 @@ Use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2
     ```
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'ENTER_STACK_NAME')].StackStatus"
     ```
- 
+
 ## Useful commands
 
  * `cdk ls`          list all stacks in the app
