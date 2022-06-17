@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: > 
+  Serverless patterns - Amazon API Gateway WebSocket Endpoint to 
+  AWS Step Functions Express, Synchronous invocation
+
+Parameters:
+  ApiStageName:
+    Description: Name of WebSockets API stage
+    Type: String
+    Default: api  
+
+# Comment each resource section to explain usage
+Resources:
+#######################################################
+#   API Gateway WebSocket API
+#######################################################
+  WebSocketApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-WebSocketApi"
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - DefaultRoute
+    Properties:
+      ApiId: !Ref WebSocketApi
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: !Ref ApiStageName
+      DeploymentId: !Ref Deployment
+      ApiId: !Ref WebSocketApi
+
+##########################################################################
+#   Default route implementation including request and response
+##########################################################################
+
+  DefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $default
+      AuthorizationType: NONE
+      OperationName: DefaultRoute
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref DefaultRouteIntegration
+
+  DefaultRouteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS
+      IntegrationMethod: POST
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:states:action/StartSyncExecution"
+      CredentialsArn: !Sub "${StepFunctionsSyncExecutionRole.Arn}" 
+      TemplateSelectionExpression: \$default
+      RequestTemplates: 
+        "$default" : 
+          Fn::Sub: >
+            #set($sfn_input=$util.escapeJavaScript($input.body).replaceAll("\\'","'"))
+            { 
+              "input": "$sfn_input",
+              "stateMachineArn": "${SyncSFn}"
+            }
+
+  DefaultRouteResponse: 
+    Type: AWS::ApiGatewayV2::RouteResponse
+    Properties:
+      RouteId: !Ref DefaultRoute
+      ApiId: !Ref WebSocketApi
+      RouteResponseKey: $default
+
+  DefaultRouteIntegrationResponse:
+    Type: AWS::ApiGatewayV2::IntegrationResponse
+    Properties: 
+      ApiId: !Ref WebSocketApi
+      IntegrationId: !Ref DefaultRouteIntegration
+      IntegrationResponseKey: $default
+
+#######################################################
+#   Step Functions Express for synchronous execution  
+#######################################################
+  SyncSFn:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        Comment: Sample Expess Workflow for Synchronous Execution by API Gateway
+        StartAt: Wait for 3 Seconds
+        States:
+          Wait for 3 Seconds:
+            Type: Wait
+            Seconds: 3
+            End: true
+      Role: !Sub "${SyncSFnRole.Arn}" 
+      Tracing:
+        Enabled: true
+
+  SyncSFnRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service:
+                - states.amazonaws.com
+      Path: /
+
+  StepFunctionsSyncExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyName: StepFunctionsSyncExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "states:StartSyncExecution"
+                Resource: !Ref SyncSFn
+
+# List all common outputs for usage
+Outputs:
+  APIEndpoint:
+    Description: "API Gateway WebSocket endpoint URL"
+    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStageName}"
+
