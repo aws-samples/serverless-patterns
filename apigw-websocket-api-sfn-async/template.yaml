@@ -1,0 +1,170 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: > 
+  Serverless patterns - Amazon API Gateway WebSocket Endpoint to 
+  AWS Step Functions Standard, asynchronous invocation
+
+Parameters:
+  ApiStageName:
+    Description: Name of WebSockets API stage
+    Type: String
+    Default: api  
+
+# Comment each resource section to explain usage
+Resources:
+#######################################################
+#   API Gateway WebSocket API
+#######################################################
+  WebSocketApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-WebSocketApi"
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - DefaultRoute
+    Properties:
+      ApiId: !Ref WebSocketApi
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: !Ref ApiStageName
+      DeploymentId: !Ref Deployment
+      ApiId: !Ref WebSocketApi
+
+##########################################################################
+#   Default route implementation including request and response
+##########################################################################
+
+  DefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $default
+      AuthorizationType: NONE
+      OperationName: DefaultRoute
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref DefaultRouteIntegration
+
+  DefaultRouteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS
+      IntegrationMethod: POST
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:states:action/StartExecution"
+      CredentialsArn: !Sub "${StepFunctionsAsyncExecutionRole.Arn}" 
+      TemplateSelectionExpression: \$default
+      RequestTemplates: 
+        "$default" : 
+          Fn::Sub: >
+            #set($sfn_input=$util.escapeJavaScript($input.body).replaceAll("\\'","'"))
+            { 
+              "input": "{\"data\":$sfn_input, \"ConnectionID\":\"$context.connectionId\"}",
+              "stateMachineArn": "${AsyncSFn}"
+            }
+
+  DefaultRouteResponse: 
+    Type: AWS::ApiGatewayV2::RouteResponse
+    Properties:
+      RouteId: !Ref DefaultRoute
+      ApiId: !Ref WebSocketApi
+      RouteResponseKey: $default
+
+  DefaultRouteIntegrationResponse:
+    Type: AWS::ApiGatewayV2::IntegrationResponse
+    Properties: 
+      ApiId: !Ref WebSocketApi
+      IntegrationId: !Ref DefaultRouteIntegration
+      IntegrationResponseKey: $default
+
+#######################################################
+#   Step Functions Standard for asynchronous execution  
+#######################################################
+  AsyncSFn:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      Definition:
+        Comment: Sample Standard Workflow for Asynchronous Execution by API Gateway
+        StartAt: Wait for 5 Seconds
+        States:
+          Wait for 5 Seconds:
+            Type: Wait
+            Seconds: 5
+            Next: Send Message to WebSocket Client
+          Send Message to WebSocket Client:
+            Type: Task
+            Resource: arn:aws:states:::apigateway:invoke
+            Parameters:
+              ApiEndpoint: !Sub "${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com"
+              Method: POST
+              Stage: !Sub "${ApiStageName}"
+              Path.$: "States.Format('/@connections/{}', $.ConnectionID)"
+              RequestBody:
+                Message: Hello from asynchronous workflow execution!
+              AuthType: IAM_ROLE
+            End: true
+      Role: !Sub "${AsyncSFnRole.Arn}" 
+      Tracing:
+        Enabled: true
+
+  AsyncSFnRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service:
+                - states.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyName: APIGWConnectionsAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "execute-api:ManageConnections"
+                Resource:
+                  - !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/api/POST/@connections/{connectionId}"
+
+  StepFunctionsAsyncExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyName: StepFunctionsAsyncExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "states:StartExecution"
+                Resource: !Ref AsyncSFn
+
+# List all common outputs for usage
+Outputs:
+  APIEndpoint:
+    Description: "API Gateway WebSocket endpoint URL"
+    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStageName}"
+
