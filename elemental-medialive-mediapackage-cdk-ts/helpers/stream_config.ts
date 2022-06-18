@@ -12,14 +12,11 @@ export type IMediaLiveConfig = {
 
   stream_name: string;
   inputSecurityGroup: string;
-  inputSpecification: {
-    codec: string;
-    maximumBitrate: string;
-    resolution: string;
-  };
-  audioDescriptions: medialive.CfnChannel.AudioDescriptionProperty[];
-  videoDescriptions: medialive.CfnChannel.VideoDescriptionProperty[];
-  outputGroups: medialive.CfnChannel.OutputGroupProperty[];
+  mediaPackageChannelId: string;
+  streamName: string;
+  codec: string;
+  name: string;
+  encodingProfile: string;
 }
 
 
