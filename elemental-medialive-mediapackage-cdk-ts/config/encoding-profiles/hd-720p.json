@@ -313,7 +313,7 @@
           "flickerAq": "ENABLED",
           "framerateControl": "SPECIFIED",
           "framerateNumerator": 30,
-          "fFramerateDenominator": 1,
+          "framerateDenominator": 1,
           "gopBReference": "ENABLED",
           "gopClosedCadence": 1,
           "gopNumBFrames": 3,

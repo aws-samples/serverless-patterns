@@ -4,5 +4,5 @@
   "mediaPackageChannelId": "mychannel",
   "codec": "AVC",
   "name": "mychannel",
-  "encodingProfile" : "HD-1080p"
+  "encodingProfile" : "SD-540p"
 }
