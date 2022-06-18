@@ -1,8 +1,7 @@
 {
-  "hls": false,
+  "hls": true,
   "dash": true,
-  "mss": false,
-  "id_channel": "test-channel",
+  "mss": true,
   "hls_segment_duration_seconds": 5,
   "hls_playlist_window_seconds": 60,
   "hls_max_video_bits_per_second": 2147483647,

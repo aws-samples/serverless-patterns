@@ -11,12 +11,13 @@ export type IMediaConnectConfig = {
 export type IMediaLiveConfig = {
 
   stream_name: string;
-  inputSecurityGroup: string;
-  mediaPackageChannelId: string;
+  inputCidr: string;
   streamName: string;
   codec: string;
-  name: string;
   encodingProfile: string;
+  type: string;
+  priUrl: string;
+  secUrl: string;
 }
 
 
@@ -25,7 +26,6 @@ export type IMediaPackageConfig = {
   hls: boolean;
   dash: boolean;
   mss: boolean;
-  id_channel: string;
   ip_sg_input: string;
   stream_name: string;
   hls_segment_duration_seconds: number;
