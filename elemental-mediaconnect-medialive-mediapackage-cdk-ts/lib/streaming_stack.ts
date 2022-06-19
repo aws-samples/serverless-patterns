@@ -28,6 +28,8 @@ export class StreamingStack extends Stack {
       mediaConnect.flowArnB
     );
 
+    mediaLiveChannel.node.addDependency(mediaConnect);
+
 
     //Add dependencyto wait for MediaPackage channel to be ready before deploying MediaLive
     const mediadep = new DependencyGroup();

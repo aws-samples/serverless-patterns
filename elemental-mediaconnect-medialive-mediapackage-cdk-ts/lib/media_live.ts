@@ -22,6 +22,42 @@ export class MediaLive extends Construct {
 
     const config = loadMediaLiveConfig();
 
+    const policy = {
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Effect: "Allow",
+          Action: [
+            "mediaconnect:ManagedDescribeFlow",
+            "mediaconnect:ManagedAddOutput",
+            "mediaconnect:ManagedRemoveOutput",
+            "mediaconnect:AddFlowMediaStreams",
+            "mediaconnect:AddFlowOutputs",
+            "mediaconnect:AddFlowSources",
+            "mediaconnect:CreateFlow",
+            "mediaconnect:DeleteFlow",
+          ],
+          Resource: mediaConnectFlowA,
+        },
+        {
+          Effect: "Allow",
+          Action: [
+            "mediaconnect:ManagedDescribeFlow",
+            "mediaconnect:ManagedAddOutput",
+            "mediaconnect:ManagedRemoveOutput",
+            "mediaconnect:AddFlowMediaStreams",
+            "mediaconnect:AddFlowOutputs",
+            "mediaconnect:AddFlowSources",
+            "mediaconnect:CreateFlow",
+            "mediaconnect:DeleteFlow",
+          ],
+          Resource: mediaConnectFlowB,
+        },
+      ],
+    };
+
+    console.log(policy)
+
     const role = new iam.Role(this, "MediaLiveAccessRole", {
       managedPolicies: [
         {
@@ -32,6 +68,9 @@ export class MediaLive extends Construct {
           managedPolicyArn: "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
         },
       ],
+      inlinePolicies: {
+        medialivecustom: iam.PolicyDocument.fromJson(policy),
+      },
       assumedBy: new iam.ServicePrincipal("medialive.amazonaws.com"),
     });
 
@@ -115,16 +154,11 @@ export class MediaLive extends Construct {
         params.encoderSettings as medialive.CfnChannel.EncoderSettingsProperty,
     });
 
-    new CfnOutput(this, "channelArn", {
+    new CfnOutput(this, "MediaLiveChannelArn", {
       exportName: Aws.STACK_NAME + "-CHANNEL-ARN",
       value: channelLive.attrArn,
     });
 
-    new CfnOutput(this, "MediaLiveInputID", { value: medialive_input.ref });
-
-    new CfnOutput(this, "MediaLiveEndpoint", {
-      value: Fn.join("", [Fn.select(0, medialive_input.attrDestinations)]),
-    });
 
     this.channelLive = channelLive;
   }
