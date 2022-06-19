@@ -40,3 +40,4 @@ export function loadMediaPackageConfig(): IMediaPackageConfig {
 
   return config as IMediaPackageConfig;
 }
+

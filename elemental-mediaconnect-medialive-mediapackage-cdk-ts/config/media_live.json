@@ -1,6 +1,5 @@
 {
   "streamName": "live",
-  "inputCidr": "0.0.0.0/0" ,
   "codec": "AVC",
   "encodingProfile" : "HD-1080p",
   "type" : "RTMP_PUSH",

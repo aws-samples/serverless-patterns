@@ -4,12 +4,13 @@ export type IMediaConnectConfig = {
     a: string;
     b: string;
   };
+  ingestPort: number;
+  minLatency: number;
 };
 
 export type IMediaLiveConfig = {
 
   stream_name: string;
-  inputCidr: string;
   streamName: string;
   codec: string;
   encodingProfile: string;

@@ -11,7 +11,13 @@ import { loadMediaLiveConfig } from "../helpers/configuration";
 export class MediaLive extends Construct {
   public readonly channelLive: medialive.CfnChannel;
 
-  constructor(scope: Construct, id: string, mediaPackageChannelId: string) {
+  constructor(
+    scope: Construct,
+    id: string,
+    mediaPackageChannelId: string,
+    mediaConnectFlowA: string,
+    mediaConnectFlowB: string
+  ) {
     super(scope, id);
 
     const config = loadMediaLiveConfig();
@@ -29,68 +35,27 @@ export class MediaLive extends Construct {
       assumedBy: new iam.ServicePrincipal("medialive.amazonaws.com"),
     });
 
-    const mediaLiveSG = new medialive.CfnInputSecurityGroup(
-      this,
-      "MediaLiveInputSecurityGroup",
-      {
-        whitelistRules: [
-          {
-            cidr: config.inputCidr,
-          },
-        ],
-      }
-    );
-
     //1. Create Input
 
-    var cfnInputProps: medialive.CfnInputProps = {
-      name: '',
-      type: '',
-      inputSecurityGroups: [],
+    const cfnInputProps: medialive.CfnInputProps = {
+      name: Aws.STACK_NAME + "_MyInput",
+      type: "MEDIACONNECT",
+      roleArn: role.roleArn,
+      mediaConnectFlows: [
+        {
+          flowArn: mediaConnectFlowA,
+        },
+        {
+          flowArn: mediaConnectFlowB,
+        },
+      ],
     };
 
-    switch (config.type) {
-
-      case "RTP_PUSH":
-        cfnInputProps = {
-          name: Aws.STACK_NAME + "_MyChannel",
-          type: config.type,
-          inputSecurityGroups: [mediaLiveSG.ref],
-        };
-        break;
-      case "RTMP_PUSH":
-        cfnInputProps = {
-          name: Aws.STACK_NAME + "_MyChannel",
-          type: config.type,
-          inputSecurityGroups: [mediaLiveSG.ref],
-          destinations: [
-            {
-              streamName: config.streamName + "/primary",
-            },
-            {
-              streamName: config.streamName + "/secondary",
-            },
-          ],
-        };
-        break;
-      case "RTMP_PULL":
-      case "URL_PULL":
-        cfnInputProps = {
-          name: Aws.STACK_NAME + "_MyInput",
-          type: config.type,
-          sources: [
-            {
-              url: config.priUrl,
-            },
-            {
-              url: config.secUrl,
-            },
-          ],
-        };
-        break;
-    }
-
-    const medialive_input = new medialive.CfnInput(this, "MediaInputChannel", cfnInputProps);
+    const medialive_input = new medialive.CfnInput(
+      this,
+      "MediaInputChannel",
+      cfnInputProps
+    );
 
     //2. Create Channel
     var params = {
@@ -162,7 +127,5 @@ export class MediaLive extends Construct {
     });
 
     this.channelLive = channelLive;
-
-
   }
 }
