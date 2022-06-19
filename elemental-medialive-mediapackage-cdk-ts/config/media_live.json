@@ -2,8 +2,8 @@
   "streamName": "live",
   "inputCidr": "0.0.0.0/0" ,
   "codec": "AVC",
-  "encodingProfile" : "SD-540p",
+  "encodingProfile" : "HD-1080p",
   "type" : "RTMP_PUSH",
-  "priUrl": "XXX",
-  "secUrl" : "XXX"
+  "priUrl": "PUT_YOUR_PRIMARY_RTMP_PULL_URL_HERE",
+  "secUrl" : "PUT_YOUR_SECONDARY_RTMP_PULL_URL_HERE"
 }

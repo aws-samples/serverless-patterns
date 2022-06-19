@@ -1,5 +1,3 @@
-import { aws_medialive as medialive } from "aws-cdk-lib";
-
 export type IMediaConnectConfig = {
   whitelistCidr: string;
   availabilityZone: {
