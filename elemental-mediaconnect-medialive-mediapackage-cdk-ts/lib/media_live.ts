@@ -37,26 +37,10 @@ export class MediaLive extends Construct {
             "mediaconnect:CreateFlow",
             "mediaconnect:DeleteFlow",
           ],
-          Resource: mediaConnectFlowA,
-        },
-        {
-          Effect: "Allow",
-          Action: [
-            "mediaconnect:ManagedDescribeFlow",
-            "mediaconnect:ManagedAddOutput",
-            "mediaconnect:ManagedRemoveOutput",
-            "mediaconnect:AddFlowMediaStreams",
-            "mediaconnect:AddFlowOutputs",
-            "mediaconnect:AddFlowSources",
-            "mediaconnect:CreateFlow",
-            "mediaconnect:DeleteFlow",
-          ],
-          Resource: mediaConnectFlowB,
-        },
+          Resource: [`arn:aws:mediaconnect:${Aws.REGION}:${Aws.ACCOUNT_ID}:*`]
+        }
       ],
     };
-
-    console.log(policy)
 
     const role = new iam.Role(this, "MediaLiveAccessRole", {
       managedPolicies: [
