@@ -22,9 +22,6 @@ export type IMediaLiveConfig = {
 
 export type IMediaPackageConfig = {
 
-  hls: boolean;
-  dash: boolean;
-  mss: boolean;
   ip_sg_input: string;
   stream_name: string;
   hls_segment_duration_seconds: number;
