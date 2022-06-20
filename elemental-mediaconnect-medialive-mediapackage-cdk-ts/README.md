@@ -17,13 +17,6 @@ The encoding profile used when deploying the stack is specified using the parame
 config/media_live.json
 ````
 
-The solution can be configured with the following input type:
-
-- RTP_PUSH
-- RTMP_PUSH
-- RTMP_PULL
-- URL_PULL
-
 3 encoding profiles are available:
 
 ```
