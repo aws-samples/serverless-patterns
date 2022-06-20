@@ -130,7 +130,7 @@ AWS MediaConnect -> AWS Elemental Media Live -> Aws Elemental Media Package
     Wait for the channel to start
 
     ```bash
-    while true ; do CHANNEL_STATUS=`aws medialive describe-channel --channel-id 5487010 --query "State" --output text` ; if [ $CHANNEL_STATUS == "RUNNING" ] ; then echo "Channel 5487010 is started" ; break ; else echo "Channel 5487010 is not started"; fi ; sleep 5 ; done
+    while true ; do CHANNEL_STATUS=`aws medialive describe-channel --channel-id 1726551 --query "State" --output text` ; if [ $CHANNEL_STATUS == "RUNNING" ] ; then echo "Channel 1726551 is started" ; break ; else echo "Channel 1726551 is not started"; fi ; sleep 5 ; done
     ```
 
 2. Start MediaConnect Flow A and B using the arn from the output above
@@ -161,13 +161,13 @@ AWS MediaConnect -> AWS Elemental Media Live -> Aws Elemental Media Package
 1. Stop Media Live channel
 
     ```bash
-    aws medialive stop-channel --channel-id 5487010
+    aws medialive stop-channel --channel-id 1726551
     ```
 
     Wait for the channel to stop
 
     ```bash
-    while true ; do CHANNEL_STATUS=`aws medialive describe-channel --channel-id 5487010 --query "State" --output text` ; if [ $CHANNEL_STATUS == "IDLE" ] ; then echo "Channel 5487010 is stopped" ; break ; else echo "Channel 5487010 is not stopped"; fi ; sleep 5 ; done
+    while true ; do CHANNEL_STATUS=`aws medialive describe-channel --channel-id 1726551 --query "State" --output text` ; if [ $CHANNEL_STATUS == "IDLE" ] ; then echo "Channel 1726551 is stopped" ; break ; else echo "Channel 1726551 is not stopped"; fi ; sleep 5 ; done
     ```
 
 2. Stop Media Connect FLOW A and FLOW B
