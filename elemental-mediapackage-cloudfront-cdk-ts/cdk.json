@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/elemental-mediapackage-cloudfront-cdk-ts.ts",
+  "app": "npx ts-node --prefer-ts-exts bin/streaming.ts",
   "watch": {
     "include": [
       "**"
