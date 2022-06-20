@@ -4,7 +4,6 @@ import { Construct } from "constructs";
 import { loadMediaConnectConfig } from "../helpers/configuration";
 
 export class MediaConnect extends Construct {
-
   public readonly flowArnA: string;
   public readonly flowArnB: string;
 
@@ -28,7 +27,6 @@ export class MediaConnect extends Construct {
       availabilityZone: config.availabilityZone.a,
     });
 
-
     const cfnFlowB = new mediaconnect.CfnFlow(this, "MyCfnFlowB", {
       name: Aws.STACK_NAME + "_" + "FlowB",
       source: {
@@ -46,27 +44,21 @@ export class MediaConnect extends Construct {
     this.flowArnB = cfnFlowB.attrFlowArn;
 
     new CfnOutput(this, "MediaConnectFlowA", {
-      exportName: Aws.STACK_NAME + "-FLOW-A-SRT",
       value:
         cfnFlowA.attrSourceIngestIp + ":" + cfnFlowA.attrSourceSourceIngestPort,
     });
 
     new CfnOutput(this, "MediaConnectFlowB", {
-      exportName: Aws.STACK_NAME + "-FLOW-B-SRT",
       value:
         cfnFlowB.attrSourceIngestIp + ":" + cfnFlowB.attrSourceSourceIngestPort,
     });
 
-
     new CfnOutput(this, "flowAArn", {
-      exportName: Aws.STACK_NAME + "-FLOW-A-ARN",
       value: cfnFlowA.attrFlowArn,
     });
 
     new CfnOutput(this, "flowBArn", {
-      exportName: Aws.STACK_NAME + "-FLOW-B-ARN",
       value: cfnFlowB.attrFlowArn,
     });
-
   }
 }

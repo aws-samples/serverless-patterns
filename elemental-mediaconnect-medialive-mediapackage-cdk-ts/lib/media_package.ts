@@ -37,11 +37,6 @@ export class MediaPackage extends Construct {
 
     hls_endpoint.node.addDependency(this.channel);
 
-    // Output the url stream to player
-    new CfnOutput(this, "HlsUrlStream", {
-      exportName: Aws.STACK_NAME + "-HLS-URL",
-      value: hls_endpoint.attrUrl,
-    });
 
     const dashPackage: mediapackage.CfnOriginEndpoint.DashPackageProperty = {
       segmentDurationSeconds: config.dash_segment_duration_seconds,
@@ -65,11 +60,7 @@ export class MediaPackage extends Construct {
 
     dash_endpoint.node.addDependency(this.channel);
 
-    // Output the url stream to player
-    new CfnOutput(this, "DashUrlStream", {
-      exportName: Aws.STACK_NAME + "-DASH-URL",
-      value: dash_endpoint.attrUrl,
-    });
+
     const mssPackage: mediapackage.CfnOriginEndpoint.MssPackageProperty = {
       segmentDurationSeconds: config.mss_segment_duration_seconds,
       manifestWindowSeconds: config.mss_manifest_window_seconds,
@@ -92,9 +83,15 @@ export class MediaPackage extends Construct {
 
     mss_endpoint.node.addDependency(this.channel);
 
-    // Output the url stream to player
-    new CfnOutput(this, "MssUrlStream", {
-      exportName: Aws.STACK_NAME + "-MSS-URL",
+    new CfnOutput(this, "DashEndpointURL", {
+      value: dash_endpoint.attrUrl,
+    });
+
+    new CfnOutput(this, "HlsEndpointURL", {
+      value: hls_endpoint.attrUrl,
+    });
+
+    new CfnOutput(this, "MssEndpointURL", {
       value: mss_endpoint.attrUrl,
     });
   }

@@ -139,7 +139,6 @@ export class MediaLive extends Construct {
     });
 
     new CfnOutput(this, "MediaLiveChannelArn", {
-      exportName: Aws.STACK_NAME + "-CHANNEL-ARN",
       value: channelLive.attrArn,
     });
 
