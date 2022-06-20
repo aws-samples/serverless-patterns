@@ -15,8 +15,7 @@ export class StreamingStack extends Stack {
     );
 
     //2. Create CloudFront distribution
-    new CloudFront(this, "MyCloudFront", mediaPackageChannel.hlsEndpoint, mediaPackageChannel.dashEndpoint, mediaPackageChannel.mssEndpoint);
-
+    const cloudfront = new CloudFront(this, "MyCloudFront", mediaPackageChannel.hlsEndpoint, mediaPackageChannel.dashEndpoint, mediaPackageChannel.mssEndpoint);
   }
 
 }
