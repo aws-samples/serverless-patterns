@@ -150,12 +150,10 @@ export class MediaLive extends Construct {
         params.encoderSettings as medialive.CfnChannel.EncoderSettingsProperty,
     });
 
-    new CfnOutput(this, "channelArn", {
-      exportName: Aws.STACK_NAME + "-CHANNEL-ARN",
+    new CfnOutput(this, "MediaLiveChannelArn", {
       value: channelLive.attrArn,
     });
 
-    new CfnOutput(this, "MediaLiveInputID", { value: medialive_input.ref });
 
     new CfnOutput(this, "MediaLiveEndpoint", {
       value: Fn.join("", [Fn.select(0, medialive_input.attrDestinations)]),
