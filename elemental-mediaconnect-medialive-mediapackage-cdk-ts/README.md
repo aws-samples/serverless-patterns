@@ -1,5 +1,5 @@
 
-# Live Streaming on AWS using SRT/Zixi/RIST/RTP FEC sources
+# Live Streaming on AWS for SRT/Zixi/RIST/RTP FEC input sources
 
 This pattern creates a live streaming stack leveraging AWS MediaConnect, AWS Elemental MediaLive and MediaPackage for SRT/Zixi/RIST/RTP FEC input sources.
 
