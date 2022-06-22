@@ -1,0 +1,39 @@
+name: "Lint Serverless Pattern"
+
+on: [pull_request]
+
+jobs:
+  verify-template:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get changed files using defaults
+        id: changed-files
+        uses: tj-actions/changed-files@v19
+        with:
+          separator: ","
+
+      - name: Validate Templates
+        uses: ./ # Uses an action in the root directory
+        id: validate-templates
+        with:
+          new-files: ${{ steps.changed-files.outputs.added_files }}
+          modified-files: ${{ steps.changed-files.outputs.modified_files }}
+      
+      - name: Comment
+        if: failure()
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `**Failed to verify your serverless pattern**: Please check the GitHub Actions and make the changes required to your template.`
+            })     

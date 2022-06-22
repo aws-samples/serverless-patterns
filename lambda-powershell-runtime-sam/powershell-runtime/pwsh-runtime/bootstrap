@@ -1,0 +1,77 @@
+#!/opt/powershell/pwsh -noprofile
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache 2.0
+
+If ($env:POWERSHELL_RUNTIME_VERBOSE -eq 'TRUE') {$VerbosePreference = "continue"}
+Write-Verbose "[RUNTIME-bootstrap]Start: bootstrap"
+
+## Initiating custom runtime
+
+# Set PowerShell version environment
+$env:POWERSHELL_VERSION = ($PSVersionTable).PSVersion.ToString()
+Write-Verbose "[RUNTIME-bootstrap]Running PowerShell: $($env:POWERSHELL_VERSION)"
+
+# Importing runtime module helpers
+Write-Verbose "[RUNTIME-bootstrap]Importing runtime module helpers"
+Import-Module '/opt/modules/pwsh-runtime.psd1'
+
+# Modify $env:PSModulePath to support Lambda paths
+Write-Verbose "[RUNTIME-bootstrap]Modify PSModulePath to support Lambda paths"
+Set-PSModulePath
+
+# Parse _HANDLER environment variable
+Write-Verbose "[RUNTIME-bootstrap]Parse _HANDLER environment variable"
+$private:handlerArray = Get-Handler -Handler $env:_HANDLER
+
+## Initiating function
+# Run function/module pre-handler initialization in global scope
+Write-Verbose "[RUNTIME-bootstrap]Run function/module pre-handler initialization in global scope"
+switch ($private:handlerArray.handlerType) {
+    "Function" {
+        Write-Verbose "[RUNTIME-bootstrap]Dot sourcing PowerShell script: $($private:handlerArray.scriptFilePath)"
+        . $private:handlerArray.ScriptFilePath
+    }
+    "Module" {
+        Write-Verbose "[RUNTIME-bootstrap]Importing module: $($private:handlerArray.moduleName)"
+        Import-Module -Name $private:handlerArray.moduleName -Force        
+    }
+}
+
+## Event loop
+# Processes invocation events from Lambda Runtime API in a loop until runtime environment is terminated.
+Write-Verbose "[RUNTIME-bootstrap]Start event loop"
+do {
+
+    # Get /NEXT invocation from AWS Lambda Runtime API.
+    Write-Verbose "[RUNTIME-bootstrap]Get /NEXT invocation from AWS Lambda Runtime API."
+    $private:runtimeNextInvocationResponse = Get-LambdaNextInvocation
+
+    # Set default and AWS Lambda specific environment variables for each invocation
+    Write-Verbose "[RUNTIME-bootstrap]Set default and AWS Lambda specific environment variables for each invocation"
+    Set-HandlerEnvironmentVariables $private:runtimeNextInvocationResponse.headers
+
+    # Create the $LambdaContext object
+    Write-Verbose "[RUNTIME-bootstrap]Create the `$LambdaContext object"
+    $private:LambdaContext = Set-LambdaContext
+
+    try {
+        # Run function handler from script/module
+        Write-Verbose "[RUNTIME-bootstrap]Run function handler from script/module"
+        $private:InvocationResponse = Invoke-FunctionHandler $private:runtimeNextInvocationResponse $private:handlerArray $private:LambdaContext
+        # POST function handler response back to Runtime API
+        Write-Verbose "[RUNTIME-bootstrap]POST function handler response back to Runtime API"
+        Send-FunctionHandlerResponse $private:InvocationResponse
+    }
+    catch {
+        # POST function invocation error back to Runtime API
+        Write-Verbose "[RUNTIME-bootstrap]POST function invocation error back to Runtime API"
+        Send-FunctionHandlerError $_
+    }
+
+    # Cleanup
+    Write-Verbose "[RUNTIME-bootstrap]Cleanup"
+    Remove-Variable -Name 'LambdaInput', 'LambdaContext', 'private:LambdaContext', 'private:runtimeNextInvocationResponse', ' private:InvocationResponse' -ErrorAction 'SilentlyContinue'
+    $env:_X_AMZN_TRACE_ID = ''
+}
+while ($true)
+Write-Verbose "[RUNTIME-bootstrap]Complete event loop, spindown runtime environment"

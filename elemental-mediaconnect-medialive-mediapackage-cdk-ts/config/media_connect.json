@@ -1,0 +1,9 @@
+{
+  "whitelistCidr": "0.0.0.0/0",
+  "availabilityZone": {
+    "a": "eu-west-1a",
+    "b": "eu-west-1b"
+  },
+  "ingestPort": 1024,
+  "minLatency": 100
+}

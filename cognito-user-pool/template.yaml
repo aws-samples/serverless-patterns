@@ -54,7 +54,7 @@ Resources:
   CognitoAuthorizerUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties: 
-      Domain: user-pool-domain
+      Domain: !Sub user-pool-domain-${AWS::AccountId}
       UserPoolId: !Ref CognitoAuthorizerUserPool
 
 Outputs:

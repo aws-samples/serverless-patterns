@@ -1,0 +1,256 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: > 
+  Serverless patterns - Amazon API Gateway WebSocket API connection
+  tracking using AWS Service integration type and Amazon DynamoDB
+
+Parameters:
+  ApiStageName:
+    Description: Name of WebSockets API stage
+    Type: String
+    Default: api  
+
+# Comment each resource section to explain usage
+Resources:
+#######################################################
+#   API Gateway WebSocket API
+#######################################################
+  WebSocketApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-WebSocketApi"
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - DefaultRoute
+    Properties:
+      ApiId: !Ref WebSocketApi
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: !Ref ApiStageName
+      DeploymentId: !Ref Deployment
+      ApiId: !Ref WebSocketApi
+
+#######################################################
+#   Default route implementation
+#######################################################
+  DefaultRouteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: 'exports.handler = async (event) => {return {statusCode: 200, body: JSON.stringify(event)}}'
+
+  DefaultRouteFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref DefaultRouteFunction
+      Principal: apigateway.amazonaws.com
+
+  DefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $default
+      AuthorizationType: NONE
+      OperationName: DefaultRoute
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref DefaultRouteIntegration
+
+  DefaultRouteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DefaultRouteFunction.Arn}/invocations"
+
+  DefaultRouteResponse: 
+    Type: AWS::ApiGatewayV2::RouteResponse
+    Properties:
+      RouteId: !Ref DefaultRoute
+      ApiId: !Ref WebSocketApi
+      RouteResponseKey: $default
+
+  DefaultRouteIntegrationResponse:
+    Type: AWS::ApiGatewayV2::IntegrationResponse
+    Properties: 
+      ApiId: !Ref WebSocketApi
+      IntegrationId: !Ref DefaultRouteIntegration
+      IntegrationResponseKey: $default
+
+
+#######################################################
+#   Connect route implementation
+#######################################################
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $connect
+      AuthorizationType: NONE
+      OperationName: ConnectRoute
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref ConnectRouteIntegration
+
+  ConnectRouteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS
+      IntegrationMethod: POST
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/PutItem"
+      CredentialsArn: !Sub "${SessionsTableAccessRole.Arn}"
+      TemplateSelectionExpression: \$default
+      RequestTemplates: 
+        "$default" : 
+          Fn::Sub: >
+            #set($ttl = $context.requestTimeEpoch + 86400)
+            { 
+                "TableName": "${SessionsTable}",
+                "Item": {
+              "connectionid": {
+                        "S": "$context.connectionId"
+                        },
+              "headers": {
+                        "S": "$input.params().get('header')"
+                        },
+              "querystring": {
+                        "S": "$input.params().get('querystring')"
+                        },
+              "ttl": {
+                        "N": "$ttl"
+                        }
+                }
+            }
+
+  ConnectRouteResponse: 
+    Type: AWS::ApiGatewayV2::RouteResponse
+    Properties:
+      RouteId: !Ref ConnectRoute
+      ApiId: !Ref WebSocketApi
+      RouteResponseKey: $default
+
+  ConnectRouteIntegrationResponse:
+    Type: AWS::ApiGatewayV2::IntegrationResponse
+    Properties: 
+      ApiId: !Ref WebSocketApi
+      IntegrationId: !Ref ConnectRouteIntegration
+      IntegrationResponseKey: /200/
+      TemplateSelectionExpression: \$default
+
+#######################################################
+#   Disconnect route implementation
+#######################################################
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $disconnect
+      AuthorizationType: NONE
+      OperationName: DisconnectRoute
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref DisconnectRouteIntegration
+
+  DisconnectRouteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS
+      IntegrationMethod: POST
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/DeleteItem"
+      CredentialsArn: !Sub "${SessionsTableAccessRole.Arn}"
+      TemplateSelectionExpression: \$default
+      RequestTemplates: 
+        "$default" : 
+          Fn::Sub: >
+            { 
+                "TableName": "${SessionsTable}",
+                "Key": {
+              "connectionid": {
+                        "S": "$context.connectionId"
+                        }
+                }
+            }
+
+  DisconnectRouteResponse: 
+    Type: AWS::ApiGatewayV2::RouteResponse
+    Properties:
+      RouteId: !Ref DisconnectRoute
+      ApiId: !Ref WebSocketApi
+      RouteResponseKey: $default
+
+  DisconnectRouteIntegrationResponse:
+    Type: AWS::ApiGatewayV2::IntegrationResponse
+    Properties: 
+      ApiId: !Ref WebSocketApi
+      IntegrationId: !Ref DisconnectRouteIntegration
+      IntegrationResponseKey: /200/
+      TemplateSelectionExpression: \$default
+
+#######################################################
+#   Data storage for connection tracking
+#######################################################
+  SessionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub  ${AWS::StackName}-Sessions
+      AttributeDefinitions:
+        - AttributeName: connectionid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: connectionid
+          KeyType: HASH
+      TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+      BillingMode: PAY_PER_REQUEST
+
+  SessionsTableAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:DeleteItem"
+                  - "dynamodb:PutItem"
+                Resource:
+                  - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SessionsTable}"
+
+# List all common outputs for usage
+Outputs:
+  APIEndpoint:
+    Description: "API Gateway WebSocket endpoint URL"
+    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStageName}"
+
+  SessionsTable:
+    Description: "DynamoDB sessions table for WebSocket API connection ID tracking"
+    Value: !Ref SessionsTable

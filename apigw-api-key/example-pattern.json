@@ -1,0 +1,58 @@
+{
+    "title": "Amazon API Gateway with an API Key",
+    "description": "Create a REST API Gateway with an API Key associated with a Usage Plan",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "An API Key is created and added to a Usage Plan (no throttling, no quota). This Usage Plan is then associated with the Prod stage of a REST API.", 
+        "The GET method of this REST API is configured to require an API Key associated with the Usage Plan.",
+        "If the API key is provided, then API Gateway allows the request and sends it to the Lambda integration.",
+        "If the API is not provided, API returns a 403 Forbidden."
+
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-api-key",
+        "templateURL": "serverless-patterns/apigw-api-key",
+        "projectFolder": "apigw-api-key",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "REST API with an API Key",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-key-with-console.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "Deploy the stack: <code>sam deploy</code>."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "headline": "Presented by Albert Blaya, Solutions Architect",
+        "name": "Albert Blaya",
+        "image": "https://media-exp1.licdn.com/dms/image/C5603AQEw2HXx9zs7yg/profile-displayphoto-shrink_200_200/0/1600474292127?e=1655942400&v=beta&t=SbeIn9psV0BIFkbROTDRIfPMKMtyrrgBdgt0tRHY0BY",
+        "bio": "Albert is a Solutions Architect at Amazon Web Services based in Australia.",
+        "linkedin": "albertblaya"
+      }
+    ]
+  }
+  
