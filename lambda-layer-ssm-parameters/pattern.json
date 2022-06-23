@@ -1,0 +1,71 @@
+{
+  "title": "AWS Lambda Layer and SSM Parameter Store - Configuration values for multiple functions",
+  "description": "This AWS SAM application is an example of using a Lambda Layer and the SSM Parameter Store to centrally manage configuration values that can be used by multiple Lambda functions within the same account and region.",
+  "language": "NodeJs",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SSM Parameter Store is used to store configuration values, each with a specific parameter path or hierachy (eg: /Config/{Parameter-Name}). The Lambda Layer uses the API command 'GetParametersByPathCommand' to retrieve all of the configuration values that match the parameter path. The Lambda Layer code runs once during the intial Lambda function invocation and stores the configuration values in an object named 'config'. The object is stored in the execution environment's memory and is available for subsequent function invocations. The 'config' object is refreshed whenever a new cold-start of the Lambda function occurs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-layer-ssm-parameters",
+      "templateURL": "serverless-patterns/lambda-layer-ssm-parameters",
+      "projectFolder": "lambda-layer-ssm-parameters",
+      "templateFile": "lambda-layer-ssm-parameters/template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Building Lambda Layers in AWS SAM",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-layers.html"
+      },
+      {
+        "text": "Using nested applications in AWS SAM",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-nested-applications.html"
+      },
+      {
+        "text": "Lambda function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html"
+      },
+      {
+        "text": "Creating Systems Manager parameters",
+        "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-su-create.html"
+      },
+      {
+        "text": "Working with parameter hierachies",
+        "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-hierarchies.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+    ]
+  },
+  "testing": {
+    "text": [
+      "From a web browser, navigate to the Url of the Lambda function to return all of the configuration values.",
+      "Update the parameters in the 'parameters/template.yml' if you want to change the configuration values. The value of a parameter can be a simple alpha-numeric string or a JSON string. Then use `sam build` and `sam deploy` to update the stack."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Greg Davis",
+      "image": "greg-davis.jpg",
+      "bio": "I am a Principal Solutions Architect, Serverless Developer, Database Engineer, and Data Integration Architect. I specialize in architecting and developing Serverless, event-driven solutions.",
+      "linkedin": "gregtx",
+      "twitter": "ServerlessGuy"
+    }
+  ]
+}
