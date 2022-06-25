@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS AppConfig integration with Lambda extensions
+
+Globals:
+  Function:
+    MemorySize: 256
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#   APP CONFIG                                                           #
+##########################################################################
+  MyApplication:
+      Type: AWS::AppConfig::Application
+      Properties:
+        Name: "MyTestApplication"
+
+  Environment:
+    Type: AWS::AppConfig::Environment
+    Properties:
+      Name: "MyTestEnvironment"
+      ApplicationId: { Ref: MyApplication }
+
+  MyConfigurationProfile:
+    Type: AWS::AppConfig::ConfigurationProfile
+    Properties:
+      ApplicationId: !Ref MyApplication
+      Name: "MyTestProfile"
+      LocationUri: "hosted"
+
+  MyDeploymentStrategy:
+    Type: AWS::AppConfig::DeploymentStrategy
+    Properties:
+      Name: "MyTestDeploymentStrategy"
+      Description: "A deployment strategy to deploy the config immediately"
+      DeploymentDurationInMinutes: 0
+      FinalBakeTimeInMinutes: 0
+      GrowthFactor: 100
+      GrowthType: LINEAR
+      ReplicateTo: NONE
+
+  BasicHostedConfigurationVersion:
+    Type: AWS::AppConfig::HostedConfigurationVersion
+    Properties:
+      ApplicationId: !Ref MyApplication
+      ConfigurationProfileId: !Ref MyConfigurationProfile
+      Description: 'A sample hosted configuration version'
+      ContentType: 'application/json'
+      Content: |
+        { 
+          "name": "ExampleApplication",
+          "id": 1,
+          "rank": 7
+        }
+
+  AppConfigDeployment:
+    Type: AWS::AppConfig::Deployment
+    Properties:
+      ApplicationId: !Ref MyApplication
+      ConfigurationProfileId: !Ref MyConfigurationProfile
+      ConfigurationVersion: !Ref BasicHostedConfigurationVersion
+      DeploymentStrategyId: !Ref MyDeploymentStrategy
+      EnvironmentId: !Ref Environment
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  PutObjectFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ./build/handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - appconfig:StartConfigurationSession
+                - appconfig:GetLatestConfiguration
+              Resource:
+                - '*'
+      Environment:
+        Variables:
+          APP_CONFIG_NAME: MyTestApplication
+          AWS_APPCONFIG_ENVIRONMENT: MyTestEnvironment
+          AWS_APPCONFIG_PROFILE: MyTestProfile
+          AWS_APPCONFIG_EXTENSION_HTTP_PORT: 2772
+      Layers:
+        - arn:aws:lambda:eu-central-1:066940009817:layer:AWS-AppConfig-Extension-Arm64:2
