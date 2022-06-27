@@ -1,12 +1,10 @@
-# AWS IoT Core to Amazon SQS to AWS Lambda
+# AWS IoT Core to Amazon S3 to AWS Lambda
 
-This pattern contains a sample AWS CDK stack to create an IoT Rule with a SQS action and an AWS Lambda function.
+This pattern contains a sample AWS CDK stack to create an IoT Rule with a S3 action and an AWS Lambda function.
 
-![iot-sns-sqs](img/iot-sns-sqs.png)
+When a message is published to the IoT topic defined in the IoT Rule, this message will be saved as an object in the S3 bucket. The object is added to the prefix `iot/` and is identified by the timestamp in unix format. The Lambda function is configured with an event source mapping and it will be triggered when a new object is added to the `iot/` prefix. In this sample the Lambda function extracts and logs the S3 object key.
 
-When a message is published to the IoT topic defined in the IoT Rule, this message will be delivered to the SQS standard queue. The Lambda function is configured with an event source mapping and it will be triggered to process the messages in the queue. In this sample the Lambda function extracts the body of the message polled from the SQS queue and logs its content.
-
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-sqs-lambda-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-s3-lambda-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -30,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
 2. Change the working directory to this pattern's directory
 
    ```sh
-   cd serverless-patterns/iot-sqs-lambda-cdk
+   cd serverless-patterns/iot-s3-lambda-cdk
    ```
 
 3. Create and activate the project's virtual environment. This allows the project's dependencies to be installed locally in the project folder, instead of globally. Note that if you have multiple versions of Python installed, where the `python` command references Python 2.x, then you can reference Python 3.x by using the `python3` command. You can check which version of Python is being referenced by running the command `python --version` or `python3 --version`
@@ -64,12 +62,10 @@ Log into the AWS Console, browse to AWS IoT Core:
 
 2. Then under `Publish to a topic`, in the Topic filter field enter this: `device/data`, type a custom message or use the default message payload: `{"message": "Hello from AWS IoT console"}`. Then click the `Publish` button.
 
-3. Check the CloudWatch Logs for the Lambda function. The Lambda execution logs should contain the original message published by AWS IoT, for example:
+3. Check the CloudWatch Logs for the Lambda function. The Lambda execution logs should contain the key of the S3 object in the format `iot/<timestamp>.json`. For example:
 
 ```json
-{
-    "message": "Hello from AWS IoT console"
-}
+   iot/1655201156794.json
 ```
 
 ## Cleanup
