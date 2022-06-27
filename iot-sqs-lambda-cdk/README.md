@@ -2,6 +2,8 @@
 
 This pattern contains a sample AWS CDK stack to create an IoT Rule with a SQS action and an AWS Lambda function.
 
+![iot-sns-sqs](img/iot-sns-sqs.png)
+
 When a message is published to the IoT topic defined in the IoT Rule, this message will be delivered to the SQS standard queue. The Lambda function is configured with an event source mapping and it will be triggered to process the messages in the queue. In this sample the Lambda function extracts the body of the message polled from the SQS queue and logs its content.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-sqs-lambda-cdk
