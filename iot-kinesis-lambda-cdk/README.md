@@ -1,12 +1,10 @@
-# AWS IoT Core to Amazon SQS to AWS Lambda
+# AWS IoT Core to Amazon Kinesis Data Streams to AWS Lambda
 
-This pattern contains a sample AWS CDK stack to create an IoT Rule with a SQS action and an AWS Lambda function.
+This pattern contains a sample AWS CDK stack to create an IoT Rule with a Kinesis Data Streams action and an AWS Lambda function.
 
-![iot-sns-sqs](img/iot-sns-sqs.png)
+When a message is published to the IoT topic defined in the IoT Rule, this message will be delivered to the Kinesis Data Stream. The Lambda function is configured with an event source mapping and it will be triggered to process the streaming data. In this sample the Lambda function decodes the message polled from the Kinesis Data Stream and logs its content.
 
-When a message is published to the IoT topic defined in the IoT Rule, this message will be delivered to the SQS standard queue. The Lambda function is configured with an event source mapping and it will be triggered to process the messages in the queue. In this sample the Lambda function extracts the body of the message polled from the SQS queue and logs its content.
-
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-sqs-lambda-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-kinesis-lambda-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -30,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
 2. Change the working directory to this pattern's directory
 
    ```sh
-   cd serverless-patterns/iot-sqs-lambda-cdk
+   cd serverless-patterns/iot-kinesis-lambda-cdk
    ```
 
 3. Create and activate the project's virtual environment. This allows the project's dependencies to be installed locally in the project folder, instead of globally. Note that if you have multiple versions of Python installed, where the `python` command references Python 2.x, then you can reference Python 3.x by using the `python3` command. You can check which version of Python is being referenced by running the command `python --version` or `python3 --version`
