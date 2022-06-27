@@ -1,8 +1,8 @@
-# AWS Step Functions to Amazon S3
+# AWS Step Function to Amazon S3
 
 This CDK  pattern creates a Step Functions workflow that publishes a file to an S3 bucket.
 
-Learn more about this pattern at Serverless Land Patterns: (https://serverlessland.com/patterns/lambda-glue-s3)
+Learn more about this pattern at Serverless Land Patterns: (https://serverlessland.com/patterns/cdk-sfn-s3)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -48,7 +48,7 @@ The AWS CDK  template deploys a Step Functions workflow that performs the specif
 
 ## Testing
 
-Use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) to invoke the Lambda function. The function name is in the outputs of the AWS CDK deployment
+Use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) to invoke the step function. The function name is in the outputs of the AWS CDK deployment
 
  1. Execute the Step Functions workflow:
     ```
