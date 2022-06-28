@@ -53,14 +53,14 @@ Important: this application uses various AWS services and there are costs associ
 
 ### Testing
 
-Use the [AWS CLI](https://aws.amazon.com/cli/) to invoke the Lambda function. The function name is in the outputs of the AWS SAM deployment (the key is `QueuePublisherFunction`):
+Use the [AWS CLI](https://aws.amazon.com/cli/) to invoke the Lambda function. The function name is in the outputs of the Terraform deployment (the key is `QueuePublisherFunction`):
 
 1. Invoke the Lambda function to publish a message to the SQS queue:
 
 ```bash
 aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME response.json
 ```
-2. Retrieve the message from the SQS queue, using the queue URL from the AWS SAM deployment outputs:
+2. Retrieve the message from the SQS queue, using the queue URL from the Terraform deployment outputs:
 ```bash
 aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
 ```

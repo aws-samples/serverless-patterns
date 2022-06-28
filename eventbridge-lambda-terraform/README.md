@@ -56,7 +56,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The AWS SAM template deploys the resources and the IAM permissions required to run the application.
+The Terraform template deploys the resources and the IAM permissions required to run the application.
 
 The EventBridge rule specified in `main.tf` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see above) to the Lambda function.
 
