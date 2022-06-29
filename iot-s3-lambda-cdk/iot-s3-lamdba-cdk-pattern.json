@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-s3-lambda-cdk",
       "templateURL": "serverless-patterns/iot-s3-lambda-cdk",
       "projectFolder": "iot-s3-lambda-cdk",
-      "templateFile": "iot-s3-lambda-cdk/iot_s3_lambda_cdk/iot_s3_lambda_cdk_stack.py"
+      "templateFile": "iot_s3_lambda_cdk/iot_s3_lambda_cdk_stack.py"
     }
   },
   "resources": {
