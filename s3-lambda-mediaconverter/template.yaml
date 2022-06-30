@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Service to Service description
+
+# Comment on each global 
+Globals:
+  Function:
+    Runtime: python3.8
+    Timeout: 180
+
+# Comment each resource section to explain usage
+Resources:
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      InlineCode: |
+        def handler(event, context):
+          print("Hello, world!")
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: InputS3Bucket     # This must be the name of an S3 bucket declared in the same template file
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix      # or "suffix"
+                    Value: input/      # The value to search for in the S3 object key names
+      Policies:
+        - AWSLambdaExecute
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource:
+                - !Sub 'arn:aws:s3:::video-input-${AWS::AccountId}/*'
+                - !Sub 'arn:aws:s3:::video-output-${AWS::AccountId}/*'
+  InputS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub 'video-input-${AWS::AccountId}'
+  OutputS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub 'video-output-${AWS::AccountId}'
+
+# List all common outputs for usage
+Outputs:
+  InputBucket:
+    Value: !Ref InputS3Bucket
+  OutputBucket:
+    Value: !Ref OutputS3Bucket
+
