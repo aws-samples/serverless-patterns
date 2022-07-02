@@ -5,8 +5,8 @@ Description: Serverless patterns - Service to Service description
 # Comment on each global 
 Globals:
   Function:
-    Runtime: python3.8
-    Timeout: 180
+    Runtime: python3.9
+    Timeout: 120
 
 # Comment each resource section to explain usage
 Resources:
@@ -14,9 +14,11 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      InlineCode: |
-        def handler(event, context):
-          print("Hello, world!")
+      Environment:
+        Variables:
+          MediaConvertRole: !GetAtt MediaConvertRole.Arn
+          DestinationBucket: !Ref OutputS3Bucket
+      CodeUri: src/
       Events:
         S3Event:
           Type: S3
@@ -24,21 +26,24 @@ Resources:
             Bucket:
               Ref: InputS3Bucket     # This must be the name of an S3 bucket declared in the same template file
             Events: s3:ObjectCreated:*
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix      # or "suffix"
-                    Value: input/      # The value to search for in the S3 object key names
       Policies:
-        - AWSLambdaExecute
+        - AWSLambdaBasicExecutionRole
+        - S3ReadPolicy:
+            BucketName:
+              !Sub 'arn:aws:s3:::video-input-${AWS::AccountId}'     # Avoiding circular dependency error --> https://aws.amazon.com/es/premiumsupport/knowledge-center/cloudformation-circular-dependency-sam/
         - Version: '2012-10-17'
           Statement:
             - Effect: Allow
               Action:
-                - s3:GetObject
+                - "mediaconvert:CreateJob"
+                - "mediaconvert:DescribeEndpoints"
               Resource:
-                - !Sub 'arn:aws:s3:::video-input-${AWS::AccountId}/*'
-                - !Sub 'arn:aws:s3:::video-output-${AWS::AccountId}/*'
+                - "*"
+            - Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !GetAtt MediaConvertRole.Arn
   InputS3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
@@ -47,6 +52,23 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Sub 'video-output-${AWS::AccountId}'
+
+  MediaConvertRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'MediaConvertRole-${AWS::StackName}'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "mediaconvert.amazonaws.com"
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:      # Default IAM Managed Policies MediaConvert needs --> https://docs.aws.amazon.com/mediaconvert/latest/ug/creating-the-iam-role-in-iam.html
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess
 
 # List all common outputs for usage
 Outputs:
