@@ -1,0 +1,402 @@
+{
+  "audioDescriptions": [
+    {
+      "codecSettings": {
+        "aacSettings": {
+          "inputType": "NORMAL",
+          "bitrate": 96000,
+          "codingMode": "CODING_MODE_2_0",
+          "rawFormat": "NONE",
+          "spec": "MPEG4",
+          "profile": "LC",
+          "rateControlMode": "CBR",
+          "qampleRate": 48000
+        }
+      },
+      "audioTypeControl": "FOLLOW_INPUT",
+      "languageCodeControl": "FOLLOW_INPUT",
+      "audioSelectorName": "default",
+      "name": "audio_j8tr8"
+    },
+    {
+      "codecSettings": {
+        "aacSettings": {
+          "inputType": "NORMAL",
+          "bitrate": 96000,
+          "codingMode": "CODING_MODE_2_0",
+          "rawFormat": "NONE",
+          "spec": "MPEG4",
+          "profile": "LC",
+          "rateControlMode": "CBR",
+          "sampleRate": 48000
+        }
+      },
+      "audioTypeControl": "FOLLOW_INPUT",
+      "languageCodeControl": "FOLLOW_INPUT",
+      "audioSelectorName": "default",
+      "name": "audio_6ht2vm"
+    },
+    {
+      "codecSettings": {
+        "aacSettings": {
+          "inputType": "NORMAL",
+          "bitrate": 96000,
+          "codingMode": "CODING_MODE_2_0",
+          "rawFormat": "NONE",
+          "spec": "MPEG4",
+          "profile": "LC",
+          "rateControlMode": "CBR",
+          "sampleRate": 48000
+        }
+      },
+      "audioTypeControl": "FOLLOW_INPUT",
+      "languageCodeControl": "FOLLOW_INPUT",
+      "audioSelectorName": "default",
+      "name": "audio_s90hue"
+    },
+    {
+      "codecSettings": {
+        "aacSettings": {
+          "inputType": "NORMAL",
+          "bitrate": 96000,
+          "codingMode": "CODING_MODE_2_0",
+          "rawFormat": "NONE",
+          "spec": "MPEG4",
+          "profile": "LC",
+          "rateControlMode": "CBR",
+          "sampleRate": 48000
+        }
+      },
+      "audioTypeControl": "FOLLOW_INPUT",
+      "languageCodeControl": "FOLLOW_INPUT",
+      "audioSelectorName": "default",
+      "name": "audio_i3rm19"
+    },
+    {
+      "codecSettings": {
+        "aacSettings": {
+          "inputType": "NORMAL",
+          "bitrate": 96000,
+          "codingMode": "CODING_MODE_2_0",
+          "rawFormat": "NONE",
+          "spec": "MPEG4",
+          "profile": "LC",
+          "rateControlMode": "CBR",
+          "sampleRate": 48000
+        }
+      },
+      "audioTypeControl": "FOLLOW_INPUT",
+      "languageCodeControl": "FOLLOW_INPUT",
+      "audioSelectorName": "default",
+      "name": "audio_ze3rtr"
+    }
+  ],
+  "captionDescriptions": [],
+  "outputGroups": [
+    {
+      "outputGroupSettings": {
+        "mediaPackageGroupSettings": {
+          "destination": {
+            "destinationRefId": "media-destination"
+          }
+        }
+      },
+      "name": "HLS HD",
+      "outputs": [
+        {
+          "audioDescriptionNames": [
+            "audio_j8tr8"
+          ],
+          "captionDescriptionNames": [],
+          "outputName": "_512x288",
+          "outputSettings": {
+            "mediaPackageOutputSettings": {}
+          },
+          "videoDescriptionName": "_512x288"
+        },
+        {
+          "audioDescriptionNames": [
+            "audio_6ht2vm"
+          ],
+          "captionDescriptionNames": [],
+          "outputName": "_640x360",
+          "outputSettings": {
+            "mediaPackageOutputSettings": {}
+          },
+          "videoDescriptionName": "_640x360"
+        },
+        {
+          "audioDescriptionNames": [
+            "audio_s90hue"
+          ],
+          "captionDescriptionNames": [],
+          "outputName": "_764x432",
+          "outputSettings": {
+            "mediaPackageOutputSettings": {}
+          },
+          "videoDescriptionName": "_768x432"
+        },
+        {
+          "audioDescriptionNames": [
+            "audio_i3rm19"
+          ],
+          "captionDescriptionNames": [],
+          "outputName": "_960x540",
+          "outputSettings": {
+            "mediaPackageOutputSettings": {}
+          },
+          "videoDescriptionName": "_960x540"
+        },
+        {
+          "audioDescriptionNames": [
+            "audio_ze3rtr"
+          ],
+          "captionDescriptionNames": [],
+          "outputName": "_1280x720",
+          "outputSettings": {
+            "mediaPackageOutputSettings": {}
+          },
+          "videoDescriptionName": "_1280x720"
+        }
+      ]
+    }
+  ],
+  "timecodeConfig": {
+    "source": "EMBEDDED"
+  },
+  "videoDescriptions": [
+    {
+      "codecSettings": {
+        "h264Settings": {
+          "afdSignaling": "NONE",
+          "colorMetadata": "INSERT",
+          "adaptiveQuantization": "HIGH",
+          "bitrate": 400000,
+          "bufSize": 800000,
+          "bufFillPct": 90,
+          "entropyEncoding": "CAVLC",
+          "flickerAq": "ENABLED",
+          "framerateControl": "SPECIFIED",
+          "framerateNumerator": 15,
+          "framerateDenominator": 1,
+          "gopBReference": "ENABLED",
+          "gopClosedCadence": 1,
+          "gopNumBFrames": 3,
+          "gopSize": 2,
+          "gopSizeUnits": "SECONDS",
+          "subgopLength": "DYNAMIC",
+          "scanType": "PROGRESSIVE",
+          "level": "H264_LEVEL_AUTO",
+          "lookAheadRateControl": "HIGH",
+          "maxBitrate": 400000,
+          "numRefFrames": 5,
+          "parControl": "SPECIFIED",
+          "parDenominator": 1,
+          "parNumerator": 1,
+          "profile": "MAIN",
+          "rateControlMode": "QVBR",
+          "qvbrQualityLevel": 6,
+          "syntax": "DEFAULT",
+          "sceneChangeDetect": "ENABLED",
+          "spatialAq": "ENABLED",
+          "temporalAq": "ENABLED",
+          "timecodeInsertion": "DISABLED"
+        }
+      },
+      "height": 288,
+      "name": "_512x288",
+      "respondToAfd": "NONE",
+      "sharpness": 100,
+      "scalingBehavior": "DEFAULT",
+      "width": 512
+    },
+    {
+      "codecSettings": {
+        "h264Settings": {
+          "afdSignaling": "NONE",
+          "colorMetadata": "INSERT",
+          "adaptiveQuantization": "HIGH",
+          "bitrate": 800000,
+          "bufSize": 1600000,
+          "bufFillPct": 90,
+          "entropyEncoding": "CAVLC",
+          "flickerAq": "ENABLED",
+          "framerateControl": "SPECIFIED",
+          "framerateNumerator": 30,
+          "framerateDenominator": 1,
+          "gopBReference": "ENABLED",
+          "gopClosedCadence": 1,
+          "gopNumBFrames": 3,
+          "gopSize": 2,
+          "gopSizeUnits": "SECONDS",
+          "subgopLength": "DYNAMIC",
+          "scanType": "PROGRESSIVE",
+          "level": "H264_LEVEL_AUTO",
+          "lookAheadRateControl": "HIGH",
+          "maxBitrate": 800000,
+          "numRefFrames": 5,
+          "parControl": "SPECIFIED",
+          "parDenominator": 1,
+          "parNumerator": 1,
+          "profile": "MAIN",
+          "rateControlMode": "QVBR",
+          "qvbrQualityLevel": 7,
+          "syntax": "DEFAULT",
+          "sceneChangeDetect": "ENABLED",
+          "spatialAq": "ENABLED",
+          "temporalAq": "ENABLED",
+          "timecodeInsertion": "DISABLED"
+        }
+      },
+      "height": 360,
+      "name": "_640x360",
+      "respondToAfd": "NONE",
+      "sharpness": 100,
+      "scalingBehavior": "DEFAULT",
+      "width": 640
+    },
+    {
+      "codecSettings": {
+        "h264Settings": {
+          "afdSignaling": "NONE",
+          "colorMetadata": "INSERT",
+          "adaptiveQuantization": "HIGH",
+          "bitrate": 1200000,
+          "bufSize": 2400000,
+          "bufFillPct": 90,
+          "entropyEncoding": "CAVLC",
+          "flickerAq": "ENABLED",
+          "framerateControl": "SPECIFIED",
+          "framerateNumerator": 30,
+          "framerateDenominator": 1,
+          "gopBReference": "ENABLED",
+          "gopClosedCadence": 1,
+          "gopNumBFrames": 3,
+          "gopSize": 2,
+          "gopSizeUnits": "SECONDS",
+          "subgopLength": "DYNAMIC",
+          "scanType": "PROGRESSIVE",
+          "level": "H264_LEVEL_AUTO",
+          "lookAheadRateControl": "HIGH",
+          "maxBitrate": 1200000,
+          "numRefFrames": 5,
+          "parControl": "SPECIFIED",
+          "parDenominator": 1,
+          "parNumerator": 1,
+          "profile": "MAIN",
+          "rateControlMode": "QVBR",
+          "qvbrQualityLevel": 7,
+          "syntax": "DEFAULT",
+          "sceneChangeDetect": "ENABLED",
+          "spatialAq": "ENABLED",
+          "temporalAq": "ENABLED",
+          "timecodeInsertion": "DISABLED"
+        }
+      },
+      "height": 432,
+      "name": "_768x432",
+      "respondToAfd": "NONE",
+      "sharpness": 100,
+      "scalingBehavior": "DEFAULT",
+      "width": 768
+    },
+    {
+      "codecSettings": {
+        "h264Settings": {
+          "afdSignaling": "NONE",
+          "colorMetadata": "INSERT",
+          "adaptiveQuantization": "HIGH",
+          "bitrate": 1800000,
+          "bufSize": 3600000,
+          "bufFillPct": 90,
+          "entropyEncoding": "CAVLC",
+          "flickerAq": "ENABLED",
+          "framerateControl": "SPECIFIED",
+          "framerateNumerator": 30,
+          "framerateDenominator": 1,
+          "gopBReference": "ENABLED",
+          "gopClosedCadence": 1,
+          "gopNumBFrames": 3,
+          "gopSize": 2,
+          "gopSizeUnits": "SECONDS",
+          "subgopLength": "DYNAMIC",
+          "scanType": "PROGRESSIVE",
+          "level": "H264_LEVEL_AUTO",
+          "lookAheadRateControl": "HIGH",
+          "maxBitrate": 1800000,
+          "numRefFrames": 5,
+          "parControl": "SPECIFIED",
+          "parDenominator": 1,
+          "parNumerator": 1,
+          "profile": "MAIN",
+          "rateControlMode": "QVBR",
+          "qvbrQualityLevel": 7,
+          "syntax": "DEFAULT",
+          "sceneChangeDetect": "ENABLED",
+          "spatialAq": "ENABLED",
+          "temporalAq": "ENABLED",
+          "timecodeInsertion": "DISABLED"
+        }
+      },
+      "height": 540,
+      "name": "_960x540",
+      "respondToAfd": "NONE",
+      "sharpness": 100,
+      "scalingBehavior": "DEFAULT",
+      "width": 960
+    },
+    {
+      "codecSettings": {
+        "h264Settings": {
+          "afdSignaling": "NONE",
+          "colorMetadata": "INSERT",
+          "adaptiveQuantization": "HIGH",
+          "bitrate": 2700000,
+          "bufSize": 5400000,
+          "bufFillPct": 90,
+          "entropyEncoding": "CAVLC",
+          "flickerAq": "ENABLED",
+          "framerateControl": "SPECIFIED",
+          "framerateNumerator": 30,
+          "framerateDenominator": 1,
+          "gopBReference": "ENABLED",
+          "gopClosedCadence": 1,
+          "gopNumBFrames": 3,
+          "gopSize": 2,
+          "gopSizeUnits": "SECONDS",
+          "subgopLength": "DYNAMIC",
+          "scanType": "PROGRESSIVE",
+          "level": "H264_LEVEL_AUTO",
+          "lookAheadRateControl": "HIGH",
+          "maxBitrate": 2700000,
+          "numRefFrames": 5,
+          "parControl": "SPECIFIED",
+          "parDenominator": 1,
+          "parNumerator": 1,
+          "profile": "MAIN",
+          "rateControlMode": "QVBR",
+          "qvbrQualityLevel": 8,
+          "syntax": "DEFAULT",
+          "sceneChangeDetect": "ENABLED",
+          "spatialAq": "ENABLED",
+          "temporalAq": "ENABLED",
+          "timecodeInsertion": "DISABLED"
+        }
+      },
+      "height": 720,
+      "name": "_1280x720",
+      "respondToAfd": "NONE",
+      "sharpness": 100,
+      "scalingBehavior": "DEFAULT",
+      "width": 1280
+    }
+  ],
+  "availConfiguration": {
+    "availSettings": {
+      "scte35SpliceInsert": {
+        "webDeliveryAllowedFlag": "FOLLOW",
+        "nNoRegionalBlackoutFlag": "FOLLOW"
+      }
+    }
+  }
+}

@@ -1,8 +1,8 @@
 # AWS Lambda to Amazon SQS
 
-The SAM template deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. The Lambda function publishes a message to the SQS queue when invoked.
+The Terraform template deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. The Lambda function publishes a message to the SQS queue when invoked.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs-terraform/
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
 
 ## Deployment Instructions
 
@@ -21,20 +21,19 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd lambda-sqs
+    cd lambda-sqs-terraform
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, initialize terraform to  to downloads and installs the providers defined in the configuration:
     ```
-    sam deploy --guided
+    terraform init
+    ```
+1. From the command line, apply the configuration in the main.tf file:
+    ```
+    terraform apply
     ```
 1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
-
-    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+    * Enter yes
+1. Note the outputs from the deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## Example payload from SQS
 
@@ -54,27 +53,34 @@ Important: this application uses various AWS services and there are costs associ
 
 ### Testing
 
-Use the [AWS CLI](https://aws.amazon.com/cli/) to invoke the Lambda function. The function name is in the outputs of the AWS SAM deployment (the key is `QueuePublisherFunction`):
+Use the [AWS CLI](https://aws.amazon.com/cli/) to invoke the Lambda function. The function name is in the outputs of the Terraform deployment (the key is `QueuePublisherFunction`):
 
 1. Invoke the Lambda function to publish a message to the SQS queue:
 
 ```bash
 aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME response.json
 ```
-2. Retrieve the message from the SQS queue, using the queue URL from the AWS SAM deployment outputs:
+2. Retrieve the message from the SQS queue, using the queue URL from the Terraform deployment outputs:
 ```bash
 aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
 ```
 
 ## Cleanup
  
-1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+1. Change directory to the pattern directory:
     ```
-1. Confirm the stack has been deleted
+    cd lambda-sqs-terraform
+    ```
+1. Delete all files from the S3 bucket
+1. Delete all created resources by terraform
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    terraform destroy
+    ```
+1. During the prompts:
+    * Enter yes
+1. Confirm all created resources has been deleted
+    ```bash
+    terraform show
     ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
