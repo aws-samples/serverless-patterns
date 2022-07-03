@@ -1,0 +1,17 @@
+VpcLambdaFunction:
+  handler: src/vpc-lambda.handler 
+  role: VpcLambdaExecutionRole # IAM execution role from iam-roles.yaml
+  vpc: # deploying Lambda function into VPC from vpc.yaml
+    securityGroupIds:
+      - !Ref VpcEndpointLambdaSecurityGroup # authorizes firewall paths to resources 
+    subnetIds: 
+      - !Ref PrivateSubnetA 
+      - !Ref PrivateSubnetB 
+  environment: 
+    SECRET_ARN: !Ref ExampleSecret # in secrets.yaml
+
+OpenLambdaFunction:
+  handler: src/open-lambda.handler 
+  role: OpenLambdaExecutionRole 
+  environment: 
+    SECRET_ARN: !Ref ExampleSecret
