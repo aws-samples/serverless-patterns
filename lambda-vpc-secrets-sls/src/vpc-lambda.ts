@@ -9,8 +9,8 @@ import {
 export const handler = async (event) => {
   console.log(event);
   
-  const client = new SecretsManagerClient({ region: process.env.REGION });
-  console.log(`Requesting secret ${process.env.SECRET_ARN} in ${process.env.REGION}`);
+  const client = new SecretsManagerClient({ region: process.env.AWS_REGION });
+  console.log(`Requesting secret ${process.env.SECRET_ARN} in ${process.env.AWS_REGION}`);
 
   const params: GetSecretValueCommandInput = {
     SecretId: process.env.SECRET_ARN,

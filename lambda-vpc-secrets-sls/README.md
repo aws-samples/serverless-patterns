@@ -1,6 +1,7 @@
-# Lambda in VPC access Secrets Manager (Serverless Framework)
+# Lambda in a VPC with access to Secrets Manager (Serverless Framework)
 
-This pattern in Serverless Framework will create a Lambda function in a VPC with strict access to Secrets Manager using the AWS private network.
+This pattern using the Serverless Framework will create a Lambda function in a VPC with strict access to Secrets Manager using the AWS private network.
+It also creates a second Lambda function not in a vpc using the same code so you can compare the differences.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-vpc-secrets-sls](https://serverlessland.com/patterns/lambda-vpc-secrets-sls).
 
@@ -14,7 +15,7 @@ Important: this application uses AWS services that always have a small cost and 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git CLI](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * [NodeJS](https://nodejs.org/en/download/) (LTS version) installed
-* [Serverless Framework CLI](https://www.serverless.com/framework/docs/getting-started) version 3.12 or greater installed
+* [Serverless Framework CLI](https://www.serverless.com/framework/docs/getting-started) version 3 or greater installed
 
 ## Deployment Instructions
 
@@ -52,14 +53,16 @@ Important: this application uses AWS services that always have a small cost and 
 
 ## Testing
 
-1. For local testing from the command line use the following:
+1. After the secret is deployed, you can test the code locally using these commands:
+    
 
     ``` sh
     npm run localVpcTest
     npm run localOpenTest
     ```
+    
 
-1. After deployment, use the function names in the output to execute a test from the command line.
+1. After deployment, use the function names in the output to execute a test in the cloud from the command line.
 
     ``` sh
     aws lambda invoke \
@@ -67,11 +70,14 @@ Important: this application uses AWS services that always have a small cost and 
     --invocation-type RequestResponse \
     response.json
     ```
-1. Retrieve the CloudWatch logs
+    [Invoke Lambda CLI docs](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/invoke.html)
+    
+1. Retrieve the CloudWatch logs 
 
     ``` sh
     sls logs -f VpcLambdaFunction
     ```
+    [Serverless Framework logs CLI docs](https://www.serverless.com/framework/docs/providers/aws/cli-reference/logs/)
 
 
 ## Cleanup

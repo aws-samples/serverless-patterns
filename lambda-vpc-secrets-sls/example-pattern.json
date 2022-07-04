@@ -1,5 +1,5 @@
 {
-  "title": "Lambda function in VPC",
+  "title": "Lambda function in a VPC",
   "description": "Create a Lambda Function in a VPC with secure access to Secrets Manager.",
   "language": "Node.js, TypeScript",
   "level": "200",
