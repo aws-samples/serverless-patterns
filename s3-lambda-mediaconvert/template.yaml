@@ -17,20 +17,17 @@ Resources:
       Environment:
         Variables:
           MediaConvertRole: !GetAtt MediaConvertRole.Arn
-          DestinationBucket: !Ref OutputS3Bucket
+          DestinationBucket: !Ref VideoOutput
       CodeUri: src/
       Events:
         S3Event:
           Type: S3
           Properties:
             Bucket:
-              Ref: InputS3Bucket     # This must be the name of an S3 bucket declared in the same template file
+              Ref: VideoInput     # This must be the name of an S3 bucket declared in the same template file
             Events: s3:ObjectCreated:*
       Policies:
         - AWSLambdaBasicExecutionRole
-        - S3ReadPolicy:
-            BucketName:
-              !Sub 'arn:aws:s3:::video-input-${AWS::AccountId}'     # Avoiding circular dependency error --> https://aws.amazon.com/es/premiumsupport/knowledge-center/cloudformation-circular-dependency-sam/
         - Version: '2012-10-17'
           Statement:
             - Effect: Allow
@@ -44,14 +41,12 @@ Resources:
                 - iam:PassRole
               Resource:
                 - !GetAtt MediaConvertRole.Arn
-  InputS3Bucket:
+  VideoInput:
     Type: 'AWS::S3::Bucket'
-    Properties:
-      BucketName: !Sub 'video-input-${AWS::AccountId}'
-  OutputS3Bucket:
+
+  VideoOutput:
     Type: 'AWS::S3::Bucket'
-    Properties:
-      BucketName: !Sub 'video-output-${AWS::AccountId}'
+
 
   MediaConvertRole:
     Type: AWS::IAM::Role
@@ -73,7 +68,7 @@ Resources:
 # List all common outputs for usage
 Outputs:
   InputBucket:
-    Value: !Ref InputS3Bucket
+    Value: !Ref VideoInput
   OutputBucket:
-    Value: !Ref OutputS3Bucket
+    Value: !Ref VideoOutput
 
