@@ -68,7 +68,7 @@ output "FunctionARN" {
   description = "Lambda function name"
 }
 
-output "FunctionUrl" {
+output "FunctionUrlEndpoint" {
   value       = aws_lambda_function_url.function_url.function_url
   description = "Lambda function url"
 }
