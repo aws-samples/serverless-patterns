@@ -1,6 +1,6 @@
 # AWS AppConfig integration with Lambda extensions
 
-The extension takes care of calling the AWS AppConfig service, managing a local cache of retrieved data, tracking the configuration tokens needed for the next service calls, and periodically checking for configuration updates in the background
+The AppConfig extension takes care of calling the AWS AppConfig service, managing a local cache of retrieved data, tracking the configuration tokens needed for the next service calls, and periodically checking for configuration updates in the background
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appconfig-lambda-rust
 
@@ -45,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The extension takes care of calling the AWS AppConfig service, managing a local cache of retrieved data, tracking the configuration tokens needed for the next service calls, and periodically checking for configuration updates in the background.
+The AppConfig extension takes care of calling the AWS AppConfig service, managing a local cache of retrieved data, tracking the configuration tokens needed for the next service calls, and periodically checking for configuration updates in the background.
 
 By default, you have 1000 TPS. After the first request, the profile is cached, so from now on, you hit the internal cache of AppConfig.
 We can use the Lambda Execution Context to avoid calling the AWS AppConfig cached service having the following benefits
