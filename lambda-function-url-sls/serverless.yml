@@ -32,3 +32,4 @@ functions:
       # authorizer: aws_iam
     # To configure cors, see https://www.serverless.com/framework/docs/providers/aws/guide/functions
       # cors: 
+
