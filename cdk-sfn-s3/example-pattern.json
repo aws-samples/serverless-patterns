@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-sfn-s3",
       "templateURL": "serverless-patterns/cdk-sfn-s3",
       "projectFolder": "cdk-sfn-s3",
-      "templateFile": "cdk-sfn-s3/lib/cdk-sfn-s3-stack.ts"
+      "templateFile": "lib/cdk-sfn-s3-stack.ts"
     }
   },
   "resources": {
@@ -44,7 +44,7 @@
   "authors": [
     {
       "name": "Harshitha Shashidhar",
-      "image": "https://phonetool.amazon.com/users/harshihs",
+      "image": "../assets/images/resources/harshihs.jpg",
       "bio": "Harshitha Shashidhar is an Cloud Application architect who loves to build the serverless applications at scale."
     }
   ]

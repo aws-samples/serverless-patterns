@@ -39,7 +39,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
 
 ## How it works
 
-The AWS Terraform template deploys the following resources:
+The Terraform template deploys the following resources:
 
 | Type | Logical ID |
 | --- | --- |

@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: A Lambda Layer that retrieves configuration values from the SSM Parameter Store.
+# The parameter value for AppName is received from the parent stack.
+Parameters:
+  AppName:
+    Description: Name of application.
+    Type: String
+Resources:
+  Layer:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      LayerName: !Sub ${AppName}-layer
+      ContentUri: ./src
+      CompatibleArchitectures:
+        - arm64
+      CompatibleRuntimes:
+        - nodejs14.x
+      RetentionPolicy: Delete
+    Metadata:
+      BuildMethod: nodejs14.x
+      BuildArchitecture: arm64
+# Output from this nested stack is used by the parent stack to pass to another nested stack.
+Outputs:
+  LayerArn:
+    Description: Arn of Lambda Layer.
+    Value: !Ref Layer
