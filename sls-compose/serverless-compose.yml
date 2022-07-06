@@ -1,0 +1,18 @@
+# serverless-compose.yml
+# Compose is available in Serverless Framework v3.15.0 or greater
+
+services:
+
+  event-bus:
+    path: event-bus
+
+  event-producer:
+    path: event-producer
+    params:
+      busName: ${event-bus.busName}
+
+  event-consumer:
+    path: event-consumer
+    params:
+      busName: ${event-bus.busName}
+

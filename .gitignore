@@ -76,6 +76,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# webpack folder
+.webpack/
+
 
 ### OSX ###
 *.DS_Store

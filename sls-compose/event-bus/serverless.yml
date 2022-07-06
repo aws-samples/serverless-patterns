@@ -1,0 +1,21 @@
+service: sls-compose-event-bus
+
+frameworkVersion: '^3' # requires serverless 3.15 or later
+
+provider:
+  name: aws
+  stage: ${opt:stage, "dev"} # Default stage to "dev"
+  region: ${opt:region, "us-east-1"} # Default region to "us-east-1"
+
+resources:
+  Resources:
+    CustomTestEventBus:
+      Type: AWS::Events::EventBus
+      Properties:
+        Name: custom-test-bus-${opt:stage, self:provider.stage}
+
+  Outputs:
+    busName:
+      Value: !Ref CustomTestEventBus
+    busArn:
+      Value: !GetAtt CustomTestEventBus.Arn
