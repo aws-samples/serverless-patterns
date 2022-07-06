@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: A Lambda function that uses a Lambda Layer to retrieve configuration values.
+# The parameter values for AppName, ParameterPath, and LayerArn are received from the parent stack.
+Parameters:
+  AppName:
+    Description: Name of application.
+    Type: String
+  ParameterPath:
+    Description: Parameter path without lagging forward slash (/).
+    Type: String
+    MinLength: 1
+    MaxLength: 950
+    AllowedPattern: ^[a-zA-Z0-9_.-/]*$
+  LayerArn:
+    Description: Arn of Lambda Layer.
+    Type: String
+Resources:
+  Function:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: !Sub ${AppName}-function
+      Runtime: nodejs14.x
+      CodeUri: ./src
+      Handler: app.handler
+      FunctionUrlConfig:
+        AuthType: NONE
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          ParameterPath: !Ref ParameterPath
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter*
+            Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*
+      Layers:
+        - !Ref LayerArn
+# Output from this nested stack is used in the output section of the parent stack.
+Outputs:
+  FunctionName:
+    Description: Name of Lambda function.
+    Value: !Ref Function
+  # When creating function URLs using AWS SAM, a resource name is auto-generated with the following syntax: {Function-Resource-Name}Url
+  # If 'Function' is the function resource name in the SAM template, the function URL resource name will be 'FunctionUrl'.
+  FunctionUrl:
+    Description: Url of Lambda function.
+    Value: !GetAtt FunctionUrl.FunctionUrl

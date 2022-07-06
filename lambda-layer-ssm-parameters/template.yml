@@ -1,0 +1,46 @@
+# This is the parent stack.
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: A Lambda Layer that retrieves configuration values from the SSM Parameter Store and a Lambda function, associated with the Lambda Layer, that returns the configuration values.
+Parameters:
+  AppName:
+    Description: Name of application.
+    Type: String
+    Default: config-example
+  ParameterPath:
+    Description: Parameter path without lagging forward slash (/).
+    Type: String
+    Default: /Config
+    MinLength: 1
+    MaxLength: 950
+    AllowedPattern: ^[a-zA-Z0-9_.-/]*$
+Resources:
+  # The following are nested stacks.
+  Parameters:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location: ./parameters/template.yml
+      Parameters:
+        ParameterPath: !Ref ParameterPath
+  Layer:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location: ./layer/template.yml
+      Parameters:
+        AppName: !Ref AppName
+  Function:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location: ./function/template.yml
+      Parameters:
+        AppName: !Ref AppName
+        ParameterPath: !Ref ParameterPath
+        # Reference Output from another nested stack:
+        LayerArn: !GetAtt Layer.Outputs.LayerArn
+Outputs:
+  FunctionName:
+    Description: Name of Lambda function
+    Value: !GetAtt Function.Outputs.FunctionName
+  FunctionUrl:
+    Description: Url of Lambda function.
+    Value: !GetAtt Function.Outputs.FunctionUrl
