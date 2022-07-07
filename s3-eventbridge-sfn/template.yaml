@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - S3 to EventBridge to Step Functions
+
+Resources:
+  # Creates an Amazon S3 bucket to which images will be uploaded to trigger our workflow.
+  IngestionBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      # Amazon EventBridge receives notifications for all events in the bucket.
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  # Creates a Step Functions workflow.
+  CatDetectorStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      # The statemachine.asl.json file contains a sample workflow definition.
+      DefinitionUri: statemachine/statemachine.asl.json
+      Policies:
+        - RekognitionDetectOnlyPolicy: {}
+        - S3ReadPolicy:
+            BucketName: !Ref IngestionBucket
+      # The Step Functions workflow is triggered each time an object is created in our S3 bucket.
+      Events:
+        StateChange:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: default
+            Pattern:
+              source:
+                - aws.s3
+              detail-type:
+                - Object Created
+              detail:
+                bucket:
+                  name:
+                    - !Ref IngestionBucket
+
+Outputs:
+  IngestionBucket:
+    Description: "S3 bucket name"
+    Value: !Ref IngestionBucket
+  CatDetectorStateMachine:
+    Description: "Example state machine"
+    Value: !Ref CatDetectorStateMachine
