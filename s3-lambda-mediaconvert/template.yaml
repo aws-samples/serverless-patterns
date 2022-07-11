@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Service to Service description
+
+# Comment on each global 
+Globals:
+  Function:
+    Runtime: python3.9
+    Timeout: 120
+
+# Comment each resource section to explain usage
+Resources:
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Environment:
+        Variables:
+          MediaConvertRole: !GetAtt MediaConvertRole.Arn
+          DestinationBucket: !Ref VideoOutput
+      CodeUri: src/
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: VideoInput     # This must be the name of an S3 bucket declared in the same template file
+            Events: s3:ObjectCreated:*
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - "mediaconvert:CreateJob"
+                - "mediaconvert:DescribeEndpoints"
+              Resource:
+                - "*"
+            - Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !GetAtt MediaConvertRole.Arn
+  VideoInput:
+    Type: 'AWS::S3::Bucket'
+
+  VideoOutput:
+    Type: 'AWS::S3::Bucket'
+
+
+  MediaConvertRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "mediaconvert.amazonaws.com"
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:      # Default IAM Managed Policies MediaConvert needs --> https://docs.aws.amazon.com/mediaconvert/latest/ug/creating-the-iam-role-in-iam.html
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess
+
+# List all common outputs for usage
+Outputs:
+  InputBucket:
+    Value: !Ref VideoInput
+  OutputBucket:
+    Value: !Ref VideoOutput
+
