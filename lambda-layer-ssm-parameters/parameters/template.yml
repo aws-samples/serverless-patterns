@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: SSM Parameter Store parameters used as configuration values.
+# The parameter value for ParameterPath are received from the parent stack.
+Parameters:
+  ParameterPath:
+    Description: Parameter path without lagging forward slash (/).
+    Type: String
+    MinLength: 1
+    MaxLength: 950
+    AllowedPattern: ^[a-zA-Z0-9_.-/]*$
+  SSMParameter1Name:
+    Description: Parameter 1 name.
+    Type: String
+    Default: Parameter1Name
+    MinLength: 1
+    MaxLength: 950
+    AllowedPattern: ^[a-zA-Z0-9_.-/]*$
+  SSMParameter2Name:
+    Description: Parameter 2 name.
+    Type: String
+    Default: Parameter2Name
+    MinLength: 1
+    MaxLength: 950
+    AllowedPattern: ^[a-zA-Z0-9_.-/]*$
+Resources:
+  # Example parameters that use the ParameterPath (eg: /Config) in the parameter name.
+  # Update the Value property below to change the parameter values.
+  SSMParameter1:
+    Type: 'AWS::SSM::Parameter'
+    Properties:
+      Name: !Sub ${ParameterPath}/${SSMParameter1Name}
+      Type: String
+      Value: Value1
+  SSMParameter2:
+    Type: 'AWS::SSM::Parameter'
+    Properties:
+      Name: !Sub ${ParameterPath}/${SSMParameter2Name}
+      Type: String
+      Value: |
+        {
+          "key1": "value1",
+          "key2": "value2"
+        }
