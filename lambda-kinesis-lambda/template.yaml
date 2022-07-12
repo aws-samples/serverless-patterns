@@ -20,8 +20,8 @@ Resources:
       Environment:
         Variables:
           KINESIS_STREAM: "testDataSream"
-      Policies: 
-      - AWSLambdaKinesisExecutionRole
+      Policies:
+      - KinesisCrudPolicy: {}
       Events:
         Stream:
           Type: Kinesis
@@ -37,6 +37,8 @@ Resources:
       CodeUri: consumer/
       Runtime: python3.9
       Handler: consumer-function.lambda_handler
+      Policies: 
+      - AWSLambdaKinesisExecutionRole      
       Events:
         Stream:
           Type: Kinesis
