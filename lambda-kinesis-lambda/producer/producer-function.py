@@ -1,3 +1,5 @@
+#! Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: MIT-0
 from concurrent.futures import process
 import boto3
 import json
@@ -8,7 +10,7 @@ import time
 import os
   
 stream_name = os.environ['KINESIS_STREAM']
-kinesis_client = boto3.client('kinesis', region_name='us-east-1')
+kinesis_client = boto3.client('kinesis', region_name=os.environ['AWS_REGION'])
 
 def put_to_stream(property_id, property_value, property_timestamp):
     payload = {

@@ -37,33 +37,16 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-Use the Amazon Kinesis Data Generator for testing. The easiest way to use this tool is to use the [hosted generator](https://awslabs.github.io/amazon-kinesis-data-generator/web/producer.html) and follow the [setup instructions](https://awslabs.github.io/amazon-kinesis-data-generator/web/help.html).
-
-After you have the generator configured, you should have a custom URL to generate data for your Kinesis data stream. In your configuration steps, you created a username and password. Log in to the generator using those credentials.
-
-When you are logged in, you can generate data for your stream test.
-
-1. Choose the region you deployed the application to
-1. For Stream/delivery stream, select your stream.
-1. For Records per second, keep the default value of 100.
-1. On the Template 1 tab, name the template Sensor1.
-1. Use the following template:
+1. Use the following dummy JSON payload to trigger your producer Lambda function:
     ```JSON
     {
-        "sensorId": {{random.number(50)}},
-        "currentTemperature": {{random.number(
-            {
-                "min":10,
-                "max":150
-            }
-        )}},
-        "status": "{{random.arrayElement(
-            ["OK","FAIL","WARN"]
-        )}}"
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
     }
     ```
-1. Choose Send Data.
-1. After several seconds, choose Stop Sending Data.
+2. Observe the logs of the consumer Lambda function to verify if the data pushed by the producer is received or not.
+
 
 ## Cleanup
 
@@ -71,20 +54,15 @@ When you are logged in, you can generate data for your stream test.
     ```bash
     aws cloudformation delete-stack --stack-name STACK_NAME
     ```
-1. Confirm the stack has been deleted
+2. Confirm the stack has been deleted
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
+OR
 
-## Cleanup
- 
-1. Delete the stack
+Simply run the following command to delete your stack from SAM CLI - 
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
