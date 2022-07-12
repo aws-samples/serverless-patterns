@@ -5,7 +5,7 @@ Parameters:
   KinesisStreamName:
     Type: String
     Default: testDataStream
-    Description: Enter a name of the Kinesis Data Stream.
+    Description: Enter a name for the Kinesis Data Stream.
 
 Resources:
   # Define an AWS Kinesis Data Stream
