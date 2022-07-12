@@ -13,32 +13,42 @@
         }
       },
       "Resource": "arn:aws:states:::aws-sdk:rekognition:detectLabels",
-      "Next": "Cat?"
+      "Next": "Map"
+    },
+    "Map": {
+      "Type": "Map",
+      "Iterator": {
+        "StartAt": "Pass",
+        "States": {
+          "Pass": {
+            "Type": "Pass",
+            "End": true
+          }
+        }
+      },
+      "ResultSelector": {
+        "Labels.$": "$[?(@.Name == 'Cat')]"
+      },
+      "ResultPath": "$.ProcessResult",
+      "Next": "Cat?",
+      "ItemsPath": "$.Labels"
     },
     "Cat?": {
       "Type": "Choice",
       "Choices": [
         {
-          "Or": [
-            {
-              "Variable": "$.Labels[0].Name",
-              "StringEquals": "Cat"
-            },
-            {
-              "Variable": "$.Labels[0].Parents[0].Name",
-              "StringEquals": "Cat"
-            }
-          ],
-          "Next": "Cat detected"
+          "Variable": "$.ProcessResult.Labels[0]",
+          "IsPresent": true,
+          "Next": "Cat"
         }
       ],
-      "Default": "No cat detected"
+      "Default": "No cat"
     },
-    "Cat detected": {
+    "Cat": {
       "Type": "Pass",
       "End": true
     },
-    "No cat detected": {
+    "No cat": {
       "Type": "Pass",
       "End": true
     }
