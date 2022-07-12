@@ -1,13 +1,18 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: A demonstration of serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream
+Parameters:
+  KinesisStreamName:
+    Type: String
+    Default: testDataStream
+    Description: Enter a name of the Kinesis Data Stream.
 
 Resources:
   # Define an AWS Kinesis Data Stream
   KinesisStream:
     Type: AWS::Kinesis::Stream
     Properties:
-      Name: "testDataSream"
+      Name: !Ref KinesisStreamName
       ShardCount: 1
 
   # Define a Lambda function as an application producer
@@ -19,16 +24,10 @@ Resources:
       Handler: producer-function.lambda_handler
       Environment:
         Variables:
-          KINESIS_STREAM: "testDataSream"
+          KINESIS_STREAM: !Ref KinesisStreamName
       Policies:
-      - KinesisCrudPolicy: {}
-      Events:
-        Stream:
-          Type: Kinesis
-          Properties:
-            Stream: !GetAtt KinesisStream.Arn
-            StartingPosition: LATEST
-            BatchSize: 100
+      - KinesisCrudPolicy:
+          StreamName: !Ref KinesisStreamName
 
   # Define a Lambda function as an application consumer
   ConsumerFunction:

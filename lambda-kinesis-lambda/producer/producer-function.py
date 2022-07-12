@@ -21,10 +21,10 @@ def put_to_stream(property_id, property_value, property_timestamp):
                         StreamName=stream_name,
                         Data=json.dumps(payload),
                         PartitionKey=property_id)
-    return {"statusCode":200, "body":"Successfully posted"}
 
 def lambda_handler(event, context):
     property_value = random.randint(40, 120)
     property_timestamp = calendar.timegm(datetime.utcnow().timetuple())
     property_id = 'Property11'
     put_to_stream(property_id, property_value, property_timestamp)
+    return {"statusCode":200, "body":"Successfully posted"}
