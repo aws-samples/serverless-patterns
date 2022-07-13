@@ -2,7 +2,7 @@ terraform {
   required_providers {
 	aws = {
 	  source  = "hashicorp/aws"
-	  version = "~> 3.27"
+	  version = "~> 4.22"
 	}
   }
 
@@ -34,7 +34,7 @@ data "aws_iam_policy" "lambda_basic_execution_role_policy" {
 }
 
 resource "aws_iam_role" "lambda_iam_role" {
-  name = "EventBridgeScheduledLambdaRole"
+  name_prefix         = "EventBridgeLambdaRole-"
   managed_policy_arns = [data.aws_iam_policy.lambda_basic_execution_role_policy.arn]
 
   assume_role_policy = <<EOF
@@ -81,7 +81,7 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
   source_arn    = aws_cloudwatch_event_rule.event_rule.arn
 }
 
-output "publisher_function" {
+output "ConsumerFunction" {
   value       = aws_lambda_function.lambda_function.arn
   description = "ConsumerFunction function name"
 }
