@@ -1,6 +1,6 @@
-# This pattern creates 2 Lambda functions, one that puts data into the Kinesis Data Stream and another one that gets trigger when there is data in the stream. 
+# Serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream
 
-This pattern creates an AWS Kinesis Data Stream, a stream consumer, and an AWS Lambda function. When data is added to the stream, the Lambda function is invoked.
+This pattern creates two Lambda functions, one that puts data into the Kinesis Data Stream and another one that gets trigger when there is data in the stream.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-kinesis-lambda](https://serverlessland.com/patterns/lambda-kinesis-lambda)
 
@@ -50,9 +50,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Cleanup
 
-For deleting the stack you can use now sam delete from SAM CLI -
-
-    ```bash
+For deleting the stack you can use sam delete from SAM CLI -
+    ```
     sam delete
     ```
 ----
