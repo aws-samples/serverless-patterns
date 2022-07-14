@@ -13,7 +13,9 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sns-sls",
-      "templateURL": "serverless-patterns/lambda-sns-sls"
+      "templateURL": "serverless-patterns/lambda-sns-sls",
+       "projectFolder": "lambda-sns-sls",
+       "templateFile": "serverless.yml"
     }
   },
   "resources": {},
