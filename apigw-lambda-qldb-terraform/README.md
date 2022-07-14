@@ -1,8 +1,8 @@
 # Amazon API Gateway to AWS Lambda to Amazon QLDB
 
-This pattern shows how to deploy a SAM template with Amazon API Gateway, AWS Lambda and Amazon Quantum Ledger Database (QLDB). The API Gateway exposes a REST API with a number of methods. Each API method uses a Lambda proxy integration to invoke a separate AWS Lambda function that interacts with a ledger in Amazon QLDB. This allows you to create a new Person record, update the record, delete the record, view the current state of the record, and view the entire revision history.
+This pattern shows how to deploy a template with Amazon API Gateway, AWS Lambda and Amazon Quantum Ledger Database (QLDB). The API Gateway exposes a REST API with a number of methods. Each API method uses a Lambda proxy integration to invoke a separate AWS Lambda function that interacts with a ledger in Amazon QLDB. This allows you to create a new Person record, update the record, delete the record, view the current state of the record, and view the entire revision history.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-qldb-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
 
 ## Deployment Instructions
 
@@ -21,28 +21,23 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigw-lambda-qldb
+    cd apigw-lambda-qldb-terraform
     ```
-1. From the command line, use AWS SAM to build the serverless application with its dependencies
+1. From the command line, initialize terraform to download and install the providers defined in the configuration:
     ```
-    sam build
+    terraform init
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, apply the configuration in the main.tf file:
     ```
-    sam deploy --guided
+    terraform apply
     ```
 1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
-
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-
-1. Note the outputs from the SAM deployment process. This contains the API Gateway endpoint URL required for testing
+    * Enter yes
+1. Note the outputs from the deployment process, these contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-The `sam template` creates the QLDB ledger, API Gateway REST API with the relevant API methods, and the AWS Lambda functions.
+The `Terraform template` creates the QLDB ledger, API Gateway REST API with the relevant API methods, and the AWS Lambda functions.
 
 * The API Gateway endpoint is publically accessible
 * You call the relevant API method passing in the appropriate data
@@ -54,7 +49,7 @@ The `sam template` creates the QLDB ledger, API Gateway REST API with the releva
 
 ### Create Table and Indexes
 
-The `sam deploy` step will create the QLDB ledger, but not the associated table and indexes. This could be done using another AWS Lambda function as a custom resource. For now, once the application is deployed, go into the QLDB console (or use the QLDB shell), and create a new table called Person:
+The `terraform apply` step will create the QLDB ledger, but not the associated table and indexes. This could be done using another AWS Lambda function as a custom resource. For now, once the application is deployed, go into the QLDB console (or use the QLDB shell), and create a new table called Person:
 
 ```code
 CREATE TABLE Person
@@ -173,14 +168,20 @@ curl --location --request DELETE <your API endpoint> \
 This will delete the record from the current state view, but you will still be able to view the full revision history.
 
 ## Cleanup
- 
-1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+
+1. Change directory to the pattern directory:
     ```
-1. Confirm the stack has been deleted
+    cd serverless-patterns/apigw-lambda-qldb-terraform
+    ```
+1. Delete all created resources
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    terraform destroy
+    ```
+1. During the prompts:
+    * Enter yes
+1. Confirm all created resources has been deleted
+    ```bash
+    terraform show
     ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
