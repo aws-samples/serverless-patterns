@@ -31,8 +31,8 @@ resource "aws_qldb_ledger" "ledger" {
 
 resource "aws_lambda_function" "lambda_function_create_person" {
   function_name    = "CreatePerson"
-  filename         = data.archive_file.lambda_zip_file_create_person.output_path
-  source_code_hash = data.archive_file.lambda_zip_file_create_person.output_base64sha256
+  filename         = data.archive_file.lambda_zip_file.output_path
+  source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "create-person.handler"
   role             = aws_iam_role.lambda_iam_role_create_person.arn
   runtime          = "nodejs14.x"
@@ -45,10 +45,10 @@ resource "aws_lambda_function" "lambda_function_create_person" {
   
 }
 
-data "archive_file" "lambda_zip_file_create_person" {
+data "archive_file" "lambda_zip_file" {
   type        = "zip"
-  source_file = "${path.module}/src/create-person.js"
-  output_path = "${path.module}/lambda-create-person.zip"
+  source_dir  = "${path.module}/src/"
+  output_path = "${path.module}/lambda.zip"
 }
 
 resource "aws_iam_role" "lambda_iam_role_create_person" {
@@ -114,23 +114,18 @@ resource "aws_iam_policy" "lambda_policy_create_person" {
 
 resource "aws_lambda_function" "lambda_function_get_person" {
   function_name    = "GetPerson"
-  filename         = data.archive_file.lambda_zip_file_get_person.output_path
-  source_code_hash = data.archive_file.lambda_zip_file_get_person.output_base64sha256
-  handler          = "app.handler"
+  filename         = data.archive_file.lambda_zip_file.output_path
+  source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
+  handler          = "get-person.handler"
   role             = aws_iam_role.lambda_iam_role_get_person.arn
   runtime          = "nodejs14.x"
+  memory_size      = 512
   environment {
     variables = {
       LEDGER_NAME = aws_qldb_ledger.ledger.id
       AWS_NODEJS_CONNECTION_REUSE_ENABLED = 1
     }
   }
-}
-
-data "archive_file" "lambda_zip_file_get_person" {
-  type        = "zip"
-  source_file = "${path.module}/src/get-person.js"
-  output_path = "${path.module}/lambda-get-person.zip"
 }
 
 resource "aws_iam_role" "lambda_iam_role_get_person" {
@@ -194,23 +189,18 @@ resource "aws_iam_policy" "lambda_policy_get_person" {
 
 resource "aws_lambda_function" "lambda_function_get_person_history" {
   function_name    = "GetPersonHistory"
-  filename         = data.archive_file.lambda_zip_file_get_person_history.output_path
-  source_code_hash = data.archive_file.lambda_zip_file_get_person_history.output_base64sha256
-  handler          = "app.handler"
+  filename         = data.archive_file.lambda_zip_file.output_path
+  source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
+  handler          = "get-person-history.handler"
   role             = aws_iam_role.lambda_iam_role_get_person_history.arn
   runtime          = "nodejs14.x"
+  memory_size      = 512
   environment {
     variables = {
       LEDGER_NAME = aws_qldb_ledger.ledger.id
       AWS_NODEJS_CONNECTION_REUSE_ENABLED = 1
     }
   }
-}
-
-data "archive_file" "lambda_zip_file_get_person_history" {
-  type        = "zip"
-  source_file = "${path.module}/src/get-person-history.js"
-  output_path = "${path.module}/lambda-get-person-history.zip"
 }
 
 resource "aws_iam_role" "lambda_iam_role_get_person_history" {
@@ -274,23 +264,18 @@ resource "aws_iam_policy" "lambda_policy_get_person_history" {
 
 resource "aws_lambda_function" "lambda_function_update_person" {
   function_name    = "UpdatePerson"
-  filename         = data.archive_file.lambda_zip_file_update_person.output_path
-  source_code_hash = data.archive_file.lambda_zip_file_update_person.output_base64sha256
-  handler          = "app.handler"
+  filename         = data.archive_file.lambda_zip_file.output_path
+  source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
+  handler          = "update-person.handler"
   role             = aws_iam_role.lambda_iam_role_update_person.arn
   runtime          = "nodejs14.x"
+  memory_size      = 512
   environment {
     variables = {
       LEDGER_NAME = aws_qldb_ledger.ledger.id
       AWS_NODEJS_CONNECTION_REUSE_ENABLED = 1
     }
   }
-}
-
-data "archive_file" "lambda_zip_file_update_person" {
-  type        = "zip"
-  source_file = "${path.module}/src/update-person.js"
-  output_path = "${path.module}/lambda-update-person.zip"
 }
 
 resource "aws_iam_role" "lambda_iam_role_update_person" {
@@ -355,23 +340,18 @@ resource "aws_iam_policy" "lambda_policy_update_person" {
 
 resource "aws_lambda_function" "lambda_function_delete_person" {
   function_name    = "DeletePerson"
-  filename         = data.archive_file.lambda_zip_file_delete_person.output_path
-  source_code_hash = data.archive_file.lambda_zip_file_delete_person.output_base64sha256
-  handler          = "app.handler"
+  filename         = data.archive_file.lambda_zip_file.output_path
+  source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
+  handler          = "delete-person.handler"
   role             = aws_iam_role.lambda_iam_role_delete_person.arn
   runtime          = "nodejs14.x"
+  memory_size      = 512
   environment {
     variables = {
       LEDGER_NAME = aws_qldb_ledger.ledger.id
       AWS_NODEJS_CONNECTION_REUSE_ENABLED = 1
     }
   }
-}
-
-data "archive_file" "lambda_zip_file_delete_person" {
-  type        = "zip"
-  source_file = "${path.module}/src/delete-person.js"
-  output_path = "${path.module}/lambda-delete-person.zip"
 }
 
 resource "aws_iam_role" "lambda_iam_role_delete_person" {
@@ -416,6 +396,7 @@ data "aws_iam_policy_document" "lambda_policy_document_delete_person" {
     effect = "Allow"
     
     actions = [
+      "qldb:PartiQLDelete",
       "qldb:PartiQLSelect"
     ]
     
@@ -495,11 +476,45 @@ resource "aws_api_gateway_method" "personid_get" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
 }
 
+resource "aws_api_gateway_integration" "personid_get" {
+  http_method = aws_api_gateway_method.personid_get.http_method
+  resource_id = aws_api_gateway_resource.personid.id
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  type        = "AWS_PROXY"
+  uri         = aws_lambda_function.lambda_function_get_person.invoke_arn
+  integration_http_method = "POST"
+}
+
+resource "aws_lambda_permission" "apigw_lambda_function_get_person" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_function_get_person.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/${aws_api_gateway_method.personid_get.http_method}${aws_api_gateway_resource.personid.path}"
+}
+
 resource "aws_api_gateway_method" "person_history_personid_get" {
   authorization = "NONE"
   http_method   = "GET"
   resource_id   = aws_api_gateway_resource.person_history_personid.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
+}
+
+resource "aws_api_gateway_integration" "person_history_personid_get" {
+  http_method = aws_api_gateway_method.person_history_personid_get.http_method
+  resource_id = aws_api_gateway_resource.person_history_personid.id
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  type        = "AWS_PROXY"
+  uri         = aws_lambda_function.lambda_function_get_person_history.invoke_arn
+  integration_http_method = "POST"
+}
+
+resource "aws_lambda_permission" "apigw_lambda_function_get_person_history" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_function_get_person_history.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/${aws_api_gateway_method.person_history_personid_get.http_method}${aws_api_gateway_resource.person_history_personid.path}"
 }
 
 resource "aws_api_gateway_method" "personid_post" {
@@ -509,11 +524,45 @@ resource "aws_api_gateway_method" "personid_post" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
 }
 
+resource "aws_api_gateway_integration" "update_person_post" {
+  http_method = aws_api_gateway_method.personid_post.http_method
+  resource_id = aws_api_gateway_resource.personid.id
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  type        = "AWS_PROXY"
+  uri         = aws_lambda_function.lambda_function_update_person.invoke_arn
+  integration_http_method = "POST"
+}
+
+resource "aws_lambda_permission" "apigw_lambda_function_update_person" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_function_update_person.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/${aws_api_gateway_method.personid_post.http_method}${aws_api_gateway_resource.personid.path}"
+}
+
 resource "aws_api_gateway_method" "personid_delete" {
   authorization = "NONE"
   http_method   = "DELETE"
   resource_id   = aws_api_gateway_resource.personid.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
+}
+
+resource "aws_api_gateway_integration" "person_delete" {
+  http_method = aws_api_gateway_method.personid_delete.http_method
+  resource_id = aws_api_gateway_resource.personid.id
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  type        = "AWS_PROXY"
+  uri         = aws_lambda_function.lambda_function_delete_person.invoke_arn
+  integration_http_method = "POST"
+}
+
+resource "aws_lambda_permission" "apigw_lambda_function_delete_person" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_function_delete_person.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/${aws_api_gateway_method.personid_delete.http_method}${aws_api_gateway_resource.personid.path}"
 }
 
 output "PersonLedger" {
