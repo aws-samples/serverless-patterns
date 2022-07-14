@@ -45,7 +45,7 @@ curl http://YOUR_LAMBDA_GET_ENDPOINT
 2. Update the value in the SSM Parameter Store
 
 ```bash
-curl -X POST http://YOUR_LAMBDA_PUT_ENDPOINT -x "YOUR_NEW_VALUE"
+curl -X PUT http://YOUR_LAMBDA_PUT_ENDPOINT -d "YOUR_NEW_VALUE"
 ```
 
 ## Cleanup
