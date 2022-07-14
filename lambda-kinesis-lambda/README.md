@@ -49,7 +49,6 @@ Important: this application uses various AWS services and there are costs associ
 
 
 ## Cleanup
-
 For deleting the stack you can use sam delete from SAM CLI -
     ```
     sam delete
