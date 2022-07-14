@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
    cd lambda-eventbridge-sls
    ```
-1. Using the editor of your choice, oopen up the serverless.yml file and change any of the configuration settings to match your environment.
+1. Using the editor of your choice, open up the serverless.yml file and change any of the configuration settings to match your environment.
 1. From the command line, use the Serverless Framework to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```
    serverless deploy
