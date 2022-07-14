@@ -565,7 +565,30 @@ resource "aws_lambda_permission" "apigw_lambda_function_delete_person" {
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/${aws_api_gateway_method.personid_delete.http_method}${aws_api_gateway_resource.personid.path}"
 }
 
+resource "aws_api_gateway_deployment" "api" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+
+  triggers = {
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.api.body))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "prod" {
+  deployment_id = aws_api_gateway_deployment.api.id
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  stage_name    = "Prod"
+}
+
 output "PersonLedger" {
   value       = aws_qldb_ledger.ledger.id
   description = "QLDB Ledger for the sample application"
+}
+
+output "PersonApi" {
+  value       = "${aws_api_gateway_stage.prod.invoke_url}/person"
+  description = "API Gateway endpoint URL for Prod stage for Person functions"
 }
