@@ -47,12 +47,13 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Observe the logs of the consumer Lambda function to verify if the data pushed by the producer is received or not.
 
-
 ## Cleanup
-For deleting the stack you can use sam delete from SAM CLI -
+
+ 1. For deleting the stack you can use sam delete from SAM CLI -
     ```
     sam delete
     ```
+
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
