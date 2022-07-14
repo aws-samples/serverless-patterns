@@ -1,0 +1,56 @@
+{
+  "Comment": "Cat detector state machine",
+  "StartAt": "DetectLabels",
+  "States": {
+    "DetectLabels": {
+      "Type": "Task",
+      "Parameters": {
+        "Image": {
+          "S3Object": {
+            "Bucket.$": "$.detail.bucket.name",
+            "Name.$": "$.detail.object.key"
+          }
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:rekognition:detectLabels",
+      "Next": "Map"
+    },
+    "Map": {
+      "Type": "Map",
+      "Iterator": {
+        "StartAt": "Pass",
+        "States": {
+          "Pass": {
+            "Type": "Pass",
+            "End": true
+          }
+        }
+      },
+      "ResultSelector": {
+        "Labels.$": "$[?(@.Name == 'Cat')]"
+      },
+      "ResultPath": "$.ProcessResult",
+      "Next": "Cat?",
+      "ItemsPath": "$.Labels"
+    },
+    "Cat?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.ProcessResult.Labels[0]",
+          "IsPresent": true,
+          "Next": "Cat"
+        }
+      ],
+      "Default": "No cat"
+    },
+    "Cat": {
+      "Type": "Pass",
+      "End": true
+    },
+    "No cat": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}
