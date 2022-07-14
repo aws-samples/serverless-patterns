@@ -1,8 +1,8 @@
-# A demonstration of serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream
+# This pattern creates 2 Lambda functions, one that puts data into the Kinesis Data Stream and another one that gets trigger when there is data in the stream. 
 
 This pattern creates an AWS Kinesis Data Stream, a stream consumer, and an AWS Lambda function. When data is added to the stream, the Lambda function is invoked.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/kinesis-to-lambda](https://serverlessland.com/patterns/kinesis-to-lambda)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-kinesis-lambda](https://serverlessland.com/patterns/lambda-kinesis-lambda)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -50,17 +50,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Cleanup
 
-1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-2. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
-OR
+For deleting the stack you can use now sam delete from SAM CLI -
 
-Simply run the following command to delete your stack from SAM CLI - 
     ```bash
     sam delete
     ```

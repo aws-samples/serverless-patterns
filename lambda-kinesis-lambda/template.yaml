@@ -37,7 +37,8 @@ Resources:
       Runtime: python3.9
       Handler: consumer-function.lambda_handler
       Policies: 
-      - AWSLambdaKinesisExecutionRole      
+      - KinesisStreamReadPolicy:
+          StreamName: !Ref KinesisStreamName      
       Events:
         Stream:
           Type: Kinesis
