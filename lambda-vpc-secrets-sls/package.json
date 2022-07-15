@@ -20,7 +20,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.121.0",
+    "@aws-sdk/client-secrets-manager": "^3.130.0",
     "axios": "^0.27.2"
   }
 }

@@ -35,6 +35,10 @@
       {
         "text": "AWS VPC Configuration with Serverless Framework",
         "link": "https://www.serverless.com/framework/docs/providers/aws/guide/functions#vpc-configuration"
+      },
+      {
+        "text": "Three ways to use AWS services from a Lambda in a VPC",
+        "link": "https://www.alexdebrie.com/posts/aws-lambda-vpc/"
       }
     ]
   },

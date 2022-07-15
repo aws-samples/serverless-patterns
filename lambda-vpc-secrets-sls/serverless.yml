@@ -23,7 +23,6 @@ custom:
 package:
   individually: true
 
-
 functions: ${file(serverless-resources/functions.yaml)}
 
 resources:
