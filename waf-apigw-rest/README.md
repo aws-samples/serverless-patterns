@@ -1,8 +1,8 @@
 # AWS Service 1 to AWS Service 2
 
-This pattern << explain usage >>
+This pattern creates an Amazon API Gateway with a WebACL attached to control access. This WebACL limits the requests to certain countries. 
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/waf-apigw-rest](https://serverlessland.com/patterns/waf-apigw-rest)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd waf-apigateway-rest
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -38,17 +38,17 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+The application will only accept requests from countries that are in the country code array for the WAF rule.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Deploy the app then go the the provided web address. If you are in the US you will get a 200 response from the backend Lambda funtion. If you are in any other country, you will get a 403 response from the WAF. Change the country codes in the array and redploy to see different results.
 
 ## Cleanup
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete --stack-name STACK_NAME
     ```
 1. Confirm the stack has been deleted
     ```bash
