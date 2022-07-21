@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# AWS WAF to Amazon API Gateway
 
 This pattern creates an Amazon API Gateway with a WebACL attached to control access. This WebACL limits the requests to certain countries. 
 
