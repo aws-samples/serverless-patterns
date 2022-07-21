@@ -1,6 +1,6 @@
 {
   "title": "AWS WAF attached to Amazon API Gateway REST API",
-  "description": "Create an Amazon API Gateway with a WebACL attached to control access. This WebACL limits the requests to certain countries.",
+  "description": "Creates an Amazon API Gateway with a WebACL attached to control access. This WebACL limits the requests to certain countries.",
   "language": "Python",
   "level": "300",
   "framework": "SAM",
