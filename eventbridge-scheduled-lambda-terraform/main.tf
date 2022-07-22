@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "~> 4.22"
     }
   }
 
@@ -18,12 +18,6 @@ variable "event_bus_name" {
   type = string
   default = "default"
 }
-
-data "aws_caller_identity" "current" {}
-
-data "aws_region" "current" {}
-
-data "aws_partition" "current" {}
 
 resource "aws_lambda_function" "lambda_function" {
   function_name    = "CloudWatchScheduledEventFunction"
@@ -45,7 +39,7 @@ data "aws_iam_policy" "lambda_basic_execution_role_policy" {
 }
 
 resource "aws_iam_role" "lambda_iam_role" {
-  name = "EventBridgeScheduledLambdaRole"
+  name_prefix         = "EventBridgeScheduledLambdaRole-"
   managed_policy_arns = [data.aws_iam_policy.lambda_basic_execution_role_policy.arn]
 
   assume_role_policy = <<EOF
@@ -81,7 +75,7 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
   source_arn    = aws_cloudwatch_event_rule.trigger_every_minute.arn
 }
 
-output "publisher_function" {
+output "CloudWatchScheduledEventFunction" {
   value       = aws_lambda_function.lambda_function.arn
-  description = "PublisherFunction function name"
+  description = "CloudWatchScheduledEventFunction function name"
 }

@@ -1,0 +1,31 @@
+service: lambda-eventbridge-sls
+
+frameworkVersion: "3"
+
+custom:
+  sourceName: "LambdaEventbridgeSls"
+  detailType: "LambdaEventbridgeSlsEventType"
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "events:PutEvents"
+          Resource:
+            Fn::Sub: "arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default"
+
+functions:
+  lambda-eventbridge-sls-post:
+    handler: handler.post
+    events:
+      - httpApi:
+          method: post
+          path: /
+    environment:
+      SOURCE_NAME: ${self:custom.sourceName}
+      DETAIL_TYPE: ${self:custom.detailType}

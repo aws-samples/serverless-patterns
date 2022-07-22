@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "~> 4.22"
     }
   }
 
@@ -50,8 +50,11 @@ data "aws_iam_policy" "lambda_basic_execution_role_policy" {
 }
 
 resource "aws_iam_role" "lambda_iam_role" {
-  name = "LambdaSSMParameterRole"
-  managed_policy_arns = [data.aws_iam_policy.lambda_basic_execution_role_policy.arn]
+  name_prefix         = "LambdaSSMParameterRole-"
+  managed_policy_arns = [
+    data.aws_iam_policy.lambda_basic_execution_role_policy.arn,
+    aws_iam_policy.lambda_policy.arn
+  ]
 
   assume_role_policy = <<EOF
 {
@@ -87,15 +90,12 @@ data "aws_iam_policy_document" "lambda_policy_document" {
 }
 
 resource "aws_iam_policy" "lambda_policy" {
-  name   = "lambda_policy"
-  path   = "/"
-  policy = data.aws_iam_policy_document.lambda_policy_document.json
-}
-
-resource "aws_iam_policy_attachment" "attach_lambda_iam_policy" {
-  name       = "lambda-policy-attachment"
-  roles      = [aws_iam_role.lambda_iam_role.name]
-  policy_arn = aws_iam_policy.lambda_policy.arn
+  name_prefix = "lambda_policy-"
+  path        = "/"
+  policy      = data.aws_iam_policy_document.lambda_policy_document.json
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_ssm_parameter" "ssm_parmeter" {

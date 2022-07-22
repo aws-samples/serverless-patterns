@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Transform: 'AWS::Serverless-2016-10-31'
+
+Description: Different methods to put the IoT events to a DynamoDB table using AWS IoT Topic rules.
+
+Resources:
+
+  # Define DynamoDB Table to save data for IoT Rule -> DynamoDB action
+  IoTExampleTableOne:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: IoTExampleTableOne
+      AttributeDefinitions:
+        - AttributeName: thingId
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: thingId
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  # Define DynamoDB Table to save data for IoT Rule -> DynamoDv2 action
+  IoTExampleTableTwo:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: IoTExampleTableTwo
+      AttributeDefinitions:
+        - AttributeName: eventId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: eventId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  # Define IAM Role to allow AWS IoT to put events to DynamoDB Tables
+  IoTTableAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: iot.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: IoTDynamoDBTablePutAccessPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: dynamodb:PutItem
+            Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${IoTExampleTableOne}
+          - Effect: Allow
+            Action: dynamodb:PutItem
+            Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${IoTExampleTableTwo}
+
+  # Define AWS IoT Topic Rule to put event to DynamoDB Table using 'DynamoDB' Action.
+  IoTToDDBRule:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      TopicRulePayload:
+        Actions:
+        - DynamoDB:
+            HashKeyField: thingId
+            HashKeyValue: ${topic(3)}
+            RangeKeyField: timestamp
+            RangeKeyValue: ${timestamp()}
+            RangeKeyType: NUMBER
+            PayloadField: device_data
+            TableName: !Ref IoTExampleTableOne
+            RoleArn: !GetAtt IoTTableAccessRole.Arn
+        RuleDisabled: false
+        Sql: SELECT * FROM 'topics/ThingsGroupOne/+'
+
+  # Define AWS IoT Topic Rule to put event to DynamoDB Table using 'DynamoDB2' Action.
+  IoTToDDBv2Rule:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      TopicRulePayload:
+        Actions:
+        - DynamoDBv2:
+            PutItem:
+              TableName: !Ref IoTExampleTableTwo
+            RoleArn: !GetAtt IoTTableAccessRole.Arn
+        RuleDisabled: false
+        Sql: SELECT * FROM 'topics/ThingsGroupTwo/TestThing'

@@ -1,0 +1,43 @@
+service: lambda-sns-sls
+
+frameworkVersion: "3"
+
+custom:
+  topicName: "lambdasnssls"
+  topicArn:
+    {
+      "Fn::Join":
+        [
+          "",
+          [
+            "arn:aws:sns:${self:provider.region}:",
+            { "Ref": "AWS::AccountId" },
+            ":${self:custom.topicName}",
+          ],
+        ],
+    }
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-2
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "sns:Publish"
+          Resource: !Ref snsTopic
+
+functions:
+  lambda-sns-sls:
+    handler: handler.handle
+    environment:
+      TOPIC_ARN: !Ref snsTopic
+
+resources:
+  Resources:
+    snsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: ${self.custom.topicName}
