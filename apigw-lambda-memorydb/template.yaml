@@ -57,6 +57,15 @@ Resources:
     Properties:
       GroupDescription: lambda access
       VpcId: !Ref memdbClusterVPC
+  lambdaSGEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      CidrIp: 0.0.0.0/0
+      GroupId:
+        Fn::GetAtt:
+          - lambdaSG
+          - GroupId
+      IpProtocol: -1
   memoryDBSGIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -68,6 +77,16 @@ Resources:
       ToPort: 6379
       FromPort: 6379
       SourceSecurityGroupId: !Ref lambdaSG
+  memoryDBSGEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: Allow all outbound traffic
+      CidrIp: 0.0.0.0/0
+      GroupId:
+        Fn::GetAtt:
+          - memoryDBClusterSG
+          - GroupId
+      IpProtocol: -1
   memoryDBCluster:
     Type: AWS::MemoryDB::Cluster
     Properties:
