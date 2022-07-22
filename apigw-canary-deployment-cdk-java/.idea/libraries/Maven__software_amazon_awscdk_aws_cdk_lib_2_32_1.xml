@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: software.amazon.awscdk:aws-cdk-lib:2.32.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/software/amazon/awscdk/aws-cdk-lib/2.32.1/aws-cdk-lib-2.32.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/software/amazon/awscdk/aws-cdk-lib/2.32.1/aws-cdk-lib-2.32.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/software/amazon/awscdk/aws-cdk-lib/2.32.1/aws-cdk-lib-2.32.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
