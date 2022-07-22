@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A Step Functions Standard Workflow that triggers a Lambda function synchronously which in turn triggers another function asynchronously.
+Resources:
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+  StateMachineStandardInvokeLambda:
+    Type: AWS::Serverless::StateMachine
+    DependsOn:
+        - StatesExecutionRole
+        - StateMachineLogGroup
+    Properties:
+      DefinitionUri: statemachine/StateMachine.asl.json
+      DefinitionSubstitutions:
+        FirstFunctionARN: !GetAtt FirstFunction.Arn
+        SecondFunctionARN: !GetAtt SecondFunction.Arn
+      Role:
+        Fn::GetAtt: [ StatesExecutionRole, Arn ]
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+        IncludeExecutionData: true
+        Level: 'ALL'
+##########################################################################
+#  Lambda functions                                                      #
+##########################################################################
+  FirstFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: firstfunction/
+      Handler: first-function.handler
+      Runtime: nodejs16.x
+      Timeout: 3
+      Policies: 
+        - CloudWatchPutMetricPolicy: {}
+  SecondFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: secondfunction/
+      Handler: second-function.handler
+      Runtime: nodejs16.x
+      Timeout: 3
+      Policies: 
+        - CloudWatchPutMetricPolicy: {}
+##########################################################################
+#  STEP FUNCTION LOG GROUP                                               #
+##########################################################################
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", StateMachineStandardInvokeLambda]]
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+  StatesExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: LambdaExecute
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "lambda:InvokeFunction"
+                Resource: 
+                  - !GetAtt FirstFunction.Arn
+                  - !GetAtt SecondFunction.Arn
+        -  PolicyName: LogPermissions
+           PolicyDocument:
+             Version: "2012-10-17"
+             Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogDelivery"
+                  - "logs:GetLogDelivery"
+                  - "logs:UpdateLogDelivery"
+                  - "logs:DeleteLogDelivery"
+                  - "logs:ListLogDeliveries"
+                  - "logs:PutLogEvents"
+                  - "logs:PutResourcePolicy"
+                  - "logs:DescribeResourcePolicies"
+                  - "logs:DescribeLogGroups"
+                Resource: "*"                  
+##########################################################################
+#   Outputs                                                              #
+##########################################################################
+Outputs:
+  StateMachineExpressSynctoLambda:
+    Value: !Ref StateMachineStandardInvokeLambda
+    Description: StateMachineStandardInvokeLambda Arn
