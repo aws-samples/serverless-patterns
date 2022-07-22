@@ -70,4 +70,4 @@ Outputs:
   # API endpoint for testing
   ApiEndpoint:
     Description: "API endpoint URL"
-    Value: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${MyApi}/stages/Prod
+    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
