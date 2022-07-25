@@ -1,7 +1,7 @@
 {
   "title": "Lambda function in a VPC",
   "description": "Create a Lambda Function in a VPC with secure access to Secrets Manager.",
-  "language": "Node.js, TypeScript",
+  "language": "TypeScript",
   "level": "200",
   "framework": "Serverless Framework",
     "services": {
