@@ -1,4 +1,5 @@
 # Serverless cross account ALB->PrivateAPI use-case using AWS Lambda, API Gateway, Application Load Balancer, VPC Endpoint
+![Concept](./flow.png)
 
 This serverless pattern allows users from one account to access their Private REST APIs present in another account over the internet. This facilitates abstraction of network resources (like load balancers, virtual private clouds, endpoints) & application resources (like lambda, api gateway) into separate  individual management accounts.
 
