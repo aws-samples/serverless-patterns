@@ -1,5 +1,7 @@
 # Serverless example to process all results from S3 data fetched in Athena Query using Step Functions. 
 
+![Concept](./sf-athena-glue.png)
+
 This serverless pattern uses AWS Athena allows to analyze data in Amazon S3 using standard SQL. A Glue crawler creates a database table from the S3 data which is queried by Athena. Step Function can be leveraged to query as well as process each result in this data received from Athena with the help of **NextToken**.
 
 Athena is out-of-the-box integrated with AWS Glue Data Catalog, allowing you to create a unified metadata repository across various services, crawl data sources to discover schemas and populate your Catalog with new and modified table and partition definitions, and maintain schema versioning. It is easy to use. Simply point to your data in Amazon S3, define the schema, and start querying using standard SQL. Most results are delivered within seconds.
