@@ -1,21 +1,54 @@
+/**
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ *  with the License. A copy of the License is located at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
+
 import {
   aws_medialive as medialive,
   aws_iam as iam,
   Aws,
-  CfnOutput,
-  Fn,
 } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { loadMediaLiveConfig } from "../helpers/configuration";
 
 export class MediaLive extends Construct {
   public readonly channelLive: medialive.CfnChannel;
+  public readonly myChannelArn: string;
+  public readonly myChannelName: string;
+  public readonly myChannelInput: string;
 
   constructor(scope: Construct, id: string, mediaPackageChannelId: string) {
     super(scope, id);
+    const myMediaLiveChannelName=Aws.STACK_NAME + "_MediaLiveChannel"
 
     const config = loadMediaLiveConfig();
+    var destinationValue=[]
+    var inputSettingsValue={}
 
+    //👇Generate a Role for MediaLive to access MediaPackage, MediaConnect and S3. You can modify the role to restrict to specific S3 buckets
+    const policyMediaConnect = {
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Effect: "Allow",
+          Action: [
+            "mediaconnect:ManagedDescribeFlow",
+            "mediaconnect:ManagedAddOutput",
+            "mediaconnect:ManagedRemoveOutput",
+            "mediaconnect:AddFlowOutputs",
+          ],
+          Resource: [`arn:aws:mediaconnect:${Aws.REGION}:${Aws.ACCOUNT_ID}:*`]
+        }
+      ],
+    };
     const role = new iam.Role(this, "MediaLiveAccessRole", {
       managedPolicies: [
         {
@@ -26,9 +59,13 @@ export class MediaLive extends Construct {
           managedPolicyArn: "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
         },
       ],
+      inlinePolicies: {
+        medialivecustom: iam.PolicyDocument.fromJson(policyMediaConnect),
+      },
       assumedBy: new iam.ServicePrincipal("medialive.amazonaws.com"),
     });
 
+   //👇Generate Security Groups for RTP and RTMP (Push) inputs 
     const mediaLiveSG = new medialive.CfnInputSecurityGroup(
       this,
       "MediaLiveInputSecurityGroup",
@@ -41,54 +78,100 @@ export class MediaLive extends Construct {
       }
     );
 
-    //1. Create Input
-
+    //👇 1. Create a MediaLive input
+    const inputName = Aws.STACK_NAME + "_" + config.inputType + "_MediaLiveInput"
     var cfnInputProps: medialive.CfnInputProps = {
       name: '',
+      roleArn: '',
       type: '',
       inputSecurityGroups: [],
+      destinations: [{
+        streamName: '',
+      }],
+      inputDevices: [{
+        id: '',
+      }],
+      mediaConnectFlows: [{
+        flowArn: '',
+      }],
+      sources: [{
+        passwordParam: 'passwordParam',
+        url: 'url',
+        username: 'username',
+      }],
+      vpc: {
+        securityGroupIds: [''],
+        subnetIds: [''],
+      },
     };
+    
 
-    switch (config.type) {
-
-      case "RTP_PUSH":
-        cfnInputProps = {
-          name: Aws.STACK_NAME + "_MyChannel",
-          type: config.type,
-          inputSecurityGroups: [mediaLiveSG.ref],
-        };
+      //👇1.1 Testing the Input Type
+      switch (config.inputType) {
+        case "INPUT_DEVICE":
+          //👇 Validating if STANDARD or SINGLE_PIPELINE Channel to provide 1 or 2 InputDevice
+          if (config.channelClass == "STANDARD") {
+            destinationValue=[{id: config.priLink},{id: config.secLink}]
+          }else{
+            destinationValue=[{id: config.priLink}]
+          }
+          cfnInputProps = {
+            name: inputName,
+            type: config.inputType,
+            inputDevices: destinationValue ,
+          };
         break;
-      case "RTMP_PUSH":
-        cfnInputProps = {
-          name: Aws.STACK_NAME + "_MyChannel",
-          type: config.type,
-          inputSecurityGroups: [mediaLiveSG.ref],
-          destinations: [
-            {
-              streamName: config.streamName + "/primary",
-            },
-            {
-              streamName: config.streamName + "/secondary",
-            },
-          ],
-        };
-        break;
-      case "RTMP_PULL":
-      case "URL_PULL":
-        cfnInputProps = {
-          name: Aws.STACK_NAME + "_MyInput",
-          type: config.type,
-          sources: [
-            {
-              url: config.priUrl,
-            },
-            {
-              url: config.secUrl,
-            },
-          ],
-        };
-        break;
-    }
+  
+        case "RTP_PUSH":
+          cfnInputProps = {
+            name: inputName,
+            type: config.inputType,
+            inputSecurityGroups: [mediaLiveSG.ref],
+          };
+          break;
+        case "RTMP_PUSH":
+          //👇 Validating if STANDARD or SINGLE_PIPELINE Channel to provide 1 or 2 URL
+          if (config.channelClass == "STANDARD") {
+            destinationValue=[{streamName: config.streamName + "/primary"},{streamName: config.streamName + "/secondary"}]
+          }else{
+            destinationValue=[{streamName: config.streamName + "/primary"}]
+          }
+          cfnInputProps = {
+            name: inputName,
+            type: config.inputType,
+            inputSecurityGroups: [mediaLiveSG.ref],
+            destinations: destinationValue,
+          };
+          break;
+        case "MP4_FILE": case "RTMP_PULL": case "URL_PULL": case "TS_FILE":
+          //👇 Validating if STANDARD or SINGLE_PIPELINE Channel to provide 1 or 2 URL
+          if (config.channelClass == "STANDARD") {
+            destinationValue=[{url: config.priUrl},{url: config.secUrl}]
+          }else{
+            destinationValue=[{url: config.priUrl}]
+          }
+          cfnInputProps = {
+            name: inputName,
+            type: config.inputType,
+            sources: destinationValue,
+          };
+          inputSettingsValue={sourceEndBehavior: config.sourceEndBehavior}
+          break;
+        case "MEDIACONNECT":
+          //👇 Validating if STANDARD or SINGLE_PIPELINE Channel to provide 1 or 2 URL
+          if (config.channelClass == "STANDARD") {
+            destinationValue=[{flowArn: config.priFlow,},{flowArn: config.secFlow,}]
+          }else{
+            destinationValue=[{flowArn: config.priFlow,}]
+          }
+          cfnInputProps = {
+            name: inputName,
+            type: config.inputType,
+            roleArn: role.roleArn,
+            mediaConnectFlows: destinationValue,
+          };
+          break;
+      }
 
     const medialive_input = new medialive.CfnInput(this, "MediaInputChannel", cfnInputProps);
 
@@ -122,7 +205,7 @@ export class MediaLive extends Construct {
     }
 
     const channelLive = new medialive.CfnChannel(this, "MediaLiveChannel", {
-      channelClass: "SINGLE_PIPELINE",
+      channelClass: config.channelClass,
       destinations: [
         {
           id: "media-destination",
@@ -138,29 +221,23 @@ export class MediaLive extends Construct {
         resolution: params.resolution,
         maximumBitrate: params.maximumBitrate,
       },
-      name: "MyMediaLiveChannel",
+      name: myMediaLiveChannelName,
       roleArn: role.roleArn,
       inputAttachments: [
         {
           inputId: medialive_input.ref,
-          inputAttachmentName: "media-package-input",
+          inputAttachmentName: inputName,
+          inputSettings: inputSettingsValue,
         },
       ],
       encoderSettings:
         params.encoderSettings as medialive.CfnChannel.EncoderSettingsProperty,
     });
 
-    new CfnOutput(this, "MediaLiveChannelArn", {
-      value: channelLive.attrArn,
-    });
-
-
-    new CfnOutput(this, "MediaLiveEndpoint", {
-      value: Fn.join("", [Fn.select(0, medialive_input.attrDestinations)]),
-    });
-
     this.channelLive = channelLive;
-
-
+    this.myChannelName=myMediaLiveChannelName;
+    this.myChannelArn=this.channelLive.attrArn;
+    this.myChannelInput=inputName;
+    
   }
 }

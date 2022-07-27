@@ -1,7 +1,7 @@
 
-# Live Streaming on AWS using RTP/RTMP sources
+# Live Streaming on AWS using MediaLive and MediaPackage
 
-This pattern creates a live streaming stack leveraging AWS Elemental MediaLive, MediaPackage for RTP/RTMP input sources.
+This pattern creates a live streaming stack leveraging AWS Elemental MediaLive, MediaPackage for any input sources supported by MediaLive.
 
 ![Concept](img/diagram.drawio.png)
 
@@ -17,21 +17,30 @@ The encoding profile used when deploying the stack is specified using the parame
 config/media_live.json
 ````
 
+The ```ChannelClass``` can be either:
+- STANDARD (fully redundant transcoding pipelines)
+- SINGLE_PIPELINE
+
 The solution can be configured with the following input type:
 
+- UDP_PUSH
 - RTP_PUSH
 - RTMP_PUSH
 - RTMP_PULL
 - URL_PULL
+- MP4_FILE
+- INPUT_DEVICE
+- TS_FILE
+- MEDIACONNECT
 
-3 encoding profiles are available:
+3 encoding profiles are available :
 
 ```
 config/encoding-profiles/hd-1080p.json
 config/encoding-profiles/hd-720p.json
 config/encoding-profiles/sd-540p.json
 ```
-
+Change the ```encodingProfile``` parameter for the following values:
 - **HD-1080p** profile: 1920x1080, 1280x720, 960x540, 768x432, 640x360, 512x288
 - **HD-720p** profile: 1280x720, 960x540, 768x432, 640x360, 512x288
 - **SD-540p** profile: 960x540, 768x432, 640x360, 512x288
@@ -43,8 +52,15 @@ Ingests the MediaLive Output and package the Live stream into:
 - HLS
 - DASH
 - CMAF
+- MSS
 
-Each format is delivered through a MediaPackage custom endpoint.
+Each format is delivered through a MediaPackage custom endpoint. The packaging settings used when deploying the stack are specified in the file:
+```
+config/media_live.json
+```
+To use CDN Authorization, enable or disable the ```cdn_authorization``` parameter in the setting file.
+
+
 
 Learn more about this pattern at: https://serverlessland.com/patterns/elemental-medialive-mediapackage-cdk-ts
 
@@ -100,17 +116,17 @@ AWS Elemental Media Live -> Aws Elemental Media Package
 
     ```bash
     Outputs:
-
-    StreamingStack.MediaLiveMediaLiveChannelArn9CBFE74E = arn:aws:medialive:eu-west-1:xxxxxxxxx:channel:5487010
-
-    StreamingStack.MediaLiveMediaLiveEndpoint6C24CC11 = rtmp://STREAMING_IP_ADDRESS:STREAMING_PORT/live/primary
-
-    StreamingStack.MediaPackageChannelDashEndpointURL075A4782 = https://aaaaaxxxxxccccvvv.mediapackage.eu-west-1.amazonaws.com/out/v1/9ba56ae160074159b272ee751fb3d20b/index.mpd
-
-    StreamingStack.MediaPackageChannelHlsEndpointURL3F32439A = https://aaaaaxxxxxccccvvv.mediapackage.eu-west-1.amazonaws.com/out/v1/6cfa1b541d2e461d9e8af5cd03ce41ca/index.m3u8
-
-    StreamingStack.MediaPackageChannelMssEndpointURL2826FEB1 = https://aaaaaxxxxxccccvvv.mediapackage.eu-west-1.amazonaws.com/out/v1/4914c65c06e9426bb6de3cb460ce1534/index.ism/Manifest
+    StreamingStack.MediaLiveChannelArn = arn:aws:medialive:::channel:
+    StreamingStack.MediaLiveChannelInputName = StreamingStack_InputType_MediaLiveInput
+    StreamingStack.MediaLiveChannelName = StreamingStack_MediaLiveChannel
+    StreamingStack.MediaPackageChannelArn = arn:aws:mediapackage:::channels/
+    StreamingStack.MediaPackageChannelName = StreamingStack_MediaPackageChannel
+    StreamingStack.MediaPackageChannelUrlCMAF =
+    StreamingStack.MediaPackageChannelUrlDASH = 
+    StreamingStack.MediaPackageChannelUrlHLS = 
+    StreamingStack.MediaPackageChannelUrlMSS = 
     ```
+NB: CMAF is not displaying on CloudFormation, but you can get it from the MediaPackage channel 
 
 1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
@@ -119,18 +135,18 @@ AWS Elemental Media Live -> Aws Elemental Media Package
 1. Start Media Live channel using the channelId from the MediaLiveChannelArn:
 
     ```bash
-    aws medialive start-channel --channel-id 5487010
+    aws medialive start-channel --channel-id CHANNEL_ID
     ```
 
     Wait for the channel to start
 
     ```bash
-    while true ; do CHANNEL_STATUS=`aws medialive describe-channel --channel-id 5487010 --query "State" --output text` ; if [ $CHANNEL_STATUS == "RUNNING" ] ; then echo "Channel 5487010 is started" ; break ; else echo "Channel 5487010 is not started"; fi ; sleep 5 ; done
+    while true ; do CHANNEL_STATUS=`aws medialive describe-channel --channel-id CHANNEL_ID --query "State" --output text` ; if [ $CHANNEL_STATUS == "RUNNING" ] ; then echo "Channel CHANNEL_ID is started" ; break ; else echo "Channel CHANNEL_ID is not started"; fi ; sleep 5 ; done
     ```
 
 2. Configure your streaming app using the url from `MediaLiveMediaLiveEndpoint6C24CC11` and start streaming
 
-3. Use the Endpoint URL (`MediaPackageChannelDashEndpointURL075A4782` or `MediaPackageChannelHlsEndpointURL3F32439A` or `MediaPackageChannelMssEndpointURL2826FEB1`) to play the video stream in any compatible player
+3. Use the Endpoint URL (`MediaPackageChannelUrlDASH` or `MediaPackageChannelUrlHLS` or `MediaPackageChannelUrlMSS`) to play the video stream in any compatible player
 
 
 ## Cleanup
@@ -138,13 +154,13 @@ AWS Elemental Media Live -> Aws Elemental Media Package
 1. Stop Media Live channel
 
     ```bash
-    aws medialive stop-channel --channel-id 5487010
+    aws medialive stop-channel --channel-id CHANNEL_ID
     ```
 
     Wait for the channel to stop
 
     ```bash
-    while true ; do CHANNEL_STATUS=`aws medialive describe-channel --channel-id 5487010 --query "State" --output text` ; if [ $CHANNEL_STATUS == "IDLE" ] ; then echo "Channel 5487010 is stopped" ; break ; else echo "Channel 5487010 is not stopped"; fi ; sleep 5 ; done
+    while true ; do CHANNEL_STATUS=`aws medialive describe-channel --channel-id 5487010 --query "State" --output text` ; if [ $CHANNEL_STATUS == "IDLE" ] ; then echo "Channel 5487010 is stopped" ; break ; else echo "Channel CHANNEL_ID is not stopped"; fi ; sleep 5 ; done
     ```
 
 
