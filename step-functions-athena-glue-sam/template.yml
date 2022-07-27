@@ -1,0 +1,184 @@
+Transform: AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Sample SAM Template for Athena Querying
+
+Parameters:
+  AthenaBucket:
+    Type: String
+    Description: Enter your unique bucket name to store Athena query results
+
+  CrawlerBucket:
+    Type: String
+    Description: Enter your unique bucket name to fetch table from
+
+  Database:
+    Type: String
+    Description: Enter a Database name
+
+Resources:
+
+  SFRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "states.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: AthenaAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - "athena:startQueryExecution"
+                  - "athena:stopQueryExecution"
+                  - "athena:getQueryExecution"
+                  - "athena:getDataCatalog"
+                  - "athena:getQueryResults"
+                Resource: 
+                  - !Sub "arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/*"
+                  - !Sub "arn:aws:athena:${AWS::Region}:${AWS::AccountId}:datacatalog/*"
+        
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetBucketLocation"
+                  - "s3:GetObject"
+                  - "s3:ListBucket"
+                  - "s3:ListBucketMultipartUploads"
+                  - "s3:ListMultipartUploadParts"
+                  - "s3:AbortMultipartUpload"
+                  - "s3:CreateBucket"
+                  - "s3:PutObject"
+                Resource:
+                  - !Sub "arn:aws:s3:::${AthenaBucket}/*"
+                  - !Sub "arn:aws:s3:::${CrawlerS3Bucket}/*"
+                  - !Sub "arn:aws:s3:::${AthenaBucket}"
+                  - !Sub "arn:aws:s3:::${CrawlerS3Bucket}"
+
+        - PolicyName: GlueAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "glue:CreateDatabase"
+                  - "glue:GetDatabase"
+                  - "glue:GetDatabases"
+                  - "glue:UpdateDatabase"
+                  - "glue:DeleteDatabase"
+                  - "glue:CreateTable"
+                  - "glue:UpdateTable"
+                  - "glue:GetTable"
+                  - "glue:GetTables"
+                  - "glue:DeleteTable"
+                  - "glue:BatchDeleteTable"
+                  - "glue:BatchCreatePartition"
+                  - "glue:CreatePartition"
+                  - "glue:UpdatePartition"
+                  - "glue:GetPartition"
+                  - "glue:GetPartitions"
+                  - "glue:BatchGetPartition"
+                  - "glue:DeletePartition"
+                  - "glue:BatchDeletePartition"
+                Resource:
+                - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog"
+                - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/*"
+                - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/*"
+                - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:userDefinedFunction/*"           
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: StateMachine
+      DefinitionUri: athenaquery.asl.json
+      DefinitionSubstitutions:
+        AthenaBucketname: !Ref AthenaBucket
+        CrawlerBucketname: !Ref CrawlerBucket
+        DBname: !Ref MyDatabase
+      Role: !GetAtt SFRole.Arn
+
+
+  AthenaQueryS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Ref AthenaBucket
+      AccessControl: "BucketOwnerFullControl"
+
+  MyRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "glue.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        ['arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole']
+      Policies:
+        -
+          PolicyName: "S3BucketAccessPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: 
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                Resource: 
+                  !Join 
+                    - ''
+                    - - !GetAtt CrawlerS3Bucket.Arn
+                      - "*"
+ 
+  MyDatabase:
+    Type: 'AWS::Glue::Database'
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: !Ref Database
+ 
+  CrawlerS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Ref CrawlerBucket
+      AccessControl: "BucketOwnerFullControl"
+ 
+  MyCrawler:
+    Type: 'AWS::Glue::Crawler'
+    Properties:
+      Name: "testcrawler"
+      Role: !GetAtt MyRole.Arn
+      DatabaseName: !Ref MyDatabase
+      Targets:
+        S3Targets:
+          - Path: 
+              !Join
+                - ''
+                - - !Ref CrawlerS3Bucket
+                  - "/"
+
+
+Outputs:
+  ActivityStateMachineArn:
+    Description: "Activity State machine ARN"
+    Value: !Ref StateMachine
+  ActivityStateMachineRoleArn:
+    Description: "IAM Role created for Activity State machine based on the specified SAM Policy Templates"
+    Value: !GetAtt SFRole.Arn
