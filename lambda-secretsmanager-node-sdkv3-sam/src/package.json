@@ -1,0 +1,9 @@
+{
+    "name": "lambda-secretsmanager-node-sdkv3-sam",
+    "type": "module",
+    "version": "1.0.0",
+    "description": "Lambda ES Module Secrets Manager",
+    "dependencies": {
+        "@aws-sdk/client-secrets-manager": "^3.36.1"
+    }
+}
