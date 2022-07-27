@@ -1,0 +1,327 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Amazon Aurora MySQL and RDS Proxy Setup
+
+## Mapping holding default network/database settings
+Mappings:
+  NetworkSettings:
+    global:
+      vpcCidr: 172.31.0.0/16
+      subPrv1Cidr: 172.31.0.0/24
+      subPrv2Cidr: 172.31.1.0/24
+      subPrv3Cidr: 172.31.2.0/24
+  ClusterSettings:
+    global:
+      dbSchema: mylab
+      dbVersion: 5.7.mysql_aurora.2.09.1
+      dbEngine: aurora-mysql
+      dbFamily: aurora-mysql5.7
+      port: 3306
+      nodeType: db.r5.large
+
+Resources:
+  # VPC for creating database and proxy
+  vpc:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      CidrBlock: !FindInMap [ NetworkSettings, global, vpcCidr ]
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-vpc"
+
+  # Private subnet 1
+  sub1Private:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref vpc
+      CidrBlock: !FindInMap [ NetworkSettings, global, subPrv1Cidr ]
+      AvailabilityZone: !Join [ "", [ !Ref "AWS::Region", a ]]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-prv-sub-1"
+
+  # Private subnet 2
+  sub2Private:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref vpc
+      CidrBlock: !FindInMap [ NetworkSettings, global, subPrv2Cidr ]
+      AvailabilityZone: !Join [ "", [ !Ref "AWS::Region", b ]]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-prv-sub-2"
+
+  # Private subnet 3
+  sub3Private:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref vpc
+      CidrBlock: !FindInMap [ NetworkSettings, global, subPrv3Cidr ]
+      AvailabilityZone: !Join [ "", [ !Ref "AWS::Region", c ]]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-prv-sub-3"
+
+  # Security group to be used by lambda function which is allowed to connect to database via Proxy
+  lambdaSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Groups for the AWS Lambda for accessing RDS/Proxy
+      GroupName: 'lambda-sg'
+      SecurityGroupEgress:
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 0
+          ToPort: 65535
+          IpProtocol: tcp
+      SecurityGroupIngress:
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 0
+          ToPort: 65535
+          IpProtocol: tcp
+      VpcId: !Ref vpc
+
+  # database cluster/proxy security group
+  dbClusterSecGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      VpcId: !Ref vpc
+      GroupName: !Sub "${AWS::StackName}-database-sg"
+      GroupDescription: "security group (firewall)"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-database-sg"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort:  !FindInMap [ ClusterSettings, global, port ]
+          ToPort: !FindInMap [ ClusterSettings, global, port ]
+          SourceSecurityGroupId: !GetAtt lambdaSg.GroupId
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          SourceSecurityGroupId: !GetAtt lambdaSg.GroupId
+
+  # Ingress rule for database security group
+  ruleDbClusterSecGroupIngressSelf:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      GroupId: !Ref dbClusterSecGroup
+      IpProtocol: -1
+      Description: "Allows all inbound access from sources with the same security group"
+      SourceSecurityGroupId: !Ref dbClusterSecGroup
+
+  # Database cluster username/password stored in AWS Secret Manager
+  secretClusterMasterUser:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Description: !Sub "Master user credentials for DB cluster '${AWS::StackName}-mysql-cluster'"
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "masteruser"}'
+        GenerateStringKey: 'password'
+        PasswordLength: 10
+        ExcludeCharacters: '"@/\$`&:{}()[]'
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-cluster-secret"
+
+  # IAM Role to be used for enabling enhanced monitoring for RDS Aurora cluster
+  roleEnhancedMonitoring:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-monitor-${AWS::Region}"
+      Description: "Allows your Aurora DB cluster to deliver Enhanced Monitoring metrics."
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - "monitoring.rds.amazonaws.com"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-monitor-${AWS::Region}"
+
+  # Custom parameter group for RDS Aurora
+  pgNodeParams:
+    Type: "AWS::RDS::DBParameterGroup"
+    Properties:
+      Description: !Sub "${AWS::StackName}-mysql-node-params"
+      Family: !FindInMap [ ClusterSettings, global, dbFamily ]
+      Parameters:
+        innodb_stats_persistent_sample_pages: "256"
+        slow_query_log: "1"
+        long_query_time: "10"
+        log_output: FILE
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-mysql-node-params"
+  dbSubnets:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupName: !Sub "${AWS::StackName}-db-subnet-group"
+      DBSubnetGroupDescription: "subnets allowed for deploying DB instances"
+      SubnetIds: [ !Ref sub1Private, !Ref sub2Private, !Ref sub3Private ]
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-db-subnet-group"
+
+  # Rds Aurora Cluster
+  dbCluster:
+    Type: "AWS::RDS::DBCluster"
+    Properties:
+      Engine: !FindInMap [ ClusterSettings, global, dbEngine ]
+      EngineVersion: !FindInMap [ ClusterSettings, global, dbVersion ]
+      DBSubnetGroupName: !Ref dbSubnets
+      DBClusterIdentifier: !Sub "${AWS::StackName}-mysql-cluster"
+      BackupRetentionPeriod: 1
+      MasterUsername: !Join [ "", [ "{{resolve:secretsmanager:", !Ref secretClusterMasterUser, ":SecretString:username}}" ] ]
+      MasterUserPassword: !Join [ "", [ "{{resolve:secretsmanager:", !Ref secretClusterMasterUser, ":SecretString:password}}" ] ]
+      DatabaseName: !FindInMap [ ClusterSettings, global, dbSchema ]
+      StorageEncrypted: true
+      VpcSecurityGroupIds: [ !Ref dbClusterSecGroup ]
+      EnableCloudwatchLogsExports: [ error, slowquery ]
+      BacktrackWindow: 86400
+      EnableIAMDatabaseAuthentication: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-mysql-cluster"
+
+  # Primary DB instance for RDS Cluster
+  dbNode1:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      DBClusterIdentifier: !Ref dbCluster
+      DBInstanceIdentifier: !Sub "${AWS::StackName}-mysql-node-1"
+      CopyTagsToSnapshot: true
+      DBInstanceClass: !FindInMap [ ClusterSettings, global, nodeType ]
+      DBParameterGroupName: !Ref pgNodeParams
+      Engine: !FindInMap [ ClusterSettings, global, dbEngine ]
+      MonitoringInterval: 1
+      MonitoringRoleArn: !GetAtt roleEnhancedMonitoring.Arn
+      PubliclyAccessible: false
+      EnablePerformanceInsights: true
+      PerformanceInsightsRetentionPeriod: 7
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-mysql-node-1"
+
+  # Reader node instance for RDS Aurora Cluster
+  dbNode2:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      DBClusterIdentifier: !Ref dbCluster
+      DBInstanceIdentifier: !Sub "${AWS::StackName}-mysql-node-2"
+      CopyTagsToSnapshot: true
+      DBInstanceClass: !FindInMap [ ClusterSettings, global, nodeType ]
+      DBParameterGroupName: !Ref pgNodeParams
+      Engine: !FindInMap [ ClusterSettings, global, dbEngine ]
+      MonitoringInterval: 1
+      MonitoringRoleArn: !GetAtt roleEnhancedMonitoring.Arn
+      PubliclyAccessible: false
+      EnablePerformanceInsights: true
+      PerformanceInsightsRetentionPeriod: 7
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-mysql-node-2"
+
+  # IAM Role to be used by RDS Proxy for fetching secrets
+  dbProxyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: [ 'sts:AssumeRole' ]
+            Effect: Allow
+            Principal:
+              Service: [ rds.amazonaws.com ]
+      Policies:
+        - PolicyName: DBProxyPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - secretsmanager:GetSecretValue
+                Effect: Allow
+                Resource:
+                  - !Ref secretClusterMasterUser
+
+  # Rds Proxy
+  dbProxy:
+    Type: AWS::RDS::DBProxy
+    Properties:
+      Auth:
+        - { AuthScheme: SECRETS, SecretArn: !Ref secretClusterMasterUser, IAMAuth: REQUIRED }
+      DBProxyName: 'rds-proxy'
+      RoleArn: !GetAtt dbProxyRole.Arn
+      EngineFamily: 'MYSQL'
+      IdleClientTimeout: 120
+      RequireTLS: true
+      DebugLogging: false
+      VpcSubnetIds:
+        - !Ref sub1Private
+        - !Ref sub2Private
+        - !Ref sub3Private
+      VpcSecurityGroupIds:
+        - !GetAtt dbClusterSecGroup.GroupId
+
+  # Rds Proxy Target group
+  proxyTargetGroup:
+    Type: AWS::RDS::DBProxyTargetGroup
+    DependsOn:
+      - dbCluster
+      - dbNode1
+      - dbNode2
+    Properties:
+      DBProxyName: !Ref dbProxy
+      DBClusterIdentifiers: [ !Ref dbCluster ]
+      TargetGroupName: default
+      ConnectionPoolConfigurationInfo:
+        MaxConnectionsPercent: 5
+        MaxIdleConnectionsPercent: 4
+        ConnectionBorrowTimeout: 120
+
+Outputs:
+  vpcId:
+    Description: "VPC Id"
+    Value: !Ref vpc
+  sub1Private:
+    Description: "Private subnet 1"
+    Value: !Ref sub1Private
+  sub2Private:
+    Description: "Private subnet 2"
+    Value: !Ref sub2Private
+  sub3Private:
+    Description: "Private subnet 3"
+    Value: !Ref sub3Private
+  clusterEndpoint:
+    Description: "RDS Aurora Cluster Endpoint"
+    Value: !GetAtt dbCluster.Endpoint.Address
+  readerEndpoint:
+    Description: "RDS Aurora cluster reader Endpoint"
+    Value: !GetAtt dbCluster.ReadEndpoint.Address
+  secretArn:
+    Description: "Database Credentials Secret Manager ARN"
+    Value: !Ref secretClusterMasterUser
+  lambdaSgGroupId:
+    Description: "Security group id to use on lambda"
+    Value: !GetAtt lambdaSg.GroupId
+  databasePort:
+    Description: "Database port"
+    Value: !FindInMap [ ClusterSettings, global, port ]
+  rdsProxyEndpoint:
+    Description: "RDS Proxy writer endpoint"
+    Value: !GetAtt dbProxy.Endpoint
+  dbProxyResourceId:
+    Description: "RDS Proxy Resource ID. This is used while configuring permissions for lambda function"
+    Value: !Select [6, !Split [":", !GetAtt dbProxy.DBProxyArn]]
