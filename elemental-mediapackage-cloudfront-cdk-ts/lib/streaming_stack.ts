@@ -8,6 +8,7 @@ export class StreamingStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    
     //1. Create MediaPackage Channel
     const mediaPackageChannel = new MediaPackage(
       this,
