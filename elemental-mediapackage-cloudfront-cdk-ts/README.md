@@ -11,9 +11,15 @@ Ingests the MediaLive Output and package the Live stream into:
 
 - HLS
 - DASH
-- CMAF
 
-Each format is delivered through a MediaPackage custom endpoint.
+
+Each format is delivered through a MediaPackage custom endpoint. There is a [CDN authorization](https://docs.aws.amazon.com/mediapackage/latest/ug/cdn-auth.html) implemented for each endpoint to reinforce the security through a secret store on [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/). This is the way to secure the access to each MediaPackage endpoints.
+The solution will create HLS, MPEG-DASH outputs with SCTE35 in Passthrough mode.
+
+## Amazon CloudFront
+
+A distribution is created to provide URL for HLS and MPEG-DASH. The default managed cache policy ELEMENTAL_MEDIA_PACKAGE is used for each behavior.
+The output will provide URL for HLS and MPEG-DASH to play only from CloudFront (MediaPackage endpoints are secured using CDN authorization).
 
 Learn more about this pattern at: https://serverlessland.com/patterns/elemental-mediapackage-cloudfront
 
