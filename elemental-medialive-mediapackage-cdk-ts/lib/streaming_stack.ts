@@ -22,7 +22,6 @@ import { Construct, DependencyGroup } from 'constructs';
 import { MediaLive } from './media_live';
 import { MediaPackage } from './media_package';
 import { MediaPackageCdnAuth } from './media_package_cdn_auth';
-
 import { Secrets } from "./secrets";
 import { loadMediaPackageConfig } from "../helpers/configuration";
 
