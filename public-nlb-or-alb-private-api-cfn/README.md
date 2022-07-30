@@ -37,10 +37,10 @@ Important: this application uses various AWS services and there are costs associ
 	
     - Enter a AWS Region [us-east-1]: 
 	
-    # Prefix that will be added to the resources name
+    #Prefix that will be added to the resources name
     - Enter a prefix
 
-    # Name of the Load Balancer
+    #Name of the Load Balancer
 	- Enter a ELB Name
 
     # Name of the target group
