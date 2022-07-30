@@ -5,7 +5,7 @@ This serverless pattern allows users from one account to access their Private RE
 
 ## Working:
 
-* Here we will add the VPC endpoint IP address as a Target behind an ALB. It can be a public/private ALB.
+* Here we will add the VPC endpoint IP address as a Target behind an ALB.
 * The ALB will pass the incoming HTTPS traffic to the Target Group attached to the HTTPS 443 listener.
 * The customd domain ACM certificate will be added to the ALB's HTTPS 443 listener.
 * VPC endpoint will be added to the resource policy of the Private API to allow access.
