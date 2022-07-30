@@ -9,15 +9,15 @@
     "text": [
       "This serverless pattern uses AWS Athena allows to analyze data in Amazon S3 using standard SQL.", 
       "A Glue crawler creates a database table from the S3 data which is queried by Athena.", 
-      "Step Function is leveraged to query as well as process each result in this data received from Athena with the help of **NextToken**."
+      "Step Function is leveraged to query as well as process each result in this data received from Athena with the help of NextToken parameter.
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sf-athena-glue-sam",
-      "templateURL": "serverless-patterns/sf-athena-glue-sam",
-      "projectFolder": "sf-athena-glue-sam",
-      "templateFile": "sf-athena-glue-sam/template.yml"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/step-functions-athena-glue-sam",
+      "templateURL": "serverless-patterns/step-functions-athena-glue-sam",
+      "projectFolder": "step-functions-athena-glue-sam",
+      "templateFile": "step-functions-athena-glue-sam/template.yml"
     }
   },
   "resources": {
@@ -44,7 +44,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>same delete</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
