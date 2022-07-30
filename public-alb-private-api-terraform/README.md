@@ -3,14 +3,22 @@
 
 This serverless pattern allows users from one account to access their Private REST APIs present in another account over the internet. This facilitates abstraction of network resources (like load balancers, virtual private clouds, endpoints) & application resources (like lambda, api gateway) into separate  individual management accounts.
 
+## Working:
+
+* Here we will add the VPC endpoint IP address as a Target behind an ALB. It can be a public/private ALB.
+* The ALB will pass the incoming HTTPS traffic to the Target Group attached to the HTTPS 443 listener.
+* The customd domain ACM certificate will be added to the ALB's HTTPS 443 listener.
+* VPC endpoint will be added to the resource policy of the Private API to allow access.
+* Finally the private API will be invoked using the custom domain name along with the Host header consisting the API's default endpoint.
+
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/public-alb-private-api-terraform
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+Important: this ready-to-use application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-## Requirements
+## Requirements:
 
 * [Create two AWS accounts](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have, create them and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configure two profiles for the individual accounts as below :
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configure two profiles with credentials for the individual accounts as below :
 ```
 [default]
 [crossaccount]
@@ -59,7 +67,7 @@ curl https://<custom_domain>/<stage-name> -H 'Host:<execute-api-invoke-url>'
 
 2. Observe the output of the Private API response from the integrated backend Lambda function:
 ```
-Run the below command 
+Hello from Lambda!
 ```
 
 ## Cleanup
