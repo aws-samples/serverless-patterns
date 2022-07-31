@@ -1,0 +1,294 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Multiple EventBridge Buses filter/pipe to multiple SNS Topics.
+
+Resources:
+  # Define 3 EventBridge Buses for 3 example organisations "banks" namely Bluebank, RedBank and GreenBank
+  BlueBankBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: bluebank-bus
+  RedBankBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: redbank-bus
+  GreenBankBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: greenbank-bus
+
+# Define all DLQs
+  ReserveBankDLQueue:
+    Type: AWS::SQS::Queue
+  BlueBankDLQueue:
+    Type: AWS::SQS::Queue
+  RedBankDLQueue:
+    Type: AWS::SQS::Queue
+  GreenBankDLQueue:
+    Type: AWS::SQS::Queue
+
+# Define the SNS Topics for Bluebank, Redbank, Greenbank - Transactions Warehouses
+  BlueBankTopic:
+    Type: AWS::SNS::Topic
+  RedBankTopic:
+    Type: AWS::SNS::Topic
+  GreenBankTopic:
+    Type: AWS::SNS::Topic
+
+# Define the SNS Topic for Central/Reserve Bank - All reportable cross-border transactions aka Balance of payment "BOP" transactions from all banks.
+  ReserveBankTopic:
+    Type: AWS::SNS::Topic
+
+# Define the Event Rule to filter reportable Bluebank events to Reserve Bank SNS Topic
+  EventRuleBlueBank:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "EventRule BlueBank transactions to Reserve Bank"
+      EventBusName: !Ref BlueBankBus
+      EventPattern:
+        account:
+          - !Sub '${AWS::AccountId}'
+        source:
+          - "atm.events"
+          - "bankbranch.events"
+        detail-type:
+          - "Bank transaction"
+        detail:
+          bop_reportable:
+            - "Yes"
+      Targets:
+        - Arn: !Ref ReserveBankTopic
+          Id: "ReserveBankTopic"
+          DeadLetterConfig:
+            Arn:  !GetAtt ReserveBankDLQueue.Arn
+
+# Define the Event Rule to pipe all Bluebank events to Bluebank Warehouse SNS Topic
+  EventRuleBlueBankCatchAll:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "EventRule Bluebank to Bluebank transactions warehouse"
+      EventBusName: !Ref BlueBankBus
+      EventPattern:
+        account:
+          - !Sub '${AWS::AccountId}'
+        source:
+          - "atm.events"
+          - "bankbranch.events"
+        detail-type:
+          - "Bank transaction"
+        detail:
+          bop_reportable:
+            - "Yes"
+            - "No"
+      Targets:
+        - Arn: !Ref BlueBankTopic
+          Id: "BlueBankTopic"
+          DeadLetterConfig:
+            Arn:  !GetAtt BlueBankDLQueue.Arn
+
+# Define the Event Rule to filter reportable Redbank events to Reserve Bank SNS Topic
+  EventRuleRedBank:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "EventRule Redbank transactions to Reserve Bank"
+      EventBusName: !Ref RedBankBus
+      EventPattern:
+        account:
+          - !Sub '${AWS::AccountId}'
+        source:
+          - "atm.events"
+          - "bankbranch.events"
+        detail-type:
+          - "Bank transaction"
+        detail:
+          bop_reportable:
+            - "Yes"
+      Targets:
+        - Arn: !Ref ReserveBankTopic
+          Id: "ReserveBankTopic"
+          DeadLetterConfig:
+            Arn:  !GetAtt ReserveBankDLQueue.Arn
+
+# Define the Event Rule to pipe all Redbank events to Redbank Warehouse SNS Topic
+  EventRuleRedBankCatchAll:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "EventRule RedBank to RedBank transactions warehouse"
+      EventBusName: !Ref RedBankBus
+      EventPattern:
+        account:
+          - !Sub '${AWS::AccountId}'
+        source:
+          - "atm.events"
+          - "bankbranch.events"
+        detail-type:
+          - "Bank transaction"
+        detail:
+          bop_reportable:
+            - "Yes"
+            - "No"
+      Targets:
+        - Arn: !Ref RedBankTopic
+          Id: "RedBankTopic"
+          DeadLetterConfig:
+            Arn:  !GetAtt RedBankDLQueue.Arn
+
+# Define the Event Rule to filter reportable Greenbank events to Reserve Bank SNS Topic
+  EventRuleGreenBank:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "EventRule Greenbank transactions to Reserve Bank"
+      EventBusName: !Ref GreenBankBus
+      EventPattern:
+        account:
+          - !Sub '${AWS::AccountId}'
+        source:
+          - "atm.events"
+          - "bankbranch.events"
+        detail-type:
+          - "Bank transaction"
+        detail:
+          bop_reportable:
+            - "Yes"
+      Targets:
+        - Arn: !Ref ReserveBankTopic
+          Id: "ReserveBankTopic"
+          DeadLetterConfig:
+            Arn:  !GetAtt ReserveBankDLQueue.Arn
+
+# Define the Event Rule to pipe all Greenbank events to Greenbank Warehouse SNS Topic
+  EventRuleGreenBankCatchAll:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "EventRule GreenBank to Greenbank transactions warehouse"
+      EventBusName: !Ref GreenBankBus
+      EventPattern:
+        account:
+          - !Sub '${AWS::AccountId}'
+        source:
+          - "atm.events"
+          - "bankbranch.events"
+        detail-type:
+          - "Bank transaction"
+        detail:
+          bop_reportable:
+            - "Yes"
+            - "No"
+      Targets:
+        - Arn: !Ref GreenBankTopic
+          Id: "GreenBankTopic"
+          DeadLetterConfig:
+            Arn: !GetAtt GreenBankDLQueue.Arn
+
+# Allow EventBridge to invoke Bluebank SNS Topic
+  SNSPolicyEventBridgeBlueBankTopicAllow:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: events.amazonaws.com
+          Action: "SNS:Publish"
+          Resource:
+            - !Ref BlueBankTopic
+      Topics:
+        - !Ref BlueBankTopic
+
+  # Allow EventBridge to invoke Redbank SNS Topic
+  SNSPolicyEventBridgeRedBankTopicAllow:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: events.amazonaws.com
+          Action: "SNS:Publish"
+          Resource:
+            - !Ref RedBankTopic
+      Topics:
+        - !Ref RedBankTopic
+
+  # Allow EventBridge to invoke Greenbank SNS Topic
+  SNSPolicyEventBridgeGreenBankTopicAllow:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: events.amazonaws.com
+          Action: "SNS:Publish"
+          Resource:
+            - !Ref GreenBankTopic
+      Topics:
+        - !Ref GreenBankTopic
+
+  # Allow EventBridge to invoke Reserve Bank SNS Topic
+  SNSPolicyEventBridgeReserveBankTopicAllow:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: events.amazonaws.com
+          Action: "SNS:Publish"
+          Resource:
+            - !Ref ReserveBankTopic
+      Topics:
+        - !Ref ReserveBankTopic
+
+# Define lambda function with permission to send events to 3 bank Buses
+  EventsGeneratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      MemorySize: 128
+      Policies:
+      - Statement:
+        - Sid: SendEvents
+          Effect: Allow
+          Action:
+          - events:DeleteRule
+          - events:DescribeRule
+          - events:DisableRule
+          - events:EnableRule
+          - events:ListRuleNamesByTarget
+          - events:ListRules
+          - events:ListTargetsByRule
+          - events:PutEvents
+          Resource:
+            - !GetAtt BlueBankBus.Arn
+            - !GetAtt RedBankBus.Arn
+            - !GetAtt GreenBankBus.Arn
+
+# Outputs and links to created resources
+Outputs:
+  BlueBankTopicName:
+    Description: SNS Topic name for Bluebank
+    Value: !GetAtt BlueBankTopic.TopicName
+  BlueBankBusARN:
+    Description: Blue Bank Bus ARN
+    Value: !GetAtt BlueBankBus.Arn
+  RedBankTopicName:
+    Description: SNS Topic name for Redbank
+    Value: !GetAtt RedBankTopic.TopicName
+  RedBankBusARN:
+    Description: Red Bank Bus ARN
+    Value: !GetAtt RedBankBus.Arn
+  GreenBankTopicName:
+    Description: SNS Topic name for Greenbank
+    Value: !GetAtt GreenBankTopic.TopicName
+  GreenBankBusARN:
+    Description: Green Bank Bus ARN
+    Value: !GetAtt GreenBankBus.Arn
+  ReserveBankTopicName:
+    Description: SNS Topic name for Reservebank
+    Value: !GetAtt ReserveBankTopic.TopicName
+  Lambdafunction:
+    Description: Main Lambda function for generating events
+    Value: !Ref EventsGeneratorFunction
