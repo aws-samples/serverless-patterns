@@ -89,9 +89,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-1. Run the following curl command to invoke the cross account Private Rest API:
+1. Run the following curl command that you got from the output section to invoke the same/cross account Private Rest API. In case if you want to use your own private API then use the below sample curl command:
     ```
-    curl https://<custom_domain>/<stage-name> -H 'Host:<execute-api-invoke-url>'
+    curl https://<custom_domain>/<stage-name>/<resource-path> -H 'Host:<api-id>.execute-api.<region>.amazonaws.com'
     ```
 
 2. Observe the output of the Private API response from the integrated backend Lambda function
