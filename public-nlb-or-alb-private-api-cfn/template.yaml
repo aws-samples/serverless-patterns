@@ -33,10 +33,7 @@ Parameters:
   PrivateSubnetIDs: 
     Description: Private Subnet IDs for VPCE
     Type: "List<AWS::EC2::Subnet::Id>"
-  SecurityGroupIDsForALB: 
-    Description: Security group IDs is only required for ALB. Note - please make sure that the security group allows 443 traffic. Select only one security group and it can be skipped for NLB.
-    Type: "List<AWS::EC2::SecurityGroup::Id>"
-  SecurityGroupIDsForVPCE: 
+  SecurityGroupID: 
     Description: Security group IDs for VPCE. Note - please make sure that the security group allows 443 traffic. Select only one security group
     Type: "List<AWS::EC2::SecurityGroup::Id>"
   DomainName:
@@ -55,6 +52,7 @@ Parameters:
       - NLB
       - ALB
     Type: String
+    Default: NLB
   SameAccount:
     Description: Deploy private API and backend resources in same account. Y for Yes and N for No
     AllowedValues:
@@ -63,6 +61,7 @@ Parameters:
       - 'yes'
       - 'no'
     Type: String
+    Default: 'Yes'
 
 Conditions: 
   NlbCheck: !Equals [!Ref NlbOrAlb, NLB]
@@ -84,7 +83,7 @@ Resources:
     Properties: 
       PrivateDnsEnabled: true
       SecurityGroupIds: 
-        - !Select [ 0, !Ref SecurityGroupIDsForVPCE ]
+        - !Select [ 0, !Ref SecurityGroupID ]
       ServiceName: !Sub com.amazonaws.${AWS::Region}.execute-api
       SubnetIds: 
         - !Select [ 0, !Ref PrivateSubnetIDs ]
@@ -369,7 +368,7 @@ Resources:
           - !Select [ 1, !Ref PublicSubnetIDs ]
         Type: application
         SecurityGroups:
-          - !Select [ 0, !Ref SecurityGroupIDsForALB ]
+          - !Select [ 0, !Ref SecurityGroupID ]
 
   ApplicationLoadBalancerListener:
       DependsOn: ApplicationLoadBalancer
@@ -396,12 +395,6 @@ Resources:
       TTL: '300'
 
 Outputs:
-  ENIsIP1:
-    Value: !GetAtt ENIsIP.PrivateIp1
-    Description: VPC Endpoint's ENI IP 1
-  ENIsIP2:
-    Value: !GetAtt ENIsIP.PrivateIp2
-    Description: VPC Endpoint's ENI IP 2 
   NetworkLoadBalancerDNS:
     Condition: NlbCheck
     Value: !GetAtt NetworkLoadBalancer.DNSName
@@ -420,7 +413,7 @@ Outputs:
   CURLCommand:  
     Condition: SameAccCheck
     Value: !Sub 
-      - 'curl https://${CustomDomain}/${ApiGatewayStage}/lambda -H "Host:${ApiId}.execute-api.${AWS::Region}.amazonaws.com"'
+      - "curl https://${CustomDomain}/${ApiGatewayStage}/lambda -H 'Host:${ApiId}.execute-api.${AWS::Region}.amazonaws.com'"
       - CustomDomain: !Ref HostedZoneRecordSet
         ApiGatewayStage: !Ref ApiGatewayStage
         ApiId: !Ref ApiGatewayRestApi
