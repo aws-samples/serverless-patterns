@@ -74,7 +74,7 @@ Important: this application uses various AWS services and there are costs associ
     #Enter NLB if you want to deploy the setup with Network Load Balancer or ALB if you want to deploy this setup with Application Load Balancer.
 	- Enter value for NlbOrAlb
 	
-    #Enter Yes or yes if you want to deploy all resources in same account. To deploy API and backend lambda resource in different account, enter NO or no and then deploy the crossAccResources.yaml in different account.
+    #Enter Yes or yes if you want to deploy all resources in same account. To deploy API and backend lambda resource in different account, enter No or no and then deploy the crossAccResources.yaml in different account.
     - Enter value for SameAccount
 
 1. For cross account deployment of API and backend resource
