@@ -8,7 +8,7 @@ The template also deploys an IAM role with SNS publish capability that is used b
 
 Note: when deploying this pattern, *CAPABILITY_IAM* is required.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-sns-sms](https://serverlessland.com/patterns/apigw-sns-sms)
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-sns-sms)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -50,7 +50,7 @@ The stack will output the **api endpoint**. You can use *Postman* or *curl*to se
 curl -X POST 'https://abc.execute-api.us-east-2.amazonaws.com/dev/' -H 'Content-Type: application/json' --data-raw '{"Message": "hi","PhoneNumber": 911234567890}'
 }'
 ```
-Please note, if the Account / region is in sandbox then you need to first verify the number before sending a message. Read more about it at Adding and verifying phone numbers in the SMS sandbox
+Please note, if the Account / region is in sandbox then you need to first verify the number before sending a message. Read more about it in the documentation for [Adding and verifying phone numbers in the SMS sandbox](https://docs.aws.amazon.com/sns/latest/dg/sns-sms-sandbox-verifying-phone-numbers.html)
 
 ## Cleanup
  
