@@ -1,10 +1,10 @@
 # Serverless same/cross account NLB/ALB->PrivateAPI use-case using VPC Endpoint, API Gateway, Network/Application Load Balancer, AWS Lambda
 ## Architecture
 * Same Account Setup
-    ![Concept](./sameAccount.png)
+    ![Concept](./images/sameAccount.png)
 
 * Cross Account Setup
-    ![Concept](./crossAccount.png)
+    ![Concept](./images/crossAccount.png)
 
 This serverless pattern allows users to access their Private REST APIs present in same or cross account over the internet. This facilitates abstraction of network resources (like load balancers, virtual private clouds, endpoints) & application resources (like lambda, api gateway) into same/separate individual management accounts.
 
