@@ -44,7 +44,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-The stack will output the **api endpoint**. You can use *Postman* or *curl*to send a POST request to the API Gateway endpoint.
+The stack will output the **api endpoint**. You can use *Postman* or *curl* to send a POST request to the API Gateway endpoint.
    
 ```
 curl -X POST 'https://abc.execute-api.us-east-2.amazonaws.com/dev/' -H 'Content-Type: application/json' --data-raw '{"Message": "hi","PhoneNumber": 911234567890}'
