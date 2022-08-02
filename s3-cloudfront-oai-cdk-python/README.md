@@ -2,7 +2,7 @@
 
 This repo contains serverless patterns showing how to setup a S3 website hosting bucket that is served by a CloudFront distribution that also obfuscates the CloudFront Distribution domain via Cloudfront Origin Access Identity (OAI).
 
-![Demo Project Solution Architecture Diagram](.diagram.png)
+![Demo Project Solution Architecture Diagram](diagram.PNG)
 
 - Learn more about these patterns at https://serverlessland.com/patterns.
 - To learn more about submitting a pattern, read the [publishing guidelines page](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md).
@@ -38,5 +38,5 @@ Each subdirectory contains additional installation and usage instructions.
 
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-```
+----
 
