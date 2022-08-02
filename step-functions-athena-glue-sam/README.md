@@ -8,7 +8,7 @@ Athena is out-of-the-box integrated with AWS Glue Data Catalog, allowing you to 
 
 This application pattern can be used to query, analyze and procees any type of data stored in S3. For example, the data can be a list of movie results, cloudtrail logs, vpc logs, inventory list etc.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sf-athena-glue-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-athena-glue-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
