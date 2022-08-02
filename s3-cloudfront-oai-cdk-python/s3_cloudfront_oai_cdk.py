@@ -29,13 +29,6 @@ class S3CloudFrontOAI(Construct):
             exposed_headers=["Access-Control-Allow-Origin"]
         )
 
-        deploy_site = s3deploy.BucketDeployment(
-            self,
-            "DeploySite",
-            sources=[s3deploy.Source.asset("./websiteDeployment/")],
-            destination_bucket=website_bucket
-        )   
-
         oai = cloudfront.OriginAccessIdentity(
             self,
             "My-OAI",
