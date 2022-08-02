@@ -38,5 +38,5 @@ Each subdirectory contains additional installation and usage instructions.
 
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-```
+----
 
