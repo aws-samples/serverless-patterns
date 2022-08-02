@@ -1,0 +1,57 @@
+{
+  "title": "S3 Hosted Website Served by a CloudFront Distribution restricted by Cloudfront Origin Access Identity (OAI)",
+  "description": "This repo contains serverless patterns showing how to setup a S3 website hosting bucket that is served by a CloudFront distribution that also obfuscates the CloudFront Distribution domain via Cloudfront Origin Access Identity (OAI).",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This python CDK Construct allows you to create a S3 Hosted website that delivers the website content via a CloudFront Distribution. The CloudFront distributions domain url is obfuscated and restricted to users who access the CloudFront Orign Access Identity (OAI.)"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-cloudfront-oai-cdk-python",
+      "templateURL": "serverless-patterns/s3-cloudfront-oai-cdk-python",
+      "projectFolder": "s3-cloudfront-oai-cdk-python",
+      "templateFile": "s3-cloudfront-oai-cdk-python/s3-cloudfront-oai_cdk_python_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Restricting access to Amazon S3 content by using an origin access identity (OAI)",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html"
+      },
+      {
+        "text": "Hosting a static website using Amazon S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "CDK deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Faraz Haider",
+      "image": "https://media-exp1.licdn.com/dms/image/C4E03AQHZtYFSzgUgcw/profile-displayphoto-shrink_200_200/0/1596493819241?e=1665014400&v=beta&t=BwDaz3rNBQX-RGvAfnmsGy0HOiwV7wL37m337nxeriA",
+      "bio": "Faraz Haider is an Associate Cloud Consultant for Amazon Web Services. Faraz's main areas of interest within AWS has been learning/developing serverless solutions and exploring front end development.",
+      "linkedin": "fhaider2",
+      "twitter": "N/A"
+    }
+  ]
+}
