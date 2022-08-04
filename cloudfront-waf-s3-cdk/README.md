@@ -2,7 +2,9 @@
 
 This pattern creates CloudFront, WAF Web ACL, and S3 bucket for UI code. Then WAF Web ACL gets applied to CloudFront distribution to restrict Website access based on source IP address.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+![Architecture](CloudFront-WAF-S3.png)
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
