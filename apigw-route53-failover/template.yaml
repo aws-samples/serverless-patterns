@@ -44,7 +44,7 @@ Resources:
     Properties: 
       ApiId: !Ref RestApiGateway
       DomainName: !Ref DomainName
-      Stage: !Ref RestApiGatewayProdStage ## = {Logicalname} + {StageName} + Stage
+      Stage: Prod
 
   RestApiGateway: # Creates a REST API endpoint
     Type: AWS::Serverless::Api
