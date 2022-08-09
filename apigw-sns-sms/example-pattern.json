@@ -6,7 +6,7 @@
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This sample project demonstrates how to send a SMS messages using API Gateway."
+        "This sample project demonstrates how to send SMS messages using API Gateway."
       ]
     },
     "gitHub": {
