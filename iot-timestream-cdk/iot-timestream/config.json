@@ -1,0 +1,10 @@
+{
+    "timestream": {
+        "databaseName": "iotTimestreamDatabase",
+        "tableName": "iotTimestreamTable"
+    },
+    "sql" : {
+        "version": "2015-10-08",
+        "statement" : "SELECT temperature, humidity FROM 'dt/#'"
+    }
+}
