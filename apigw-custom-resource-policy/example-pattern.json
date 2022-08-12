@@ -12,9 +12,9 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-custom-resource-polic",
-      "templateURL": "serverless-patterns/apigw-custom-resource-polic",
-      "projectFolder": "apigw-custom-resource-polic",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-custom-resource-policy",
+      "templateURL": "serverless-patterns/apigw-custom-resource-policy",
+      "projectFolder": "apigw-custom-resource-policy"
     }
   },
   "resources": {
