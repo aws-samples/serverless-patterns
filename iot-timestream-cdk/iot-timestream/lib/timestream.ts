@@ -27,6 +27,9 @@ export class Timestream extends NestedStack {
             }
         })
 
+        this.tstrm_table.applyRemovalPolicy(RemovalPolicy.DESTROY)
+        this.tstrm_database.applyRemovalPolicy(RemovalPolicy.DESTROY)
+
 
 
     }
