@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: API Gateway Resource Policies
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+
+  # REST API Configuration. Adds a resource policy limiting access to the endpoint to specific dates
+  TempApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+            - Effect: Allow
+              Principal: "*"
+              Action: execute-api:Invoke
+              Resource: execute-api:/Prod/*/* # Applied to all resources and paths on the Prod stage.
+              Condition:
+                DateGreaterThan:
+                  aws:CurrentTime: "2022-09-01T00:00:00Z" # Requests must be after this date and time
+                DateLessThan:
+                  aws:CurrentTime: "2022-09-30T23:59:59Z" # Requests must be before this date and time
+
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - arm64
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TempApi
+            Path: /
+            Method: get
+            
+Outputs:
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${TempApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
