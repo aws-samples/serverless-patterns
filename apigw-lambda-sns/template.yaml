@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  MySnsTopic:
+    Type: AWS::SNS::Topic
+
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: s1
+      DefinitionBody: # an OpenApi definition
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './api.yaml'
+      OpenApiVersion: 3.0.3
+      EndpointConfiguration:
+          Type: REGIONAL
+
+  lambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Description: Example Lambda function
+      FunctionName: LambdaFunctionName
+      Handler: code.lambda_handler
+      MemorySize: 128
+      Timeout: 3
+      Runtime: python3.8
+      Environment:
+        Variables:
+          TOPIC_ARN: !Ref MySnsTopic
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Policies:
+        - S3FullAccessPolicy:
+            BucketName: severlesspatternlambda
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt MySnsTopic.TopicName
+      Events:
+        APIEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId: !Ref RestApi
+Outputs:
+  lambdaArn:
+    Value: !GetAtt lambdaFunction.Arn
+
+  SNStopicARN:
+    Description: SNS topic ARN
+    Value: !Ref MySnsTopic
+
+  apiGatewayInvokeURL:
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/s1

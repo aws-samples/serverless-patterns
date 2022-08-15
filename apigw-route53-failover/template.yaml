@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Failover example
+Globals:
+  Function:
+    Timeout: 3
+    Tracing: Active
+    Runtime: python3.9
+    Handler: app.lambda_handler
+    Architectures:
+      - arm64
+  Api:
+    TracingEnabled: True
+
+Parameters:
+  DomainName:
+    Type: String
+    Description: Domian name for api
+    MinLength: 5
+  ZoneId:
+    Type: String
+    Description: Zone ID.
+    MinLength: 5
+  CertArn:
+    Type: String
+    Description: Certificate ARN
+    MinLength: 5
+  Priority:
+    Type: String
+    Description: PRIMARY or SECONDARY
+    AllowedValues: ["PRIMARY", "SECONDARY"]
+
+Resources:
+  CustomDomain: # Creates the domain name
+    Type: AWS::ApiGatewayV2::DomainName
+    Properties: 
+      DomainName: !Ref DomainName
+      DomainNameConfigurations: 
+        - EndpointType: REGIONAL
+          CertificateArn: !Ref CertArn
+
+  RestApiMapping: #Create a maooing to a REST API
+    Type: AWS::ApiGatewayV2::ApiMapping
+    Properties: 
+      ApiId: !Ref RestApiGateway
+      DomainName: !Ref DomainName
+      Stage: Prod
+
+  RestApiGateway: # Creates a REST API endpoint
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      EndpointConfiguration:
+        Type: REGIONAL
+  
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Events:
+        Fetch:
+          Type: Api
+          Properties:
+            RestApiId: !Ref RestApiGateway
+            Path: /
+            Method: get
+
+  HealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Properties: 
+      HealthCheckConfig:
+        EnableSNI: true
+        FullyQualifiedDomainName: !Sub ${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com
+        Type: HTTPS
+        FailureThreshold: 5 ## Default is 3
+        MeasureLatency: true ## Cannot be changed after creation
+        ResourcePath: /Prod
+
+  FailoverRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Failover: !Ref Priority
+      Name: !Ref DomainName
+      HostedZoneId: !Ref ZoneId
+      SetIdentifier: !Sub ${AWS::Region}-failover
+      HealthCheckId: !Ref HealthCheck
+      TTL: 60
+      AliasTarget:
+        DNSName: !GetAtt CustomDomain.RegionalDomainName
+        HostedZoneId: !GetAtt CustomDomain.RegionalHostedZoneId
+      Type: A
+
+Outputs:
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

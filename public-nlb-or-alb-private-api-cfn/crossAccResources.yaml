@@ -1,0 +1,163 @@
+# Cloudformation
+# Author - Shivam Rajawat
+# Cloudformation template to deploy Backend resources in cross account for NLB VPCE setup.
+# Aim - To invoke same/cross account private API via via NLB and also attach custom domain to an API
+
+Transform: AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: 2010-09-09
+Description: This cloudformation template is to deploy resources for invoking same/cross account private API via NLB and also attach custom domain to an API
+Parameters:
+  VPCEndpointId:
+    Description: Prefix to be added to all the resources name for tracking purpose
+    Type: String
+    MinLength: 10
+    MaxLength: 30
+  APIName:
+    Description: Prefix to be added to all the resources name for tracking purpose
+    Type: String
+    MinLength: 2
+    MaxLength: 40
+  Prefix:
+    Description: Prefix to be added to all the resources name for tracking purpose
+    Type: String
+    MinLength: 2
+    MaxLength: 40
+  DomainName:
+    Description: Prefix to be added to all the resources name for tracking purpose
+    Type: String
+    MinLength: 5
+    MaxLength: 80
+Resources:
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    DependsOn: BackendLambdaFunction
+    Properties:
+      ApiKeySourceType: HEADER
+      Description: An API Gateway with a Lambda Integration
+      EndpointConfiguration:
+        Types:
+          - PRIVATE
+      Name: !Sub ${Prefix}-${APIName}
+      Policy: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal: "*"
+            Action:
+              - "execute-api:Invoke"
+            Resource: "execute-api:/*"
+          - Effect: "Deny"
+            Principal: "*"
+            Action:
+              - "execute-api:Invoke"
+            Resource: "execute-api:/*"
+            Condition:
+              StringNotEquals:
+                aws:sourceVpce: !Ref VPCEndpointId
+
+  ApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: 'lambda'
+      RestApiId: !Ref ApiGatewayRestApi
+
+  ApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        ConnectionType: INTERNET
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${BackendLambdaFunction.Arn}/invocations'
+      OperationName: 'lambda'
+      ResourceId: !Ref ApiGatewayResource
+      RestApiId: !Ref ApiGatewayRestApi
+
+  ApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    DependsOn: ApiGatewayDeployment
+    Properties:
+      DeploymentId: !Ref ApiGatewayDeployment
+      Description: Lambda API Stage v0
+      RestApiId: !Ref ApiGatewayRestApi
+      StageName: 'v0'
+
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ApiGatewayMethod
+    Properties:
+      Description: New Stage being added here, Latest Lambda API Deployment
+      RestApiId: !Ref ApiGatewayRestApi
+
+  APIGatewayLambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref BackendLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/*'
+
+  BackendLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+              'statusCode': 200,
+              'body': json.dumps("Hello from Private API in different account")
+            }    
+      Description: AWS Lambda function
+      FunctionName: !Sub ${Prefix}-PrivateApiLambdaFncViaCFN
+      Handler: index.lambda_handler
+      MemorySize: 256
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: python3.9
+      Timeout: 60
+  
+  LambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Select [0, [!Join ['-', [!Ref Prefix, 'custom-lambda-function-role']]]]
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: BasicExecutionRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action: logs:CreateLogGroup
+              Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+            - Effect: Allow
+              Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              Resource: !Sub 
+                - 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${functionName}:*'
+                - functionName: !Select [0, [!Join ['-', [!Ref Prefix, Custom-lambda-function]]]]
+Outputs:
+  APIGatewayURL:
+    Value: !Sub 
+      - 'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/v0/lambda'
+      - ApiId: !Ref ApiGatewayRestApi
+  CURLCommand:  
+    Value: !Sub 
+      - "curl https://${CustomDomain}/${ApiGatewayStage}/lambda -H 'Host:${ApiId}.execute-api.${AWS::Region}.amazonaws.com'"
+      - CustomDomain: !Ref DomainName
+        ApiGatewayStage: !Ref ApiGatewayStage
+        ApiId: !Ref ApiGatewayRestApi
