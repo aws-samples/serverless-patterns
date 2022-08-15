@@ -71,7 +71,7 @@ You can test the pattern using AWS Console.
    ```
 Use a site such as [Epoch Converter](https://www.epochconverter.com/) to UTC timestamp in milliseconds and update the value to reflect the time when you are testing.
 Then click the `Publish` button.
-`macId` and `timestamp` fields in the message are mandatory since the CDK stack has configured the IoT rule action and Timestream to use these fields.
+`macId` and `timestamp` fields in the message are mandatory since the CDK stack has configured DynamoDB table to use the `macId` field as the Partition Key and `timestamp` field as the Sort key.
 You can generate a new/different value for `timestamp` and change the values of then click publish button. You should test by publishing the message a few more times - each time you should change the `timestamp` field, and optionally vary the `temperature` and `humidity` fields (use 2 digits after the decimal point).
 
 10. Switch to the DynamoDB explore items window, and refresh to scan the table. You should be able to see data an entry with 5 columns. For the test message above you will observe:
