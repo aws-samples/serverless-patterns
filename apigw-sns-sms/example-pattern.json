@@ -27,7 +27,7 @@
     },
     "deploy": {
       "text": [
-        "sam deploy --guided --capabilities CAPABILITY_IAM"
+        "sam deploy --guided --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM"
       ]
     },
     "testing": {
