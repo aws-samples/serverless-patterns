@@ -1,3 +1,4 @@
+
 from constructs import Construct
 from aws_cdk import (
     App,
@@ -8,7 +9,7 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_s3_deployment as s3deploy,
     aws_glue as glue,
-    aws_lambda as _lambda
+    aws_lambda as _lambda, CfnParameter
 )
 
 
@@ -16,6 +17,9 @@ class CdkGlueStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        # set the unique bucket name below
+        s3_bucket_name = "my-glue-job-bucket";
 
         # Glue job execution IAM Role
         glue_job_role = iam.Role(
@@ -26,7 +30,7 @@ class CdkGlueStack(Stack):
         )
 
         # S3 Bucket to host glue scripts
-        bucket = s3.Bucket(self, "MyGlueJobBucket", bucket_name="my-glue-job-bucket", versioned=True,
+        bucket = s3.Bucket(self, "MyGlueJobBucket", bucket_name=s3_bucket_name,  versioned=True,
                            removal_policy=RemovalPolicy.DESTROY,
                            auto_delete_objects=True, block_public_access=s3.BlockPublicAccess.BLOCK_ALL)
 
@@ -74,7 +78,7 @@ class CdkGlueStack(Stack):
         )
 
         # CDK Outputs
-        CfnOutput(scope=self, id='LambdaArn', value=my_lambda.function_name)
+        CfnOutput(scope=self, id='LambdaFunctionName', value=my_lambda.function_name)
         CfnOutput(scope=self, id='GlueJobName', value=job.name)
         CfnOutput(scope=self, id='S3BucketName', value=bucket.bucket_name)
 
