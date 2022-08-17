@@ -1,8 +1,8 @@
-# S3 Hosted Website Served by a CloudFront Distribution restricted by Cloudfront Origin Access Identity (OAI)
+# S3 Triggered Lambda Function that starts an Amazon Transcribe Job and points to another S3 bucket for results
 
 This repo contains serverless patterns showing how to setup a Lambda with an S3 *object created* trigger that starts a basic, one-speaker, Amazon Transcribe job. The resulting transcription is placed into another S3 bucket.
 
-![Demo Project Solution Architecture Diagram](architecture.png.PNG)
+![Demo Project Solution Architecture Diagram](architecture.png)
 
 - Learn more about these patterns at https://serverlessland.com/patterns.
 - To learn more about submitting a pattern, read the [publishing guidelines page](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md).
