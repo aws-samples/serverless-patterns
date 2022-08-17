@@ -8,7 +8,6 @@
     "headline": "How it works",
     "text": [
       "This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template that deploys a Lambda Function with an S3 object created trigger to start an Amazon Transcribe job and place the results in another S3 bucket.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
       "This pattern deploys one Lambda Function and two S3 Buckets."
     ]
   },
