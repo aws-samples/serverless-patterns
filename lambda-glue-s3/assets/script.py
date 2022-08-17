@@ -8,8 +8,11 @@ glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 job = Job(glueContext)
 
-input_loc = "s3://my-glue-job-bucket/glue-python-assets/file.csv"
-output_loc = "s3://my-glue-job-bucket/glue-python-assets/"
+# set the bucket name where the input files were uploaded.
+s3_bucket_name = "my-glue-job-bucket"
+
+input_loc = "s3://" + str(s3_bucket_name) + "/glue-python-assets/file.csv"
+output_loc = "s3://" + str(s3_bucket_name) + "/glue-python-assets/"
 
 inputDyf = glueContext.create_dynamic_frame_from_options(
     connection_type="s3",
