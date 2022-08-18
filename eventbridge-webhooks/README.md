@@ -30,17 +30,21 @@ Important: this application uses various AWS services and there are costs associ
   3. It will create a signing secret which is needed in Step 4 below for parameter StripeWebhookSecret.
   4. After the stack is deployed, replace the dummy value of the Endpoint URL on Stripe with the Lambda fURL.
 
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+- To run the GitHub example, cd to `2-github`.
+  1. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. (You can create a secret phrase of your choice) This secret will later be needed in step 2 bellow along with the Lambda fURL
+  2. Setup Webhook for a repository of choice from your GitHub Account [Create GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
+ 
+2. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
     ```
-4. During the prompts:
+3. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+4. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
