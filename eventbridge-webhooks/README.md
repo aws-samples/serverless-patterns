@@ -19,11 +19,11 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
     cd eventbridge-webhooks
     ```
-2. There are several examples in this directory.
+3. There are several examples in this directory.
 - To run the Stripe example, cd to `1-stripe`.
   1. The Stripe Inbound webhook requires a Stripe Signing Secret prior to creating the CloudFormation Stack.
   2. To generate a Stripe Signing Secret, Create an endpoint with a dummy value of the Endpoint URL (This will be updated once the Lambda fURL is available). 
@@ -34,17 +34,17 @@ Important: this application uses various AWS services and there are costs associ
   1. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. (You can create a secret phrase of your choice) This secret will later be needed in step 2 bellow along with the Lambda fURL
   2. Setup Webhook for a repository of choice from your GitHub Account [Create GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
  
-2. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
     ```
-3. During the prompts:
+5. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-4. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
@@ -64,7 +64,7 @@ Stripe emits events for a variety of actions, for example, when a payment was su
     ```bash
     aws cloudformation delete-stack --stack-name STACK_NAME
     ```
-1. Confirm the stack has been deleted
+2. Confirm the stack has been deleted
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
