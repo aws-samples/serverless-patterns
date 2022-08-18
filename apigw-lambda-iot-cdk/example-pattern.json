@@ -6,7 +6,7 @@
 	"introBox": {
 		"headline": "How it works",
 		"text": [
-			"This pattern createsa Amazon API Gateway REST API endpoint, that invokes a Lambda function.",
+			"This pattern creates an Amazon API Gateway REST API endpoint, that invokes a Lambda function.",
 			"The Lambda function has been given permissions to publish to AWS IoT Core (`iot:Publish`). Make a POST call to the API Endpoint with `topic` and `message` in the body.",
 			"This pattern deploys an API Gateway resource and one Lambda function."
 		]

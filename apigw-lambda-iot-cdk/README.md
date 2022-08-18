@@ -6,7 +6,7 @@ This patterns contains a sample CDK stack to create an API to invoke a Lambda fu
 ![apigw-lambda-iot](./apigw-lambda-iot.png)
 
 
-This pattern createsa Amazon API Gateway REST API endpoint, that invokes a Lambda function. The Lambda function has been given permissions to publish to AWS IoT Core (`iot:Publish`). Make a POST call to the API Endpoint with `topic` and `message` in the body. 
+This pattern creates an Amazon API Gateway REST API endpoint, that invokes a Lambda function. The Lambda function has been given permissions to publish to AWS IoT Core (`iot:Publish`). Make a POST call to the API Endpoint with `topic` and `message` in the body. 
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-iot-cdk
 
@@ -87,6 +87,8 @@ cdk destroy
 
 1. [Boto3 IoT Publish](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iot-data.html#IoTDataPlane.Client.publish)
 2. [AWS IoT HTTPS](https://docs.aws.amazon.com/iot/latest/developerguide/http.html)
+3. [Amazon API Gateway quotas and important notes](https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html)
+4. [AWS IoT Core endpoints and quotas](https://docs.aws.amazon.com/general/latest/gr/iot-core.html)
 
 ## Notes and CDK Stack Info
 
