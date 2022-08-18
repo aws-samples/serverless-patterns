@@ -14,7 +14,7 @@ export class EventbridgeScheduledLambdaCdkStack extends Stack {
 
     // check if user enter --context value, if not application will terminate
     if (typeof interval_in_minutes === 'undefined') {
-      console.log('example: cdk deploy --context internal_in_minutes=5')
+      console.log('example: cdk deploy --context interval_in_minutes=5')
       process.exit(1)
     }
     
