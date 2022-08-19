@@ -33,6 +33,7 @@ Important: this application uses various AWS services and there are costs associ
 - To run the GitHub example, cd to `2-github`.
   1. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. (You can create a secret phrase of your choice) This secret will later be needed in step 2 bellow along with the Lambda fURL
   2. Setup Webhook for a repository of choice from your GitHub Account [Create GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
+  3. [Set up GitHub Webhook on EventBridge Service Console](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas-furls.html#furls-connection-github)
  
 4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
