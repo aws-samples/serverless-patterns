@@ -40,14 +40,14 @@
       {
         "text": "CDK Patterns",
         "link": "https://cdkpatterns.com/"
-      }   
+      }
     ]
   },
   "author": {
-    "headline": "Presented by Ibrahim Cesar, AWS Community Builder",
+    "headline": "Presented by Ibrahim Cesar",
     "name": "Ibrahim Cesar",
-    "imageURL": "https://pbs.twimg.com/profile_images/1340028653812506627/yi7ZDMAE_400x400.jpg",
+    "imageURL": "https://pbs.twimg.com/profile_images/1541760776410697728/T3VTQRBV_400x400.jpg",
     "twitter": "ibrahimcesar",
-    "bio": "/ɪ́brəhɪjm/ is a Technology Director at a news startup media in Brazil. Work with frontend, web development and serverless."
+    "bio": "Enterprise Solutions Architect at AWS"
   }
 }
