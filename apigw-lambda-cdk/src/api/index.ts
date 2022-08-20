@@ -4,7 +4,7 @@ import { Stack, StackProps, Tags } from "aws-cdk-lib";
 import * as apigw from "aws-cdk-lib/aws-apigateway"
 import * as lambda from "aws-cdk-lib/aws-lambda";
 
-import path from "path";
+import path from "node:path";
 import config from "./config.json";
 
 export class ApiStack extends Stack {
