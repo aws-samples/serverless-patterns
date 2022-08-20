@@ -18,7 +18,12 @@
   },
   "deploy": {
     "text": [
-      "npx cdk deploy --app 'ts-node .'"
+      "npm run deploy"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: npm run destroy"
     ]
   },
   "gitHub": {
@@ -44,10 +49,10 @@
     ]
   },
   "author": {
-    "headline": "Presented by Ibrahim Cesar",
-    "name": "Ibrahim Cesar",
-    "imageURL": "https://pbs.twimg.com/profile_images/1541760776410697728/T3VTQRBV_400x400.jpg",
-    "twitter": "ibrahimcesar",
-    "bio": "Enterprise Solutions Architect at AWS"
+      "name": "Ibrahim Cesar",
+      "image": "https://phonetool.amazon.com/users/ibracnb",
+      "bio": "Enterprise Solutions Architect @ AWS",
+      "linkedin": "https://www.linkedin.com/in/ibrahimcesar/?locale=en_US",
+      "twitter": "twitter.com/ibrahimcesar"
   }
 }
