@@ -1,10 +1,16 @@
-# Amazon EventBridge to AWS Lambda with feedback control by Amazon Cloudwatch Alarms
+# Amazon EventBridge to AWS Lambda with feedback control by Amazon CloudWatch Alarms
 
-This sample project demonstrates an ON/OFF control implementation on AWS Lambda with a closed-loop (feedback) control mechanism. This is useful when your application is dependent on third-party calls and you need to handle any throttling or a performance issue on the third-party service.
+This serverless pattern demonstrates an ON/OFF control implementation on AWS Lambda with a closed-loop (feedback) control mechanism. This is useful when your application is dependent on third-party calls and you need to handle any throttling or a performance issue on the third-party service.
 
-This pattern deploys two AWS Lambda functions, one Amazon EventBridge rule, two Amazon CloudWatch alarms and one Amazon Cloudwatch composite alarm. After performing the third-party call on AWS Lambda function, it uses Amazon Cloudwatch custom metrics feature to store third-party service call metrics like response time and status code to provide feedback for generation of the control signal.
+This pattern deploys two AWS Lambda functions, one Amazon EventBridge rule, two Amazon CloudWatch alarms and one Amazon CloudWatch composite alarm. After performing the third-party call on AWS Lambda function, it uses Amazon CloudWatch custom metrics feature to store third-party service call metrics like response time and status code to provide feedback for generation of the control signal.
 
-A set of Cloudwatch Alarms monitors these custom metrics produced after the third-party call and decides if the third-party service call is healty. If not, the event planner Lambda function stops feeding messages to EventBridge to drop third-party calls temporarly to avoid additional load on the third-party service. It also brings cost benefits and concurrency savings on AWS Lambda by avoiding the lambda invocations for the unhealthy 3rd party service. 
+A set of CloudWatch Alarms monitors these custom metrics produced after the third-party call and decides if the third-party service call is healthy. If not, the event planner Lambda function stops feeding messages to EventBridge to drop third-party calls temporarily to avoid additional load on the third-party service. It also brings cost benefits and concurrency savings on AWS Lambda by avoiding the lambda invocations for the unhealthy 3rd party service. 
+
+### Considerations 
+- This serverless pattern uses Amazon CloudWatch metrics to store remote service's health information. This brings all the power of CloudWatch metrics and math expressions to make the decision of the remote API worker call.
+- You can use CloudWatch metrics to build CloudWatch dashboards for monitoring the remote service's health and also API call control decisions.
+- This serverless pattern doesn't implement any fallback mechanism. You can choose and bring another serverless pattern with your decision of the fallback path.
+- The controller function makes API calls to Amazon CloudWatch Alarms feature to get alarm status and implements an ON/OFF control. You can also use all the alarm status properties to make advanced decisions on remote service API call.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cdk-closed-loop-serverless-control-pattern
 
@@ -63,9 +69,9 @@ Closed-loop (feedback) control system tries to handle the throttling by stopping
 
 ### Alarm definitions
 
-There are two Amazon CloudWatch Alarm rules and one Amazon Cloudwatch composite alarm implemented in this pattern. One rule defines the abnormal behaviour on average API response time and the other defines the abnormal error ratio of API status codes. The composite alarm allows to perform a logic operation `OR` for `ON_ALARM` states of any of two rules. Thus, when any alarm goes on `ON_ALARM`, state, the composite alarm indicates `ON_ALARM` state as well. The composite alarm is used as a control signal of third-party API processing event in the `CallPlanner` Lambda function.
+There are two Amazon CloudWatch Alarm rules and one Amazon CloudWatch composite alarm implemented in this pattern. One rule defines the abnormal behaviour on average API response time and the other defines the abnormal error ratio of API status codes. The composite alarm allows to perform a logic operation `OR` for `ON_ALARM` states of any of two rules. Thus, when any alarm goes on `ON_ALARM`, state, the composite alarm indicates `ON_ALARM` state as well. The composite alarm is used as a control signal of third-party API processing event in the `CallPlanner` Lambda function.
 
-![Amazon Cloudwatch Alarms dashboard](images/cloudwatch-alarm-dashboard.png)
+![Amazon CloudWatch Alarms dashboard](images/cloudwatch-alarm-dashboard.png)
 
 ## Testing
 
