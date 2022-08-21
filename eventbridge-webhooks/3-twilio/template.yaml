@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  twilio-webhook
+
+  Amazon EventBridge Inbound webhooks using lambda fURLs CFNs Template.
+
+Parameters:
+  TwilioWebhookSecret:
+    Type: String
+    Description: Twilio webhook secret
+    NoEcho: true
+    AllowedPattern: ".+"
+
+  EventBusName:
+    Type: String
+    Description: EventBridge event bus name
+    Default: default
+
+  LambdaInvocationThreshold:
+    Type: String
+    Description: Innovation Alarm Threshold for number of events in a 5 minute period. 
+    Default: 2000
+
+Resources:
+  WebhookSecretsManager:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub WebhookSecret-${AWS::StackName}
+      Description: Secrets Manager for storing Webhook Secret
+      SecretString: !Ref TwilioWebhookSecret
+
+  LambdaInvocationsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: !Sub Alarm for ${AWS::StackName} - InboundWebhook Lambda for traffic spikes
+      AlarmName: !Sub InboundWebhook-Lambda-Invocation-Alarm-${AWS::StackName}
+      MetricName: Invocations
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: "300"
+      EvaluationPeriods: "2"
+      Threshold: !Ref LambdaInvocationThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref WebhookFunction
+      ComparisonOperator: GreaterThanThreshold
+
+  WebhookFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    DependsOn: WebhookSecretsManager
+    Properties:
+      FunctionName: !Sub [
+          "InboundWebhook-Lambda-${ID}",
+          ID: !Select [2, !Split ["/", !Ref AWS::StackId]],
+        ] # Append the stack UUID
+      CodeUri:
+        Bucket: !Sub 'eventbridge-inbound-webhook-templates-prod-${AWS::Region}'
+        Key: 'lambda-templates/twilio-lambdasrc.zip'
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      ReservedConcurrentExecutions: 10
+      Environment:
+        Variables:
+          TWILIO_WEBHOOK_SECRET_ARN: !Ref WebhookSecretsManager
+          EVENT_BUS_NAME: !Ref EventBusName
+      MemorySize: 128
+      Timeout: 100
+      FunctionUrlConfig:
+        AuthType: NONE
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref EventBusName
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:DescribeSecret
+                - secretsmanager:GetSecretValue
+              Resource: !Ref WebhookSecretsManager
+
+Outputs:
+  FunctionUrlEndpoint:
+    Description: "Webhhook Function URL Endpoint"
+    Value: !GetAtt WebhookFunctionUrl.FunctionUrl
+
+  LambdaFunctionName:
+    Value: !Ref WebhookFunction
+
+  LambdaFunctionARN:
+    Description: Lambda function ARN.
+    Value: !GetAtt WebhookFunction.Arn
