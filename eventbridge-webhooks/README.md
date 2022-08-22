@@ -19,46 +19,31 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
     cd eventbridge-webhooks
     ```
-2. There are several examples in this directory.
-- To run the Stripe example, cd to `1-stripe`.
-  1. The Stripe Inbound webhook requires a Stripe Signing Secret prior to creating the CloudFormation Stack.
-  2. To generate a Stripe Signing Secret, Create an endpoint with a dummy value of the Endpoint URL (This will be updated once the Lambda fURL is available). 
-  3. It will create a signing secret which is needed in Step 4 below for parameter StripeWebhookSecret.
-  4. After the stack is deployed, replace the dummy value of the Endpoint URL on Stripe with the Lambda fURL.
-- To run the Twilio Example, cd to `3-twilio`.
-  1. The Twilio Inbound webhook requires a Twilio Auth Token prior to creating the CloudFormation Stack. Navigate to your Twilio Auth Tokens & API Keys page to reveal your Auth Token.
-  2. Use the Auth Token for the Parameter TwilioWebhookSecret during the deployment process.
-  3. After the stack is deployed, set the value of the endpoint URL for your event webhook to the deployed fURL endpoint. The process to configure this endpoint will depend on the Twilio product you're using, see [here](https://www.twilio.com/docs/usage/webhooks#webhooks-by-product) for more details.
-
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. There are several examples in this directory.
+- To run the GitHub example, cd to `2-github`.
+  1. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. [Create Encrypted Secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+  2. Deploy the cloudformation template. You’ll need the secret you created in step 1 (See step 4, on how to deploy the cloudformation template)
+  3. Finally, create the webhook on GitHub. You’ll need the secret you created in step 1 and the Lambda function URL you created in step 2 to complete this step. [Set up GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
+ 
+4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
     ```
-2. During the prompts:
+5. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-3. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-### Stripe
-
-Stripe emits events for a variety of actions, for example, when a payment was successful or an order was created. Using Inbound webhooks using Lambda fURLs you can send the payloads to EventBridge for processing. Users can extend this example by adding targets to act on Stripe events in real-time. The Stripe Dashboard can be used simulating production events. For example, the product.created event could be simulated by navigating to the [Products](https://dashboard.stripe.com/products) page and adding a new product. More info on Stripe Webhooks can be found [here](https://stripe.com/docs/webhooks).
-
-### GitHub
-
 GitHub emits events for a variety of actions, for example, when a repository was created or the status of a commit changed. Using Inbound webhooks using Lambda function URLs you can send the payloads to EventBridge for processing. More info on GitHub Webhooks can be found [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/about-webhooks).
-
-### Twilio
-
-Twilio emits events for a variety of actions, for example, when a voice message is left for you or your Twilio phone number received a text message. Webhooks enable you to send the payloads to EventBridge for processing. More info on Twilio Webhooks can be found [here](https://www.twilio.com/docs/usage/webhooks).
 
 ## Testing
 
@@ -72,11 +57,11 @@ Twilio emits events for a variety of actions, for example, when a voice message 
     ```bash
     aws cloudformation delete-stack --stack-name STACK_NAME
     ```
-1. Confirm the stack has been deleted
+2. Confirm the stack has been deleted
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
