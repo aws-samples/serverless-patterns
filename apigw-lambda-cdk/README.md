@@ -30,7 +30,16 @@ Important: this application uses various AWS services and there are costs associ
     ```
 4. To deploy from the command line use the following:
     ```bash
-      npx cdk deploy --app 'ts-node .'
+      npm run deploy
+    ```
+5. _Optional_ If you do not use the default profile in your configuration for aws credentials, you must edit your scripts section in the `src/package.json`, replacing `<YOUR_PROFILE_NAME>` with your named profile:
+    ```json
+      {
+        "scripts": {
+          "deploy": "cdk deploy --profile <YOUR_PROFILE_NAME>",
+          "destroy": "cdk destroy --profile <YOUR_PROFILE_NAME>"
+        }
+      }
     ```
 
 ## Testing
@@ -40,16 +49,16 @@ Important: this application uses various AWS services and there are costs associ
 3. This page logs any path you type after "/". You can use this as a starting point as a general purpose endpoint for various types of applications.
 
 ## Cleanup
- 
+
 1. From the command line, use the following in the source folder
     ```bash
-    npx cdk destroy --app 'ts-node .'
+    npm run destroy
     ```
 2. Confirm the removal and wait for the resource deletion to complete.
 
 ----
 
-© Copyright 2021 [Ibrahim Cesar](https://ibrahimcesar.cloud)
+© Copyright 2022 [Ibrahim Cesar](https://ibrahimcesar.cloud)
 
 MIT License
 

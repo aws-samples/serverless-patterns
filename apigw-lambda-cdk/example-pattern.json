@@ -18,7 +18,12 @@
   },
   "deploy": {
     "text": [
-      "npx cdk deploy --app 'ts-node .'"
+      "npm run deploy"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: npm run destroy"
     ]
   },
   "gitHub": {
@@ -40,14 +45,14 @@
       {
         "text": "CDK Patterns",
         "link": "https://cdkpatterns.com/"
-      }   
+      }
     ]
   },
   "author": {
-    "headline": "Presented by Ibrahim Cesar, AWS Community Builder",
-    "name": "Ibrahim Cesar",
-    "imageURL": "https://pbs.twimg.com/profile_images/1340028653812506627/yi7ZDMAE_400x400.jpg",
-    "twitter": "ibrahimcesar",
-    "bio": "/ɪ́brəhɪjm/ is a Technology Director at a news startup media in Brazil. Work with frontend, web development and serverless."
+      "name": "Ibrahim Cesar",
+      "image": "https://phonetool.amazon.com/users/ibracnb",
+      "bio": "Enterprise Solutions Architect @ AWS",
+      "linkedin": "https://www.linkedin.com/in/ibrahimcesar/?locale=en_US",
+      "twitter": "twitter.com/ibrahimcesar"
   }
 }
