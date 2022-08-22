@@ -1,6 +1,6 @@
 # Inbound webhooks for EventBridge
 
-This pattern creates an inbound webhook from Stripe to Amazon EventBridge. The webhook is a Lambda function URL that uses the Stripe Webhook secret to verify the request, then forwards it to EventBridge.
+This pattern creates an inbound webhook from Stripe to Amazon EventBridge. The webhook is a Lambda function URL that verifies the inbound request then forwards it to EventBridge.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-webhook-stripe
 
@@ -24,12 +24,6 @@ Important: this application uses various AWS services and there are costs associ
     cd eventbridge-webhooks
     ```
 3. There are several examples in this directory.
-- To run the Stripe example, cd to `1-stripe`.
-  1. The Stripe Inbound webhook requires a Stripe Signing Secret prior to creating the CloudFormation Stack.
-  2. To generate a Stripe Signing Secret, Create an endpoint with a dummy value of the Endpoint URL (This will be updated once the Lambda fURL is available). 
-  3. It will create a signing secret which is needed in Step 4 below for parameter StripeWebhookSecret.
-  4. After the stack is deployed, replace the dummy value of the Endpoint URL on Stripe with the Lambda fURL.
-
 - To run the GitHub example, cd to `2-github`.
   1. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. [Create Encrypted Secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
   2. Deploy the cloudformation template. You’ll need the secret you created in step 1 (See step 4, on how to deploy the cloudformation template)
@@ -49,15 +43,13 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-### Stripe
-
-Stripe emits events for a variety of actions, for example, when a payment was successful or an order was created. Using Inbound webhooks using Lambda fURLs you can send the payloads to EventBridge for processing. Users can extend this example by adding targets to act on Stripe events in real-time.
+GitHub emits events for a variety of actions, for example, when a repository was created or the status of a commit changed. Using Inbound webhooks using Lambda function URLs you can send the payloads to EventBridge for processing. More info on GitHub Webhooks can be found [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/about-webhooks).
 
 ## Testing
 
-1. After updating the Endpoint URL with the deployed Lambda fURL, select the event types you want to send to EventBridge.
-2. Simulate the events using the Stripe Dashboard. For example, the product.created event could be simulated by navigating to the [Products](https://dashboard.stripe.com/products) page and adding a new product.
-3. The Cloudwatch Logs for your WebhookFunction will indicate if there were any errors with processing the Stripe event.
+1. After updating the Endpoint URL in the SaaS application with the deployed Lambda fURL, select the event types you want to send to EventBridge.
+2. Test the webhook by simulating or performing actions in the SaaS application.
+3. The Cloudwatch Logs for your WebhookFunction will indicate if there were any errors with processing the inbound event.
 
 ## Cleanup
  
@@ -70,6 +62,6 @@ Stripe emits events for a variety of actions, for example, when a payment was su
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
