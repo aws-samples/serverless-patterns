@@ -31,9 +31,9 @@ Important: this application uses various AWS services and there are costs associ
   4. After the stack is deployed, replace the dummy value of the Endpoint URL on Stripe with the Lambda fURL.
 
 - To run the GitHub example, cd to `2-github`.
-  1. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. (You can create a secret phrase of your choice) This secret will later be needed in step 2 bellow along with the Lambda fURL
-  2. Setup Webhook for a repository of choice from your GitHub Account [Create GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
-  3. [Set up GitHub Webhook on EventBridge Service Console](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas-furls.html#furls-connection-github)
+  1. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. [Create Encrypted Secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+  2. Deploy the cloudformation template. You’ll need the secret you created in step 1 (See step 4, on how to deploy the cloudformation template)
+  3. Finally, create the webhook on GitHub. You’ll need the secret you created in step 1 and the Lambda function URL you created in step 2 to complete this step. [Set up GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
  
 4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```

@@ -1,7 +1,7 @@
-AWSTemplateFormatVersion: 2010-09-09
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Github-webhook
+  github-webhook
 
   Amazon EventBridge Inbound webhooks using lambda fURLs CFNs Template.
 
@@ -54,8 +54,11 @@ Resources:
         "InboundWebhook-Lambda-${ID}",
         ID: !Select [2, !Split ["/", !Ref AWS::StackId]],
       ] # Append the stack UUID
-      Handler: src/app.handler
-      Runtime: nodejs16.x
+      CodeUri:
+        Bucket: !Sub 'eventbridge-inbound-webhook-templates-prod-${AWS::Region}'
+        Key: 'lambda-templates/github-lambdasrc.zip'
+      Handler: app.lambda_handler
+      Runtime: python3.7
       ReservedConcurrentExecutions: 10
       Environment:
         Variables:
