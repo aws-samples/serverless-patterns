@@ -1,7 +1,7 @@
-# Serverless same/cross account NLB/ALB->PrivateAPI use-case using VPC Endpoint, API Gateway, Network/Application Load Balancer, AWS Lambda
+# Invoke cross account Step Function -> AWS Lambda Function
 ## Architecture
 * Account Setup
-    ![Concept](./images/stepfunctions-crossacc-lambda.png.png)
+    ![Concept](./images/stepfunctions-crossacc-lambda.png)
 
 This serverless pattern allows users to invoke their lambda functions present in cross account directly via step function. Step function can invoke and retrieve the desired results/details from the lambda function for the other account. 
 
