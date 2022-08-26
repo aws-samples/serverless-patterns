@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { AwsLambdaToSecretsManagerInPrivateSubnetStack } from '../lib/aws-lambda-to-secrets-manager-in-private-subnet-stack';
+import { AwsLambdaPrivSubnetStack } from '../lib/aws-lambda-to-secrets-manager-in-private-subnet-stack';
 
 const app = new cdk.App();
-new AwsLambdaToSecretsManagerInPrivateSubnetStack(app, 'AwsLambdaToSecretsManagerInPrivateSubnetStack', {
+new AwsLambdaPrivSubnetStack(app, 'AwsLambdaPrivSubnetStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */

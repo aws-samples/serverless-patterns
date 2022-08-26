@@ -14,8 +14,9 @@ def lambda_handler(event, context):
         )
     )
 
-    print(client.list_secrets())
+    list_secrets = client.list_secrets()
     return {
         'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!')
+        'body': json.dumps('Hello from Lambda!'),
+        'api_response': json.dumps(list_secrets, default=str)
     }
