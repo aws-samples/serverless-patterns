@@ -1,7 +1,7 @@
 {
   "title": "Amazon EventBridge to AWS Lambda with feedback control by Amazon Cloudwatch Alarms",
   "description": "Create a closed-Loop (feedback) control mechanism for throttle-handling of 3rd party calls on AWS Lambda with Amazon Cloudwatch Alarms and Amazon EventBridge",
-  "language": "Python",
+  "language": "TypeScript",
   "level": "400",
   "framework": "CDK",
   "introBox": {
