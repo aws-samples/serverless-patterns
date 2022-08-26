@@ -26,6 +26,7 @@
   },
   "gitHub": {
     "template": {
+      "projectFolder": "apigw-http-api-eventbridge-python",
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-eventbridge-python",
       "templateURL": "apigw-http-api-eventbridge/apigw_http_api_eventbridge_stack.py",
       "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-eventbridge-python/README.md"
