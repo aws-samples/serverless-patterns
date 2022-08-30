@@ -3,7 +3,7 @@
 #Creating IAM role for stepfunction
 resource "aws_iam_role" "step-function-role" {
     name = "${var.prefix}-stepfunction-function-role"
-
+    
     assume_role_policy = <<POLICY
 {
   "Version": "2012-10-17",

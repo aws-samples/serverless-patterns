@@ -20,7 +20,7 @@ provider "aws" {
  
 #cross account
 provider "aws" {
- profile = "shivMain"
+ profile = "crossaccount"
  region  = "${var.region}"
  alias   = "crossaccount"
 }

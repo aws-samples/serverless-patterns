@@ -1,10 +1,20 @@
+# while adding permissions to the lambda function it needs the step function IAM role so 
+# sometime is required for role to populate globally and become available.
+resource "time_sleep" "wait_10_seconds" {
+  depends_on = [aws_iam_role.step-function-role]
+  create_duration = "10s"
+}
+
 #Ceating Lambda
 resource "aws_lambda_permission" "step_function_lambda" {
   statement_id  = "AllowExecutionFromStepFunction"
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.lambda.function_name}"
-  principal = aws_iam_role.step-function-role.arn
+  principal = "${aws_iam_role.step-function-role.arn}"
   provider = aws.crossaccount
+  depends_on = [
+    time_sleep.wait_10_seconds
+  ]
 }
 
 resource "aws_lambda_function" "lambda" {
