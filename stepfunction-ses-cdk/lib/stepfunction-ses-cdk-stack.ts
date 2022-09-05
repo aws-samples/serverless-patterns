@@ -1,4 +1,4 @@
-import { aws_stepfunctions_tasks as tasks, aws_stepfunctions as sfn, CfnParameter, aws_iam as iam, Stack, StackProps } from 'aws-cdk-lib';
+import { aws_stepfunctions_tasks as tasks, aws_stepfunctions as sfn, CfnParameter, aws_iam as iam, CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 export class StepfunctionSesCdkStack extends Stack {
@@ -50,5 +50,12 @@ export class StepfunctionSesCdkStack extends Stack {
         ],
       }),
     )
+
+    // Output
+    new CfnOutput(this, 'StateMachine', {
+      value: myStateMachine.stateMachineName,
+      description: 'State machine',
+      exportName: 'StateMachine',
+    });
   }
 }
