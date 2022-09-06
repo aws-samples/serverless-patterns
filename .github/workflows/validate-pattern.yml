@@ -7,7 +7,6 @@ on: [pull_request]
 
 jobs:
   validate-pattern:
-    environment: CI
     runs-on: ubuntu-latest
     permissions:
       contents: write
