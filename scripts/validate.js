@@ -107,22 +107,14 @@ try {
   const result = v.validate(parsedJSON, patternSchema);
 
   if (result.errors.length > 0) {
-    // Errors write them back to the comment on GitHub....
-
     const errors = buildErrors(result.errors);
-    console.log('We have errors', errors);
-  } else {
-    console.log('All valid!');
+    console.log(errors);
+    throw new Error('Failed to validate pattern, errors found');
+  } 
 
-    // Verify that the GitHub URL is correct and can be loaded.
-  }
+  // Everything OK....
 
-  // run against some schema validation stuff.
-
-  //   console.log(parsedJSON);
 } catch (error) {
   console.error(error);
   throw Error('Failed to process the example-pattern.json file.');
 }
-
-// Validate the path to the URL is correct too...
