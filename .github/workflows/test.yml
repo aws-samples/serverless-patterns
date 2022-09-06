@@ -9,7 +9,7 @@ on:
 
 jobs:
   my-workflow-job-4:
-    uses: .github/workflows/validate-pattern.yml
+    uses: .github/workflows/validate-pattern.yml@main
     with:
       ENVIRONMENT: CI
     secrets:
