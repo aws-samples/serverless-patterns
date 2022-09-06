@@ -1,0 +1,30 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Validate Pattern
+
+on: [pull_request]
+
+jobs:
+  verify-template:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+       - name: Checkout code
+         uses: actions/checkout@v3   
+
+       - uses: actions/setup-node@v3
+         with:
+          node-version: 16  
+
+       - name: Get changed files using defaults
+         id: changed-files
+         uses: tj-actions/changed-files@v19
+         with:
+          separator: ","    
+
+       - run: node scripts/validate.js
+         with:
+          modified-files: ${{ steps.changed-files.outputs.modified_files }}
