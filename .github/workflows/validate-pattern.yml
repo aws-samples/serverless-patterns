@@ -26,5 +26,5 @@ jobs:
           separator: ","    
 
        - run: node scripts/validate.js
-         with:
-          modified-files: ${{ steps.changed-files.outputs.modified_files }}
+        #  with:
+          # modified-files: ${{ steps.changed-files.outputs.modified_files }}
