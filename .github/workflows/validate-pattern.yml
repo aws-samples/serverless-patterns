@@ -7,6 +7,7 @@ on: [pull_request]
 
 jobs:
   validate-pattern:
+    environment: CI
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -29,12 +30,8 @@ jobs:
 
        - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
        - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
+       - run: echo "COMMENT_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
        - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
       
        - name: Validate
-         env: 
-          TOKEN: '${{ secrets.COMMENT_TOKEN }}'
-          RANDOM: 'test'
-          XXXX: ${{ secrets.COMMENT_TOKEN }}
-          YYYY: ${{ env.COMMENT_TOKEN }}
          run: node scripts/validate.js
