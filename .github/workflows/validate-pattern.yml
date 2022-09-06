@@ -38,3 +38,16 @@ jobs:
       
        - name: Validate
          run: node scripts/validate.js
+
+       - name: Comment
+         if: failure()
+         uses: actions/github-script@v3
+         with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Failed to validate your pattern`
+            })       
