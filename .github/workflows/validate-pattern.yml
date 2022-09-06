@@ -8,6 +8,7 @@ on: [pull_request]
 jobs:
   validate-pattern:
     runs-on: ubuntu-latest
+    environment: CI 
     permissions: write-all
     steps:
        - name: Checkout code
