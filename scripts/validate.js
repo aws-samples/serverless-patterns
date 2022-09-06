@@ -8,3 +8,12 @@ console.log('addedFiles', addedFiles);
 console.log('modifiedFiles', modifiedFiles);
 
 // Get the pattern file....
+
+// example-pattern.json
+
+const findFile = (array, filename) => array.find(item => item.includes(filename));
+
+const pattern = findFile([...addedFiles, ...modifiedFiles], 'example-pattern.json');
+
+console.log('Pattern', pattern);
+console.log('README', findFile([...addedFiles, ...modifiedFiles], 'README.md'));
