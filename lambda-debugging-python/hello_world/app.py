@@ -2,6 +2,7 @@ import logging
 import traceback
 import json
 import sys
+import os
 import boto3
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
@@ -17,8 +18,6 @@ patch_all()
 def lambda_handler(event, context):
 
     try:
-        logger.debug(f'## EVENT\r' + json.dumps(event))
-
         #Place the code being debugged/implemented below
 
         return {'statusCode': 200, 'body': 'Hello World!'}
@@ -28,7 +27,7 @@ def lambda_handler(event, context):
         
         traceback_string = traceback.format_exception(exception_type, exception_value, exception_traceback)
 
-        err_msg = json.dumps({"errorType": exception_type.__name__,"errorMessage": str(exception_value),"stackTrace": traceback_string})
+        err_msg = json.dumps({"errorType": exception_type.__name__,"errorMessage": str(exception_value),"stackTrace": traceback_string,"xrayTraceId": os.environ['_X_AMZN_TRACE_ID'],"event": event}) # Including the X-Ray Trace ID in the raised error and then performing a CloudWatch Insights inquiry enables linking out to the X-Ray trace console
         
         logger.error(err_msg)
 
