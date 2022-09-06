@@ -28,7 +28,7 @@ jobs:
 
        - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
        - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
-       - run: echo "TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+       - run: echo "TOKEN=${{ secrets.COMMENT_TOKEN }}" >> $GITHUB_ENV
        - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
       
        - name: Validate
