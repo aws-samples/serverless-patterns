@@ -7,9 +7,10 @@ on: [pull_request]
 
 jobs:
   validate-pattern:
-    environment: CI
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions: 
+      contents: 'write' 
+      pull-requests: 'write'
     steps:
        - name: Checkout code
          uses: actions/checkout@v3   
@@ -28,7 +29,6 @@ jobs:
 
        - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
        - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
-       - run: echo "TOKEN=${{ secrets.COMMENT_TOKEN }}" >> $GITHUB_ENV
        - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
       
        - name: Validate

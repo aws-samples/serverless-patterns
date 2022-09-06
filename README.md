@@ -20,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a new directory and navigate to that directory in a terminal.
 
-1. Clone this repo:
+1. Clone this repo
 
 ```
 git clone https://github.com/aws-samples/serverless-patterns
