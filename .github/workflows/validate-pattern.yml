@@ -3,49 +3,41 @@
 
 name: "Validate Pattern"
 
-# on: [pull_request]
-
-on:
-  workflow_call:
-    inputs:
-      ENVIRONMENT:
-        required: true
-        type: string
-    secrets:
-      MY_SECRET: 
-        required: true
+on: 
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   validate-pattern:
+    environment: CI
+    env:
+      MY_SECRET: ${{ secrets.COMMENT_TOKEN }}
     runs-on: ubuntu-latest
-    environment: CI 
     permissions: write-all
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3   
+       - name: Checkout code
+         uses: actions/checkout@v3   
 
-      - uses: actions/setup-node@v3
-        with:
+       - run : |
+            echo 'printing envs'
+            env  
+
+       - uses: actions/setup-node@v3
+         with:
           node-version: 16  
 
-      - name: Get changed files using defaults
-        id: changed-files
-        uses: tj-actions/changed-files@v19
-        with:
+       - name: Get changed files using defaults
+         id: changed-files
+         uses: tj-actions/changed-files@v19
+         with:
           separator: ","    
 
-      - run: cd scripts && npm i
+       - run: cd scripts && npm i
 
-      - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
-      - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
-      - run: echo "TOKEN=${{ secrets.COMMENT_TOKEN }}" >> $GITHUB_ENV
-      - run: echo "TOKENT=${{ secrets.test }}" >> $GITHUB_ENV
-      - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
+       - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
+       - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
+       - run: echo "TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+       - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
       
-      - name: Validate
-        run: node scripts/validate.js
-        env: # Or as an environment variable
-          super_secret: ${{ env.COMMENT_TOKEN }}
-          super_secret2: "${{ env.COMMENT_TOKEN }}"
-          super_secret3: ${{ secrets.test }}
-          super_secret4: "${{ secrets.test }}"
+       - name: Validate
+         run: node scripts/validate.js
