@@ -3,7 +3,17 @@
 
 name: "Validate Pattern"
 
-on: [pull_request]
+# on: [pull_request]
+
+on:
+  workflow_call:
+    inputs:
+      ENVIRONMENT:
+        required: true
+        type: string
+    secrets:
+      MY_SECRET: 
+        required: true
 
 jobs:
   validate-pattern:
