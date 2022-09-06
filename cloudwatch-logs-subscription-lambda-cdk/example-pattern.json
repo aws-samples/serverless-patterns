@@ -1,7 +1,7 @@
 {
   "title": "Cloudwatch Logs Subscription to Lambda",
   "description": "Create a Cloudwatch Logs subscription to Lambda function",
-  "language": "Typescript",
+  "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
@@ -50,7 +50,7 @@
     {
       "name": "Pubudu Jayawardana",
       "image": "https://avatars.githubusercontent.com/u/1263087",
-      "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusisast.",
+      "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusiast.",
       "linkedin": "pubudusj",
       "twitter": "@pubudusj"
     }
