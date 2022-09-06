@@ -119,7 +119,7 @@ const main = async () => {
       const errors = buildErrors(result.errors);
       console.log(errors);
 
-      const errorList = errors.map((error, index) => `${index + 1}. ${error.path}: ${error.stack}\n\n`);
+      const errorList = errors.map((error, index) => `${index + 1}. \`${error.path}\`: ${error.stack}\n\n`);
 
       // Write comment back with errors for
       await octokit.rest.issues.createComment({
