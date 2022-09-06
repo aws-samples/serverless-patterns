@@ -130,8 +130,7 @@ const main = async () => {
           'Thank you for your contribution to Serverless Land! 🚀 \n\n' +
           '⚠️ Your `example-pattern.json` is missing some key fields, please review below and address any errors you have \n\n' +
           `${errorList.toString()} \n\n` +
-          `Once fixed and pushed back into the repo. We can review your pattern. \n\n` +
-          `![Snippet](${imageUrl})\n\n`,
+          `Once fixed and pushed back into the repo. We can review your pattern. \n\n`
       });
 
       throw new Error('Failed to validate pattern, errors found');
