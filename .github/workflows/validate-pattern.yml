@@ -25,7 +25,10 @@ jobs:
          with:
           separator: ","    
 
-       - run: echo "TEST=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
+       - run: ls
+
+       - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
+       - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
       
        - run: node scripts/validate.js
         #  with:
