@@ -3,15 +3,12 @@
 
 name: "Validate Pattern"
 
-on: 
-  pull_request:
-  workflow_dispatch:
+on: [pull_request]
 
 jobs:
   validate-pattern:
-    environment: myenvironment
     env:
-      MY_SECRET: ${{ secrets.test }}
+      MY_SECRET: ${{ secrets.TEST }}
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
