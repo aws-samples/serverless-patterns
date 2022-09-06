@@ -4,13 +4,9 @@ const { Octokit } = require('@octokit/rest');
 
 const Validator = require('jsonschema').Validator;
 const v = new Validator();
-
-const supportedLanguages = ['TypeScript', 'Node.js', 'Python', 'Java', '.Net', 'C#', 'Go', 'Rust'];
-const supportedFrameworks = ['CDK', 'SAM', 'Terraform', 'Serverless Framework'];
+const schema = require('./pattern-schema.json');
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
-
-console.log(process.env);
 
 const octokit = new Octokit({
   auth: process.env.TOKEN,
@@ -27,63 +23,6 @@ const buildErrors = (validationErrors) => {
   });
 };
 
-const patternSchema = {
-  id: 'serverless-pattern-schema',
-  type: 'object',
-  properties: {
-    title: { type: 'string' },
-    description: { type: 'string' },
-    language: {
-      type: 'string',
-      enum: supportedLanguages,
-    },
-    framework: {
-      type: 'string',
-      enum: supportedFrameworks,
-    },
-    introBox: {
-      type: 'object',
-      properties: {
-        headline: { type: 'string' },
-        text: {
-          type: 'array',
-          items: {
-            type: 'string',
-          },
-        },
-      },
-      required: ['headline', 'text'],
-    },
-    gitHub: {
-      type: 'object',
-      properties: {
-        template: {
-          type: 'object',
-          properties: {
-            repoURL: { type: 'string' },
-            templateURL: { type: 'string' },
-            projectFolder: { type: 'string' },
-            templateFile: { type: 'string' },
-          },
-          required: ['repoURL', 'templateURL', 'projectFolder', 'templateFile'],
-        },
-      },
-      required: ['template'],
-    },
-    authors: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string' },
-          bio: { type: 'string' },
-        },
-        required: ['name', 'bio'],
-      },
-    },
-  },
-  required: ['title', 'language', 'framework', 'introBox', 'gitHub', 'authors'],
-};
 
 //console.log('VALIDATE 3');
 //console.log(process.env);
@@ -113,7 +52,7 @@ const main = async () => {
 
     const parsedJSON = JSON.parse(examplePatternData);
 
-    const result = v.validate(parsedJSON, patternSchema);
+    const result = v.validate(parsedJSON, schema);
 
     if (result.errors.length > 0) {
       const errors = buildErrors(result.errors);
