@@ -127,18 +127,32 @@ const main = async () => {
         repo,
         issue_number: process.env.PR_NUMBER,
         body:
-          'Your `example-pattern.json` is missing some key fields, please review below and address any errors you have \n\n' +
+          `@${process.env.GITHUB_ACTOR} your 'example-pattern.json' is missing some key fields, please review below and address any errors you have \n\n` +
           `${errorList.toString()} \n\n` +
           `_If you need any help, take a look at the [example-pattern file](https://github.com/aws-samples/serverless-patterns/blob/main/_pattern-model/example-pattern.json)._ \n\n` +
-          `Make the changes, and push your changes back to this pull request. When all automated checks are succesfull, the Serverless DA team will process your pull request. \n\n`
+          `Make the changes, and push your changes back to this pull request. When all automated checks are succesfull, the Serverless DA team will process your pull request. \n\n`,
+      });
+
+      await octokit.rest.issues.addLabels({
+        owner,
+        repo,
+        issue_number,
+        labels: ['changes-required'],
       });
 
       throw new Error('Failed to validate pattern, errors found');
     }
 
+    // Everything OK, remove this label
+    await octokit.rest.issues.removeLabel({
+      owner,
+      repo,
+      issue_number,
+      name: 'changes-required',
+    });
+
     // Everything OK....
   } catch (error) {
-    console.error(error);
     throw Error('Failed to process the example-pattern.json file.');
   }
 };
