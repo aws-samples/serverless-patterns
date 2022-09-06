@@ -6,6 +6,8 @@ const v = new Validator();
 const supportedLanguages = ['TypeScript', 'Node.js', 'Python', 'Java', '.Net', 'C#', 'Go', 'Rust'];
 const supportedFrameworks = ['CDK', 'SAM', 'Terraform', 'Serverless Framework'];
 
+console.log(process.env)
+
 const buildErrors = (validationErrors) => {
   return validationErrors.map((error) => {
     return {
