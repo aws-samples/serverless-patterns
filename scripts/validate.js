@@ -136,7 +136,7 @@ const main = async () => {
       await octokit.rest.issues.addLabels({
         owner,
         repo,
-        issue_number,
+        issue_number: process.env.PR_NUMBER,
         labels: ['changes-required'],
       });
 
@@ -147,7 +147,7 @@ const main = async () => {
     await octokit.rest.issues.removeLabel({
       owner,
       repo,
-      issue_number,
+      issue_number: process.env.PR_NUMBER,
       name: 'changes-required',
     });
 
