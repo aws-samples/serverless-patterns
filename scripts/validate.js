@@ -8,7 +8,7 @@ const v = new Validator();
 const supportedLanguages = ['TypeScript', 'Node.js', 'Python', 'Java', '.Net', 'C#', 'Go', 'Rust'];
 const supportedFrameworks = ['CDK', 'SAM', 'Terraform', 'Serverless Framework'];
 
-const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
 
 console.log(process.env);
 
@@ -118,6 +118,14 @@ const main = async () => {
     if (result.errors.length > 0) {
       const errors = buildErrors(result.errors);
       console.log(errors);
+
+      const response = await octokit.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number: process.env.PR_NUMBER,
+        body: 'Failed to validate your example-pattern.json file! 🚀 \n\n',
+      });
+
       throw new Error('Failed to validate pattern, errors found');
     }
 
@@ -126,16 +134,6 @@ const main = async () => {
     console.error(error);
     throw Error('Failed to process the example-pattern.json file.');
   }
-
-  const response = await octokit.rest.issues.createComment({
-    owner,
-    repo,
-    issue_number: process.env.PR_NUMBER,
-    body:
-      'Your contribution is now live! 🚀 \n\n'
-  });
-
-
 };
 
 main();
