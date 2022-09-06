@@ -1,2 +1,2 @@
 fields @timestamp, @requestId, @message, @logStream, @xrayTraceId
-| filter @message like /ERROR/
+| filter @message like /errorType/
