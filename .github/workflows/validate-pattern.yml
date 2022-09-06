@@ -9,9 +9,9 @@ on:
 
 jobs:
   validate-pattern:
-    environment: CI
+    environment: myenvironment
     env:
-      MY_SECRET: ${{ secrets.COMMENT_TOKEN }}
+      MY_SECRET: ${{ secrets.test }}
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
