@@ -7,17 +7,13 @@ on: [pull_request]
 
 jobs:
   validate-pattern:
-    env:
-      MY_SECRET: ${{ secrets.TEST }}
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions: 
+      contents: write 
+      pull-requests: write
     steps:
        - name: Checkout code
          uses: actions/checkout@v3   
-
-       - run : |
-            echo 'printing envs'
-            env  
 
        - uses: actions/setup-node@v3
          with:
