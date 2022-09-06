@@ -128,9 +128,10 @@ const main = async () => {
         issue_number: process.env.PR_NUMBER,
         body:
           'Thank you for your contribution to Serverless Land! 🚀 \n\n' +
-          '⚠️ Your `example-pattern.json` is missing some key fields, please review below and address any errors you have \n\n' +
+          'Your `example-pattern.json` is missing some key fields, please review below and address any errors you have \n\n' +
           `${errorList.toString()} \n\n` +
-          `Once fixed and pushed back into the repo. We can review your pattern. \n\n`
+          `_If you need any help, take a look at the [example-pattern file](https://github.com/aws-samples/serverless-patterns/blob/main/_pattern-model/example-pattern.json)._ \n\n`
+          `Make the changes, and push your changes back to this pull request. When all automated checks are succesfull, the Serverless DA team will process your pull request. \n\n`
       });
 
       throw new Error('Failed to validate pattern, errors found');
