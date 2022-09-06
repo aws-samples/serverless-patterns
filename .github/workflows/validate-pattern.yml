@@ -36,7 +36,6 @@ jobs:
       #    run: node scripts/validate.js
 
        - name: Comment
-         if: failure()
          uses: actions/github-script@v6
          with:
           script: |
