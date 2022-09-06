@@ -1,12 +1,20 @@
 const fs = require('fs');
 const path = require('path');
+const { Octokit } = require('@octokit/rest');
+
 const Validator = require('jsonschema').Validator;
 const v = new Validator();
 
 const supportedLanguages = ['TypeScript', 'Node.js', 'Python', 'Java', '.Net', 'C#', 'Go', 'Rust'];
 const supportedFrameworks = ['CDK', 'SAM', 'Terraform', 'Serverless Framework'];
 
-console.log(process.env)
+const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+
+console.log(process.env);
+
+const octokit = new Octokit({
+  auth: process.env.TOKEN,
+});
 
 const buildErrors = (validationErrors) => {
   return validationErrors.map((error) => {
@@ -90,31 +98,44 @@ const findFile = (array, filename) => array.find((item) => item.includes(filenam
 
 const pathToExamplePattern = findFile([...addedFiles, ...modifiedFiles], 'example-pattern.json');
 
-if (!pathToExamplePattern) {
-  console.log('No example-pattern found, skipping any validation phase.');
-  process.exit(0);
-}
+const main = async () => {
+  if (!pathToExamplePattern) {
+    console.log('No example-pattern found, skipping any validation phase.');
+    process.exit(0);
+  }
 
-// Read the file contents
+  // Read the file contents
 
-try {
-  const examplePatternData = fs.readFileSync(path.join(__dirname, '../', pathToExamplePattern), {
-    encoding: 'utf-8',
+  try {
+    const examplePatternData = fs.readFileSync(path.join(__dirname, '../', pathToExamplePattern), {
+      encoding: 'utf-8',
+    });
+
+    const parsedJSON = JSON.parse(examplePatternData);
+
+    const result = v.validate(parsedJSON, patternSchema);
+
+    if (result.errors.length > 0) {
+      const errors = buildErrors(result.errors);
+      console.log(errors);
+      throw new Error('Failed to validate pattern, errors found');
+    }
+
+    // Everything OK....
+  } catch (error) {
+    console.error(error);
+    throw Error('Failed to process the example-pattern.json file.');
+  }
+
+  const response = await octokit.rest.issues.createComment({
+    owner,
+    repo,
+    issue_number: process.env.PR_NUMBER,
+    body:
+      'Your contribution is now live! 🚀 \n\n'
   });
 
-  const parsedJSON = JSON.parse(examplePatternData);
 
-  const result = v.validate(parsedJSON, patternSchema);
+};
 
-  if (result.errors.length > 0) {
-    const errors = buildErrors(result.errors);
-    console.log(errors);
-    throw new Error('Failed to validate pattern, errors found');
-  } 
-
-  // Everything OK....
-
-} catch (error) {
-  console.error(error);
-  throw Error('Failed to process the example-pattern.json file.');
-}
+main();
