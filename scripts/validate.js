@@ -1,16 +1,16 @@
 const fs = require('fs');
 const path = require('path');
-const { Octokit } = require('@octokit/rest');
+// const { Octokit } = require('@octokit/rest');
 
 const Validator = require('jsonschema').Validator;
 const v = new Validator();
 const schema = require('./pattern-schema.json');
 
-const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
+// const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
 
-const octokit = new Octokit({
-  auth: process.env.TOKEN,
-});
+// const octokit = new Octokit({
+//   auth: process.env.TOKEN,
+// });
 
 const buildErrors = (validationErrors) => {
   return validationErrors.map((error) => {
@@ -23,7 +23,6 @@ const buildErrors = (validationErrors) => {
   });
 };
 
-console.log(process.env);
 
 const addedFiles = process.env.ADDED_FILES ? process.env.ADDED_FILES.split(',') : [];
 const modifiedFiles = process.env.MODIFIED_FILES ? process.env.MODIFIED_FILES.split(',') : [];

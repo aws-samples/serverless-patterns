@@ -3,7 +3,7 @@
 
 name: "Validate Pattern"
 
-on: [pull_request_target]
+on: [pull_request]
 
 jobs:
   validate-pattern:
@@ -12,37 +12,24 @@ jobs:
       contents: 'write' 
       pull-requests: 'write'
     steps:
-      #  - name: Checkout code
-      #    uses: actions/checkout@v3   
+       - name: Checkout code
+         uses: actions/checkout@v3   
 
-      #  - uses: actions/setup-node@v3
-      #    with:
-      #     node-version: 16  
-
-      #  - name: Get changed files using defaults
-      #    id: changed-files
-      #    uses: tj-actions/changed-files@v19
-      #    with:
-      #     separator: ","    
-
-      #  - run: cd scripts && npm i
-
-      #  - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
-      #  - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
-      #  - run: echo "TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-      #  - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
-      
-      #  - name: Validate
-      #    run: node scripts/validate.js
-
-       - name: Comment
-         uses: actions/github-script@v6
+       - uses: actions/setup-node@v3
          with:
-          github-token: ${{ secrets.COMMENT_TOKEN }}
-          script: |
-            github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['Triage']
-            })
+          node-version: 16  
+
+       - name: Get changed files using defaults
+         id: changed-files
+         uses: tj-actions/changed-files@v19
+         with:
+          separator: ","    
+
+       - run: cd scripts && npm i
+
+       - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
+       - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
+       - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
+      
+       - name: Validate
+         run: node scripts/validate.js
