@@ -9,7 +9,7 @@ on:
 
 jobs:
   my-workflow-job-4:
-    uses: boyney123/serverless-land/.github/workflows/validate-pattern.yml@master
+    uses: boyney123/serverless-patterns/.github/workflows/validate-pattern.yml@main
     with:
       ENVIRONMENT: CI
     secrets:
