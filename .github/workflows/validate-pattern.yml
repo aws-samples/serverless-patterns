@@ -6,7 +6,7 @@ name: Validate Pattern
 on: [pull_request]
 
 jobs:
-  verify-template:
+  validate-pattern:
     runs-on: ubuntu-latest
     permissions:
       contents: write
