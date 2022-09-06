@@ -21,7 +21,7 @@ const buildErrors = (validationErrors) => {
     return {
       path: error.property.replace(/instance\./g, ''),
       message: error.message.replace(/instance\./g, ''),
-      data: error.instance.replace(/instance\./g, ''),
+      data: error.instance,
       stack: error.stack.replace(/instance\./g, ''),
     };
   });
