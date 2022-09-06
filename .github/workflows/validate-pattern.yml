@@ -32,6 +32,8 @@ jobs:
        - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
        - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
       
-       - run: node scripts/validate.js
+       - name: Validate
          env: 
           TOKEN: '${{ secrets.COMMENT_TOKEN }}'
+          RANDOM: 'test'
+         run: node scripts/validate.js
