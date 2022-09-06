@@ -33,5 +33,3 @@ jobs:
        - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
       
        - run: node scripts/validate.js
-        #  with:
-          # modified-files: ${{ steps.changed-files.outputs.modified_files }}

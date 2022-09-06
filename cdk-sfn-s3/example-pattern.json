@@ -5,7 +5,7 @@
   "level": "200",
   "framework": "CDK",
   "introBox": {
-    "headline": "How it workss",
+    "headline": "How it works",
     "text": [
       "This pattern creates a Step Functions workflow that publishes a file to an S3 bucket."
     ]
