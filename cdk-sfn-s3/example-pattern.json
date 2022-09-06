@@ -43,6 +43,7 @@
   },
   "authors": [
     {
+      "name": "Harshitha Shashidhar",
       "image": "../assets/images/resources/harshihs.jpg",
       "bio": "Harshitha Shashidhar is an Cloud Application architect who loves to build the serverless applications at scale."
     }
