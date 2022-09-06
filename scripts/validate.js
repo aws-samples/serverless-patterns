@@ -19,10 +19,10 @@ const octokit = new Octokit({
 const buildErrors = (validationErrors) => {
   return validationErrors.map((error) => {
     return {
-      path: error.property,
-      message: error.message,
-      data: error.instance,
-      stack: error.stack,
+      path: error.property.replace(/instance\./g, ''),
+      message: error.message.replace(/instance\./g, ''),
+      data: error.instance.replace(/instance\./g, ''),
+      stack: error.stack.replace(/instance\./g, ''),
     };
   });
 };
@@ -121,12 +121,17 @@ const main = async () => {
 
       const errorList = errors.map((error, index) => `${index + 1}. ${error.path}: ${error.stack}\n\n`);
 
-      // Write comment back with errors for user.
+      // Write comment back with errors for
       await octokit.rest.issues.createComment({
         owner,
         repo,
         issue_number: process.env.PR_NUMBER,
-        body: 'Failed to validate your example-pattern.json file! 🚀 \n\n' + `${errorList.toString()} \n\n`,
+        body:
+          'Thank you for your contribution to Serverless Land! 🚀 \n\n' +
+          '⚠️ Your `example-pattern.json` is missing some key fields, please review below and address any errors you have \n\n' +
+          `${errorList.toString()} \n\n` +
+          `Once fixed and pushed back into the repo. We can review your pattern. \n\n` +
+          `![Snippet](${imageUrl})\n\n`,
       });
 
       throw new Error('Failed to validate pattern, errors found');
