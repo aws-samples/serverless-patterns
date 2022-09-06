@@ -23,15 +23,8 @@ const buildErrors = (validationErrors) => {
   });
 };
 
-
-//console.log('VALIDATE 3');
-//console.log(process.env);
-
 const addedFiles = process.env.ADDED_FILES ? process.env.ADDED_FILES.split(',') : [];
 const modifiedFiles = process.env.MODIFIED_FILES ? process.env.MODIFIED_FILES.split(',') : [];
-
-// const addedFiles = ['/cdk-sfn-s3/example-pattern.json'];
-// const modifiedFiles = ['README.md'];
 
 const findFile = (array, filename) => array.find((item) => item.includes(filename));
 
@@ -39,11 +32,9 @@ const pathToExamplePattern = findFile([...addedFiles, ...modifiedFiles], 'exampl
 
 const main = async () => {
   if (!pathToExamplePattern) {
-    console.log('No example-pattern found, skipping any validation phase.');
+    console.log('No example-pattern.json found, skipping any validation phase.');
     process.exit(0);
   }
-
-  // Read the file contents
 
   try {
     const examplePatternData = fs.readFileSync(path.join(__dirname, '../', pathToExamplePattern), {
