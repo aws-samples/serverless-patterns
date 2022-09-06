@@ -153,6 +153,7 @@ const main = async () => {
 
     // Everything OK....
   } catch (error) {
+    console.log(error);
     throw Error('Failed to process the example-pattern.json file.');
   }
 };
