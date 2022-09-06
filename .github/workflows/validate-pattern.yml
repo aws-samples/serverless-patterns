@@ -38,6 +38,7 @@ jobs:
        - name: Comment
          uses: actions/github-script@v6
          with:
+          github-token: ${{ secrets.COMMENT_TOKEN }}
           script: |
             github.rest.issues.addLabels({
               issue_number: context.issue.number,
