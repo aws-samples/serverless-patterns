@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@octokit/rest": "^19.0.4",
     "jsonschema": "^1.4.1"
   }
 }
