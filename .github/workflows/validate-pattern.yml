@@ -1,0 +1,35 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions.
+
+name: "Validate Pattern"
+
+on: [pull_request]
+
+jobs:
+  validate-pattern:
+    environment: CI
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+       - name: Checkout code
+         uses: actions/checkout@v3   
+
+       - uses: actions/setup-node@v3
+         with:
+          node-version: 16  
+
+       - name: Get changed files using defaults
+         id: changed-files
+         uses: tj-actions/changed-files@v19
+         with:
+          separator: ","    
+
+       - run: cd scripts && npm i
+
+       - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
+       - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
+       - run: echo "TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+       - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
+      
+       - name: Validate
+         run: node scripts/validate.js
