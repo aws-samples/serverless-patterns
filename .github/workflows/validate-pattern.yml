@@ -36,4 +36,6 @@ jobs:
          env: 
           TOKEN: '${{ secrets.COMMENT_TOKEN }}'
           RANDOM: 'test'
+          XXXX: ${{ secrets.COMMENT_TOKEN }}
+          YYYY: ${{ env.COMMENT_TOKEN }}
          run: node scripts/validate.js
