@@ -28,6 +28,7 @@ jobs:
        - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
        - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
        - run: echo "TOKEN=${{ secrets.COMMENT_TOKEN }}" >> $GITHUB_ENV
+       - run: echo "TOKENT=${{ secrets.test }}" >> $GITHUB_ENV
        - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
       
        - name: Validate
@@ -35,3 +36,5 @@ jobs:
          env: # Or as an environment variable
           super_secret: ${{ secrets.COMMENT_TOKEN }}
           super_secret2: "${{ secrets.COMMENT_TOKEN }}"
+          super_secret3: ${{ secrets.test }}
+          super_secret4: "${{ secrets.test }}"
