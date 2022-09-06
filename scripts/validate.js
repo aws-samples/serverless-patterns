@@ -119,11 +119,14 @@ const main = async () => {
       const errors = buildErrors(result.errors);
       console.log(errors);
 
-      const response = await octokit.rest.issues.createComment({
+      const errorList = errors.map((error, index) => `${index + 1}. ${error.path}: ${error.stack}\n\n`);
+
+      // Write comment back with errors for user.
+      await octokit.rest.issues.createComment({
         owner,
         repo,
         issue_number: process.env.PR_NUMBER,
-        body: 'Failed to validate your example-pattern.json file! 🚀 \n\n',
+        body: 'Failed to validate your example-pattern.json file! 🚀 \n\n' + `${errorList.toString()} \n\n`,
       });
 
       throw new Error('Failed to validate pattern, errors found');
