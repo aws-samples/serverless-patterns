@@ -1,4 +1,6 @@
-name: Manual Validate
+# Manual trigger that will post information back to the pull request with required changes.
+
+name: Manual Validate Pattern
 
 on:
   workflow_dispatch:

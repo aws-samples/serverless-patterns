@@ -65,15 +65,14 @@ const main = async () => {
         });
       }
 
-      console.info('includeGitHubChanges', includeGitHubChanges)
-
       if (!includeGitHubChanges) {
         throw new Error('Failed to validate pattern, errors found');
       }
-      console.info('Added comments back to the pull request requesting changes');
+      console.info('Errors found: Added comments back to the pull request requesting changes');
+    } else {
+      console.info('Everything OK with pattern');
     }
 
-    console.info('Everything OK with pattern');
   } catch (error) {
     console.info(error);
     throw Error('Failed to process the example-pattern.json file.');
