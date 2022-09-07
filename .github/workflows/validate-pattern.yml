@@ -29,3 +29,4 @@ jobs:
           MODIFIED_FILES: ${{ steps.changed-files.outputs.modified_files }}
           ADDED_FILES: ${{ steps.changed-files.outputs.added_files }}
           PR_NUMBER: ${{ github.event.number }}
+          GH_AUTOMATION: false
