@@ -7,7 +7,7 @@ const v = new Validator();
 const schema = require('./pattern-schema.json');
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
-const includeGitHubChanges = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION === 'true' : true;
+const githubAutomation = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION === 'true' : true;
 
 const octokit = new Octokit({
   auth: process.env.TOKEN,
@@ -51,7 +51,7 @@ const main = async () => {
 
       const errorList = errors.map((error, index) => `${index + 1}. \`${error.path}\`: ${error.stack}\n\n`);
 
-      if (includeGitHubChanges) {
+      if (githubAutomation) {
         // Write comment back with errors for
         await octokit.rest.issues.createComment({
           owner,
@@ -63,16 +63,41 @@ const main = async () => {
             `_If you need any help, take a look at the [example-pattern file](https://github.com/aws-samples/serverless-patterns/blob/main/_pattern-model/example-pattern.json)._ \n\n` +
             `Make the changes, and push your changes back to this pull request. When all automated checks are successful, the Serverless DA team will process your pull request. \n\n`,
         });
-      }
 
-      if (!includeGitHubChanges) {
+        await octokit.rest.issues.addLabels({
+          owner,
+          repo,
+          issue_number: process.env.PR_NUMBER,
+          labels: ['invalid-example-pattern-file', 'requested-changes'],
+        });
+
         throw new Error('Failed to validate pattern, errors found');
       }
+
+      if (!githubAutomation) {
+        throw new Error('Failed to validate pattern, errors found');
+      }
+
       console.info('Errors found: Added comments back to the pull request requesting changes');
     } else {
+      if (githubAutomation) {
+        await octokit.rest.issues.addLabels({
+          owner,
+          repo,
+          issue_number: process.env.PR_NUMBER,
+          labels: ['valid-example-pattern-file'],
+        });
+
+        await octokit.rest.issues.removeLabel({
+          owner,
+          repo,
+          issue_number: process.env.PR_NUMBER,
+          name: 'requested-changes',
+        });
+      }
+
       console.info('Everything OK with pattern');
     }
-
   } catch (error) {
     console.info(error);
     throw Error('Failed to process the example-pattern.json file.');
