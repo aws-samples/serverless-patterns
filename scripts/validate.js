@@ -13,6 +13,8 @@ const octokit = new Octokit({
   auth: process.env.TOKEN,
 });
 
+console.info(process.env)
+
 const buildErrors = (validationErrors) => {
   return validationErrors.map((error) => {
     return {
