@@ -1,0 +1,40 @@
+name: Measure packages size
+
+on:
+  workflow_dispatch:
+    inputs:
+      prNumber:
+        description: "PR Number"
+        required: true
+
+jobs:
+  measure-utils-sizes:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: dev
+      PR_NUMBER: ${{ inputs.prNumber }}
+    steps:
+      # Since we are manually triggering the workflow the previous checkout has the main branch. In order to checkout the branch/code of the PR
+      # we need first to use the PR number to retrieve the PR SHA number. This means we need three steps to: checkout the repo,
+      # run a custom script to get the SHA, and then finally checkout the PR branch
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Extract PR details
+        id: extract_PR_details
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const script = require('.github/scripts/get_pr_info.js');
+            await script({github, context, core});
+      - name: Checkout PR code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.extract_PR_details.outputs.headSHA }}
+      # - name: Packages size report
+      #   uses: flochaz/pkg-size-action@v2.0.0
+      #   with:
+      #     build-command: mkdir dist && npm run package -w packages/logger -w packages/tracer -w packages/metrics -w packages/commons && npm run package-bundle -w packages/logger -w packages/tracer -w packages/metrics -w packages/commons && bash -c "mv ./packages/*/dist/* dist/" && ls dist
+      #     dist-directory: /dist
+      #     pr-number: ${{ inputs.prNumber }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
