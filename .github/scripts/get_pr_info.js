@@ -7,13 +7,15 @@ module.exports = async ({ github, context, core }) => {
 
   try {
     const {
-      data: { head, base },
+      data: { head, base, ...rest },
     } = await github.rest.pulls.get({
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: prNumber,
     });
 
+
+    console.log("data", rest);
     core.setOutput('headRef', head.ref);
     core.setOutput('headSHA', head.sha);
     core.setOutput('baseRef', base.ref);
