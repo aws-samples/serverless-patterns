@@ -20,7 +20,7 @@ module.exports = async ({ github, context, core }) => {
       pull_number: prNumber
     })
 
-    const allChangedFiles = fileData.map(file => filename);
+    const allChangedFiles = fileData.map(file => file.filename);
 
     core.setOutput('files', allChangedFiles);
 
