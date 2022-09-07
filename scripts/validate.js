@@ -7,11 +7,13 @@ const v = new Validator();
 const schema = require('./pattern-schema.json');
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
-const includeGitHubChanges = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION === 'true' : true;
+const githubAutomation = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION === 'true' : true;
 
 const octokit = new Octokit({
   auth: process.env.TOKEN,
 });
+
+console.info(process.env);
 
 const buildErrors = (validationErrors) => {
   return validationErrors.map((error) => {
@@ -34,6 +36,26 @@ const pathToExamplePattern = findFile([...addedFiles, ...modifiedFiles], 'exampl
 const main = async () => {
   if (!pathToExamplePattern) {
     console.info('No example-pattern.json found, skipping any validation phase.');
+
+    if (githubAutomation) {
+      await octokit.rest.issues.addLabels({
+        owner,
+        repo,
+        issue_number: process.env.PR_NUMBER,
+        labels: ['missing-example-pattern-file'],
+      });
+
+      await octokit.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number: process.env.PR_NUMBER,
+        body:
+          `@${process.env.ACTOR} looks like you are missing the example-pattern.json file in your pattern. \n\n` +
+          `You can [find the example-pattern template here](https://github.com/aws-samples/serverless-patterns/blob/main/_pattern-model/example-pattern.json). \n\n` +
+          `The file is used on ServerlessLand and is required. Once the file is added we can review the pattern. \n\n`,
+      });
+    }
+
     process.exit(0);
   }
 
@@ -51,28 +73,65 @@ const main = async () => {
 
       const errorList = errors.map((error, index) => `${index + 1}. \`${error.path}\`: ${error.stack}\n\n`);
 
-      if (includeGitHubChanges) {
+      if (githubAutomation) {
         // Write comment back with errors for
         await octokit.rest.issues.createComment({
           owner,
           repo,
           issue_number: process.env.PR_NUMBER,
           body:
-            `@${process.env.GITHUB_ACTOR} your 'example-pattern.json' is missing some key fields, please review below and address any errors you have \n\n` +
+            `@${process.env.ACTOR} your 'example-pattern.json' is missing some key fields, please review below and address any errors you have \n\n` +
             `${errorList.toString().replace(/,/g, '')} \n\n` +
             `_If you need any help, take a look at the [example-pattern file](https://github.com/aws-samples/serverless-patterns/blob/main/_pattern-model/example-pattern.json)._ \n\n` +
             `Make the changes, and push your changes back to this pull request. When all automated checks are successful, the Serverless DA team will process your pull request. \n\n`,
         });
-      }
 
-      if (!includeGitHubChanges) {
+        await octokit.rest.issues.addLabels({
+          owner,
+          repo,
+          issue_number: process.env.PR_NUMBER,
+          labels: ['invalid-example-pattern-file', 'requested-changes'],
+        });
+
         throw new Error('Failed to validate pattern, errors found');
       }
+
+      if (!githubAutomation) {
+        throw new Error('Failed to validate pattern, errors found');
+      }
+
       console.info('Errors found: Added comments back to the pull request requesting changes');
     } else {
+      if (githubAutomation) {
+        await octokit.rest.issues.addLabels({
+          owner,
+          repo,
+          issue_number: process.env.PR_NUMBER,
+          labels: ['valid-example-pattern-file'],
+        });
+
+        try {
+          // try and remove labels if they are there, will error if not, but that's OK.
+          await octokit.rest.issues.removeLabel({
+            owner,
+            repo,
+            issue_number: process.env.PR_NUMBER,
+            name: 'requested-changes',
+          });
+
+          await octokit.rest.issues.removeLabel({
+            owner,
+            repo,
+            issue_number: process.env.PR_NUMBER,
+            name: 'missing-example-pattern-file',
+          });
+        } catch (error) {
+          // silent fail here
+        }
+      }
+
       console.info('Everything OK with pattern');
     }
-
   } catch (error) {
     console.info(error);
     throw Error('Failed to process the example-pattern.json file.');
