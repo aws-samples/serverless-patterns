@@ -34,6 +34,26 @@ const pathToExamplePattern = findFile([...addedFiles, ...modifiedFiles], 'exampl
 const main = async () => {
   if (!pathToExamplePattern) {
     console.info('No example-pattern.json found, skipping any validation phase.');
+
+    if (githubAutomation) {
+      await octokit.rest.issues.addLabels({
+        owner,
+        repo,
+        issue_number: process.env.PR_NUMBER,
+        labels: ['missing-example-pattern-file'],
+      });
+
+      await octokit.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number: process.env.PR_NUMBER,
+        body:
+          `@${process.env.GITHUB_ACTOR} looks like you are missing the example-pattern.json file in your pattern. \n\n` +
+          `You can [find the example-pattern template here](https://github.com/aws-samples/serverless-patterns/blob/main/_pattern-model/example-pattern.json). \n\n` +
+          `The file is used on ServerlessLand and is required. Once the file is added we can review the pattern. \n\n`,
+      });
+    }
+
     process.exit(0);
   }
 
@@ -93,6 +113,13 @@ const main = async () => {
           repo,
           issue_number: process.env.PR_NUMBER,
           name: 'requested-changes',
+        });
+
+        await octokit.rest.issues.removeLabel({
+          owner,
+          repo,
+          issue_number: process.env.PR_NUMBER,
+          name: 'missing-example-pattern-file',
         });
       }
 
