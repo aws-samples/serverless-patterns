@@ -1,0 +1,3 @@
+aws-cdk-lib==2.38.1
+constructs>=10.0.0,<11.0.0
+aws-cdk.aws-apigatewayv2-alpha==2.38.1a0
