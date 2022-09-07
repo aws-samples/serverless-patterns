@@ -1,4 +1,4 @@
-name: Measure packages size
+name: Validate Pattern Pull Request (Manual)
 
 on:
   workflow_dispatch:
@@ -8,7 +8,10 @@ on:
         required: true
 
 jobs:
-  measure-utils-sizes:
+  validate-pull-request:
+    permissions: 
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     env:
       NODE_ENV: dev
@@ -30,11 +33,24 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ steps.extract_PR_details.outputs.headSHA }}
-      # - name: Packages size report
-      #   uses: flochaz/pkg-size-action@v2.0.0
-      #   with:
-      #     build-command: mkdir dist && npm run package -w packages/logger -w packages/tracer -w packages/metrics -w packages/commons && npm run package-bundle -w packages/logger -w packages/tracer -w packages/metrics -w packages/commons && bash -c "mv ./packages/*/dist/* dist/" && ls dist
-      #     dist-directory: /dist
-      #     pr-number: ${{ inputs.prNumber }}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get changed files using defaults
+        id: changed-files
+        uses: tj-actions/changed-files@v19
+        with:
+          separator: ","
+
+      - run: cd scripts && npm i
+
+      - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
+      - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
+      - run: echo "TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+      - run: echo "PR_NUMBER=${{ inputs.prNumber }}" >> $GITHUB_ENV
+
+      - name: Validate
+        run: node scripts/validate.js
+        env: # Or as an environment variable
+          MODIFIED_FILES: ${{ steps.changed-files.outputs.modified_files }}
+          ADDED_FILES: "${{ steps.changed-files.outputs.added_files }}"
+          PR_NUMBER: ${{ inputs.prNumber }}
+          TOKEN: "${{ secrets.GITHUB_TOKEN }}"           
