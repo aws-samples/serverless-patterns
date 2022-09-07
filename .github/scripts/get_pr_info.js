@@ -14,8 +14,15 @@ module.exports = async ({ github, context, core }) => {
       pull_number: prNumber,
     });
 
+    const files = github.rest.pulls.listFiles({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      pull_number: prNumber
+    })
 
-    console.log("data", rest);
+
+    console.log("data", files);
+    
     core.setOutput('headRef', head.ref);
     core.setOutput('headSHA', head.sha);
     core.setOutput('baseRef', base.ref);
