@@ -40,7 +40,7 @@ jobs:
         with:
           separator: ","
 
-      - run: ls
+      - run: cd scripts && ls
       - run: cd scripts && npm i
 
       - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
