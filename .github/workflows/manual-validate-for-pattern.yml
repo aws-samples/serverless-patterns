@@ -44,4 +44,5 @@ jobs:
           MODIFIED_FILES: ${{ steps.extract_PR_details.outputs.files }}
           ADDED_FILES: "${{ steps.changed-files.outputs.added_files }}"
           PR_NUMBER: ${{ inputs.prNumber }}
+          ACTOR: ${{ steps.extract_PR_details.outputs.user }}
           TOKEN: "${{ secrets.GITHUB_TOKEN }}"           

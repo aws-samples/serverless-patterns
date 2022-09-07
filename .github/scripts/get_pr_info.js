@@ -7,7 +7,7 @@ module.exports = async ({ github, context, core }) => {
 
   try {
     const {
-      data: { head, base, ...rest },
+      data: { head, base, user, ...rest },
     } = await github.rest.pulls.get({
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -28,6 +28,7 @@ module.exports = async ({ github, context, core }) => {
     core.setOutput('headSHA', head.sha);
     core.setOutput('baseRef', base.ref);
     core.setOutput('baseSHA', base.sha);
+    core.setOutput('user', user.login);
   } catch (error) {
     core.setFailed(`Unable to retrieve info from PR number ${prNumber}.\n\n Error details: ${error}`);
     throw error;
