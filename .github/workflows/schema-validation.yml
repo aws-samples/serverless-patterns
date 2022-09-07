@@ -1,0 +1,30 @@
+name: "Schema Validation"
+
+on: [pull_request]
+
+jobs:
+  validate-pattern:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3   
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16  
+
+      - name: Get changed files using defaults
+        id: changed-files
+        uses: tj-actions/changed-files@v19
+        with:
+          separator: ","    
+
+      - run: cd scripts && npm i
+
+      - name: Validate
+        run: node scripts/validate.js
+        env: # Or as an environment variable
+          MODIFIED_FILES: ${{ steps.changed-files.outputs.modified_files }}
+          ADDED_FILES: ${{ steps.changed-files.outputs.added_files }}
+          PR_NUMBER: ${{ github.event.number }}
+          GH_AUTOMATION: false

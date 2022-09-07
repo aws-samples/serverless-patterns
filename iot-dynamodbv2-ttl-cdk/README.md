@@ -45,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 The CDK app deploys the resources and the IAM permissions required to run the application. 
-Review the [README](./iot-timestream/README.md) (the `Notes` section specially) in the `iot-timestream` folder for additional information.
+Review the [README](./iot-ddbv2/README.md) (the `Notes` section specially) in the `iot-ddbv2` folder for additional information.
 
 ## Testing
 
