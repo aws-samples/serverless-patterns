@@ -68,9 +68,11 @@ class CdkGlueStack(Stack):
             }
         )
         # Add InLine Policy to Lambda to provide access to start the jobs
+        accountID = Stack.of(self).account
+        region = Stack.of(self).region
         customPolicy = iam.PolicyStatement(
             actions=['glue:StartJobRun'],
-            resources=['*']
+            resources=[f"arn:aws:glue:{region}:{accountID}:job/{job.name}"]
         )
 
         my_lambda.role.attach_inline_policy(
