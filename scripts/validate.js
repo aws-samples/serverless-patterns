@@ -7,7 +7,7 @@ const v = new Validator();
 const schema = require('./pattern-schema.json');
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
-const includeGitHubChanges = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION === 'true' : true
+const includeGitHubChanges = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION === 'true' : true;
 
 const octokit = new Octokit({
   auth: process.env.TOKEN,
@@ -33,7 +33,7 @@ const pathToExamplePattern = findFile([...addedFiles, ...modifiedFiles], 'exampl
 
 const main = async () => {
   if (!pathToExamplePattern) {
-    console.log('No example-pattern.json found, skipping any validation phase.');
+    console.info('No example-pattern.json found, skipping any validation phase.');
     process.exit(0);
   }
 
@@ -48,7 +48,6 @@ const main = async () => {
 
     if (result.errors.length > 0) {
       const errors = buildErrors(result.errors);
-      console.log(errors);
 
       const errorList = errors.map((error, index) => `${index + 1}. \`${error.path}\`: ${error.stack}\n\n`);
 
@@ -64,35 +63,19 @@ const main = async () => {
             `_If you need any help, take a look at the [example-pattern file](https://github.com/aws-samples/serverless-patterns/blob/main/_pattern-model/example-pattern.json)._ \n\n` +
             `Make the changes, and push your changes back to this pull request. When all automated checks are successful, the Serverless DA team will process your pull request. \n\n`,
         });
-
-        await octokit.rest.issues.addLabels({
-          owner,
-          repo,
-          issue_number: process.env.PR_NUMBER,
-          labels: ['changes-required'],
-        });
       }
 
-      if(!includeGitHubChanges){
+      console.info('includeGitHubChanges', includeGitHubChanges)
+
+      if (!includeGitHubChanges) {
         throw new Error('Failed to validate pattern, errors found');
       }
-      console.log('Added comments back to the pull request requesting changes');
+      console.info('Added comments back to the pull request requesting changes');
     }
 
-    if (includeGitHubChanges) {
-      // Everything OK, remove this label
-      await octokit.rest.issues.removeLabel({
-        owner,
-        repo,
-        issue_number: process.env.PR_NUMBER,
-        name: 'changes-required',
-      });
-    }
-
-    console.log('Everything OK with pattern');
-
+    console.info('Everything OK with pattern');
   } catch (error) {
-    console.log(error);
+    console.info(error);
     throw Error('Failed to process the example-pattern.json file.');
   }
 };
