@@ -22,7 +22,7 @@ module.exports = async ({ github, context, core }) => {
 
     const allChangedFiles = fileData.map(file => file.filename);
 
-    core.setOutput('files', allChangedFiles);
+    core.setOutput('files', allChangedFiles.toString());
 
     core.setOutput('headRef', head.ref);
     core.setOutput('headSHA', head.sha);
