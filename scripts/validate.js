@@ -73,7 +73,10 @@ const main = async () => {
         });
       }
 
-      throw new Error('Failed to validate pattern, errors found');
+      if(!includeGitHubChanges){
+        throw new Error('Failed to validate pattern, errors found');
+      }
+      console.log('Added comments back to the pull request requesting changes');
     }
 
     if (includeGitHubChanges) {
@@ -86,7 +89,8 @@ const main = async () => {
       });
     }
 
-    // Everything OK....
+    console.log('Everything OK with pattern');
+
   } catch (error) {
     console.log(error);
     throw Error('Failed to process the example-pattern.json file.');
