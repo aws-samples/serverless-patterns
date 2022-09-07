@@ -9,8 +9,6 @@ const schema = require('./pattern-schema.json');
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
 const includeGitHubChanges = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION === 'true' : true
 
-console.log('includeGitHubChanges', includeGitHubChanges)
-
 const octokit = new Octokit({
   auth: process.env.TOKEN,
 });
