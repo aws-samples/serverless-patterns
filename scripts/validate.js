@@ -71,7 +71,7 @@ const main = async () => {
     if (result.errors.length > 0) {
       const errors = buildErrors(result.errors);
 
-      const errorList = errors.map((error, index) => `${index + 1}. \`${error.path}\`: ${error.stack}\n\n`);
+      const errorList = errors.map((error, index) => `${index + 1}. \`${error.path}\`: ${error.stack}\n`);
 
       if (githubAutomation) {
         // Write comment back with errors for
@@ -81,7 +81,7 @@ const main = async () => {
           issue_number: process.env.PR_NUMBER,
           body:
             `@${process.env.ACTOR} your 'example-pattern.json' is missing some key fields, please review below and address any errors you have \n\n` +
-            `${errorList.toString().replace(/,/g, '')} \n\n` +
+            `${errorList.reduce((acc, error) => `${acc}${error}`, '')} \n\n` +
             `_If you need any help, take a look at the [example-pattern file](https://github.com/aws-samples/serverless-patterns/blob/main/_pattern-model/example-pattern.json)._ \n\n` +
             `Make the changes, and push your changes back to this pull request. When all automated checks are successful, the Serverless DA team will process your pull request. \n\n`,
         });
