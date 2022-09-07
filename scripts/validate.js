@@ -25,8 +25,8 @@ const buildErrors = (validationErrors) => {
 
 console.log(process.env);
 
-const addedFiles = process.env.ADDED_FILES ? process.env.ADDED_FILES.split(',') : [];
-const modifiedFiles = process.env.MODIFIED_FILES ? process.env.MODIFIED_FILES.split(',') : [];
+const addedFiles = process.env.ADDED_FILES ? JSON.parse(process.env.ADDED_FILES.split(',')) : [];
+const modifiedFiles = process.env.MODIFIED_FILES ? JSON.parse(process.env.MODIFIED_FILES.split(',')) : [];
 
 console.log('modifiedFiles', modifiedFiles)
 console.log('addedFiles', addedFiles)
