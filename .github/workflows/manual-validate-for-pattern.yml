@@ -1,0 +1,48 @@
+# Manual trigger that will post information back to the pull request with required changes.
+
+name: Manual Validate Pattern
+
+on:
+  workflow_dispatch:
+    inputs:
+      prNumber:
+        description: "PR Number"
+        required: true
+
+jobs:
+  validate-pull-request:
+    permissions: 
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: dev
+      PR_NUMBER: ${{ inputs.prNumber }}
+    steps:
+      # Since we are manually triggering the workflow the previous checkout has the main branch. In order to checkout the branch/code of the PR
+      # we need first to use the PR number to retrieve the PR SHA number. This means we need three steps to: checkout the repo,
+      # run a custom script to get the SHA, and then finally checkout the PR branch
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Extract PR details
+        id: extract_PR_details
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const script = require('.github/scripts/get_pr_info.js');
+            await script({github, context, core});
+      - name: Checkout PR code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.extract_PR_details.outputs.headSHA }}
+
+      - run: cd scripts && npm i
+
+      - name: Validate
+        run: node scripts/validate.js
+        env: # Or as an environment variable
+          MODIFIED_FILES: ${{ steps.extract_PR_details.outputs.files }}
+          ADDED_FILES: "${{ steps.changed-files.outputs.added_files }}"
+          PR_NUMBER: ${{ inputs.prNumber }}
+          ACTOR: ${{ steps.extract_PR_details.outputs.user }}
+          TOKEN: "${{ secrets.GITHUB_TOKEN }}"           
