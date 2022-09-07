@@ -28,6 +28,9 @@ console.log(process.env);
 const addedFiles = process.env.ADDED_FILES ? process.env.ADDED_FILES.split(',') : [];
 const modifiedFiles = process.env.MODIFIED_FILES ? process.env.MODIFIED_FILES.split(',') : [];
 
+console.log('modifiedFiles', modifiedFiles)
+console.log('addedFiles', addedFiles)
+
 const findFile = (array, filename) => array.find((item) => item.includes(filename));
 
 const pathToExamplePattern = findFile([...addedFiles, ...modifiedFiles], 'example-pattern.json');

@@ -51,7 +51,7 @@ jobs:
       - name: Validate
         run: node scripts/validate.js
         env: # Or as an environment variable
-          MODIFIED_FILES: ${{ steps.changed-files.outputs.modified_files }}
+          MODIFIED_FILES: ${{ steps.extract_PR_details.outputs.files }}
           ADDED_FILES: "${{ steps.changed-files.outputs.added_files }}"
           PR_NUMBER: ${{ inputs.prNumber }}
           TOKEN: "${{ secrets.GITHUB_TOKEN }}"           
