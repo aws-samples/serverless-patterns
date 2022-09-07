@@ -13,7 +13,7 @@ const octokit = new Octokit({
   auth: process.env.TOKEN,
 });
 
-console.info(process.env)
+console.info(process.env);
 
 const buildErrors = (validationErrors) => {
   return validationErrors.map((error) => {
@@ -110,19 +110,24 @@ const main = async () => {
           labels: ['valid-example-pattern-file'],
         });
 
-        await octokit.rest.issues.removeLabel({
-          owner,
-          repo,
-          issue_number: process.env.PR_NUMBER,
-          name: 'requested-changes',
-        });
+        try {
+          // try and remove labels if they are there, will error if not, but that's OK.
+          await octokit.rest.issues.removeLabel({
+            owner,
+            repo,
+            issue_number: process.env.PR_NUMBER,
+            name: 'requested-changes',
+          });
 
-        await octokit.rest.issues.removeLabel({
-          owner,
-          repo,
-          issue_number: process.env.PR_NUMBER,
-          name: 'missing-example-pattern-file',
-        });
+          await octokit.rest.issues.removeLabel({
+            owner,
+            repo,
+            issue_number: process.env.PR_NUMBER,
+            name: 'missing-example-pattern-file',
+          });
+        } catch (error) {
+          // silent fail here
+        }
       }
 
       console.info('Everything OK with pattern');
