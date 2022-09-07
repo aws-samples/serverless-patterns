@@ -1,19 +1,6 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions.
+name: "Schema Validation"
 
-name: "Validate Pattern"
-
-# on: [pull_request]
-
-on:
-  workflow_call:
-    inputs:
-      ENVIRONMENT:
-        required: true
-        type: string
-    secrets:
-      MY_SECRET: 
-        required: true
+on: [pull_request]
 
 jobs:
   validate-pattern:
@@ -36,16 +23,9 @@ jobs:
 
       - run: cd scripts && npm i
 
-      - run: echo "MODIFIED_FILES=${{ steps.changed-files.outputs.modified_files }}" >> $GITHUB_ENV
-      - run: echo "ADDED_FILES=${{ steps.changed-files.outputs.added_files }}" >> $GITHUB_ENV
-      - run: echo "TOKEN=${{ secrets.COMMENT_TOKEN }}" >> $GITHUB_ENV
-      - run: echo "TOKENT=${{ secrets.test }}" >> $GITHUB_ENV
-      - run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
-      
       - name: Validate
         run: node scripts/validate.js
         env: # Or as an environment variable
-          super_secret: ${{ env.COMMENT_TOKEN }}
-          super_secret2: "${{ env.COMMENT_TOKEN }}"
-          super_secret3: ${{ secrets.test }}
-          super_secret4: "${{ secrets.test }}"
+          MODIFIED_FILES: ${{ steps.changed-files.outputs.modified_files }}
+          ADDED_FILES: ${{ steps.changed-files.outputs.added_files }}
+          PR_NUMBER: ${{ github.event.number }}
