@@ -1,0 +1,34 @@
+service: lambda-function-url-sls
+
+frameworkVersion: '^3' # requires serverless 3.12 or later
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  architecture: arm64 
+  stage: ${opt:stage, "dev"} # Default stage to "dev"
+  region: ${opt:region, "us-east-1"} # Default region to "us-east-1"
+  memorySize: 256 # Default lambda memory size
+  timeout: 10 # Default lambda timeout
+
+plugins:
+  - serverless-bundle
+  - serverless-prune-plugin
+  
+custom:
+  prune:
+    automatic: true
+    number: 1
+
+package:
+  individually: true
+
+functions:
+  hellolambda:
+    handler: src/lambda.handler
+    url: true # Default is public
+    # To protect using IAM authentication add...
+      # authorizer: aws_iam
+    # To configure cors, see https://www.serverless.com/framework/docs/providers/aws/guide/functions
+      # cors: 
+

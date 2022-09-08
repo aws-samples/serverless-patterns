@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - AWS WAF to Amazon API Gateway REST
+
+Resources:
+  # Log group
+  MyLogGroup:
+    Type: AWS::Logs::LogGroup
+
+  # Amazon API gateway REST API
+  MyApi: 
+    Type: AWS::Serverless::Api 
+    Properties: 
+      StageName: Prod
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true # Enable tracing with Amazon X-Ray
+      AccessLogSetting: # Enable access logging with Amazon CloudWatch
+        DestinationArn: !GetAtt MyLogGroup.Arn
+        Format: >
+          {"requestId":"$context.requestId",
+          "waf-error":"$context.waf.error",
+          "waf-status":"$context.waf.status",
+          "waf-latency":"$context.waf.latency",
+          "waf-response":"$context.wafResponseCode",
+          "authenticate-error":"$context.authenticate.error",
+          "authenticate-status":"$context.authenticate.status",
+          "authenticate-latency":"$context.authenticate.latency",
+          "authorize-error":"$context.authorize.error",
+          "authorize-status":"$context.authorize.status",
+          "authorize-latency":"$context.authorize.latency",
+          "integration-error":"$context.integration.error",
+          "integration-status":"$context.integration.status",
+          "integration-latency":"$context.integration.latency",
+          "integration-requestId":"$context.integration.requestId",
+          "integration-integrationStatus":"$context.integration.integrationStatus",
+          "response-latency":"$context.responseLatency",
+          "status":"$context.status"}
+
+  # Lambda function as an example micro-service behind the API Gateway REST endpoint
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Events:
+        RootGet:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RestApiId: !Ref MyApi
+
+Outputs:
+  # API endpoint for testing
+  ApiEndpoint:
+    Description: API endpoint URL
+    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+  LogGroupName:
+    Description: Name of the log group
+    Value: !Ref MyLogGroup

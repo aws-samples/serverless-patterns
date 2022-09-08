@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - AWS WAF to Amazon API Gateway REST
+
+Resources:
+  # AWS WAF Access Control List limits each IP to 100 requestes per second
+  MyWAFACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      CustomResponseBodies: # Define a response from WAF
+        CountryNotValid:
+          Content: Country not allowed
+          ContentType: TEXT_PLAIN
+      DefaultAction:
+        Block: 
+          CustomResponse: # Choose a defined template to respond when blocked
+            ResponseCode: "403"
+            CustomResponseBodyKey: CountryNotValid
+      Description: Application WAF
+      Scope: REGIONAL
+      VisibilityConfig:
+        CloudWatchMetricsEnabled: true
+        MetricName: AppRules
+        SampledRequestsEnabled: true
+      Rules:
+        - Action:
+            Allow: {} # Allow if conditions are met
+          Name: AllowCountryList
+          Priority: 0
+          Statement:
+            GeoMatchStatement:
+              CountryCodes: # Requests from following countries are allowed (Add your country code to test)
+                - US
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: AllowCountryList
+            SampledRequestsEnabled: true
+  
+  # Amazon API gateway REST API
+  MyApi: 
+    Type: AWS::Serverless::Api 
+    Properties: 
+      StageName: Prod
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+
+  # Associate the WebACL with the API gateway
+  MyWAFAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties: 
+      ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${MyApi}/stages/Prod
+      WebACLArn: !GetAtt MyWAFACL.Arn
+
+# Lambda function as an example micro-service behind the API Gateway REST endpoint
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Events:
+        RootGet:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RestApiId: !Ref MyApi
+
+Outputs:
+  # API endpoint for testing
+  ApiEndpoint:
+    Description: "API endpoint URL"
+    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod

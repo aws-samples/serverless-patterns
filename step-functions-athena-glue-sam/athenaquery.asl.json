@@ -1,0 +1,81 @@
+{
+  "StartAt": "Start Athena Query",
+  "States": {
+    "Start Athena Query": {
+      "Next": "Get Query Results without token",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
+      "Parameters": {
+        "QueryString": "SELECT title FROM ${CrawlerBucketname} limit 10",
+        "QueryExecutionContext": {
+          "Database": "${DBname}"
+        },
+        "ResultConfiguration": {
+          "OutputLocation": "s3://${AthenaBucketname}"
+        }
+      }
+    },
+    "Get Query Results without token": {
+      "Type": "Task",
+      "ResultPath": "$.GetQueryResults",
+      "Resource": "arn:aws:states:::athena:getQueryResults",
+      "Parameters": {
+        "MaxResults": 2,
+        "QueryExecutionId.$": "$.QueryExecution.QueryExecutionId"
+      },
+      "Next": "Map State"
+    },
+    "Get Query Results with NextToken": {
+      "Next": "Map State",
+      "Type": "Task",
+      "ResultPath": "$.GetQueryResults",
+      "Resource": "arn:aws:states:::athena:getQueryResults",
+      "Parameters": {
+        "NextToken.$": "$.StartQueryParams.NextToken",
+        "MaxResults": 2,
+        "QueryExecutionId.$": "$.QueryExecution.QueryExecutionId"
+      }
+    },
+    "Prepare Next Query Params": {
+      "Type": "Pass",
+      "ResultPath": "$.StartQueryParams",
+      "Parameters": {
+        "QueryExecutionId.$": "$.QueryExecution.QueryExecutionId",
+        "NextToken.$": "$.GetQueryResults.NextToken"
+      },
+      "Next": "Get Query Results with NextToken"
+    },
+    "Has More Results?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.GetQueryResults.NextToken",
+          "IsPresent": true,
+          "Next": "Prepare Next Query Params"
+        }
+      ],
+      "Default": "Done"
+    },
+    "Map State": {
+      "Type": "Map",
+      "ResultPath": null,
+      "Next": "Has More Results?",
+      "InputPath": "$.GetQueryResults.ResultSet.Rows[1:]",
+      "Iterator": {
+        "StartAt": "ProcessResult",
+        "States": {
+          "ProcessResult": {
+            "Type": "Pass",
+            "End": true
+          }
+        }
+      },
+      "MaxConcurrency": 1
+    },
+    "Done": {
+      "Type": "Succeed",
+      "Comment": "All results in the query are processed successfully"
+    }
+  },
+  "TimeoutSeconds": 3600
+}

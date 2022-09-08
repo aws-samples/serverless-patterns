@@ -1,0 +1,8 @@
+{
+  "streamName": "live",
+  "codec": "AVC",
+  "encodingProfile" : "HD-1080p",
+  "type" : "RTMP_PUSH",
+  "priUrl": "PUT_YOUR_PRIMARY_RTMP_PULL_URL_HERE",
+  "secUrl" : "PUT_YOUR_SECONDARY_RTMP_PULL_URL_HERE"
+}

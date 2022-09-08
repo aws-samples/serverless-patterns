@@ -1,0 +1,51 @@
+service: lambda-ssm-sls
+
+frameworkVersion: "3"
+
+custom:
+  parameterName: "LambdaSsmSls"
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "ssm:*"
+            - "ssm:GetParameter"
+            - "ssm:GetParameters"
+            - "ssm:GetParametersByPath"
+            - "ssm:PutParameter"
+            - "ssm:DeleteParameter"
+            - "ssm:DeleteParameters"
+          Resource:
+            Fn::Sub: "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.parameterName}"
+
+functions:
+  lambda-ssm-sls-get:
+    handler: handler.get
+    events:
+      - httpApi:
+          method: get
+          path: /
+    environment:
+      PARAMETER_NAME: ${self:custom.parameterName}
+  lambda-ssm-sls-post:
+    handler: handler.put
+    events:
+      - httpApi:
+          method: put
+          path: /
+    environment:
+      PARAMETER_NAME: ${self:custom.parameterName}
+resources:
+  Resources:
+    sqsQueue:
+      Type: AWS::SSM::Parameter
+      Properties:
+        Name: ${self:custom.parameterName}
+        Type: String
+        Value: "test"

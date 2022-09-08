@@ -1,0 +1,17 @@
+{
+  "hls_segment_duration_seconds": 5,
+  "hls_playlist_window_seconds": 60,
+  "hls_max_video_bits_per_second": 2147483647,
+  "hls_min_video_bits_per_second": 0,
+  "hls_stream_order": "ORIGINAL",
+  "dash_segment_duration_seconds": 5,
+  "dash_manifest_window_seconds": 60,
+  "dash_max_video_bits_per_second": 2147483647,
+  "dash_min_video_bits_per_second": 0,
+  "dash_stream_order": "ORIGINAL",
+  "mss_segment_duration_seconds": 5,
+  "mss_manifest_window_seconds": 60,
+  "mss_max_video_bits_per_second": 2147483647,
+  "mss_min_video_bits_per_second": 0,
+  "mss_stream_order": "ORIGINAL"
+}

@@ -1,0 +1,31 @@
+service: lambda-vpc-secrets-sls
+
+frameworkVersion: '^3' # requires serverless 3.0 or later
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  architecture: arm64 
+  stage: ${opt:stage, "dev"} # Default stage to "dev"
+  region: ${opt:region, "us-east-1"} # Default region to "us-east-1"
+  memorySize: 256 # Default lambda memory size; min = 128 and max = 10240
+  timeout: 10 # Default lambda timeout; max is 900 seconds
+
+plugins:
+  - serverless-bundle
+  - serverless-prune-plugin
+  
+custom:
+  prune:
+    automatic: true
+    number: 1
+
+package:
+  individually: true
+
+functions: ${file(serverless-resources/functions.yaml)}
+
+resources:
+  - ${file(serverless-resources/iam-roles.yaml)}
+  - ${file(serverless-resources/secrets.yaml)}
+  - ${file(serverless-resources/vpc.yaml)}

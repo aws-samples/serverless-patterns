@@ -1,0 +1,46 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "First_Function",
+    "States": {
+      "First_Function": {
+        "Type": "Task",
+        "Resource": "${FirstFunctionARN}",
+        "Parameters": {
+          "Payload.$": "$"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "Next": "Second_Function"
+      },
+      "Second_Function": {
+        "Type": "Task",
+        "Resource": "${SecondFunctionARN}",
+        "Parameters": {
+          "Payload.$": "$"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "End": true
+      }
+    }
+  }
