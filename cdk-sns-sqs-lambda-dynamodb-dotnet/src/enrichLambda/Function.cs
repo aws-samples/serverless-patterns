@@ -43,26 +43,31 @@ public class Function
         var client = new RestClient($"https://api.github.com/users/{gitUser.login}");
         var request = new RestRequest();
         request.Method = Method.Get;
-        var apiResponse = client.Execute(request).Content;
+        var apiCall = client.Execute(request);
 
+        var apiResponse = apiCall.Content;
         context.Logger.LogInformation(apiResponse);
-        var messagerequest = new SendMessageRequest
+
+        if (apiCall.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            QueueUrl = Environment.GetEnvironmentVariable("Enrich_Queue"),
-            MessageBody = apiResponse
-        };
+            
+            var messagerequest = new SendMessageRequest
+            {
+                QueueUrl = Environment.GetEnvironmentVariable("ENRICH_QUEUE"),
+                MessageBody = apiResponse
+            };
 
 
-        await amazonSQSClient.SendMessageAsync(messagerequest);
+            await amazonSQSClient.SendMessageAsync(messagerequest);
 
-        gitUser = JsonSerializer.Deserialize<GitUser>(apiResponse);
+            gitUser = JsonSerializer.Deserialize<GitUser>(apiResponse);
 
 
-        await this.dynamoDbClient.PutItemAsync(Environment.GetEnvironmentVariable("TABLE_NAME"),
-                 new Dictionary<string, AttributeValue>()
-                 {
+            await this.dynamoDbClient.PutItemAsync(Environment.GetEnvironmentVariable("TABLE_NAME"),
+                     new Dictionary<string, AttributeValue>()
+                     {
                     {"login", new AttributeValue(gitUser.login)},
-                    {"datatype", new AttributeValue("Enriched")},
+                    {"datatype", new AttributeValue("enriched")},
                     {"id", new AttributeValue(gitUser.id.ToString()) },
                     {"node_id", new AttributeValue(gitUser.node_id) },
                     {"avatar_url", new AttributeValue(gitUser.avatar_url) },
@@ -94,6 +99,11 @@ public class Function
                     {"following", new AttributeValue(gitUser.following.ToString()) },
                     {"created_at", new AttributeValue(gitUser.created_at.ToString()) },
                     {"updated_at", new AttributeValue(gitUser.updated_at.ToString()) },
-                 });
+                     });
+        }
+        else
+        {
+            context.Logger.LogError($"Error while calling API for {gitUser.login}");
+        }
     }
 }

@@ -38,6 +38,7 @@ public class Function
                 new Dictionary<string, AttributeValue>()
                 {
                     {"login", new AttributeValue(req.login)},
+                    {"type", new AttributeValue(req.type)},
                     {"datatype", new AttributeValue("rawdata")}
                 });
     }

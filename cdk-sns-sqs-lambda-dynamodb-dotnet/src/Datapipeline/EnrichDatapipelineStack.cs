@@ -40,7 +40,7 @@ namespace Datapipeline
                     Description = ".NET 6 Docker rawLambda function",
                     Environment = new Dictionary<string, string>
                     {
-                        { "Enrich_Queue", enrichQueueOutput.QueueUrl},
+                        { "ENRICH_QUEUE", enrichQueueOutput.QueueUrl},
                         { "TABLE_NAME", CrossStackTable.TableName}
                     },
                     Timeout = Duration.Minutes(1)

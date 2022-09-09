@@ -9,6 +9,6 @@ namespace rawLambda.model
     internal class GitUser
     {
         public string login { get; set; } = string.Empty;
-        public string datatype { get; set; } = string.Empty;
+        public string type { get; set; } = string.Empty;
     }
 }

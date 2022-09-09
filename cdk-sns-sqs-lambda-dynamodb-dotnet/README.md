@@ -1,14 +1,76 @@
-# Welcome to your CDK C# project!
+# Serverless Data Enrichment Pipeline with Persistence
 
-This is a blank project for CDK development with C#.
+This pattern helps you deploy a CDK stack with SNS, SQS, Lambda and DynamoDB. The pattern uses these AWS services to create a serverless data enrichment pipeline with persistence of data in SQS. The Lambda functions are used to consume data from SQS queues, perform enrichment, update DynamoDB table. The enriched data is further sent to another SQS queue.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+The pattern also features usage of CrossStack to export resources from one CloudFormation stack to another.
 
-It uses the [.NET Core CLI](https://docs.microsoft.com/dotnet/articles/core/) to compile and execute your project.
+## Requirements
 
-## Useful commands
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [.Net Core](https://dotnet.microsoft.com/en-us/download/dotnet)
+    - 3.1 for the CDK Stack - https://dotnet.microsoft.com/en-us/download/dotnet/3.1
+    - 6.0 for the Lambda Function - https://dotnet.microsoft.com/en-us/download/dotnet/6.0
+* [Docker](https://docs.docker.com/get-docker/) installed and running
+* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
-* `dotnet build src` compile this app
-* `cdk deploy`       deploy this stack to your default AWS account/region
-* `cdk diff`         compare deployed stack with current state
-* `cdk synth`        emits the synthesized CloudFormation template
+## Deployment Instructions
+
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+2. Change directory to the pattern directory:
+    ```
+    cd cdk-sns-sqs-lambda-dynamodb-dotnet
+    ```
+3. Install dependencies
+    ```
+    dotnet restore/src
+    ```
+
+4. Deploy the stack to your default AWS account and region.
+    ```
+    cdk deploy --all
+    ```
+
+## How it works
+
+Data Pipeline Stack #1, relay the raw message from SNS to DynamoDB.
+
+Data Pipeline Stack #2, relay the enrich message from SNS and route it to DynamoDB & SQS. 
+
+One common design pattern is called “fanout.” In this pattern, a message published to an SNS topic is distributed to a number of SQS queues in parallel. By using this pattern, you can build applications that take advantage parallel, asynchronous processing.
+
+## Testing
+
+Have SQS Listner running, Send the following message to the SNS Topic 
+
+```
+aws sns publish --topic-arn "<arn>" --message '{\"login\": \"mojombo\",\"type\": \"User\"}'
+
+aws sqs receive-message --queue-url <url> --attribute-names All --message-attribute-names All --max-number-of-messages 10
+
+aws dynamodb get-item --table-name gitusers --key '{\"login\": {\"S\": \"mojombo\"},\"datatype\": {\"S\": \"enriched\"}}'
+aws dynamodb get-item --table-name gitusers --key '{\"login\": {\"S\": \"mojombo\"},\"datatype\": {\"S\": \"rawdata\"}}'
+
+```
+
+If using console to send message
+
+```
+{"login": "mojombo","type": "User"}
+```
+
+
+## Cleanup
+ 
+Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
+```
+cdk destroy
+```
+----
+Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
