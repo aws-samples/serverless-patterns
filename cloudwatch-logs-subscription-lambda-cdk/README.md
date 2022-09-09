@@ -1,6 +1,6 @@
 # Amazon CloudWatch Logs Subscription to AWS Lambda with CDK
 
-This pattern demonstrates how to create the Amazon CloudWatch Log Subscription to AWS Lambada. Logs filtering is also demonstrated to filter only a certain logs sent to AWS Lambda.
+This pattern demonstrates how to create the Amazon CloudWatch Log Subscription to AWS Lambda. Logs filtering is also demonstrated to filter only certain logs to be sent to AWS Lambda.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cloudwatch-logs-subscription-lambda-cdk
 
