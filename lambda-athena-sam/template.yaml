@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A demonstration of how to start query execution and fetch the result from an Athena table using an AWS Lambda function.
+Parameters:
+  AthenaWorkGroupName:
+    Type: String
+    Default: primary
+    Description: Enter the Workgroup name for your Athena table
+  S3BucketName:
+    Type: String
+    Default: sabsden
+    Description: Enter your S3 Bucket Name
+
+Resources:
+  # Define a Lambda function
+  AthenaQueryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: function/
+      Runtime: python3.9
+      Timeout: 10
+      Handler: athenaquerymaker.lambda_handler
+      Policies:
+      - AthenaQueryPolicy:
+          WorkGroupName: !Ref AthenaWorkGroupName
+      - S3CrudPolicy:
+          BucketName: !Ref S3BucketName
+      - Statement:
+        - Sid: GlueGetTablePolicy
+          Effect: Allow
+          Action:
+          - glue:GetTable
+          Resource: [ !Sub 'arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:catalog', 
+            !Sub 'arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:database/*', 
+            !Sub 'arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:table/*']
+Outputs:
+  AthenaQueryFunction:
+    Description: AthenaQueryFunction ARN
+    Value: !Ref AthenaQueryFunction
