@@ -7,7 +7,8 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample pattern allows users from one account to invoke their Lambda function present in a different account via Step function and retrieve the desired output."
+      "This sample pattern allows users from one account to invoke their Lambda function present in a different account via Step function and retrieve the desired output.",
+      "This is highly efficient and useful when it comes to pulling cross account data all in one place."
     ]
   },
   "gitHub": {
