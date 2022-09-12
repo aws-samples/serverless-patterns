@@ -1,7 +1,7 @@
 {
-    "title": "Invoke cross account lambda function directly via Step function",
-    "description": "Create ",
-    "language": "HCL",
+    "title": "Invoke cross account Lambda function directly via Step function",
+    "description": "Create a Step function which invokes cross account Lambda function",
+    "language": "",
     "level": "100",
     "framework": "Terraform",
     "introBox": {
