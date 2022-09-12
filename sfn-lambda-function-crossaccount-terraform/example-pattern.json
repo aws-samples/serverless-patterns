@@ -13,10 +13,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-lambda-function-crossaccount-terraform",
-      "templateURL": "serverless-patterns/sfn-lambda-function-crossaccount-terraform",
-      "projectFolder": "sfn-lambda-function-crossaccount-terraform",
-      "templateFile": "sfn-lambda-function-crossaccount-terraform/main.tf"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/step-function-lambda-function-crossaccount-terraform",
+      "templateURL": "serverless-patterns/step-function-lambda-function-crossaccount-terraform",
+      "projectFolder": "step-function-lambda-function-crossaccount-terraform",
+      "templateFile": "step-function-lambda-function-crossaccount-terraform/main.tf"
     }
   },
   "resources": {
