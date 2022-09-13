@@ -1,0 +1,10 @@
+{
+    "name": "IndexFace",
+    "version": "1.0.0",
+    "description": "Lambdas to index face from the given a S3 image",
+    "private": true,
+    "license": "MIT",
+    "dependencies": {
+        "aws-sdk": "*"
+    }
+}
