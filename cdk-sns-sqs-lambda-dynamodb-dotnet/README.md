@@ -1,6 +1,6 @@
 # Serverless Data Enrichment Pipeline with Persistence
 
-This pattern helps you deploy a CDK stack with SNS, SQS, Lambda and DynamoDB. The pattern uses these AWS services to create a serverless data enrichment pipeline with persistence of data in SQS. The Lambda functions are used to consume data from SQS queues, perform enrichment, update DynamoDB table. The enriched data is further sent to another SQS queue.
+This pattern helps you deploy a CDK stack with SNS, SQS, Lambda and DynamoDB. The pattern uses these AWS services to create a serverless data enrichment pipeline with short-term persistence of data in SQS. The Lambda functions are used to consume data from SQS queues, perform enrichment, update DynamoDB table. The enriched data is further sent to another SQS queue.
 
 The pattern also features usage of CrossStack to export resources from one CloudFormation stack to another.
 
