@@ -37,7 +37,7 @@ The pattern also features usage of CrossStack to export resources from one Cloud
 
 Data Pipeline Stack #1, relay the raw message from SNS to DynamoDB.
 
-Data Pipeline Stack #2, relay the enrich message from SNS and route it to DynamoDB & SQS. 
+Data Pipeline Stack #2, enrich the raw message from SNS and route it to DynamoDB & SQS. 
 
 One common design pattern is called “fanout.” In this pattern, a message published to an SNS topic is distributed to a number of SQS queues in parallel. By using this pattern, you can build applications that take advantage parallel, asynchronous processing.
 
