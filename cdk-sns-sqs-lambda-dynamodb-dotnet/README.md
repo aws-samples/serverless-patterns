@@ -45,9 +45,10 @@ One common design pattern is called “fanout.” In this pattern, a message pub
 
 Have SQS Listner running, Send the following message to the SNS Topic 
 
-```
+``` bash
 aws sns publish --topic-arn "<arn>" --message '{\"login\": \"mojombo\",\"type\": \"User\"}'
 
+//enrich - output queue
 aws sqs receive-message --queue-url <url> --attribute-names All --message-attribute-names All --max-number-of-messages 10
 
 aws dynamodb get-item --table-name gitusers --key '{\"login\": {\"S\": \"mojombo\"},\"datatype\": {\"S\": \"enriched\"}}'
