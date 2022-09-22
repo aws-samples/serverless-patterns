@@ -2,7 +2,7 @@
 
 This project contains a sample AWS CDK template for triggering [AWS AppSync](https://aws.amazon.com/appsync/) from an [Amazon EventBridge](https://aws.amazon.com/eventbridge/).
 
-In this pattern, AWS AppSync is configured with a a schema to manage and read todos. The pattern uses an event bridge bus and an EventBridge [API destination](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-destinations.html) to trigger the AppSync GraphQL `updateTodo` mutation when an event that matches the defined rule is received. The AppSync [API KEY](https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html#api-key-authorization) is used as the mode of authorization.
+In this pattern, AWS AppSync is configured with a schema to manage and read todos. The pattern uses an EventBridge bus and an EventBridge [API destination](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-destinations.html) to trigger the AppSync GraphQL `updateTodo` mutation when an event that matches the defined rule is received. The AppSync [API KEY](https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html#api-key-authorization) is used as the mode of authorization.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
