@@ -38,7 +38,7 @@ export class SfnToSfnCdkStack extends Stack {
         statements: [
           new iam.PolicyStatement({
             actions: ['states:SendTaskSuccess'],
-            resources: ['*'],
+            resources: ['arn:aws:states:' + Stack.of(this).region + ':' + Stack.of(this).account + ':stateMachine:*'],
           }),
         ],
       }),
