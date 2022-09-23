@@ -30,18 +30,8 @@ output "lambda_role_arn" {
   value       = module.lambda_function.lambda_role_arn
 }
 
-# Lambda Layer
-output "lambda_layer_arn" {
-  description = "The ARN of the Lambda Layer with version"
-  value       = module.lambda_layer.lambda_layer_arn
-}
-
-output "lambda_layer_layer_arn" {
-  description = "The ARN of the Lambda Layer without version"
-  value       = module.lambda_layer.lambda_layer_layer_arn
-}
-
-output "lambda_layer_version" {
-  description = "The Lambda Layer version"
-  value       = module.lambda_layer.lambda_layer_version
+# EventBridge
+output "eventbridge_rule_arns" {
+  description = "The EventBridge Rule ARNs"
+  value       = module.eventbridge.eventbridge_rule_arns
 }

@@ -1,50 +1,17 @@
-# Amazon API Gateway HTTP API to AWS Lambda
+# Amazon API Gateway (HTTP) to AWS Lambda
 
 This pattern creates an Amazon API Gateway HTTP API and an AWS Lambda function.
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/terraform-apigw-http-api-lambda).
+## Getting started with Terraform Serverless Patterns
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
-
-## Requirements
-
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
-
-## Deployment Instructions
-
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-1. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/terraform-apigw-http-api-lambda
-    ```
-1. From the command line, initialize terraform to download and install the providers defined in the configuration:
-    ```
-    terraform init
-    ```
-1. From the command line, apply the Terraform configurations:
-    ```
-    terraform apply
-    ```
-1. During the prompts:
-    * Enter yes
-1. Note the outputs from the deployment process, these contain the resource names and/or ARNs which are used for testing.
-
-## How it works
-
-This pattern deploys an Amazon API Gateway HTTP API with a default route and basic CORS configuration. The default route is integrated with an AWS Lambda function written in Python. The function welcomes you and doesn't do anything else.
+Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md). 
 
 ## Testing
 
-Once the stack is deployed, call the endpoint retrieve from the `apigatewayv2_api_api_endpoint` output using curl or Postman.
+Call the endpoint retrieved from the `apigatewayv2_api_api_endpoint` output using `curl` or Postman.
 
 ```
-$ curl $(terraform output -raw apigatewayv2_api_api_endpoint)
+curl https://wargabe3ei.execute-api.eu-west-1.amazonaws.com
 
 #sample output
 {
@@ -82,23 +49,74 @@ curl '<your http api endpoint>'/pets/dog/1?foo=bar -X POST \
 
 Then check the logs for the Lambda function from the Lambda console.
 
-## Cleanup
- 
-1. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/apigw-http-api-lambda-terraform
-    ```
-1. Delete all created resources
-    ```bash
-    terraform destroy
-    ```
-1. During the prompts:
-    * Enter yes
-1. Confirm all created resources has been deleted
-    ```bash
-    terraform show
-    ```
-----
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
 
-SPDX-License-Identifier: MIT-0
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.9 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_disabled_lambda"></a> [disabled\_lambda](#module\_disabled\_lambda) | ../../ | n/a |
+| <a name="module_lambda_at_edge"></a> [lambda\_at\_edge](#module\_lambda\_at\_edge) | ../../ | n/a |
+| <a name="module_lambda_function"></a> [lambda\_function](#module\_lambda\_function) | ../../ | n/a |
+| <a name="module_lambda_function_existing_package_local"></a> [lambda\_function\_existing\_package\_local](#module\_lambda\_function\_existing\_package\_local) | ../../ | n/a |
+| <a name="module_lambda_function_for_each"></a> [lambda\_function\_for\_each](#module\_lambda\_function\_for\_each) | ../../ | n/a |
+| <a name="module_lambda_function_with_package_deploying_externally"></a> [lambda\_function\_with\_package\_deploying\_externally](#module\_lambda\_function\_with\_package\_deploying\_externally) | ../../ | n/a |
+| <a name="module_lambda_layer_local"></a> [lambda\_layer\_local](#module\_lambda\_layer\_local) | ../../ | n/a |
+| <a name="module_lambda_layer_s3"></a> [lambda\_layer\_s3](#module\_lambda\_layer\_s3) | ../../ | n/a |
+| <a name="module_lambda_layer_with_package_deploying_externally"></a> [lambda\_layer\_with\_package\_deploying\_externally](#module\_lambda\_layer\_with\_package\_deploying\_externally) | ../../ | n/a |
+| <a name="module_lambda_with_mixed_trusted_entities"></a> [lambda\_with\_mixed\_trusted\_entities](#module\_lambda\_with\_mixed\_trusted\_entities) | ../../ | n/a |
+| <a name="module_lambda_with_provisioned_concurrency"></a> [lambda\_with\_provisioned\_concurrency](#module\_lambda\_with\_provisioned\_concurrency) | ../../ | n/a |
+| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | terraform-aws-modules/s3-bucket/aws | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_sqs_queue.dlq](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue) | resource |
+| [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_lambda_cloudwatch_log_group_arn"></a> [lambda\_cloudwatch\_log\_group\_arn](#output\_lambda\_cloudwatch\_log\_group\_arn) | The ARN of the Cloudwatch Log Group |
+| <a name="output_lambda_function_arn"></a> [lambda\_function\_arn](#output\_lambda\_function\_arn) | The ARN of the Lambda Function |
+| <a name="output_lambda_function_invoke_arn"></a> [lambda\_function\_invoke\_arn](#output\_lambda\_function\_invoke\_arn) | The Invoke ARN of the Lambda Function |
+| <a name="output_lambda_function_kms_key_arn"></a> [lambda\_function\_kms\_key\_arn](#output\_lambda\_function\_kms\_key\_arn) | The ARN for the KMS encryption key of Lambda Function |
+| <a name="output_lambda_function_last_modified"></a> [lambda\_function\_last\_modified](#output\_lambda\_function\_last\_modified) | The date Lambda Function resource was last modified |
+| <a name="output_lambda_function_name"></a> [lambda\_function\_name](#output\_lambda\_function\_name) | The name of the Lambda Function |
+| <a name="output_lambda_function_qualified_arn"></a> [lambda\_function\_qualified\_arn](#output\_lambda\_function\_qualified\_arn) | The ARN identifying your Lambda Function Version |
+| <a name="output_lambda_function_source_code_hash"></a> [lambda\_function\_source\_code\_hash](#output\_lambda\_function\_source\_code\_hash) | Base64-encoded representation of raw SHA-256 sum of the zip file |
+| <a name="output_lambda_function_source_code_size"></a> [lambda\_function\_source\_code\_size](#output\_lambda\_function\_source\_code\_size) | The size in bytes of the function .zip file |
+| <a name="output_lambda_function_url"></a> [lambda\_function\_url](#output\_lambda\_function\_url) | The URL of the Lambda Function URL |
+| <a name="output_lambda_function_url_id"></a> [lambda\_function\_url\_id](#output\_lambda\_function\_url\_id) | The Lambda Function URL generated id |
+| <a name="output_lambda_function_version"></a> [lambda\_function\_version](#output\_lambda\_function\_version) | Latest published version of Lambda Function |
+| <a name="output_lambda_layer_arn"></a> [lambda\_layer\_arn](#output\_lambda\_layer\_arn) | The ARN of the Lambda Layer with version |
+| <a name="output_lambda_layer_created_date"></a> [lambda\_layer\_created\_date](#output\_lambda\_layer\_created\_date) | The date Lambda Layer resource was created |
+| <a name="output_lambda_layer_layer_arn"></a> [lambda\_layer\_layer\_arn](#output\_lambda\_layer\_layer\_arn) | The ARN of the Lambda Layer without version |
+| <a name="output_lambda_layer_source_code_size"></a> [lambda\_layer\_source\_code\_size](#output\_lambda\_layer\_source\_code\_size) | The size in bytes of the Lambda Layer .zip file |
+| <a name="output_lambda_layer_version"></a> [lambda\_layer\_version](#output\_lambda\_layer\_version) | The Lambda Layer version |
+| <a name="output_lambda_role_arn"></a> [lambda\_role\_arn](#output\_lambda\_role\_arn) | The ARN of the IAM role created for the Lambda Function |
+| <a name="output_lambda_role_name"></a> [lambda\_role\_name](#output\_lambda\_role\_name) | The name of the IAM role created for the Lambda Function |
+| <a name="output_local_filename"></a> [local\_filename](#output\_local\_filename) | The filename of zip archive deployed (if deployment was from local) |
+| <a name="output_s3_object"></a> [s3\_object](#output\_s3\_object) | The map with S3 object data of zip archive deployed (if deployment was from S3) |
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

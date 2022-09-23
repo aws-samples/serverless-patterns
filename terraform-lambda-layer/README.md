@@ -1,19 +1,53 @@
-# Complete AWS Lambda examples
+# Lambda Function and Lambda Layers
 
-Configuration in this directory creates AWS Lambda Function, Layers, Alias, and so on with the large variety of supported features showing this module in action.
+This pattern deploys a Lambda Function and attaches a Lambda Layer to it.
 
+## Getting started with Terraform Serverless Patterns
 
-## Usage
+Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md).
 
-To run this example you need to execute:
+## Testing
 
-```bash
-$ terraform init
-$ terraform plan
-$ terraform apply
+Call the endpoint retrieved from the `apigatewayv2_api_api_endpoint` output using `curl` or Postman.
+
+```
+curl https://wargabe3ei.execute-api.eu-west-1.amazonaws.com
+
+#sample output
+{
+  "message ": {
+    "functionName": "test_apigw_integration",
+    "xForwardedFor": "{YourIpAddress}",
+    "method": "GET",
+    "rawPath": "/",
+    "queryString": null,
+    "timestamp": "04/Apr/2022:22:50:34 +0000"
+  }
+}
 ```
 
-Note that this example may create resources which cost money. Run `terraform destroy` when you don't need these resources.
+```
+curl '<your http api endpoint>'/pets/dog/1?foo=bar -X POST \
+--header 'Content-Type: application/json' \
+-d '{"key1":"hello", "key2":"World!"}'
+
+#sample output
+{
+  "message ": {
+    "functionName": "test_apigw_integration",
+    "xForwardedFor": "{YourIpAddress}",
+    "method": "POST",
+    "rawPath": "/pets/dog/1",
+    "queryString": {
+      "foo": "bar"
+    },
+    "timestamp": "04/Apr/2022:22:49:14 +0000",
+    "body": "{\"key1\":\"hello\", \"key2\":\"World!\"}"
+  }
+}
+```
+
+Then check the logs for the Lambda function from the Lambda console.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements

@@ -30,18 +30,23 @@ output "lambda_role_arn" {
   value       = module.lambda_function.lambda_role_arn
 }
 
-# Lambda Layer
-output "lambda_layer_arn" {
-  description = "The ARN of the Lambda Layer with version"
-  value       = module.lambda_layer.lambda_layer_arn
+# DynamoDB Stream
+output "dynamodb_table_arn" {
+  description = "ARN of the DynamoDB table"
+  value       = module.dynamodb_table.dynamodb_table_arn
 }
 
-output "lambda_layer_layer_arn" {
-  description = "The ARN of the Lambda Layer without version"
-  value       = module.lambda_layer.lambda_layer_layer_arn
+output "dynamodb_table_id" {
+  description = "ID of the DynamoDB table"
+  value       = module.dynamodb_table.dynamodb_table_id
 }
 
-output "lambda_layer_version" {
-  description = "The Lambda Layer version"
-  value       = module.lambda_layer.lambda_layer_version
+output "dynamodb_table_stream_arn" {
+  description = "The ARN of the Table Stream. Only available when var.stream_enabled is true"
+  value       = module.dynamodb_table.dynamodb_table_stream_arn
+}
+
+output "dynamodb_table_stream_label" {
+  description = "A timestamp, in ISO 8601 format of the Table Stream. Only available when var.stream_enabled is true"
+  value       = module.dynamodb_table.dynamodb_table_stream_label
 }

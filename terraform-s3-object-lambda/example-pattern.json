@@ -1,23 +1,23 @@
 {
-  "title": "Amazon API Gateway (HTTP) to AWS Lambda",
-  "description": "This pattern creates an Amazon API Gateway (HTTP) and an AWS Lambda function.",
+  "title": "Amazon API Gateway HTTP API to AWS Lambda",
+  "description": "This pattern creates an Amazon API Gateway HTTP API and an AWS Lambda function.",
   "language": "Python",
   "level": "200",
   "framework": "terraform",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an Amazon API Gateway (HTTP) with a default route and basic CORS configuration.",
+      "This pattern deploys an Amazon API Gateway HTTP API with a default route and basic CORS configuration.", 
       "The default route is integrated with an AWS Lambda function written in Python.", 
       "The function logs the incoming API event (v2) and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-apigw-http-lambda",
-      "templateURL": "serverless-patterns/terraform-apigw-http-api-lambda",
-      "projectFolder": "terraform-apigw-http-lambda",
-      "templateFile": "terraform-apigw-http-lambda/main.tf"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda-terraform",
+      "templateURL": "serverless-patterns/apigw-http-api-lambda-terraform",
+      "projectFolder": "apigw-http-api-lambda-terraform",
+      "templateFile": "apigw-http-api-lambda-terraform/main.tf"
     }
   },
   "resources": {
@@ -38,7 +38,7 @@
   },
   "deploy": {
     "text": [
-      "terraform init && terraform apply"
+      "terraform apply"
     ]
   },
   "testing": {
@@ -53,11 +53,8 @@
   },
   "authors": [
     {
-      "name": "Anton Babenko",
-      "image": "https://avatars.githubusercontent.com/u/393243",
-      "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
-      "linkedin": "https://www.linkedin.com/in/antonbabenko",
-      "twitter": "antonbabenko"
+      "name": "Carlos Bauer",
+      "bio": "I am a Technical Account Manager at AWS"
     }
   ]
 }

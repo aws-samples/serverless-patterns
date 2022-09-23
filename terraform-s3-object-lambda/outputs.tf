@@ -30,18 +30,20 @@ output "lambda_role_arn" {
   value       = module.lambda_function.lambda_role_arn
 }
 
-# Lambda Layer
-output "lambda_layer_arn" {
-  description = "The ARN of the Lambda Layer with version"
-  value       = module.lambda_layer.lambda_layer_arn
+# S3 bucket
+output "s3_bucket_id" {
+  description = "The name of the bucket."
+  value       = module.s3_bucket.s3_bucket_id
 }
 
-output "lambda_layer_layer_arn" {
-  description = "The ARN of the Lambda Layer without version"
-  value       = module.lambda_layer.lambda_layer_layer_arn
+output "s3_bucket_arn" {
+  description = "The ARN of the bucket. Will be of format arn:aws:s3:::bucketname."
+  value       = module.s3_bucket.s3_bucket_arn
 }
 
-output "lambda_layer_version" {
-  description = "The Lambda Layer version"
-  value       = module.lambda_layer.lambda_layer_version
+# S3 Object Lambda access point
+output "s3_lambda_access_point" {
+  description = "The ARN of the S3 Object Lambda access point."
+  value       = aws_s3control_object_lambda_access_point.this.arn
 }
+
