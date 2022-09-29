@@ -1,8 +1,9 @@
-# AWS Service 1 to AWS Service 2
+# Invokiing step functions workflows using appsync and direct lambda resolvers
 
-This pattern << explain usage >>
+This SAM templates deploys an AWS Appsync API,a DynamoDB table and a step functions workflow.
+You can invoke the step functions workflow by sending a random Id number as input to a mutation in the appsync api.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appsync-lambda-sfn-sam.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -19,9 +20,9 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+1. Change directory:
     ```
-    cd _patterns-model
+     cd ./serverless-patterns/appsync-lambda-sfn-sam/
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -36,13 +37,13 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-## How it works
-
-Explain how the service interaction works.
 
 ## Testing
+Sign in to your AWS console and search for appsync. Open up appsync and click on your newly deployed appsync project.
+![alt text](./assets/g.png)
+![alt text](./assets/snap.png)
+![alt text](./assets/i.png)
 
-Provide steps to trigger the integration and show what should be observed if successful.
 
 ## Cleanup
  
