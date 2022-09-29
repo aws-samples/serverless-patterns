@@ -1,6 +1,7 @@
 {
     "title": "Amazon API Gateway REST API with Mapping templates for status code and parameter mapping.",
     "description": "Using mapping template to over-ride status, status code and body returned from the Lambda function.",
+    "language": "Python",
     "level": "200",
     "framework": "SAM",
     "introBox": {
