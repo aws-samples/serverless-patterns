@@ -1,0 +1,38 @@
+openapi: "3.0.1"
+info:
+  title: "testquery"
+  version: "2022-09-27T13:47:09Z"
+servers:
+  variables:
+    basePath:
+      default: "/v1"
+paths:
+  /:
+    x-amazon-apigateway-any-method:
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: 
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIFunction.Arn}/invocations"
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$'))\n#if($inputRoot.toString().contains(\"\
+                error\"))\n#set($context.responseOverride.status = 400)\n#set($inputRoot.statuscode\
+                \ = 650)\n#set($inputRoot.body = \"changed\")\n#end\n$input.json(\"\
+                $\")"
+        passthroughBehavior: "when_no_templates"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+components:
+  schemas:
+    Empty:
+      title: "Empty Schema"
+      type: "object"
