@@ -1,0 +1,22 @@
+[
+    {
+        "timestamp": 1664652476000,
+        "message": "THIS IS FINE"
+    },
+    {
+        "timestamp": 1664652476000,
+        "message": "THIS IS AN ERROR"
+    },
+    {
+        "timestamp": 1664652476000,
+        "message": "THIS IS ANOTHER WARNING"
+    },
+    {
+        "timestamp": 1664652476000,
+        "message": "THIS LOG IS FINE"
+    },
+    {
+        "timestamp": 1664652476000,
+        "message": "THIS LOG IS ANOTHER WARNING"
+    }
+]

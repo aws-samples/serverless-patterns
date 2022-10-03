@@ -2,8 +2,8 @@
 !jest.config.js
 *.d.ts
 node_modules
-!./lib
-./example_logs.log
+!/lib
+!example_logs.log
 
 # CDK asset staging directory
 .cdk.staging
