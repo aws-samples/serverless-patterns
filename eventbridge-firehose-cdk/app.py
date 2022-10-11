@@ -104,3 +104,4 @@ class EventBridgeKinesisFirehoseStack(Stack):
 app = App()
 EventBridgeKinesisFirehoseStack(app, "EventBridgeKinesisFirehoseExample")
 app.synth()
+
