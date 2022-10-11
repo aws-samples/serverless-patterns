@@ -1,6 +1,6 @@
 # AWS serverless patterns
 
-This repo contains serverless patterns showing how to integrate services services using infrastructure-as-code (IaC). You can use these patterns to help develop your own projects quickly.
+This repo contains serverless patterns showing how to integrate services using infrastructure-as-code (IaC). You can use these patterns to help develop your own projects quickly.
 
 - Learn more about these patterns at https://serverlessland.com/patterns.
 - To learn more about submitting a pattern, read the [publishing guidelines page](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md).
