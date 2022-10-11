@@ -1,6 +1,6 @@
 {
   "title": "Eventbridge to Kinesis Firehose to S3",
-  "description": "forward custom events to Amazon Simple Storage Service (Amazon S3) using EventBridge rules and Amazon Kinesis Data Firehose.",
+  "description": "Forward custom events to Amazon Simple Storage Service (Amazon S3) using EventBridge rules and Amazon Kinesis Data Firehose.",
   "language": "Python",
   "level": "200",
   "framework": "CDK",
