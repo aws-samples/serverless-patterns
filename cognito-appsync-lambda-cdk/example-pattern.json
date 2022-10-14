@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-appsync-lambda-cdk",
       "templateURL": "serverless-patterns/cognito-appsync-lambda-cdk",
       "projectFolder": "cognito-appsync-lambda-cdk",
-      "templateFile": "cognito-appsync-lambda-cdk/lib/cognito-auth-cdk-stack.ts"
+      "templateFile": "cognito-appsync-lambda-cdk/cognito-auth-cdk-stack.ts"
     }
   },
   "resources": {
