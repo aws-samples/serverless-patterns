@@ -1,5 +1,5 @@
 {
-  "title": "Appsync Api Authentication with Cognito UserPools ",
+  "title": "Appsync Api Authentication with Cognito UserPools(TypeScript) ",
   "description": "Create an appsync api and authenticate all request with AWS Cognito User Pools",
   "language": "typescript",
   "level": "200",
