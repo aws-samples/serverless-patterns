@@ -38,9 +38,10 @@ env: { account: "13xxxxxxxxxx", region: "us-east-2" },
 
 ## Testing
 
-Sign in to your AWS console and search for appsync. Open up appsync and click on your newly deployed appsync project.
+Sign in to your AWS console and search for appsync. Open up appsync and click on your newly deployed project.
 
-- On the left hand side menu, click on settings and create a new `API_KEY. Click on `Queries` on the left hand side menu.
+- On the left hand side menu, click on `Settings` and create a new `API_KEY`.
+- Click on `Queries` on the left hand side menu to create and run your mutation.
 
 - Create your first mutation. See image below.
   ![alt text](./assets/mutation_non_auth.png)
@@ -48,18 +49,19 @@ Sign in to your AWS console and search for appsync. Open up appsync and click on
 - Run the mutation and you should get an `unauthorized access` error. See image below
   ![alt text](./assets/mutation_non_auth_1.png)
 
-This occurs because we applied the directive `@aws_cognito_user_pools` to the mutation endpoint in `schema.graphql`.
-That directive ensures that, that mutation can only be accessed by authenticated cognito users.
+This occurs because we applied the appsync directive `@aws_cognito_user_pools` to the mutation endpoint in `schema.graphql`.
+That appsync directive ensures that, that mutation can only be accessed by authenticated cognito users.
 
 So let's go ahead and create a new user in cognito. See screenshots.
-Type Cognito in the aws console search bar and open it up.
-![alt text](./assets/cognito_1.png)
 
-Search for your cognito project by name or by filtering and open it up.
-Create a new user
-![alt text](./assets/cognito_2.png)
-![alt text](./assets/cognito_3.png)
-![alt text](./assets/cognito_4.png)
+- Type Cognito in the aws console search bar and open it up.
+  ![alt text](./assets/cognito_1.png)
+
+- Search for your cognito project by name or by filtering and open it up.
+- Create a new user
+  ![alt text](./assets/cognito_2.png)
+  ![alt text](./assets/cognito_3.png)
+  ![alt text](./assets/cognito_4.png)
 
 Once user has been created, go back to your project in appsync, click on `API_KEY` and select your `Amazon cognito user pool`.
 
@@ -69,8 +71,10 @@ Sign in with the credentials you used when creating the user in cognito.
 You'll be prompted to create a new password for the user
 ![alt text](./assets/cognito_6.png)
 
-Once you've successfully logged in, run your mutation again, and you should get an output similar to this screenshot.
+Once you've successfully logged in, run your mutation again, and you should get a successful output similar to this screenshot.
 ![alt text](./assets/cognito_7.png)
+
+Congratulations, you've successfully created and tested an authenticated appsync api.
 
 ## Cleanup
 
