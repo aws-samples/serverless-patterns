@@ -1,7 +1,7 @@
 {
-  "title": "Appsync Api Authentication with Cognito UserPools(TypeScript)",
+  "title": "Authenticate AppSync Api with Cognito",
   "description": "Create an appsync api and authenticate all request with AWS Cognito User Pools.",
-  "language": "typescript",
+  "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-cognito-lambda-cdk",
       "templateURL": "serverless-patterns/appsync-cognito-lambda-cdk",
       "projectFolder": "appsync-cognito-lambda-cdk",
-      "templateFile": "appsync-cognito-lambda-cdk/lib/cognito-auth-cdk-stack.ts"
+      "templateFile": "appsync-cognito-lambda-cdk/cognito-auth-cdk-stack.ts"
     }
   },
   "resources": {
