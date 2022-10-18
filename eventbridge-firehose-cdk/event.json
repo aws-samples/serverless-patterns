@@ -1,0 +1,8 @@
+[
+    {
+      "DetailType": "message",
+      "Source": "my-application",
+      "EventBusName": "test-bus-cdk",
+      "Detail": "{ \"key1\": \"value1\", \"key2\": \"value2\" }"
+    }
+  ]
