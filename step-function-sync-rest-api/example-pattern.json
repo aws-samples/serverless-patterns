@@ -13,7 +13,7 @@
     "gitHub": {
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/step-function-sync-rest-api",
-        "templateURL": "serverless-pattern/step-function-sync-rest-api",
+        "templateURL": "serverless-patterns/step-function-sync-rest-api",
         "projectFolder": "step-function-sync-rest-api",
         "templateFile": "step-function-sync-rest-api/template.yaml"
       }
