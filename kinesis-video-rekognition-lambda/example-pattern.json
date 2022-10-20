@@ -1,0 +1,59 @@
+{
+  "title": "Kinesis Video Stream to Rekognition Stream Processor to Lambda",
+  "description": "Create a Rekognition Stream Processor to work on a Kinesis Video Stream and pass the generated events to Lambda for processing or analytics.",
+  "language": "CloudFormation, Python",
+  "level": "300",
+  "framework": "CloudFormation",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use a Rekognition Stream Processors to analyse Kinesis Video Streams with a variety of operations and then pass the generated metadata to AWS Lambda for further processing/analytics. This pattern is leveraging the native integration between Kinesis Video and Rekognition Stream Processors which means only CloudFormation and resource ARNs are used to form these connections.",
+      "",
+      "This pattern deploys the following resources: 1 Kinesis Video Stream, 1 Kinesis Data Stream, 1 Rekogntion Stream Processor, 1 Lambda Function, 1 Kinesis Firehose, 1 S3 Bucket"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
+      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
+      "projectFolder": "sfn-athena-cdk-python",
+      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Call Athena with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+      },
+      {
+        "text": "Amazon Athena - Serverless Interactive Query Service",
+        "link": "https://aws.amazon.com/athena/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Your name",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Your bio.",
+      "linkedin": "linked-in-ID",
+      "twitter": "twitter-handle"
+    }
+  ]
+}
