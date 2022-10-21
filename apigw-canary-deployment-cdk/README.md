@@ -67,7 +67,7 @@ The API Gateway Canary Deployment will route 50% of the traffic to the new funct
 From the command line, run the following command to send an HTTP `GET` request to APIs endpoint. Note that you must edit the {MyServerlessApplicationStack.ApigwId} and {Region} placeholder with the ID of the deployed API and Region that it is deployed in. This is provided in the MyServerlessApplicationStack deployment outputs.
 
 ```
-curl -H "Origin: https://www.example.com" "http://{MyServerlessApplicationStack.ApigwId}.execute-api.{Region}.amazonaws.com/prod"
+curl -H "Origin: https://www.example.com" "https://{MyServerlessApplicationStack.ApigwId}.execute-api.{Region}.amazonaws.com/prod"
 ```
 
 Since the canary deployment is set at 50% traffic, when you run the above command more than once you should see the old version's and new version's output at a rate of about 50/50.

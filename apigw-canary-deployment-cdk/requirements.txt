@@ -1,5 +1,3 @@
 aws-cdk-lib
 constructs
-aws-cdk.aws-apigateway
-aws-cdk.aws-lambda
-aws-cdk.aws-iam
+
