@@ -1,0 +1,11 @@
+{
+    "name": "getParameterLambda",
+    "version": "1.0.0",
+    "description": "Lambdas to retrieve parameter from ssm parameter store using Lambda extension",
+    "private": true,
+    "license": "MIT",
+    "dependencies": {
+        "aws-sdk": "*",
+        "axios": "^0.27.2"
+    }
+}
