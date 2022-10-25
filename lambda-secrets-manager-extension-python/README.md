@@ -45,13 +45,13 @@ Important: this application uses various AWS services and there are costs associ
 
 1. On line 3 of app.py we import the requests module which is used to make HTTP GET requests to the Secrets Manager extension endpoint.
 
-2. On lines 5-10 we obtain the secret name, secrets extension http port, and aws session token from environment variables and craft our request.
+2. On lines 5-11 we obtain the secret name, secrets extension http port, and aws session token from environment variables and craft our request.
 
-3. On line 14 we make a request to the endpoint
+3. On line 17 we make a request to the endpoint
 
-4. On line 16 we use json.loads to parse our secret from the response and also decode special characters.
+4. On line 20 we use json.loads to parse our secret from the response and also decode special characters.
 
-5. On line 18 we print the secret for demonstration purposes. Please remove this in production!
+5. On line 23 and 29 we print the secret for demonstration purposes and return the secret in our response body for demostration purposes. Please remove this in production!
 
 ## Testing
 
