@@ -1,9 +1,9 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: An example Lambda function using the Secrets Manager Lambda Extension
 
 #When you "sam build" it will ask you to provide a name for your secret. The default is "MySecret"
-Parameters:      
+Parameters:
   SecretName:
     Description: Secret Name
     Type: String
@@ -11,9 +11,9 @@ Parameters:
     AllowedPattern: ^[a-zA-Z0-9_.-/]*$
 
 Resources:
-#Make a secret
+  #Make a secret
   MySecret:
-    Type: 'AWS::SecretsManager::Secret'
+    Type: "AWS::SecretsManager::Secret"
     Properties:
       Name: !Ref SecretName
       Description: "Secret with dynamically generated secret password."
@@ -21,7 +21,7 @@ Resources:
         PasswordLength: 30
         ExcludeCharacters: '"@/\'
 
-#Make a lambda function
+  #Make a lambda function
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -39,3 +39,14 @@ Resources:
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Ref MySecret
+
+Outputs:
+  MySecret:
+    Value: !Ref MySecret
+    Description: MySecret ARN
+  MySecretName:
+    Value: !Ref SecretName
+    Description: SecretName
+  HelloWorldFunction:
+    Value: !Ref HelloWorldFunction
+    Description: HelloWorldFunction Lambda Function
