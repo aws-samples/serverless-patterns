@@ -44,6 +44,14 @@ export class KvsRekognitionStack extends Stack {
           resources: [
             connectedHomeEventNotification.topicArn
           ]
+        }),
+        new iam.PolicyStatement({
+          actions:[
+            's3:PutObject'
+          ],
+          resources: [
+            event_storage.bucketArn
+          ]
         })
       ],
     });
