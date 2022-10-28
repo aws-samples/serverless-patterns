@@ -1,7 +1,7 @@
 {
   "title": "Kinesis Video Stream to Rekognition Stream Processor to Lambda",
   "description": "Create a Rekognition Stream Processor to work on a Kinesis Video Stream and pass the generated events to Lambda for processing or analytics.",
-  "language": "Typescript, Python",
+  "language": "Typescript",
   "level": "300",
   "framework": "CDK",
   "introBox": {
