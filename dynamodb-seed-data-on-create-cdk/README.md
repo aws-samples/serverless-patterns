@@ -26,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Run below command to install required dependancies:
     ```
-    npm install && cd ./lambda && npm install && cd ./..
+    npm install
     ```
 
 3. From the command line, run:
