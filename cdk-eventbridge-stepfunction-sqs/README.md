@@ -111,7 +111,7 @@ Click the "Failed" status execution to see the state machine, and details. After
 
 In the AWS Console, navigate to the SQS service. You should see your new failure sqs in the list.
 
-![View SQS HomePage](docs/images/TBD)
+![View SQS HomePage](docs/images/FailureSQS.png)
 
 Click the "EventBridgeCDKStateMachineStack-StepfuntionFailureQueue81XXXXX", and you should see the "Send and Receive messages" on the top right side. Click the "Send and Receive messages" to navigate to "Poll message" screen. 
 ![View SQS HomePage](docs/images/FailureSQS-Home.png)
