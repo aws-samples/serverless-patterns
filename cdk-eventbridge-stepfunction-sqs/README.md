@@ -2,7 +2,11 @@
 
 This pattern creates an EventBridge event bus, a Step Functions workflow, and subscribes the Step Functions workflow to be executed when a `customEvent` event is published to the event bus. The Step Functions workflow executes Lambda function for business worflow. AWS Lambda can occasionally experience transient service errors. In this case, invoking Lambda results in a 500 error, such as ServiceException, AWSLambdaException, or SdkClientException. As a best practice, proactively handle these exceptions in your state machine to Retry invoking your Lambda function, or to Catch the error and move to Failed Queue for operational needs. 
 
-![architecture diagram](architecture.png)
+## Architecture
+![Architecture diagram](docs/images/Architecture.png)
+
+## StateMachine Flow
+![StateMachine Flow](docs/images/stateMachineFlow.svg)
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cdk-eventbridge-stepfunction
 
@@ -30,7 +34,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 4. From the command line, use CDK to deploy the AWS resources for the pattern. You'll be prompted to approve security related changes during the deployment.
     ```
-    npx cdk deploy
+    cdk deploy
     ```
 5. This command will take sometime to run. After successfully completing, it will print out a few output variables.  Your output should look something like this which contain the resource names which are used for testing.
 ```
@@ -48,7 +52,7 @@ EventBridgeCDKStateMachineStack.EventBridgeFailureDLQ = EventBridgeCDKStateMachi
 
 ## Testing
 
-### Publish "Success" Send an event to the event bus to trigger the Step Functions workflow
+### Send an event to the event bus to trigger the Step Functions workflow
 
 Let's create two custom events for success and failure execution, To do this, log into the AWS Console at [https://console.aws.amazon.com](https://console.aws.amazon.com) you can send a two custom messages separately to the event bus using the AWS Console. 
 
