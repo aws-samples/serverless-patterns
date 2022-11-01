@@ -70,7 +70,7 @@ AWS Glue to AWS Lambda over Amazon EventBridge
     ```bash
     cdk deploy
     ```
-1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
+1. Note the output from the CDK deployment process. It contain the resources names and/or ARNs which are used for testing.
 
 1. Run unit tests:
 
@@ -107,7 +107,6 @@ aws glue get-jobs --query 'Jobs[].Name'
 
 ````
 aws glue start-job-run --job-name '<replace by job name>'
-aws lambda invoke --function-name <Replace by function name> --cli-binary-format raw-in-base64-out --payload '{ "msg": "test" }' response.json"
 ````
 
 3. After 1 minute, check the status of the last Glue Job run status. It must be: "JobRunState": "TIMEOUT" 
@@ -115,16 +114,16 @@ aws lambda invoke --function-name <Replace by function name> --cli-binary-format
 aws glue get-job-runs --job-name '<replace by job name>'
 ````
 
-4. Go to CloudWatch and verify the lambda Log Group. You must see a Info log with the message "AWS Glue Job timeout successfully caught". It means that the Lambda Function was executed by the Event, after the Glue Job State has been changed to TIMEOUT.
+4. Go to CloudWatch Console and verify the lambda Log Group. You must see a Info log with the message "AWS Glue Job timeout successfully caught". It means that the Lambda Function was executed by the Event, after the Glue Job State has been changed to TIMEOUT.
 
 
 ## Cleanup
 
-1. Delete the stack
+1. Delete the stack. You will see the message "GlueEventBridgeLambda: destroyed" at the end
     ```bash
     cdk destroy
     ```
-1. Confirm the stack has been deleted
+1. You can confirm that the stack has been deleted by executing the command bellow
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
