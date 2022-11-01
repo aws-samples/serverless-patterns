@@ -6,9 +6,7 @@ This pattern creates an EventBridge event bus, a Step Functions workflow, and su
 ![Architecture diagram](docs/images/Architecture.png)
 
 ## StateMachine Flow
-![StateMachine Flow](docs/images/stateMachineFlow.svg)
-
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cdk-eventbridge-stepfunction
+![StateMachine Flow](docs/images/StateMachineFlow.svg)
 
 ## Requirements
 
@@ -16,7 +14,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node.js Installed](https://nodejs.org/en/download/)
-* [AWS CDK] (https://docs.aws.amazon.com/cdk/v2/guide/cli.html)
+* [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/cli.html)
 
 ## Deployment Instructions
 
@@ -62,7 +60,7 @@ Let's create two custom events for success and failure execution, To do this, lo
 
 1.a Publish "success" event
     Click on the "Send Events" button at the top right. This brings up a screen that you can use to publish events to the EventBridge.
-
+    ![publish success event create screen](docs/images/SuccessEvent-Create.png)
     * Event bus: Select the CustomBus (EventBridgeCDKStateMachineStackcustomEventBusXXXXXX).
     * Event source: Enter `CreateEvent` - This is required field 
     * Detail type: Enter `CREATE` - This is required field
@@ -73,12 +71,12 @@ Let's create two custom events for success and failure execution, To do this, lo
 }
 ```
 1.b Click the "Send" button and the confirmation will be displayed:
-![publish success event create screen](docs/images/SuccessEvent-create.png)
+
 ![publish success event](docs/images/SuccessEvent-Send.png)
 
 2.a Publish "failure" event
     Click on the "Send Events" button at the top right. This brings up a screen that you can use to publish events to the EventBridge.
-
+    ![publish failure event create screen](docs/images/FailureEvent-Create.png)
     * Event bus: Select the CustomBus (EventBridgeCDKStateMachineStackcustomEventBusXXXXXX).
     * Event source: Enter `CreateEvent` - This is required field 
     * Detail type: Enter `CREATE` - This is required field
@@ -89,7 +87,6 @@ Let's create two custom events for success and failure execution, To do this, lo
 }
 ```
 2.b Click the "Send" button and the confirmation will be displayed:
-![publish failure event create screen](docs/images/FailureEvent-Create.png)
 ![publish failure event](docs/images/FailureEvent-Send.png)
 
 ### Check that the Step Functions workflow started
