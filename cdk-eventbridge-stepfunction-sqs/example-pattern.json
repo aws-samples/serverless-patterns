@@ -1,5 +1,5 @@
 {
-  "title": "EventBridge -> Step Functions -> SQS",
+  "title": "EventBridge to Step Functions and failure events to SQS",
   "description": "Create a Step Functions workflow to Send Failure event to SQS for operational needs.",
   "language": "Typscript",
   "level": "200",
@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-eventbridge-stepfunction-sqs",
       "templateURL": "serverless-patterns/cdk-eventbridge-stepfunction-sqs",
       "projectFolder": "cdk-eventbridge-stepfunction-sqs",
-      "templateFile": "cdk-eventbridge-stepfunction-sqs/eventbridge-stepfunction-sqs-stack.ts"
+      "templateFile": "lib/eventbridge-stepfunction-sqs-stack.ts"
     }
   },
   "resources": {
@@ -50,10 +50,8 @@
   "authors": [
     {
       "name": "Shankar Srinivasan",
-      "image": "",
-      "bio": "I am a Cloud Application Architect. I specialize in architecting and developing serverless, event-driven solutions on AWS.",
-      "linkedin": "https://www.linkedin.com/in/shankar-srinivasan-3863a110",
-      "twitter": ""
+      "bio": "I am a Cloud Application Architect at AWS. I specialize in architecting and developing serverless, event-driven solutions on AWS.",
+      "linkedin": "https://www.linkedin.com/in/shankar-srinivasan-3863a110"
     }
   ]
 }
