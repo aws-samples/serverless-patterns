@@ -85,38 +85,38 @@ Let's create two custom events for success and failure execution, To do this, lo
 }
 ```
 2.b Click the "Send" button and the confirmation will be displayed:
-![publish failure event create screen](docs/images/FailureEvent-create.png)
+![publish failure event create screen](docs/images/FailureEvent-Create.png)
 ![publish failure event](docs/images/FailureEvent-Send.png)
 
 ### Check that the Step Functions workflow started
 
 In the AWS Console, navigate to the Step Functions service. You should see your new state machine in the list.
 
-![view state machines](docs/images/StepFunction-Home.png)
+![View state machines](docs/images/StepFunction-Home.png)
 
 Click on your state machine, and you should see a list of executions. Click on the latest to view the result of the execution and you will notice two recent executions. 
 
-![view Step function executions](docs/images/StepFunction-failure-home.png)
+![View Step function executions](docs/images/Stepfunction-failure-home.png)
 
 Click the " Succeeded" status execution to see the state machine, and details. 
 
-![view succeeded execution detail](docs/images/Stepfunction-success-home.png)
+![View succeeded execution detail](docs/images/Stepfunction-success-details.png)
 
 Click the "Failed" status execution to see the state machine, and details. After the execution the failed event is send to Failed SQS queue.
 
-![view failed execution detail](docs/images/Stepfunction-failure-detail.png)
+![View failed execution detail](docs/images/Stepfunction-failure-detail.png)
 
 ### Check that the Failure SQS recieved the failed messages
 
 In the AWS Console, navigate to the SQS service. You should see your new failure sqs in the list.
 
-![view SQS HomePage](docs/images/FailureSQS-Home.png)
+![View SQS HomePage](docs/images/TBD)
 
 Click the "EventBridgeCDKStateMachineStack-StepfuntionFailureQueue81XXXXX", and you should see the "Send and Receive messages" on the top right side. Click the "Send and Receive messages" to navigate to "Poll message" screen. 
+![View SQS HomePage](docs/images/FailureSQS-Home.png)
+![View SQS Send & Recieve Message](docs/images/SQS-Poll-Message-Home.png)
 
-![view SQS Send & Recieve Message](docs/images/SQS-Poll-Message-Home.png)
-
-Click the "Poll for messages", and you should see the failure messages on the bottom.
+Click the "Poll for messages", and you should see the failure messages displayed on the bottom.
 
 ![view SQS Poll Message](docs/images/SQS-Poll-Message.png)
 
@@ -135,7 +135,7 @@ Important: this application uses various AWS services and there are costs associ
 
 2. Confirm the stack has been deleted. Login to the AWS console and navigate to the AWS Cloudformation service page "EventBridgeCDKStateMachineStack" is deleted or run the below 
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'CdkEventbridgeStepfunctionStack')].StackStatus"
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'EventBridgeCDKStateMachineStack')].StackStatus"
     ```
 
 You should expect to see a message confirming `DELETE_COMPLETE`.
