@@ -2,6 +2,8 @@
 
 This pattern creates an EventBridge event bus, a Step Functions workflow, and subscribes the Step Functions workflow to be executed when a `customEvent` event is published to the event bus. The Step Functions workflow executes Lambda function for business worflow. AWS Lambda can occasionally experience transient service errors. In this case, invoking Lambda results in a 500 error, such as ServiceException, AWSLambdaException, or SdkClientException. As a best practice, proactively handle these exceptions in your state machine to Retry invoking your Lambda function, or to Catch the error and move to Failed Queue for operational needs. 
 
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+
 ## Architecture
 ![Architecture diagram](docs/images/Architecture.png)
 
@@ -126,8 +128,6 @@ Click the "Poll for messages", and you should see the failure messages displayed
 You can customize the Step Functions configuration by editing the code at `./lib/eventbridge-stepfunction-sqs-stack.ts`. To deploy changes, use the `cdk deploy` command.
 
 ## Cleanup
-
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
  
 1. Delete the stack
     ```

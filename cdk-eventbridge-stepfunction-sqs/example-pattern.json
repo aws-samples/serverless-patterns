@@ -1,0 +1,59 @@
+{
+  "title": "EventBridge -> Step Functions -> SQS",
+  "description": "Create a Step Functions workflow to Send Failure event to SQS for operational needs.",
+  "language": "Typscript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an AWS Step Functions state machine to send failure event to SQS.",
+      "This pattern is leveraging the native integration between the eventBridge to step function andto SQS services . Successfull event invokes Step function and executes lambda function successfully and completes the step function state machine successfully. Failure event invokes Step function and executes lambda function which throws custom exception and get retried 2 times using Step function error hanlder. After retry is exhausted, Catch handler moves the state machine Failure SQS. Stepfunction writes Failure message to the SQS using native 'SendMessage' task which can be handled for operational needs.",
+      "This pattern deploys one Step Functions, two SQS queue, one Custom Event bus and one lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-eventbridge-stepfunction-sqs",
+      "templateURL": "serverless-patterns/cdk-eventbridge-stepfunction-sqs",
+      "projectFolder": "cdk-eventbridge-stepfunction-sqs",
+      "templateFile": "cdk-eventbridge-stepfunction-sqs/eventbridge-stepfunction-sqs-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "CDK Custom Resource",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResource.html"
+      },
+      {
+        "text": "Call Amazon SQS with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-sqs.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shankar Srinivasan",
+      "image": "",
+      "bio": "I am a Cloud Application Architect. I specialize in architecting and developing serverless, event-driven solutions on AWS.",
+      "linkedin": "https://www.linkedin.com/in/shankar-srinivasan-3863a110",
+      "twitter": ""
+    }
+  ]
+}
