@@ -1,0 +1,46 @@
+{
+  "title": "Outbox pattern with DynamoDB and EventBridge",
+  "description": "Outbox pattern example with DynamoDB streams and EventBridge. Listen for new inserts and raise domain events into your architecture.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern will insert data into a DynamoDB table and setup a stream into Lambda. Lambda will then process the messages and forward them onto EventBridge for downstream consumers"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-streams-to-eventbridge-outbox-pattern",
+      "templateURL": "serverless-patterns/dynamodb-streams-to-eventbridge-outbox-pattern",
+      "projectFolder": "dynamodb-streams-to-eventbridge-outbox-pattern",
+      "templateFile": "lib/eventbridge-outbox-pattern-with-ddb-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Transactional outbox",
+        "link": "https://microservices.io/patterns/data/transactional-outbox.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.jpg",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}
