@@ -1,0 +1,13 @@
+{
+    "version": "0",
+    "id": "124ec64d-0675-0148-e0ca-4246a813f758",
+    "detail-type": "CREATE",
+    "source": "CustomEvent",
+    "account": "1111111111",
+    "time": "2022-10-31T23:53:37Z",
+    "region": "us-east-2",
+    "resources": [],
+    "detail": {
+      "failure": false
+    }
+}
