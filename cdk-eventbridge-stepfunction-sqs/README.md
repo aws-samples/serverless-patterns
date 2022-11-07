@@ -1,6 +1,6 @@
 # Amazon EventBridge -> AWS Step Functions -> SQS
 
-This pattern creates an EventBridge event bus, a Step Functions workflow, and subscribes the Step Functions workflow to be executed when a `customEvent` event is published to the event bus. The Step Functions workflow executes Lambda function for business worflow. AWS Lambda can occasionally experience transient service errors. In this case, invoking Lambda results in a 500 error, such as ServiceException, AWSLambdaException, or SdkClientException. As a best practice, proactively handle these exceptions in your state machine to Retry invoking your Lambda function, or to Catch the error and move to Failed Queue for operational needs. 
+This pattern creates an Amazon EventBridge event bus, a AWS Step Functions workflow, and subscribes the AWS Step Functions workflow to be executed when a `customEvent` event is published to the event bus. The AWS Step Functions workflow executes Lambda function for business worflow. AWS Lambda can occasionally experience transient service errors. In this case, invoking Lambda results in a 500 error, such as ServiceException, AWSLambdaException, or SdkClientException. As a best practice, proactively handle these exceptions in your state machine to Retry invoking your Lambda function, or to Catch the error and move to Failed Queue for operational needs. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -47,8 +47,8 @@ EventBridgeCDKStateMachineStack.EventBridgeFailureDLQ = EventBridgeCDKStateMachi
 ## How it works
 
 * Let's create two custom events through AWS Console one for failure and another one for successfull execution. 
-  Successfull event invokes Step function and executes lambda function successfully and completes the step function state machine successfully 
-  Failure event invokes Step function and executes lambda function which throws custom exception and get retried 2 times using Step function error hanlder. After retry is exhausted, Catch handler moves the state machine Failure SQS. Stepfunction writes Failure message to the SQS using "SendMessage" task which can be handled for operational needs. 
+  Successfull event invokes AWS Step Functions and executes lambda function successfully and completes the step function state machine successfully 
+  Failure event invokes AWS Step Functions and executes lambda function which throws custom exception and get retried 2 times using AWS Step Functions error hanlder. After retry is exhausted, Catch handler moves the state machine failure queue. AWS Step Functions writes failure message to the AWS SQS using "SendMessage" task which can be handled for operational needs. 
 
 ## Testing
 
@@ -93,7 +93,7 @@ Let's create two custom events for success and failure execution, To do this, lo
 
 ### Check that the Step Functions workflow started
 
-In the AWS Console, navigate to the Step Functions service. You should see your new state machine in the list.
+In the AWS Console, navigate to the AWS Step Functions service. You should see your new state machine in the list.
 
 ![View state machines](docs/images/StepFunction-Home.png)
 
@@ -105,13 +105,13 @@ Click the " Succeeded" status execution to see the state machine, and details.
 
 ![View succeeded execution detail](docs/images/Stepfunction-success-details.png)
 
-Click the "Failed" status execution to see the state machine, and details. After the execution the failed event is send to Failed SQS queue.
+Click the "Failed" status execution to see the state machine, and details. After the execution the failed event is send to failed AWS SQS queue.
 
 ![View failed execution detail](docs/images/Stepfunction-failure-detail.png)
 
 ### Check that the Failure SQS recieved the failed messages
 
-In the AWS Console, navigate to the SQS service. You should see your new failure sqs in the list.
+In the AWS Console, navigate to the AWS SQS service. You should see your new failure queue in the list.
 
 ![View SQS HomePage](docs/images/FailureSQS.png)
 
@@ -125,7 +125,7 @@ Click the "Poll for messages", and you should see the failure messages displayed
 
 ### Making changes
 
-You can customize the Step Functions configuration by editing the code at `./lib/eventbridge-stepfunction-sqs-stack.ts`. To deploy changes, use the `cdk deploy` command.
+You can customize the AWS Step Functions configuration by editing the code at `./lib/eventbridge-stepfunction-sqs-stack.ts`. To deploy changes, use the `cdk deploy` command.
 
 ## Cleanup
  
