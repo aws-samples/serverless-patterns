@@ -8,7 +8,7 @@
       "text": [
         "The purpose of this pattern is to deploy the infrastructure necessary to use Kinesis Data Firehose to fanout SNS messages to storage and analytics services.",
         "Through Kinesis Data Firehose delivery streams, you can fan out Amazon SNS notifications to Amazon Simple Storage Service (Amazon S3), Amazon Redshift, Amazon OpenSearch Service (OpenSearch Service), and to third-party service providers such as Datadog, New Relic, MongoDB, and Splunk.",
-        "This pattern delivers SNS messages to Amazon S3 for archival or compliance purposes, but additional Firehose Delivery Stream destinations can be added for fanout."
+        "This pattern delivers SNS messages to Amazon S3 for archival or compliance purposes."
       ]
     },
     "gitHub": {

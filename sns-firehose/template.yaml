@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: Uses Kinesis Firehose to fanout SNS notifications to S3, and potentially multiple endpoints.
+Description: Uses Kinesis Firehose to fanout SNS notifications to S3.
+
 
 Parameters:
   DestinationBucketName:
@@ -55,24 +56,7 @@ Resources:
       TopicArn: !Ref SNSTopic
       SubscriptionRoleArn: !GetAtt SNSSubscriptionRole.Arn
 
-  ########## POLICIES ###########
-  SNSTopicPolicy:
-    Type: AWS::SNS::TopicPolicy
-    Properties:
-      PolicyDocument:
-        Id: SNSTopicPolicy
-        Version: 2012-10-17
-        Statement:
-        - Sid: ''
-          Effect: Allow
-          Principal:
-            AWS: "*"
-          Action: sns:Publish
-          Resource: 
-            - !Ref SNSTopic
-      Topics:
-      - !Ref SNSTopic
-
+  ########## POLICIES ##########
   SNSFirehoseAccessPolicy:
     Type: AWS::IAM::Policy
     Properties:
