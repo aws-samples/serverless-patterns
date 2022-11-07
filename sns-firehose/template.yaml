@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: Uses Kinesis Firehose to fanout SNS notifications to multiple endpoints
+Description: Uses Kinesis Firehose to fanout SNS notifications to S3, and potentially multiple endpoints.
 
 Parameters:
   DestinationBucketName:
