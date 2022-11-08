@@ -8,8 +8,8 @@
     "headline": "How it works",
     "text": [
       "This sample project demonstrates how to use an AWS Step Functions state machine to send failure event to SQS.",
-      "This pattern is leveraging the native integration between the eventBridge to step function andto SQS services . Successfull event invokes Step function and executes lambda function successfully and completes the step function state machine successfully. Failure event invokes Step function and executes lambda function which throws custom exception and get retried 2 times using Step function error hanlder. After retry is exhausted, Catch handler moves the state machine Failure SQS. Stepfunction writes Failure message to the SQS using native 'SendMessage' task which can be handled for operational needs.",
-      "This pattern deploys one Step Functions, two SQS queue, one Custom Event bus and one lambda function."
+      "This pattern is leveraging the native integration between the Amazon EventBridge to AWS Step Function to AWS SQS services. There are two types of event sample payloads available in the code repository. For the success event, the Amazon EventBridge rule invokes the AWS Step Functions and executes the lambda function, and completes the state machine successfully. For the failure event , the Amazon EventBridge rule invokes the AWS Step Functions and executes the lambda function, which throws a custom exception and gets retried 2 times using the AWS Step Functions error handler.  After the retry is exhausted, the Catch handler moves the state machine failure to AWS SQS. Step function writes failure message to the AWS SQS using native 'SendMessage' task which can be handled for operational needs.",
+      "This pattern deploys one AWS Step Functions, two AWS SQS queues, one custom EventBus, and one lambda function."
     ]
   },
   "gitHub": {
