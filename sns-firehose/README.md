@@ -46,15 +46,16 @@ This SAM template creates an SNS Topic, Kinesis Firehose Delivery Stream, S3 buc
 
 ## Testing
 
-* Publish a message to the SNS topic by running the CLI command: 
+1. Publish a message to the SNS topic by running the CLI command: 
 ```
 aws sns publish --topic-arn arn:aws:sns:us-east-1:{AWS ACCOUNT NUMBER}:SourceSNSTopic --message "Hello world"
 ```
-* Click on Create Subscription
-* Under Protocol, select the type of endpoint to subscribe to (email, SMS, etc.)
-* Confirm the message subscription
-* Upload an object to the S3 bucket you created
-* Check your notifications
+
+2. Check that test messages are being sent to the destination S3 bucket (it will take a few minutes for events to begin streaming):
+
+```
+aws s3 ls s3://{destination bucket name} --recursive --human-readable --summarize
+```
 
 
 ## Cleanup
