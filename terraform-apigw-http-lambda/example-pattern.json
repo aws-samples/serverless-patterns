@@ -3,7 +3,7 @@
   "description": "This pattern creates an Amazon API Gateway (HTTP) and an AWS Lambda function.",
   "language": "Python",
   "level": "200",
-  "framework": "terraform",
+  "framework": "Terraform (with modules)",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -23,6 +23,22 @@
   "resources": {
     "bullets": [
       {
+        "test": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+      },
+      {
+        "test": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "test": "Terraform AWS API Gateway v2 (HTTP/Websocket) module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2"
+      },
+      {
+        "test": "Terraform AWS API Gateway v2 (HTTP/Websocket) examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples"
+      },
+      {
         "text": "Working with HTTP APIs",
         "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
       },
@@ -31,8 +47,8 @@
         "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
       },
       {
-        "test": "AWS Lambda - the Basics",
-        "link": "https://docs.aws.amazon.com/whitepapers/latest/serverless-architectures-lambda/aws-lambdathe-basics.html"
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
       }
     ]
   },

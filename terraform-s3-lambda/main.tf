@@ -36,7 +36,7 @@ module "lambda_function" {
 ###################
 
 module "s3_bucket" {
-  source = "terraform-aws-modules/s3-bucket/aws"
+  source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 3.0"
 
   bucket        = "${random_pet.this.id}-bucket"
@@ -49,7 +49,7 @@ module "s3_bucket" {
 }
 
 module "s3_notification" {
-  source = "terraform-aws-modules/s3-bucket/aws//modules/notification"
+  source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
   version = "~> 3.0"
 
   bucket = module.s3_bucket.s3_bucket_id
@@ -61,7 +61,7 @@ module "s3_notification" {
       function_arn  = module.lambda_function.lambda_function_arn
       function_name = module.lambda_function.lambda_function_name
       events        = ["s3:ObjectCreated:*"]
-      filter_prefix = "prefix/"
+      filter_prefix = "data/"
       filter_suffix = ".json"
     }
   }

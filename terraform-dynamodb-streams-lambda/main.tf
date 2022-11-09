@@ -57,8 +57,8 @@ module "dynamodb_table" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "~> 1.0"
 
-  name     = "${random_pet.this.id}-table-with-stream"
-  hash_key = "id"
+  name             = "${random_pet.this.id}-table-with-stream"
+  hash_key         = "id"
   table_class      = "STANDARD"
   stream_view_type = "NEW_AND_OLD_IMAGES"
   stream_enabled   = true

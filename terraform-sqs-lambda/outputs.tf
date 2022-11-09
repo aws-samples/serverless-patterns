@@ -32,11 +32,11 @@ output "lambda_role_arn" {
 
 # SQS
 output "sqs_queue_id" {
-  description = "The name of the queue."
-  value       = aws_sqs_queue.this.id
+  description = "The URL for the created Amazon SQS queue"
+  value       = module.sqs.sqs_queue_id
 }
 
 output "sqs_queue_arn" {
-  description = "The ARN of the queue."
-  value       = aws_sqs_queue.this.arn
+  description = "The ARN of the SQS queue"
+  value       = module.sqs.sqs_queue_arn
 }

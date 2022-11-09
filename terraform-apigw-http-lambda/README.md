@@ -15,35 +15,54 @@ curl https://wargabe3ei.execute-api.eu-west-1.amazonaws.com
 
 #sample output
 {
-  "message ": {
-    "functionName": "test_apigw_integration",
-    "xForwardedFor": "{YourIpAddress}",
-    "method": "GET",
-    "rawPath": "/",
-    "queryString": null,
-    "timestamp": "04/Apr/2022:22:50:34 +0000"
-  }
-}
-```
-
-```
-curl '<your http api endpoint>'/pets/dog/1?foo=bar -X POST \
---header 'Content-Type: application/json' \
--d '{"key1":"hello", "key2":"World!"}'
-
-#sample output
-{
-  "message ": {
-    "functionName": "test_apigw_integration",
-    "xForwardedFor": "{YourIpAddress}",
-    "method": "POST",
-    "rawPath": "/pets/dog/1",
-    "queryString": {
-      "foo": "bar"
-    },
-    "timestamp": "04/Apr/2022:22:49:14 +0000",
-    "body": "{\"key1\":\"hello\", \"key2\":\"World!\"}"
-  }
+   "hello":"Hello Python! Hello Terraform!",
+   "functionName":"famous-emu-lambda",
+   "event":{
+      "version":"2.0",
+      "routeKey":"ANY /",
+      "rawPath":"/",
+      "rawQueryString":"",
+      "headers":{
+         "accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+         "accept-encoding":"gzip, deflate, br",
+         "accept-language":"en-US,en;q=0.9,uk;q=0.8,es-ES;q=0.7,es;q=0.6,ru;q=0.5,no;q=0.4,nb;q=0.3",
+         "content-length":"0",
+         "dnt":"1",
+         "host":"k4l4ajulel.execute-api.eu-west-1.amazonaws.com",
+         "sec-ch-ua":"\"Google Chrome\";v=\"107\", \"Chromium\";v=\"107\", \"Not=A?Brand\";v=\"24\"",
+         "sec-ch-ua-mobile":"?0",
+         "sec-ch-ua-platform":"\"macOS\"",
+         "sec-fetch-dest":"document",
+         "sec-fetch-mode":"navigate",
+         "sec-fetch-site":"none",
+         "sec-fetch-user":"?1",
+         "upgrade-insecure-requests":"1",
+         "user-agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
+         "x-amzn-trace-id":"Root=1-636ba988-62a696d211fcf22255036432",
+         "x-forwarded-for":"79.160.217.204",
+         "x-forwarded-port":"443",
+         "x-forwarded-proto":"https"
+      },
+      "requestContext":{
+         "accountId":"835367859851",
+         "apiId":"k4l4ajulel",
+         "domainName":"k4l4ajulel.execute-api.eu-west-1.amazonaws.com",
+         "domainPrefix":"k4l4ajulel",
+         "http":{
+            "method":"GET",
+            "path":"/",
+            "protocol":"HTTP/1.1",
+            "sourceIp":"79.160.217.204",
+            "userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
+         },
+         "requestId":"bVdtYjsRjoEEJ6Q=",
+         "routeKey":"ANY /",
+         "stage":"$default",
+         "time":"09/Nov/2022:13:22:16 +0000",
+         "timeEpoch":1668000136636
+      },
+      "isBase64Encoded":false
+   }
 }
 ```
 
@@ -54,7 +73,7 @@ Then check the logs for the Lambda function from the Lambda console.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
 
@@ -62,33 +81,20 @@ Then check the logs for the Lambda function from the Lambda console.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.9 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_disabled_lambda"></a> [disabled\_lambda](#module\_disabled\_lambda) | ../../ | n/a |
-| <a name="module_lambda_at_edge"></a> [lambda\_at\_edge](#module\_lambda\_at\_edge) | ../../ | n/a |
-| <a name="module_lambda_function"></a> [lambda\_function](#module\_lambda\_function) | ../../ | n/a |
-| <a name="module_lambda_function_existing_package_local"></a> [lambda\_function\_existing\_package\_local](#module\_lambda\_function\_existing\_package\_local) | ../../ | n/a |
-| <a name="module_lambda_function_for_each"></a> [lambda\_function\_for\_each](#module\_lambda\_function\_for\_each) | ../../ | n/a |
-| <a name="module_lambda_function_with_package_deploying_externally"></a> [lambda\_function\_with\_package\_deploying\_externally](#module\_lambda\_function\_with\_package\_deploying\_externally) | ../../ | n/a |
-| <a name="module_lambda_layer_local"></a> [lambda\_layer\_local](#module\_lambda\_layer\_local) | ../../ | n/a |
-| <a name="module_lambda_layer_s3"></a> [lambda\_layer\_s3](#module\_lambda\_layer\_s3) | ../../ | n/a |
-| <a name="module_lambda_layer_with_package_deploying_externally"></a> [lambda\_layer\_with\_package\_deploying\_externally](#module\_lambda\_layer\_with\_package\_deploying\_externally) | ../../ | n/a |
-| <a name="module_lambda_with_mixed_trusted_entities"></a> [lambda\_with\_mixed\_trusted\_entities](#module\_lambda\_with\_mixed\_trusted\_entities) | ../../ | n/a |
-| <a name="module_lambda_with_provisioned_concurrency"></a> [lambda\_with\_provisioned\_concurrency](#module\_lambda\_with\_provisioned\_concurrency) | ../../ | n/a |
-| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | terraform-aws-modules/s3-bucket/aws | n/a |
+| <a name="module_api_gateway"></a> [api\_gateway](#module\_api\_gateway) | terraform-aws-modules/apigateway-v2/aws | ~> 2.0 |
+| <a name="module_lambda_function"></a> [lambda\_function](#module\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 4.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_sqs_queue.dlq](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue) | resource |
 | [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
-| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 
 ## Inputs
 
@@ -98,25 +104,11 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_lambda_cloudwatch_log_group_arn"></a> [lambda\_cloudwatch\_log\_group\_arn](#output\_lambda\_cloudwatch\_log\_group\_arn) | The ARN of the Cloudwatch Log Group |
+| <a name="output_apigatewayv2_api_api_endpoint"></a> [apigatewayv2\_api\_api\_endpoint](#output\_apigatewayv2\_api\_api\_endpoint) | The URI of the API |
 | <a name="output_lambda_function_arn"></a> [lambda\_function\_arn](#output\_lambda\_function\_arn) | The ARN of the Lambda Function |
 | <a name="output_lambda_function_invoke_arn"></a> [lambda\_function\_invoke\_arn](#output\_lambda\_function\_invoke\_arn) | The Invoke ARN of the Lambda Function |
-| <a name="output_lambda_function_kms_key_arn"></a> [lambda\_function\_kms\_key\_arn](#output\_lambda\_function\_kms\_key\_arn) | The ARN for the KMS encryption key of Lambda Function |
-| <a name="output_lambda_function_last_modified"></a> [lambda\_function\_last\_modified](#output\_lambda\_function\_last\_modified) | The date Lambda Function resource was last modified |
 | <a name="output_lambda_function_name"></a> [lambda\_function\_name](#output\_lambda\_function\_name) | The name of the Lambda Function |
 | <a name="output_lambda_function_qualified_arn"></a> [lambda\_function\_qualified\_arn](#output\_lambda\_function\_qualified\_arn) | The ARN identifying your Lambda Function Version |
-| <a name="output_lambda_function_source_code_hash"></a> [lambda\_function\_source\_code\_hash](#output\_lambda\_function\_source\_code\_hash) | Base64-encoded representation of raw SHA-256 sum of the zip file |
-| <a name="output_lambda_function_source_code_size"></a> [lambda\_function\_source\_code\_size](#output\_lambda\_function\_source\_code\_size) | The size in bytes of the function .zip file |
-| <a name="output_lambda_function_url"></a> [lambda\_function\_url](#output\_lambda\_function\_url) | The URL of the Lambda Function URL |
-| <a name="output_lambda_function_url_id"></a> [lambda\_function\_url\_id](#output\_lambda\_function\_url\_id) | The Lambda Function URL generated id |
 | <a name="output_lambda_function_version"></a> [lambda\_function\_version](#output\_lambda\_function\_version) | Latest published version of Lambda Function |
-| <a name="output_lambda_layer_arn"></a> [lambda\_layer\_arn](#output\_lambda\_layer\_arn) | The ARN of the Lambda Layer with version |
-| <a name="output_lambda_layer_created_date"></a> [lambda\_layer\_created\_date](#output\_lambda\_layer\_created\_date) | The date Lambda Layer resource was created |
-| <a name="output_lambda_layer_layer_arn"></a> [lambda\_layer\_layer\_arn](#output\_lambda\_layer\_layer\_arn) | The ARN of the Lambda Layer without version |
-| <a name="output_lambda_layer_source_code_size"></a> [lambda\_layer\_source\_code\_size](#output\_lambda\_layer\_source\_code\_size) | The size in bytes of the Lambda Layer .zip file |
-| <a name="output_lambda_layer_version"></a> [lambda\_layer\_version](#output\_lambda\_layer\_version) | The Lambda Layer version |
 | <a name="output_lambda_role_arn"></a> [lambda\_role\_arn](#output\_lambda\_role\_arn) | The ARN of the IAM role created for the Lambda Function |
-| <a name="output_lambda_role_name"></a> [lambda\_role\_name](#output\_lambda\_role\_name) | The name of the IAM role created for the Lambda Function |
-| <a name="output_local_filename"></a> [local\_filename](#output\_local\_filename) | The filename of zip archive deployed (if deployment was from local) |
-| <a name="output_s3_object"></a> [s3\_object](#output\_s3\_object) | The map with S3 object data of zip archive deployed (if deployment was from S3) |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

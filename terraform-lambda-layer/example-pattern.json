@@ -3,7 +3,7 @@
   "description": "Create a Lambda Function that has a Lambda Layer added to it",
   "language": "Python",
   "level": "200",
-  "framework": "Terraform",
+  "framework": "Terraform (with modules)",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -14,7 +14,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-layer",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-lambda-layer",
       "templateURL": "serverless-patterns/terraform-lambda-layer",
       "projectFolder": "terraform-lambda-layer",
       "templateFile": "terraform-lambda-layer/main.tf"
@@ -22,6 +22,18 @@
   },
   "resources": {
     "bullets": [
+      {
+        "test": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+      },
+      {
+        "test": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
       {
         "text": "AWS Lambda Developer Guide - Creating and sharing Lambda layers",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html"

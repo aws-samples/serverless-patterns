@@ -1,104 +1,88 @@
-# Amazon API Gateway HTTP API to AWS Lambda
+# Amazon S3 with S3 Object Lambda (return image thumbnails from S3)
 
-This pattern creates an Amazon API Gateway HTTP API and an AWS Lambda function.
+This pattern creates an S3 bucket, an S3 Access Point, an S3 Object Lambda Access Point, and Lambda function.
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/terraform-apigw-http-api-lambda).
+This application uses S3 Object Lambda to return a thumbnail version of an image in S3.
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+## Getting started with Terraform Serverless Patterns
 
-## Requirements
-
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
-
-## Deployment Instructions
-
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-1. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/terraform-apigw-http-api-lambda
-    ```
-1. From the command line, initialize terraform to download and install the providers defined in the configuration:
-    ```
-    terraform init
-    ```
-1. From the command line, apply the Terraform configurations:
-    ```
-    terraform apply
-    ```
-1. During the prompts:
-    * Enter yes
-1. Note the outputs from the deployment process, these contain the resource names and/or ARNs which are used for testing.
+Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md).
 
 ## How it works
 
-This pattern deploys an Amazon API Gateway HTTP API with a default route and basic CORS configuration. The default route is integrated with an AWS Lambda function written in Python. The function welcomes you and doesn't do anything else.
+When a request is made to the S3 Object Lambda Access Point, the Lambda function is invoked. Within the Lambda function code, the `getObjectContext` property contains the following useful information:
+
+1. inputS3Url: a [presigned URL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html) that the function can use to download the original object from the supporting Access Point. In this way, the Lambda function does not need to have S3 read permissions to retrieve the original object and can only access the object processed by each invocation.
+1. outputRoute, outputToken: used to send back the modified object using the [WriteGetObjectResponse](https://docs.aws.amazon.com/AmazonS3/latest/API/API_WriteGetObjectResponse.html) API.
+
+The function uses the provided presigned URL to retrieve the requested image from S3 using [axios](https://www.npmjs.com/package/axios). The function resizes the image using [sharp](https://www.npmjs.com/package/sharp). Then the function returns a thumbnail version of the image back to S3 Object Lambda.
 
 ## Testing
 
-Once the stack is deployed, call the endpoint retrieve from the `apigatewayv2_api_api_endpoint` output using curl or Postman.
+After deployment, upload sample image to the S3 bucket using this command (replace `<bucket-name>` with the value returned in `s3_bucket_id`):
 
-```
-$ curl $(terraform output -raw apigatewayv2_api_api_endpoint)
-
-#sample output
-{
-  "message ": {
-    "functionName": "test_apigw_integration",
-    "xForwardedFor": "{YourIpAddress}",
-    "method": "GET",
-    "rawPath": "/",
-    "queryString": null,
-    "timestamp": "04/Apr/2022:22:50:34 +0000"
-  }
-}
+```shell
+aws s3 cp ./images/sample.jpg s3://<bucket-name>
 ```
 
-```
-curl '<your http api endpoint>'/pets/dog/1?foo=bar -X POST \
---header 'Content-Type: application/json' \
--d '{"key1":"hello", "key2":"World!"}'
+Download a thumbnail version of the uploaded image from the S3 Object Lambda Access Point using this command (replace `<lambda-access-point>` with the value returned in `s3_lambda_access_point`):
 
-#sample output
-{
-  "message ": {
-    "functionName": "test_apigw_integration",
-    "xForwardedFor": "{YourIpAddress}",
-    "method": "POST",
-    "rawPath": "/pets/dog/1",
-    "queryString": {
-      "foo": "bar"
-    },
-    "timestamp": "04/Apr/2022:22:49:14 +0000",
-    "body": "{\"key1\":\"hello\", \"key2\":\"World!\"}"
-  }
-}
+```shell
+aws s3api get-object --bucket <lambda-access-point> --key sample.jpg ./thumbs/sample-thumbnail.jpg
+
+open ./thumbs/sample-thumbnail.jpg
 ```
 
-Then check the logs for the Lambda function from the Lambda console.
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
 
-## Cleanup
- 
-1. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/apigw-http-api-lambda-terraform
-    ```
-1. Delete all created resources
-    ```bash
-    terraform destroy
-    ```
-1. During the prompts:
-    * Enter yes
-1. Confirm all created resources has been deleted
-    ```bash
-    terraform show
-    ```
-----
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
 
-SPDX-License-Identifier: MIT-0
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.9 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_lambda_function"></a> [lambda\_function](#module\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 4.0 |
+| <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | terraform-aws-modules/s3-bucket/aws | ~> 3.0 |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_s3_access_point.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_access_point) | resource |
+| [aws_s3control_object_lambda_access_point.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3control_object_lambda_access_point) | resource |
+| [aws_s3control_object_lambda_access_point_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3control_object_lambda_access_point_policy) | resource |
+| [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
+| [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_iam_policy_document.bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.object_lambda_access_point_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_lambda_function_arn"></a> [lambda\_function\_arn](#output\_lambda\_function\_arn) | The ARN of the Lambda Function |
+| <a name="output_lambda_function_invoke_arn"></a> [lambda\_function\_invoke\_arn](#output\_lambda\_function\_invoke\_arn) | The Invoke ARN of the Lambda Function |
+| <a name="output_lambda_function_name"></a> [lambda\_function\_name](#output\_lambda\_function\_name) | The name of the Lambda Function |
+| <a name="output_lambda_function_qualified_arn"></a> [lambda\_function\_qualified\_arn](#output\_lambda\_function\_qualified\_arn) | The ARN identifying your Lambda Function Version |
+| <a name="output_lambda_function_version"></a> [lambda\_function\_version](#output\_lambda\_function\_version) | Latest published version of Lambda Function |
+| <a name="output_lambda_role_arn"></a> [lambda\_role\_arn](#output\_lambda\_role\_arn) | The ARN of the IAM role created for the Lambda Function |
+| <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
+| <a name="output_s3_bucket_id"></a> [s3\_bucket\_id](#output\_s3\_bucket\_id) | The name of the bucket. |
+| <a name="output_s3_lambda_access_point"></a> [s3\_lambda\_access\_point](#output\_s3\_lambda\_access\_point) | The ARN of the S3 Object Lambda access point. |
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

@@ -22,7 +22,9 @@ module "lambda_function" {
   runtime       = "nodejs12.x"
   publish       = true
 
-  source_path = "${path.module}/src"
+  architectures = ["arm64"] # Set to "arm64" if you are running this from ARM, else use "x86_64"
+
+  source_path     = "${path.module}/src"
   build_in_docker = true # This will create a package with the correct architecture for Lambda Function (when building on ARM, for example)
 
   attach_policy_statements = true
@@ -35,8 +37,8 @@ module "lambda_function" {
 
     # Actions taken from https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-template-list.html#s3-crud-policy
     s3_crud = {
-      effect    = "Allow",
-      actions   = [
+      effect = "Allow",
+      actions = [
         "s3:GetObject",
         "s3:ListBucket",
         "s3:GetBucketLocation",
@@ -66,14 +68,14 @@ module "lambda_function" {
 ###################
 
 module "s3_bucket" {
-  source = "terraform-aws-modules/s3-bucket/aws"
+  source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 3.0"
 
   bucket        = local.bucket_name
   force_destroy = true
 
   attach_policy = true
-  policy = data.aws_iam_policy_document.bucket_policy.json
+  policy        = data.aws_iam_policy_document.bucket_policy.json
 
   # S3 bucket-level Public Access Block configuration
   block_public_acls       = true
@@ -90,7 +92,7 @@ module "s3_bucket" {
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["*"]
     }
 
@@ -141,23 +143,23 @@ resource "aws_s3control_object_lambda_access_point_policy" "this" {
   name = aws_s3control_object_lambda_access_point.this.name
 
   policy = data.aws_iam_policy_document.object_lambda_access_point_policy.json
-#  jsonencode({
-#    Version = "2008-10-17"
-#    Statement = [{
-#      Effect = "Allow"
-#      Action = "s3-object-lambda:GetObject"
-#      Principal = {
-#        AWS = data.aws_caller_identity.this.account_id
-#      }
-#      Resource = aws_s3control_object_lambda_access_point.this.arn
-#    }]
-#  })
+  #  jsonencode({
+  #    Version = "2008-10-17"
+  #    Statement = [{
+  #      Effect = "Allow"
+  #      Action = "s3-object-lambda:GetObject"
+  #      Principal = {
+  #        AWS = data.aws_caller_identity.this.account_id
+  #      }
+  #      Resource = aws_s3control_object_lambda_access_point.this.arn
+  #    }]
+  #  })
 }
 
 data "aws_iam_policy_document" "object_lambda_access_point_policy" {
   statement {
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = [data.aws_caller_identity.this.account_id]
     }
 

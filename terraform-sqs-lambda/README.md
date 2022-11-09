@@ -1,104 +1,69 @@
-# Amazon API Gateway HTTP API to AWS Lambda
+# Amazon SQS Queue to AWS Lambda
 
-This pattern creates an Amazon API Gateway HTTP API and an AWS Lambda function.
+This pattern creates an Amazon SQS Queue, AWS Lambda function and setup event sourcing from the Queue to the Lambda function.
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/terraform-apigw-http-api-lambda).
+## Getting started with Terraform Serverless Patterns
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
-
-## Requirements
-
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
-
-## Deployment Instructions
-
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-1. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/terraform-apigw-http-api-lambda
-    ```
-1. From the command line, initialize terraform to download and install the providers defined in the configuration:
-    ```
-    terraform init
-    ```
-1. From the command line, apply the Terraform configurations:
-    ```
-    terraform apply
-    ```
-1. During the prompts:
-    * Enter yes
-1. Note the outputs from the deployment process, these contain the resource names and/or ARNs which are used for testing.
-
-## How it works
-
-This pattern deploys an Amazon API Gateway HTTP API with a default route and basic CORS configuration. The default route is integrated with an AWS Lambda function written in Python. The function welcomes you and doesn't do anything else.
+Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md).
 
 ## Testing
 
-Once the stack is deployed, call the endpoint retrieve from the `apigatewayv2_api_api_endpoint` output using curl or Postman.
+After deployment, send a message to the SQS queue. Go to the CloudWatch Logs for the deployed Lambda function. You will see the event is logged out containing the item data.
 
-```
-$ curl $(terraform output -raw apigatewayv2_api_api_endpoint)
+To do this, you can run these commands in the terminal (replace `<queue-id>` with the value returned in `sqs_queue_id`):
 
-#sample output
+```shell
+aws sqs send-message --queue-url <queue-id> --message-body "Test message"
+
+# Sample output
 {
-  "message ": {
-    "functionName": "test_apigw_integration",
-    "xForwardedFor": "{YourIpAddress}",
-    "method": "GET",
-    "rawPath": "/",
-    "queryString": null,
-    "timestamp": "04/Apr/2022:22:50:34 +0000"
-  }
+    "MD5OfMessageBody": "82dfa5549ebc9afc168eb7931ebece5f",
+    "MessageId": "362f04c9-ac60-4f7b-be33-05e2dc0af2c2"
 }
 ```
 
-```
-curl '<your http api endpoint>'/pets/dog/1?foo=bar -X POST \
---header 'Content-Type: application/json' \
--d '{"key1":"hello", "key2":"World!"}'
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
 
-#sample output
-{
-  "message ": {
-    "functionName": "test_apigw_integration",
-    "xForwardedFor": "{YourIpAddress}",
-    "method": "POST",
-    "rawPath": "/pets/dog/1",
-    "queryString": {
-      "foo": "bar"
-    },
-    "timestamp": "04/Apr/2022:22:49:14 +0000",
-    "body": "{\"key1\":\"hello\", \"key2\":\"World!\"}"
-  }
-}
-```
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
 
-Then check the logs for the Lambda function from the Lambda console.
+## Providers
 
-## Cleanup
- 
-1. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/apigw-http-api-lambda-terraform
-    ```
-1. Delete all created resources
-    ```bash
-    terraform destroy
-    ```
-1. During the prompts:
-    * Enter yes
-1. Confirm all created resources has been deleted
-    ```bash
-    terraform show
-    ```
-----
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+| Name | Version |
+|------|---------|
+| <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
 
-SPDX-License-Identifier: MIT-0
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_lambda_function"></a> [lambda\_function](#module\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 4.0 |
+| <a name="module_sqs"></a> [sqs](#module\_sqs) | terraform-aws-modules/sqs/aws | ~> 3.0 |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_lambda_function_arn"></a> [lambda\_function\_arn](#output\_lambda\_function\_arn) | The ARN of the Lambda Function |
+| <a name="output_lambda_function_invoke_arn"></a> [lambda\_function\_invoke\_arn](#output\_lambda\_function\_invoke\_arn) | The Invoke ARN of the Lambda Function |
+| <a name="output_lambda_function_name"></a> [lambda\_function\_name](#output\_lambda\_function\_name) | The name of the Lambda Function |
+| <a name="output_lambda_function_qualified_arn"></a> [lambda\_function\_qualified\_arn](#output\_lambda\_function\_qualified\_arn) | The ARN identifying your Lambda Function Version |
+| <a name="output_lambda_function_version"></a> [lambda\_function\_version](#output\_lambda\_function\_version) | Latest published version of Lambda Function |
+| <a name="output_lambda_role_arn"></a> [lambda\_role\_arn](#output\_lambda\_role\_arn) | The ARN of the IAM role created for the Lambda Function |
+| <a name="output_sqs_queue_arn"></a> [sqs\_queue\_arn](#output\_sqs\_queue\_arn) | The ARN of the SQS queue |
+| <a name="output_sqs_queue_id"></a> [sqs\_queue\_id](#output\_sqs\_queue\_id) | The URL for the created Amazon SQS queue |
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

@@ -20,14 +20,14 @@ module "lambda_function" {
 
   allowed_triggers = {
     sqs = {
-      service  = "sqs"
-      source_arn = aws_sqs_queue.this.arn
+      service    = "sqs"
+      source_arn = module.sqs.sqs_queue_arn
     }
   }
 
   event_source_mapping = {
     sqs = {
-      event_source_arn        = aws_sqs_queue.this.arn
+      event_source_arn        = module.sqs.sqs_queue_arn
       function_response_types = ["ReportBatchItemFailures"]
     }
   }
@@ -49,12 +49,15 @@ module "lambda_function" {
 # SQS Queue
 ############
 
-resource "aws_sqs_queue" "this" {
+module "sqs" {
+  source  = "terraform-aws-modules/sqs/aws"
+  version = "~> 3.0"
+
   name = random_pet.this.id
 
   tags = {
     Pattern = "terraform-sqs-lambda"
-    Module  = "aws_sqs_queue"
+    Module  = "sqs"
   }
 }
 

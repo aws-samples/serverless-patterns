@@ -2,6 +2,8 @@
 
 *Important:* the Terraform configurations use various AWS services and there can be costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
+More information about using Terraform to manage serverless resources on AWS is available on [serverless.tf](https://serverless.tf).
+
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
@@ -36,6 +38,8 @@
 Once terraform finishes execution, resources will be deployed.
 
 See `Testing` section in the documentation for the pattern for further steps.
+
+Please note, by default, resources will be created in AWS region `Ireland (eu-west-1)`.
 
 ## Cleanup
 

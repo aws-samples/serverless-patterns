@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "eventbridge" {
-  source = "terraform-aws-modules/eventbridge/aws"
+  source  = "terraform-aws-modules/eventbridge/aws"
   version = "~> 1.0"
 
   # ScheduleExpression is supported only on the default event bus.

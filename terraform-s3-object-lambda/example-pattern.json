@@ -1,44 +1,63 @@
 {
-  "title": "Amazon API Gateway HTTP API to AWS Lambda",
-  "description": "This pattern creates an Amazon API Gateway HTTP API and an AWS Lambda function.",
+  "title": "Amazon S3 with S3 Object Lambda (return image thumbnails from S3)",
+  "description": "This pattern creates an S3 bucket, an S3 Access Point, an S3 Object Lambda Access Point, and Lambda function.",
   "language": "Python",
   "level": "200",
-  "framework": "terraform",
+  "framework": "Terraform (with modules)",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an Amazon API Gateway HTTP API with a default route and basic CORS configuration.", 
-      "The default route is integrated with an AWS Lambda function written in Python.", 
-      "The function logs the incoming API event (v2) and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller."
+      "This pattern creates an S3 bucket, an S3 Access Point, an S3 Object Lambda Access Point, and Lambda function.",
+      "This application uses S3 Object Lambda to return a thumbnail version of an image in S3."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda-terraform",
-      "templateURL": "serverless-patterns/apigw-http-api-lambda-terraform",
-      "projectFolder": "apigw-http-api-lambda-terraform",
-      "templateFile": "apigw-http-api-lambda-terraform/main.tf"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-s3-object-lambda",
+      "templateURL": "serverless-patterns/terraform-s3-object-lambda",
+      "projectFolder": "terraform-s3-object-lambda",
+      "templateFile": "terraform-s3-object-lambda/main.tf"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Working with HTTP APIs",
-        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+        "test": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
       },
       {
-        "text": "Working with AWS Lambda proxy integrations for HTTP APIs",
-        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
+        "test": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
       },
       {
-        "test": "AWS Lambda - the Basics",
-        "link": "https://docs.aws.amazon.com/whitepapers/latest/serverless-architectures-lambda/aws-lambdathe-basics.html"
+        "test": "Terraform AWS S3 bucket module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket"
+      },
+      {
+        "test": "Terraform AWS S3 bucket examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples"
+      },
+      {
+        "text": "Using Amazon S3 Object Lambda Access Points",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/olap-use.html"
+      },
+      {
+        "text": "Introducing Amazon S3 Object Lambda – Use Your Code to Process Data as It Is Being Retrieved from S3",
+        "link": "https://aws.amazon.com/blogs/aws/introducing-amazon-s3-object-lambda-use-your-code-to-process-data-as-it-is-being-retrieved-from-s3/"
+      },
+      {
+        "text": "Amazon S3 Developer Guide",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+      },
+      {
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "terraform apply"
+      "terraform init && terraform apply"
     ]
   },
   "testing": {
@@ -53,8 +72,11 @@
   },
   "authors": [
     {
-      "name": "Carlos Bauer",
-      "bio": "I am a Technical Account Manager at AWS"
+      "name": "Anton Babenko",
+      "image": "https://avatars.githubusercontent.com/u/393243",
+      "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
+      "linkedin": "https://www.linkedin.com/in/antonbabenko",
+      "twitter": "antonbabenko"
     }
   ]
 }
