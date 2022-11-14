@@ -184,6 +184,11 @@ var/
 /*/.serverless/
 /*/.build/
 =======
+
+# Serverless.tf / Terraform
+**/builds/*
+
+=======
 # Terraform
 **/*.terraform*
 **/terraform.tfstate*
