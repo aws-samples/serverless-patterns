@@ -1,4 +1,4 @@
-# AWS Lambda to AWS Lambda(async) - Transfer payload through S3 when the payload size is too large
+# AWS Lambda to AWS Lambda(async) - Transfer payload with S3 when the payload size is too large
 
 This SAM template creates first Lambda function that call second Lambda function asynchronously. In this template, it focuses on the case when the payload is transferred to second Lambda function.
 
