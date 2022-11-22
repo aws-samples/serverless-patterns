@@ -1,0 +1,9 @@
+[
+  {
+    "Source": "myapp.users",
+    "Detail": "{ \"id\": \"a829a89f-a579-49b0-aafe-a1cd850720db\", \"firstName\": \"David\", \"lastName\": \"Boyne\" }",
+    "Resources": [],
+    "DetailType": "UserCreated",
+    "EventBusName": "MyCustomBus"
+  }
+]
