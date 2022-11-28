@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This sample project demonstrates how to protect an AppSync Graphql API against attacks using WAF (Web Application Firewall) rules.",
-      "This pattern deploys a graphql API with dynamodb resolvers, and a WAF web ACL with rules for protecting GraphQL APIs."
+      "This pattern deploys a graphql API with DynamoDB resolvers, and a WAF web ACL with rules for protecting GraphQL APIs."
     ]
   },
   "gitHub": {
@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/waf-appsync-cdk",
       "templateURL": "serverless-patterns/waf-appsync-cdk",
       "projectFolder": "waf-appsync-cdk",
-      "templateFile": "waf_appsync_cdk/waf_appsync_cdk_stack.py"
+      "templateFile": "cdk.ts"
     }
   },
   "resources": {

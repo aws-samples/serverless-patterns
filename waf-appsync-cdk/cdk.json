@@ -30,7 +30,6 @@
     "@aws-cdk/core:enablePartitionLiterals": true,
     "@aws-cdk/aws-events:eventsTargetQueueSameAccount": true,
     "@aws-cdk/aws-iam:standardizedServicePrincipals": false,
-
     "@aws-cdk/aws-ecs:disableExplicitDeploymentControllerForCircuitBreaker": true
   }
 }
