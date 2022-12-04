@@ -11,9 +11,6 @@ provider:
   runtime: nodejs16.x
   architecture: arm64 # use Graviton for running all Lambda functions
 
-  # use --region option value or the default - us-east-1
-  region: ${opt:region, "us-east-1"}
-
   # override the default stage (dev)
   stage: ${opt:stage, "prod"}
 
