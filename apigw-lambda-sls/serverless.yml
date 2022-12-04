@@ -12,7 +12,7 @@ provider:
   architecture: arm64 # use Graviton for running all Lambda functions
 
   # override the default stage (dev)
-  stage: ${opt:stage, "prod"}
+  stage: prod
 
   # optional, Lambda function's memory size in MB, default is 1024
   memorySize: 256
