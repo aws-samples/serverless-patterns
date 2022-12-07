@@ -118,7 +118,7 @@ Resources:
   SAMConfigFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: sam-config/
+      CodeUri: src/
       Handler: app.lambdaHandler
       Runtime: nodejs16.x
       Architectures:
@@ -127,6 +127,8 @@ Resources:
       Layers:
         - !Sub arn:aws:lambda:${AWS::Region}:434848589818:layer:AWS-AppConfig-Extension:82
       
+      ## The following policy shows how to restrict the function access to the specific configuration/environment.
+      ## This can be relaxed, allowing it to access the entire application or application/environment
       Policies:        
         - Version: '2012-10-17'
           Statement:
