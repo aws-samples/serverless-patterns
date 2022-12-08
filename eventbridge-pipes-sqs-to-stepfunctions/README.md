@@ -1,8 +1,6 @@
-# AWS Service 1 to AWS Service 2
+# SQS to Step Functions with EventBridge Pipes
 
 This pattern shows how to use EventBridge Pipes to launch a StepFunctions state machine with a message coming from SQS Queue
-
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -66,6 +64,6 @@ aws sqs send-message --queue-url <SQS Queue URL> --message-body "Test"
     ```
 
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
