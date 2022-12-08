@@ -1,5 +1,5 @@
 {
-  "title": "",
+  "title": "SQS to Step Functions with EventBridge Pipes",
   "description": "This pattern shows how to use EventBridge Pipes to launch a StepFunctions state machine with a message coming from SQS Queue.",
   "language": "",
   "level": "200",
@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "EventBridge Pipe used to poll a SQS queue and use the message to launch a StepFunctions state machine with it "
+      "EventBridge Pipe used to poll a SQS queue and use the message to launch a StepFunctions state machine"
     ]
   },
   "gitHub": {
@@ -21,12 +21,20 @@
   "resources": {
     "bullets": [
       {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
         "text": "Cloudformation API for Pipes",
         "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
       },
       {
         "text": "Video explaining EventBridge Pipes",
         "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
       }
     ]
   },
