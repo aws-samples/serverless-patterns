@@ -113,25 +113,3 @@ Resources:
           DetailType: "OrderUpdated"
           Source: "myapp.orders"
 
-  # EventBridge Pipe to listen to all removed items in DDB table
-  OrderDeletedPipe:
-    Type: AWS::Pipes::Pipe
-    Properties:
-      Name: !Sub ${AWS::StackName}-order-deleted
-      Description: "Pipes to connect to DDB stream listening only for remove changes"
-      RoleArn: !GetAtt PipeRole.Arn
-      Source: !GetAtt OrdersTable.StreamArn
-      SourceParameters:
-        FilterCriteria:
-          Filters:
-            - Pattern: '{ "eventName": ["REMOVE"] }'
-        DynamoDBStreamParameters:
-          StartingPosition: LATEST
-          BatchSize: 1
-          DeadLetterConfig:
-            Arn: !GetAtt PipeDLQueue.Arn
-      Target: !GetAtt ApplicationEventBus.Arn
-      TargetParameters:
-        EventBridgeEventBusParameters:
-          DetailType: "OrderRemoved"
-          Source: "myapp.orders"
