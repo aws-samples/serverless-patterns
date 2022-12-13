@@ -40,7 +40,7 @@
   "authors": [
     {
       "name": "Sayan Moitra",
-      "image": "../images/resources/smoitra.png",
+      "image": "./smoitra.png",
       "bio": "Associate Solutions Architect, CSC."
     }
   ]
