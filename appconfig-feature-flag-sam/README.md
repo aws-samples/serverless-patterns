@@ -31,21 +31,23 @@ Important: this application uses various AWS services and there are costs associ
 1. Change directory to the pattern directory:
 
     ```
-    cd apigw-http-api-lambda
+    cd appconfig-feature-flag-sam
     ```
 
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
 
     ```
+    sam build
     sam deploy --guided
     ```
 
 1. During the prompts:
-    - Enter a stack name
-    - Enter the desired AWS Region
-    - Enter the Application Name to identify the application in AWS AppConfig
-    - Enter the Environment Name
-    - Enter the name of the Feature Flag configuration
+    - Enter a stack name: eg. appconfig-feature-flag-sam
+    - Enter the desired AWS Region: eg. us-east-1
+    - Enter the Application Name to identify the application in AWS AppConfig: appconfig-feature-flag-sam
+    - Enter the Environment Name: eg. dev
+    - Enter the name of the Feature Flag configuration: TestConfig
+    - Enter the AWS AppConfig Lambda extension arn for your Region from https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions-versions.html#appconfig-integration-lambda-extensions-enabling-x86-64
     - Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -90,13 +92,7 @@ Response:
 1. Delete the stack
 
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-
-1. Confirm the stack has been deleted
-
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete 
     ```
 
 This pattern was contributed by Greg Davis.
