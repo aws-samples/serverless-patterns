@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Event driven vulnerabilities with Lambda and EventBridge using Amazon Inspector
+
+Resources:
+  # Consumer for the Inspector condition
+  Consumer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-consumer
+      CodeUri: src/
+      Handler: index.handler
+      Runtime: nodejs16.x
+      MemorySize: 128
+      Timeout: 15
+      Architectures:
+        - x86_64
+
+  # Create rule that listens for scan rules
+  InspectorRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: InspectorScanCompleteEvent
+      # All Cloudtrail events go to the default event bus
+      EventBusName: default
+      Targets:
+        - Arn: !GetAtt Consumer.Arn
+          Id: "InspectorScanCompleteEvent"
+      EventPattern:
+        source:
+          - "aws.inspector2"
+        detail-type:
+          - "Inspector2 Scan"
+        detail:
+          scan-status:
+            - "INITIAL_SCAN_COMPLETE"
+
+  # Permissions for rule to call Lambda function
+  PermissionForRuleToTriggerLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: !Ref Consumer
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt InspectorRule.Arn          
