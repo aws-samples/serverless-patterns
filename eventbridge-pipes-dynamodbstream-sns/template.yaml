@@ -5,10 +5,10 @@ Description: Template to connect DynamoDB Stream to AWS SNS
 
 Parameters:
   Email:
-    Description: some description text
+    Description: Email for SNS Subscription
     Type: String
   NationalTeam:
-    Description: some description text
+    Description: National Team Name
     Type: String
     Default: Argentina
 
@@ -76,7 +76,7 @@ Resources:
     Type: AWS::Pipes::Pipe
     Properties:
       Name: ddb-to-eventbridge
-      Description: "Pipe to connect DDB stream to EventBridge event bus"
+      Description: "Pipe to connect DynamoDB Stream to AWS SNS"
       RoleArn: !GetAtt PipeRole.Arn
       Source: !GetAtt DynamoDBWCTable.StreamArn
       SourceParameters:
