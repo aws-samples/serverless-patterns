@@ -1,0 +1,54 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "Transform SQS message into JSON",
+    "States": {
+      "Transform SQS message into JSON": {
+        "Type": "Pass",
+        "Next": "Get Order from DB",
+        "Parameters": {
+          "data.$": "States.StringToJson($.[0].body)"
+        }
+      },
+      "Get Order from DB": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::dynamodb:getItem",
+        "Parameters": {
+          "TableName": "${DDBTable}",
+          "Key": {
+            "Id": {
+              "S.$": "$.data.order_id"
+            }
+          }
+        },
+        "Next": "Verify item"
+      },
+      "Verify item": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.Item",
+            "IsPresent": true,
+            "Comment": "Item Found",
+            "Next": "Format result for target"
+          }
+        ],
+        "Default": "Nothing returned",
+        "Comment": "Item not found"
+      },
+      "Format result for target": {
+        "Type": "Pass",
+        "End": true,
+        "Parameters": [
+          {
+            "Item.$": "$.Item"
+          }
+        ]
+      },
+      "Nothing returned": {
+        "Type": "Pass",
+        "End": true,
+        "Result": [],
+        "Comment": "Not found"
+      }
+    }
+  }
