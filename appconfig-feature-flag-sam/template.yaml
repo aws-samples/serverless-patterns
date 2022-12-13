@@ -9,12 +9,19 @@ Parameters:
   AppConfigAppName:
     Type: String
     Description: AppConfig Application Name
+    Default: appconfig-feature-flag-sam
   AppConfigAppEnvironmentName:
     Type: String
     Description: AppConfig Application Environment Name
+    Default: dev
   AppConfigName:
     Type: String
     Description: AppConfig Name
+    Default: TestConfig
+  AppConfigLayerArn:
+    Type: String
+    Description: Retrieve AWS AppConfig Lambda extension arn from `https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions-versions.html#appconfig-integration-lambda-extensions-enabling-x86-64`
+    Default: arn:aws:lambda:us-east-1:027255383542:layer:AWS-AppConfig-Extension:82
 
 Globals:
   Function:
@@ -125,7 +132,7 @@ Resources:
         - x86_64
       
       Layers:
-        - !Sub arn:aws:lambda:${AWS::Region}:434848589818:layer:AWS-AppConfig-Extension:82
+        - arn:aws:lambda:us-east-1:027255383542:layer:AWS-AppConfig-Extension:82
       
       ## The following policy shows how to restrict the function access to the specific configuration/environment.
       ## This can be relaxed, allowing it to access the entire application or application/environment
