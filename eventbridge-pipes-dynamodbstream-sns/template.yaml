@@ -82,7 +82,7 @@ Resources:
       SourceParameters:
         FilterCriteria:
           Filters:
-            - Pattern: !Sub '{"dynamodb": {"Keys": {"Username": {"S": [{"prefix": "${NationalTeam}"}]}}}}'
+            - Pattern: !Sub '{"dynamodb": {"NewImage": {"Nationality": {"S": [{"prefix": "${NationalTeam}"}]}}}}'
         DynamoDBStreamParameters:
           StartingPosition: LATEST
           BatchSize: 1
