@@ -31,10 +31,10 @@ Important: this application uses various AWS services and there are costs associ
     sam deploy --guided
     ```
 1. During the prompts:
-    * Enter a stack name
+    * Enter a stack name: eg. eventbridge-pipes-dynamodbstream-sns
     * Enter the desired AWS Region
     * Enter Email ID for SNS to create a topic and subscription.
-    * Enter NationalTeam(This is configurable, you can create any parameter name).
+    * Enter NationalTeam(This is configurable, you can create any parameter name).: eg. Argentina
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -51,13 +51,27 @@ Now, we can directly integrate DynamoDB streams with AWS SNS without the need fo
 
 ## Testing
 
-Lets' trigger the DynamoDB stream.
+Once the deployment has completed, you will receive an email to confirm the SNS subscription. CLick on the link to confirm before testing.
+
+The Pipe is configured to filter on the NationalTeam value of "Argentina"
+Add an item to the DynamoDB stream which does match the filter.
 
 ```bash
 aws dynamodb put-item \
-    --table-name <DynamoDB_Table_Name> \
+    --table-name WorldCupTable \
+    --item PlayerName={S="Lionel Messi"},Nationality={S="Argentina"},GoalsScored={S="1"}
+```
+
+You should receive an email notification from SNS.
+
+Now add an item to the DynamoDB stream which doesn't match the filter.
+```bash
+aws dynamodb put-item \
+    --table-name WorldCupTable \
     --item PlayerName={S="Sergy Gnabry"},Nationality={S="Germany"},GoalsScored={S="1"}
 ```
+
+You should not receive an email notification from SNS.
 
 ## Cleanup
  
