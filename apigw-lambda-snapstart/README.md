@@ -7,6 +7,7 @@
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Maven](https://maven.apache.org/)
+* [CURL](https://curl.se/)
 
 ## Deployment Instructions
 
@@ -24,8 +25,23 @@
     ```
 4. Deploy the infrastructure
     ```
-    sam deploy --guided
+    sam deploy --stack-name unicorn-store --guided
     ```
+
+## Testing
+
+To test the Lambda function you can POST a unicorn JSON payload to the '/unicorns' endpoint.
+
+```bash
+curl --location --request POST $(aws cloudformation describe-stacks --stack-name unicorn-store --query "Stacks[0].Outputs[?OutputKey=='UnicornEndpoint'].OutputValue" --output text)'/unicorns' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"name": "Something",
+"age": "Older",
+"type": "Animal",
+"size": "Very big"
+}' | jq
+```
 
 ## Measuring the results
 
