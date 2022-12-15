@@ -38,7 +38,7 @@
     "text": ["See the Github repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": ["Delete the stack: sam delete"]
   },
   "authors": [
       {
