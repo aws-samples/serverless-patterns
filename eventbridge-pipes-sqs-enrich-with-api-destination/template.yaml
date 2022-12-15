@@ -1,10 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Template to connect launch StepFunctions with SQS
+Description: Template to enrich Amazon EventBridge Pipes data using API destinations
 Parameters:
   MyApiWithPathURL:
     Type: String
-    Default: https://api.zippopotam.us/us/*  #This API call will return details about the particular zip code passed for USA, for more info visit http://www.zippopotam.us/
+    Default: https://api.zippopotam.us/us/*  #This API call will return details about the a particular USA zip code, for more info visit http://www.zippopotam.us/
+    #Example API path https://api.zippopotam.us/us/90210
 Resources:
   #Source SQS
   SourceQueue:
@@ -22,7 +23,7 @@ Resources:
     Properties:
       RetentionInDays: 7
       LogGroupName: sqs-pipes-api-logs
-  # Role for EventBridge Pipes to read from SQS and call pipe to enrich data with API and send to logs
+  # Role for EventBridge Pipes to read from SQS and call pipe to enrich data with API and send to Cloudwatch logs
   EventBridgePipesRole:
     Type: AWS::IAM::Role
     Properties:
@@ -79,7 +80,7 @@ Resources:
         HttpParameters:
           PathParameterValues:
              - $.body.zip
-      Target: !GetAtt TargetCWLogGroup.Arn      
+      Target: !GetAtt TargetCWLogGroup.Arn
   MyConnection:
     Type: AWS::Events::Connection
     Properties:

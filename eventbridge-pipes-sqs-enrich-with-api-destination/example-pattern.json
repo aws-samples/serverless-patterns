@@ -1,13 +1,13 @@
 {
-  "title": "Enrich SQS Message with EventBridge Pipes API Destination",
-  "description": "This pattern shows how to use EventBridge Pipes and enrich SQS message with API destinations and then send response to CloudWatch Logs.",
+  "title": "Enrich SQS Message data with Amazon EventBridge Pipes using API destinations",
+  "description": "This pattern shows how to use EventBridge Pipes to enrich SQS message data using API destinations and then send response to pipe target.",
   "language": "",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Enrich SQS with EventBridge Pipes API Destination"
+      "The sample project demonstrates how to use Amazon EventBridge Pipes to enrich data using API destinations before sending it to the target. The pattern uses SQS message as a source to EventBridge Pipe, Pipe enriches the data by calling an API destination using input from the SQS message, and sending it as path parameter to API. Response from API is sent to an EventBridge Pipe target of Amazon CloudWatch logs."
     ]
   },
   "gitHub": {
@@ -56,7 +56,8 @@
   "authors": [
     {
       "name": "Sachin Doshi",      
-      "bio": "AWS Application Architect"
+      "bio": "AWS Application Architect",
+      "linkedin": "https://www.linkedin.com/in/sachin1doshi/"
     }
   ]
 }
