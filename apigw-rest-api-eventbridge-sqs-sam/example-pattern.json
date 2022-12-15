@@ -48,7 +48,6 @@
   },
   "authors": [
     {
-      "headline": "Presented by Daniele Frasca",
       "name": "Daniele Frasca",
       "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale."
