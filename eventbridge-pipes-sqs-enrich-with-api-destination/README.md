@@ -36,7 +36,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-EventBridge Pipes polls for messages from SQS queue, once a message is received, EventBridge pipe enriches message data using an API destination.For our use case, SQS message is a US zip code, EventBridge Pipe extracts the zip code from the message and sends as a path parameter to API destination. API returns additional details about the zip code as a response. EventBridge Pipe receives a response from API destination and send is to target of Cloudwatch Logs.
+EventBridge Pipes polls for messages from the SQS queue, EventBridge pipe enriches message data using an API destination. For our use case, the body of the SQS message has a US zip code, and EventBridge Pipe extracts the zip code from the message and sends it as a path parameter to the API destination. API returns additional details about the zip code as a response. EventBridge Pipe receives a response from the API destination and sends it to a target of Cloudwatch Logs.
 
 ## Testing
 
