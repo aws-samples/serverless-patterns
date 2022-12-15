@@ -38,8 +38,7 @@
     "text": ["See the Github repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": [
-        "sam deploy --guided"    ]
+    "text": ["Delete the stack: <code>sam delete</code>."]
   },
   "authors": [
       {
