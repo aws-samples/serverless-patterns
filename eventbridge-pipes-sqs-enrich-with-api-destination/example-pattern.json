@@ -1,7 +1,7 @@
 {
   "title": "Enrich SQS Message data with Amazon EventBridge Pipes using API destinations",
   "description": "This pattern shows how to use EventBridge Pipes to enrich SQS message data using API destinations and then send response to pipe target.",
-  "language": "",
+  "language": "Python",
   "level": "200",
   "framework": "SAM",
   "introBox": {
