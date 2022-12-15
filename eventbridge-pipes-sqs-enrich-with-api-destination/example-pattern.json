@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The sample project demonstrates how to use Amazon EventBridge Pipes to enrich data using API destinations before sending it to the target. The pattern uses SQS message as a source to EventBridge Pipe, Pipe enriches the data by calling an API destination using input from the SQS message, and sending it as path parameter to API. Response from API is sent to an EventBridge Pipe target of Amazon CloudWatch logs."
+      "The sample project demonstrates how to use Amazon EventBridge Pipes to enrich data using API destinations before sending it to the target. The pattern uses SQS message as a source to EventBridge Pipe, Pipe enriches the data by calling an API destination using input from the SQS message. Pipe extracts data from SQS message and sends it as path parameter(s) to API. Response from API is sent to an EventBridge Pipe target of Amazon CloudWatch logs."
     ]
   },
   "gitHub": {
