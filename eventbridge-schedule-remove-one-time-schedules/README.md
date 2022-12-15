@@ -13,7 +13,7 @@ The EventBridge team are aware of this and are looking to add some fixes in the 
 ## How it works
 
 1. Schedule is run every day at 00:00
-2. Schedules are scanning for processing
+2. Schedules are scanned for processing
 3. Schedules are processed at one-time schedules are picked out
 4. One-time schedules dates are checked. 
 5. If the one-time schedule is over 2 days old the schedule is removed from your account.
