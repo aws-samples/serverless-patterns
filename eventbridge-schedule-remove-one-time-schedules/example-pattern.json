@@ -29,7 +29,7 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy"]
+    "text": ["sam build && sam deploy"]
   },
   "testing": {
     "text": ["See the Github repo for detailed testing instructions."]

@@ -18,6 +18,15 @@ The EventBridge team are aware of this and are looking to add some fixes in the 
 4. One-time schedules dates are checked. 
 5. If the one-time schedule is over 2 days old the schedule is removed from your account.
 
+## How to run
+
+You have a couple of options to run the pattern
+
+1. Wait until 0:00 and the pattern will run
+2. Manually trigger the `FindSchedules` function
+
+Triggering the `FindSchedules` function will trigger and start the process.
+
 ## Important things to know
 
 Your one-time schedules might still be in your account, and might not have processed (failure). This pattern does not check if your schedule has run or not, it just removes them based on the timesamp of the schedule.
