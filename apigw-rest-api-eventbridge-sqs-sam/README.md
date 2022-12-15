@@ -1,8 +1,8 @@
 # API Gateway REST API to EventBridge with event payload composition and SQS as target
 
-This pattern deploys an API Gateway HTTP API with a custom domain configuration and permissions to publish HTTP requests as events to EventBridge.
+The APIGW payload is sent to EventBridge as a custom event payload. In the integration request, a custom payload is created and passed to EventBridge to target an SQS.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigateway-http-eventbridge-custom](https://serverlessland.com/patterns/apigateway-http-eventbridge-custom)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns?services=apigw%2Ceventbridge](https://serverlessland.com/patterns?services=apigw%2Ceventbridge
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
@@ -51,8 +51,6 @@ curl --location --request POST 'https://[YOUT_API_URL]' \
     "Source":"demo.event"
 }'
 ```
-
-
 
 The response would be like:
 

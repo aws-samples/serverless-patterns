@@ -1,13 +1,13 @@
 {
   "title": "API Gateway REST API to EventBridge with event payload composition and SQS as target",
-  "description": "Create an API Gateway that sends events to EventBridge and enrich the event in the integration request.",
+  "description": "Create an API Gateway that sends events to EventBridge and enriches the event in the integration request.",
   "language": "",
   "level": "300",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The APIGW payload is sent to EventBridge as part of a custom event payload. In the integration request a custom payload is created and passed to EventBridge that will target an SQS."
+      "The APIGW payload is sent to EventBridge as a custom event payload. In the integration request, a custom payload is created and passed to EventBridge to target an SQS."
     ]
   },
   "gitHub": {
