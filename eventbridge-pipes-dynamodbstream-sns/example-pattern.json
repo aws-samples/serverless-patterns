@@ -39,7 +39,8 @@
   },
   "cleanup": {
     "text": [
-        "sam deploy --guided"    ]
+      "Delete the stack: <code>sam delete</code>."
+    ]
   },
   "authors": [
       {
