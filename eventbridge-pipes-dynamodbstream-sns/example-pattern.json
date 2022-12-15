@@ -1,7 +1,7 @@
 {
   "title": "DynamoDB Stream to Amazon SNS with Amazon EventBridge Pipes",
   "description": "This pattern uses Amazon EventBridge Pipes to connect DynamoDB Stream directly to Amazon SNS with filtering option.",
-  "language": "",
+  "language": "Java",
   "level": "200",
   "framework": "SAM",
   "introBox": {
@@ -39,7 +39,7 @@
   },
   "cleanup": {
     "text": [
-        "Delete the stack: sam delete"
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
