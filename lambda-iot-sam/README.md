@@ -25,13 +25,7 @@ Important: this application uses various AWS services and there are costs associ
    ```sh
    cd serverless-patterns/lambda-iot-sam
    ```
-3. Set up the stack in your AWS account and region. 
-- Change the working directory to the stack 
-
-   ```sh
-   cd lambda-iot-sam
-   ```
-- Deploy the stack to your default AWS account and region. 
+3. Deploy the stack to your default AWS account and region. 
 
    ```sh
    sam deploy -g
@@ -39,10 +33,13 @@ Important: this application uses various AWS services and there are costs associ
 
 ### Testing Using AWS Console
 
-1. Go to AWS IoT -> MQTT test client
-2. Subscribe to the topic created. It is under Manage -> All devices -> Things
-3. Run the Lambda
-4. You will see the message appear in the MQTT test client
+1. Browse to AWS IoT Core in the AWS Management Console
+2. Get the topic name from Manage -> All devices -> Thing
+3. Navigate to MQTT test client
+4. Subscribe to the topic created using the retrieved thing name
+5. Browse to AWS Lamdba in the AWS MAnagement Console and navigate to the Lambda function specified in the SAM outputs
+6. Configure  a test event in the console and run a Test invoke of the Lambda function
+7. NAvigate back to the MQTT test client in AWS IoT Core Console, you will see the message appear in the MQTT test client
 
    ```sh
     {
