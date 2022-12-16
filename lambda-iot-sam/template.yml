@@ -1,0 +1,112 @@
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: nodejs16.x
+    Architectures: ["arm64"]
+    Timeout: 29
+    MemorySize: 1024
+    Environment:
+      Variables:
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+Resources:
+##########################################################################
+#   IOT                                                                  #
+##########################################################################
+  IOTRealtime:
+    Type: "AWS::IoT::Thing"
+    Properties:
+      ThingName: !Sub ${AWS::StackName}-iot
+      AttributePayload:
+        Attributes: {}
+
+  GetIoTEndpoint:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-GetIoTEndpoint
+      Handler: GetIoTEndpoint.handler
+      CodeUri: ./cf-customResource/
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - iot:DescribeEndpoint
+            Resource:
+              - '*'
+  IotEndpoint:
+    Type: 'Custom::IotEndpoint'
+    Properties:
+      ServiceToken: !GetAtt GetIoTEndpoint.Arn
+
+  IotRulesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Principal: 
+              Service: 
+                - "iot.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/service-role/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSIoTRuleActions"
+
+  IoTThingPolicy:
+    Type: AWS::IoT::Policy
+    Properties: 
+      PolicyDocument: {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "iot:*",
+            "Resource": "*"
+          }
+        ]
+      }
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  LambdaFuncton:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: MainFunction
+      CodeUri: src
+      Handler: handler.handler
+      Environment:
+        Variables:
+          IOT_DATA_ENDPOINT: !GetAtt IotEndpoint.IotEndpointAddress
+          IOT_TOPIC: !Ref IOTRealtime
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Resource: 'arn:aws:iot:*'
+            Action:
+              - iot:Connect
+              - iot:Publish
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        External: 
+          - aws-sdk
+        Minify: true
+        Target: "es2020"
+        Sourcemap: false
+        EntryPoints: 
+          - handler.ts
+
+##########################################################################
+#   OUTPUTS                                                              #
+##########################################################################
+Outputs:
+  LambdaFuncton:
+    Value: !Ref LambdaFuncton
+    Description: Lambda Function Name
