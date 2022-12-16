@@ -1,24 +1,28 @@
 {
 	"title": "AWS Lambda to AWS IoT Core",
-	"description": "This pattern contains a sample AWS SAM stack to publish a message to AWS IoT Core Thing",
+	"description": "AWS Lambda function publishing to AWS IoT Core topic.",
 	"level": "200",
+    "services": {
+        "from": "lambda",
+        "to": "iot"
+    },
   "language": "Node.js",
 	"framework": "SAM",
 	"introBox": {
 		"headline": "How it works",
 		"text": [
 			"This pattern contains a sample AWS SAM stack with an AWS IoT Core thing and a Lambda function.",
-			"The Lambda function publishes a message to the Iot topic which you can view in the console.",
+			"The Lambda function publishes a message to the IoT topic which you can view in the console."
 		]
 	},
-	"gitHub": {
-		"template": {
-			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-iot-sam",
-			"templateURL": "serverless-patterns/lambda-iot-sam",
-			"projectFolder": "lambda-iot-sam",
-			"templateFile": "template.yaml"
-		}
-	},
+    "gitHub": {
+        "template": {
+            "repoURL": "ttps://github.com/aws-samples/serverless-patterns/tree/main/lambda-iot-sam",
+            "templateURL": "serverless-patterns/lambda-iot-sam",
+            "projectFolder": "lambda-iot-sam",
+            "templateFile": "template.yaml"
+        }
+    },    
 	"resources": {
 		"bullets": [
       {
