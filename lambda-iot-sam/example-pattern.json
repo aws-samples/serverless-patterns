@@ -7,9 +7,8 @@
 	"introBox": {
 		"headline": "How it works",
 		"text": [
-			"This pattern contains a sample AWS CDK stack to create an IoT Rule with a Timestream action. ",
-			"When a message is published to the IoT topic defined in the IoT Rule, this message will be delivered to the specified Timestream database and table in the IoT Rule.",
-			"This pattern deploys one Timestream database, table, one IoT Rule."
+			"This pattern contains a sample AWS SAM stack with an AWS IoT Core thing and a Lambda function.",
+			"The Lambda function publishes a message to the Iot topic which you can view in the console.",
 		]
 	},
 	"gitHub": {
