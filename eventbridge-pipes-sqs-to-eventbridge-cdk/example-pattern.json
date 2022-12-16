@@ -37,13 +37,13 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy --guided"]
+    "text": ["cdk deploy"]
   },
   "testing": {
     "text": ["See the README in the Github repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
   },
   "authors": [
     {
