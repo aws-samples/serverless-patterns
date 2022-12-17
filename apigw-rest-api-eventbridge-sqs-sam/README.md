@@ -1,6 +1,6 @@
 # API Gateway REST API to EventBridge with event payload composition and SQS as target
 
-The APIGW payload is sent to EventBridge as a custom event payload. In the integration request, a custom payload is created and passed to EventBridge to target an SQS.
+The APIGW payload is sent to EventBridge as a custom event payload. In the integration request, a custom payload is created and passed to EventBridge that target an SQS.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns?services=apigw%2Ceventbridge](https://serverlessland.com/patterns?services=apigw%2Ceventbridge
 
@@ -19,29 +19,30 @@ Important: this application uses various AWS services and there are costs associ
     ```
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change the directory to the pattern directory:
     ```
-    cd apigw-eventbridge
+    cd apigw-rest-api-eventbridge-sqs-sam
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
+    sam build
     sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
     ```
-1. During the prompts:
+4. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## Testing
 
-Use your preferred terminal to send a http request.
+1. Use your preferred terminal to send an http request.
 
 ```bash
-curl --location --request POST 'https://[YOUT_API_URL]' \
+curl --location --request POST '[YOUT_API_URL]' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "Detail":{ 
@@ -52,7 +53,7 @@ curl --location --request POST 'https://[YOUT_API_URL]' \
 }'
 ```
 
-The response would be like:
+2. The response would be like this:
 
 ```bash
 {
@@ -65,7 +66,22 @@ The response would be like:
 } 
 ```
 
-This means your event was published successfuly and you should see it in the SQS.
+3. This means your event was published successfully in the SQS.
+
+4. Go to the console and check the Lambda logs:
+
+Below are snippets from the logs
+
+```
+2022-12-17T08:05:42.754Z  5c0616f6-523d-54cb-8b83-4ae128b6822b  INFO  {
+  data: { IsHelloWorldExample: 'Hello' },
+  metadata: {
+    requestId: 'bcb9dd02-b9a4-40b8-ae9d-37a4fdb9d8cc',
+    requestTimeEpoch: '1671264101920'
+  }
+}
+
+```
 
 ## Cleanup
 
