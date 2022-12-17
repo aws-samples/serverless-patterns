@@ -6,7 +6,7 @@
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
-    "text": ["SQS queue is polled and a Step Functions workflow execution is started for each message."]
+    "text": ["SQS queue is polled and a Step Functions workflow execution is started for each batch of messages."]
   },
   "gitHub": {
     "template": {
