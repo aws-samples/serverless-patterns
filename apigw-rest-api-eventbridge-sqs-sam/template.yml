@@ -1,6 +1,15 @@
-AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Serverless pattern API Gateway to EventBridge
+
+Globals:
+  Function:
+    Runtime: nodejs16.x
+    Architectures: ["arm64"]
+    Timeout: 29
+    MemorySize: 1024
+    Environment:
+      Variables:
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
 
 Resources:
 # ##########################################################
@@ -175,6 +184,41 @@ Resources:
   Queue1:
     Type: AWS::SQS::Queue
 
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  LambdaFuncton:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: LambdaFuncton
+      CodeUri: src
+      Handler: handler.handler
+      Tracing: Active
+      Events:
+        Queue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt Queue.Arn
+            BatchSize: 10
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        External: 
+          - aws-sdk
+        Minify: true
+        Target: "es2020"
+        Sourcemap: false
+        EntryPoints: 
+          - handler.ts
+
+  LambdaFunctonLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+      LogGroupName: !Sub /aws/lambda/${LambdaFuncton}
+
 
 ##########################################################################
 #   OUTPUTS                                                              #
@@ -183,3 +227,7 @@ Outputs:
   ApiURL:
     Description: API Endpoint
     Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+
+  LambdaFuncton:
+    Value: !Ref LambdaFuncton
+    Description: Lambda Function Name
