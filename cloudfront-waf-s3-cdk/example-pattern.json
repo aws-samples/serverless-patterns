@@ -1,7 +1,7 @@
 {
   "title": "Amazon CloudFront to AWS WAF to Amazon S3 using .Net CDK",
   "description": "Creates CloudFront, WAF Web ACL, and S3 bucket for UI code. Then WAF Web ACL gets applied to CloudFront distribution to restrict Website access based on source IP address.",
-  "language": ".Net",
+  "language": ".NET",
   "level": "200",
   "framework": "CDK",
   "introBox": {

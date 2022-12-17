@@ -1,7 +1,7 @@
 {
   "title": "Amazon EventBridge to Amazon Firehose Delivery Stream to Amazon S3 using .Net CDK",
   "description": "Creates EventBridge, Firehose Delivery Stream, and S3 bucket. Apply Firehose DynamicPartitioningConfiguration to parse the input message to extract department value to use it to create S3 partition",
-  "language": ".Net",
+  "language": ".NET",
   "level": "200",
   "framework": "CDK",
   "introBox": {
