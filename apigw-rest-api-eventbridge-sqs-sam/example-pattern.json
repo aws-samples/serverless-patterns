@@ -1,7 +1,7 @@
 {
   "title": "API Gateway REST API to EventBridge with event payload composition and SQS as target",
   "description": "Create an API Gateway that sends events to EventBridge and enriches the event in the integration request.",
-  "language": "Node.js, TypeScript",
+  "language": "Node.js",
   "level": "300",
   "framework": "SAM",
   "introBox": {
@@ -48,6 +48,7 @@
   },
   "authors": [
     {
+      "headline": "Presented by Daniele Frasca",
       "name": "Daniele Frasca",
       "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale."
