@@ -24,18 +24,28 @@ namespace Cdk
                 this,
                 "SourceSQSQueue");
 
+            var mapState = new Map(
+                this,
+                "LoopMessages",
+                new MapProps()
+                {
+                    ItemsPath = JsonPath.EntirePayload,
+                });
+            mapState.Iterator(
+                new Wait(
+                    this,
+                    "WaitState",
+                    new WaitProps()
+                    {
+                        Time = WaitTime.Duration(Duration.Seconds(10)),
+                    }));
+
             var stepFunction = new StateMachine(
                 this,
                 "TargetStepFunction",
                 new StateMachineProps()
                 {
-                    Definition = new Wait(
-                        this,
-                        "WaitState",
-                        new WaitProps()
-                        {
-                            Time = WaitTime.Duration(Duration.Seconds(10))
-                        }),
+                    Definition = mapState,
                     StateMachineType = StateMachineType.STANDARD
                 });
 
