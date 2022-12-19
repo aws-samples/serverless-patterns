@@ -1,7 +1,7 @@
 {
     "title": "API Gateway and Lambda to generate S3 pre-signed URLS",
     "description": "Secured REST API that expose a Lambda function to generate S3 pre-signed URLs",
-    "language": "Typescript",
+    "language": "TypeScript",
     "level": "300",
     "framework": "CDK",
     "introBox": {
