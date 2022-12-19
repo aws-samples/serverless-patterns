@@ -1,20 +1,22 @@
 {
-    "title": "API that expose a Lambda function to generate S3 pre-signed URLs",
-    "description": "Web and mobile applications often provide their users ability to upload files, documents or pictures. A good and now common practice is to upload them directly to Amazon S3, using [pre-signed URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html). To generate this pre-signed URL, you have to use the AWS SDK (generally in an AWS Lambda function), and expose the feature to the client through an API (with Amazon API Gateway).",
+    "title": "API Gateway and Lambda to generate S3 pre-signed URLS",
+    "description": "Secured REST API that expose a Lambda function to generate S3 pre-signed URLs",
     "language": "Typescript",
     "level": "300",
     "framework": "CDK",
     "introBox": {
       "headline": "How it works",
       "text": [
-            "The infrastructure deployed by this pattern contains an API Gateway REST API, exposing a Lambda function that will generate the S3 pre-signed URL and return it to the client. The API, the Lambda function and the S3 bucket handle CORS headers so that there is no error on the client side. The API is protected by a Cognito User Pool."
+        "Web and mobile applications often provide their users ability to upload files, documents or pictures. A good and now common practice is to upload them directly to Amazon S3, using pre-signed URLs. To generate this pre-signed URL, you have to use the AWS SDK (generally in an AWS Lambda function), and expose the feature to the client through an API (with Amazon API Gateway).",
+        "The infrastructure deployed by this pattern contains an API Gateway REST API, exposing a Lambda function that will generate the S3 pre-signed URL and return it to the client. The API, the Lambda function and the S3 bucket handle CORS headers so that there is no error on the client side. The API is protected by a Cognito User Pool."
       ]
     },
     "gitHub": {
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-upload-presignedurl-api-cdk-ts",
         "templateURL": "serverless-patterns/s3-upload-presignedurl-api-cdk-ts",
-        "projectFolder": "s3-upload-presignedurl-api-cdk-ts"
+        "projectFolder": "bin",
+        "templateFile": "s3-upload-presignedurl-api-cdk.ts"
       }
     },
     "resources": {
