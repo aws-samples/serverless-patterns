@@ -1,6 +1,6 @@
 # API Gateway REST API to EventBridge with event payload composition and SQS as target
 
-The APIGW payload is sent to EventBridge as a custom event payload. In the integration request, a custom payload is created and passed to EventBridge that target an SQS.
+The APIGW payload is sent to Amazon EventBridge as a custom event payload. A custom payload is created in the integration request and passed to EventBridge with the "DetailType":"POSTED". A rule matches these events and sends the event to SQS. A Lambda function polls the SQS queue and writes the payload to CloudWatch Logs.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns?services=apigw%2Ceventbridge](https://serverlessland.com/patterns?services=apigw%2Ceventbridge
 
@@ -66,12 +66,15 @@ curl --location --request POST '[YOUT_API_URL]' \
 } 
 ```
 
-3. This means your event was published successfully in the SQS.
+3. This means your event was published successfully to EventBridge.
 
-4. Go to the console and check the Lambda logs:
+4. To view the message sent to SQS, either navigate to the Lambda console and check the logs, or use `sam logs` to retrieve the logs within your terminal. Replace (stack-name) with the name you gave your your AWS SAM stack.
+
+```bash
+sam logs --stack-name (stack-name)
+```
 
 Below are snippets from the logs
-
 ```
 2022-12-17T08:05:42.754Z  5c0616f6-523d-54cb-8b83-4ae128b6822b  INFO  {
   data: { IsHelloWorldExample: 'Hello' },
