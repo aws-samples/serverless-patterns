@@ -1,7 +1,7 @@
 {
   "title": "API Gateway to Lambda to DynamoDb",
   "description": "Create a Lambda function that receives a request from API Gateway and inserts a record into a DynamoDB table.",
-  "language": "C#",
+  "language": ".NET",
   "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
   "videoId": "",
   "level":"200",
