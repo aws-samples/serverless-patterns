@@ -1,6 +1,6 @@
-# AWS Service 1 to AWS Service 2
+# Enrich EventBridge Pipes source data with Salesforce via API destinations
 
-This pattern << explain usage >>
+This pattern shows how to use EventBridge Pipes to enrich messages data coming from SQS Queue using Salesforce with API destinations.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd eventbridge-pipes-sqs-enrich-with-sfdc
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -38,11 +38,15 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+EventBridge Pipes polls for messages from the SQS queue, EventBridge pipe enriches message data using an API destination. For our use case, the body of the SQS message has an account ID, and EventBridge Pipe extracts the account ID from the message and sends it as a path parameter to the API destination Salesforce endpoint. API returns additional details about the account as a response. EventBridge Pipe receives a response from the API destination and sends it to a target of Cloudwatch Logs.
 
 ## Testing
+1. Replace the content of the event.json file with an account ID in your Salesforce environment.
 
-Provide steps to trigger the integration and show what should be observed if successful.
+2. Put a message in the queue using the AWS CLI or the AWS Console.
+aws sqs send-message --queue-url ENTER_YOUR_SQS_QUEUE_URL --message-body file://event.json
+
+3. Navigate to the log group configured as the Pipe Target to see the account details coming from the API Destinations response.
 
 ## Cleanup
  
