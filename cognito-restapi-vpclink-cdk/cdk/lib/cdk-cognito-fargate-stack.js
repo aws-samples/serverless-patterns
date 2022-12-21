@@ -84,16 +84,6 @@ class CdkCognitoFargateStack extends Stack {
       maxAzs: 2
     });
 
-    new ec2.BastionHostLinux(this, "BastionHost", {
-      vpc,
-      blockDevices: [{
-        deviceName: "/dev/xvda",
-        volume: ec2.BlockDeviceVolume.ebs(10, {
-          encrypted: true,
-        }),
-      }],
-    });
-
     const cluster = new ecs.Cluster(this, "Cluster", {
       vpc: vpc
     });
