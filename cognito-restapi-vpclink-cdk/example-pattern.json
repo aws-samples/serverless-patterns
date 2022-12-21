@@ -1,7 +1,7 @@
 {
   "title": "Cognito to API Gateway private REST API",
   "description": "This pattern shows how to authenticate and authorize requests to a private REST API Gateway with Amazon Cognito.",
-  "language": "TypeScript",
+  "language": "Node.js",
   "level": "200",
   "framework": "CDK",
   "introBox": {
