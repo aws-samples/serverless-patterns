@@ -46,7 +46,8 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
