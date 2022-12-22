@@ -1,7 +1,7 @@
 {
   "title": "Response Transformation from XML to JSON in API Gateway",
   "description": "Use VTL template to transform json response to xml in Amazon API Gateway.",
-  "language": "node",
+  "language": "Node.js",
   "level": "200",
   "framework": "SAM",
   "introBox": {
