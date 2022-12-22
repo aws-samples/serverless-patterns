@@ -51,7 +51,8 @@
   },
   "authors": [
     {
-      "name": "Vamsi Krishna Ganti"
+      "name": "Vamsi Krishna Ganti",
+      "bio": "Cloud Consultant at AWS focusing on Application Development."
     }
   ]
 }
