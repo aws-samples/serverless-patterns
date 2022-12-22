@@ -37,10 +37,10 @@ Important: this application uses various AWS services and there are costs associ
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
-Many a times, we work with customers who are undergoing modernisation journey within their organisation. When modernising an application, they sometimes have to adhere to some of the contracts with upstream and downstream interfaces.  For example, messaging protocols, data models etc. Today we are going to address a problem where customer is modernising a system which receives and produces xml response to Serverless using Amazon API Gateway and AWS Lambda.  We will be talking more about producing and consuming XML requests in this article.
+Many a times, we work with customers who are undergoing modernisation journey within their organisation. When modernising an application, they sometimes have to adhere to some contracts with upstream and downstream interfaces.  For example, messaging protocols, data models etc. Today we are going to address a problem where customer is modernising a system which receives and produces xml response to Serverless using Amazon API Gateway and AWS Lambda.  We will be talking more about producing and consuming XML requests in this article.
 Since the contracts were in xml, we had a choice of either maintaining the contract by coding the program to handle at Lambda using libraries or Lambda will return a json response and the conversion of json to xml happens at API Gateway level.
 To narrow down the purpose of this blog post further, we utilise the VTL template capability of API Gateway to do conversion of Json to XML.
-As part of this article, we will be creating an AWS Lambda, and an API Gateway. The API Gateway will return xml transforming the json response from lambda.
+As part of this article, we will be creating an AWS Lambda, and an API Gateway. The API Gateway will return xml transforming the json response from lambda with the help of mapping templates.
 Note: API Gateway supports mapping templates only with lambda integration and not lambda proxy integration.
 
 Content involved:
@@ -54,10 +54,11 @@ Tips:
 
 ## Testing
 Provide steps to trigger the integration and show what should be observed if successful.
+We have hardcoded the response in Lambda and created custom format of XML in API Gateway mapping template.
 
 1. Invoke the lambda via the console test option to view the json response of Lambda.
 2. Test the APIGateway which invokes Lambda to see the corresponding XML response.
-We have hardcoded the response in Lambda and created custom format in API Gateway mapping template.
+
 To test the endpoint:
 
 ```
