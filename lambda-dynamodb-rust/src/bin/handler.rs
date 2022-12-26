@@ -1,6 +1,6 @@
 use aws_sdk_dynamodb::model::AttributeValue;
 use chrono::Utc;
-use lambda_runtime::{handler_fn, Context, Error};
+use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use serde_json::Value;
 
 #[tokio::main]
@@ -8,18 +8,19 @@ async fn main() -> Result<(), Error> {
     let config = aws_config::load_from_env().await;
     let dynamodb_client = aws_sdk_dynamodb::Client::new(&config);
 
-    lambda_runtime::run(handler_fn(|event: Value, ctx: Context| {
-        execute(&dynamodb_client, event, ctx)
+    run(service_fn(|event: LambdaEvent<Value>| {
+        function_handler(&dynamodb_client, event)
     }))
-    .await?;
-
-    Ok(())
+    .await
 }
 
-pub async fn execute(client: &aws_sdk_dynamodb::Client, _event: Value, _ctx: Context,) -> Result<(), Error> {
+pub async fn function_handler(
+    client: &aws_sdk_dynamodb::Client,
+    event: LambdaEvent<Value>,
+) -> Result<(), Error> {
     let table = std::env::var("TABLE_NAME").expect("TABLE_NAME must be set");
 
-    let metadata = serde_json::to_string(&_event).unwrap();
+    let metadata = serde_json::to_string(&event.payload).unwrap();
 
     let result = client
         .put_item()
@@ -33,4 +34,3 @@ pub async fn execute(client: &aws_sdk_dynamodb::Client, _event: Value, _ctx: Con
 
     Ok(())
 }
-
