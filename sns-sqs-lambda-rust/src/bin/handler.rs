@@ -1,6 +1,6 @@
 use aws_lambda_events::event::{sns::SnsMessage, sqs::SqsEvent};
 use futures::future::join_all;
-use lambda_runtime::{service_fn, Error, LambdaEvent};
+use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use serde::Deserialize;
 
 #[tokio::main]
@@ -8,14 +8,16 @@ async fn main() -> Result<(), Error> {
     tracing_subscriber::fmt()
         .with_ansi(false)
         .without_time()
+        .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
         .init();
 
-    lambda_runtime::run(service_fn(|event: LambdaEvent<SqsEvent>| execute(event))).await?;
-
-    Ok(())
+    run(service_fn(|event: LambdaEvent<SqsEvent>| {
+        function_handler(event)
+    }))
+    .await
 }
 
-pub async fn execute(event: LambdaEvent<SqsEvent>) -> Result<(), Error> {
+pub async fn function_handler(event: LambdaEvent<SqsEvent>) -> Result<(), Error> {
     println!("Input {:?}", event);
 
     let mut tasks = Vec::with_capacity(event.payload.records.len());
