@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appconfig-lambda-rust",
       "templateURL": "serverless-patterns/appconfig-lambda-rust",
       "projectFolder": "appconfig-lambda-rust",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+      "templateFile": "appconfig-lambda-rus/template.yml"
     }
   },
   "resources": {
