@@ -1,4 +1,6 @@
-use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt, Response, http::StatusCode};
+use lambda_http::{
+    http::StatusCode, run, service_fn, Error, IntoResponse, Request, RequestExt, Response,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
@@ -10,10 +12,7 @@ async fn main() -> Result<(), Error> {
         .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
         .init();
 
-    run(service_fn(|event: Request| {
-        function_handler(event)
-    }))
-    .await
+    run(service_fn(|event: Request| function_handler(event))).await
 }
 
 pub async fn function_handler(event: Request) -> Result<impl IntoResponse, Error> {
