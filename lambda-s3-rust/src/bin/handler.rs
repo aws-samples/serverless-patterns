@@ -9,6 +9,7 @@ async fn main() -> Result<(), Error> {
         .without_time()
         .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
         .init();
+
     let config = aws_config::load_from_env().await;
     let s3_client = aws_sdk_s3::Client::new(&config);
 
