@@ -4,6 +4,12 @@ use serde_json::Value;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    tracing_subscriber::fmt()
+        .with_ansi(false)
+        .without_time()
+        .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
+        .init();
+
     let config = aws_config::load_from_env().await;
     let sfn_client = aws_sdk_sfn::Client::new(&config);
 
