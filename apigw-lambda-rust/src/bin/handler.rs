@@ -6,6 +6,12 @@ use serde_json::json;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    tracing_subscriber::fmt()
+        .with_ansi(false)
+        .without_time()
+        .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
+        .init();
+
     run(service_fn(|event: Request| function_handler(event))).await
 }
 
