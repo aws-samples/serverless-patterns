@@ -10,10 +10,10 @@ name = "handler"
 path = "src/bin/handler.rs"
 
 [dependencies]
-aws-config = "0.6.0"
-aws-types = "0.6.0"
-aws-sdk-dynamodb = "0.6.0"
-lambda_runtime = "0.4.1"
+aws-config = "0.52.0"
+aws-types = "0.52.0"
+aws-sdk-dynamodb = "0.22.0"
+lambda_runtime = "0.7.2"
 serde_json = "1.0.68"
 tokio = { version = "1", features = ["full"] }
 chrono = "0.4.19"
