@@ -10,7 +10,6 @@ path = "src/bin/handler.rs"
 
 [dependencies]
 aws-config = "0.52.0"
-aws-types = "0.52.0"
 lambda_runtime = "0.7.2"
 lazy_static = "1.4.0"
 reqwest = { version = "0.11", default-features = false, features = ["rustls-tls", "json"] }

@@ -51,15 +51,20 @@ This pattern deploys an Amazon API Gateway HTTP API with a default route and bas
 
 Once the application is deployed, retrieve the HttpApiEndpoint value from CloudFormation Outputs. Either browse to the endpoint in a web browser or call the endpoint from Postman.
 
-Example GET Request: https://{HttpApiId}.execute-api.{region}.amazonaws.com/
+Example GET Request:
+```
+curl -H "content-type:application/json" https://{HttpApiId}.execute-api.{region}.amazonaws.com
+```
 
 Response:
 ```
 hello stranger
 ```
 
-Example POST Request: https://{HttpApiId}.execute-api.{region}.amazonaws.com/path1/path2?name=Daniele
-- Request Header: "Content-Type: application/json"
+Example POST Request: 
+```
+curl -X POST -H "content-type:application/json" https://{HttpApiId}.execute-api.{region}.amazonaws.com/path1/path2?name=Daniele
+```
 
 Response: 
 ```
