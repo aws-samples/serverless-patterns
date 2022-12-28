@@ -1,6 +1,6 @@
 # DynamoDB Stream to AWS Lambda with Stepfunction Enrichment using EventBridge Pipes
 
-This pattern demonstrates sending DynamoDB Streams directly to AWS SNS using EventBridge Pipes with filtering.
+This pattern demonstrates sending DynamoDB Stream to AWS Lambda with Stepfunction Enrichment using EventBridge Pipes.
 
 ![Pipes diagram](./ddbstream-lambda-stepfunction-enrichment.png)
 
@@ -59,8 +59,6 @@ aws dynamodb put-item \
     --table-name SampleTable \
     --item PK={S="Message#1234"},SK={S="Channel#1231"},messageId={S="3"}
 ```
-
-You should not receive an email notification from SNS.
 
 ## Cleanup
  
