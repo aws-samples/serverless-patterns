@@ -1,11 +1,11 @@
-# DynamoDB Stream to AWS SNS without Lambda using EventBridge Pipes
+# DynamoDB Stream to AWS Lambda with Stepfunction Enrichment using EventBridge Pipes
 
 This pattern demonstrates sending DynamoDB Streams directly to AWS SNS using EventBridge Pipes with filtering.
 
-![Pipes diagram](./ddbstream-sns.png)
+![Pipes diagram](./ddbstream-lambda-stepfunction-enrichment.png)
 
 
-Learn more about this pattern at Serverless Land Patterns:https://serverlessland.com/patterns/eventbridge-pipes-dynamodbstream-sns
+Learn more about this pattern at Serverless Land Patterns:https://serverlessland.com/patterns/eventbridge-pipes-dynamodbstream-to-lambda-with-stepfunction-enrichment
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
