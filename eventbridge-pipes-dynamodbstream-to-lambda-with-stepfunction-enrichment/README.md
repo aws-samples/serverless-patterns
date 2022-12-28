@@ -41,7 +41,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-DynamoDB Streams can directly sent event to lambda with the help of Lambda event source mapping. But if we want to enrich the event from DynamoDB streams before it gets sent to AWS Lambda, then previously we have to implement some additional logic which would take care of the enrichment. 
+Amazon DynamoDB is integrated with AWS Lambda so that you can create triggers, pieces of code that automatically respond to events in DynamoDB Streams. With triggers, you can build applications that react to data modifications in DynamoDB tables. We can also filter the event with the help of lambda event source mapping. But if we want to enrich the event from DynamoDB streams before it gets sent to AWS Lambda, then previously we have to implement some additional logic which would take care of the enrichment. 
 
 But at re:invent 2022, AWS launched a new feature for AWS EventBridge known as EventBridge Pipes.
 
