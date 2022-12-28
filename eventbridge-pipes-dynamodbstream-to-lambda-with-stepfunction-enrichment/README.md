@@ -33,8 +33,6 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name: eg. eventbridge-pipes-dynamodbstream-to-lambda-with-stepfunction-enrichment
     * Enter the desired AWS Region
-    * Enter Email ID for SNS to create a topic and subscription.
-    * Enter NationalTeam(This is configurable, you can create any parameter name).: eg. Argentina
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
