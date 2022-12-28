@@ -1,7 +1,7 @@
 {
   "title": "DynamoDB Stream to AWS Lambda with Step Function Event Enrichment",
   "description": "This pattern triggers a Lambda function from a DynamoDB Stream with Step functions enrichment in between them using EventBridge Pipes.",
-  "language": "",
+  "language": "Python",
   "level": "200",
   "framework": "SAM",
   "introBox": {
