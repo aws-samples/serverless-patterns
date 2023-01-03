@@ -50,12 +50,12 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-Use the [AWS CLI](https://aws.amazon.com/cli/) to send logs to CloudWatch and retrieve the filtered logs from the SQS queue. The LOG_GROUP_NAME, LOG_STREAM_NAME and QUEUE_URL are in the stack outputs. Example logs are available in the `example_logs.log` file.
+Use the [AWS CLI](https://aws.amazon.com/cli/) to send logs to CloudWatch and retrieve the filtered logs from the SQS queue. The LOG_GROUP_NAME, LOG_STREAM_NAME and QUEUE_URL are in the stack outputs. Example logs are available in the `example_logs.json` file.
 
 1. Send logs to CloudWatch:
 
    ```
-   aws logs put-log-events --log-group-name LOG_GROUP_NAME --log-stream-name LOG_STREAM_NAME --log-events file://example_logs.log
+   aws logs put-log-events --log-group-name LOG_GROUP_NAME --log-stream-name LOG_STREAM_NAME --log-events file://example_logs.json
    ```
 
 2. Retrieve the filtered logs from the SQS queue:
