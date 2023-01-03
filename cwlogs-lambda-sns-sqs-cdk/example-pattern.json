@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrate how to use CloudWatch Logs to create Lambda subscription filter and publish the filtered logs to an SNS topic and deliver to an SQS queue. The logs sent to Lambda through a subsciption filter are base64 encoded and compressed with gzip format"
+      "This pattern demonstrate how to use CloudWatch Logs to create Lambda subscription filter and publish the filtered logs to an SNS topic and deliver to an SQS queue. The logs sent to Lambda through a subsciption filter are base64 encoded and compressed with gzip format."
     ]
   },
   "gitHub": {
@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cwlogs-lambda-sns-sqs-cdk",
       "templateURL": "serverless-patterns/cwlogs-lambda-sns-sqs-cdk",
       "projectFolder": "cwlogs-lambda-sns-sqs-cdk",
-      "templateFile": ""
+      "templateFile": "src/cwlogs_lambda_sns_sqs/cwlogs_lambda_sns_sqs_stack.py"
     }
   },
   "resources": {
@@ -38,6 +38,7 @@
   "authors": [
     {
       "name": "Kimia Yahyazadeh",
+      "image": "",
       "bio": "AWS Cloud Application Developer",
       "linkedin": "https://www.linkedin.com/in/kimiayahyazadeh/"
     }
