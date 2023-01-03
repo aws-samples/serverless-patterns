@@ -24,7 +24,7 @@ class CwlogsLambdaSnsSqsStack(Stack):
         #Create a Lambda function
         my_lambda = _lambda.Function(self, "LogsLambdaFunction",
             runtime=_lambda.Runtime.PYTHON_3_9,
-            code=_lambda.Code.from_asset("lambda"),
+            code=_lambda.Code.from_asset("src/lambda"),
             handler="index.lambda_handler",
             timeout=Duration.seconds(30),
             environment={'TOPIC_ARN': my_topic.topic_arn}
