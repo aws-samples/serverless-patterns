@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 3. From the command line, use AWS CDK to deploy the AWS resources for the pattern:
    ```
-   cdk deploy
+   cdk deploy -all
    ```
 
 ## Testing
