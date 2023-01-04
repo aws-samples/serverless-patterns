@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 2. Change directory to the pattern directory:
    ```
-   cd cwlogs-lambda-sns-sqs-cdk
+   cd serverless-patterns/cwlogs-lambda-sns-sqs-cdk/
    ```
 3. Create a virtual environment for python:
    ```
