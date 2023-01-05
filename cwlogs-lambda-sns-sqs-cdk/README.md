@@ -1,6 +1,6 @@
 # Amazon CloudWatch Logs Subscription to AWS Lambda to Amazon SNS to Amazon SQS with CDK
 
-This CDK template deploys a CloudWatch Logs Subscription, a Lambda function, an SNS topic and an SQS queue with required IAM permissions to run the pattern. The CloudWatch Logs subscription sends filtered log data to the Lambda function. The Lambda function publishes the log as a message to the SNS topic and the SNS invokes the SQS queue subscribed to the topic.
+This pattern demonstrates how to use CloudWatch Logs Subscription to stream CloudWatch Logs to SNS. The CloudWatch Log Group, Log Stream, Subscription filters, Lambda Function, SNS Topic, SQS Queue with SNS Subscription and required IAM Role & Permissions are all deployed using the CDK Stack. For the specified filter parameter, the subscriber a Lambda Function receives the log data from CloudWatch Logs, the Lambda function publishes it to SNS, and a SQS subscriber obtains the same.
 
 Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/cwlogs-lambda-sns-sqs-cdk](https://serverlessland.com/patterns/cwlogs-lambda-sns-sqs-cdk)
 
@@ -47,10 +47,21 @@ Important: this application uses various AWS services and there are costs associ
    ```
    cdk deploy 
    ```
+   
+   Expected Result:
+   
+   ```
+   Outputs:
+      cwlogs-lambda-sns-sqs.LOGGROUPNAME = cwlogs-lambda-sns-sqs-myLogGroup11111XXX-XXXXXXX
+      cwlogs-lambda-sns-sqs.LOGSTREAMNAME = cwlogs-lambda-sns-sqs-myLogStream11111YYYY-YYYYYYY
+      cwlogs-lambda-sns-sqs.QUEUEURL = https://sqs.us-east-1.amazonaws.com/111122223333/cwlogs-lambda-sns-sqs-myQueue11111ZZZZ-b188560f
+   Stack ARN:
+      arn:aws:cloudformation:us-east-1:111122223333:stack/cwlogs-lambda-sns-sqs/a1b2c3d4-5678-90ab-cdef-EXAMPLEbbbbb
+   ```
 
 ## Testing
 
-Use the [AWS CLI](https://aws.amazon.com/cli/) to send logs to CloudWatch and retrieve the filtered logs from the SQS queue. The LOG_GROUP_NAME, LOG_STREAM_NAME and QUEUE_URL are in the stack outputs. Example logs are available in the `example_logs.json` file.
+Use the [AWS CLI](https://aws.amazon.com/cli/) to send logs to CloudWatch and retrieve the filtered logs from the SQS queue. The LOG_GROUP_NAME, LOG_STREAM_NAME and QUEUE_URL are in the stack outputs. Example logs are available in the `example_logs.json` file. As needed update the timestamp to most recent using [epochconverter](https://www.epochconverter.com/).
 
 1. Send logs to CloudWatch:
 
@@ -70,9 +81,17 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send logs to CloudWatch and re
    ```
    cdk destroy
    ```
+   
+## Useful commands
+
+ * `cdk ls`          list all stacks in the app
+ * `cdk synth`       emits the synthesized CloudFormation template
+ * `cdk deploy`      deploy this stack to your default AWS account/region
+ * `cdk diff`        compare deployed stack with current state
+ * `cdk docs`        open CDK documentation
 
 ---
 
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
