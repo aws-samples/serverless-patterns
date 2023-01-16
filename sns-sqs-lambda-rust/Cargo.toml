@@ -10,11 +10,10 @@ name = "handler"
 path = "src/bin/handler.rs"
 
 [dependencies]
-aws_lambda_events = "0.6.1"
-futures = "0.3.17"
-lambda_runtime = "0.5.1"
-serde = {version = "1.0", features = ["derive"] }
-serde_json = "1.0.68"
-simple-error = "0.2"
-tokio = { version = "1", features = ["full"] }
-tracing-subscriber = "0.3"
+aws_lambda_events = { version = "0.7", default-features = false, features = ["sqs", "sns"] }
+futures = "0.3"
+lambda_runtime = "0.7.2"
+serde = {version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["macros"] }
+tracing-subscriber = { version = "0.3", features = ["fmt", "json"] }

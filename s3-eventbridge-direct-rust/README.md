@@ -1,4 +1,4 @@
-# Amazon S3 to Amazon EventBridge - Publish events directly from S3
+# Amazon S3 to Amazon EventBridge
 
 The SAM template deploys an S3 bucket that publishes events to Amazon EventBridge, and sets up a Lambda function to show how to consume these events via an EventBridge rule. It deploys the the IAM resources required to run the application.
 
