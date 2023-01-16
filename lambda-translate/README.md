@@ -1,8 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# Translate Text in real-time using Lambda function and Amaozn Translate
 
 This pattern contains the source code and supporting files for a serverless application that you can deploy with the SAM CLI. Deploying the SAM file makes use of a Lambda function that calls the translate service to translate text in real-time.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-translate
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
