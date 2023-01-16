@@ -1,4 +1,4 @@
-# Translate Text in real-time using Lambda function and Amaozn Translate
+# Translate Text in real-time using Lambda function and Amazon Translate
 
 This pattern contains the source code and supporting files for a serverless application that you can deploy with the SAM CLI. Deploying the SAM file makes use of a Lambda function that calls the translate service to translate text in real-time.
 
