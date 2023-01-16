@@ -47,7 +47,7 @@ step to activate your virtualenv.
 
 ## How it works
 
-The template will create an EventBridge schedule and a step function. Every 5 minutes, EventBridge schedule will trigger a step function execution.
+The template will create an EventBridge schedule and a Step Function. Every 5 minutes, EventBridge schedule will trigger a Step Function execution.
 
 ## Delete stack
 
