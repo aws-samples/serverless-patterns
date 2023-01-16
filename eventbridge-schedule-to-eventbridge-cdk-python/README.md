@@ -47,7 +47,35 @@ step to activate your virtualenv.
 
 ## How it works
 
-[EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html) is used to trigger a EventBridge event every 5 minutes. 
+This template will create an EventBridge Schedule, Event Bus, EventBridge Rule and a Lambda function.
+
+EventBridge Schedule will put an event to Event Bus every 5 minutes. Lambda function is configured as the target of the EventBridge Rule, so it will be triggered every time Event Bus received the messsage.
+
+## Testing
+
+Once this stack is deployed in your AWS account, wait about 5 minutes and visit the Lambda function's CloudWatch Log Group. You can see the logs are being generated every 5 minutes with same format as below:
+
+```json
+{
+    "version": "0",
+    "id": "2866b92b-d8ed-7a66-d15e-4a4b936387bf",
+    "detail-type": "ScheduleTriggered",
+    "source": "scheduled.events",
+    "account": "xxxxxxxxxxxx",
+    "time": "2023-01-13T09:23:21Z",
+    "region": "eu-central-1",
+    "resources": [],
+    "detail": {
+        "metadata": {
+            "eventId": "MY_SCHEDULED_EVENT"
+        },
+        "data": {
+            "firstName": "Pubudu",
+            "lastName": "Jayawardana"
+        }
+    }
+}
+```
 
 ## Delete stack
 
@@ -57,6 +85,6 @@ cdk destroy
 
 ---
 
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
