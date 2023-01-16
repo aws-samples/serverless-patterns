@@ -46,7 +46,7 @@ Resources:
                           <getPetDetails>##
                           #set($details= $inputBody.petDetails)
                           <response #foreach($key in $details.keySet()) $key="$util.escapeJavaScript($details.get($key))"#end/>##
-                          <category "id"=$inputBody.category.id "name"= $inputBody.category.name"/>##
+                          <category name"="$inputBody.category.name"/>##
                           #set($inputTags=$inputBody.tags)
                           #if($inputTags.size()>0)
                           <tags>##
