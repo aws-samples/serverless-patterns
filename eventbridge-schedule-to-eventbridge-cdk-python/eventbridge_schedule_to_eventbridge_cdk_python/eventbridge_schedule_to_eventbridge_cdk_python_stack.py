@@ -15,7 +15,7 @@ class EventbridgeScheduleToEventbridgeCdkPythonStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        ## Add event bus and target Lambda function
+        ## Add event bus, rule and target Lambda function
         event_bus = events.EventBus(self, "my-event-bus")
 
         my_lambda_function = _lambda.Function(
@@ -35,7 +35,7 @@ class EventbridgeScheduleToEventbridgeCdkPythonStack(Stack):
 
         my_event_rule.add_target(event_target.LambdaFunction(my_lambda_function))
 
-        ## Add scheduler
+        ## Create schedule role
         scheduler_role = iam.Role(self, "scheduler-role",
             assumed_by=iam.ServicePrincipal("scheduler.amazonaws.com"),
         )
@@ -53,7 +53,8 @@ class EventbridgeScheduleToEventbridgeCdkPythonStack(Stack):
             name="my-schedule-group",
         );
 
-        my_scheduler = scheduler.CfnSchedule(self, "my-scheduler",
+        ## Create schedule
+        my_schedule = scheduler.CfnSchedule(self, "my-schedule",
                 flexible_time_window=scheduler.CfnSchedule.FlexibleTimeWindowProperty(
                     mode="OFF",
                 ),
@@ -79,6 +80,6 @@ class EventbridgeScheduleToEventbridgeCdkPythonStack(Stack):
             )
 
         ## Output
-        CfnOutput(self, "SCHEDULER_NAME", value=my_scheduler.ref)
+        CfnOutput(self, "SCHEDULE_NAME", value=my_schedule.ref)
         CfnOutput(self, "EVENT_BUS_NAME", value=event_bus.event_bus_name)
         CfnOutput(self, "LAMBDA_FUNCTION_NAME", value=my_lambda_function.function_name)
