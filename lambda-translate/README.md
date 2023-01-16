@@ -40,6 +40,8 @@ Important: this application uses various AWS services and there are costs associ
 
 Use the AWS CLI to invoke the Lambda function.
 
+The example provided  performs Translation from English to German language. The following lanugaes are [supported](https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html).
+
 ## Testing
 
 Replace "{LambdaFunctionName}" with the function name as seen in the output of CloudFormation template
