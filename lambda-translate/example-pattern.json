@@ -46,12 +46,12 @@
       "Delete the stack: aws cloudformation delete-stack --stack-name {STACK_NAME}"
     ]
   },
-  "author": [
+  "authors": [
     {
-      "headline": "Presented by Abilashkumar P C",
       "name": "Abilashkumar P C",
       "image": "https://phonetool.amazon.com/users/abilasc",
-      "bio": "Cloud Support Engineer II @ AWS"
+      "bio": "Abilash is an ardent follower of cricket, technology and loves driving",
+      "linkedin": "https://www.linkedin.com/abilashkumar-p-c"
     }
   ]
 }
