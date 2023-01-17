@@ -4,10 +4,6 @@
   "language": ".NET",
   "level": "200",
   "framework": "CDK",
-  "services": {
-    "from": "apigw",
-    "to": "lambda"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
