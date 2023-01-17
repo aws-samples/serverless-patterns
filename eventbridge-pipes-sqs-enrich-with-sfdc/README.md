@@ -30,11 +30,15 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
+    * View Salesforce documentation for Salesforce connection parameters.
+    * [SalesforceOAuthUrl](https://developer.salesforce.com/docs/atlas.en-us.214.0.api_rest.meta/api_rest/intro_understanding_oauth_endpoints.htm) for token requests
+    * [SFEndpointUrl](https://developer.salesforce.com/docs/atlas.en-us.214.0.api_rest.meta/api_rest/dome_get_field_values.htm)
+    * [SalesforceOauthClientId, SalesforceOauthClientSecret, SalesforceUsername, SalesforcePassword](https://developer.salesforce.com/docs/atlas.en-us.214.0.api_rest.meta/api_rest/intro_understanding_username_password_oauth_flow.htm)
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+2. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
@@ -46,17 +50,17 @@ EventBridge Pipes polls for messages from the SQS queue, EventBridge pipe enrich
 2. Put a message in the queue using the AWS CLI or the AWS Console.
 aws sqs send-message --queue-url ENTER_YOUR_SQS_QUEUE_URL --message-body file://event.json
 
-3. Navigate to the log group configured as the Pipe Target to see the account details coming from the API Destinations response.
+1. Navigate to the log group configured as the Pipe Target to see the account details coming from the API Destinations response or use `sam logs` to retrieve the logs within your terminal. Replace (stack-name) with the name you gave your your AWS SAM stack.
+
+```bash
+sam logs --stack-name (stack-name)
+```
 
 ## Cleanup
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
