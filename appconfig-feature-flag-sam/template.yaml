@@ -1,0 +1,189 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-appconfig
+
+  Sample SAM Template for sam-appconfig
+
+Parameters:
+  AppConfigAppName:
+    Type: String
+    Description: AppConfig Application Name
+    Default: appconfig-feature-flag-sam
+  AppConfigAppEnvironmentName:
+    Type: String
+    Description: AppConfig Application Environment Name
+    Default: dev
+  AppConfigName:
+    Type: String
+    Description: AppConfig Name
+    Default: TestConfig
+  AppConfigLayerArn:
+    Type: String
+    Description: Retrieve AWS AppConfig Lambda extension arn from `https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions-versions.html#appconfig-integration-lambda-extensions-enabling-x86-64`
+    Default: arn:aws:lambda:us-east-1:027255383542:layer:AWS-AppConfig-Extension:82
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  
+  ## AppConfig FeatureFlag
+  SAMConfigApplication:
+      Type: AWS::AppConfig::Application
+      Properties:
+        Name: !Ref AppConfigAppName
+  
+  Environment:
+    Type: AWS::AppConfig::Environment
+    Properties:
+      Name: !Ref AppConfigAppEnvironmentName
+      ApplicationId: !Ref SAMConfigApplication
+  
+  SAMConfigConfigurationProfile:
+    Type: AWS::AppConfig::ConfigurationProfile
+    Properties:
+      ApplicationId: !Ref SAMConfigApplication
+      Name: !Ref AppConfigName
+      Type: "AWS.AppConfig.FeatureFlags"
+      LocationUri: "hosted"
+
+  SAMConfigDeploymentStrategy:
+    Type: AWS::AppConfig::DeploymentStrategy
+    Properties:
+      Name: "SAMConfigDeploymentStrategy"
+      Description: "A deployment strategy to deploy the config immediately"
+      DeploymentDurationInMinutes: 0
+      FinalBakeTimeInMinutes: 0
+      GrowthFactor: 100
+      GrowthType: LINEAR
+      ReplicateTo: NONE
+
+  BasicHostedConfigurationVersion:
+    Type: AWS::AppConfig::HostedConfigurationVersion
+    Properties:
+      ApplicationId: !Ref SAMConfigApplication
+      ConfigurationProfileId: !Ref SAMConfigConfigurationProfile
+      Description: 'A sample hosted configuration version'
+      ContentType: 'application/json'
+      Content: |
+        {
+          "version":"1",
+          "flags":
+          {
+            "pagination":
+              {
+                "name":"AppPagination",
+                "attributes":
+                {
+                  "pageSize":
+                  {
+                      "constraints":
+                      {
+                        "type":"number",
+                        "required":false,
+                        "minimum":5,
+                        "maximum":10
+                      }
+                  }
+                }
+              },
+              "wizardSwitch":
+              {
+                "name":"WizardSwitch"
+              }
+          },
+          "values":
+          {
+            "pagination":
+            {
+              "enabled":true,
+              "pageSize":5
+            },
+            "wizardSwitch":
+            {
+              "enabled":true
+            }
+          }
+        }
+
+  AppConfigDeployment:
+    Type: AWS::AppConfig::Deployment
+    Properties:
+      ApplicationId: !Ref SAMConfigApplication
+      ConfigurationProfileId: !Ref SAMConfigConfigurationProfile
+      ConfigurationVersion: !Ref BasicHostedConfigurationVersion
+      DeploymentStrategyId: !Ref SAMConfigDeploymentStrategy
+      EnvironmentId: !Ref Environment
+
+  ## API
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+
+  ## Lambda
+  SAMConfigFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambdaHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      
+      Layers:
+        - arn:aws:lambda:us-east-1:027255383542:layer:AWS-AppConfig-Extension:82
+      
+      ## The following policy shows how to restrict the function access to the specific configuration/environment.
+      ## This can be relaxed, allowing it to access the entire application or application/environment
+      Policies:        
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - appconfig:GetLatestConfiguration
+                - appconfig:StartConfigurationSession
+              Resource: !Sub 'arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/${SAMConfigApplication}/environment/${Environment}/configuration/${SAMConfigConfigurationProfile}'
+      
+      Environment:
+        Variables:
+          SAM_CONFIG_PATH: !Sub '/applications/${AppConfigAppName}/environments/${AppConfigAppEnvironmentName}/configurations/${AppConfigName}'
+
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /config
+            Method: get
+            ApiId: !Ref HttpApi
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+        - app.ts
+
+Outputs:
+  SAMConfigApplication:
+    Description: Application Id
+    Value: !Ref SAMConfigApplication
+  Environment:
+    Description: Environment
+    Value: !Ref Environment
+  SAMConfigConfigurationProfile:
+    Description: ConfigurationProfile
+    Value: !Ref SAMConfigConfigurationProfile
+  ConfigPath:
+    Description: Configuration Path
+    Value: !Sub '/applications/${AppConfigAppName}/environments/${AppConfigAppEnvironmentName}/configurations/${AppConfigName}'
+  HttpApiUrl:
+    Description: URL of your API endpoint
+    Value:
+      Fn::Sub: 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/'
+  HttpApiId:
+    Description: Api id of HttpApi
+    Value:
+      Ref: HttpApi

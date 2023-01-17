@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A Lambda that is invoked by APIGateway Rest API. Response transformation from JSON TO XML In API Gateway
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 20
+    Tracing: Active
+  Api:
+    TracingEnabled: True
+
+# Comment each resource section to explain usage
+Resources:
+##########################################################################
+#   Rest API                                                             #
+##########################################################################
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionBody:
+        info:
+          version: "2018-12-27T19:28:53Z"
+          title: "MyApi"
+        basePath: /
+        paths:
+          /details:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                type: aws
+                uri: !Sub  "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
+
+                responses:
+                  "default":
+                    statusCode: '200'
+                    responseTemplates:
+                      application/json: |
+                        ##  See http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
+                        ##  This template will pass through the response received and frame corresponding xml structure.
+                        #set($inputRoot = $input.path('$'))
+                        #set($inputBody= $util.parseJson($inputRoot.body))
+                          <?xml version="1.0" encoding="UTF-8" standalone="yes"?>##
+                          <getPetDetails>##
+                          #set($details= $inputBody.petDetails)
+                          <response #foreach($key in $details.keySet()) $key="$util.escapeJavaScript($details.get($key))"#end/>##
+                          <category name="$inputBody.category.name"/>##
+                          #set($inputTags=$inputBody.tags)
+                          #if($inputTags.size()>0)
+                          <tags>##
+                          #foreach($elem in $inputTags)
+                          <tag name = "$elem.name">$util.escapeJavaScript($elem.value)</tag>##
+                          #end
+                          </tags>##
+                          #else
+                          <tags/>##
+                          #end
+                          </getPetDetails>
+              responses:
+                '200':
+                  description: >-
+                    The request has been handled and responded back successfully.
+                '404':
+                  description: The given URI doesn't exists
+                '412':
+                  description: >-
+                    There was an error in the request because the topic name doesn't
+                    exists
+                '500':
+                  description: An unexpected error occured
+        schemes:
+          - https
+        swagger: "2.0"
+      Name: MyApi
+      StageName: Prod
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  MyLambdaFunction: # Adds a GET api endpoint at "/details" to the MyApi via an Api event
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: MyLambdaFunction
+      Description: Lambda to be invoked by the API Gateway
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs18.x
+      Timeout: 3
+      MemorySize: 128
+      Events:
+        PetStore:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /details
+            Method: get
+            RestApiId:
+              Ref: MyApi
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+  MyApiRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: Logs
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:DescribeLogGroups'
+                  - 'logs:DescribeLogStreams'
+                  - 'logs:PutLogEvents'
+                  - 'logs:GetLogEvents'
+                  - 'logs:FilterLogEvents'
+                Resource: !GetAtt MyApiAccessLogs.Arn
+
+##########################################################################
+#   Cloudwatch Logs                                                      #
+##########################################################################
+
+  MyApiAccessLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: MyApi-Access-Logs
+      RetentionInDays: 1
+
+##########################################################################
+#   Outputs                                                              #
+##########################################################################
+Outputs:
+  MyApiEndpoint:
+    Description: "API endpoint"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com"
+
+  MyLambdaFunction:
+    Description: MyLambdaFunction name
+    Value: !Ref MyLambdaFunction

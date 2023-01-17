@@ -1,27 +1,25 @@
 use aws_lambda_events::event::sqs::SqsEvent;
 use futures::future::join_all;
-use lambda_runtime::{service_fn, Error, LambdaEvent};
+use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    // required to enable CloudWatch error logging by the runtime
     tracing_subscriber::fmt()
-        // this needs to be set to false, otherwise ANSI color codes will
-        // show up in a confusing manner in CloudWatch logs.
         .with_ansi(false)
-        // disabling time is handy because CloudWatch will add the ingestion time.
         .without_time()
+        .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
         .init();
 
-    lambda_runtime::run(service_fn(|event: LambdaEvent<SqsEvent>| execute(event))).await?;
-
-    Ok(())
+    run(service_fn(|event: LambdaEvent<SqsEvent>| {
+        function_handler(event)
+    }))
+    .await
 }
 
-pub async fn execute(event: LambdaEvent<SqsEvent>) -> Result<Value, Error> {
+pub async fn function_handler(event: LambdaEvent<SqsEvent>) -> Result<Value, Error> {
     println!("Input {:?}", event);
     let failed_message: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
     let mut tasks = Vec::with_capacity(event.payload.records.len());

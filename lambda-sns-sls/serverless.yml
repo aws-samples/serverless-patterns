@@ -4,23 +4,10 @@ frameworkVersion: "3"
 
 custom:
   topicName: "lambdasnssls"
-  topicArn:
-    {
-      "Fn::Join":
-        [
-          "",
-          [
-            "arn:aws:sns:${self:provider.region}:",
-            { "Ref": "AWS::AccountId" },
-            ":${self:custom.topicName}",
-          ],
-        ],
-    }
 
 provider:
   name: aws
-  runtime: python3.8
-  region: us-east-2
+  runtime: python3.9
   iam:
     role:
       statements:

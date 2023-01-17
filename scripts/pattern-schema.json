@@ -6,7 +6,7 @@
     "description": { "type": "string" },
     "language": {
       "type": "string",
-      "enum": ["TypeScript", "Node.js", "Python", "Java", ".Net", "C#", "Go", "Rust"]
+      "enum": ["TypeScript", "Node.js", "Python", "Java", "Go", "Rust", ".NET"]
     },
     "framework": {
       "type": "string",

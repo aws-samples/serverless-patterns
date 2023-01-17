@@ -231,3 +231,6 @@ terraform.rc
 #Ignore lock file
 .terraform.lock.hcl
 
+#Ignore Intellij files
+*.iml
+*.idea

@@ -1,7 +1,7 @@
 {
   "title": "CloudFront to S3 - Static Website",
   "description": "Creates CloudFront Distributions to server the static site from S3.",
-  "language": ".Net",
+  "language": ".NET",
   "level": "200",
   "framework": "CDK",
   "introBox": {

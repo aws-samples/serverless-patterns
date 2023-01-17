@@ -1,4 +1,4 @@
-# AWS Lambda to AWS S3
+# AWS Lambda to Amazon S3
 
 This SAM template creates a Lambda function that writes to an S3 bucket when invoked.
 

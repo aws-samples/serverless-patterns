@@ -1,6 +1,6 @@
 # AWS API Gateway to Amazon EventBridge
 
-This pattern deploys an API Gateway HTTP API with a custom domain configuration and permissions to publish HTTP requests as an events to EventBridge.
+This pattern deploys an API Gateway HTTP API with a custom domain configuration and permissions to publish HTTP requests as events to EventBridge.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigateway-http-eventbridge-custom](https://serverlessland.com/patterns/apigateway-http-eventbridge-custom)
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigateway-eventbridge
+    cd apigw-eventbridge
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -55,11 +55,11 @@ Simply specify any `source` and `detailType` as a path parameters. The `body` of
 | AWS::ApiGatewayV2::Route | HttpApiRoute |
 | AWS::CloudFormation::Stack1 | apigw2eb-[STAGE] |
 
-When you send a HTTP POST request the API Gateway publishes an event to the custom event bus in EventBridge.
+When you send an HTTP POST request, the API Gateway publishes an event to the custom event bus in EventBridge.
 
 ## Testing
 
-Use your preffered terminal to send a http request.
+Use your preferred terminal to send a http request.
 
 ```bash
 curl --location --request POST 'https://dev-events.example.com/apigw2eb/mysource/mydetailtype' \

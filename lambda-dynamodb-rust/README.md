@@ -1,4 +1,4 @@
-# AWS Lambda To Amazon DynamoDB - Persist Data to DynamoDB table from a Lambda function
+# AWS Lambda To Amazon DynamoDB
 
 The SAM template deploys a Lambda function, a DynamoDB table and the minimum IAM resources required to run the application. 
 

@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template to connect DynamoDB Stream to AWS SNS
+
+
+Parameters:
+  Email:
+    Description: Email for SNS Subscription
+    Type: String
+  NationalTeam:
+    Description: National Team Name
+    Type: String
+    Default: Argentina
+
+
+Resources:
+  # DynamoDB Table Creation with Stream Enabled
+  DynamoDBWCTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: WorldCupTable
+      AttributeDefinitions:
+        - AttributeName: PlayerName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PlayerName
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES    
+
+  # AWS SNS for Target
+  MySNSTopicArn:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+      - Endpoint: !Ref Email
+        Protocol: email
+
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: SourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:DescribeStream"
+                  - "dynamodb:GetRecords"
+                  - "dynamodb:GetShardIterator"
+                  - "dynamodb:ListStreams"
+                Resource: !GetAtt DynamoDBWCTable.StreamArn
+        - PolicyName: TargetPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                 - "sns:Publish"
+                Resource: !Ref MySNSTopicArn
+           
+  Pipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: ddb-to-eventbridge
+      Description: "Pipe to connect DynamoDB Stream to AWS SNS"
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt DynamoDBWCTable.StreamArn
+      SourceParameters:
+        FilterCriteria:
+          Filters:
+            - Pattern: !Sub '{"dynamodb": {"NewImage": {"Nationality": {"S": [{"prefix": "${NationalTeam}"}]}}}}'
+        DynamoDBStreamParameters:
+          StartingPosition: LATEST
+          BatchSize: 1
+      Target: !Ref MySNSTopicArn

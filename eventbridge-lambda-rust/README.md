@@ -46,6 +46,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
+This template deploys a Lambda function that is triggered by an EventBridge rule. In this example, the rule filters for specific attributes in the event before invoking the function.
+
 ## Example event payload from EventBridge to Lambda
 ```
 {
@@ -67,7 +69,7 @@ Important: this application uses various AWS services and there are costs associ
 
 The AWS SAM template deploys the resources and the IAM permissions required to run the application.
 
-The EventBridge rule specified in `template.yaml` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see above) to the Lambda function.
+The EventBridge rule specified in `template.yml` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see above) to the Lambda function.
 
 ## Testing
 

@@ -1,0 +1,233 @@
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless pattern API Gateway to EventBridge
+
+Globals:
+  Function:
+    Runtime: nodejs16.x
+    Architectures: ["arm64"]
+    Timeout: 29
+    MemorySize: 1024
+    Environment:
+      Variables:
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+Resources:
+# ##########################################################
+# BUS                                                      #
+# ##########################################################
+  MyBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub ${AWS::StackName}-bus
+
+###########################################################################
+#   API GATEWAY ROLE WITH PERMISSIONS TO PUT EVENTS   #
+##########################################################################
+  ApiGatewayEventBridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: !Join ["", ["/", !Ref "AWS::StackName", "/"]]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowApiGatewayServiceToAssumeRole
+            Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: EBPutEvents
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:PutEvents'
+                Resource:
+                  - !GetAtt  MyBus.Arn
+
+##########################################################################
+#   REST API GATEWAY                                                     #
+##########################################################################
+  CloudWatchRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub ${AWS::StackName}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
+      ManagedPolicyArns:
+        - >-
+          arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+
+  ApiGwAccount:
+    Type: 'AWS::ApiGateway::Account'
+    Properties:
+      CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
+
+  ApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${AWS::StackName}
+        - ResourceName: Api
+      StageName: Prod
+      DefinitionBody:
+        openapi: '3.0'
+        info: {}
+        paths:
+          /:
+            post:
+              responses:
+                "200":
+                  description: "200 response"
+                  content:
+                    application/json:
+                      schema:
+                        $ref: "#/components/schemas/Empty"
+              x-amazon-apigateway-integration:
+                type: "aws"
+                uri:
+                  Fn::Sub: "arn:aws:apigateway:${AWS::Region}:events:action/PutEvents"
+                credentials: !GetAtt  ApiGatewayEventBridgeRole.Arn
+                httpMethod: "POST"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: !Sub 
+                    - |- 
+                      #set($context.requestOverride.header.X-Amz-Target = "AWSEvents.PutEvents")
+                      #set($context.requestOverride.header.Content-Type = "application/x-amz-json-1.1")
+                      #set($inputRoot = $input.path('$'))
+                      {
+                          "Entries": [
+                              {
+                                  "Detail": "{ \"data\": {\"IsHelloWorldExample\": \"$inputRoot.Detail.IsHelloWorldExample\"},\"metadata\": {\"requestId\": \"$context.requestId\",\"requestTimeEpoch\": \"$context.requestTimeEpoch\"}}",
+                                  "DetailType": "$inputRoot.DetailType",
+                                  "EventBusName": "${EventBusName}",
+                                  "Source": "$inputRoot.Source"
+                              }
+                          ]
+                      }
+                    - { EventBusName: !Ref MyBus }
+                passthroughBehavior: "when_no_templates"
+        components:
+          schemas:
+            Empty:
+              title: "Empty Schema"
+              type: "object"
+      AccessLogSetting: # Enable access logging with Amazon CloudWatch
+        DestinationArn: !GetAtt ApiLogGroup.Arn
+        Format: >
+          {"requestId":"$context.requestId",
+          "integration-error":"$context.integration.error",
+          "integration-status":"$context.integration.status",
+          "integration-latency":"$context.integration.latency",
+          "integration-requestId":"$context.integration.requestId",
+          "integration-integrationStatus":"$context.integration.integrationStatus",
+          "response-latency":"$context.responseLatency",
+          "status":"$context.status"}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+
+##########################################################################
+#   SQS                                                                  #
+##########################################################################
+  Queue:
+    Type: AWS::SQS::Queue
+
+  # Define the event rule to filter for events
+  QueueRule: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "SQSEventRule"
+      EventBusName: !Ref MyBus
+      EventPattern: 
+        account: 
+          - !Sub '${AWS::AccountId}'
+        source:
+          - "demo.event"
+        detail-type:
+          - POSTED
+      Targets: 
+        - Arn: !GetAtt Queue.Arn
+          Id: "Queue"
+
+  # Allow EventBridge to invoke SQS
+  EventBridgeToToQeuPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: events.amazonaws.com
+          Action: SQS:SendMessage
+          Resource: !GetAtt Queue.Arn
+      Queues:
+        - !Ref Queue
+
+  Queue1:
+    Type: AWS::SQS::Queue
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  LambdaFuncton:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: LambdaFuncton
+      CodeUri: src
+      Handler: handler.handler
+      Tracing: Active
+      Events:
+        Queue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt Queue.Arn
+            BatchSize: 10
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        External: 
+          - aws-sdk
+        Minify: true
+        Target: "es2020"
+        Sourcemap: false
+        EntryPoints: 
+          - handler.ts
+
+  LambdaFunctonLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+      LogGroupName: !Sub /aws/lambda/${LambdaFuncton}
+
+
+##########################################################################
+#   OUTPUTS                                                              #
+##########################################################################
+Outputs:
+  ApiURL:
+    Description: API Endpoint
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+
+  LambdaFuncton:
+    Value: !Ref LambdaFuncton
+    Description: Lambda Function Name
