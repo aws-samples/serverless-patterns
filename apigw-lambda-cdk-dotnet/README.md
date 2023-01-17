@@ -29,24 +29,24 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd apigw-lambda-cdk-dotnet/src/cdk/src
     ```
-3. Build appliction
+3. Build the application
     ```
     dotnet build
     ```
-4. Go one level back to this path `apigw-lambda-cdk-dotnet/src/cdk`
+4. Return one level back to the path `apigw-lambda-cdk-dotnet/src/cdk`
     ```
     cd..
     ```
-5. Deploy the stack to your default AWS account and region. The output of this command should give you the HTTP API URL.
+5. Deploy the stack to your default AWS account and region. The output of this command should give you the REST API URL.
     ```
     cdk deploy
     ```
 
 ## Testing
 
-1. After deployment, the output shows the API Gateway URL with the Lambda integration, for example: `ServerlessLandApi.ServerlessLandEndpointC36EEEC4 = https://<random-id>.execute-api.us-east-1.amazonaws.com/prod/`
-2. Copy this URL and append `WatherForecast`, the URL will become like `https://<random-id>.execute-api.us-east-1.amazonaws.com/prod/WatherForecast`
-3. Hit this URL in the browser, you should get JSON response about weather information.
+1. After deployment, the output shows the API Gateway URL with the Lambda integration, for example: `CdkStack.RESTAPIUrl = https://<random-id>.execute-api.ap-south-1.amazonaws.com/prod/`
+2. Copy this URL and append `WeatherForecast`, the URL will look like this: `https://<random-id>.execute-api.ap-south-1.amazonaws.com/prod/WeatherForecast`
+3. Enter this URL into your browser, you should receive a JSON response with weather information.
 
 ## Cleanup
 Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
