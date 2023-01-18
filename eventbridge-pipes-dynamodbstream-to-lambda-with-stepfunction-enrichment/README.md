@@ -31,7 +31,7 @@ Important: this application uses various AWS services and there are costs associ
     sam deploy --guided
     ```
 1. During the prompts:
-    * Enter a stack name: eg. eventbridge-pipes-dynamodbstream-to-lambda-with-stepfunction-enrichment
+    * Enter a stack name: eg. eventbridge-pipes-ddb-lambda-sfn-enrich
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
@@ -63,7 +63,7 @@ aws dynamodb put-item \
 To check logs if the payload has been logged, you can use the below command
 
 ```bash
-sam logs -n <lambda_function_name> --stack-name <stack_name> --tail
+sam logs --stack-name <stack_name> --tail
 ```
 
 This will help to monitor the lambda function logs and will wait for new logs and you can see them as they arrive from the terminal. 
