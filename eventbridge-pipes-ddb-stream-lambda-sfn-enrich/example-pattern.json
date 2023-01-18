@@ -12,9 +12,9 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-dynamodbstream-to-lambda-with-stepfunction-enrichment",
-      "templateURL": "serverless-patterns/eventbridge-pipes-dynamodbstream-to-lambda-with-stepfunction-enrichment",
-      "projectFolder": "eventbridge-pipes-dynamodbstream-to-lambda-with-stepfunction-enrichment",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-ddb-stream-lambda-sfn-enrich",
+      "templateURL": "serverless-patterns/eventbridge-pipes-ddb-stream-lambda-sfn-enrich",
+      "projectFolder": "eventbridge-pipes-ddb-stream-lambda-sfn-enrich",
       "templateFile": "template.yaml"
     }
   },
