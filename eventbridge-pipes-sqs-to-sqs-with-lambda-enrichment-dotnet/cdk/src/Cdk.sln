@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cdk", "Cdk\Cdk.csproj", "{166A925A-D4D5-463D-9E09-7DEEDCD0212D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnrichmentHandler", "..\code\src\EnrichmentHandler\EnrichmentHandler.csproj", "{D46743D9-F0A9-4A5B-8BFB-641EC4FD5E43}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnrichmentHandler", "code\EnrichmentHandler\EnrichmentHandler.csproj", "{D46743D9-F0A9-4A5B-8BFB-641EC4FD5E43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

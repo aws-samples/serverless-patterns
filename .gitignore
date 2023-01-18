@@ -78,6 +78,7 @@ typings/
 
 # dotenv environment variables file
 .env
+output.zip
 
 
 ### OSX ###
