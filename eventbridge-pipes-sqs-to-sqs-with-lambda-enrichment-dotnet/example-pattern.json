@@ -1,18 +1,18 @@
 {
-  "title": "SQS to Step Function Workflow using EventBridge Pipes",
-  "description": "This pattern uses SQS and triggers a Step Function workflow directly with optional filtering supported.",
+  "title": "SQS to SQS with EventBridge Pipes and Lambda Enrichment",
+  "description": "This pattern demonstrates sending SQS messages to another SQS queue with a Lambda function to enrich the data.",
   "language": ".NET",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
-    "text": ["SQS queue is polled and a Step Functions workflow execution is started for each batch of messages."]
+    "text": ["SQS queue is polled, the Lambda enricher is invoked and the response of the Lambda function is passed to SQS."]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-step-functions-cdk-dotnet",
-      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-step-functions-cdk-dotnet",
-      "projectFolder": "eventbridge-pipes-sqs-to-step-functions-cdk-dotnet",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-sqs-with-lambda-enrichment-dotnet",
+      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-sqs-with-lambda-enrichment-dotnet",
+      "projectFolder": "eventbridge-pipes-sqs-to-sqs-with-lambda-enrichment-dotnet",
       "templateFile": "cdk/src/Cdk/CdkStack.cs"
     }
   },
