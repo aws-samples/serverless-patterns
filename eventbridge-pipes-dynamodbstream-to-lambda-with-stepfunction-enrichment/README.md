@@ -60,6 +60,14 @@ aws dynamodb put-item \
     --item PK={S="Message#1234"},SK={S="Channel#1231"},messageId={S="3"}
 ```
 
+To check logs if the payload has been logged, you can use the below command
+
+```bash
+sam logs -n <lambda_function_name> --stack-name <stack_name> --tail
+```
+
+This will help to monitor the lambda function logs and will wait for new logs and you can see them as they arrive from the terminal. 
+
 ## Cleanup
  
 1. Delete the stack
@@ -68,6 +76,6 @@ aws dynamodb put-item \
     ```
 
 ----
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
