@@ -1,23 +1,24 @@
-use lambda_http::{
-    handler,
-    lambda_runtime::{self, Context, Error},
-    IntoResponse, Request, RequestExt,
-};
+use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    lambda_runtime::run(handler(|event: Request, ctx: Context| execute(event, ctx))).await?;
-    Ok(())
+    tracing_subscriber::fmt()
+        .with_ansi(false)
+        .without_time()
+        .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
+        .init();
+
+    run(service_fn(|event: Request| function_handler(event))).await
 }
 
-pub async fn execute(event: Request, _ctx: Context) -> Result<impl IntoResponse, Error> {
+pub async fn function_handler(event: Request) -> Result<impl IntoResponse, Error> {
     println!("EVENT {:?}", event);
 
     Ok(format!(
         "hello {}",
-        event  // access information provided directly from the underlying trigger events using the RequestExt trait
+        event
             .query_string_parameters()
-            .get("name")
+            .first("name")
             .unwrap_or_else(|| "stranger")
     ))
 }
