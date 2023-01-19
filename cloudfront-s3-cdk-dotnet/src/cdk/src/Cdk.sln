@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cdk", "Cdk\Cdk.csproj", "{DD4AA2DB-0267-458A-A000-1D3F0789F851}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Debug|x64.Build.0 = Debug|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Debug|x86.Build.0 = Debug|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Release|x64.ActiveCfg = Release|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Release|x64.Build.0 = Release|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Release|x86.ActiveCfg = Release|Any CPU
+		{DD4AA2DB-0267-458A-A000-1D3F0789F851}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8ADB515A-CEA3-43A6-AB67-5BB109D1D893}
+	EndGlobalSection
+EndGlobal
