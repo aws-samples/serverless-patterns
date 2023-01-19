@@ -41,11 +41,24 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-1. After deployment, the output displays two URLs, one signed and one normal.
-   - `CloudFrontToS3CdkStack.PDFFileSignedURL = https://d1vdgbnd2t5hch.cloudfront.net/sample.pdf?Policy=eyJTdGF......`
-   - `CloudFrontToS3CdkStack.PDFFileURL = https://d1vdgbnd2t5hch.cloudfront.net/sample.pdf`
-2. Try to access the resource `sample.pdf` using both URLs.
-3. It should only be accessible via the signed URL.
+1. After deployment, the output displays the following values.
+   - Resource URL: `CloudFrontToS3CdkStack.RESOURCEURL = https://d1vdgbnd2t5hch.cloudfront.net/sample.pdf`
+   - Public Key Id: `CloudFrontToS3CdkStack.CLOUDFRONTPUBLICKEYID = K2UQHVS54O0BAQ`
+   - Private Key: `CloudFrontToS3CdkStack.PRIVATEKEY = <private-key-text>`
+2. The PDF resource should only be accessible via the signed URL.
+3. Use the following function to generate a signed URL and then use that URL to access the PDF resource. 
+    ```cs
+    string GenerateCloudFrontSignedURL(string resourceUrl, string publicKeyId, string privateKey)
+    {
+        string policyDoc = AmazonCloudFrontUrlSigner.BuildPolicyForSignedUrl(
+            resourceUrl,
+            DateTime.Now.AddDays(+1),
+            null);
+
+        return AmazonCloudFrontUrlSigner.SignUrl(resourceUrl, publicKeyId, new StringReader(privateKey), policyDoc);
+    }
+    ```
+4. The above code requires `AWSSDK.CloudFront` NuGet package.
 
 
 ## Cleanup
