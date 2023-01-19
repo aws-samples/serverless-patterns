@@ -84,25 +84,12 @@ namespace Cdk
             });
 
 
-            // OUTPUT FILE URLs
-
+            // PRINT OUTPUT
             string pdfFileUrl = $"https://{distribution.DistributionDomainName}/sample.pdf";
-            string pdfFileSignedUrl = GenerateCloudFrontSignedURL(pdfFileUrl, publicKeyConstruct.PublicKeyId, publicPrivateKeyPEM);
 
-            new CfnOutput(this, "PDF_File_URL", new CfnOutputProps { Value = pdfFileUrl });
-            new CfnOutput(this, "PDF_File_Signed_URL", new CfnOutputProps { Value = pdfFileSignedUrl });
-        }
-
-
-
-        private string GenerateCloudFrontSignedURL(string resourceUrl, string publicKeyId, string privateKey)
-        {
-            string policyDoc = Amazon.CloudFront.AmazonCloudFrontUrlSigner.BuildPolicyForSignedUrl(
-                resourceUrl,
-                DateTime.Now.AddDays(+1),
-                null);
-
-            return Amazon.CloudFront.AmazonCloudFrontUrlSigner.SignUrl(resourceUrl, publicKeyId, new StringReader(privateKey), policyDoc);
+            new CfnOutput(this, "RESOURCE_URL", new CfnOutputProps { Value = pdfFileUrl });
+            new CfnOutput(this, "CLOUDFRONT_PUBLIC_KEY_ID", new CfnOutputProps { Value = publicKeyConstruct.PublicKeyId });
+            new CfnOutput(this, "PRIVATE_KEY", new CfnOutputProps { Value = publicPrivateKeyPEM });
         }
     }
 }
