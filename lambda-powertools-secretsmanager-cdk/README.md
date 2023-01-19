@@ -19,7 +19,7 @@ This pattern creates an AWS Lambda function to call a protected API endpoint. It
     ```
 1. Change directory to the pattern directory:
     ```
-    cd lambda-powertools-secretsmanager-cdk
+    cd serverless-patterns/lambda-powertools-secretsmanager-cdk
     ```
 1. Create a virtual environment for Python:
     ```
