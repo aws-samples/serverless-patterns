@@ -44,7 +44,17 @@
   "authors": [
     {
       "name": "Luke Viens",
-      "bio": "Cloud application developer at AWS.",
+      "image": ""
+      "bio": "Cloud application developer at AWS."
+      "linkedin": "",
+      "twitter": ""
+    },
+    {
+      "name": "Sakthivel Chellapparimanam",
+      "image": "",
+      "bio": "AWS - Cloud Application Architect",
+      "linkedin": "https://www.linkedin.com/in/srcsakthivel",
+      "twitter": "@srcsakthivel"
     }
   ]
 }
