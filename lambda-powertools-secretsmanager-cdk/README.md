@@ -40,6 +40,7 @@ This pattern creates an AWS Lambda function to call a protected API endpoint. It
     ```
 1. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the app.py file:
     ```
+    cdk synth
     cdk deploy --all
     ```
 1. Note the outputs from the CDK deployment process. This will contain the deployed lambda function URL.
