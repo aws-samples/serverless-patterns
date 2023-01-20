@@ -39,14 +39,16 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern deploys an Amazon API Gateway REST API and a default route integrated with an AWS Lambda function written in Python. The lambda function calls AWS Translate service using the text and language given in the request body and returns the translated text or error response if the language code is not supported.
+This pattern deploys an Amazon API Gateway REST API and a default route integrated with an AWS LAMBDA function written in Python. The lambda function calls AWS Translate service using the text and language given in the request body and returns the translated text or error response if the language code is not supported.
 
 ## Testing
 
 Once the application is deployed, either use a curl or call the endpoint from Postman.
 
 Example POST Request to translate text to Spanish:
+```
     curl -X POST "https://{api-gateway-endpoint}/prod"  -H 'Content-Type: application/json' -d '{"OriginalText":"Hello, my name is AWS","TranslateToLanguage":"es"}'
+```
 
 Response:
 ```
@@ -54,7 +56,9 @@ Response:
 ```
 
 Example POST Request to translate text to Afrikaans:
+```
     curl -X POST "https://{api-gateway-endpoint}/prod"  -H 'Content-Type: application/json' -d '{"OriginalText":"Hello, my name is AWS","TranslateToLanguage":"af"}'
+```
 
 Response:
 ```
@@ -62,7 +66,9 @@ Response:
 ```
 
 Example POST Request with unsupported language:
+```
     curl -X POST "https://{api-gateway-endpoint}/prod"  -H 'Content-Type: application/json' -d '{"OriginalText":"Hello, my name is AWS","TranslateToLanguage":"ef"}'
+```
 
 Response:
 ```
@@ -80,16 +86,12 @@ Response:
 
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 
 This pattern was contributed by Sudheer Yalamanchili.
 
 ----
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
