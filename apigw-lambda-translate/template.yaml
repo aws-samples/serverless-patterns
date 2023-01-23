@@ -6,7 +6,7 @@ Resources:
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: ApiGatewayApi
+      Name: apigw-translate
       StageName: prod
       EndpointConfiguration:
         Type: REGIONAL
@@ -14,7 +14,7 @@ Resources:
   ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: apigw-translate
+      FunctionName: lambda-translate
       Runtime: python3.9
       Handler: index.lambda_handler
       CodeUri: src/
@@ -30,7 +30,7 @@ Resources:
             RestApiId:
               Ref: ApiGatewayApi
 
-    Outputs:
-      RestApiEndpoint:
-        Description: "The endpoint for the REST API Gateway"
-        Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+Outputs:
+  RestApiEndpoint:
+    Description: "The endpoint for the REST API Gateway"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
