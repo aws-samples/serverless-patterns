@@ -1,6 +1,6 @@
 .eslintrc.js
 !jest.config.js
-!lib/mappings/*.js
+!lib/**/*.js
 *.d.ts
 node_modules
 
