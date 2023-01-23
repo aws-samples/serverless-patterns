@@ -1,0 +1,9 @@
+.eslintrc.js
+!jest.config.js
+!lib/mappings/*.js
+*.d.ts
+node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
