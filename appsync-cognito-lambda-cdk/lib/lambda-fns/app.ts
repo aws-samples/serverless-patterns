@@ -1,20 +1,18 @@
 type AppSyncEvent = {
-  info: {
-    fieldName: string;
-  };
-  arguments: {
-    input: {
-      username: string;
-      email: string;
-      profilePicUrl: string;
-    };
-  };
-};
+	info: {
+		fieldName: string
+	}
+	arguments: {
+		id: string
+	}
+}
 
 exports.handler = async (event: AppSyncEvent) => {
-  console.log(JSON.stringify(event));
-  return {
-    id: "324987234",
-    ...event.arguments.input,
-  };
-};
+	console.log(JSON.stringify(event))
+	return {
+		id: event.arguments.id,
+		email: 'test@sample.com',
+		profilePicUrl: 'https://catpic.com',
+		username: 'Serverless Cat',
+	}
+}
