@@ -1,6 +1,6 @@
 # Authenticating an AppSync API using Amazon Cognito
 
-This CDK template deploys an AWS AppSync Api and a Cognito Userpool.
+This CDK template deploys an AWS AppSync API and a Cognito userpool.
 You'll need to create a user in Cognito before being able to have authorized access to the api.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cognito-appsync-lambda-cdk
@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+- [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/api/v2/) (AWS CDK) installed
 
 ## Deployment Instructions
 
@@ -33,7 +33,7 @@ env: { account: "13xxxxxxxxxx", region: "us-east-2" },
 5. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `./cognito-appsync-lambda-cdk/lib/cognito-auth-cdk-stack.ts` file:
 
    ```bash
-   cdk deploy
+   npx aws-cdk deploy
    ```
 
 ## Testing
@@ -41,16 +41,12 @@ env: { account: "13xxxxxxxxxx", region: "us-east-2" },
 Sign in to your AWS console and search for appsync. Open up appsync and click on your newly deployed project.
 
 - On the left hand side menu, click on `Settings` and create a new `API_KEY`.
-- Click on `Queries` on the left hand side menu to create and run your mutation.
+- Click on `Queries` on the left hand side menu to create and run the `getUserAccount` query.
 
-- Create your first mutation. See image below.
-  ![alt text](./assets/mutation_non_auth.png)
+- You should get an `unauthorized access` error.
 
-- Run the mutation and you should get an `unauthorized access` error. See image below
-  ![alt text](./assets/mutation_non_auth_1.png)
-
-This occurs because we applied the appsync directive `@aws_cognito_user_pools` to the mutation endpoint in `schema.graphql`.
-That appsync directive ensures that, that mutation can only be accessed by authenticated cognito users.
+This occurs because we applied the appsync directive `@aws_cognito_user_pools` to the Query endpoint in `schema.graphql`.
+That appsync directive ensures that, that query can only be accessed by authenticated cognito users.
 
 So let's go ahead and create a new user in cognito. See screenshots.
 
@@ -63,7 +59,7 @@ So let's go ahead and create a new user in cognito. See screenshots.
   ![alt text](./assets/cognito_3.png)
   ![alt text](./assets/cognito_4.png)
 
-Once user has been created, go back to your project in appsync, click on `API_KEY` and select your `Amazon cognito user pool`.
+Once user has been created, go back to your project in appsync, click on `Login with User Pools`
 
 Sign in with the credentials you used when creating the user in cognito.
 ![alt text](./assets/cognito_5.png)
@@ -71,21 +67,13 @@ Sign in with the credentials you used when creating the user in cognito.
 You'll be prompted to create a new password for the user
 ![alt text](./assets/cognito_6.png)
 
-Once you've successfully logged in, run your mutation again, and you should get a successful output similar to this screenshot.
-![alt text](./assets/cognito_7.png)
+Once you've successfully logged in, run your query again, and you should successfully get a response.
 
 Congratulations, you've successfully created and tested an authenticated appsync api.
 
 ## Cleanup
 
-1. Delete the stack
-   ```bash
-   aws cloudformation delete-stack --stack-name STACK_NAME
-   ```
-1. Confirm the stack has been deleted
-   ```bash
-   aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-   ```
+run the command `npx aws-cdk destory` from your local terminal.
 
 ---
 
