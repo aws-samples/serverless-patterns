@@ -4,7 +4,7 @@
 node_modules
 codegen
 !graphql/**/*
-
+graphql/codegen
 # CDK asset staging directory
 .cdk.staging
 cdk.out
