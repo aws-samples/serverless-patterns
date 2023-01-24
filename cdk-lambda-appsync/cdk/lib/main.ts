@@ -60,7 +60,7 @@ export class MainStack extends Stack {
 		})
 
 		const lambda = new NodejsFunction(this, 'trigger', {
-			runtime: Runtime.NODEJS_18_X,
+			runtime: Runtime.NODEJS_16_X,
 			bundling: {
 				target: 'es2020',
 
