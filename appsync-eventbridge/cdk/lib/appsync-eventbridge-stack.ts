@@ -4,13 +4,12 @@ import {
 	GraphqlApi,
 	SchemaFile,
 	FieldLogLevel,
-	MappingTemplate,
 	AppsyncFunction,
 	Code,
 	FunctionRuntime,
 	Resolver,
 } from 'aws-cdk-lib/aws-appsync'
-import { Role, ServicePrincipal, PolicyStatement } from 'aws-cdk-lib/aws-iam'
+
 import { EventBus } from 'aws-cdk-lib/aws-events'
 import { join } from 'path'
 
