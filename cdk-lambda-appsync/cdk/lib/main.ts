@@ -3,7 +3,6 @@ import { Construct } from 'constructs'
 import {
 	GraphqlApi,
 	SchemaFile,
-	MappingTemplate,
 	AuthorizationType,
 	AppsyncFunction,
 	Code,
@@ -12,6 +11,7 @@ import {
 } from 'aws-cdk-lib/aws-appsync'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { join } from 'path'
+import { Runtime } from 'aws-cdk-lib/aws-lambda'
 
 export class MainStack extends Stack {
 	constructor(scope: Construct, id: string, props?: StackProps) {
@@ -60,8 +60,10 @@ export class MainStack extends Stack {
 		})
 
 		const lambda = new NodejsFunction(this, 'trigger', {
+			runtime: Runtime.NODEJS_18_X,
 			bundling: {
-				target: 'es2022',
+				target: 'es2020',
+
 				commandHooks: {
 					beforeInstall: (inputDir: string, outputDir: string) => [],
 					beforeBundling: (inputDir: string, outputDir: string) => [
