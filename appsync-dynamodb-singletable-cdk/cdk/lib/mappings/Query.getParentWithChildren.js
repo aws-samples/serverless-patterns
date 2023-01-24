@@ -15,9 +15,9 @@ export function request(ctx) {
 
 export function response(ctx) {
 	const children = []
+	let PK, SK, data, type
 
-	for (item of ctx.result.items) {
-		let PK, SK, data, type
+	for (let item of ctx.result.items) {
 		if (item.type === 'parent') {
 			PK = item['PK']
 			SK = item['SK']
