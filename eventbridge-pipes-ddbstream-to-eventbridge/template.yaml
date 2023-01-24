@@ -76,7 +76,7 @@ Resources:
       SourceParameters:
         DynamoDBStreamParameters:
           StartingPosition: LATEST
-          BatchSize: 1
+          BatchSize: 10
           DeadLetterConfig:
             Arn: !GetAtt PipeDLQueue.Arn
       Target: !GetAtt ApplicationEventBus.Arn
