@@ -1,5 +1,5 @@
-import { createTodo } from './codegen/graphql/mutations'
-import { CreateTodoMutationVariables } from './codegen/graphql/API'
+import { createTodo } from '../graphql/codegen/graphql/mutations'
+import { CreateTodoMutationVariables } from '../graphql/codegen/graphql/API'
 import request from './appsyncRequest'
 
 const appsyncURL = process.env.GRAPHQL_URL!
