@@ -67,7 +67,7 @@ export class MainStack extends Stack {
 				commandHooks: {
 					beforeInstall: (inputDir: string, outputDir: string) => [],
 					beforeBundling: (inputDir: string, outputDir: string) => [
-						`cd lib`,
+						`cd graphql`,
 						`amplify codegen`,
 					],
 					afterBundling: (inputDir: string, outputDir: string) => [],
