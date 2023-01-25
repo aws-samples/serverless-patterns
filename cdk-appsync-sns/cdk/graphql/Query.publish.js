@@ -1,12 +1,15 @@
 import { util } from '@aws-appsync/utils'
 
 export function request(ctx) {
+	console.log('the context', ctx)
 	const topicArn = util.urlEncode(ctx.prev.result.TOPIC_ARN)
+	console.log('the topic arn encoded', topicArn)
 	let body = `Action=Publish&Version=2010-03-31&TopicArn=${topicArn}`
 	const obj = ctx.args
 	const message = util.urlEncode(JSON.stringify(obj))
 	body = `${body}&Message=${message}`
 
+	console.log('the actual body', body)
 	return {
 		version: '2018-05-29',
 		method: 'POST',
@@ -26,6 +29,6 @@ export function response(ctx) {
 		// the result body as a map and only get the User object.
 		return util.xml.toMap(ctx.result.body).PublishResponse.PublishResult
 	} else {
-		util.appendError(ctx.result.body, '$ctx.result.statusCode')
+		util.appendError(ctx.result.body, ctx.result.statusCode)
 	}
 }

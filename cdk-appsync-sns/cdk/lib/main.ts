@@ -35,7 +35,7 @@ export class CdkAppSyncSnSStack extends Stack {
 		const myJsFunction = new appsync.AppsyncFunction(this, 'function', {
 			name: 'my_js_function',
 			api,
-			dataSource: api.addNoneDataSource('none'),
+			dataSource: datasource,
 			code: appsync.Code.fromAsset(
 				join(__dirname, '../graphql/Query.publish.js')
 			),
