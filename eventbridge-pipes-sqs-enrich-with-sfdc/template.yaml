@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template to enrich Amazon EventBridge Pipes data using API destinations
+Parameters:
+  SalesforceOauthUrl:
+    Type: String
+    Description: 'Salesforce Url for OAuth authentication. e.g: https://MyDomainNameSandboxName.my.salesforce.com/services/oauth2/token'
+  SFEndpointUrl:
+    Type: String
+    Description: 'Salesforce Endpoint Url for enriching pipe data.'
+  SalesforceOauthClientId:
+    Type: String
+    Description: 'Salesforce Integration Application Client ID'
+    MinLength: 1
+    MaxLength: 256
+  SalesforceOauthClientSecret:
+    Type: String
+    Description: 'Salesforce Integration Application Client Secret'
+    MinLength: 1
+    MaxLength: 256
+  SalesforceUsername:
+    Type: String
+    Description: 'Username of Salesforce integration User'
+    MinLength: 1
+    MaxLength: 128
+  SalesforcePassword:
+    Type: String
+    Description: 'Password of Salesforce integration User concatenated with security token'
+    MinLength: 1
+    MaxLength: 128
+
+Resources:
+  #Source SQS
+  SourceQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt SourceQueueDLQ.Arn
+        maxReceiveCount: 5
+  #DLQ for source
+  SourceQueueDLQ:
+    Type: AWS::SQS::Queue
+  #Logs as Target
+  TargetCWLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+      LogGroupName: sqs-pipes-api-logs
+  # Role for EventBridge Pipes to read from SQS and call pipe to enrich data with API and send to Cloudwatch logs
+  EventBridgePipesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: !GetAtt TargetCWLogGroup.Arn
+        - PolicyName: ReadSQS
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource: !GetAtt SourceQueue.Arn
+        - PolicyName: InvokeApiDest
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:InvokeApiDestination'
+                Resource: !GetAtt SalesforceDestination.Arn
+  # Pipes definition
+  SqsToApiDestination:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: 'SqsToApiDestination'
+      RoleArn: !GetAtt EventBridgePipesRole.Arn
+      Source: !GetAtt SourceQueue.Arn
+      SourceParameters:
+        SqsQueueParameters:
+          BatchSize: 1
+      Enrichment: !GetAtt SalesforceDestination.Arn
+      EnrichmentParameters:
+        HttpParameters:
+          PathParameterValues:
+            - $.body.accountId
+      Target: !GetAtt TargetCWLogGroup.Arn
+      
+  # Establishing Connection to Salesforce Account
+  SalesforceConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      Description: 'My connection with Salesforce through OAuth'
+      AuthorizationType: OAUTH_CLIENT_CREDENTIALS
+      AuthParameters:
+        OAuthParameters:
+          AuthorizationEndpoint: !Ref SalesforceOauthUrl
+          ClientParameters:
+            ClientID: !Ref SalesforceOauthClientId
+            ClientSecret: !Ref SalesforceOauthClientSecret
+          HttpMethod: POST
+          OAuthHttpParameters:
+            BodyParameters:
+              - Key: 'grant_type'
+                Value: 'password'
+                IsValueSecret: 'false'
+              - Key: 'username'
+                Value: !Ref SalesforceUsername
+                IsValueSecret: 'true'
+              - Key: 'password'
+                Value: !Ref SalesforcePassword
+                IsValueSecret: 'true'
+  # API Destination to SalesForce
+  SalesforceDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'SalesforceAPIDestination'
+      ConnectionArn:
+        Fn::GetAtt: [ SalesforceConnection, Arn ]
+      InvocationEndpoint: !Ref SFEndpointUrl
+      HttpMethod: GET
+      InvocationRateLimitPerSecond: 10
+Outputs:
+  SourceQueueUrl:
+    Description: 'Source SQS Queue URL'
+    Value: !Ref  SourceQueue
+  TargetCWLogGroup:
+    Description: 'Target Log Group Name'
+    Value: !Ref TargetCWLogGroup
