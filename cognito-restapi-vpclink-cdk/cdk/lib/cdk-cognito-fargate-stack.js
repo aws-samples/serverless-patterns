@@ -97,10 +97,7 @@ class CdkCognitoFargateStack extends Stack {
         rollback: true
       },
       taskImageOptions: {
-        image: ecs.ContainerImage.fromRegistry("mendhak/http-https-echo"),
-        environment: {
-          JWT_HEADER: "authorization",
-        }
+        image: ecs.ContainerImage.fromRegistry("amazon/amazon-ecs-sample")
       },
       memoryLimitMiB: 1024,
       publicLoadBalancer: false,
