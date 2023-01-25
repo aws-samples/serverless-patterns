@@ -42,6 +42,7 @@ export class CdkAppSyncSnSStack extends Stack {
 			runtime: appsync.FunctionRuntime.JS_1_0_0,
 		})
 
+		const topicArnObj = JSON.stringify({ TOPIC_ARN: topic.topicArn })
 		new appsync.Resolver(this, 'PipelineResolver', {
 			api,
 			typeName: 'Query',
@@ -51,9 +52,7 @@ export class CdkAppSyncSnSStack extends Stack {
             export function request(...args) {
               console.log(args);
               
-              return {
-                TOPIC_ARN: ${topic.topicArn}
-              }
+              return ${topicArnObj}
             }
         
             // The after step
