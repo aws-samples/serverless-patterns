@@ -76,6 +76,11 @@ export class CdkAppSyncSqSStack extends Stack {
 			runtime: appsync.FunctionRuntime.JS_1_0_0,
 		})
 
+		const pipelineVars = JSON.stringify({
+			accountId: account,
+			queueUrl: queue.queueUrl,
+			queueName: queue.queueName,
+		})
 		new appsync.Resolver(this, 'PipelineResolver', {
 			api,
 			typeName: 'Query',
@@ -84,7 +89,7 @@ export class CdkAppSyncSqSStack extends Stack {
             // The before step
             export function request(...args) {
               console.log(args);
-              return ${JSON.stringify({ accountId: account, queue })}
+              return ${pipelineVars}
             }
         
             // The after step
