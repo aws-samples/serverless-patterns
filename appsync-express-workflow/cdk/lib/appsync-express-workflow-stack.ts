@@ -34,7 +34,7 @@ export class AppsyncExpressWorkflowStack extends Stack {
 		const api = new GraphqlApi(this, 'Api', {
 			name: 'SyncStateMachineAPI',
 			schema: SchemaFile.fromAsset(
-				join(__dirname, '../grpahql/schema.graphql')
+				join(__dirname, '../graphql/schema.graphql')
 			),
 			xrayEnabled: true,
 			logConfig: {
@@ -74,7 +74,9 @@ export class AppsyncExpressWorkflowStack extends Stack {
 			name: 'my_js_function',
 			api,
 			dataSource: httpdatasource,
-			code: Code.fromAsset(__dirname, '../graphql/Mutation.startExecution.js'),
+			code: Code.fromAsset(
+				join(__dirname, '../graphql/Mutation.startExecution.js')
+			),
 			runtime: FunctionRuntime.JS_1_0_0,
 		})
 
