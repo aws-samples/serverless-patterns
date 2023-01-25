@@ -70,7 +70,9 @@ export class CdkAppSyncSqSStack extends Stack {
 			name: 'my_js_function',
 			api,
 			dataSource: datasource,
-			code: appsync.Code.fromAsset('directory/function_code.js'),
+			code: appsync.Code.fromAsset(
+				join(__dirname, '../graphql/Query.sendMessage.js')
+			),
 			runtime: appsync.FunctionRuntime.JS_1_0_0,
 		})
 
