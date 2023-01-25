@@ -74,7 +74,7 @@ export class AppsyncExpressWorkflowStack extends Stack {
 			name: 'my_js_function',
 			api,
 			dataSource: httpdatasource,
-			code: Code.fromAsset('directory/function_code.js'),
+			code: Code.fromAsset(__dirname, '../graphql/Mutation.startExecution.js'),
 			runtime: FunctionRuntime.JS_1_0_0,
 		})
 
