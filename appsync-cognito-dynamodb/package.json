@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@aws-cdk/aws-cognito-identitypool-alpha": "^2.62.0-alpha.0"
+  }
+}

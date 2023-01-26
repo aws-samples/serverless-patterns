@@ -1,0 +1,17 @@
+type Query {
+	listUsers(limit: Int, nextToken: String): UserConnection
+		@aws_iam
+		@aws_cognito_user_pools
+}
+
+type User @aws_iam {
+	userId: ID!
+	firstname: String!
+	lastname: String!
+	picture: AWSURL!
+}
+
+type UserConnection @aws_iam {
+	items: [User!]
+	nextToken: String
+}
