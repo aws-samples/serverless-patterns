@@ -4,6 +4,10 @@ type Query {
 		@aws_cognito_user_pools
 }
 
+type Mutation {
+	createUser(input: UserInput!): User @aws_cognito_user_pools
+}
+
 type User @aws_iam {
 	userId: ID!
 	firstname: String!
@@ -14,4 +18,10 @@ type User @aws_iam {
 type UserConnection @aws_iam {
 	items: [User!]
 	nextToken: String
+}
+
+input UserInput {
+	firstname: String!
+	lastname: String!
+	picture: AWSURL
 }
