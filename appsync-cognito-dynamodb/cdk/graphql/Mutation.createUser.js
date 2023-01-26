@@ -6,11 +6,11 @@ export function request(ctx) {
 
 	return {
 		operation: 'PutItem',
-		key: util.dynamodb.toMapValues({ id: input.id }),
+		key: util.dynamodb.toMapValues({ userId: input.userId }),
 		attributeValues: util.dynamodb.toMapValues(input),
 	}
 }
 
 export function response(ctx) {
-	return ctx.prev.result
+	return ctx.result
 }

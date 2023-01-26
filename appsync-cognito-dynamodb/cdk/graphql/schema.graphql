@@ -1,3 +1,5 @@
+## default authtype: Cognito userpools
+
 type Query {
 	listUsers(limit: Int, nextToken: String): UserConnection
 		@aws_iam
@@ -5,17 +7,17 @@ type Query {
 }
 
 type Mutation {
-	createUser(input: UserInput!): User @aws_cognito_user_pools
+	createUser(input: UserInput!): User
 }
 
-type User @aws_iam {
+type User @aws_iam @aws_cognito_user_pools {
 	userId: ID!
 	firstname: String!
 	lastname: String!
 	picture: AWSURL!
 }
 
-type UserConnection @aws_iam {
+type UserConnection @aws_iam @aws_cognito_user_pools {
 	items: [User!]
 	nextToken: String
 }
