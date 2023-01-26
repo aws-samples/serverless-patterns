@@ -2,7 +2,7 @@ import { util } from '@aws-appsync/utils'
 
 export function request(ctx) {
 	const input = ctx.args.input
-	input.id = util.autoId()
+	input.userId = util.autoId()
 
 	return {
 		operation: 'PutItem',

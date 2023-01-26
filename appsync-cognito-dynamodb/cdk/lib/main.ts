@@ -111,7 +111,7 @@ export class CdkStack extends Stack {
 			runtime: FunctionRuntime.JS_1_0_0,
 		})
 
-		new Resolver(this, 'PipelineResolver', {
+		new Resolver(this, 'listUsersPipelineResolver', {
 			api,
 			typeName: 'Query',
 			fieldName: 'listUsers',
@@ -133,7 +133,7 @@ export class CdkStack extends Stack {
 			runtime: FunctionRuntime.JS_1_0_0,
 		})
 
-		new Resolver(this, 'PipelineResolver', {
+		new Resolver(this, 'createUserPipelineResolver', {
 			api,
 			typeName: 'Mutation',
 			fieldName: 'createUser',
