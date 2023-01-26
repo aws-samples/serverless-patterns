@@ -69,6 +69,7 @@ export class CdkStack extends Stack {
 			partitionKey: { name: 'userId', type: AttributeType.STRING },
 		})
 
+		// create an API that defaults to userpools, but also uses IAM
 		const api = new GraphqlApi(this, 'UsersAPI', {
 			name: 'UsersAPI',
 			schema: SchemaFile.fromAsset(path.join(__dirname, 'schema.graphql')),
@@ -94,36 +95,54 @@ export class CdkStack extends Stack {
 		// allow unauthenticated access to the `listUsers` query
 		api.grantQuery(identityPool.unauthenticatedRole, 'listUsers')
 
-		// Create the AppSync function
+		// add our DynamoDB table as a datasource for our API
+		const userTableDS = api.addDynamoDbDataSource('userTableDS', userTable)
+
+		// Create the listUsers function and add it to its pipeline
 		const listUsersFunction = new AppsyncFunction(this, 'listUsersFunction', {
 			name: 'listUsersFunction',
 			api,
-			dataSource: api.addDynamoDbDataSource('listUsers', userTable),
-			code: Code.fromAsset(path.join(__dirname, 'mappings/Query.listUsers.js')),
+			dataSource: userTableDS,
+			code: Code.fromAsset(
+				path.join(__dirname, '../graphql/Query.listUsers.js')
+			),
 			runtime: FunctionRuntime.JS_1_0_0,
 		})
 
-		//Create the pipeline
 		new Resolver(this, 'PipelineResolver', {
 			api,
 			typeName: 'Query',
 			fieldName: 'listUsers',
-			code: Code.fromInline(`
-    // The before step (no before steps)
-    export function request() {
-      return {}
-    }
-
-    // The after step (simply return the result)
-    export function response(ctx) {
-      return ctx.prev.result
-    }
-  `),
+			code: Code.fromAsset(
+				path.join(__dirname, '../graphql/Pipeline.simple.js')
+			),
 			runtime: FunctionRuntime.JS_1_0_0,
 			pipelineConfig: [listUsersFunction],
 		})
 
-		// output these variables. The frontend needs some of these. See deploy script in package.json
+		// create the createUserFunction and add it to its pipeline
+		const createUserFunction = new AppsyncFunction(this, 'createUser', {
+			name: 'createUserFunction',
+			api,
+			dataSource: userTableDS,
+			code: Code.fromAsset(
+				path.join(__dirname, '../graphql/Mutation.createUser.js')
+			),
+			runtime: FunctionRuntime.JS_1_0_0,
+		})
+
+		new Resolver(this, 'PipelineResolver', {
+			api,
+			typeName: 'Mutation',
+			fieldName: 'createUser',
+			code: Code.fromAsset(
+				path.join(__dirname, '../graphql/Pipeline.simple.js')
+			),
+			runtime: FunctionRuntime.JS_1_0_0,
+			pipelineConfig: [createUserFunction],
+		})
+
+		// outputs
 		new CfnOutput(this, 'UserPoolId', {
 			value: userPool.userPoolId,
 		})
