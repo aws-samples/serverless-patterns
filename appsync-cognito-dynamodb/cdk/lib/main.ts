@@ -72,7 +72,9 @@ export class CdkStack extends Stack {
 		// create an API that defaults to userpools, but also uses IAM
 		const api = new GraphqlApi(this, 'UsersAPI', {
 			name: 'UsersAPI',
-			schema: SchemaFile.fromAsset(path.join(__dirname, 'schema.graphql')),
+			schema: SchemaFile.fromAsset(
+				path.join(__dirname, '../graphql/schema.graphql')
+			),
 			authorizationConfig: {
 				defaultAuthorization: {
 					authorizationType: AuthorizationType.USER_POOL,
