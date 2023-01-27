@@ -8,7 +8,7 @@ Pattern that will run every day at 00:00 and will delete any one-time schedules 
 
 EventBridge Scheduler supports one-time schedules, after they run it is up to the developer to remove them from their account. These schedules are included in your account quota even if they have run/expired.
 
-The EventBridge team are aware of this and are looking to add some fixes in the future, but in the mean time this pattern was created to help you.
+The EventBridge team are aware of this and are looking to add some updates in the future, but in the mean time this pattern was created to help you.
 
 ## How it works
 
