@@ -1,18 +1,32 @@
 #!/usr/bin/env node
 import 'source-map-support/register'
 import * as cdk from 'aws-cdk-lib'
-import { CdkStack } from '../lib/main'
+import { AuthStack } from '../lib/AuthStack'
+import { FileStorageStack } from '../lib/fileStorageStack'
+import { DatabaseStack } from '../lib/DatabaseStack'
+import { IdentityStack } from '../lib/IdentityStack'
+import { APIStack } from '../lib/APIStack'
 
 const app = new cdk.App()
-new CdkStack(app, 'CdkStack', {
-	/* If you don't specify 'env', this stack will be environment-agnostic.
-	 * Account/Region-dependent features and context lookups will not work,
-	 * but a single synthesized template can be deployed anywhere. */
-	/* Uncomment the next line to specialize this stack for the AWS Account
-	 * and Region that are implied by the current CLI configuration. */
-	// env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
-	/* Uncomment the next line if you know exactly what Account and Region you
-	 * want to deploy the stack to. */
-	// env: { account: '123456789012', region: 'us-east-1' },
-	/* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+
+const authStack = new AuthStack(app, 'ProductAuthStack', {})
+
+const identityStack = new IdentityStack(app, 'ProductIdentityStack', {
+	userpool: authStack.userpool,
+	userpoolClient: authStack.userPoolClient,
+})
+
+const databaseStack = new DatabaseStack(app, 'ProductDatabaseStack', {})
+
+const apiStack = new APIStack(app, 'ProductAppSyncAPIStack', {
+	userpool: authStack.userpool,
+	sampleTable: databaseStack.productTable,
+	unauthenticatedRole: identityStack.unauthenticatedRole,
+	identityPool: identityStack.identityPool,
+})
+
+const fileStorageStack = new FileStorageStack(app, 'ProductFileStorageStack', {
+	authenticatedRole: identityStack.authenticatedRole,
+	unauthenticatedRole: identityStack.unauthenticatedRole,
+	allowedOrigins: ['http://localhost:3000'],
 })

@@ -23,8 +23,8 @@
 	"resources": {
 		"bullets": [
 			{
-				"text": "Blog post: Fullstack guide to securing AppSync APIs",
-				"link": "https://aws.amazon.com/blogs/mobile/secure-aws-appsync-with-iam-permissions-using-the-aws-cdk/"
+				"text": "Blog post: Fullstack guide to managing images in AWS AppSync",
+				"link": "https://aws.amazon.com/blogs/mobile/managing-images-in-your-nextjs-app-with-aws-appsync-and-the-aws-cdk/"
 			},
 			{
 				"text": "Amazon AppSync - Managed GraphQL service",

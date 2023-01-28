@@ -1,0 +1,30 @@
+type Query {
+	getProduct(id: ID!): Product @aws_iam @aws_cognito_user_pools
+	listProducts: [Product] @aws_iam @aws_cognito_user_pools
+}
+
+type Mutation {
+	createProduct(input: ProductInput!): Product @aws_cognito_user_pools
+}
+
+type Subscription {
+	onProductCreate: Product @aws_subscribe(mutations: ["createProduct"])
+}
+
+type Product @aws_iam @aws_cognito_user_pools {
+	id: ID!
+	name: String
+	description: String
+	price: Float
+	isLive: Boolean
+	imgKey: String
+}
+
+input ProductInput {
+	id: ID
+	name: String!
+	description: String
+	imgKey: String!
+	price: Float!
+	isLive: Boolean
+}
