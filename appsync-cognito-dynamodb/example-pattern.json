@@ -16,7 +16,8 @@
 		"template": {
 			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-cognito-dynamodb",
 			"templateURL": "serverless-patterns/appsync-cognito-dynamodb",
-			"projectFolder": "appsync-cognito-dynamodb"
+			"projectFolder": "appsync-cognito-dynamodb",
+			"templateFile": "appsync-cognito-dynamodb/cdk/lib/main.ts"
 		}
 	},
 	"resources": {
