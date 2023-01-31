@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 
-from_email = 'dullsury@amazon.com'
+from_email = 'youremail@verifieddomain.com'
 config_set_name = 'CustomConfigSet'
 client = boto3.client('ses')
 
@@ -35,7 +35,7 @@ def lambda_handler(event, context):
     try:
         ses_response = client.send_email(
             Destination={
-                'ToAddresses': ['dullsury@amazon.com'],
+                'ToAddresses': ['emailaddress@verified_domain.com'],
             },
             Message=email_message,
             Source=from_email,
