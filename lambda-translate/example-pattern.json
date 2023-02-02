@@ -43,15 +43,15 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: aws cloudformation delete-stack --stack-name {STACK_NAME}"
+      "Delete the stack:  sam delete --stack-name {StackName}"
     ]
   },
-  "authors": [
+  "author": [
     {
+      "headline": "Presented by Abilashkumar P C",
       "name": "Abilashkumar P C",
-      "image": "https://phonetool.amazon.com/users/abilasc",
-      "bio": "Abilash is an ardent follower of cricket, technology and loves driving",
-      "linkedin": "https://www.linkedin.com/abilashkumar-p-c"
+      "image": "https://drive.google.com/file/d/1bxOh_WBw8J_xEqvT-qRezH8WXqSBPI24/view?usp=sharing",
+      "bio": "Cloud Support Engineer II @ AWS"
     }
   ]
 }
