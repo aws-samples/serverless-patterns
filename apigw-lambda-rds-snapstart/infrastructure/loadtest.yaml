@@ -1,0 +1,15 @@
+config:
+  phases:
+    - duration: 60
+      arrivalRate: 25
+  http:
+    timeout: 29
+scenarios:
+  - flow:
+      - post:
+          url: "{{ url }}"
+          json:
+            name: "Big Unicorn"
+            age: "Quite old"
+            type: "Beautiful"
+            size: "Very big"
