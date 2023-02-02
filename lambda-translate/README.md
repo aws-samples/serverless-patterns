@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd patterns-model
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -40,14 +40,14 @@ Important: this application uses various AWS services and there are costs associ
 
 Use the AWS CLI to invoke the Lambda function.
 
-The example provided  performs Translation from English to German language. The following lanugaes are [supported](https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html).
+The example provided  performs Translation from English to German language. The following languages are [supported](https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html).
 
 ## Testing
 
 Replace "{LambdaFunctionName}" with the function name as seen in the output of CloudFormation template
 
 ```
-aws lambda invoke --function-name lambda-sam-1-TranslateTextLambdaFunction-N34oQq55jama --invocation-type RequestResponse --cli-binary-format raw-in-base64-out --payload "{\"text\":\"I am very happy\", \"sl\":\"en\",\"tl\":\"de\"}" response.json
+aws lambda invoke --{LambdaFunctionName} lambda-sam-1-TranslateTextLambdaFunction-N34oQq55jama --invocation-type RequestResponse --cli-binary-format raw-in-base64-out --payload "{\"text\":\"I am very happy\", \"sl\":\"en\",\"tl\":\"de\"}"
 ```
 
 The command above returns the following output:
@@ -57,13 +57,9 @@ das ist schlecht
 
 ## Cleanup
  
-1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+Delete the stack - Replace "{StackName}" with the name of the stack
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete --stack-name {StackName}
     ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
