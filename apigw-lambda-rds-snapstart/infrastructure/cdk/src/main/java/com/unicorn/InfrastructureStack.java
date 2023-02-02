@@ -86,10 +86,10 @@ public class InfrastructureStack extends Stack {
     }
 
     private DatabaseSecret createDatabaseSecret() {
-        return DatabaseSecret.Builder
-                .create(this, "postgres")
+        return DatabaseSecret.Builder.create(this, "postgres")
                 .secretName("unicornstore-db-secret")
-                .username("postgres").build();
+                .username("postgres")
+                .build();
     }
 
     private IVpc createUnicornVpc() {
