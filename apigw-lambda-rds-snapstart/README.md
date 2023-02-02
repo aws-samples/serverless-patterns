@@ -14,6 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install) (AWS CDK) installed
+- jq
 
 ## Deployment Instructions
 
@@ -25,7 +26,40 @@ Important: this application uses various AWS services and there are costs associ
    ```
    cd apigw-lambda-rds-snapstart
    ```
-3. 
+3. Build the database setup and unicorn functions
+   ```
+   ./mvnw clean package -f infrastructure/db-setup/pom.xml
+   ./mvnw clean package -f software/unicorn-store/pom.xml
+   ```
+4. Deploy the infrastructure
+   ```
+   cd infrastructure/cdk
+   cdk bootstrap
+   cdk deploy UnicornStoreInfrastructure --require-approval never --outputs-file target/output.json
+   ```
+5. Execute the DB setup function to create the table
+   ```
+   aws lambda invoke --function-name $(cat target/output.json | jq -r '.UnicornStoreInfrastructure.DbSetupArn') /dev/stdout | cat;
+   ```
+6. Deploy the unicorn store
+   ```
+   cdk deploy UnicornStoreApp --outputs-file target/output.json --require-approval never
+   ```
+
+## Testing 
+
+Create a new unicorn
+
+```
+curl --location --request POST $(cat target/output.json | jq -r '.UnicornStoreApp.ApiEndpoint')'/unicorns' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+    "name": "Something",
+    "age": "Older",
+    "type": "Animal",
+    "size": "Very big"
+}' | jq
+```
 
 ## How it works
 
@@ -34,7 +68,8 @@ Important: this application uses various AWS services and there are costs associ
 ## Delete stack
 
 ```bash
-cdk destroy
+cd infrastructure/cdk
+cdk destroy --all
 ```
 
 ---
