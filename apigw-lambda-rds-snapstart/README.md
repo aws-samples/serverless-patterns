@@ -14,7 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install) (AWS CDK) installed
-- jq
+- [jq](https://stedolan.github.io/jq/download/)
 
 ## Deployment Instructions
 
@@ -54,6 +54,7 @@ Create a new unicorn
 curl --location --request POST $(cat target/output.json | jq -r '.UnicornStoreApp.ApiEndpoint')'/unicorns' \
   --header 'Content-Type: application/json' \
   --data-raw '{
+    "id": "123",
     "name": "Something",
     "age": "Older",
     "type": "Animal",
@@ -61,15 +62,20 @@ curl --location --request POST $(cat target/output.json | jq -r '.UnicornStoreAp
 }' | jq
 ```
 
-Get a unicorn with the Id generated
+Get a unicorn with the Id.
 
 ```
-curl 
+curl --location --request GET $(cat target/output.json | jq -r '.UnicornStoreApp.ApiEndpoint')'/unicorns/123'
 ```
 
 ## How it works
 
-This REST API is implemented with the [Micronaut framework](https://micronaut.io/). 
+CDK creates all the infrastructure we need for the pattern, include the VPC, subnets, security groups,secrets and the DB.
+
+The DB setup Lambda function is executed once to create the database table with a given structure.
+
+This REST API is implemented with the [Micronaut framework](https://micronaut.io/). Credentials for the DB are passed as
+environment variables to the application. 
 
 # SnapStart Best Practice
 

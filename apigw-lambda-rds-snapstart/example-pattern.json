@@ -7,8 +7,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "EventBridge Pipe polls messages in source SQS queue. Then using enrichment Lambda function, it extract the original payload.",
-      "Then the messages is sent to the Event Bus. Two SQS queues are set as targets and based on the 'type' value on the orignial message, it will be delivered to the respective target queue."
+      "CDK creates all the infrastructure we need for the pattern, include the VPC, subnets, security groups,secrets and the DB.",
+      "The DB setup Lambda function is executed once to create the database table with a given structure.",
+      "This REST API is implemented with the Micronaut framework. Credentials for the DB are passed as environment variables to the application."
     ]
   },
   "gitHub": {
@@ -41,7 +42,7 @@
   },
   "deploy": {
     "text": [
-      "cdk deploy"
+      "cdk deploy --all"
     ]
   },
   "testing": {
@@ -51,7 +52,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk destroy</code>."
+      "Delete the stack: <code>cdk destroy --all</code>."
     ]
   },
   "authors": [
