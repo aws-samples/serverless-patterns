@@ -61,9 +61,49 @@ curl --location --request POST $(cat target/output.json | jq -r '.UnicornStoreAp
 }' | jq
 ```
 
+Get a unicorn with the Id generated
+
+```
+curl 
+```
+
 ## How it works
 
+This REST API is implemented with the [Micronaut framework](https://micronaut.io/). 
 
+# SnapStart Best Practice
+
+The Micronaut Data component implements it's database connectivity using the Hikari data source library. When a Lambda 
+function is initialised it automatically creates and opens a connection to the database, in this case to Postgres. 
+
+This is advantageous if you are not using SnapStart, if you are then the application state is recorded with the
+knowledge of an active db connection. This means that the first time a snapshot is resumed it has a stale db connection
+and the database library has to repair this by making a new connection.
+
+It is best practice to use [Runtime hooks](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-runtime-hooks.html) to
+suspend the data source and close any open connections before the snapshot is taken. You can then resume the data source
+after the snapshot has been resumed.
+
+The Micronaut framework has created additional support to help with this scenario. To enable it include the [Micronaut 
+CRaC](https://micronaut-projects.github.io/micronaut-crac/latest/guide/) module in you project. 
+
+```xml
+<dependency>
+   <groupId>io.micronaut.crac</groupId>
+   <artifactId>micronaut-crac</artifactId>
+   <scope>compile</scope>
+</dependency>
+```
+
+When this is added the
+Hikari data source hooks in <code>[HikariDataSourceResource.java](https://github.com/micronaut-projects/micronaut-crac/blob/master/crac/src/main/java/io/micronaut/crac/resources/datasources/HikariDataSourceResource.java)</code>
+are activated.
+
+
+| Test                  | Restore Duration | Duration | Total Duration |
+|-----------------------|------------------|----------|----------------|
+| without runtime hooks | 527ms            | 333ms    | 860ms          |
+| with runtime hooks    | 280ms            | 438ms    | 718ms (-16%)   |
 
 ## Delete stack
 
