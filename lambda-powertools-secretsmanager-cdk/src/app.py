@@ -28,7 +28,7 @@ class TestAPIStack(Stack):
                     apigateway.IntegrationResponse(
                         status_code = "200",
                         response_templates = {
-                            "application/json": "{ \"response\": \"Successfully authenticated using API Key.\" }"
+                            "application/json": "{ \"response\": \"Successfully authenticated using API Key from Secrets Manager.\" }"
                         }
                     )
                 ],
