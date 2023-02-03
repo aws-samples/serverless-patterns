@@ -12,10 +12,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-powertools-secretsmanager-cdk",
-      "templateURL": "serverless-patterns/lambda-powertools-secretsmanager-cdk",
-      "projectFolder": "lambda-powertools-secretsmanager-cdk/src",
-      "templateFile": "lambda-powertools-secretsmanager-cdk/src/app.py"
+        "projectFolder": "lambda-powertools-secretsmanager-cdk/src",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-powertools-secretsmanager-cdk",
+        "templateURL": "serverless-patterns/lambda-powertools-secretsmanager-cdk",
+        "templateFile": "app.py"
     }
   },
   "resources": {
@@ -44,8 +44,8 @@
   "authors": [
     {
       "name": "Luke Viens",
-      "image": ""
-      "bio": "Cloud application developer at AWS."
+      "image": "",
+      "bio": "Cloud application developer at AWS.",
       "linkedin": "",
       "twitter": ""
     },
