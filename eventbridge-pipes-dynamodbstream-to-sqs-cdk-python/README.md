@@ -1,4 +1,4 @@
-# DynamoDB Stream to SQS using EventBridge Pipes using CDK/Python
+# DynamoDB Stream to SQS using EventBridge Pipes with CDK/Python
 
 This pattern will send messages from a DynamoDB Stream into a target SQS queue using EventBridge Pipes.
 
