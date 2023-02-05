@@ -13,10 +13,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-lambda-rust",
-      "templateURL": "serverless-patterns/sns-sqs-lambda-rust",
-      "projectFolder": "sns-sqs-lambda-rust",
-      "templateFile": "sns-sqs-lambda-rust/template.yml"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-lambda-rust-sam",
+      "templateURL": "serverless-patterns/sns-sqs-lambda-rust-sam",
+      "projectFolder": "sns-sqs-lambda-rust-sam",
+      "templateFile": "template.yml"
     }
   },
   "resources": {

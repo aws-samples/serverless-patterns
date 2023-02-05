@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd lambda-sqs-rust
+    cd lambda-sqs-rust-sam
     ```
 3. Install dependencies and build:
     ```

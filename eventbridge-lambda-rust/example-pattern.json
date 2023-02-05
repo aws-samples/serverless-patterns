@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-rust",
       "templateURL": "serverless-patterns/eventbridge-lambda-rust",
       "projectFolder": "eventbridge-lambda-rust",
-      "templateFile": "eventbridge-lambda-rust/template.yml"
+      "templateFile": "template.yml"
     }
   },
   "resources": {
