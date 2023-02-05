@@ -1,5 +1,5 @@
 [package]
-name = "sns-sqs-lambda-rust"
+name = "sns-sqs-lambda-rust-sam"
 version = "0.1.0"
 edition = "2021"
 

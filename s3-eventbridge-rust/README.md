@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd s3-eventbridge-direct-rust
+    cd s3-eventbridge-rust-sam
     ```
 3. Install dependencies and build:
     ```

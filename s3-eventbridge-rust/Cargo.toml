@@ -1,5 +1,5 @@
 [package]
-name = "sqs-lambda-rust"
+name = "s3-eventbridge-rust-sam"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,7 +10,10 @@ name = "handler"
 path = "src/bin/handler.rs"
 
 [dependencies]
-aws_lambda_events = { version = "0.7", default-features = false, features = ["sqs"] }
+aws-config = "0.52.0"
+aws-sdk-s3 = "0.22.0"
 lambda_runtime = "0.7.2"
+serde_json = "1"
+serde = {version = "1.0", features = ["derive"] }
 tokio = { version = "1", features = ["macros"] }
 tracing-subscriber = { version = "0.3", features = ["fmt", "json"] }
