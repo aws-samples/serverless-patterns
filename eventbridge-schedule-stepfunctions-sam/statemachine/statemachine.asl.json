@@ -1,0 +1,13 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "Pass",
+  "States": {
+      "Pass": {
+        "Type": "Pass",
+        "End":true,
+        "Parameters": {
+          "item.$": "$"
+        }
+      }
+  }
+}

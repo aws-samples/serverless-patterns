@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sfn-rust",
       "templateURL": "serverless-patterns/lambda-sfn-rust",
       "projectFolder": "lambda-sfn-rust",
-      "templateFile": "lambda-sfn-rust/template.yml"
+      "templateFile": "template.yml"
     }
   },
   "resources": {

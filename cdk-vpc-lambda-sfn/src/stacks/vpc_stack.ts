@@ -54,9 +54,6 @@ export class vpcStack extends Stack {
             securityGroups: [vSecurityGroup]
         });
 
-        vSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(80), 'allow HTTP traffic');
-        vSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(443), 'allow HTTPS traffic');
-
         this.iVpc = vpc;
         this.publicSubNet = vpc.publicSubnets;
         this.privateSubNet = vpc.privateSubnets;

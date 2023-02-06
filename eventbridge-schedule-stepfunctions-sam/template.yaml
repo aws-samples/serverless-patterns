@@ -1,0 +1,57 @@
+
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Introduction to serverless for developers:part3 GitHub to Slack
+  
+##########################################################################
+#  Parameters & Globals                                                  #
+##########################################################################
+Parameters:
+
+Resources:
+##########################################################################
+#   Lambda Functions                                                      #
+##########################################################################
+    #  Order Manager SFN                                                   #
+  GitHubTrafficTracker:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: statemachine/statemachine.asl.json
+
+  # Schedule that will run every day at 00:00 to trigger process
+  GitHubTrafficTrackerSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Description: Schedule the runs every day to start teh workflow
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      ScheduleExpression: 'cron(24 14 * * ? *)'
+      Target:
+        Arn: !GetAtt GitHubTrafficTracker.Arn
+        RoleArn: !GetAtt GitHubTrafficTrackerScheduleRole.Arn
+
+  GitHubTrafficTrackerScheduleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: invokeGitHubTrafficTrackerSFN
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'states:startExecution'
+                Resource:
+                  - !GetAtt GitHubTrafficTracker.Arn
