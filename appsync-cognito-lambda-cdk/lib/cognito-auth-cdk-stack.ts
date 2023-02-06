@@ -69,6 +69,9 @@ export class CognitoAuthCdkStack extends Stack {
 						userPool,
 					},
 				},
+				additionalAuthorizationModes: [
+					{ authorizationType: AuthorizationType.API_KEY },
+				],
 			},
 			logConfig: {
 				fieldLogLevel: FieldLogLevel.ALL,
