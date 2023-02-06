@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/appsync-express-workflow.ts",
+  "app": "npx ts-node --prefer-ts-exts bin/appsync-stepfunctions-express-cdk.ts",
   "watch": {
     "include": [
       "**"

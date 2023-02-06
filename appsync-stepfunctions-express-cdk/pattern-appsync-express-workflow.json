@@ -2,7 +2,7 @@
 	"title": "AppSync to StepFunctions(Synchronous Express Workflows)",
 	"description": "Create an AppSync API with a StepFunctions State Machine as HTTP data source",
 	"language": "Node.js",
-	"architectureURL": "architecture-appsync-express-workflow.png",
+	"architectureURL": "architecture-appsync-stepfunctions-express-cdk.png",
 	"videoId": "",
 	"level": "100",
 	"framework": "CDK",
@@ -21,9 +21,9 @@
 	},
 	"gitHub": {
 		"template": {
-			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-express-workflow",
-			"templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/appsync-express-workflow/cdk/lib/appsync-express-workflow-stack.ts",
-			"readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-express-workflow/README.md"
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-stepfunctions-express-cdk",
+			"templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/appsync-stepfunctions-express-cdk/cdk/lib/appsync-stepfunctions-express-cdk.ts",
+			"readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-stepfunctions-express-cdk/README.md"
 		}
 	},
 	"resources": {
