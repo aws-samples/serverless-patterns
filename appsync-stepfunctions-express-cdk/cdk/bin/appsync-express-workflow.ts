@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { AppsyncExpressWorkflowStack } from '../lib/appsync-express-workflow-stack';
+import { AppsyncExpressWorkflowStack } from '../lib/appsync-stepfunctions-express-cdk';
 
 const app = new cdk.App();
 new AppsyncExpressWorkflowStack(app, 'AppsyncExpressWorkflowStack', {

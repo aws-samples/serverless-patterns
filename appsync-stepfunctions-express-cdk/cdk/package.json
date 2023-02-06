@@ -1,8 +1,8 @@
 {
-	"name": "appsync-express-workflow",
+	"name": "appsync-stepfunctions-express-cdk",
 	"version": "0.1.0",
 	"bin": {
-		"appsync-express-workflow": "bin/appsync-express-workflow.js"
+		"appsync-stepfunctions-express-cdk": "bin/appsync-stepfunctions-express-cdk.js"
 	},
 	"scripts": {
 		"build": "tsc",

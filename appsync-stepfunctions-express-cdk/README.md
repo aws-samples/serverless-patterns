@@ -21,7 +21,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 
 2. Change the working directory to this pattern's directory
 ```
-cd appsync-express-workflow/cdk
+cd appsync-stepfunctions-express-cdk/cdk
 ```
 
 3. Install dependencies
