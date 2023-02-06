@@ -1,7 +1,8 @@
 # Authenticating an AppSync API using Amazon Cognito
 
-This CDK template deploys an AWS AppSync API and a Cognito userpool.
-You'll need to create a user in Cognito before being able to have authorized access to the API.
+This CDK template deploys a Cognito userpool, an AWS AppSync API and an AWS Lambda function.
+
+The Cognito userpool will be used to authorize requests to our AppSync API which will then trigger a Lambda function. In this application, the Lambda is kept service agnostic and simply returns a sample user.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cognito-appsync-lambda-cdk
 
