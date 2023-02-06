@@ -2,7 +2,7 @@
 	"title": "AppSync to EventBridge Scheduler to SNS",
 	"description": "AWS AppSync to dynamically create an EventBridge Schedule that publishes a message to SNS",
 	"language": "TypeScript",
-	"level": "200",
+	"level": "300",
 	"framework": "CDK",
 	"introBox": {
 		"headline": "How it works",
