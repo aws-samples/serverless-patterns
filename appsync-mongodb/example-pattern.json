@@ -1,59 +1,57 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
-  "language": "Python",
-  "level": "200",
-  "framework": "CDK",
-  "introBox": {
-    "headline": "How it works",
-    "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
-    ]
-  },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
-    }
-  },
-  "resources": {
-    "bullets": [
-      {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
-      },
-      {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
-      }
-    ]
-  },
-  "deploy": {
-    "text": [
-      "sam deploy"
-    ]
-  },
-  "testing": {
-    "text": [
-      "See the Github repo for detailed testing instructions."
-    ]
-  },
-  "cleanup": {
-    "text": [
-      "Delete the stack: <code>cdk delete</code>."
-    ]
-  },
-  "authors": [
-    {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
-    }
-  ]
+	"title": "AppSync to MongoDB",
+	"description": "Perform a write and list operation from AWS AppSync to Amazon DynamoDB that is protected with an idenity pool and userpool from Amazon Cognito.",
+	"language": "TypeScript",
+	"level": "300",
+	"framework": "CDK",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This project demonstrates how to connect directly to a MongoDB Atlas cluster using AWS Appsync.",
+			"Connecting directly to MongoDB requires the use of their Data API and AppSync's HTTP resolver.",
+			"In doing so, there is no need for a proxying Lambda function."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-mongodb",
+			"templateURL": "serverless-patterns/appsync-mongodb",
+			"projectFolder": "appsync-mongodb",
+			"templateFile": "appsync-mongodb/cdk/lib/main.ts"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "Blog post: The fullstack guide to using AWS AppSync and MongoDB Atlas",
+				"link": "https://aws.amazon.com/blogs/mobile/the-fullstack-guide-to-using-aws-appsync-and-mongodb-atlas/"
+			},
+			{
+				"text": "Amazon AppSync - Managed GraphQL service",
+				"link": "https://aws.amazon.com/appsync/"
+			},
+			{
+				"text": "Fullstack repo",
+				"link": "https://github.com/focusOtter/fullstack-appsync-mongodb"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["<code>npx aws-cdk deploy</code>"]
+	},
+	"testing": {
+		"text": ["See the Github repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>npx aws-cdk destroy</code>."]
+	},
+	"authors": [
+		{
+			"name": "Michael Liendo 🦦",
+			"image": "https://pbs.twimg.com/profile_images/1610321865213444096/OttGok0S_400x400.jpg",
+			"bio": "Michael Liendo is a fullstack developer, avid taco eater, and Senior Developer Advocate for AWS AppSync.",
+			"linkedin": "focusotter",
+			"twitter": "focusotter"
+		}
+	]
 }
