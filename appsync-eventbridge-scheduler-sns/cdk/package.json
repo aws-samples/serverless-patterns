@@ -1,0 +1,30 @@
+{
+	"name": "appsync-ebscheduler-sns",
+	"version": "0.1.0",
+	"bin": {
+		"appsync-ebscheduler-sns": "bin/appsync-ebscheduler-sns.js"
+	},
+	"scripts": {
+		"build": "tsc",
+		"watch": "tsc -w",
+		"test": "jest",
+		"cdk": "cdk",
+		"test:mapping": "aws appsync evaluate-code   --code ./lib/graphql/mappings/Mutation.createSchedule.js   --function request --context ./lib/graphql/mappings/context.json  --runtime name=APPSYNC_JS,runtimeVersion=1.0.0"
+	},
+	"devDependencies": {
+		"@aws-appsync/utils": "^1.0.1",
+		"@types/jest": "^29.2.4",
+		"@types/node": "18.11.18",
+		"aws-cdk": "2.62.2",
+		"jest": "^29.3.1",
+		"ts-jest": "^29.0.3",
+		"ts-node": "^10.9.1",
+		"typescript": "~4.9.4"
+	},
+	"dependencies": {
+		"@aws-cdk/aws-cognito-identitypool-alpha": "^2.62.2-alpha.0",
+		"aws-cdk-lib": "2.62.2",
+		"constructs": "10.1.234",
+		"source-map-support": "^0.5.21"
+	}
+}

@@ -1,0 +1,23 @@
+type Query {
+	getSchedule(id: ID!): Schedule
+}
+
+type Mutation {
+	createSchedule(input: ScheduleInput): Schedule
+}
+
+type Schedule {
+	id: ID!
+	title: String
+	message: String
+	timezone: String
+	deliveryTime: String
+	scheduleName: String
+}
+
+input ScheduleInput {
+	title: String!
+	message: String!
+	timezone: String!
+	deliveryTime: String!
+}

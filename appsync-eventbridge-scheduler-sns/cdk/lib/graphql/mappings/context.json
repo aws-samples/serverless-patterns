@@ -1,0 +1,15 @@
+{
+	"description": "used in the test:mapping npm command (see package.json)",
+	"stash": {
+		"SNS_TOPIC_ARN": "arn:SNS_TOPIC_ARN",
+		"SCHEDULER_ROLE_ARN": "arn:SCHEDULER_ROLE_ARN"
+	},
+	"arguments": {
+		"input": {
+			"title": "get groceries",
+			"message": "spaghetti, bread, dog food",
+			"deliveryTime": "2023-01-27T05:43:00",
+			"timezone": "America/Chicago"
+		}
+	}
+}
