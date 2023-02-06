@@ -2,13 +2,8 @@
 	"title": "AppSync to SNS",
 	"description": "Create an AppSync API with an SNS HTTP data source",
 	"language": "Node.js",
-	"architectureURL": "pattern-cdk-appsync-sns.png",
 	"level": "100",
 	"framework": "CDK",
-	"services": {
-		"from": "appsync",
-		"to": "sns"
-	},
 	"introBox": {
 		"headline": "How it works",
 		"text": [
@@ -16,7 +11,7 @@
 		]
 	},
 	"deploy": {
-		"text": ["See the Github repo for detailed instructions"]
+		"text": ["npx aws-cdk deploy"]
 	},
 	"gitHub": {
 		"template": {
@@ -38,9 +33,13 @@
 			}
 		]
 	},
-	"author": {
-		"headline": "Presented by Michael Liendo",
-		"name": "Michael Liendo 🦦",
-		"bio": "Senior Developer Advocate - AppSync @ AWS"
-	}
+	"authors": [
+		{
+			"name": "Michael Liendo",
+			"image": "https://pbs.twimg.com/profile_images/1610321865213444096/OttGok0S_400x400.jpg",
+			"bio": "Senior Developer Advocate | AWS AppSync 🦦",
+			"linkedin": "focusotter",
+			"twitter": "focusotter"
+		}
+	]
 }
