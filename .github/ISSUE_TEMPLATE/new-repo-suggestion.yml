@@ -80,7 +80,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Author information:
+        Please provide some information about the project Author:
   - type: input
     id: AuthorName
     attributes:
@@ -102,7 +102,7 @@ body:
     id: AuthorLinkedIn
     attributes:
       label: Author LinkedIn URL 
-labels: ["repo"]
+labels: ["repo-issue"]
 assignees: 
   - jbesw
   - bls20AWS
