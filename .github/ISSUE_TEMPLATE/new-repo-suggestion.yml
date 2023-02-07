@@ -12,16 +12,16 @@ body:
     validations:
       required: true
   - type: input 
-    id: description
+    id: language
     attributes:
       label: language
       description: (e.g. "English")
     validations:
       required: true
   - type: input 
-    id: description
+    id: runtime
     attributes:
-      label: language
+      label: runtime
       description: (e.g. "Python")
     validations:
       required: true
