@@ -1,6 +1,7 @@
 
 name: New repo suggestion form
-description: 'To suggest a GitHub repo for inclusion in the Serverless Repo Collection, please complete the following form in full:'
+description: |
+            To suggest a GitHub repo for inclusion in the Serverless Repo Collection, please complete the following form in full:
 body:
   - type: markdown
     attributes:
