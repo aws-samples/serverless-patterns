@@ -51,13 +51,35 @@ body:
       description: (e.g. "AWS SAM", "AWS CDK", "Terraform")
     validations:
       required: true
-  - type: input
+  - type: checkboxes
     id: services
     attributes:
       label: AWS Serverless services used
-      description: comma sepperated list
-    validations:
-      required: true
+      options:
+        - label: Amazon API Gateway
+          required: false
+        - label: Amazon DynamoDB
+          required: false
+        - label: Amazon EventBridge
+          required: false
+        - label: AWS IoT
+          required: false
+        - label: AWS Lambda
+          required: false
+        - label: Amazon Rekognition
+          required: false
+        - label: Amazon S3
+          required: false
+        - label: AWS Step Functions
+          required: false
+        - label: Amazon SNS
+          required: false
+        - label: Amazon SQS
+          required: false
+        - label: Amazon Transcribe
+          required: false
+        - label: Amazon Translate
+          required: false
   - type: input
     id: headline
     attributes:
