@@ -33,7 +33,7 @@ Important: this application uses various AWS services and there are costs associ
     cdk bootstrap 1111111111/us-east-1
     cdk bootstrap --profile test 1111111111/us-east-1
    ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS CDK to deploy the AWS resources for the pattern.
     ```
     npm run build && cdk deploy 
     ```
