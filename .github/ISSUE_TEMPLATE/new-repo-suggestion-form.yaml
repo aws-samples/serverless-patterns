@@ -1,0 +1,81 @@
+
+name: New repo suggestion form
+description: 'To suggest a GitHub repo for inclusion in the Serverless Repo Collection, please complete the following form in full:'
+title: "[New repo]: "
+labels: ["repo"]
+assignees: 
+  - jbesw
+  - bls20AWS
+body:
+  - type: markdown
+    attributes:
+      value: |
+        To suggest a GitHub repo for inclusion in the Serverless Repo Collection, please complete the following form in full:
+  - type: textarea 
+    id: description
+    attributes:
+      label: Description
+      description: Describe what this project does (100-200 words)
+    validations:
+      required: true
+  - type: input 
+    id: description
+    attributes:
+      label: language
+      description: (e.g. "English")
+    validations:
+      required: true
+  - type: input 
+    id: description
+    attributes:
+      label: language
+      description: (e.g. "Python")
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: Level
+      description: choose from 100(beginner) to 400 (expert) 
+      options:
+        - 100
+        - 200
+        - 300
+        - 400
+    validations:
+      required: true
+  - type: input
+    id: image
+    attributes:
+      label: Primary image
+      description: (500x300 pixels, JPG or PNG) - provide link
+    validations:
+      required: true
+  - type: input
+    id: iac
+    attributes:
+      label: IaC framework 
+      description: (e.g. "AWS SAM", "AWS CDK", "Terraform")
+    validations:
+      required: true
+  - type: input
+    id: services
+    attributes:
+      label: AWS Serverless services used
+      description: comma sepperated list
+    validations:
+      required: true
+  - type: input
+    id: headline
+    attributes:
+      label: Description headline
+      description: (max 160 chars)
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Repo URL
+      description: Link to repo
+    validations:
+      required: true
