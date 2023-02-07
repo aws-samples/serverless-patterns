@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/content-filter-pattern-kinesis-cdk",
       "templateURL": "serverless-patterns/content-filter-pattern-kinesis-cdk",
       "projectFolder": "content-filter-pattern-kinesis-cdk",
-      "templateFile": "content-filter-pattern-kinesis-cdk/lib/content-filter-stack.ts"
+      "templateFile": "src/lib/content-filter-stack.ts"
     }
   },
   "resources": {
