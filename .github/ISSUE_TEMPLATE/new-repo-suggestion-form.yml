@@ -1,11 +1,6 @@
 
 name: New repo suggestion form
 description: 'To suggest a GitHub repo for inclusion in the Serverless Repo Collection, please complete the following form in full:'
-title: "[New repo]: "
-labels: ["repo"]
-assignees: 
-  - jbesw
-  - bls20AWS
 body:
   - type: markdown
     attributes:
@@ -79,3 +74,8 @@ body:
       description: Link to repo
     validations:
       required: true
+title: "[New repo]: "
+labels: ["repo"]
+assignees: 
+  - jbesw
+  - bls20AWS
