@@ -33,10 +33,10 @@ body:
       label: Level
       description: choose from 100(beginner) to 400 (expert) 
       options:
-        - 100
-        - 200
-        - 300
-        - 400
+        - "100"
+        - "200"
+        - "300"
+        - "400"
     validations:
       required: true
   - type: input
