@@ -1,4 +1,3 @@
----
 name: New repo suggestion form
 about: 'To suggest a GitHub repo for inclusion in the Serverless Repo Collection,
   please complete the following form in full:'
@@ -18,6 +17,3 @@ body:
       description: Describe what this repo does (max 100 chars)
     validations:
       required: true
-
----
-
