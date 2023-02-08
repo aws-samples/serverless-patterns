@@ -38,9 +38,9 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: type
+    id: typeof
     attributes:
-      label: Type
+      label: Type of application
       description: choose from the options below 
       options:
         - "Application"
