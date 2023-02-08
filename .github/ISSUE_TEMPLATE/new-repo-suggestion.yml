@@ -140,6 +140,11 @@ body:
     attributes:
       value: |
         Thanks for taking the time to add a repo!
+  - type: input
+    id: leave
+    attributes:
+      label: leave
+      description: Leave blank
 labels: ["repo-issue"]
 assignees: 
   - jbesw
