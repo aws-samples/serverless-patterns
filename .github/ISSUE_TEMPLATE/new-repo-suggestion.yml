@@ -136,7 +136,7 @@ body:
     id: AuthorLinkedIn
     attributes:
       label: Author LinkedIn URL 
-
+  
 labels: ["repo-issue"]
 assignees: 
   - jbesw
