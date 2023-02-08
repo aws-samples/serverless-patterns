@@ -1,6 +1,6 @@
 # SQS to EventBridge using EventBridge Pipes with normalizer pattern
 
-This pattern demonstrates the [normalizer pattern](https://www.enterpriseintegrationpatterns.com/Normalizer.html) between two SQS and EventBridge, implemented using an EventBridge Pipe. The pipe uses a Step Functions workflow to unify the events.
+This pattern demonstrates the [normalizer pattern](https://www.enterpriseintegrationpatterns.com/Normalizer.html) between SQS and EventBridge, implemented using an EventBridge Pipe. The pipe uses a Step Functions workflow to unify the events.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/normalizer-pattern-cdk
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/content-filter-pattern-kinesis-cdk/src
+    cd serverless-patterns/normalizer-pattern-cdk/src
     ```
 1. Install dependencies:
     ```
