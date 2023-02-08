@@ -2,7 +2,7 @@
 name: New repo suggestion form
 description: |
             To suggest a GitHub repo for inclusion in the Serverless Repo Collection, please complete the following form in full:
-title: "[New repo]: "
+title: " "
 body:
   - type: textarea 
     id: description
@@ -35,6 +35,18 @@ body:
         - "200"
         - "300"
         - "400"
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      description: choose from the options below 
+      options:
+        - "Application"
+        - "Examples"
+        - "Tips"
+        - "Workshop"
     validations:
       required: true
   - type: input
@@ -124,6 +136,10 @@ body:
     id: AuthorLinkedIn
     attributes:
       label: Author LinkedIn URL 
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to add a repo
 labels: ["repo-issue"]
 assignees: 
   - jbesw
