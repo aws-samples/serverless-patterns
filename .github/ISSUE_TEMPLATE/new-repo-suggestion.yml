@@ -136,10 +136,7 @@ body:
     id: AuthorLinkedIn
     attributes:
       label: Author LinkedIn URL 
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for taking the time to add a repo
+
 labels: ["repo-issue"]
 assignees: 
   - jbesw
