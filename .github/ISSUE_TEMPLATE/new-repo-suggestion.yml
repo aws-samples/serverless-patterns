@@ -47,6 +47,16 @@ body:
         - "Examples"
         - "Tips"
         - "Workshop"
+  - type: dropdown
+    id: usecase
+    attributes:
+      label: Use case
+      description: choose from the options below 
+      options:
+        - "Backend"
+        - "Interactive workload"
+        - "Observability"
+        - "Performance"
     validations:
       required: true
   - type: input
