@@ -1,10 +1,8 @@
-# SQS to Step Functions using EventBridge Pipes with message translator pattern
+# SQS to EventBridge using EventBridge Pipes with normalizer pattern
 
-This pattern implementes the [message translator](https://www.enterpriseintegrationpatterns.com/MessageTranslator.html) pattern using an EventBridge Pipe. This example uses SQS as source and Step Functions as target, but the pattern can be applied to other sources and targets as well. 
+This pattern demonstrates the [normalizer pattern](https://www.enterpriseintegrationpatterns.com/Normalizer.html) between SQS and EventBridge, implemented using an EventBridge Pipe. The pipe uses a Step Functions workflow to unify the events.
 
-In an event-driven architecture, event senders and receivers are independent from each other, and for that reason, the events they exchange may have different formats. To allow communication between different components, a translation of these events is needed, known as the Message Translator pattern. For example, an event contains an address, but the consumer expects coordinates.
-
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/message-translator-pattern-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/normalizer-pattern-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -23,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/message-translator-pattern-cdk/src
+    cd serverless-patterns/normalizer-pattern-cdk/src
     ```
 1. Install dependencies:
     ```
@@ -35,7 +33,7 @@ Important: this application uses various AWS services and there are costs associ
     cdk bootstrap 1111111111/us-east-1
     cdk bootstrap --profile test 1111111111/us-east-1
    ```
-1. From the command line, use AWS CDK to deploy the AWS resources for the pattern.
+1. From the command line, use AWS CDK to deploy the AWS resources for the pattern:
     ```
     npm run build && cdk deploy 
     ```
@@ -45,14 +43,16 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-For demonstration purposes this pattern is implemented using a lambda function which mocks the result. This way, you can test it without the need for an geolocation API.
+This template demonstrates how EventBridge Pipes can filter events between two Kinesis streams. The pipe uses a filter to discard unwanted messages and an input transformer to select which attributes to keep for the remaining messages. Use the AWS Lambda function as described below to generate sample events.
 
 ## Testing
 
 Step-by-step instructions to understand the implementation for the pattern:
 
-1. Trigger the MessageTranslatorSampleDataCreatorLambda-function to generate an example event with an address.
-2. Take a look at the MessageTranslatorTargetStepFunctionsWorkflow to see the result.
+1. Deploy the ContentFilterStack
+1. Trigger the ContentFilterTestLambda-function to generate two sample events on the sourceStream.
+1. Look at the SourceStream: you will find two records per ContentFilterTestLambda-execution, including PII-data.
+1. Look at the TargetStream, you will find that only the ORDER event has been forwarded, and it does not contain personal data anymore.
 
 ## Cleanup
  
