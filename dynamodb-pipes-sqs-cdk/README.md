@@ -9,7 +9,7 @@ In order to reprocess a failed DynamoDB streams message, you would need to write
 
 This approach leverages SQS and its feature to re-drive failed messages from the dead letter queue to the input queue. That means the same code can be used to process both the original messages and the failed messages.  The dead letter queue is configured to keep the messages for up to 14 days, which allow the team time to fix the problem and reprocess the messages without having to rush.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamo-pipes-sqs-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-pipes-sqs-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -29,7 +29,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd dynamo-pipes-sqs-cdk
+    cd dynamodb-pipes-sqs-cdk
     ```
 1. From the command line, use AWS CDK to deploy the AWS resources for the pattern:
     ```
