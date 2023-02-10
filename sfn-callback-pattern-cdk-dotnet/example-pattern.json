@@ -1,0 +1,46 @@
+{
+	"title": "AWS Step Functions callback pattern",
+	"description": "AWS Step Functions callback pattern sample in .NET",
+	"language": "",
+	"level": "200",
+	"framework": "CDK",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This sample provides implementation of callback pattern for approval or confirmation step from external API/service with the help of Amazon S3, and AWS Lambda functions."
+		]
+	},
+	 "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/aws-step-functions-callback-pattern-dotnet-sample",
+      "projectFolder": "aws-step-functions-callback-pattern-dotnet-sample",
+      "readmeURL": "https://github.com/aws-samples/aws-step-functions-callback-pattern-dotnet-sample/blob/main/README.md",
+      "templateURL": "https://github.com/aws-samples/aws-step-functions-callback-pattern-dotnet-sample/blob/main/Deployment/CdkStack.cs",
+    }
+  },
+  "deploy": {
+    "text": [
+	  "<code>cdk synth</code>",
+      "<code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+  "authors": [
+    {
+      "name": "Uma Shankar",
+      "image": "https://avatars.githubusercontent.com/u/12746278?s=400&u=ff64e2f3321c310ff9c1d1a8ac7ab381f8e2bebc&v=4",
+      "bio": "Application Development Consultant at AWS Professional Services.",
+      "linkedin": "https://www.linkedin.com/in/uma-shankar-patel-061a7924/"
+    }
+  ]
+}
