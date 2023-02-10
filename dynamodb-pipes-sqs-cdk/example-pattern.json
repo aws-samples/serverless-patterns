@@ -14,10 +14,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamo-pipes-sqs-cdk",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-pipes-sqs-cdk",
       "templateURL": "serverless-patterns/dynamo-pipes-sqs-cdk",
-      "projectFolder": "dynamo-pipes-sqs-cdk",
-      "templateFile": "dynamo-pipes-sqs-cdk/src/DynamoPipeSqsDynamoPipeSqsStack.cs"
+      "projectFolder": "dynamodb-pipes-sqs-cdk",
+      "templateFile": "dynamodb-pipes-sqs-cdk/src/DynamoPipeSqsDynamoPipeSqsStack.cs"
     }
   },
   "resources": {
