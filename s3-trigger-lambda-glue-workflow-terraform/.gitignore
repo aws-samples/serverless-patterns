@@ -1,0 +1,5 @@
+builds/*
+thumbs/*
+.terraform/*
+.terraform*
+lambda.zip
