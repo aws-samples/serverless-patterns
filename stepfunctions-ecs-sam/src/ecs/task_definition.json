@@ -1,0 +1,77 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:<REGION>:<ACCOUNTID>:task-definition/<TASKNAME>:1",
+    "containerDefinitions": [
+        {
+            "name": "<IMAGENAME>",
+            "image": "<ACCOUNTID>.dkr.ecr.<REGION>.amazonaws.com/<IMAGENAME>:latest",
+            "cpu": 0,
+            "portMappings": [],
+            "essential": true,
+            "entryPoint": [],
+            "command": [],
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "startTimeout": 60,
+            "stopTimeout": 120,
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/<TASKNAME>",
+                    "awslogs-region": "<REGION>",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "family": "<TASKNAME>",
+    "taskRoleArn": "arn:aws:iam::<ACCOUNTID>:role/ECS_AuroraS3_FullAccess",
+    "executionRoleArn": "arn:aws:iam::<ACCOUNTID>:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 1,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.container-ordering"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "2048",
+    "runtimePlatform": {
+        "operatingSystemFamily": "LINUX"
+    },
+    "tags": []
+}

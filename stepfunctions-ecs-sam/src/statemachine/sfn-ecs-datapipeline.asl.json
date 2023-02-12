@@ -1,0 +1,65 @@
+{
+  "Comment": "State Definition for a Step Function - ECS task invocation workflow",
+  "StartAt": "Parallel ECS Tasks",
+  "States": {
+    "Parallel ECS Tasks": {
+      "Comment": "A Map state is used to invoke multiple ecs tasks in parallel items in an array input.",
+      "Type": "Map",
+      "ItemsPath": "$.bucketArray",
+      "MaxConcurrency": 0,
+      "Iterator": {
+        "StartAt": "Invoke ECS Task",
+        "States": {
+          "Invoke ECS Task": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::ecs:runTask.waitForTaskToken",
+            "Parameters": {
+              "LaunchType": "FARGATE",
+              "Cluster": "${ECSClusterARN}",
+              "TaskDefinition": "${ECSTaskDefinitionARN}",
+              "Overrides": {
+                "ContainerOverrides": [
+                  {
+                    "Name": "${ECSTaskName}",
+                    "Environment": [
+                      {
+                        "Name": "TASK_TOKEN",
+                        "Value.$": "$$.Task.Token"
+                      },
+                      {
+                        "Name": "S3_BUCKET",
+                        "Value.$": "$"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "NetworkConfiguration": {
+                "AwsvpcConfiguration": {
+                  "Subnets": ["${ECSVpcSubnet}"],
+                  "AssignPublicIp": "ENABLED"
+                }
+              }
+            },
+            "End": true
+          }
+        }
+      },
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "custom error"
+          ],
+          "ResultPath": "$.failureOutput",
+          "Next": "Review Results"
+        }
+      ],
+      "ResultPath": "$.results",
+      "Next": "Review Results"
+    },
+    "Review Results": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}
