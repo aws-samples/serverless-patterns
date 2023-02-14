@@ -145,7 +145,7 @@ aws logs describe-log-groups --log-group-name-pattern EsmSqsFilter
 3. Navigate to CloudWatch console and view the following log groups:
 
 | Log Group | Pattern(s) | Comment |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | /aws/lambda/\*EsmSqsFilterFunctionNoFilter\* | | matches all test messages |
 | /aws/lambda/\*EsmSqsFilterFunctionPrefix\* | `{"body":{"region":[{"prefix":"us-"}]}}` | matches the message if the region begins with "us-" |
 | /aws/lambda/\*EsmSqsFilterFunctionIP\* | `{body":{"sourceIPAddress":[{ "cidr":"10.0.0.0/24"}]}}` | matches messages that have sourceIPAddress within the cidr range specified (10.0.0.0->10.0.0.255) |
