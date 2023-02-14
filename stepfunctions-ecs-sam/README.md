@@ -37,7 +37,7 @@ Important: this application uses various AWS services and there are costs associ
     * Create the task image and push it to the repository  
     * Create the required roles for executing the ECS tasks
     * Create the ECS Cluster and the task definition for running the task
-    * Note the ARNs of the ECS Cluster and the Task Definition. Also note the image name for the task. These are the ARNs and image name which will be used for testing.
+    * Note the ARNs of the ECS Cluster, the Task Definition, the task role and the task execution roles. Also note the image name for the task. These are the ARNs and image name which will be used for testing and are required to be passed to the sam deploy process to deploy the statemachine..
 
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -48,6 +48,8 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the cluster arn
     * Enter the task definition arn
     * Enter the task image name
+    * Enter the ECS Task Execution Role arn
+    * Enter the ECS Task Role arn
     * Enter the subnet to run the VPC (Note: You can edit the statemachine definition after it is created to specify an array of subnets, if required)
     * Allow SAM CLI to create IAM roles with the required permissions
    Once you have run sam deploy -guided mode once and saved arguments to a configuration file (samconfig.toml), you can use sam deploy in the future to use these defaults.

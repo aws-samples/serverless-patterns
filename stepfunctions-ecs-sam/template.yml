@@ -15,6 +15,14 @@ Parameters:
     Type: String
     Description: Enter the task's image name
 
+  EcsTaskExecutionRole:
+    Type: String
+    Description: Enter the ARN of the ECS Task Execution Role
+
+  EcsTaskRole:
+    Type: String
+    Description: Enter the ARN of the ECS Task Role
+  
   VpcSubnet:
     Type: String
     Description: Enter a subnet to use to run the tasks
@@ -43,7 +51,15 @@ Resources:
                 - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/*"
               - Effect: Allow
                 Action: "iam:PassRole"
-                Resource: "*"
+                Resource:
+                - !Ref EcsTaskExecutionRole
+                Condition:
+                  StringLike:
+                    "iam:PassedToService": "ecs-tasks.amazonaws.com"
+              - Effect: Allow
+                Action: "iam:PassRole"
+                Resource:
+                - !Ref EcsTaskRole
                 Condition:
                   StringLike:
                     "iam:PassedToService": "ecs-tasks.amazonaws.com"
