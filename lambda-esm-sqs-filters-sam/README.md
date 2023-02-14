@@ -139,7 +139,7 @@ aws sns publish --topic-arn ENTER_YOUR_TOPIC_ARN --message file://events/testMes
 ```
 2. Retrieve the logs from Cloudwatch Logs and verify all functions have run:
 ```bash
-aws logs describe-log-groups --log-group-name-pattern EsmSqsFilteraws
+aws logs describe-log-groups --log-group-name-pattern EsmSqsFilter
 ```
 
 ## Cleanup
