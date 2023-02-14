@@ -147,11 +147,11 @@ aws logs describe-log-groups --log-group-name-pattern EsmSqsFilter
 | Log Group | Pattern(s) | Comment |
 | --- | --- | --- | --- |
 | /aws/lambda/\*EsmSqsFilterFunctionNoFilter\* | | matches all test messages |
-| /aws/lambda/\*EsmSqsFilterFunctionPrefix\* | {"body":{"region":[{"prefix":"us-"}]}} | matches the message if the region begins with "us-" |
-| /aws/lambda/\*EsmSqsFilterFunctionIP\* | body":{"sourceIPAddress":[{ "cidr":"10.0.0.0/24"}]}} | matches messages that have sourceIPAddress within the cidr range specified (10.0.0.0->10.0.0.255) |
-| /aws/lambda/\*EsmSqsFilterFunctionAnythingBut\* | {"body":{"address":{"state":[{"anything-but":"GA"}]}}} | matches messages that have a value in address->state not equal to "GA" |
-| /aws/lambda/\*EsmSqsFilterFunctionAnd\* | {"body":{"rating":[{"numeric":[">",0,"<=",5]}],"address":{"country":["USA"],"street":[{"exists":true}]}}} | Logical AND. It will match any rating between 0 and 5 (excluding 0) AND the country needs to match AND the "street" key needs to be present (the exists filter only works on leaf nodes!) |
-| /aws/lambda/\*EsmSqsFilterFunctionOr\* | {"body":{"rating":[4,5]}}, {"body":{"fileName": ["metadata.txt"]}}, {"body":{"address":{"country":["USA"],"street":[{"exists":true}]}}}}| Logical OR. The filter will match if any of the rules match. Rating is 4 or 5 OR the filename is "metadata.txt" OR (the country is "USA" and there is a street address present) |
+| /aws/lambda/\*EsmSqsFilterFunctionPrefix\* | `{"body":{"region":[{"prefix":"us-"}]}}` | matches the message if the region begins with "us-" |
+| /aws/lambda/\*EsmSqsFilterFunctionIP\* | `{body":{"sourceIPAddress":[{ "cidr":"10.0.0.0/24"}]}}` | matches messages that have sourceIPAddress within the cidr range specified (10.0.0.0->10.0.0.255) |
+| /aws/lambda/\*EsmSqsFilterFunctionAnythingBut\* | `{"body":{"address":{"state":[{"anything-but":"GA"}]}}}` | matches messages that have a value in address->state not equal to "GA" |
+| /aws/lambda/\*EsmSqsFilterFunctionAnd\* | `{"body":{"rating":[{"numeric":[">",0,"<=",5]}],"address":{"country":["USA"],"street":[{"exists":true}]}}}` | Logical AND. It will match any rating between 0 and 5 (excluding 0) AND the country needs to match AND the "street" key needs to be present (the exists filter only works on leaf nodes!) |
+| /aws/lambda/\*EsmSqsFilterFunctionOr\* | `{"body":{"rating":[4,5]}}, {"body":{"fileName": ["metadata.txt"]}}, {"body":{"address":{"country":["USA"],"street":[{"exists":true}]}}}}`| Logical OR. The filter will match if any of the rules match. Rating is 4 or 5 OR the filename is "metadata.txt" OR (the country is "USA" and there is a street address present) |
 
 
 ## Cleanup
