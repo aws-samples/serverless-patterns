@@ -1,6 +1,6 @@
 {
     "title": "Step Functions workflow to invoke ECS tasks that read from S3",
-    "description": "Step Functions - Polly SDK integration for text to speech output as mp3 into s3 .",
+    "description": "Step Functions - ECS Integration to run multiple ECS tasks in parallel",
     "language": "Python",
     "level": "200",
     "framework": "SAM",
