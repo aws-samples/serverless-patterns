@@ -97,10 +97,13 @@ Important: this application uses various AWS services and there are costs associ
 ```
 
 ## Filters that do not work with SQS
-**Suffix** - Also known as Ends with. Filter like this: `"FileName": [ { "suffix": ".png" } ]` does not work with ESM for SQS
-**$Or** - Also known as Or (multiple fields). Filter like this: `"$or": [ { "Location": [ "New York" ] }, { "Day": [ "Monday" ] } ]` does not work with ESM for SQS
-**Filters on `messageAttributes`** - When sending an SQS message, there is an option to add additional attributes to the message. ESM filters do not work on these. Filters do work on the `body` & `attributes` (see ecample payload below) part of the message, but not on the messageAttributes.
-**equals-ignore-case** - `"Name": [ { "equals-ignore-case": "alice" } ]` This operator is not supported by ESM filters for SQS
+*Suffix* - Also known as Ends with. Filter like this: `"FileName": [ { "suffix": ".png" } ]` does not work with ESM for SQS
+
+*$Or* - Also known as Or (multiple fields). Filter like this: `"$or": [ { "Location": [ "New York" ] }, { "Day": [ "Monday" ] } ]` does not work with ESM for SQS
+
+*Filters on `messageAttributes`* - When sending an SQS message, there is an option to add additional attributes to the message. ESM filters do not work on these. Filters do work on the `body` & `attributes` (see ecample payload below) part of the message, but not on the messageAttributes.
+
+*equals-ignore-case* - `"Name": [ { "equals-ignore-case": "alice" } ]` This operator is not supported by ESM filters for SQS
 
 ## Example test json
 ```
@@ -149,7 +152,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ```
 
-### Testing
+## Testing
 
 Use the [AWS CLI](https://aws.amazon.com/cli/) to publish a message to the SNS topic. SNS will send the message to all SQS Queues, which will be used as a trigger for the Lambda functions. Using event source mapping (ESM), the message content will be evaluated against the defined rules on the event trigger. If the rules match, the lambda function will be triggered, otherwise the message will be discarded. The SNS topic name is in the outputs of the AWS SAM deployment (the key is `SNSArn`):
 
