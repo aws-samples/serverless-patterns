@@ -1,0 +1,158 @@
+# AWS Event Source Mapping for Lambda from Amazon SQS
+
+You can use event filtering to control which events Lambda sends to your function for processing. You can use this template to explore and test how to configure event filtering for SQS messages triggering a lambda function. The SAM template deploys multiple Lambda function, multiple SQS queues and the permissions required to run the application. The template also deploys an SNS topic that helps automate the testing of the pattern.
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-esm-sqs-filters-sam/
+
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+
+## Requirements
+
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+
+## Deployment Instructions
+
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+1. Change directory to the pattern directory:
+    ```
+    cd serverless-patterns/lambda-esm-sqs-filters-sam
+    ```
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+    ```
+    sam deploy --guided
+    ```
+1. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region
+    * Allow SAM CLI to create IAM roles with the required permissions.
+
+    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+
+1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+
+## Included scenarios
+**No Filter** - A simple trigger without a filter criteria
+**Prefix** - A filter checking whether a particular JSON field value begins with a particular value
+```
+{
+    "body":{
+        "region":[{"prefix":"us-"}]
+    }
+}
+```
+
+**Anything But** - A filter checking whether a particular JSON value is not what we have defined in the filter rule
+```
+{
+    "body":{
+        "address":{"state":[{"anything-but":"GA"}]}
+    }
+}
+```
+
+**IP** - A filter checking whether the inspected value is an IP address within a certain CIDR
+```
+{
+    "body":{
+        "sourceIPAddress":[{"cidr":"10.0.0.0/24"}]
+    }
+}
+```
+
+**AND** - Logical AND. This filter will match any rating between 0 and 5 (excluding 0) AND the country needs to match AND the "street" key needs to be present (the exists filter only works on leaf nodes!)
+```
+{
+    "body" : {
+      "rating" : [ { "numeric": [ ">", 0, "<=", 5]}],
+      "address" : {
+          "country": [ "USA" ],
+          "street": [ { "exists": true  } ]
+      }
+    }
+}
+```
+
+**OR** - Logical OR. The filter will match if any of the rules match. Rating is 4 or 5 OR the filename is "metadata.txt" OR (the country is "USA" and there is a street address present)
+```
+{
+    "body":{"rating":[4,5]}
+}
+{
+    "body":{"fileName": ["metadata.txt"]}
+}
+{
+    "body":{
+        "address":{
+            "country":["USA"],
+            "street":[{"exists":true}]
+        }
+    }
+}
+```
+
+## Example test json
+```
+{
+    "region": "us-east-1",
+    "sourceIPAddress": "10.0.0.11",
+    "rating": 4,
+    "fileName": "metadata.txt",
+    "address": {
+        "country": "USA",
+        "street": "56 Fox Dr",
+        "city": "Boston",
+        "state": "MA"
+    }
+}
+```
+
+## Example payload from SQS
+
+```
+{                                                                                                                   
+    "Messages": [
+        {
+            "MessageId": "12345678-876d-41f7-b32c-1234567890",
+            "ReceiptHandle": "AQEBZfn1234567890O78Kn0C1234567890/z1+1234567890f2bQYOvD9RL1234567890Srr7+XQ/U1234567890j7nL+uaDVnJL1234567890mASoiwI/yQ1234567890gv/h17BW12345678908Pry0JM1234567890DfHE1g1234567890aMisj1234567890M+rC+ZF21234567890QdQpEwrX01234567890Fw6w2+Po0OA1234567890DkKgGuEmebp1234567890w7nNXujzSnzIXj1234567890CqfDOb2D1234567890kCk841+01234567890OaYzXV1234567890C+ruRXj1234567890AR5+vj8+U1234567890SJplJLjd1234567890YWV8o1234567890gJXb12345678901234567890",
+            "MD5OfBody": "1234567890eb64e60d1234567890",
+            "Body": "Message at Wed Feb 10 2021 13:47:31 GMT+0000 (Coordinated Universal Time)"
+        }
+    ]
+}
+
+```
+
+### Testing
+
+Use the [AWS CLI](https://aws.amazon.com/cli/) to publish a message to the SNS topic. SNS will send the message to all SQS Queues, which will be used as a trigger for the Lambda functions. Using event source mapping (ESM), the message content will be evaluated against the defined rules on the event trigger. If the rules match, the lambda function will be triggered, otherwise the message will be discarded. The SNS topic name is in the outputs of the AWS SAM deployment (the key is `SNSArn`):
+
+1. Publish a test message to the SNS topic to send it to all test SQS queues:
+
+```bash
+aws sns publish --topic-arn ENTER_YOUR_TOPIC_ARN --message file://events/testMessage.json
+```
+2. Retrieve the logs from Cloudwatch Logs and verify all functions have run:
+```bash
+aws logs describe-log-groups --log-group-name-pattern EsmSqsFilteraws
+```
+
+## Cleanup
+ 
+1. Delete the stack
+    ```bash
+    aws cloudformation delete-stack --stack-name STACK_NAME
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    ```
+----
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
