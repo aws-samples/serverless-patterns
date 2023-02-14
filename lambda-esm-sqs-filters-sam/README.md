@@ -96,6 +96,12 @@ Important: this application uses various AWS services and there are costs associ
 }
 ```
 
+## Filters that do not work with SQS
+**Suffix** - Also known as Ends with. Filter like this: `"FileName": [ { "suffix": ".png" } ]` does not work with ESM for SQS
+**$Or** - Also known as Or (multiple fields). Filter like this: `"$or": [ { "Location": [ "New York" ] }, { "Day": [ "Monday" ] } ]` does not work with ESM for SQS
+**Filters on `messageAttributes`** - When sending an SQS message, there is an option to add additional attributes to the message. ESM filters do not work on these. Filters do work on the `body` & `attributes` (see ecample payload below) part of the message, but not on the messageAttributes.
+**equals-ignore-case** - `"Name": [ { "equals-ignore-case": "alice" } ]` This operator is not supported by ESM filters for SQS
+
 ## Example test json
 ```
 {
@@ -115,13 +121,28 @@ Important: this application uses various AWS services and there are costs associ
 ## Example payload from SQS
 
 ```
-{                                                                                                                   
-    "Messages": [
+{
+    "Records": [
         {
-            "MessageId": "12345678-876d-41f7-b32c-1234567890",
-            "ReceiptHandle": "AQEBZfn1234567890O78Kn0C1234567890/z1+1234567890f2bQYOvD9RL1234567890Srr7+XQ/U1234567890j7nL+uaDVnJL1234567890mASoiwI/yQ1234567890gv/h17BW12345678908Pry0JM1234567890DfHE1g1234567890aMisj1234567890M+rC+ZF21234567890QdQpEwrX01234567890Fw6w2+Po0OA1234567890DkKgGuEmebp1234567890w7nNXujzSnzIXj1234567890CqfDOb2D1234567890kCk841+01234567890OaYzXV1234567890C+ruRXj1234567890AR5+vj8+U1234567890SJplJLjd1234567890YWV8o1234567890gJXb12345678901234567890",
-            "MD5OfBody": "1234567890eb64e60d1234567890",
-            "Body": "Message at Wed Feb 10 2021 13:47:31 GMT+0000 (Coordinated Universal Time)"
+            "messageId": "059f36b4-87a3-44ab-83d2-661975830a7d",
+            "receiptHandle": "AQEBwJnKyrHigUMZj6rYigCgxlaS3SLy0a...",
+            "body": "test",
+            "attributes": {
+                "ApproximateReceiveCount": "1",
+                "SentTimestamp": "1545082649183",
+                "SenderId": "AIDAIENQZJOLO23YVJ4VO",
+                "ApproximateFirstReceiveTimestamp": "1545082649185"
+            },
+            "messageAttributes": {
+                'customAttribute': {
+                DataType: 'String',
+                StringValue: 'CustomValue'
+                }
+            },
+            "md5OfBody": "098f6bcd4621d373cade4e832627b4f6",
+            "eventSource": "aws:sqs",
+            "eventSourceARN": "arn:aws:sqs:us-east-2:123456789012:my-queue",
+            "awsRegion": "us-east-2"
         }
     ]
 }
