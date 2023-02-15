@@ -13,10 +13,10 @@
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunctions-ecs-sam",
-        "templateURL": "serverless-patterns/stepfunctions-ecs-sam",
-        "projectFolder": "stepfunctions-ecs-sam",
-        "templateFile": "stepfunctions-ecs-sam/template.yml"
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-ecs-sam",
+        "templateURL": "serverless-patterns/sfn-ecs-sam",
+        "projectFolder": "sfn-ecs-sam",
+        "templateFile": "sfn-ecs-sam/template.yml"
       }
     },
     "resources": {
