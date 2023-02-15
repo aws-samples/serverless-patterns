@@ -12,12 +12,12 @@
       ]
     },
     "gitHub": {
-      "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-ecs-sam",
-        "templateURL": "serverless-patterns/sfn-ecs-sam",
-        "projectFolder": "sfn-ecs-sam",
-        "templateFile": "sfn-ecs-sam/template.yml"
-      }
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-ecs-sam",
+            "templateURL": "serverless-patterns/sfn-ecs-sam",
+            "projectFolder": "sfn-ecs-sam",
+            "templateFile": "template.yml"
+            }
     },
     "resources": {
       "bullets": [
