@@ -16,7 +16,7 @@
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-esm-sqs-filters-sam/",
         "templateURL": "serverless-patterns/lambda-esm-sqs-filters-sam",
         "projectFolder": "lambda-esm-sqs-filters-sam",
-        "templateFile": "lambda-esm-sqs-filters-sam/template.yaml",
+        "templateFile": "lambda-esm-sqs-filters-sam/template.yaml"
       }
     },
     "resources": {
