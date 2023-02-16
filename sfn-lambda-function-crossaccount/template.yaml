@@ -1,0 +1,98 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  This CloudFormation deploys
+Parameters:
+  StepFunctionName:
+    Type: String
+    Default: StepFunction
+    Description: Lambda Function Name.
+
+  StepFunctionRoleName:
+    Type: String
+    Default: crossAccLambdaFunctionRole
+    Description: Lambda Function execution role's name.
+
+  CrossAccountID:
+    Type: String
+    Description: Cross Account Id where Lambda function will be deployed
+    AllowedPattern: ^\d{12}
+  
+  LambdaFunctionName:
+    Type: String
+    Description: Enter the name of the Lambda function which will be deployed in other account
+  
+  Region:
+    Type: String
+    Description: Enter the region where Lambda function will be deployed in other account. For eg - us-east-1
+
+
+Resources:
+  StepFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+            - Effect: Allow
+              Principal:
+                Service: states.amazonaws.com
+              Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "LambdaExecutionPolicy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !Sub 
+                          - "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName}"
+                          - Region: !Ref Region
+                            AccountId: !Ref CrossAccountID
+                            LambdaFunctionName: !Ref LambdaFunctionName
+      RoleName: !Ref StepFunctionRoleName
+
+  StepFunction:
+    Type: AWS::StepFunctions::StateMachine
+    Properties: 
+      Definition:
+        {
+          "Comment": "A Hello World example of the Amazon States Language using Pass states",
+          "StartAt": "LambdaFunction",
+          "States": {
+            "LambdaFunction": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "${Lambda}",
+                "Payload": {
+                  "data.$": "$.payload"
+                }
+              },
+              "End": true
+            }
+          }
+        }
+      DefinitionSubstitutions: 
+        Lambda: !Sub 
+                - "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName}"
+                - Region: !Ref Region
+                  AccountId: !Ref CrossAccountID
+                  LambdaFunctionName: !Ref LambdaFunctionName
+      RoleArn: !GetAtt StepFunctionRole.Arn
+      StateMachineName: !Ref StepFunctionName
+      StateMachineType: STANDARD
+
+Outputs:
+  StateMachineArn:
+    Description: This is the ARN of the state machine
+    Value: !Ref StepFunction
+  
+  AccountId:
+    Description: Account Id
+    Value: !Sub '${AWS::AccountId}'
+  
+  StepFunctionRoleName:
+    Description: Name of the step function's execution role
+    Value: !Ref StepFunctionRoleName
