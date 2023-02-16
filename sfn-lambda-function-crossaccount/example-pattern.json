@@ -1,7 +1,7 @@
 {
 	"title": "Invoke cross account Lambda function directly via Step function",
 	"description": "Create a Step function which invokes cross account Lambda function",
-	"language": "Python",
+	"language": "HCL",
 	"level": "200",
 	"framework": "Serverless",
 	"introBox": {
@@ -51,8 +51,7 @@
       "name": "Shivam Rajawat",
       "image": "https://drive.google.com/file/d/1q872K5V1RKFHCrkwGSssWNeIwug6ZLxO/view",
       "bio": "I am a Cloud Support Engineer (Serverless) at AWS and I love to solve complex problems.",
-      "linkedin": "shivam-rajawat-a42b68124",
-      "twitter": ""
+      "linkedin": "shivam-rajawat-a42b68124"
     }
   ]
 }
