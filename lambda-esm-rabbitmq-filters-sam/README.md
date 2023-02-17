@@ -118,7 +118,7 @@ The `host` field points to the RabbitMQ (use the output from the SAM template)
 
 The `appId` field will be passed as an app_id basic property to the RabbitMQ
 
-The `secret` field is your secret in AWS Secrets Manager (use the output from the first command you ran `aws secretsmanager create-secret...`)
+The `secret` field is your secret in AWS Secrets Manager (output from `aws secretsmanager create-secret...`)
 
 The `queues` array is a list of queues that will be created on the RabbitMQ. The `messageBody` will be sent as a payload, along with the `appId` field as a basic property, to all RabbitMQ queues.
 
@@ -212,7 +212,7 @@ aws logs describe-log-groups --log-group-name-pattern MQFunction
 | /aws/lambda/\*MQFunctioIP\* | `{data":{"sourceIPAddress":[{ "cidr":"10.0.0.0/24"}]}}` | matches messages that have sourceIPAddress within the cidr range specified (10.0.0.0->10.0.0.255) |
 | /aws/lambda/\*MQFunctionAnythingBut\* | `{"data":{"address":{"state":[{"anything-but":"GA"}]}}}` | matches messages that have a value in address->state not equal to "GA" |
 | /aws/lambda/\*MQFunctionAnd\* | `{"data":{"rating":[{"numeric":[">",0,"<=",5]}],"address":{"country":["USA"],"street":[{"exists":true}]}}}` | Logical AND. It will match any rating between 0 and 5 (excluding 0) AND the country needs to match AND the "street" key needs to be present (the exists filter only works on leaf nodes!) |
-| /aws/lambda/\*MQFunctionOr\* | `{"data":{"rating":[4,5]}}, {"basicProperties":{"appId": ["myShinyApp"]}}, {"data":{"address":{"country":["USA"],"street":[{"exists":true}]}}}}`| Logical OR. The filter will match if any of the rules match. Note this combines filters for both the message data and message properties passed from RabbitMQ. The appId property is "myShinyApp" OR Rating is 4 or 5 OR the OR (the country is "USA" and there is a street address present) |
+| /aws/lambda/\*MQFunctionOr\* | `{"data":{"rating":[4,5]}}, {"basicProperties":{"appId": ["myShinyApp"]}}, {"data":{"address":{"country":["USA"],"street":[{"exists":true}]}}}`| Logical OR. The filter will match if any of the rules match. Note this combines filters for both the message data and message properties passed from RabbitMQ. The appId property is "myShinyApp" OR Rating is 4 or 5 OR the OR (the country is "USA" and there is a street address present) |
 
 
 ## Cleanup
