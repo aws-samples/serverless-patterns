@@ -1,0 +1,20 @@
+{
+  "host": "b-ed320c84-ad59-46ae-830b-db8b483228df.mq.us-east-1.amazonaws.com",
+  "appId": "myShinyApp1",
+  "queues": ["noFilterQ","prefixQ", "anythingButQ", "IPQ", "orQ", "andQ"],
+  "secret": "MQaccess",
+  "messageBody": {
+    "region": "us-east-1",
+    "sourceIPAddress": "10.1.0.11",
+    "rating": 3,
+    "fileName": "metadata.txt",
+    "address": {
+      "country": "USA",
+      "street": "56 Fox Dr",
+      "city": "Boston",
+      "state": "MA"
+    }
+  }
+}
+
+

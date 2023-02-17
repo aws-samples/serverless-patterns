@@ -1,0 +1,60 @@
+{
+    "title": "AWS Event Source Mapping for Lambda from AmazonMQ RabbitMQ",
+    "description": "Sample Lambda ESM Filter rules for RabbitMQ triggers",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "Use this code to test out different trigger filters for your Lambda functions. You can use event filtering to control which events Lambda sends to your function for processing. ",
+        "Use this template to explore and test how to configure event filtering for AmazonMQ RabbitMQ messages triggering a lambda function. ",
+        "The SAM template deploys multiple Lambda consumer functions, an MQ broker and the permissions required to run the application. ",
+        "The template also deploys an additional helper Lambda function used for creating the RabbitMQ Queues and pushing messages to it for testing purposes."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-esm-rabbitmq-filters-sam/",
+        "templateURL": "serverless-patterns/lambda-esm-rabbitmq-filters-sam",
+        "projectFolder": "lambda-esm-rabbitmq-filters-sam",
+        "templateFile": "lambda-esm-rabbitmq-filters-sam/template.yaml"
+      }
+    },
+    "resources": {
+      "headline": "Additional resources",
+      "bullets": [
+        {
+          "text": "Lambda event filtering",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam build",
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "headline": "Testing",
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "headline": "Cleanup",
+      "text": [
+        "1. Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+        {
+          "name": "Tsvetko Tsenkov",
+          "image": "https://avatars.githubusercontent.com/u/27500154?v=4",
+          "bio": "Tsvetko is a Senior Partner Solutions Architect based out of Atlanta, GA.",
+          "linkedin": "tsvetko-tsenkov-6501413",
+          "twitter": "cvetko_cenkov"
+        }
+    ]
+}
