@@ -1,7 +1,7 @@
 {
     "title": "EventBridge Pipes with Amazon MSK as source and Lambda function as target",
     "description": "This pattern shows how to use EventBridge Pipes with data coming in from Amazon MSK and process these messages using Lambda function",
-    "language": "",
+    "language": "Node.js",
     "level": "200",
     "framework": "SAM",
     "introBox": {
