@@ -1,8 +1,6 @@
 # AWS S3 to AWS Lambda to AWS Glue workflow
 
-This pattern << explain usage >>
-
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+This pattern creates an s3 bucket trigger that triggers a Lambda function(Whenever file lands), The Lambda function is used for triggering a Glue workflow with input parameters such as file key and bucket names. All elements covered in this pattern are built using Terraform.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -11,7 +9,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Terraform](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
 ## Getting started with Terraform Serverless Patterns
 
