@@ -10,7 +10,7 @@
     },
     "framework": {
       "type": "string",
-      "enum": ["CDK", "SAM", "Terraform", "Serverless Framework", "Terraform (with modules)", "Pulumi"]
+      "enum": ["CDK", "SAM", "Terraform", "Serverless Framework", "Terraform (with modules)"]
     },
     "introBox": {
       "type": "object",
