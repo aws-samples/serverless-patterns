@@ -5,7 +5,7 @@ output "S3-Bucket" {
 }
 
 output "lambda_function_name" {
-  value = aws_lambda_function.file_ingestion_trigger_glue_workflow.function_name
+  value = aws_lambda_function.first_glue_job_trigger_glue_workflow.function_name
 }
 
 output "cloudwatch_log_group" {
