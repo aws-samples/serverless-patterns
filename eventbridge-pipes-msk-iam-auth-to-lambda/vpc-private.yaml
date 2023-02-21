@@ -1,0 +1,175 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Mappings:
+  SubnetConfig:
+      VPC:
+        CIDR: '10.0.0.0/16'
+      PublicOne:
+        CIDR: '10.0.0.0/24'
+      PrivateSubnetMSKOne:
+        CIDR: '10.0.1.0/24'
+      PrivateSubnetMSKTwo:
+        CIDR: '10.0.2.0/24'
+      PrivateSubnetMSKThree:
+        CIDR: '10.0.3.0/24'
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+      Tags:
+        - Key: 'Name'
+          Value: 'MSKVPC'
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicOne', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: 'Name'
+          Value: 'PublicSubnet'
+  PrivateSubnetMSKOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetMSKOne', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetMSKOne'
+  PrivateSubnetMSKTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 1
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetMSKTwo', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetMSKTwo'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachement
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetOne
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  NATEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachement
+    Properties: 
+      Domain: vpc
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NATEIP.AllocationId
+      SubnetId: !Ref 'PublicSubnetOne'
+      Tags: 
+        - Key: 'Name'
+          Value: 'MSKNATGateway'
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway'
+
+  PrivateSubnetMSKOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetMSKOne
+  PrivateSubnetMSKTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetMSKTwo
+Outputs:
+  VPCId: 
+    Description: The ID of the VPC created
+    Value: !Ref 'VPC'
+  PublicSubnetOne: 
+    Description: The name of the public subnet created
+    Value: !Ref 'PublicSubnetOne'
+  PrivateSubnetMSKOne: 
+    Description: The ID of private subnet one created
+    Value: !Ref 'PrivateSubnetMSKOne'
+  PrivateSubnetMSKTwo: 
+    Description: The ID of private subnet two created
+    Value: !Ref 'PrivateSubnetMSKTwo'
+  VPCStackName: 
+    Description: The name of the VPC Stack
+    Value: !Ref 'AWS::StackName'
+  DefaultSecurityGroup:
+    Description: Default Security Group
+    Value: !GetAtt VPC.DefaultSecurityGroup
+
+  # VPCId: 
+  #   Description: The ID of the VPC created
+  #   Value: !Ref 'VPC'
+  #   Export:
+  #     Name: !Sub "${AWS::StackName}-VPCID"
+  # PublicSubnetOne: 
+  #   Description: The name of the public subnet created
+  #   Value: !Ref 'PublicSubnetOne'
+  #   Export:
+  #     Name: !Sub "${AWS::StackName}-PublicSubnetOne"
+  # PrivateSubnetMSKOne: 
+  #   Description: The ID of private subnet one created
+  #   Value: !Ref 'PrivateSubnetMSKOne'
+  #   Export:
+  #     Name: !Sub "${AWS::StackName}-PrivateSubnetMSKOne"
+  # PrivateSubnetMSKTwo: 
+  #   Description: The ID of private subnet two created
+  #   Value: !Ref 'PrivateSubnetMSKTwo'
+  #   Export:
+  #     Name: !Sub "${AWS::StackName}-PrivateSubnetMSKTwo"
+  # VPCStackName: 
+  #   Description: The name of the VPC Stack
+  #   Value: !Ref 'AWS::StackName'
+  #   Export:
+  #     Name: !Sub "${AWS::StackName}-VPCStackName"
+    
+
+
