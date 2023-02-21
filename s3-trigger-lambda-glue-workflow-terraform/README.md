@@ -8,7 +8,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-For cases where we need to process files using Glue jobs, we can use Glue 
+For cases where we need to process files using Glue jobs, we can use Glue Workflows to orchestrate our Glue jobs and Glue crawlers. S3 trigger is set up to trigger the Lambda on file upload event. To be able to trigger a Glue workflow with certain parameters, we use AWS Lambda to start glue workflows with parameters.
 
 ## Requirements
 
