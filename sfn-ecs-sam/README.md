@@ -9,7 +9,7 @@ This application pattern can be extended to
 1. Process multiple files from a single bucket in parallel
 2. Perform long running tasks not suited for Lambda processing in parallel 
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/stepfunctions-ecs-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-ecs-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -30,7 +30,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/stepfunctions-ecs-sam
+    cd serverless-patterns/sfn-ecs-sam
     ```
 1. Do the following to setup ECS (example scripts and roles to create can be found in the 'src/ecs' and 'src/ecs/roles' folders in the downloaded code)
     * Create the ECR Repository
