@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd sns-lambda
+    cd serverless-patterns/sns-lambda
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -73,7 +73,7 @@ aws sns publish --topic-arn ENTER_SNS_TOPIC_ARN FROM_OUTPUT --subject testSubjec
 ```
 2. Retrieve the logs from the Lambda function:
 ```bash
-sam logs -n ENTER_YOUR_CONSUMER_FUNCTION_NAME
+sam logs -n ENTER_YOUR_CONSUMER_FUNCTION_NAME -s STACK_NAME
 ```
 
 ## Cleanup
