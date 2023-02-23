@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrate how to use CloudWatch Logs to create Lambda subscription filter and publish the filtered logs to an SNS topic and deliver to an SQS queue. The logs sent to Lambda through a subsciption filter are base64 encoded and compressed with gzip format."
+      "This pattern demonstrates how to use CloudWatch Logs to create Lambda subscription filter and publish the filtered logs to an SNS topic and deliver to an SQS queue. The logs sent to Lambda through a subsciption filter are base64 encoded and compressed with gzip format."
     ]
   },
   "gitHub": {
