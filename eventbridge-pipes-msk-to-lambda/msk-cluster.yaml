@@ -1,0 +1,160 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  MSKKafkaVersion:
+    Type: String
+    Default: 2.8.1
+    AllowedValues:
+    - 2.8.1
+    - 2.8.0
+    - 2.7.1
+    - 2.7.0
+    - 2.6.2
+    - 2.6.1
+    - 2.6.0
+    - 2.5.1
+    - 2.4.1.1
+    - 2.3.1
+    - 2.2.1
+  InstanceType:
+    Type: String
+    Default: kafka.m5.large
+    AllowedValues:
+    - kafka.t3.small
+    - kafka.m5.large
+    - kafka.m5.xlarge
+    - kafka.m5.2xlarge
+    - kafka.m5.4xlarge
+    - kafka.m5.8xlarge
+    - kafka.m5.12xlarge
+    - kafka.m5.16xlarge
+    - kafka.m5.24xlarge
+  VPCId:
+    Type: String
+    Description: 'The VPC ID'
+  PublicSubnetOne:
+    Type: String
+    Description: 'Public Subnet'
+  PrivateSubnetMSKOne:
+    Type: String
+    Description: 'Private Subnet One'
+  PrivateSubnetMSKTwo:
+    Type: String
+    Description: 'Private Subnet Two'
+  
+Resources:
+  KafkaClientInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
+      GroupName: !Sub "${AWS::StackName} Security group attached to the kakfa client producer"
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 10.0.0.0/24
+  
+  MSKSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:         
+      GroupName: !Sub "${AWS::StackName} Security group for the MSK cluster"
+      GroupDescription: Security Group for the MSK cluster
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+      - Description: ZooKeeper Plaintext
+        FromPort: 2181
+        ToPort: 2181
+        IpProtocol: tcp
+        SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+      - Description: Bootstrap servers Plaintext
+        FromPort: 9092
+        ToPort: 9092
+        IpProtocol: tcp
+        SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+      - Description: Bootstrap servers TLS
+        FromPort: 9094
+        ToPort: 9094
+        IpProtocol: tcp
+        SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+      - Description: Kafka Connect
+        FromPort: 8083
+        ToPort: 8083
+        IpProtocol: tcp
+        SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+      - Description: Enable access to Schema Registry inside the SG
+        FromPort: 8081
+        ToPort: 8081
+        IpProtocol: tcp
+        SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+
+  MSKSecurityGroup9094:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: MSKSecurityGroup
+    Properties:
+      GroupId: !GetAtt MSKSecurityGroup.GroupId
+      Description: Enable Self referencing Bootstrap servers TLS
+      IpProtocol: tcp
+      FromPort: 9094
+      ToPort: 9094
+      SourceSecurityGroupId: !GetAtt MSKSecurityGroup.GroupId
+
+  MSKSecurityGroup9092:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: MSKSecurityGroup
+    Properties:
+      GroupId: !GetAtt MSKSecurityGroup.GroupId
+      Description: Enable Self referencing Bootstrap servers Plaintext
+      IpProtocol: tcp
+      FromPort: 9092
+      ToPort: 9092
+      SourceSecurityGroupId: !GetAtt MSKSecurityGroup.GroupId
+
+  MSKSecurityGroup9096:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: MSKSecurityGroup
+    Properties:
+      GroupId: !GetAtt MSKSecurityGroup.GroupId
+      Description: Enable Self referencing SASL
+      IpProtocol: tcp
+      FromPort: 9096
+      ToPort: 9096
+      SourceSecurityGroupId: !GetAtt MSKSecurityGroup.GroupId
+
+  MSKSecurityGroup9098:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: MSKSecurityGroup
+    Properties:
+      GroupId: !GetAtt MSKSecurityGroup.GroupId
+      Description: Enable Self referencing IAM
+      IpProtocol: tcp
+      FromPort: 9098
+      ToPort: 9098
+      SourceSecurityGroupId: !GetAtt MSKSecurityGroup.GroupId
+
+  MSKCluster:
+    Type: AWS::MSK::Cluster
+    Properties: 
+      BrokerNodeGroupInfo: 
+        ClientSubnets:
+          - !Ref PrivateSubnetMSKOne
+          - !Ref PrivateSubnetMSKTwo
+        SecurityGroups:
+          - !GetAtt MSKSecurityGroup.GroupId
+        InstanceType: !Ref InstanceType
+        StorageInfo:
+          EBSStorageInfo:
+            VolumeSize: 500
+      ClusterName: !Sub "${AWS::StackName}-cluster"
+      ClientAuthentication:
+          Unauthenticated: 
+            Enabled: True
+      KafkaVersion: !Ref MSKKafkaVersion
+      NumberOfBrokerNodes: 2
+      EncryptionInfo: 
+        EncryptionInTransit: 
+          ClientBroker: TLS_PLAINTEXT
+
+Outputs:
+  MSKCluster: 
+    Description: MSK Cluster details
+    Value: !Ref MSKCluster
