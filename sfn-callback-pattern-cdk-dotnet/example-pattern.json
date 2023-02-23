@@ -1,5 +1,5 @@
 {
-	"title": "AWS Step Functions callback pattern",
+	"title": "AWS Step Functions callback pattern using dotnet",
 	"description": "AWS Step Functions callback pattern sample in .NET",
 	"language": "",
 	"level": "200",
@@ -14,14 +14,13 @@
     "template": {
       "repoURL": "https://github.com/aws-samples/aws-step-functions-callback-pattern-dotnet-sample",
       "projectFolder": "aws-step-functions-callback-pattern-dotnet-sample",
-      "readmeURL": "https://github.com/aws-samples/aws-step-functions-callback-pattern-dotnet-sample/blob/main/README.md",
-      "templateURL": "https://github.com/aws-samples/aws-step-functions-callback-pattern-dotnet-sample/blob/main/Deployment/CdkStack.cs",
-    }
+      "readmeURL": "https://github.com/aws-samples/aws-step-functions-callback-pattern-dotnet-sample/blob/main/README.md"
+     }
   },
   "deploy": {
     "text": [
 	  "<code>cdk synth</code>",
-      "<code>cdk deploy</code>"
+    "<code>cdk deploy</code>"
     ]
   },
   "testing": {
@@ -31,7 +30,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk destroy</code>."
+      "<code>cdk destroy</code>."
     ]
   },
   "authors": [
