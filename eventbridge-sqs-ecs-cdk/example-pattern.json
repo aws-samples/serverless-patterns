@@ -8,7 +8,8 @@
     "headline": "How it works",
     "text": [
       "This project contains sample AWS CDK code to integrate Amazon EventBridge, Amazon SQS and Amazon Elastic Container Service (ECS).",
-      "As a new event is sent to EventBridge, it is queued in SQS and then, based on the number of messages in the queue, it creates an ECS cluster with Fargate task definitions."
+      "As a new event is sent to EventBridge, it is queued in SQS and then, based on the number of messages in the queue, it creates an ECS cluster with Fargate task definitions.",
+      "When the task is completed, it deletes the message from the queue."
     ]
   },
   "gitHub": {
