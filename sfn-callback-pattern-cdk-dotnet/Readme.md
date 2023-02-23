@@ -48,7 +48,7 @@ This is the architecture that this sample implements.
 12. API lambda sends acknowledgement response to the user.
 13. Starts complete order task\
 \
-***Note: To store task token any kind of storage you can use as Amazon S3/ DynamoDB/ Any DB based on your scanrio and cost considerations. You can use ECS Task (with Fargate) if task in Step function is taking more than 15 minutes as lambda function has 15 minutes per execution time limit.***
+***Note: To store task token you can use any kind of storage as Amazon S3/ DynamoDB or Any database, based on your scanrio and cost considerations. You can use ECS Task (with Fargate) if task in Step function is taking more than 15 minutes as lambda function has 15 minutes per execution time limit.***
 
 
 ## Testing
