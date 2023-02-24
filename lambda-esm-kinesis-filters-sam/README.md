@@ -1,9 +1,8 @@
-# AWS Event Source Mapping for Lambda from Amazon SQS
+# AWS Event Source Mapping for Lambda from Amazon Kinesis Data Stream
 
 This pattern demonstrates the ability to filter Amazon Kinesis events so that only a subset of all events is sent to an AWS Lambda function for processing. Demo stack will create a single Amazon Kinesis Data Stream (stream-lambda-esm-filter) and a number of AWS Lambda functions that are subscribed to that stream using different filter configurations.
 
 Review [Filter rule syntax](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html#filtering-syntax) for more details on the message filtering configuration.
-**Important note**: Filter definition should not contain any whitespace (tabs, space, etc.) in order to work properly!
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-esm-kinesis-filters-sam/](https://serverlessland.com/patterns/lambda-esm-kinesis-filters-sam/)
 
@@ -53,7 +52,15 @@ git clone https://github.com/aws-samples/serverless-patterns
 
 ## How it works
 
-Explain how the service interaction works.
+A new Amazon Kinesis Data Stream (stream-lambda-esm-filter) is created. Multiple AWS Lambda functions are subscribed to that stream with different filter settings. This way we demonstrate how various filtering settings affect which Amazon Kinesis Data Stream events are sent to each AWS Lambda function for processing.
+
+All AWS Lambda functions use the same code for demo purposes.
+
+The following considerations should be taken into account when working with Amazon Kinesis Data Stream events:
+
+* Event payload is base64 encoded and Lambda function is responsible for decoding it before processing
+* Event filtering for Amazon Kinesis Data Stream supports a subset of [Amazon EventBridge event patterns](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html), for example, `Or (multiple fields)` and `Ends with` didn't work
+* Filter definition should not contain any whitespace (tabs, space, etc.) in order to work properly!
 
 ## Testing
 

@@ -1,6 +1,6 @@
 {
-    "title": "AWS Event Source Mapping for Lambda from Amazon Kinesis",
-    "description": "Sample Lambda ESM Filter rules for Kinesis triggers",
+    "title": "AWS Event Source Mapping for Lambda from Amazon Kinesis Data Stream",
+    "description": "Sample Lambda ESM Filter rules for Amazon Kinesis Data Stream triggers",
     "language": "Node.js",
     "level": "200",
     "framework": "SAM",
