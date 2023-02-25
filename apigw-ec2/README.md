@@ -2,7 +2,7 @@
 ## Architecture
 * Account Setup
 
-    ![Concept](./images/stepfunctions-crossacc-lambda.png)
+    ![Concept](./images/apigw.png)
 
 This sample pattern allows users to quickly deploy a REST API, Network Load Balancer and NGINX server on a EC2 machine in their own VPC. The pattern uses Amazon API Gateway with VPC Link to securely connect to the NLB which routes traffic to EC2 instances running NGINX server. By using this pattern, users can ensure that their private resources are not exposed to the public internet while still allowing secure access through API Gateway. This pattern can be useful in scenarios where there is a need to integrate with private resources, such as internal databases or applications, while also maintaining a high level of security.
 
