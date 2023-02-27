@@ -26,6 +26,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd eventbridge-sqs-ecs-cdk/src
     ```
+3. From the command line, use npm to install the development dependencies:
+    ```
+    npm install    
+    ```
 3. Install the project dependencies
     ```
     python -m pip install -r python-app/requirements.txt
