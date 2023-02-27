@@ -1,7 +1,7 @@
 {
 	"title": "AWS Step Functions callback pattern using dotnet",
 	"description": "AWS Step Functions callback pattern sample in .NET",
-	"language": "C#",
+	"language": ".NET",
 	"level": "200",
 	"framework": "CDK",
 	"introBox": {
@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/aws-step-functions-callback-pattern-dotnet-sample.git",
       "templateURL": "aws-step-functions-callback-pattern-dotnet-sample",
       "projectFolder": "aws-step-functions-callback-pattern-dotnet-sample",
-      "templateFile": "C:\Projects\OpenSource\aws-step-functions-callback-pattern-dotnet-sample/Deployment/CdkStack.cs"
+      "templateFile": "/aws-step-functions-callback-pattern-dotnet-sample/Deployment/CdkStack.cs"
      }
     },
     "resources": {
