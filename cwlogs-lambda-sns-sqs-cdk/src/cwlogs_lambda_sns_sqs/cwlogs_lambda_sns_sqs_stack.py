@@ -1,5 +1,6 @@
 from constructs import Construct
 from aws_cdk import (
+    Aspects,
     Duration,
     Stack,
     CfnOutput,
@@ -12,6 +13,7 @@ from aws_cdk import (
     aws_iam as iam,
     aws_logs_destinations as log_destinations
 )
+import cdk_nag
 
 
 class CwlogsLambdaSnsSqsStack(Stack):
@@ -31,13 +33,17 @@ class CwlogsLambdaSnsSqsStack(Stack):
             master_key=alias
         )
         
-        #Create a Lambda function
+        #Create a Lambda function and Lambda execution role 
+        lambda_execution_role = iam.Role(self, "Custom Lambda Role",
+            assumed_by=iam.ServicePrincipal("lambda.amazonaws.com")
+        )
         subscribed_lambda = _lambda.Function(self, "SubscribedFunction",
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset("src/lambda"),
             handler="index.lambda_handler",
             timeout=Duration.seconds(2),
-            environment={'TOPIC_ARN': topic.topic_arn}
+            environment={'TOPIC_ARN': topic.topic_arn},
+            role=lambda_execution_role
         )
 
         #Create a CloudWatch Log group and stream
@@ -46,6 +52,30 @@ class CwlogsLambdaSnsSqsStack(Stack):
         log_stream = logs.LogStream(self, "LogStream",
             log_group=log_group,
         )
+        
+        
+        #IAM role to access CloudWatch logs
+        subscribed_lambda.add_to_role_policy(iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=[
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            resources=["*"],
+        ))
+        
+        #CDK Nag rule suppression for wildcard permission 
+        cdk_nag.NagSuppressions.add_resource_suppressions(lambda_execution_role, [{
+                "id":"AwsSolutions-IAM5", 
+                "reason":"To create custome Lambda execution role to write to CloudWatch.",
+                "applies_to": [{
+                    "regex": "Resource::arn:aws:logs:(.*):\\*$/g"
+                }]
+            }],
+            apply_to_children=True
+            )
+        
 
         #IAM role to invoke Lambda 
         subscribed_lambda.add_to_role_policy(iam.PolicyStatement(
@@ -65,10 +95,11 @@ class CwlogsLambdaSnsSqsStack(Stack):
             resources=[topic.topic_arn],
         ))
 
+        #IAM Role to access KMS key
         subscribed_lambda.add_to_role_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
             actions=[
-                "kms:GenerateDataKey*",
+                "kms:GenerateDataKey",
                 "kms:Decrypt"
             ],
             resources=[key.key_arn],
@@ -84,6 +115,11 @@ class CwlogsLambdaSnsSqsStack(Stack):
         dead_letter_queue = sqs.Queue(self, "DeadLetterQueue",
             enforce_ssl=True
         )
+        
+        #CDK Nag rule suppression for dlq 
+        cdk_nag.NagSuppressions.add_resource_suppressions(dead_letter_queue, 
+        [{"id":"AwsSolutions-SQS3", "reason":"This is a dead letter queue for the main queue."}])
+        
         #Create an SQS queue
         main_queue = sqs.Queue(self, "MainQueue",
             enforce_ssl=True,
@@ -98,6 +134,8 @@ class CwlogsLambdaSnsSqsStack(Stack):
             main_queue, 
             raw_message_delivery=True
         ))
+        
+        Aspects.of(self).add(cdk_nag.AwsSolutionsChecks())
 
         #Stack Outputs
         CfnOutput(self, "LOG GROUP NAME", 
