@@ -1,4 +1,4 @@
-# Invoke cross account Step Function -> AWS Lambda Function
+# Deploy a NGINX server on private EC2 server and proxy it via REST API
 ## Architecture
 * Account Setup
 
@@ -11,7 +11,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
-* [Create two AWS accounts for cross account setup](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have, create them and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [Create one AWS account for this setup](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have, create them and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) install and configure one profiles with credentials for the accounts as below:
     ```
@@ -19,6 +19,9 @@ Important: this application uses various AWS services and there are costs associ
     ```
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed
+* You need a existing VPC with 2 private subnets and one security group that allows http traffic on port 80 within the VPC i.e VPC Cidr range.
+* One route table that should be 2 private subnet association.
+* One pre-existing key pair for EC2 machine.
 
 ## Deployment Instructions
 
@@ -62,7 +65,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-1. You can now invoke the REST API by executing a GET request via the below CURL command or from the browser. Copy the output from the Outputs section after deployment. 
+1. You can now invoke the REST API by executing a GET request via the CURL command present in the output section or invoke the REST API from the browser using the API URL obtained from the Outputs section after deployment. 
 
 ## Cleanup
  
@@ -75,6 +78,6 @@ Important: this application uses various AWS services and there are costs associ
     sam delete --stack-name <stackname>
     ```
 ----
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
