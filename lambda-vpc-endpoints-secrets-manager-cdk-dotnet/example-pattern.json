@@ -1,13 +1,13 @@
 {
     "title": "AWS Lambda to AWS Secrets Manager",
-    "description": "Create an AWS Lambda function inside private subnet and access AWS Secrets Manager using VPC endpoint.",
+    "description": "Create an AWS Lambda function inside private subnet and access AWS Secrets Manager privately.",
     "language": ".NET",
     "level": "200",
     "framework": "CDK",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This CDK application demonstrates how to establish an AWS Lambda function inside a private subnet of a VPC and access AWS Secrets Manager using VPC endpoint without any Internet Gateway Or NAT Gateway."
+        "This CDK application demonstrates how to establish an AWS Lambda function inside a private subnet of a VPC and access AWS Secrets Manager privately using VPC endpoints."
       ]
     },
     "gitHub": {

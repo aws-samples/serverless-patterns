@@ -1,6 +1,6 @@
 # AWS Lambda to AWS Secrets Manager
 
-This CDK application demonstrates how to establish an AWS Lambda function inside a private subnet of a VPC and access AWS Secrets Manager using VPC endpoint without any Internet Gateway Or NAT Gateway.
+This CDK application demonstrates how to establish an AWS Lambda function inside a private subnet of a VPC and access AWS Secrets Manager privately using VPC endpoint.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-vpc-endpoints-secrets-manager-cdk-dotnet.
 
