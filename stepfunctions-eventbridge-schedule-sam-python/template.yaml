@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  StepFunctions Event Bridge Schedule using AWS SAM with Python
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  ScheduleTargetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambda/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      EventInvokeConfig:
+        MaximumRetryAttempts: 0
+
+  ScheduleGroup:
+    Type: AWS::Scheduler::ScheduleGroup
+    Properties:
+      Name: 'MySchedulesGroup'
+
+  ScheduleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: SendTaskSuccessFailure
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: InvokeLambdaFunction
+                Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt ScheduleTargetFunction.Arn
+
+  CreateScheduleStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: 'CreateScheduleStateMachine'
+      DefinitionUri: state_machine/create_schedules.asl.json
+      DefinitionSubstitutions:
+        TargetArn: !GetAtt ScheduleTargetFunction.Arn
+        RoleArn: !GetAtt ScheduleRole.Arn
+        ScheduleGroup: !Ref ScheduleGroup
+      Policies:
+        - Version: 2012-10-17
+          Statement:
+            - Sid: PassSchedulerRole
+              Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !GetAtt ScheduleRole.Arn
+            - Sid: CreateAndDeleteSchedule
+              Effect: Allow
+              Action:
+                - scheduler:CreateSchedule
+                - scheduler:DeleteSchedule
+              Resource:
+                - !Sub
+                  - "arn:aws:scheduler:${AWS::Region}:${AWS::AccountId}:schedule/${scheduleGroup}/*"
+                  - scheduleGroup: !Ref ScheduleGroup
+
+Outputs:
+  ScheduleTargetFunction:
+    Description: "Schedule Target Function Arn"
+    Value: !GetAtt ScheduleTargetFunction.Arn
+  ScheduleGroupArn:
+    Description: "Schedule Group Arn"
+    Value: !GetAtt ScheduleGroup.Arn
