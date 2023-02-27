@@ -1,5 +1,7 @@
 # EventBridge Pipes Splitter Pattern using DynamoDB and EventBridge as an example.
 
+![Splitter Architecture using Pipes](./architecture.png)
+
 This pattern demonstrates the [splitter pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html), takes an event from DynamoDB and splits the event into many events directly into EventBridge.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-splitter-pattern
