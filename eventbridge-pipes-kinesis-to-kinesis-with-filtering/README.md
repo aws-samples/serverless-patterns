@@ -65,8 +65,12 @@ Once deployed you will need to run the following command to put information into
 ```
 
 ```sh
-# Put message onto the Source Kinesis Stream (one record with NEW_CUSTOMER and one with EXISTING_CUSTOMER)
-aws kinesis put-records --stream-name kin-to-kin-source --records file://example-records.json
+# Put message onto the stream for a new customer
+aws kinesis put-record --stream-name <StackName>-source --data '{ "orderId": "527a5b8b-78bc-4477-8620-022e9c1b3ed4", "customerId": "8d18e7d1-80d1-4cf8-ad17-765fc8ca5305", "type": "NEW_CUSTOMER" }' --partition-key "x" 
+
+# Put message onto the stream for an existing customer
+aws kinesis put-record --stream-name <StackName>-source --data '{ "orderId": "527a5b8b-78bc-4477-8620-022e9c1b3eda", "customerId": "8d18e7d1-80d1-4cf8-ad17-765fc8ca5304", "type": "EXISTING_CUSTOMER" }' --partition-key "x" 
+
 ```
 
 ## Delete stack
