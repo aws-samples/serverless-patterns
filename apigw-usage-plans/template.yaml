@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: API gateway Usage plans and API keys
+Globals:
+  Function:
+    Timeout: 45
+    MemorySize: 256
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+
+Resources:
+  UsagePlanAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      ApiKeySourceType: HEADER
+      Auth:
+        AddDefaultAuthorizerToCorsPreflight: false
+        ApiKeyRequired: true
+
+  UsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn: UsagePlanAPIProdStage
+    Properties: 
+      ApiStages: 
+        - ApiId: !Ref UsagePlanAPI
+          Stage: !Ref UsagePlanAPIProdStage
+          Throttle:
+            /plantest/POST:
+              BurstLimit: 10
+              RateLimit: 5
+      Quota: 
+        Limit: 50
+        Period: DAY
+      Throttle:
+        BurstLimit: 30
+        RateLimit: 15
+      UsagePlanName: DailyLimit
+
+  UsagePlanApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Enabled: true
+
+  UsagePlanLinkKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref UsagePlanApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref UsagePlan
+
+  UsagePlanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+      - x86_64
+      Events:
+        HelloWorldGet:
+          Type: Api
+          Properties:
+            RestApiId: !Ref UsagePlanAPI
+            Path: /plantest/
+            Method: get
+        HelloWorldPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref UsagePlanAPI
+            Path: /plantest/
+            Method: post
+
+Outputs:
+  UsagePlanApi:
+    Description: API Gateway endpoint URL for Prod stage for usage API
+    Value: !Sub "https://${UsagePlanAPI}.execute-api.${AWS::Region}.amazonaws.com/${UsagePlanAPIProdStage}/plantest"

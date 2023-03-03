@@ -1,0 +1,20 @@
+{
+  "host": "<your_rabbitmq_host>",
+  "appId": "myShinyApp",
+  "queues": ["noFilterQ","prefixQ", "anythingButQ", "IPQ", "orQ", "andQ"],
+  "secret": "MQaccess",
+  "messageBody": {
+    "region": "us-east-1",
+    "sourceIPAddress": "10.0.0.11",
+    "rating": 3,
+    "fileName": "metadata.txt",
+    "address": {
+      "country": "USA",
+      "street": "56 Fox Dr",
+      "city": "Boston",
+      "state": "MA"
+    }
+  }
+}
+
+

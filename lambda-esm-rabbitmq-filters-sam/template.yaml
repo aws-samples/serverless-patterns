@@ -1,0 +1,275 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: ARMQ Example
+
+Globals:
+  Function:
+    CodeUri: src/
+    Handler: app.lambda_handler
+    Timeout: 3
+    Runtime: python3.9
+    Architectures:
+      - arm64
+
+Parameters:
+  SecretARN:
+    Type: String
+    Description: Enter the ARN for your AWS Secrets Manager secret
+  SecretName:
+    Type: String
+    Description: Enter the name of your secret
+
+Resources:
+  MQBroker:
+    Type: AWS::AmazonMQ::Broker
+    Properties: 
+      AutoMinorVersionUpgrade: false
+      BrokerName: myQueue
+      DeploymentMode: SINGLE_INSTANCE
+      EngineType: RABBITMQ
+      EngineVersion: "3.10.10"
+      HostInstanceType: mq.m5.large
+      PubliclyAccessible: true
+      Users:
+        - Password: '{{resolve:secretsmanager:MQaccess:SecretString:password::}}'
+          Username: '{{resolve:secretsmanager:MQaccess:SecretString:username::}}'
+
+  RabbitLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: rabbit-layer
+      ContentUri: dependencies/
+      CompatibleRuntimes:
+        - python3.9
+
+  #RabbitMQ writter - it will help with testing
+  MQHelper:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretARN
+      Handler: mqHelper.lambda_handler
+      Layers:
+        - arn:aws:lambda:us-east-1:177933569100:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:4 #This layer is specific to us-east-1. Layers for other regions can be found here: https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets_lambda.html#retrieving-secrets_lambda_ARNs
+        - !Ref RabbitLayer
+      Environment:
+        Variables:
+          SECRET_NAME: !Ref SecretName
+
+ # 1. No Filter          
+  MQFunctionNoFilter:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Resource: '*'
+              Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeVpcs
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            BatchSize: 10
+            Broker: !GetAtt MQBroker.Arn
+            Queues:
+              - noFilterQ
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Ref SecretARN
+
+
+  # 2. Prefix Matching. Note here we are filtering based on the RabbitMQ message properties, not the payload
+  MQFunctionPrefix:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Resource: '*'
+              Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeVpcs
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            BatchSize: 10
+            Broker: !GetAtt MQBroker.Arn
+            Queues:
+              - prefixQ
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Ref SecretARN
+            FilterCriteria:
+                Filters:
+                  - Pattern: '{"basicProperties":{"appId":[{"prefix":"my"}]}}'
+
+  # 3. Match anything except what is provided in the filter. You can use anything-but matching with strings and numeric values, including lists that contain only strings, or only numbers.
+  MQFunctionAnythingBut:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Resource: '*'
+              Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeVpcs
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            BatchSize: 10
+            Broker: !GetAtt MQBroker.Arn
+            Queues:
+              - anythingButQ
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Ref SecretARN
+            FilterCriteria:
+                Filters:
+                  - Pattern: '{"data":{"address":{"state":[{"anything-but":"GA"}]}}}'
+
+  # 4. Matches an IP range (CIDR)
+  MQFunctioIP:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Resource: '*'
+              Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeVpcs
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            BatchSize: 10
+            Broker: !GetAtt MQBroker.Arn
+            Queues:
+              - IPQ
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Ref SecretARN
+            FilterCriteria:
+                Filters:
+                  - Pattern: '{"data":{"sourceIPAddress":[{ "cidr":"10.0.0.0/24"}]}}'
+
+
+  # 5. Logical AND. It will match any rating between 0 and 5 (excluding 0) AND the country needs to match AND the "street" key needs to be present (the exists filter only works on leaf nodes!)
+  #
+  #   "data" : {
+  #     "rating" : [ { "numeric": [ ">", 0, "<=", 5]}],
+  #     "address" : {
+  #         "country": [ "USA" ],
+  #         "street": [ { "exists": true  } ]
+  #     }
+  #   }
+  MQFunctionAnd:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Resource: '*'
+              Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeVpcs
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            BatchSize: 10
+            Broker: !GetAtt MQBroker.Arn
+            Queues:
+              - andQ
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Ref SecretARN
+            FilterCriteria:
+                Filters:
+                  - Pattern: '{"data":{"rating":[{"numeric":[">",0,"<=",5]}],"address":{"country":["USA"],"street":[{"exists":true}]}}}'
+
+
+  # 6. Logical OR. The filter will match if any of the rules match. Note this combines filters for both the message data and message properties passed from RabbitMQ
+  #    The appId property is "myShinyApp" OR Rating is 4 or 5 OR the OR (the country is "USA" and there is a street address present)
+  MQFunctionOr:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Resource: '*'
+              Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeVpcs
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            BatchSize: 10
+            Broker: !GetAtt MQBroker.Arn
+            Queues:
+              - orQ
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Ref SecretARN
+            FilterCriteria:
+                Filters:
+                  - Pattern: '{"basicProperties":{"appId":["myShinyApp"]}}'
+                  - Pattern: '{"data":{"rating":[4,5]}}'
+                  - Pattern: '{"data":{"address":{"country":["USA"],"street":[{"exists":true}]}}}'
+
+Outputs:
+  MQBrokerHost:
+    Description: The RabbitMQ web-console host
+    Value: !Sub '${MQBroker}.mq.${AWS::Region}.amazonaws.com'
+  LambdaHelper:
+    Description: The lambda function that can be used for creating RabbitMQ queues and sending messages to them
+    Value: !Ref MQHelper

@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-rust",
       "templateURL": "serverless-patterns/lambda-s3-rust",
       "projectFolder": "lambda-s3-rust",
-      "templateFile": "lambda-s3-rust/template.yml"
+      "templateFile": "template.yml"
     }
   },
   "resources": {

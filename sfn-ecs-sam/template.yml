@@ -1,0 +1,113 @@
+Transform: AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Sample SAM Template for StepFunction ECS Integration
+
+Parameters:
+  ECSCluster:
+    Type: String
+    Description: Enter the ARN of the ECS Cluster that will run the task
+
+  TaskDefinition:
+    Type: String
+    Description: Enter the ARN of the task definition to use
+
+  TaskName:
+    Type: String
+    Description: Enter the task's image name
+
+  EcsTaskExecutionRole:
+    Type: String
+    Description: Enter the ARN of the ECS Task Execution Role
+
+  EcsTaskRole:
+    Type: String
+    Description: Enter the ARN of the ECS Task Role
+  
+  VpcSubnet:
+    Type: String
+    Description: Enter a subnet to use to run the tasks
+
+Resources:
+  StepFunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "states.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: ECSAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: "ecs:RunTask"
+                Resource: 
+                - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/*"
+              - Effect: Allow
+                Action: "iam:PassRole"
+                Resource:
+                - !Ref EcsTaskExecutionRole
+                Condition:
+                  StringLike:
+                    "iam:PassedToService": "ecs-tasks.amazonaws.com"
+              - Effect: Allow
+                Action: "iam:PassRole"
+                Resource:
+                - !Ref EcsTaskRole
+                Condition:
+                  StringLike:
+                    "iam:PassedToService": "ecs-tasks.amazonaws.com"
+        
+        - PolicyName: CloudWatchLogAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogDelivery"
+                  - "logs:GetLogDelivery"
+                  - "logs:UpdateLogDelivery"
+                  - "logs:DeleteLogDelivery"
+                  - "logs:ListLogDeliveries"
+                  - "logs:PutResourcePolicy"
+                  - "logs:DescribeResourcePolicies"
+                  - "logs:DescribeLogGroups"
+                Resource: "*"
+        
+        - PolicyName: XRayAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "xray:PutTraceSegments"
+                  - "xray:PutTelemetryRecords"
+                  - "xray:GetSamplingRules"
+                  - "xray:GetSamplingTargets"
+                Resource: "*"
+                   
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: sfn-ecs-workflow
+      DefinitionUri: src/statemachine/sfn-ecs-datapipeline.asl.json
+      DefinitionSubstitutions:
+        ECSClusterARN: !Ref ECSCluster
+        ECSTaskDefinitionARN: !Ref TaskDefinition
+        ECSTaskName: !Ref TaskName
+        ECSVpcSubnet: !Ref VpcSubnet
+      Role: !GetAtt StepFunctionExecutionRole.Arn
+
+Outputs:
+  ActivityStateMachineArn:
+    Description: "Activity State machine ARN"
+    Value: !Ref StateMachine
+  ActivityStateMachineRoleArn:
+    Description: "IAM Role created for Activity State machine based on the specified SAM Policy Templates"
+    Value: !GetAtt StepFunctionExecutionRole.Arn

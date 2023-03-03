@@ -23,7 +23,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: find-schedules.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: 2012-10-17
@@ -59,7 +59,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: process-schedule-batch.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: 2012-10-17

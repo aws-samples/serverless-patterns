@@ -1,0 +1,10 @@
+micronaut:
+  application:
+    name: storeMicronaut
+datasources:
+  default:
+    driver-class-name: org.postgresql.Driver
+    db-type: postgres
+    dialect: POSTGRES
+    maximum-pool-size: 1
+    allow-pool-suspension: true

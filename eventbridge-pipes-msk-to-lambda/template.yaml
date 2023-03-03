@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Creates an EventBridge Pipes with MSK cluster source and Lambda function as destination. 
+  The MSK cluster is deployed into private subnet.
+
+Parameters:
+  MSKKafkaVersion:
+    Type: String
+    Default: 2.8.1
+    AllowedValues:
+    - 2.8.1
+    - 2.8.0
+    - 2.7.1
+    - 2.7.0
+    - 2.6.2
+    - 2.6.1
+    - 2.6.0
+    - 2.5.1
+    - 2.4.1.1
+    - 2.3.1
+    - 2.2.1
+  InstanceType:
+    Type: String
+    Default: kafka.m5.large
+    AllowedValues:
+    - kafka.t3.small
+    - kafka.m5.large
+    - kafka.m5.xlarge
+    - kafka.m5.2xlarge
+    - kafka.m5.4xlarge
+    - kafka.m5.8xlarge
+    - kafka.m5.12xlarge
+    - kafka.m5.16xlarge
+    - kafka.m5.24xlarge
+  MSKTopic:
+    Type: String
+    Default: msk-demo-topic
+
+Resources:
+  MSKVPCStack:
+      Type: AWS::CloudFormation::Stack
+      Properties:
+        TemplateURL: "./vpc-private.yaml"
+
+  MSKCluster:
+      Type: AWS::CloudFormation::Stack
+      DependsOn: MSKVPCStack
+      Properties:
+        TemplateURL: "./msk-cluster.yaml"
+        Parameters:
+          VPCId: !GetAtt MSKVPCStack.Outputs.VPCId
+          PublicSubnetOne: !GetAtt MSKVPCStack.Outputs.PublicSubnetOne
+          PrivateSubnetMSKOne: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKOne
+          PrivateSubnetMSKTwo: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKTwo
+          InstanceType: kafka.m5.large
+          MSKKafkaVersion: 2.8.1
+
+  PipesStack:
+      Type: AWS::CloudFormation::Stack
+      DependsOn: MSKCluster
+      Properties:
+        TemplateURL: "./pipes.yaml"
+        Parameters:
+          MSKCluster: !GetAtt MSKCluster.Outputs.MSKCluster
+          PrivateSubnetMSKOne: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKOne
+          PrivateSubnetMSKTwo: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKTwo
+          MSKTopic: !Ref MSKTopic
+
+
+

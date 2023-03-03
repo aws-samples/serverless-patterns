@@ -1,5 +1,6 @@
 *.js
 !jest.config.js
+!mappings/Mutation.putEvent.js
 *.d.ts
 node_modules
 

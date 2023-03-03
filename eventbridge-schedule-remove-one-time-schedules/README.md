@@ -27,6 +27,8 @@ You have a couple of options to run the pattern
 
 Triggering the `FindSchedules` function will trigger and start the process.
 
+Try running with Node Version 18.x
+
 ## Important things to know
 
 Your one-time schedules might still be in your account, and might not have processed (failure). This pattern does not check if your schedule has run or not, it just removes them based on the timesamp of the schedule.

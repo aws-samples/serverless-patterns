@@ -1,0 +1,38 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "states:*",
+            "Resource": "*"
+        },
+        {
+            "Action": "ssm:DescribeParameters",
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": "ssm:GetParameters",
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": "kms:Decrypt",
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": "elasticfilesystem:*",
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:*",
+                "s3-object-lambda:*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
