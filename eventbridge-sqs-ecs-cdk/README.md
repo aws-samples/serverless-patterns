@@ -1,6 +1,6 @@
 # EventBridge to SQS to ECS
 
-This project contains sample AWS CDK code to integrate Amazon EventBridge, Amazon SQS and Amazon Elastic Container Service (ECS). As a new event is sent to EventBridge, it is queued in SQS and based on the number of messages that queue has, it creates an ECS cluster with Fargate task definitions. 
+This project contains sample AWS CDK code to integrate Amazon EventBridge, Amazon SQS and Amazon Elastic Container Service (ECS). As a new event is sent to EventBridge, it is queued in SQS. SQS, in turn, spins up ECS tasks based on the number of messages available for retrieval from the queue.
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-sqs-ecs-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page (https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -12,6 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * AWS CLI (https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * Git Installed (https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * Node and NPM (https://nodejs.org/en/download/) installed
+* Docker (https://docs.docker.com/get-started/) installed and configured
 * Python, pip (https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html) installed
 * AWS Cloud Development Kit (https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
@@ -30,28 +31,51 @@ Important: this application uses various AWS services and there are costs associ
     ```
     npm install    
     ```
-3. Install the project dependencies
+4. Install the project dependencies
     ```
     python -m pip install -r python-app/requirements.txt
     ```
-4. Deploy the stack to your default AWS account and region.
+5. Deploy the stack to your default AWS account and region.
     ```
     cdk deploy
     ```
 
 ## How it works
 
-The CDK stack deploys the resources and the IAM permissions required to run the application. A customer event stored in a file in json format is sent to EventBridge and queued in a SQS queue. It also creates a new ECS cluster, a container and task definition. As a new message is added in the queue, it triggers the task execution on ECS. After the task is finished, an item from the queue is deleted which will automatically scale down ECS cluster and task. It scales up and down based on the amount of messages in the SQS queue.
+The CDK stack deploys the resources required to run the application. An event stored in a file in json format is sent to EventBridge and queued in a SQS queue which in turn triggers the task execution on ECS. The solution also creates step scaling of ECS tasks based on the number of messages available for retrieval from the queue. After the task is finished, an item from the queue is deleted which automatically scales down the ECS cluster and task.
 
 ## Testing
 
-Sends custom events to Amazon EventBridge so that they can be matched to rules using put-events command
+Send custom events to Amazon EventBridge so that they can be matched to rules using put-events command
+
+For an example, an event in event.json file is as follows- 
+[
+    {
+      "EventBusName": "test-bus-cdk",
+      "Source": "eb-sqs-ecs",
+      "DetailType": "message-for-queue",
+      "Detail": "{\"message\":\"Hello CDK world!\"}"
+    }
+  ]
+
+Execute the following command to put event on EventBridge-
 
 ```
-aws events put-events --entries file://event.json (file:///event.json)
+aws events put-events --entries file://event.json 
 
 ```
-If successful, you’ll see a new EventBridge bus, a SQS queue, an ECS cluster and a task created in the AWS Management Console. You'll also notice a queue url and an event ID(json) in the output. You can monitor CloudWatch logs and notice the queue reading, messages read and deleted messages. 
+
+After execution, you see output similar to following in the command line-
+{
+    "FailedEntryCount": 0,
+    "Entries": [
+        {
+            "EventId": "<Event ID created>"
+        }
+    ]
+}
+
+In the AWS Management Console, you’ll notice a new EventBridge event bus, a SQS queue, an ECS cluster and a task. You can monitor CloudWatch logs and notice the log for queue reading, messages read and deleted messages.  
 
 
 ## Cleanup
