@@ -10,7 +10,6 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * AWS CLI already configured with Administrator permission
-* [NodeJS 14.x installed](https://nodejs.org/en/download/)
 
 ## Deployment Instructions
 
@@ -26,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
 git clone https://github.com/aws-samples/serverless-patterns
 ```
 
-Each subdirectory contains additional installation and usage instructions. 
+Each subdirectory contains additional installation and usage instructions.
 
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
