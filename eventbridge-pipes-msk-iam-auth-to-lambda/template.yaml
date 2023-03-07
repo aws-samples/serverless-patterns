@@ -46,20 +46,6 @@ Resources:
       Properties:
         TemplateURL: "./vpc-private.yaml"
 
-  KafkaProducerStack:
-      Type: AWS::CloudFormation::Stack
-      DependsOn: MSKCluster
-      Properties:
-        TemplateURL: "./producer.yaml"
-        Parameters:
-          PublicSubnetOne: !GetAtt MSKVPCStack.Outputs.PublicSubnetOne
-          PrivateSubnetMSKOne: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKOne
-          PrivateSubnetMSKTwo: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKTwo
-          KafkaClientInstanceSecurityGroupID: !GetAtt MSKCluster.Outputs.KafkaClientInstanceSecurityGroupID
-          KeyName: !Ref KeyName
-          MSKKafkaVersion: !Ref MSKKafkaVersion
-          MSKCluster: !GetAtt MSKCluster.Outputs.MSKCluster
-
   MSKCluster:
       Type: AWS::CloudFormation::Stack
       DependsOn: MSKVPCStack
@@ -86,6 +72,17 @@ Resources:
           ClusterName: !GetAtt MSKCluster.Outputs.ClusterName
           ClusterId: !GetAtt MSKCluster.Outputs.ClusterId
 
-
-
+  # KafkaProducerStack:
+  #     Type: AWS::CloudFormation::Stack
+  #     DependsOn: MSKCluster
+  #     Properties:
+  #       TemplateURL: "./producer.yaml"
+  #       Parameters:
+  #         PublicSubnetOne: !GetAtt MSKVPCStack.Outputs.PublicSubnetOne
+  #         PrivateSubnetMSKOne: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKOne
+  #         PrivateSubnetMSKTwo: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKTwo
+  #         KafkaClientInstanceSecurityGroupID: !GetAtt MSKCluster.Outputs.KafkaClientInstanceSecurityGroupID
+  #         KeyName: !Ref KeyName
+  #         MSKKafkaVersion: !Ref MSKKafkaVersion
+  #         MSKCluster: !GetAtt MSKCluster.Outputs.MSKCluster
 

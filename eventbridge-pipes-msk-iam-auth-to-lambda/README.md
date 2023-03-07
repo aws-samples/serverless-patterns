@@ -84,7 +84,7 @@ In case you want to try out testing with Kafka producer client provided as part 
 <details>
   <summary><b> Testing using Kafka producer client</b></summary>
   
-- Uncomment KafkaProducerStack resource in the template.yaml.
+- Uncomment KafkaProducerStack resource in the template.yaml (line 75 to 87)
 
 - Redeploy the SAM template 
     ```
