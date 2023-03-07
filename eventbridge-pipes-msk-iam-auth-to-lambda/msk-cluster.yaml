@@ -160,18 +160,6 @@ Resources:
         EncryptionInTransit: 
           InCluster: true
 
-  Cloud9EC2Bastion:
-    Type: AWS::Cloud9::EnvironmentEC2
-    Properties: 
-      AutomaticStopTimeMinutes: 600
-      Description: "Cloud9 EC2 environment"
-      InstanceType: m5.large
-      Name: !Sub "${AWS::StackName}-Cloud9EC2Bastion"
-      SubnetId: !Ref PublicSubnetOne
-      Tags: 
-        - Key: 'Purpose'
-          Value: 'Cloud9EC2BastionHostInstance'
-
 Outputs:
   MSKCluster: 
     Description: MSK Cluster details
@@ -182,3 +170,7 @@ Outputs:
   ClusterId:
     Description: MSK Cluster Id
     Value: !Select [ 2, !Split ["/", !Ref MSKCluster]]
+  KafkaClientInstanceSecurityGroupID:
+    Description: Kafka client SG ID
+    Value: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+

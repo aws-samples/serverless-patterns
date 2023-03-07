@@ -144,32 +144,6 @@ Outputs:
   DefaultSecurityGroup:
     Description: Default Security Group
     Value: !GetAtt VPC.DefaultSecurityGroup
-
-  # VPCId: 
-  #   Description: The ID of the VPC created
-  #   Value: !Ref 'VPC'
-  #   Export:
-  #     Name: !Sub "${AWS::StackName}-VPCID"
-  # PublicSubnetOne: 
-  #   Description: The name of the public subnet created
-  #   Value: !Ref 'PublicSubnetOne'
-  #   Export:
-  #     Name: !Sub "${AWS::StackName}-PublicSubnetOne"
-  # PrivateSubnetMSKOne: 
-  #   Description: The ID of private subnet one created
-  #   Value: !Ref 'PrivateSubnetMSKOne'
-  #   Export:
-  #     Name: !Sub "${AWS::StackName}-PrivateSubnetMSKOne"
-  # PrivateSubnetMSKTwo: 
-  #   Description: The ID of private subnet two created
-  #   Value: !Ref 'PrivateSubnetMSKTwo'
-  #   Export:
-  #     Name: !Sub "${AWS::StackName}-PrivateSubnetMSKTwo"
-  # VPCStackName: 
-  #   Description: The name of the VPC Stack
-  #   Value: !Ref 'AWS::StackName'
-  #   Export:
-  #     Name: !Sub "${AWS::StackName}-VPCStackName"
     
 
 

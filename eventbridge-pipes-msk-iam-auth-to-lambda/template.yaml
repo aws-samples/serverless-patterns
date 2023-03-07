@@ -5,6 +5,9 @@ Description: >
   The MSK cluster is deployed into private subnet.
 
 Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the kafka client instance
+    Type: String
   MSKKafkaVersion:
     Type: String
     Default: 2.8.1
@@ -43,6 +46,20 @@ Resources:
       Properties:
         TemplateURL: "./vpc-private.yaml"
 
+  KafkaProducerStack:
+      Type: AWS::CloudFormation::Stack
+      DependsOn: MSKCluster
+      Properties:
+        TemplateURL: "./producer.yaml"
+        Parameters:
+          PublicSubnetOne: !GetAtt MSKVPCStack.Outputs.PublicSubnetOne
+          PrivateSubnetMSKOne: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKOne
+          PrivateSubnetMSKTwo: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKTwo
+          KafkaClientInstanceSecurityGroupID: !GetAtt MSKCluster.Outputs.KafkaClientInstanceSecurityGroupID
+          KeyName: !Ref KeyName
+          MSKKafkaVersion: !Ref MSKKafkaVersion
+          MSKCluster: !GetAtt MSKCluster.Outputs.MSKCluster
+
   MSKCluster:
       Type: AWS::CloudFormation::Stack
       DependsOn: MSKVPCStack
@@ -53,8 +70,8 @@ Resources:
           PublicSubnetOne: !GetAtt MSKVPCStack.Outputs.PublicSubnetOne
           PrivateSubnetMSKOne: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKOne
           PrivateSubnetMSKTwo: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKTwo
-          InstanceType: kafka.m5.large
-          MSKKafkaVersion: 2.8.1
+          InstanceType: !Ref InstanceType
+          MSKKafkaVersion: !Ref MSKKafkaVersion
 
   PipesStack:
       Type: AWS::CloudFormation::Stack
@@ -68,6 +85,7 @@ Resources:
           MSKCluster: !GetAtt MSKCluster.Outputs.MSKCluster
           ClusterName: !GetAtt MSKCluster.Outputs.ClusterName
           ClusterId: !GetAtt MSKCluster.Outputs.ClusterId
+
 
 
 
