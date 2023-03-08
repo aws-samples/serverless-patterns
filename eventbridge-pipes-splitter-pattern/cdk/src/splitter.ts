@@ -1,18 +1,17 @@
-import { unmarshall } from '@aws-sdk/util-dynamodb';
-import {DynamoDBRecord} from 'aws-lambda';
+import { unmarshall, NativeAttributeValue } from '@aws-sdk/util-dynamodb';
+import { AttributeValue, DynamoDBRecord } from 'aws-lambda';
 
 interface Ticket {
-  id: string
+  id: string;
 }
 
 export async function handler(records: DynamoDBRecord[]) {
-
-  const newOrderRaw = records[0]?.dynamodb?.NewImage || {};
+  const newOrderRaw = (records[0]?.dynamodb?.NewImage as { [key: string]: NativeAttributeValue }) || {};
   const newOrder = unmarshall(newOrderRaw);
 
-  const { id:orderId, userId, tickets = [] } = newOrder;
+  const { id: orderId, userId, tickets = [] } = newOrder;
 
-  if(!tickets){
+  if (!tickets) {
     // return empty array for Pipes so it can continue the enrichment and not trigger downstream consumer
     return [];
   }
@@ -22,11 +21,9 @@ export async function handler(records: DynamoDBRecord[]) {
     return {
       id: ticket?.id,
       orderId,
-      userId
-    }
+      userId,
+    };
   });
 
   return events;
 }
-
-
