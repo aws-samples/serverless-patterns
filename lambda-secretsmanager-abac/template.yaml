@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Transform: AWS::Serverless-2016-10-31
+
+Description: Sample Lambda function that uses attribute-based access control for access to Secrets Manager
+
+Parameters:
+  SecretName:
+    Description: Secret name
+    Type: String
+    Default: TheSecret
+    AllowedPattern: ^[A-Za-z0-9_.-]*$
+
+Globals:
+  Function:
+    Handler: app.handler
+    Runtime: nodejs18.x
+    Tracing: Active
+    Tags:
+      Application: lambda-secretsmanager-abac
+
+
+Resources:
+  GetSecretFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Example function that retrieves a secret from Secrets Manager
+      CodeUri: functions/get-secret
+      Environment:
+        Variables:
+          SECRET_NAME: !Ref SecretName
+      Role: !GetAtt GetSecretFunctionRole.Arn
+      Tags:
+        App: sample-function
+        Env: dev
+
+  GetSecretFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Description: Allow get secret function to retrieve secret
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - !Ref SecretAccessPolicy
+      Tags:
+        - Key: App
+          Value: sample-function
+        - Key: Env
+          Value: dev
+
+  TheSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Ref SecretName
+      Description: Example secret, generated
+      GenerateSecretString:
+        PasswordLength: 15
+        ExcludeCharacters: '"@/\'
+      Tags:
+        - Key: Application
+          Value: lambda-secretsmanager-abac
+        - Key: App
+          Value: sample-function
+        - Key: Env
+          Value: dev
+
+  SecretAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Allows access to secret using ABAC
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: secretsmanager:GetSecretValue
+            Resource: !Ref TheSecret
+            Condition:
+              StringEquals:
+                'secretsmanager:ResourceTag/App': '${aws:PrincipalTag/App}'
+                'secretsmanager:ResourceTag/Env': '${aws:PrincipalTag/Env}'
+
+Outputs:
+  TheSecret:
+    Value: !Ref TheSecret
+    Description: Secret ARN
+  
+  GetSecretFunction:
+    Value: !Ref GetSecretFunction
+    Description: Get secret function ARN
+
+  GetSecretFunctionRole:
+    Value: !Ref GetSecretFunctionRole
+    Description: Get secret function role name
