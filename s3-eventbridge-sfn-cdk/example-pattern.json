@@ -1,59 +1,52 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "title": "S3 to Step Functions",
+  "description": "This pattern demonstrates how to create an EventBridge rule with S3 as the event source and Step Functions as target.",
   "language": "Python",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
+      "This sample project demonstrates how you can trigger an execution in Step Functions state machine when an object is created in an S3 bucket . ",
+      "When you uploads an object to the newly created S3 bucket, this will send an `Object Created` event to EventBridge, based on the EventBridge rule, the state machine is executed",
+      "This pattern deploys one Step Functions state machine, one S3 bucket, one EventBridge rule."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-sfn-cdk",
+      "templateURL": "serverless-patterns/s3-eventbridge-sfn-cdk",
+      "projectFolder": "s3-eventbridge-sfn-cdk",
+      "templateFile": "s3-eventbridge-sfn-cdk/src/lib/s3-eventbridge-sfn.ts"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "text": "AWS S3 Event Notifications with EventBridge",
+        "link": "https://aws.amazon.com/blogs/aws/new-use-amazon-s3-event-notifications-with-amazon-eventbridge/"
       },
       {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Using EventBridge with S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html"
       }
     ]
   },
   "deploy": {
-    "text": [
-      "sam deploy"
-    ]
+    "text": ["cdk deploy"]
   },
   "testing": {
-    "text": [
-      "See the Github repo for detailed testing instructions."
-    ]
+    "text": ["See the Github repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": [
-      "Delete the stack: <code>cdk delete</code>."
-    ]
+    "text": ["Delete the stack: <code>cdk delete</code>."]
   },
   "authors": [
     {
-      "name": "Your name",
+      "name": "Trinh Vo",
       "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "bio": "Trinh is an Associate Solutions Architect at AWS Vietnam.",
+      "linkedin": "https://www.linkedin.com/in/trinh-vo-095848185/"
     }
   ]
 }
