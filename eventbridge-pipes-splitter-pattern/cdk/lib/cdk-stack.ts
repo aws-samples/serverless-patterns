@@ -2,20 +2,45 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { CfnPipe } from 'aws-cdk-lib/aws-pipes';
 import { EventBus } from 'aws-cdk-lib/aws-events';
+import { Rule, Match } from 'aws-cdk-lib/aws-events';
 import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { AttributeType, BillingMode, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { RemovalPolicy } from 'aws-cdk-lib';
+import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Runtime, StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
+import { CloudWatchLogGroup } from 'aws-cdk-lib/aws-events-targets';
 
 export class EventBridgePipesSplitterPattern extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const tickerOrdersBus = new EventBus(this, 'ticket-orders', {
+    // log group to see Splitter output
+    const ticketLogGroup = new LogGroup(this, 'tickets-log', {
+      logGroupName: '/aws/events/tickets',
+      retention: RetentionDays.ONE_DAY
+    });
+
+    const ticketOrdersBus = new EventBus(this, 'ticket-orders', {
       eventBusName: 'ticket-orders',
     });
+
+    // Rule that matches any incoming event and sends it to a logGroup
+    const catchAll = new Rule(this, 'send-to-log', {
+      eventBus: ticketOrdersBus,
+      ruleName: 'catchall',
+      eventPattern: {
+        source:  Match.exists()
+      },
+      targets: [new CloudWatchLogGroup(ticketLogGroup)]
+    } );
+
+    const eventBridgeRole = new Role(this, 'events-role', {
+      assumedBy: new ServicePrincipal('events.amazonaws.com'),
+    });
+
+    ticketLogGroup.grantWrite(eventBridgeRole);
 
     // table for the orders.
     const ordersTable = new Table(this, 'Orders-Table', {
@@ -27,19 +52,19 @@ export class EventBridgePipesSplitterPattern extends cdk.Stack {
     });
 
     // function used to split the order into seperate events.
-    const splitterFunc: NodejsFunction = new NodejsFunction(this, 'scheduled-lambda-function', {
+    const splitterFunc: NodejsFunction = new NodejsFunction(this, 'lambda-function-splitter', {
       memorySize: 1024,
       runtime: Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src', 'splitter.ts'),
     });
 
-    const pipeRole = new Role(this, 'role', {
+    const pipeRole = new Role(this, 'pipe-role', {
       assumedBy: new ServicePrincipal('pipes.amazonaws.com'),
     });
 
     ordersTable.grantStreamRead(pipeRole);
-    tickerOrdersBus.grantPutEventsTo(pipeRole);
+    ticketOrdersBus.grantPutEventsTo(pipeRole);
     splitterFunc.grantInvoke(pipeRole);
 
     // Create new Pipe
@@ -61,7 +86,7 @@ export class EventBridgePipesSplitterPattern extends cdk.Stack {
         },
       },
       enrichment: splitterFunc.functionArn,
-      target: tickerOrdersBus.eventBusArn,
+      target: ticketOrdersBus.eventBusArn,
       targetParameters: {
         eventBridgeEventBusParameters: {
           detailType: 'TicketPurchased',
