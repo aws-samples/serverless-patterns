@@ -2,7 +2,7 @@
 
 ![Splitter Architecture using Pipes](./architecture.png)
 
-This pattern demonstrates the [Splitter pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html). It takes an event from DynamoDB and splits the event into many events using a Lambda function and sends them to EventBridge.
+This pattern demonstrates the [Splitter pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html). It takes an event from DynamoDB and splits the event into many events using a Lambda enrichment function and sends them to EventBridge.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-splitter-pattern
 
@@ -41,7 +41,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates a DDB table and EventBridge Pipe to split Orders inserted into the table into one events per ticket and sends them to EventBridge (target). For illustration purposes, the EventBridge simply routes the events to a CloudWatch log. To see the Splitter in action, insert a new record into DDB.
+This pattern creates a DDB table and EventBridge Pipe to split Orders inserted into the table into one event per ticket and sends them to EventBridge (target). For illustration purposes, the EventBridge simply routes the events to a CloudWatch log. To see the Splitter in action, insert a new record into DDB.
 
 ```sh
  # Insert a new order with three tickets into orders table
