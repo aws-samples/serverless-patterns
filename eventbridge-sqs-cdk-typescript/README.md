@@ -13,14 +13,14 @@ Important: this application uses various AWS services and there are costs associ
 * [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
-## Deploy
+## Deployment Instructions
 
-1. Clone the project to your local working directory
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
 ```
 git clone https://github.com/aws-samples/serverless-patterns
 ```
 
-2. Change the working directory to this pattern's directory
+2. Change directory to the pattern directory:
 ```
 cd eventbridge-sqs-cdk-typescript
 ```
@@ -40,7 +40,34 @@ npm run build
 cdk synth
 ```
 
-6. Deploy the stack to your default AWS account and region. The output of this command should give you the event bus name and SQS queue name.
+6. Deploy the stack to your default AWS account and region.
 ```
 cdk deploy
 ```
+
+## Testing
+
+Use the [AWS CLI](https://aws.amazon.com/cli/) to send a test event to EventBridge:
+
+1. Replace EventBusName in event.json with the created Event Bus Name or ARN
+
+2. Send an event to EventBridge:
+    ```bash
+    aws events put-events --entries file://event.json
+    ```
+
+3. Retrieve the message from the created SQS queue using the queue URL:
+    ```bash
+    aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
+    ```
+
+## Cleanup
+
+1. Delete the stack
+    ```bash
+    cdk destroy --all
+    ```
+----
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0

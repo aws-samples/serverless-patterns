@@ -42,7 +42,7 @@ export class EventBridgeSqsConstruct extends Construct {
     // Add event pattern to rule
     rule.addEventPattern({
       source: ['my-cdk-application'],
-      detail: ['message-for-queue']
+      detailType: ['message-for-queue']
     });
 
     // Create SQS queue;
