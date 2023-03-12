@@ -1,37 +1,56 @@
-## README
+# AWS SNS to Step Functions via EventBridge Pipes and Bus
 
-CDK Pattern highlighting an architectual pattern that connects an SNS Message Producer to a Step Function by using EventBridge and SQS
+This pattern demonstrates how to trigger a Step Function from an Event that is publisehded into
+SNS and is handled by EventBridge Pipes where it is filtered and transformed before sending to an
+EventBus
 
-![High Level Architecture](https://www.binaryheap.com/wp-content/uploads/2023/03/sns_pipes.png)
+Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
-### Description of the Flow
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
--   A publisher submits a message to SNS
--   SNS will then trigger the message and post into an SQS. The subscription needs to be marked as `Raw Message Delivery`
--   An EventBridge Pipe listens to the SQS and then
-    -   Filters the message for types of events it's interested in
-    -   Tranforms the body from an SQS Message Body into something more usable for an EventBus
--   A Custom Event Bus has a `Rule` that handles the message and targets a Step Function
--   The State Machine is triggered and just does a Succeed tasks (more workflow could surely be added)
+## Requirements
 
-### Running the Solution
+-   [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+-   [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+-   [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+-   [Node and NPM](https://nodejs.org/en/download/) installed
+-   [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (AWS CDK) installed
 
-#### Deploying
+## Deployment Instructions
 
-To Deploy, run
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ```
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+2. Change directory to the pattern directory:
+    ```
+    cd cdk-sns-sqs-eventbridge-pipes-stepfunctions
+    ```
+3. Install the project dependencies
+    ```
+     npm instaall
+    ```
+4. Deploy the stack to your default AWS account and region
+    ```
+    cdk deploy
+    ```
 
-```
-make local-deploy
-```
+## How it works
 
-This will execute
+Once the pattern is deployed to AWS, you will have the following resources created with the described capabilities
 
--   CDK synth
--   Deploy out to your AWS Environment configured in your ~/.aws/profile
+-   SNS Topic that is used for receiving the input message
+-   SQS Queue which is subscrited to the SNS Topic with `rawMessageDelivery` enabled
+-   EventBridge Pipe is reading from the SQS
+    -   A Filter step will be attached for limiting the events the pipe allows through
+    -   A Transformation step will be attached to the Pipe for modifying the incoming Message Body to a more suitable output for consumption
+-   An EventBridge Custom EventBus
+-   EventBridge Rule attached to the Custom Bus which Triggers the State Machine
+-   A very basic Step Function with a Succeed Task to simply demonstrate connectivity
 
-#### Triggering the workflow
+## Testing
 
-Post a message onto the SNS Topic with the following structure
+In the AWS Console, browse to the SNS Service and find the `sample-topic` that is created. Once the Topic is opened, choose to `Publish Message`. Enter the below in the Message Body
 
 ```javascript
 {
@@ -41,3 +60,23 @@ Post a message onto the SNS Topic with the following structure
     "field3": "Sample Field 3"
 }
 ```
+
+After publishing, browse to the Step Functions Service and inspect that the State Machine was triggered and that the input supplied matches the input defined in the EventBridge Pipe.
+
+## Cleanup
+
+1. Delete the stack
+    ```bash
+    cdk destroy
+    ```
+
+## Documentation
+
+-   [AWS EventBridge Pipes](https://aws.amazon.com/eventbridge/pipes/)
+-   [AWS EventBridge Pipes SQS Source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-sqs.html)
+
+---
+
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
