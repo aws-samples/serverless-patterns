@@ -37,6 +37,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
+This pattern is designed to help connect producers that are submitting messages into SNS with EventBridge as a way to deliver those same events in a more configuration driven and scalable way. It also helps reduce load and needless code downstream by leveraging AWS EventBridge Pipes to both filter and transform the data from the producer before attaching to an EventBus for further consumption.
+
 Once the pattern is deployed to AWS, you will have the following resources created with the described capabilities
 
 -   SNS Topic that is used for receiving the input message
