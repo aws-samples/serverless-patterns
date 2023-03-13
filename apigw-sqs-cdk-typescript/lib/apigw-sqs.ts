@@ -21,7 +21,7 @@ export interface ApiGwSqsProps {
 }
 
 /**
-* To create an EventBridge rule that involes an SQS queue
+* To create an API Gateway that published requests to an SQS queue
 */
 export class ApiGwSqsConstruct extends Construct {
   public customApiGateway: apigw.IRestApi;
