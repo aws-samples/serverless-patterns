@@ -1,0 +1,8 @@
+[
+    {
+      "EventBusName": "test-bus-cdk",
+      "Source": "eb-sqs-ecs",
+      "DetailType": "message-for-queue",
+      "Detail": "{\"message\":\"Hello CDK world!\"}"
+    }
+  ]

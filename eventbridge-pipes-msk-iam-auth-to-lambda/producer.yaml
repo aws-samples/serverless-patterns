@@ -1,0 +1,121 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  KeyName:
+    Type: String
+  PublicSubnetOne:
+    Type: String
+    Description: 'Public Subnet'
+  PrivateSubnetMSKOne:
+    Type: String
+    Description: 'Private Subnet One'
+  PrivateSubnetMSKTwo:
+    Type: String
+    Description: 'Private Subnet Two'
+  KafkaClientInstanceSecurityGroupID:
+    Type: String
+  MSKKafkaVersion:
+    Type: String
+  MSKCluster:
+    Type: String
+    Description: 'MSK Cluster'
+  
+Resources:
+  Cloud9EC2Bastion:
+    Type: AWS::Cloud9::EnvironmentEC2
+    Properties: 
+      AutomaticStopTimeMinutes: 600
+      Description: "Cloud9 EC2 environment"
+      InstanceType: t3.small
+      Name: !Sub "${AWS::StackName}-Cloud9EC2Bastion"
+      SubnetId: !Ref PublicSubnetOne
+      Tags: 
+        - Key: 'Purpose'
+          Value: 'Cloud9EC2BastionHostInstance'
+
+  KafkaClientEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.large
+      KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      AvailabilityZone: 
+        Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      SubnetId: !Ref PrivateSubnetMSKOne
+      SecurityGroupIds: [!Ref KafkaClientInstanceSecurityGroupID]
+      ImageId: ami-006dcf34c09e50022
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaClientInstance'
+      UserData: 
+        Fn::Base64: 
+          !Sub |
+            #!/bin/bash
+            yum update -y
+            sudo yum install java-1.8.0 -y
+
+            # Download Kafka
+            cd /home/ec2-user
+            sudo wget https://archive.apache.org/dist/kafka/${MSKKafkaVersion}/kafka_2.12-${MSKKafkaVersion}.tgz
+            sudo tar -xzf kafka_2.12-${MSKKafkaVersion}.tgz
+
+            # Get IAM Auth library and move it into lib folder
+            sudo wget https://github.com/aws/aws-msk-iam-auth/releases/download/v1.1.5/aws-msk-iam-auth-1.1.5-all.jar -P kafka_2.12-${MSKKafkaVersion}/libs
+            
+            cd /home/ec2-user/kafka_2.12-${MSKKafkaVersion}/bin
+            sudo touch client.properties
+            sudo echo "security.protocol=SASL_SSL" >> client.properties
+            sudo echo "sasl.mechanism=AWS_MSK_IAM" >> client.properties
+            sudo echo "sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;" >> client.properties
+            sudo echo "sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler" >> client.properties
+
+  EC2Role: 
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: "/"
+      
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      Roles:
+        - !Ref EC2Role
+
+  KafkaClientEC2InstancePolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: KafkaClientEC2InstancePolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+              - Effect: Allow
+                Action:
+                  - kafka:DescribeCluster
+                  - kafka:DescribeClusterV2
+                  - kafka:GetBootstrapBrokers
+                Resource: 
+                  - "*"
+              - Effect: Allow
+                Action:
+                  - kafka-cluster:Connect
+                  - kafka-cluster:DescribeGroup
+                  - kafka-cluster:AlterGroup
+                  - kafka-cluster:DescribeTopic
+                  - kafka-cluster:ReadData
+                  - kafka-cluster:DescribeClusterDynamicConfiguration
+                  - kafka-cluster:*Topic*
+                  - kafka-cluster:WriteData
+                Resource:
+                  - !Ref MSKCluster
+                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:group/*/*/*'
+                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:topic/*/*/*'
+      Roles:
+        - !Ref EC2Role
