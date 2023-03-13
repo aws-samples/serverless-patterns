@@ -5,18 +5,20 @@
 	"level": "200",
 	"framework": "CDK",
 	"introBox": {
-		"headline": "How it works",
+		"headline": "AWS Step functions callback pattern to implement approval through external API step",
 		"text": [
-			"This sample provides implementation of callback pattern for approval or confirmation step from external API/service with the help of Amazon S3, and AWS Lambda functions."
+		"In many workflow-based applications, certain steps in the process require a pause and wait for confirmation from external sources. After receiving the confirmation, the workflow can either resume or terminate the execution. One way to accomplish this is through the use of a callback pattern.",
+		"To implement the callback pattern in AWS Step Functions, a task can be defined as a state in the state machine. When the state is executed, a task token is generated and sent to an external process or command. The external process or command can then use the task token to signal the completion of the task and resume the workflow execution."
+		"This pattern can be used in a variety of use cases, such as waiting for a user to approve a transaction or waiting for a third-party API to return data. By using the callback pattern in AWS Step Functions, developers can create more flexible and responsive workflows that can adapt to external events and conditions.."
 		]
 	},
 	 "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/aws-step-functions-callback-pattern-dotnet-sample.git",
-      "templateURL": "aws-step-functions-callback-pattern-dotnet-sample",
-      "projectFolder": "aws-step-functions-callback-pattern-dotnet-sample",
-      "templateFile": "/aws-step-functions-callback-pattern-dotnet-sample/Deployment/CdkStack.cs"
-     }
+		  "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-callback-pattern-cdk-dotnet",
+      "templateURL": "serverless-patterns/sfn-callback-pattern-cdk-dotnet",
+      "projectFolder": "sfn-callback-pattern-cdk-dotnet",
+      "templateFile": "sfn-callback-pattern-cdk-dotnet/src/Deployment/CdkStack.cs"
+    }
     },
     "resources": {
       "bullets": [

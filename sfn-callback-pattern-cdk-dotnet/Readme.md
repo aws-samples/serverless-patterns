@@ -13,26 +13,27 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Deployment Instructions
 
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
-    git clone https://github.com/aws-samples/aws-step-functions-callback-pattern-dotnet-sample
-    ```
-1. Change directory to the pattern directory:
-    ```
-    cd aws-step-functions-callback-pattern-dotnet-sample
-    ```
-1. From the command line, use AWS CDK to deploy the AWS resources for the pattern
-    ```
-    cdk deploy
-    ```
-
+1. Clone this repository to your local machine.
+2. Open a terminal window and navigate to the root directory of the project.
+3. In Program.cs file under cdk project, either pass you AWS account id or set enviorment variable `CDK_DEFAULT_ACCOUNT` with aws account id.
+   `
+                Env = new Amazon.CDK.Environment
+                {
+                    Account = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_ACCOUNT"),
+                    Region = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_REGION"),
+                }
+   `
+4. Run `dotnet restore` to restore the NuGet packages.
+5. Run `dotnet publish -c Release`
+5. Run `cdk bootstrap` to create an S3 bucket in your AWS account to store the CDK toolkit stack.
+5. Run `cdk deploy` to deploy the application stack to your AWS account.
+ 
  Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
 This is the architecture that this sample implements for callback pattern.
-This is the architecture that this sample implements.
-![callback-pattern-sample-architecture](https://github.com/aws-samples/serverless-patterns/main/sfn-callback-pattern-cdk-dotnet/img/callback-pattern.png)
+![callback-pattern-sample-architecture](https://github.com/aws-samples/serverless-patterns/tree/main/sfn-callback-pattern-cdk-dotnet/src/blob/callback-pattern.png)
 
 1. User sends process order request.
 2. API Lambda function validate request.
@@ -58,7 +59,7 @@ After deployment, you will get API Gateway endpoint URL under outputs. You can u
 1. Process Order Request:\
 Method: POST\
 URL: {Your API Gateway endpoint URL}/OrderRequest/ProcessOrder\
-Headers: x-api-key: {Take the same value that is passed in cdkstack.cs file under cdk project in solution}\
+Headers: x-api-key: {Take the same value that is passed in cdkstack.cs file under Deployment project in solution}\
 Body:
     `{
     "OrderId":"2d6bfae2-c279-41d5-b59e-280b22733f9d",
@@ -68,7 +69,7 @@ Body:
 3. Confirm/Complete Order Request:\
 Method: POST\
 URL: {Your API Gateway endpoint URL}/OrderRequest/CompleteOrder\
-Headers: x-api-key: {Take the same value that is passed in cdkstack.cs file under cdk project in solution}\
+Headers: x-api-key: {Take the same value that is passed in cdkstack.cs file under Deployment project in solution}\
 Body:
     `{
     "OrderId":"2d6bfae2-c279-41d5-b59e-280b22733f9d",
