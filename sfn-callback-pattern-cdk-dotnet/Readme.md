@@ -81,8 +81,7 @@ Body:
 
 Delete the stack
 
-    `cdk destroy
-    `
+`cdk destroy`
 
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
