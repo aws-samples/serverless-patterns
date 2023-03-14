@@ -1,8 +1,8 @@
-﻿# Running Web API on ECS Fargate with custom domain backed with ALB, fronted by Route53, and secured with ACM Certifacte
+﻿# Running Web API on ECS Fargate with custom domain backed with ALB, fronted by Route53, and secured with ACM Certificate
 
-This pattern shows how to deploy a containerized Web API as an ECS fargate service, and expose it with a custom domain using Route53.
+This pattern shows how to deploy a containerized Web API to the Amazon ECS fargate service, and expose it with a custom domain using Route53.
 
-This pattern uses .NET as a programming language to create entire CDK stack.
+This pattern uses .NET as a programming language to create the entire CDK stack.
 
 ## Architecture 
 ![architecture diagram](images/architecture.png)
@@ -22,7 +22,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 ## Deployment Instructions
 
-1. Clone the project to your local working directory
+1. Clone the project to your local working directory.
     ```
     git clone https://github.com/aws-samples/serverless-patterns
     ```
@@ -30,11 +30,11 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
     string apiDomainName = "api.yourdomain.com";
     ```
-2. Change the working directory to this pattern's directory
+2. Change the working directory to this pattern's directory.
     ```
     cd route53-alb-fargate-cdk-dotnet/src
     ```
-3. Build the application
+3. Build the application.
     ```
     dotnet build
     ```
@@ -46,19 +46,19 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
     cdk deploy
     ```
-6. ⚠️ **Important** - Deployment pauses while validating the certificate. 
+6. ⚠️ **Important** - The deployment is paused while the certificate is validated.
 
    ![deployment-paused-screenshot](images/1.png)
 
     Follow the instructions below to complete the certificate validation by proving domain ownership:
-    - Go to **Route53 console** in AWS console, and choose the **Hosted Zone** created recently.
-    - Copy all four servers listed for **Name servers**. and save it somewhere.
+    - Navigate to the **Route53 console** and select the recently created **Hosted Zone**.
+    - Copy all four servers listed for **name servers**, and save it somewhere.
     - Go to your domain registrar and do the following:
       - Create a new DNS record with **NS** type for your domain.
       - Update the name servers for the domain to use the four Route 53 name servers.
 
-7.  Once the DNS validation completes, Certificat is created in ACM, and CDK resumes the deployment.
-8.  Once the deployment finishes, CDK prints 2 URLs, first points to the ALB, and second points to the domain you own.
+7.  When the DNS validation is finished, the certificate is created in ACM, and the CDK resumes the deployment.
+8.  When the deployment is complete, CDK prints two URLs, the first of which points to the ALB and the second to the domain you own.
 
     ![deployment-paused-screenshot](images/2.png)
 
