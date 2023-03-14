@@ -40,12 +40,12 @@ This is the architecture that this sample implements for callback pattern.
 3. API Lambda trigger the setp function workflow.
 4. API Lambda sends acknowledgement response to the user.
 5. Process order task execution starts.
-6. Execution paused and wait for confirmation API, invoke storeTaskToken lambda function.
-7. storeTaskToken lambda function stores task token into S3 bucket.
+6. Execution paused and wait for confirmation API, invoke `storeTaskToken` lambda function.
+7. `storeTaskToken` lambda function stores task token into S3 bucket.
 8. User sends confirmation request to API.
 9. API lambda validate confirmation request.
-10. API lambda fetch task token from S3 for given request and sends task sucess to step functions.
-11. As it gets `SendTaskSucess`, it resumes the execution.
+10. API lambda fetch task token from S3 for given request and sends task success to step functions.
+11. As it gets `SendTaskSuccess`, it resumes the execution.
 12. API lambda sends acknowledgement response to the user.
 13. Starts complete order task\
 \
