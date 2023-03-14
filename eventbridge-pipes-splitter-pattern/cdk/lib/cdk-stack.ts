@@ -19,7 +19,8 @@ export class EventBridgePipesSplitterPattern extends cdk.Stack {
     // log group to see Splitter output
     const ticketLogGroup = new LogGroup(this, 'tickets-log', {
       logGroupName: '/aws/events/tickets',
-      retention: RetentionDays.ONE_DAY
+      retention: RetentionDays.ONE_DAY,
+      removalPolicy: RemovalPolicy.DESTROY
     });
 
     const ticketOrdersBus = new EventBus(this, 'ticket-orders', {
