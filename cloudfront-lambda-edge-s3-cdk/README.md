@@ -15,7 +15,11 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
 
+
+
 ## Deployment Instructions
+
+*NOTE: Lambda@Edge functions are deployed in the us-east-1 region. For ease this sample is hard coded to use the us-east-1 region for all resources.*
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
@@ -41,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 
 In this example a CloudFront distribution is used to front an S3 bucket, allowing clients to upload files directly to S3 using HTTPS and apply custom authentication logic using Lambda@Edge. 
 
-When submitting a HTTP PUT request to the CloudFront URL with the file to upload the Lambda function will check a valid JWT token has been passed in the Authorization HTTP header. If the JWT is missing or invalid access will be denied. 
+When submitting a HTTP PUT request to the CloudFront URL with the file to upload the Lambda function will check a valid JWT token has been passed in the Authorization HTTP header. If the JWT is missing or invalid access will be denied. JWT tokens are validated using the `aws-jwt-verify` package available on [GitHub](https://github.com/awslabs/aws-jwt-verify).
 
 Direct access to the S3 bucket is denied using a S3 bucket policy and an [Origin Access Identity (OAI)](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html) with CloudFront. Only the OAI has PutObject rights in the bucket policy.
 
@@ -60,6 +64,11 @@ This example uses a Cognito User Pool and JWT tokens for auth, however any custo
     export APPCLIENT="$(aws cloudformation describe-stacks --stack-name AmazonS3UploadApiPatternsStack --query "Stacks[0].Outputs[?OutputKey=='CognitoAppClientId'].OutputValue" --output text --region us-east-1)"
     ```
 
+1. Next, do the same for the S3 bucket:
+    ```bash
+    export S3BUCKET="$(aws cloudformation describe-stacks --stack-name AmazonS3UploadApiPatternsStack --query "Stacks[0].Outputs[?OutputKey=='S3BucketName'].OutputValue" --output text --region us-east-1)"
+    ```
+
 1. Finally, set the CloudFront distribution variable:
     ```bash
     export CFURL="$(aws cloudformation describe-stacks --stack-name AmazonS3UploadApiPatternsStack --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionUrl'].OutputValue" --output text --region us-east-1)"
@@ -69,6 +78,7 @@ This example uses a Cognito User Pool and JWT tokens for auth, however any custo
     ```bash
     echo $USERPOOL
     echo $APPCLIENT
+    echo $S3BUCKET
     echo $CFURL
     ```
 
@@ -112,6 +122,21 @@ This example uses a Cognito User Pool and JWT tokens for auth, however any custo
     eyJraWQiOiJYeEhEaGFZZkJMdTJLME5mSzdnS0sraTJcLytXU25TRnBvVnJGeUs2dEF6dz0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhNmU4YTQ2ZC0zMjRkLTQyNjUtOTQwYy0xZmM5NTZkZGVhZTkiLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV93QUp2Z3V4ZWsiLCJjbGllbnRfaWQiOiI2NnFmdXA0cnJ1aDlvaXNvZm0zNGV0a2YwbyIsIm9yaWdpbl9qdGkiOiJlYTU3MWQ2YS1hNGY2LTRkMTYtYTFiZS1iMmU5ZjAzMTRlNGYiLCJldmVudF9pZCI6ImY2ZmEyMjViLTgyN2EtNDMzYS1hMzBiLWU5YWI1OTRjYjgyZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE2NzI5MTYyNjIsImV4cCI6MTY3MjkxOTg2MiwiaWF0IjoxNjcyOTE2MjYyLCJqdGkiOiIzYzEwZWNjNy1lOTE1LTRmYjctYjVlYS0yZGJlOTAzMWZkNDIiLCJ1c2VybmFtZSI6ImRlbW8ifQ.d7ZtgrTZMOyGAJbDgEP-nGXPU-5vWOrXnulbLRCQBeyAPIvTSSnSEX2xaLfdxId2X0GKGz1nPN6MoxHHgzmBx2dYv4Oglgv2ZJfM-qJUwx0fVhhe0A0XlEfJuaBO2bxsWu7aC5Dg3hHu-OANbBalTgJmDpC8nOhZmdsYLB1pAajJEQVmMPGiMHRAV6yQM9x6hWBX2PZCaaO-caKN7VVNCpk0yQ95j71eDgZTVt3QcW1RUth-cawOBWju9LjQn_0nhBnEIUmP_eFzdb-Kj-Rs0CbiOMtrb3sVmpTP1NVsNQGn6XT1FUsloeoNKD62q6e4ISTJ_EeyIzuUBOMrhZu72A
     ```
 
+1. First, test the unauthorized case by by submitting a request with an invalid JWT header:
+
+    ```bash
+    curl --location --request PUT "https://${CFURL}/image.jpg" \
+    --header 'authorization: my-invalid-token' \
+    --header 'Content-Type: image/jpeg' \
+    --data-binary '@./image.jpg'
+    ```
+
+    Check the S3 bucket does not contain the uploaded image:
+    ```bash
+    aws s3 ls $S3BUCKET
+    ```
+
+
 1. Use the access token as the authorization header in a cURL request to upload a file to S3:
 
     ```bash
@@ -121,24 +146,30 @@ This example uses a Cognito User Pool and JWT tokens for auth, however any custo
     --data-binary '@./image.jpg'
     ```
 
-1. Finally, test the unauthorized case by changing the token to be invalid and see that now we cannot upload to S3:
-
+    Check that we can now see the uploaded file in the bucket:
     ```bash
-    curl --location --request PUT "https://${CFURL}/image.jpg" \
-    --header 'authorization: my-invalid-token' \
-    --header 'Content-Type: image/jpeg' \
-    --data-binary '@./image.jpg'
+    aws s3 ls $S3BUCKET
     ```
+
 
 ## Cleanup
 
-1. Delete the `image.jpg` file from the S3 bucket.
+1. Delete the `image.jpg` file from the S3 bucket. This is because the bucket must be empty before it can be deleted.
+    ```bash
+    aws s3 rm "s3://${S3BUCKET}/image.jpg"
+    ```
 
-2. Delete the `AmazonS3UploadApiPatternsStack` CDK stack:
+1. Delete the `AmazonS3UploadApiPatternsStack` CDK stack:
    ```
    cdk destroy AmazonS3UploadApiPatternsStack
    ```
 
+    *NOTE: if you get an error from CloudFormation deleting the Lambda@Edge function, then you should wait a while and then retry `cdk destroy`. [Reference documentation](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-delete-replicas.html).*
+
+1. Optionally, delete the Cognito user pool, as this is left behind by the stack.
+    ```bash
+    aws cognito-idp delete-user-pool --user-pool-id $USERPOOL --region us-east-1
+    ```
 
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.

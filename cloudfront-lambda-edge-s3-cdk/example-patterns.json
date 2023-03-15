@@ -62,14 +62,14 @@
     "authors": [
       {
         "name": "Thomas Moore",
-        "image": "link-to-your-photo.jpg",
-        "bio": "Senior Solutions Architect | AWS",
+        "image": "https://media.licdn.com/dms/image/C4E03AQE-RZl0cWis7w/profile-displayphoto-shrink_800_800/0/1603702578898?e=1684368000&v=beta&t=qYZp45l0aJGwGLr5w_L3iaEy-GslYtsgZ__31T_V1kw",
+        "bio": "Senior Solutions Architect @ Amazon Web Services",
         "linkedin": "tmmruk"
       },
       {
         "name": "Josh Hart",
-        "image": "link-to-your-photo.jpg",
-        "bio": "Senior Solutions Architect | AWS",
+        "image": "https://media.licdn.com/dms/image/C4D03AQGRwNOzXNqY3g/profile-displayphoto-shrink_800_800/0/1623056962115?e=1684368000&v=beta&t=49QN439QTtRHw96h94xihNqsAP7soOjMqHXrRpfuLWs",
+        "bio": "Senior Solutions Architect @ Amazon Web Services",
         "linkedin": "hartjosh"
       }
     ]

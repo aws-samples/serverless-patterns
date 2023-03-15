@@ -72,6 +72,8 @@ export class AmazonS3UploadApiPatternsStack extends cdk.Stack {
       })
     );
 
+    new CfnOutput(this, 'S3BucketName', { value: bucket.bucketName })
+
     const cfdistribution = new Distribution(this, "cloudfrontDistribution", {
       defaultBehavior: {
         origin: new S3Origin(bucket, {
