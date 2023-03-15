@@ -77,7 +77,7 @@ Run the given command to delete the resources that were created. It might take s
 cdk destroy
 ```
 
-⚠️ **IMPORTANT** - The above command `cdk destory` does not delete the **Route53 Hosted Zone** because it contains new records created during the Certificate Validation process, so deleting it with `cdk destroy` resulted in an error. As a result, the record's removal policy has been set to **RETAIN**. You must manually delete this hosted zone by accessing the Route53 console.
+⚠️ **IMPORTANT** - The above command `cdk destory` does not delete the **Route53 Hosted Zone** because it contains new records created during the Certificate validation process, because, deleting it with `cdk destroy` results in error. As a result, the record's removal policy has been set to **RETAIN**. You must manually delete this hosted zone by accessing the Route53 console.
 
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
