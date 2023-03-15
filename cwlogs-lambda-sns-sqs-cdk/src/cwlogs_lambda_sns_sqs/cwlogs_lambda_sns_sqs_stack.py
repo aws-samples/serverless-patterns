@@ -68,7 +68,7 @@ class CwlogsLambdaSnsSqsStack(Stack):
         #CDK Nag rule suppression for wildcard permission 
         cdk_nag.NagSuppressions.add_resource_suppressions(lambda_execution_role, [{
                 "id":"AwsSolutions-IAM5", 
-                "reason":"To create custome Lambda execution role to write to CloudWatch.",
+                "reason":"To create custom Lambda execution role to write to CloudWatch.",
                 "applies_to": [{
                     "regex": "Resource::arn:aws:logs:(.*):\\*$/g"
                 }]
