@@ -1,7 +1,7 @@
 {
   "title": "S3 to Step Functions",
   "description": "This pattern demonstrates how to create an EventBridge rule with S3 as the event source and Step Functions as target.",
-  "language": "Python",
+  "language": "Typescript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
@@ -44,9 +44,9 @@
   "authors": [
     {
       "name": "Trinh Vo",
-      "image": "link-to-your-photo.jpg",
+      "image": "https://media.licdn.com/dms/image/C5603AQF4Ke0jgSBcZA/profile-displayphoto-shrink_800_800/0/1658462515681?e=2147483647&v=beta&t=zgT3WKQkas7N1w98d-ToTCMqhRUDbWTjMaPowWH1JeE",
       "bio": "Trinh is an Associate Solutions Architect at AWS Vietnam.",
-      "linkedin": "https://www.linkedin.com/in/trinh-vo-095848185/"
+      "linkedin": "trinh-vo-095848185"
     }
   ]
 }
