@@ -1,6 +1,6 @@
 ﻿# Running Web API on ECS Fargate with custom domain backed with ALB, fronted by Route53, and secured with ACM Certificate
 
-This pattern shows how to deploy a containerized Web API to the Amazon ECS fargate service, and expose it with a custom domain using Route53.
+This pattern shows how to deploy a containerized Web API to the Amazon ECS fargate service, and expose it with a custom domain using Amazon Route53.
 
 This pattern uses .NET as a programming language to create the entire CDK stack.
 
@@ -26,9 +26,9 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-2. Go to this file [Route53AlbFargateCdkDotnetStack.cs](src/Route53AlbFargateCdkDotnet/Route53AlbFargateCdkDotnetStack.cs), and replace the API domain name value with your domain name.
+2. Go to this file [Route53AlbFargateCdkDotnetStack.cs](src/Route53AlbFargateCdkDotnet/Route53AlbFargateCdkDotnetStack.cs), and replace the `apiDomainName` variable value with your domain name.
     ```
-    string apiDomainName = "api.yourdomain.com";
+    string apiDomainName = "api.YOUR-DOMAIN.com";
     ```
 2. Change the working directory to this pattern's directory.
     ```
@@ -46,7 +46,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
     cdk deploy
     ```
-6. ⚠️ **Important** - The deployment is paused while the certificate is validated.
+6. ⚠️ **Important** - The deployment is paused while validating the certificate.
 
    ![deployment-paused-screenshot](images/1.png)
 
@@ -65,9 +65,9 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 ## Testing
 
 1. After deployment, the output displays the following values.
-   - Load Balancer URL: ``
-   - API Custom Domain URL: ``
-2. Copy the URL with custom domain and append `WeatherForecast`, the URL will look like this: https://api.yourdomain.com/WeatherForecast
+   - Load Balancer URL: `Route53AlbFargateCdkDotnetStack.sampleapiserviceLoadBalancerDNS60B9DACF = Route-sampl-16MTWZYE6AGI4-1107455325.ap-south-1.elb.amazonaws.com`
+   - API Custom Domain URL: `Route53AlbFargateCdkDotnetStack.sampleapiserviceServiceURLC8317C98 = https://api.YOUR-DOMAIN.com`
+2. Copy the URL with custom domain and append `WeatherForecast`, the URL will look like this - https://api.YOUR-DOMAIN.com/WeatherForecast.
 3. Enter this URL into your browser, you should receive a JSON response with weather information.
 
 ## Cleanup

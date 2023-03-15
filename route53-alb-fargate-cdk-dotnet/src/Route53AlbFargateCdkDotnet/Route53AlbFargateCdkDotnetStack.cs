@@ -17,7 +17,7 @@ namespace Route53AlbFargateCdkDotnet
         internal Route53AlbFargateCdkDotnetStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
             // Replace the value with your domain name
-            string apiDomainName = "api.yourdomain.com";
+            string apiDomainName = "api.YOUR-DOMAIN.com";
 
             // 1. Hosted zone
             var hostedZone = new HostedZone(this, "hosted-zone", new HostedZoneProps
