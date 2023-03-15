@@ -48,7 +48,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
 6. ⚠️ **Important** - The deployment is paused while validating the certificate.
 
-   ![deployment-paused-screenshot](images/1.png)
+   ![deployment-paused-screenshot](images/screenshot-1.png)
 
     Follow the instructions below to complete the certificate validation by proving domain ownership:
     - Navigate to the **Route53 console** and select the recently created **Hosted Zone**.
@@ -60,7 +60,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 7.  When the DNS validation is finished, the certificate is created in ACM, and the CDK resumes the deployment.
 8.  When the deployment is complete, CDK prints two URLs, the first of which points to the ALB and the second to the domain you own.
 
-    ![deployment-paused-screenshot](images/2.png)
+    ![deployment-paused-screenshot](images/screenshot-2.png)
 
 ## Testing
 
