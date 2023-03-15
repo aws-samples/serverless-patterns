@@ -20,7 +20,9 @@ export class AmazonS3UploadApiPatternsStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const pool = new UserPool(this, "cognitoUserPool");
+    const pool = new UserPool(this, "cognitoUserPool", {
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
     const client = pool.addClient("cognitoAppClient", {
       authFlows: {
         adminUserPassword: true,
@@ -59,7 +61,9 @@ export class AmazonS3UploadApiPatternsStack extends cdk.Stack {
 
     const bucket = new Bucket(this, "originBucket", {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
+    
     bucket.addToResourcePolicy(
       new PolicyStatement({
         principals: [

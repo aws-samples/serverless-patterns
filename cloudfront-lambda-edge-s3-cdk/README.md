@@ -166,10 +166,6 @@ This example uses a Cognito User Pool and JWT tokens for auth, however any custo
 
     *NOTE: if you get an error from CloudFormation deleting the Lambda@Edge function, then you should wait a while and then retry `cdk destroy`. [Reference documentation](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-delete-replicas.html).*
 
-1. Optionally, delete the Cognito user pool, as this is left behind by the stack.
-    ```bash
-    aws cognito-idp delete-user-pool --user-pool-id $USERPOOL --region us-east-1
-    ```
 
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
