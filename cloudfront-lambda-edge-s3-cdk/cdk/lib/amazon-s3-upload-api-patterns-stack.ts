@@ -8,7 +8,7 @@ import {
 } from "aws-cdk-lib/aws-cloudfront";
 import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
-import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
+import { BlockPublicAccess, Bucket, CfnBucket } from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { UserPool } from "aws-cdk-lib/aws-cognito";
@@ -63,18 +63,6 @@ export class AmazonS3UploadApiPatternsStack extends cdk.Stack {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
-    
-    bucket.addToResourcePolicy(
-      new PolicyStatement({
-        principals: [
-          new CanonicalUserPrincipal(
-            originAccessIdentity.cloudFrontOriginAccessIdentityS3CanonicalUserId
-          ),
-        ],
-        actions: ["s3:PutObject"],
-        resources: [bucket.arnForObjects("*")],
-      })
-    );
 
     new CfnOutput(this, 'S3BucketName', { value: bucket.bucketName })
 
@@ -93,6 +81,13 @@ export class AmazonS3UploadApiPatternsStack extends cdk.Stack {
         ],
       },
     });
+
+    const policyOverride = bucket.node.findChild("Policy").node
+      .defaultChild as CfnBucket;
+    policyOverride.addOverride(
+      "Properties.PolicyDocument.Statement.0.Action",
+      "s3:PutObject"
+    );
 
     new CfnOutput(this, 'CloudFrontDistributionUrl', { value: cfdistribution.distributionDomainName });
 
