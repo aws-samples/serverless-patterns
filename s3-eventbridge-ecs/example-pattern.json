@@ -53,11 +53,13 @@
   "authors": [
     {
       "name": "Jeff Hunter",
+      "image": "https://avatars.githubusercontent.com/u/128183699",
       "bio": "AWS Sr. Solutions Architect",
       "linkedin": "https://www.linkedin.com/in/hunterjeff/"
     },
     {
       "name": "Rajdeep Banerjee",
+      "image": "https://avatars.githubusercontent.com/u/106704318",
       "bio": "AWS Sr. Solutions Architect",
       "linkedin": "https://www.linkedin.com/in/rajdeep-banerjee/"
     }
