@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda function that calls asynchronous Lambda function
+
+  Transfer the payload through S3 bucket as an object when the payload size is larger than asynchronous lambda function invocation payload quota.
+
+Parameters:
+  PayloadBucketName:
+    Type: String
+  PayloadPrefix:
+    Type: String
+    Default: MyPayload_
+  AsyncLambdaFunctionName:
+    Type: String
+    Default: MyAsynchronousFunction
+
+Resources:
+  ## Define a Lambda function to call asynchronous Lambda function
+  SendPayloadFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: SendPayloadFunction
+      CodeUri: sendPayloadFunction/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      MemorySize: 128
+      Environment:
+        Variables:
+          PayloadBucketName: !Ref PayloadBucketName
+          PayloadPrefix: !Ref PayloadPrefix
+          AsyncLambdaFunctionName: !Ref AsyncLambdaFunctionName
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref AsyncLambdaFunctionName
+        - S3WritePolicy:
+            BucketName: !Ref PayloadBucketName
+          
+  ## S3 bucket to save large size payload
+  PayloadBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref PayloadBucketName
+
+  ## Define an asynchronous Lambda function that called by Lambda function or S3
+  AsynchronousFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Ref AsyncLambdaFunctionName
+      CodeUri: asynchronousFunction/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      MemorySize: 128
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref PayloadBucketName
+      Events:
+        PayloadCreationEvent:
+          Type: S3
+          Properties:
+            Bucket: 
+              Ref: PayloadBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                - Name: prefix
+                  Value: !Ref PayloadPrefix

@@ -9,8 +9,7 @@ name = "handler"
 path = "src/bin/handler.rs"
 
 [dependencies]
-lambda_http = "0.5.0"
-lambda_runtime = "0.5.0"
-serde_json = "1.0.68"
-tokio = { version = "1", features = ["full"] }
-tracing-subscriber = "0.3"
+lambda_http = "0.7.2"
+serde_json = "1"
+tokio = { version = "1", features = ["macros"] }
+tracing-subscriber = { version = "0.3", features = ["fmt", "json"] }

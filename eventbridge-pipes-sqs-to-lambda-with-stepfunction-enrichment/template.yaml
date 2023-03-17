@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: EventBridge Pipe that connects SQS to Lambda with Enrichment
+
+Resources:
+  Source:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-source-queue
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt SourceQueueDLQ.Arn
+        maxReceiveCount: 5
+
+  #DLQ for source
+  SourceQueueDLQ:
+    Type: AWS::SQS::Queue
+
+  # Pipes target (Lambda function)
+  Target:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-target-lambda
+      CodeUri: src/
+      Handler: index.handler
+      Runtime: nodejs16.x
+      MemorySize: 128
+      Timeout: 15
+      Architectures:
+        - x86_64
+
+  # Enrichment log group
+  EnrichmentLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['/', ['stepfunctions', StateMachine]]
+
+  # Enrichment with Step Functions
+  EnrichmentStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      DefinitionUri: workflow/enrichment.asl.json
+      Role: !GetAtt EnrichmentStateMachineRole.Arn
+      DefinitionSubstitutions:
+        DDBTable: !Ref OrdersTable
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt EnrichmentLogGroup.Arn
+        IncludeExecutionData: true
+        Level: 'ALL'
+
+  #Execution Role for StepFunctions
+  EnrichmentStateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - states.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'cloudwatch:*'
+                  - 'logs:*'
+                Resource: '*'
+        - PolicyName: DynamoDBWrite
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:DescribeTable'
+                Resource: !GetAtt OrdersTable.Arn
+
+  # DynamoDB Table that holds order information
+  OrdersTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: !Sub ${AWS::StackName}-orders
+      PrimaryKey:
+        Name: Id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+  # Role + Permissions for Pipes
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: SourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource: !GetAtt Source.Arn
+        - PolicyName: TargetPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunction'
+                Resource: !GetAtt Target.Arn
+        - PolicyName: EnrichmentPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'states:StartExecution'
+                  - 'states:StartSyncExecution'
+                Resource: !GetAtt EnrichmentStateMachine.Arn
+
+  # Create Pipe
+  Pipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: !Sub ${AWS::StackName}-sqs-lambda
+      Description: 'Pipe that connects SQS to Lambda with Enrichment from Step Functions'
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt Source.Arn
+      SourceParameters:
+        SqsQueueParameters:
+          BatchSize: 1
+      Enrichment: !GetAtt EnrichmentStateMachine.Arn
+      Target: !GetAtt Target.Arn
+
+Outputs: 
+  QueueUSourceSQSURLRL: 
+    Description: "URL of new Amazon SQS Queue"
+    Value: 
+      Ref: Source
+  DDBEnrichmentTable: 
+    Description: "Arn of the DDB table used for enrichment"
+    Value: 
+      Ref: OrdersTable

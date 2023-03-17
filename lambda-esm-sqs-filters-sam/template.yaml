@@ -1,0 +1,302 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  esm-sqs-filters
+
+  Sample SAM Template for esm-sqs-filters
+
+Globals:
+  Function:
+    Handler: app.lambda_handler
+    Timeout: 3
+    Runtime: python3.9
+    Architectures:
+      - arm64
+
+Resources:
+
+  # 1. No Filter
+  EsmSqsFilterQueueNoFilter:
+    Type: AWS::SQS::Queue
+  EsmSqsFilterFunctionNoFilter:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: functions/esm-sqs-filter-function-generic/
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EsmSqsFilterQueueNoFilter.Arn
+            BatchSize: 10
+
+  # 2. Prefix Matching
+  EsmSqsFilterQueuePrefix:
+    Type: AWS::SQS::Queue
+  EsmSqsFilterFunctionPrefix:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: functions/esm-sqs-filter-function-generic/
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EsmSqsFilterQueuePrefix.Arn
+            BatchSize: 10
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"body":{"region":[{"prefix":"us-"}]}}'
+
+
+  # 3. Match anything except what is provided in the filter. You can use anything-but matching with strings and numeric values, including lists that contain only strings, or only numbers.
+  EsmSqsFilterQueueAnythingBut:
+    Type: AWS::SQS::Queue
+  EsmSqsFilterFunctionAnythingBut:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: functions/esm-sqs-filter-function-generic/
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EsmSqsFilterQueueAnythingBut.Arn
+            BatchSize: 10
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"body":{"address":{"state":[{"anything-but":"GA"}]}}}'
+
+  # 4. Matches an IP range (CIDR)
+  EsmSqsFilterQueueIP:
+    Type: AWS::SQS::Queue
+  EsmSqsFilterFunctionIP:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: functions/esm-sqs-filter-function-generic/
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EsmSqsFilterQueueIP.Arn
+            BatchSize: 10
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"body":{"sourceIPAddress":[{ "cidr":"10.0.0.0/24"}]}}'
+
+  # 5. Logical AND. It will match any rating between 0 and 5 (excluding 0) AND the country needs to match AND the "street" key needs to be present (the exists filter only works on leaf nodes!)
+  #
+  #   "body" : {
+  #     "rating" : [ { "numeric": [ ">", 0, "<=", 5]}],
+  #     "address" : {
+  #         "country": [ "USA" ],
+  #         "street": [ { "exists": true  } ]
+  #     }
+  #   }
+  EsmSqsFilterQueueAnd:
+    Type: AWS::SQS::Queue
+  EsmSqsFilterFunctionAnd:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: functions/esm-sqs-filter-function-generic/
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EsmSqsFilterQueueAnd.Arn
+            BatchSize: 10
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"body":{"rating":[{"numeric":[">",0,"<=",5]}],"address":{"country":["USA"],"street":[{"exists":true}]}}}'
+
+  # 6. Logical OR. The filter will match if any of the rules match. Rating is 4 or 5 OR the filename is "metadata.txt" OR (the country is "USA" and there is a street address present)
+  EsmSqsFilterQueueOr:
+    Type: AWS::SQS::Queue
+  EsmSqsFilterFunctionOr:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: functions/esm-sqs-filter-function-generic/
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EsmSqsFilterQueueOr.Arn
+            BatchSize: 10
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"body":{"rating":[4,5]}}'
+                - Pattern: '{"body":{"fileName": ["metadata.txt"]}}'
+                - Pattern: '{"body":{"address":{"country":["USA"],"street":[{"exists":true}]}}}'
+
+  # SNS to push messages to all queues at once for testing
+  EmsSqsFilterSnsTopic:
+    Type: AWS::SNS::Topic
+
+  # Add subscriptions
+  EmsSqsFilterSnsToSqsSubscriptionOr:
+    Type: AWS::SNS::Subscription
+    Properties:
+       Protocol: sqs
+       RawMessageDelivery : true
+       Endpoint: !GetAtt EsmSqsFilterQueueOr.Arn
+       TopicArn: !Ref EmsSqsFilterSnsTopic
+  EmsSqsFilterSnsToSqsSubscriptionAnd:
+    Type: AWS::SNS::Subscription
+    Properties:
+       Protocol: sqs
+       RawMessageDelivery : true
+       Endpoint: !GetAtt EsmSqsFilterQueueAnd.Arn
+       TopicArn: !Ref EmsSqsFilterSnsTopic
+  EmsSqsFilterSnsToSqsSubscriptionIP:
+    Type: AWS::SNS::Subscription
+    Properties:
+       Protocol: sqs
+       RawMessageDelivery : true
+       Endpoint: !GetAtt EsmSqsFilterQueueIP.Arn
+       TopicArn: !Ref EmsSqsFilterSnsTopic
+  EmsSqsFilterSnsToSqsSubscriptionAnythingBut:
+    Type: AWS::SNS::Subscription
+    Properties:
+       Protocol: sqs
+       RawMessageDelivery : true
+       Endpoint: !GetAtt EsmSqsFilterQueueAnythingBut.Arn
+       TopicArn: !Ref EmsSqsFilterSnsTopic
+  EmsSqsFilterSnsToSqsSubscriptionPrefix:
+    Type: AWS::SNS::Subscription
+    Properties:
+       Protocol: sqs
+       RawMessageDelivery : true
+       Endpoint: !GetAtt EsmSqsFilterQueuePrefix.Arn
+       TopicArn: !Ref EmsSqsFilterSnsTopic
+  EmsSqsFilterSnsToSqsSubscriptionNoFilter:
+    Type: AWS::SNS::Subscription
+    Properties:
+       Protocol: sqs
+       RawMessageDelivery : true
+       Endpoint: !GetAtt EsmSqsFilterQueueNoFilter.Arn
+       TopicArn: !Ref EmsSqsFilterSnsTopic
+
+
+  # Policies allows SNS to publish to the respective SQS queue
+
+  EmsSqsFilterSnsToSqsPolicyOr:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal: 
+              Service: "sns.amazonaws.com"
+            Resource: [
+              !GetAtt EsmSqsFilterQueueOr.Arn
+            ]
+            Action: SQS:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref EmsSqsFilterSnsTopic
+      Queues:
+        - Ref: EsmSqsFilterQueueOr
+
+  EmsSqsFilterSnsToSqsPolicyAnd:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal: 
+              Service: "sns.amazonaws.com"
+            Resource: [
+              !GetAtt EsmSqsFilterQueueAnd.Arn
+            ]
+            Action: SQS:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref EmsSqsFilterSnsTopic
+      Queues:
+        - Ref: EsmSqsFilterQueueAnd
+        
+  EmsSqsFilterSnsToSqsPolicyIP:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal: 
+              Service: "sns.amazonaws.com"
+            Resource: [
+              !GetAtt EsmSqsFilterQueueIP.Arn
+            ]
+            Action: SQS:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref EmsSqsFilterSnsTopic
+      Queues:
+        - Ref: EsmSqsFilterQueueIP
+
+  EmsSqsFilterSnsToSqsPolicyAnythingBut:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal: 
+              Service: "sns.amazonaws.com"
+            Resource: [
+              !GetAtt EsmSqsFilterQueueAnythingBut.Arn
+            ]
+            Action: SQS:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref EmsSqsFilterSnsTopic
+      Queues:
+        - Ref: EsmSqsFilterQueueAnythingBut
+
+  EmsSqsFilterSnsToSqsPolicyPrefix:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal: 
+              Service: "sns.amazonaws.com"
+            Resource: [
+              !GetAtt EsmSqsFilterQueuePrefix.Arn
+            ]
+            Action: SQS:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref EmsSqsFilterSnsTopic
+      Queues:
+        - Ref: EsmSqsFilterQueuePrefix
+
+  EmsSqsFilterSnsToSqsPolicyNoFilter:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal: 
+              Service: "sns.amazonaws.com"
+            Resource: [
+              !GetAtt EsmSqsFilterQueueNoFilter.Arn
+            ]
+            Action: SQS:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref EmsSqsFilterSnsTopic
+      Queues:
+        - Ref: EsmSqsFilterQueueNoFilter
+
+Outputs:
+  SNSArn:
+    Description: The ARN of the test Topic
+    Value: !Ref EmsSqsFilterSnsTopic

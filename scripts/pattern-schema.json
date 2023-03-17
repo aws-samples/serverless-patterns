@@ -6,11 +6,11 @@
     "description": { "type": "string" },
     "language": {
       "type": "string",
-      "enum": ["TypeScript", "Node.js", "Python", "Java", ".Net", "C#", "Go", "Rust"]
+      "enum": ["TypeScript", "Node.js", "Python", "Java", "Go", "Rust", ".NET"]
     },
     "framework": {
       "type": "string",
-      "enum": ["CDK", "SAM", "Terraform", "Serverless Framework", "Terraform (with modules)"]
+      "enum": ["CDK", "SAM", "Terraform", "Serverless Framework", "Terraform (with modules)", "Pulumi"]
     },
     "introBox": {
       "type": "object",

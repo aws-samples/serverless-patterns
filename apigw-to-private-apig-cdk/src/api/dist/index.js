@@ -12,7 +12,7 @@ __export(exports, {
 });
 
 // api/config.json
-var prefix = "PrivateAPIGateway";
+var prefix = "APIGateway";
 var description = "A VPC Lambda to get request from API Gateway Private API with CDK";
 var api = {
   handler: "ProxyLambda"

@@ -1,0 +1,21 @@
+[package]
+name = "dynamodb-streams-lambda-eventbridge-sam-rust"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "handler"
+path = "src/bin/handler.rs"
+
+[dependencies]
+aws_lambda_events = { version = "0.7", default-features = false, features = ["dynamodb"] }
+aws-types = "0.54"
+aws-config = "0.54"
+aws-sdk-eventbridge = "0.24"
+lambda_runtime = "0.7"
+serde_json = "1"
+serde = {version = "1.0", features = ["derive"] }
+tokio = { version = "1", features = ["macros"] }
+tracing-subscriber = { version = "0.3", features = ["fmt", "json"] }
+typed-builder = "0.12"

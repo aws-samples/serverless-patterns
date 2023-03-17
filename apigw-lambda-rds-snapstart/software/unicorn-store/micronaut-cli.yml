@@ -1,0 +1,6 @@
+applicationType: function
+defaultPackage: com.unicorn.store
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [annotation-api, app-name, aws-lambda, data, data-jpa, java, jdbc-hikari, junit, logback, maven, postgres, readme, shade, testcontainers, yaml]

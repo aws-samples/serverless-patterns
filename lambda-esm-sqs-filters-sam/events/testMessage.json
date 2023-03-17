@@ -1,0 +1,12 @@
+{
+    "region": "us-east-1",
+    "sourceIPAddress": "10.0.0.11",
+    "rating": 4,
+    "fileName": "metadata.txt",
+    "address": {
+        "country": "USA",
+        "street": "56 Fox Dr",
+        "city": "Boston",
+        "state": "MA"
+    }
+}

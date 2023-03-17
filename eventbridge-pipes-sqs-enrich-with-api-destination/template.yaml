@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template to enrich Amazon EventBridge Pipes data using API destinations
+Parameters:
+  MyApiWithPathURL:
+    Type: String
+    Default: https://api.zippopotam.us/us/*  #This API call will return details about the a particular USA zip code, for more info visit http://www.zippopotam.us/
+    #Example API path https://api.zippopotam.us/us/90210
+Resources:
+  #Source SQS
+  SourceQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt SourceQueueDLQ.Arn
+        maxReceiveCount: 5
+  #DLQ for source
+  SourceQueueDLQ:
+    Type: AWS::SQS::Queue
+  #Logs as Target
+  TargetCWLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+      LogGroupName: sqs-pipes-api-logs
+  # Role for EventBridge Pipes to read from SQS and call pipe to enrich data with API and send to Cloudwatch logs
+  EventBridgePipesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: !GetAtt TargetCWLogGroup.Arn
+        - PolicyName: ReadSQS
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource: !GetAtt SourceQueue.Arn
+        - PolicyName: InvokeApiDest
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:InvokeApiDestination'
+                Resource: !GetAtt MyApiDestination.Arn
+  # Pipes definition
+  SqsToApiDestination:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: 'SqsToApiDestination'
+      RoleArn: !GetAtt EventBridgePipesRole.Arn
+      Source: !GetAtt SourceQueue.Arn
+      SourceParameters:
+        SqsQueueParameters:
+          BatchSize: 1
+      Enrichment: !GetAtt MyApiDestination.Arn
+      EnrichmentParameters:
+        HttpParameters:
+          PathParameterValues:
+             - $.body.zip
+      Target: !GetAtt TargetCWLogGroup.Arn
+  MyConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      Description: 'My connection with an API key'
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: MyWebhook
+          ApiKeyValue: MyAPIkey
+  MyApiDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'MyWebhookTest'
+      ConnectionArn: !GetAtt MyConnection.Arn
+      InvocationEndpoint: !Ref MyApiWithPathURL
+      HttpMethod: GET 
+      InvocationRateLimitPerSecond: 10
+
+Outputs:
+  SourceQueueUrl:
+    Description: 'Source SQS Queue URL'
+    Value: !Ref  SourceQueue
+  TargetCWLogGroup:
+    Description: 'Target Log Group Name'
+    Value: !Ref TargetCWLogGroup

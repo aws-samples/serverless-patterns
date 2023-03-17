@@ -1,0 +1,44 @@
+type Schema {
+	query: Query
+	mutation: Mutation
+}
+
+type Query {
+	listApplicants(limit: Int, skip: Int): [Applicant]
+}
+
+type Mutation {
+	addApplicant(input: ApplicantInput!): Applicant
+}
+
+type Applicant {
+	id: ID
+	name: String
+	email: AWSEmail
+	phoneNumber: AWSPhone
+	employmentStatus: EMPLOYMENT_STATUS_ENUM
+	startDate: AWSDate
+	focusArea: FOCUS_AREA_ENUM
+	createdAt: AWSDateTime
+	updatedAt: AWSDateTime
+}
+
+input ApplicantInput {
+	id: ID
+	name: String!
+	email: AWSEmail!
+	phoneNumber: AWSPhone
+	employmentStatus: EMPLOYMENT_STATUS_ENUM!
+	startDate: AWSDate!
+	focusArea: FOCUS_AREA_ENUM!
+}
+
+enum EMPLOYMENT_STATUS_ENUM {
+	EMPLOYED
+	UNEMPLOYED
+}
+
+enum FOCUS_AREA_ENUM {
+	FRONTEND
+	BACKEND
+}

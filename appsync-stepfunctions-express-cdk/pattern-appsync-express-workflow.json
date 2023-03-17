@@ -1,0 +1,47 @@
+{
+	"title": "AppSync to StepFunctions(Synchronous Express Workflows)",
+	"description": "Create an AppSync API with a StepFunctions State Machine as HTTP data source",
+	"language": "Node.js",
+	"architectureURL": "architecture-appsync-stepfunctions-express-cdk.png",
+	"videoId": "",
+	"level": "100",
+	"framework": "CDK",
+	"services": {
+		"from": "appsync",
+		"to": "stepfunctions"
+	},
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This project contains a sample AWS CDK template for running Step Functions synchronous express workflows from an AppSync API. The State Machine will be added as an HTTP data source to AppSync API. "
+		]
+	},
+	"deploy": {
+		"text": ["cdk deploy"]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-stepfunctions-express-cdk",
+			"templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/appsync-stepfunctions-express-cdk/cdk/lib/appsync-stepfunctions-express-cdk.ts",
+			"readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-stepfunctions-express-cdk/README.md"
+		}
+	},
+	"resources": {
+		"headline": "Additional resources",
+		"bullets": [
+			{
+				"text": "HTTP Resolvers",
+				"link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html"
+			},
+			{
+				"text": "Synchronous Express Workflows",
+				"link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+			}
+		]
+	},
+	"author": {
+		"headline": "Presented by Michael Liendo",
+		"name": "Michael Liendo 🦦",
+		"bio": "Senior Developer Advocate @ AWS AppSync"
+	}
+}

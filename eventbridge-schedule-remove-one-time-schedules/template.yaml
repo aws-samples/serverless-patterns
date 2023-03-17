@@ -1,0 +1,130 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Pattern that will remove one-time schedules based on a given expiry time
+
+Resources:
+  # Queue to hold schedules to remove, Lambda will process them in batches of 10
+  ScheduleQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-removal-queue
+      VisibilityTimeout: 350
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt ScheduleQueueDLQ.Arn
+        maxReceiveCount: 5
+
+  #DLQ for source
+  ScheduleQueueDLQ:
+    Type: AWS::SQS::Queue
+
+  # Lambda function to query schedules and put the onto a queue for processing
+  FindSchedules:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: find-schedules.handler
+      Runtime: nodejs18.x
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'scheduler:ListSchedules'
+                - 'scheduler:GetSchedule'
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - 'sqs:SendMessage'
+                - 'sqs:SendMessageBatch'
+              Resource: !GetAtt ScheduleQueue.Arn
+      Architectures:
+        - x86_64
+      Timeout: 300
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref ScheduleQueue
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2020'
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+          - find-schedules.ts
+
+  # Lambda function to check schedule and remove it if its one-time and expired.
+  ProcessSchedules:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: process-schedule-batch.handler
+      Runtime: nodejs18.x
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'scheduler:GetSchedule'
+                - 'scheduler:DeleteSchedule'
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - 'sqs:ReceiveMessage'
+                - 'sqs:DeleteMessage'
+                - 'sqs:GetQueueAttributes'
+              Resource: !GetAtt ScheduleQueue.Arn
+
+      Architectures:
+        - x86_64
+      Timeout: 300
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ScheduleQueue.Arn
+            BatchSize: 10
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2020'
+        # Sourcemap: true # Enabling source maps will create the required NODE_OPTIONS environment variables on your lambda function during sam build
+        EntryPoints:
+          - process-schedule-batch.ts
+
+  # Schedule that will run every day at 00:00 to trigger process
+  CleanUpOneTimeSchedules:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Description: Schedule the runs every day to clean up one time schedules
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      ScheduleExpression: 'cron(0 0 * * ? *)'
+      Target:
+        Arn: !GetAtt FindSchedules.Arn
+        RoleArn: !GetAtt CleanUpOneTimeSchedulesRole.Arn
+
+  CleanUpOneTimeSchedulesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeLambda
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunction'
+                Resource:
+                  - !GetAtt FindSchedules.Arn

@@ -46,7 +46,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern deploys an Amazon Cloudfront distribution, an Amazon API Gateway HTTP API with a default route and basic CORS configuration. The default route is integrated with an AWS Lambda function written in Rust. The function logs the incoming API event (v2) and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller.
+This pattern deploys an Amazon Cloudfront distribution, an AWS Lambda function URL. The function logs the incoming event and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller.
 
 ## Testing
 

@@ -1,0 +1,16 @@
+{
+  "name": "example1",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "aws-lambda": "^1.0.7",
+    "@types/node": "^18.11.11",
+    "typescript": "^4.9.4"
+  }
+}
