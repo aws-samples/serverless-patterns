@@ -1,6 +1,6 @@
 # Serverless pattern to integrate EventBridge and ECS-Fargate tasks
 
-![Serverless Pattern Architecture](/EventBridge/s3-eb-ecs.png)
+![Serverless Pattern Architecture](/s3-eb-ecs.png)
 
 This serverless pattern uses EventBridge to trigger multiple ECS tasks on Fargate. The ECS task queries the S3 bucket for files and reads them. These ECS tasks can be extended to insert the data to a database, thus speeding up the process of loading data from S3 to a database.
 
@@ -9,7 +9,7 @@ This application pattern can be extended to
     1. Process a file from a single bucket in parallel
     2. Perform long running tasks not suited for Lambda processing in parallel
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/?aws-products-pricing.sort-by=item.additionalFields.productNameLowercase&aws-products-pricing.sort-order=asc&awsf.Free%20Tier%20Type=*all&awsf.tech-category=*all) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 # Requirements
 
@@ -28,14 +28,14 @@ Important: this application uses various AWS services and there are costs associ
     
 3. Change directory to the pattern directory:
     ~~~ code
-    cd serverless-patterns/eventbridge-ecs
+    cd serverless-patterns/s3-eventbridge-ecs
     
-4. Go to the [Docker directory](./docker/README.md) and execute the docker command and bash script to do the following:
+4. Go to the [Docker directory](src/docker/README.md) and execute the docker command and bash script to do the following:
     - Create the ECR Repository
     - Create the task image and push it to the repository
     - Note the ARNs of the image name for the task. The ARN and image name will be needed in terraform script
 
-5. Make the following changes in the [terraform script](./terraform/pattern_s3_eb_ecs.tf) located inside of terraform folder:
+5. Make the following changes in the [terraform script](pattern_s3_eb_ecs.tf):
     - Put an unique S3 bucket name in line 2
     - Put the image URI in the line 4
     - Put a subnet block in line 5
