@@ -21,21 +21,28 @@ Learn more about this pattern at Serverless Land Patterns: << Add the live URL h
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ```
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
+
+```
+git clone https://github.com/aws-samples/serverless-patterns
+```
+
 2. Change directory to the pattern directory:
-    ```
-    cd cdk-eventbridge-mesh
-    ```
+
+```
+cd cdk-eventbridge-mesh
+```
+
 3. Install the project dependencies
-    ```
-     npm install
-    ```
+
+```
+npm install
+```
+
 4. Deploy the stack to your default AWS account and region
-    ```
-    make deploy
-    ```
+
+```
+make deploy
+```
 
 ## How it works
 
@@ -98,7 +105,7 @@ The results should appear like below
 1. Delete the stack
 
 ```bash
-    make destroy
+make destroy
 ```
 
 ## Documentation
