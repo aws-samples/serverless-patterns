@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  CloudWatch Subscription Filter with Lambda Function as destination
+  
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Runtime: nodejs16.x
+    Architectures:
+        - x86_64
+
+Resources:
+  
+  #The Lambda Function whose logs in CloudWatch will invoke another Lambda Function
+  LogsGeneratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:  
+      Handler: app.handler  
+      CodeUri: src/
+
+  #The Log Group associated with the first function   
+  LogsGeneratorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      LogGroupName: !Join [ "", [ "/aws/lambda/", !Ref LogsGeneratorFunction] ]
+      RetentionInDays: 30
+
+  #The Lambda Function that will be invoked by the Log Group
+  LogsSubscriberFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      
+  #The Subscription Filter to invoke the Lambda Function on every log that match the filter
+  LogsGeneratorLogGroupSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Properties: 
+      DestinationArn: !GetAtt LogsSubscriberFunction.Arn
+      FilterName: Lambda
+      FilterPattern: "" #Send all the logs without filtering. Can be changed to send only some logs like the ones with 'Error' or another identifier
+      LogGroupName: !Ref LogsGeneratorLogGroup
+  
+  #Gives permissions to the Log Group to invoke the second Lambda Function 
+  CloudWatchSubscriptionFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LogsSubscriberFunction.Arn
+      Action: 'lambda:InvokeFunction'
+      Principal: 'logs.amazonaws.com'
+      SourceArn: !GetAtt LogsGeneratorLogGroup.Arn
+
+Outputs:
+  LogsGeneratorFunction:
+    Description: "LogsGenerator Lambda Function"
+    Value: !Ref LogsGeneratorFunction
+  LogsSubscriberFunction:
+    Description: "LogsSubscriber Lambda Function"
+    Value: !Ref LogsSubscriberFunction

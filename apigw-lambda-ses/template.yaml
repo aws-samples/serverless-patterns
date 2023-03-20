@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  lambda-ses
+
+  Sample SAM Template for lambda-ses
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: sendEmail
+      OpenApiVersion: 3.0.3
+      EndpointConfiguration:
+          Type: REGIONAL
+
+  SESConfigSet:
+    Type: 'AWS::SES::ConfigurationSet'
+    Properties:
+      Name: CustomConfigSet
+
+  EmailSESLambda:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: email-lambda
+      Description: Python Email Lambda
+      CodeUri: ./email-lambda/
+      Handler: email-lambda.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Policies:
+          - Statement:
+              - Effect: Allow
+                Action:
+                  - "ses:SendEmail"
+                  - "ses:SendTemplatedEmail"
+                  - "ses:SendRawEmail"
+                  - "ses:SendBulkTemplatedEmail"
+                Resource: "*"
+      Environment:
+            Variables:
+              SES_CONFIG_SET_NAME:
+                Ref: SESConfigSet
+      Events:
+        APIEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId: !Ref RestApi
+
+Outputs:
+  lambdaArn:
+    Value: !GetAtt EmailSESLambda.Arn
+  
+  apiGatewayInvokeURL:
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/sendEmail
