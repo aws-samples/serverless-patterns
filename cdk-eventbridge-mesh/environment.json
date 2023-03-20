@@ -1,0 +1,10 @@
+{
+    "Parameters": {
+        "DD_FLUSH_TO_LOG": "true",
+        "DD_TRACE_ENABLED": "true",
+        "LOG_LEVEL": "debug",
+        "IS_LOCAL": "true",
+        "TABLE_NAME": "UserProfile",
+        "EVENT_BUS": "main-user-profile-bus"
+    }
+}
