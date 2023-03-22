@@ -8,25 +8,16 @@ namespace WindowsECS
         {
             var app = new App();
 
-            var vpcStack = new VPCStack(app, "VPCStack", new StackProps { Env = makeEnv() });
-            var securityGroupStack = new SecurityGroupStack(app, "SecurityGroupStack", new StackProps { Env = makeEnv() });
-            var albStack = new ALBStack(app, "ALBStack", new StackProps { Env = makeEnv() });
-            var windowsECSClusterStack = new WindowsECSClusterStack(app, "WindowsECSClusterStack", new StackProps { Env = makeEnv() });
+            var vpcStack = new VPCStack(app, "VPCStack", new StackProps());
+            var securityGroupStack = new SecurityGroupStack(app, "SecurityGroupStack", new StackProps());
+            var albStack = new ALBStack(app, "ALBStack", new StackProps());
+            var windowsECSClusterStack = new WindowsECSClusterStack(app, "WindowsECSClusterStack", new StackProps());
 
             securityGroupStack.Node.AddDependency(vpcStack);
             albStack.Node.AddDependency(vpcStack, securityGroupStack);
             windowsECSClusterStack.Node.AddDependency(vpcStack, securityGroupStack, albStack);
 
             app.Synth();
-
-            Amazon.CDK.Environment makeEnv()
-            {
-                return new Amazon.CDK.Environment
-                {
-                    Account = System.Environment.GetEnvironmentVariable("CDK_DEPLOY_ACCOUNT"),
-                    Region = System.Environment.GetEnvironmentVariable("CDK_DEPLOY_REGION"),
-                };
-            }
         }
     }
 }
