@@ -1,0 +1,214 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Kinesis event filtering for Lambda demo stack
+
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Handler: app.handler
+    Runtime: nodejs18.x
+    CodeUri: ./src
+    Timeout: 10
+    MemorySize: 128
+    Architectures:
+      - arm64
+
+Resources:
+
+  DataStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: stream-lambda-esm-filter
+      StreamModeDetails:
+        StreamMode: ON_DEMAND
+
+  # 1. this Lambda is invoked for all messages, regardless of the payload format and contents
+  NoFilterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fn-esm-no-filter
+      Description: No filter
+      Events:
+        KinesisEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt DataStream.Arn
+            StartingPosition: LATEST
+  NoFilterFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${NoFilterFunction}"
+      RetentionInDays: 3
+
+  # 2. this Lambda is invoked for:
+  # {
+  #   "kind": "Event"
+  # }
+  FilterEventsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fn-filter-events
+      Description: Demo filtering in a single field
+      Events:
+        KinesisEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt DataStream.Arn
+            StartingPosition: LATEST
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"data":{"kind":["Event"]}}'
+  FilterEventsFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${FilterEventsFunction}"
+      RetentionInDays: 3
+
+  # 3. this Lambda is invoked for:
+  # {
+  #   "kind": "Event"
+  #   "responseStatus": {
+  #     "code": 300
+  #   }
+  # }
+  FilterEventsAndResponseCodeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fn-filter-events-and-response-code
+      Description: Demo filtering on multiple fields
+      Events:
+        KinesisEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt DataStream.Arn
+            StartingPosition: LATEST
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"data":{"kind":["Event"],"responseStatus":{"code":[{"numeric":["=",300]}]}}}'
+  FilterEventsAndResponseCodeFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${FilterEventsAndResponseCodeFunction}"
+      RetentionInDays: 3
+
+  # 4. this Lambda is invoked for either of the following messages:
+  # - option 1 - code is >= 300
+  #   {
+  #     "responseStatus": {
+  #       "code": 300
+  #     }
+  #   }
+  # - option 2 - RBAC flag is set to true
+  #   {
+  #     "RBAC": true
+  #   }
+  FilterMultiplePatternsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fn-filter-multiple-patterns
+      Description: Demo multiple patterns
+      Events:
+        KinesisEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt DataStream.Arn
+            StartingPosition: LATEST
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"data":{"responseStatus":{"code":[{"numeric":[">=",300]}]}}}'
+                - Pattern: '{"data":{"RBAC":[true]}}'
+  FilterMultiplePatternsFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${FilterMultiplePatternsFunction}"
+      RetentionInDays: 3
+
+  # 5. this Lambda is invoked for the messages having kind set to anything other than Event
+  FilterNotEventKindFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fn-filter-not-event-kind
+      Description: Demo Not filter
+      Events:
+        KinesisEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt DataStream.Arn
+            StartingPosition: LATEST
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"data":{"kind":[{"anything-but":["Event"]}]}}'
+  FilterNotEventKindFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${FilterNotEventKindFunction}"
+      RetentionInDays: 3
+
+  # 6. this Lambda is invoked for the messages having region property starting with `us-`
+  FilterStartsWithFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fn-filter-starts-with
+      Description: Demo prefix filter
+      Events:
+        KinesisEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt DataStream.Arn
+            StartingPosition: LATEST
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"data":{"region":[{"prefix":"us-"}]}}'
+  FilterStartsWithFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${FilterStartsWithFunction}"
+      RetentionInDays: 3
+
+  # 7. this Lambda is invoked for the messages having code between 300 and 350 (both end inclusive)
+  FilterBetweenInclusiveFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fn-filter-between-inclusive
+      Description: Demo inclusive range filter
+      Events:
+        KinesisEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt DataStream.Arn
+            StartingPosition: LATEST
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"data":{"responseStatus":{"code":[{"numeric":[">=",300,"<=",350]}]}}}'
+  FilterBetweenInclusiveFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${FilterBetweenInclusiveFunction}"
+      RetentionInDays: 3
+
+  # 8. this Lambda is invoked for messages with partition key set to `code-is-300`
+  # {
+  #   "kind": "Event"
+  # }
+  FilterOnDataAndMetadataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fn-filter-on-data-and-metadata
+      Description: Demo inclusive range filter
+      Events:
+        KinesisEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt DataStream.Arn
+            StartingPosition: LATEST
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"data":{"kind":["Event"]},"partitionKey":["code-is-300"]}'
+  FilterOnDataAndMetadataFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${FilterOnDataAndMetadataFunction}"
+      RetentionInDays: 3
