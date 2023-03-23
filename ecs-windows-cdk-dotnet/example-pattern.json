@@ -21,7 +21,7 @@
     },
     "deploy": {
       "text": [
-        "cdk deploy --all --require-approval never"
+        "cdk deploy --all"
       ]
     },
     "testing": {
@@ -31,7 +31,7 @@
     },
     "cleanup": {
       "text": [
-        "Delete the stack: <code>cdk destroy --all --require-approval never</code>."
+        "Delete the stack: <code>cdk destroy</code>."
       ]
     },
     "authors": [

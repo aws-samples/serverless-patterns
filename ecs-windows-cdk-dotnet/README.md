@@ -27,15 +27,15 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
 2. Change the working directory to this pattern's directory.
     ```
-    cd ecs-windows-cdk-dotnet/cdk/src/WindowsECS
+    cd ecs-windows-cdk-dotnet/cdk/src
     ```
 3. Build the application.
     ```
     dotnet build
     ```
-4. Change the working directory.
+4. Return one level back to the path `ecs-windows-cdk-dotnet/cdk`
     ```
-    cd ecs-windows-cdk-dotnet/cdk
+    cd..
     ```
 5. Bootstrap AWS Environment.
     ```
@@ -43,7 +43,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
 6. Deploy the stack to your default AWS account and region.
     ```
-    cdk deploy --all --require-approval never
+    cdk deploy --all
     ```
 
 ## Testing
@@ -56,7 +56,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
 ```
-cdk destroy --all --require-approval never
+cdk destroy --all
 ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
