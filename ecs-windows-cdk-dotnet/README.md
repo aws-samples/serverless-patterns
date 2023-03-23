@@ -1,8 +1,8 @@
 # Running Web API on ECS Fargate with custom domain backed with ALB, fronted by Route53, and secured with ACM Certificate
 
-This CDK application demonstrates how to deploy a ASP.NET Framework application on Windows based ECS Cluster.
+This AWS CDK application demonstrates how to deploy a application on Windows based Amazon Elastic Container Service (Amazon ECS) Cluster.
 
-This pattern uses .NET as a programming language to create the entire CDK stack.
+This pattern uses .NET as a programming language to create the entire AWS CDK stack. For demonstration purpose, Windows sample image is used (mcr.microsoft.com/windows/servercore/iis), however same steps can be performed if Windows Docker image need to be deployed from Amazon Elastic Container Registry (Amazon ECR) repository.
 
 ## Architecture 
 ![architecture diagram](images/architecture.png)
@@ -35,28 +35,30 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
     dotnet build
     ```
-4. Return one level back to the path `route53-alb-fargate-cdk-dotnet`
+4. Change the working directory.
     ```
-    cd..
+    cd ecs-windows-cdk-dotnet/cdk
     ```
-5. Deploy the stack to your default AWS account and region.
+5. Bootstrap AWS Environment.
     ```
-    cdk deploy
+    cdk bootstrap
+    ```
+6. Deploy the stack to your default AWS account and region.
+    ```
+    cdk deploy --all --require-approval never
     ```
 
 ## Testing
 
-1. After deployment, the output displays the following values.
-   - Load Balancer URL: `Route53AlbFargateCdkDotnetStack.sampleapiserviceLoadBalancerDNS60B9DACF = Route-sampl-16MTWZYE6AGI4-1107455325.ap-south-1.elb.amazonaws.com`
-   - API Custom Domain URL: `Route53AlbFargateCdkDotnetStack.sampleapiserviceServiceURLC8317C98 = https://api.YOUR-DOMAIN.com`
-2. Copy the URL with custom domain and append `WeatherForecast`, the URL will look like this - https://api.YOUR-DOMAIN.com/WeatherForecast.
-3. Enter this URL into your browser, you should receive a JSON response with weather information.
+1. After deployment, copy the URL for the following ALBStack output.    
+   - ALBStack.ApplicationLoadBalancer = `ALBSt-Appli-******R2TM3H-******171.us-east-1.elb.amazonaws.com`   
+3. Enter this URL into your browser, you should view the IIS site.
 
 ## Cleanup
 
 Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
 ```
-cdk destroy
+cdk destroy --all --require-approval never
 ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
