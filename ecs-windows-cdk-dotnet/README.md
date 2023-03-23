@@ -1,4 +1,4 @@
-# Running Web API on ECS Fargate with custom domain backed with ALB, fronted by Route53, and secured with ACM Certificate
+# Running Windows Containers with Amazon ECS on AWS Fargate
 
 This AWS CDK application demonstrates how to deploy a application on Windows based Amazon Elastic Container Service (Amazon ECS) Cluster.
 
@@ -24,8 +24,6 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 1. Clone the project to your local working directory.
     ```
     git clone https://github.com/aws-samples/serverless-patterns
-    ```
-
     ```
 2. Change the working directory to this pattern's directory.
     ```

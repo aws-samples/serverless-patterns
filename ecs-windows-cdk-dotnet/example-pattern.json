@@ -1,13 +1,13 @@
 {
-    "title": "Windows based ECS cluster ",
-    "description": "This CDK application demonstrates how to deploy a ASP.NET Framework application on Windows based ECS Cluster.",
+    "title": "Windows Containers with Amazon ECS",
+    "description": "This AWS CDK application demonstrates how to deploy a application on Windows based Amazon Elastic Container Service (Amazon ECS) Cluster on AWS Fargate.",
     "language": ".NET",
-    "level": "200",
+    "level": "300",
     "framework": "CDK",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This CDK application demonstrates how to deploy a ASP.NET Framework application on Windows based ECS Cluster."
+        "This pattern uses .NET as a programming language to create the entire AWS CDK stack. For demonstration purpose, Windows sample image is used (mcr.microsoft.com/windows/servercore/iis), however same steps can be performed if Windows Docker image need to be deployed from Amazon Elastic Container Registry (Amazon ECR) repository."
       ]
     },
     "gitHub": {
@@ -21,7 +21,7 @@
     },
     "deploy": {
       "text": [
-        "cdk deploy"
+        "cdk deploy --all --require-approval never"
       ]
     },
     "testing": {
@@ -31,7 +31,7 @@
     },
     "cleanup": {
       "text": [
-        "Delete the stack: <code>cdk destroy</code>."
+        "Delete the stack: <code>cdk destroy --all --require-approval never</code>."
       ]
     },
     "authors": [
