@@ -1,6 +1,6 @@
 {
-    "title": "Windows Containers with Amazon ECS",
-    "description": "This AWS CDK application demonstrates how to deploy a application on Windows based Amazon Elastic Container Service (Amazon ECS) Cluster on AWS Fargate.",
+    "title": "Running Windows Containers with Amazon ECS",
+    "description": "This AWS CDK application demonstrates how to deploy a application on Windows based Amazon Elastic Container Service (Amazon ECS) Cluster.",
     "language": ".NET",
     "level": "300",
     "framework": "CDK",

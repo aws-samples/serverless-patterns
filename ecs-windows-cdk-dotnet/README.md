@@ -1,4 +1,4 @@
-# Running Windows Containers with Amazon ECS on AWS Fargate
+# Running Windows Containers with Amazon ECS
 
 This AWS CDK application demonstrates how to deploy a application on Windows based Amazon Elastic Container Service (Amazon ECS) Cluster.
 
