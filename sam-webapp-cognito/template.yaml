@@ -4,6 +4,7 @@ Description: >
   Serverless WebApp with S3, CloudFront, API Gateway, DynamoDB and Cognito.
 Resources:
 
+  # Origin Access Control to restrict access to S3 bucket by sending authenticated requests to S3.
   CloudFrontOriginAccessControl:
     Type: AWS::CloudFront::OriginAccessControl
     Properties: 
@@ -14,6 +15,7 @@ Resources:
         SigningBehavior: no-override
         SigningProtocol: sigv4
 
+  # CloudFront cache policy to cache contents for 3 hours.
   CachePolicy:
     Type: AWS::CloudFront::CachePolicy
     Properties:
@@ -88,15 +90,16 @@ Resources:
               - POST
               - DELETE
               - PATCH
-
             TargetOriginId: api
             ViewerProtocolPolicy: redirect-to-https
             #AWS managed cache-policy that disables caching. Recommended for API Gateway Origins.
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad 
 
+  # S3 bucket to host static content.
   FrontEndS3Bucket:
     Type: AWS::S3::Bucket
 
+  # Bucket policy to restrict access only to CloudFront
   S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -114,6 +117,7 @@ Resources:
               StringEquals:
                 AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudfrontDistribution}"
 
+  # Cognito User Pool
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
@@ -123,6 +127,7 @@ Resources:
       AutoVerifiedAttributes:
         - email
 
+  # Cognito client
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -142,6 +147,7 @@ Resources:
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
 
+  # HTTP API with CORS configuration
   HttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -166,6 +172,7 @@ Resources:
                 - !Ref UserPoolClient
         DefaultAuthorizer: OAuth2Authorizer
 
+  # Lambda function with API Gateway as event source and access to DynamoDB table.
   LamdaFunction:
     Type: AWS::Serverless::Function
     Properties:
