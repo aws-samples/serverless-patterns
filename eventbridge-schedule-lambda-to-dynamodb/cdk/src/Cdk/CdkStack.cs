@@ -16,15 +16,19 @@ namespace Cdk
 
         internal CdkStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
-            var buildCommands = new[]
-               {
-                    "cd /asset-input",
-                    "export DOTNET_CLI_HOME=\"/tmp/DOTNET_CLI_HOME\"",
-                    "export PATH=\"$PATH:/tmp/DOTNET_CLI_HOME/.dotnet/tools\"",
-                    "dotnet tool install -g Amazon.Lambda.Tools",
-                    "dotnet lambda package -o function.zip",
-                    "unzip -o -d /asset-output function.zip"
-                };
+            var buildOption = new BundlingOptions()
+            {
+                Image = Runtime.DOTNET_6.BundlingImage,
+                User = "root",
+                OutputType = BundlingOutput.ARCHIVED,
+                Command = new string[]{
+               "/bin/sh",
+                "-c",
+                " dotnet tool install -g Amazon.Lambda.Tools"+
+                " && dotnet build"+
+                " && dotnet lambda package --output-package /asset-output/function.zip"
+                }
+            };
 
             // Create a DynamoDB Table
             // Note: RemovalPolicy.DESTROY will delete the DynamoDB table when you run cdk destroy command
@@ -56,14 +60,7 @@ namespace Cdk
                 Runtime = Runtime.DOTNET_6,
                 Code = Code.FromAsset("code/src/AddItemsDynamoDB", new Amazon.CDK.AWS.S3.Assets.AssetOptions()
                 {
-                    Bundling = new BundlingOptions
-                    {
-                        Image = Runtime.DOTNET_6.BundlingImage,
-                        Command = new[]
-                        {
-                            "bash", "-c", string.Join(" && ", buildCommands)
-                        }
-                    }
+                    Bundling = buildOption
                 }),
                 Handler = "AddItemsDynamoDB::AddItemsDynamoDB.Function::FunctionHandler",
                 Role = lambdaExecutionRole,
