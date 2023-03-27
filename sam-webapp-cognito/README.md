@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# AWS SAM Pattern for Serverless Web Application
 
 This pattern creates a Serverless WebApp using Amazon S3, Amazon CloudFront, Amazon API Gateway HTTP API, AWS Lambda, Amazon DynamoDB table and Amazon Cognito
 
