@@ -1,10 +1,10 @@
-# Schedule AWS Lambda to add items to Amazon DynamoDB using CDK in C#
+# Schedule AWS Lambda to add items to Amazon DynamoDB
 
 This AWS CDK application demonstrates how to schedule AWS Lambda to add items to Amazon DynamoDB.
 
 This pattern uses .NET as a programming language to create the entire AWS CDK stack. Consider a scenario where an application needs to get and display Associate's details on page load from external HR system. External HR system was deployed to on-premises so there was a delay to retrieve the associate details using API while loading the application and frequent API calls were made to the on-premises server. Also, in-memory cache was used to load the associate details in the application which made the solution stateful.
 
-As part of application modernization, one of the goal is going cloud native and refactoring stateful application to be stateless. This pattern implements an automated solution to overcome this problem by scheduling a Lambda function on daily basis to add the most recent associate data in Amazon DynamoDB Table to be used by the application and other downstream microservices. Amazon DynamoDB TTL (Time to Live) was enabled to purge the old data in Dynamo DB on daily basis.
+As part of application modernization, one of the goal is going cloud native and refactoring stateful application to be stateless. This pattern implements an automated solution to overcome this problem by scheduling a Lambda function on daily basis to add the most recent associate data in Amazon DynamoDB table to be used by the application and other downstream microservices. Amazon DynamoDB TTL (Time to Live) was enabled to purge the old data in Dynamo DB on daily basis.
 
 Provisioning cloud applications can be a challenging process that requires you to perform manual actions, write custom scripts, maintain templates, or learn domain-specific languages. AWS CDK provisions your resources in a safe, repeatable manner through AWS CloudFormation. It also enables you to compose and share your own custom constructs that incorporate your organization's requirements, helping you start new projects faster.
 
@@ -39,7 +39,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
 4. Deploy the stack to your default AWS account and region.
     ```
-    cdk deploy --require-approval never
+    cdk deploy
     ```
 
 ## Testing
@@ -50,7 +50,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
 ```
-cdk destroy --require-approval never
+cdk destroy
 ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
