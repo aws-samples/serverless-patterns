@@ -10,14 +10,14 @@ import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 
 export interface EventBridgeRuleConstructProps {
     stateMachine: IStateMachine;
+    dataStore: CfnFHIRDatastore;
 }
 
 export class EventBridgeRuleConstruct extends Construct {
     constructor(
         scope: Construct,
         id: string,
-        props: EventBridgeRuleConstructProps,
-        hl: CfnFHIRDatastore
+        props: EventBridgeRuleConstructProps
     ) {
         super(scope, id);
 
@@ -29,7 +29,7 @@ export class EventBridgeRuleConstruct extends Construct {
                     eventSource: ["healthlake.amazonaws.com"],
                     eventName: ["CreateResource", "UpdateResource"],
                     requestParameters: {
-                        datastoreId: [hl.attrDatastoreId],
+                        datastoreId: [props.dataStore.attrDatastoreId],
                     },
                     responseElements: {
                         statusCode: [200, 201],

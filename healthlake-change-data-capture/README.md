@@ -2,13 +2,13 @@
 
 This pattern demonstrates how to handle changes in Healthlake that can be published into an Event-Driven Architecture ecosystem as a data change event.
 
-![Diagram](./diagram.png)
+![Diagram](./Healthlake_CDC.png)
 
-By connecting two or more EventBuses together forming a mesh, the rules associated with the consumers and producers can be more isolated and closer to the features that are producing and consuming those messages. This layer of isolation gives a feature/service the ability to work more autonomously and reduces the risk of rules overlapping or permissions being too liberal.
+When using this pattern, Healthlake becomes not only a consumer of data but also a producer. By adding this capability to Healthlake, it can be put in the center of a modern distributed Healthcare application and serve as an ingress and egress point.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
-**Important**: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+**Important**: this application uses various AWS services (including Healthlake) and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
@@ -17,6 +17,7 @@ Learn more about this pattern at Serverless Land Patterns: << Add the live URL h
 -   [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 -   [Node and NPM](https://nodejs.org/en/download/) installed
 -   [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (AWS CDK) installed
+-   [Go Laguage](https://go.dev/doc/install) installed
 
 ## Deployment Instructions
 
@@ -29,7 +30,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 2. Change directory to the pattern directory:
 
 ```
-cd cdk-eventbridge-mesh
+cd healthlake-change-data-capture
 ```
 
 3. Install the project dependencies
@@ -46,59 +47,39 @@ make deploy
 
 ## How it works
 
-This pattern is designed to create two separate Custom EventBridge EventBuses and connect them together via an EventBridge Rule. The output of a generated message will be the triggering of a State Machine that simply runs a Succeed Task
+This pattern is designed to demonstrate how to turn AWS Healthlake into a publisher of events so that it can be integrated into an Event-Driven Architecture. It leverages several "serverless" services to achieve this.
 
 Once the pattern is deployed to AWS, you will have the following resources created with the described capabilities
 
--   EventBusOne `event-bus-one` which is the source bus for events to be produced onto
--   EventBusTwo `event-bus-two` which is the consuming bus that is "meshed" with Bus One
--   State Machine `SampleStateMachine` that will be the target of an additional rule in EventBusTwo that demonstrates consuming the originally produced event
+-   Healthlake Datastore v4 - this is an FHIR-compliant datastore that will hold Patient-centric Healthcare data [AWS Healthlake](https://aws.amazon.com/healthlake/)
+-   EventBridge Rule - Rule on the default bus that will listen to API-recorded events that happen against the Healthlake. **For this to work, a CloudTrail must be enabled on the account**
+-   State Machine that will receive events published from the EventBridge Rule as a target. The State Machine will "hydrate" the changed Patients and prepare them for publishing
+-   SQS - acts as a Dead Letter Queue for failed attempts at publishing to the State Machine Target from the EventBridge Rule
+-   Two Lambda Functions written in Go that will be executed in the State Machine
 
-Those resources will look like the below in the AWS Console
+#### How to create a CloudTrail
 
-#### EventBuses
+Visit the AWS Console and navigate to CloudTrail. When you "Create Trail" it will look like this
 
-![Buses](./buses.jpg)
+![Create Trail](./trail.png)
 
-#### State Machine
+## Testing in the AWS Console
 
-![State Machine](./state_machine.jpg)
+After running `make deploy` POST a record into the Healthlake store.
 
-## Testing
+-   Visit the AWS Console and search for Healthlake.
+-   Click View Datastores
+-   Run Query
+    -   Pick the datastore
+    -   Select create resource
+    -   Select patient as the resource
+    -   Use the sample patient resource
 
-Included in this repository is a `Makefile` that looks like the following
+![Patient Create](./put_record.png)
 
-```Makefile
-deploy:
-	cdk synth
-	cdk deploy
+Visit the State Machine Executions and there will be an execution that looks like this
 
-destroy:
-	cdk destroy
-
-test-events:
-	./tests/put-event.sh
-```
-
-After running `make deploy` create a couple of test events
-
-### Testing Success
-
-`make test-events`
-
-```bash
-aws events put-events --entries '[ { "Source": "com.binaryheap.sample", "Detail": "{ \"fieldA\": \"Hello\", \"fieldB\": \"World\" }", "DetailType": "Busing", "EventBusName": "event-bus-one" }, { "Source": "com.binaryheap.sample", "Detail": "{ \"fieldA\": \"Hello\", \"fieldB\": \"Again! Hi!\" }", "DetailType": "Busing", "EventBusName": "event-bus-one" } ]'
-```
-
-The Make command will run this AWS CLI command to put 2 events on `event-bus-one`
-
-### Inspecting in the AWS Console
-
-StepFunctions - `SampleStateMachine` will be created when deployed and executed upon running the command above
-
-The results should appear like below
-
-![Results](./state_runs.jpg)
+![State Machine](./state_execution.png)
 
 ## Cleanup
 
@@ -110,8 +91,10 @@ make destroy
 
 ## Documentation
 
--   [EventBridge CDK Documentation](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_events-readme.html)
--   [AWS EventBridge Custom Bus](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-event-bus.html)
+-   [AWS EventBridge CDK Documentation](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_events-readme.html)
+-   [AWS Healthlake](https://aws.amazon.com/healthlake/)
+-   [AWS Cloudtrail](https://aws.amazon.com/cloudtrail/)
+-   [Golang Lambda](https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html)
 
 ---
 

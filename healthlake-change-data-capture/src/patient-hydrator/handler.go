@@ -33,7 +33,7 @@ func init() {
 	signer := v4.NewSigner(sess.Config.Credentials)
 	fhirClient = NewHealthLakePatientClient(
 		"healthlake.us-west-2.amazonaws.com/datastore",
-		"095d2262da454bb7347488c930e009eb", // os.Getenv("HL_STORE_ID"),
+		os.Getenv("HL_STORE_ID"),
 		"us-west-2",
 		lib.NewHttpClient(),
 		signer,

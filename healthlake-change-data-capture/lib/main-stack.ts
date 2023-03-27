@@ -1,22 +1,26 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { EventBridgeRuleStack } from "./event-bridge-rule-stack";
-import { FunctionsConstruct } from "./functions-stack";
+import { EventBridgeRuleConstruct } from "./event-bridge-rule-construct";
+import { FunctionsConstruct } from "./functions-contruct";
 import { HealthlakeConstruct } from "./healthlake-construct";
 import { KeyConstruct } from "./key-construct";
-import { HydratorStateMachineStack } from "./state-machine-stack";
+import { HydratorStateMachineConstruct } from "./state-machine-construct";
 
 export class AppStack extends cdk.Stack {
     constructor(scope: Construct, id: string) {
         super(scope, id);
 
+        // create the KMS that encrypts healthlake data
         const key = new KeyConstruct(this, "KeyConstruct");
+
+        // build the healthlake store
         const hl = new HealthlakeConstruct(
             this,
             "HealthlakeConstruct",
             key.key
         );
 
+        // funcs used in the state machine
         const func = new FunctionsConstruct(
             this,
             "FunctionsConstruct",
@@ -24,18 +28,16 @@ export class AppStack extends cdk.Stack {
             key.key
         );
 
-        // const sm = new HydratorStateMachineStack(this, `StateMachine`, {
-        //     patientHydratorFunc: func.patientHydrator,
-        //     patientPublisherFunc: func.patientPublisher,
-        // });
+        // state machine for working "what" changed
+        const sm = new HydratorStateMachineConstruct(this, `StateMachine`, {
+            patientHydratorFunc: func.patientHydrator,
+            patientPublisherFunc: func.patientPublisher,
+        });
 
-        // new EventBridgeRuleStack(
-        //     this,
-        //     "EventBridgeRule",
-        //     {
-        //         stateMachine: sm.stateMachine,
-        //     },
-        //     hlStack.cfnFHIRDatastore
-        // );
+        // listens to cloudtrail and pushes to the state machine
+        new EventBridgeRuleConstruct(this, "EventBridgeRule", {
+            stateMachine: sm.stateMachine,
+            dataStore: hl.cfnFHIRDatastore,
+        });
     }
 }
