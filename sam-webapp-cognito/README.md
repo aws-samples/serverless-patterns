@@ -48,7 +48,7 @@ This pattern uses the frontend and lambda code as shown in https://webapp.server
 
 ## Testing
 
-Once the application is deployed, you can test it by entering the cloudfront url in a browser. Goto /register.html to create a Cognito user and /signin.html to login. Refer to https://webapp.serverlessworkshops.io for further information on how the application works
+Once the application is deployed, you can test it by entering the cloudfront url in a browser. Goto /register.html to create a Cognito user and /signin.html to login. Refer to https://webapp.serverlessworkshops.io for further information on how the application works.
 
 ## Cleanup
 
