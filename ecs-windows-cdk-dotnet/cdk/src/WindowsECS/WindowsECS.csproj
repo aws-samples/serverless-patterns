@@ -9,9 +9,8 @@
 
   <ItemGroup>
     <!-- CDK Construct Library dependencies -->
-    <PackageReference Include="Amazon.CDK" Version="1.197.0" />
-    <PackageReference Include="Amazon.CDK.AWS.ECS" Version="1.197.0" />
-    <PackageReference Include="Amazon.CDK.AWS.ElasticLoadBalancingV2" Version="1.197.0" />
+	  <PackageReference Include="Amazon.CDK.Lib" Version="2.65.0" />
+	  <PackageReference Include="Constructs" Version="10.1.254" />
 
     <!-- jsii Roslyn analyzers (un-comment to obtain compile-time checks for missing required props
     <PackageReference Include="Amazon.Jsii.Analyzers" Version="*" PrivateAssets="all" />

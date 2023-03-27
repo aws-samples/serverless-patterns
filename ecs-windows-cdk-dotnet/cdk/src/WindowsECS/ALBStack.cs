@@ -1,6 +1,7 @@
 ﻿using Amazon.CDK;
 using Amazon.CDK.AWS.EC2;
 using Amazon.CDK.AWS.ElasticLoadBalancingV2;
+using Constructs;
 using System.Collections.Generic;
 using HealthCheck = Amazon.CDK.AWS.ElasticLoadBalancingV2.HealthCheck;
 
@@ -8,11 +9,10 @@ namespace WindowsECS
 {
     public class ALBStack : Stack
     {
-        public static List<ApplicationTargetGroup> applicationWindowsTargetGroupsList = new List<ApplicationTargetGroup>();
-        public static List<string> applicationWindowsTargetGroupsArnList = new List<string>();
-        private ApplicationLoadBalancer alb;
-        private Vpc vpc = WindowsECS.VPCStack.vpc;
-        private SecurityGroup alb_sg = WindowsECS.SecurityGroupStack.alb_sg;
+        public static List<ApplicationTargetGroup> applicationWindowsTargetGroupsList = new();
+        public static List<string> applicationWindowsTargetGroupsArnList = new();
+        private Vpc vpc = VPCStack.vpc;
+        private SecurityGroup alb_sg = SecurityGroupStack.alb_sg;
 
         internal ALBStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
@@ -23,7 +23,7 @@ namespace WindowsECS
             CreateTargetGroups(vpc, windowsTargetGroups, applicationWindowsTargetGroupsList, applicationWindowsTargetGroupsArnList);
 
             // Create Application Load Balancer
-            alb = CreateApplicationLoadBalancer(vpc, alb_sg, applicationWindowsTargetGroupsArnList);
+            _ = CreateApplicationLoadBalancer(vpc, alb_sg, applicationWindowsTargetGroupsArnList);
         }
 
         private ApplicationLoadBalancer CreateApplicationLoadBalancer(Vpc vpc, SecurityGroup alb_sg, List<string> applicationWindowsTargetGroupsArnList)
@@ -40,8 +40,7 @@ namespace WindowsECS
             });
 
             Amazon.CDK.Tags.Of(alb).Add("Name", "app-load-balancer-Windows");
-
-            var applicationListenerDefaultWindows = alb.AddListener("ApplicationListenerWindows", new BaseApplicationListenerProps
+            _ = alb.AddListener("ApplicationListenerWindows", new BaseApplicationListenerProps
             {
                 Port = 80,
                 DefaultAction = new ListenerAction(
@@ -52,7 +51,7 @@ namespace WindowsECS
                       })
             });
 
-            new CfnOutput(this, "ApplicationLoadBalancerOutput", new CfnOutputProps
+            _= new CfnOutput(this, "ApplicationLoadBalancerOutput", new CfnOutputProps
             {
                 Value = alb.LoadBalancerDnsName,
                 Description = "The DNS name for the load balancer"

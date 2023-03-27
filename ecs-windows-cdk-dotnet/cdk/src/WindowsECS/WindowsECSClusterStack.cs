@@ -3,15 +3,16 @@ using Amazon.CDK.AWS.EC2;
 using Amazon.CDK.AWS.ECS;
 using Amazon.CDK.AWS.ElasticLoadBalancingV2;
 using Amazon.CDK.AWS.IAM;
+using Constructs;
 using System.Collections.Generic;
 
 namespace WindowsECS
 {
     public class WindowsECSClusterStack : Stack
     {
-        private Vpc vpc = WindowsECS.VPCStack.vpc;
-        private SecurityGroup alb_sg = WindowsECS.SecurityGroupStack.alb_sg;
-        private List<ApplicationTargetGroup> applicationWindowsTargetGroupsList = WindowsECS.ALBStack.applicationWindowsTargetGroupsList;
+        private Vpc vpc = VPCStack.vpc;
+        private SecurityGroup alb_sg = SecurityGroupStack.alb_sg;
+        private List<ApplicationTargetGroup> applicationWindowsTargetGroupsList = ALBStack.applicationWindowsTargetGroupsList;
 
         internal WindowsECSClusterStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
@@ -71,8 +72,10 @@ namespace WindowsECS
                 })
             });
 
-            var portMappings = new PortMapping();
-            portMappings.ContainerPort = 80;
+            var portMappings = new PortMapping
+            {
+                ContainerPort = 80
+            };
             ecsWindowsContainer.AddPortMappings(portMappings);
             return taskDefinition;
         }

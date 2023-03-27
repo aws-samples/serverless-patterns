@@ -1,12 +1,13 @@
 ﻿using Amazon.CDK;
 using Amazon.CDK.AWS.EC2;
+using Constructs;
 
 namespace WindowsECS
 {
     public class SecurityGroupStack : Stack
     {
         public static SecurityGroup alb_sg;
-        private Vpc vpc = WindowsECS.VPCStack.vpc;
+        private Vpc vpc = VPCStack.vpc;
 
         internal SecurityGroupStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
