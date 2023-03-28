@@ -50,9 +50,15 @@ cdk deploy
 Run the following command to send a POST request to the REST API endpoint that has been created. Note, replace {MyRESTApi} placeholder in the command with the endpoint that has been deployed. The endpoint can be found in the CloudFormation stack output. 
 
 ```bash
-curl --location --request POST '{MyRESTApi}/' \
-> --header 'Content-Type: application/json' \
-> --data-raw '{ "message": "this is a test message" }'
+curl --location --request POST '{MyRestApi}' \
+--header 'Content-Type: application/json' \
+--data-raw '{ "message": "this is a test message" }'
+```
+
+To check and receive messages in the queue, it can be done in the AWS console or by running the following command. Note, replace {MyQueueUrl} placeholder in the command with the endpoint that has been deployed. The endpoint can be found in the CloudFormation stack output.
+
+```bash
+aws sqs receive-message --queue-url '{MyQueueUrl}'
 ```
 
 ## Cleanup

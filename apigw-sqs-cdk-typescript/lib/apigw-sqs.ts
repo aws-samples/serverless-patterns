@@ -106,5 +106,7 @@ export class ApiGwSqsConstruct extends Construct {
 
       new cfnOutput(this, 'ApiGatewayName', { value: this.customApiGateway.restApiName});
       new cfnOutput(this, 'SqsQueueName', { value: this.customQueue.queueName });
+      new cfnOutput(this, 'SqsEndpoint', { value: this.customQueue.queueUrl});
+
   }
 }
