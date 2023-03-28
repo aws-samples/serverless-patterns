@@ -13,13 +13,15 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-lambda-to-dynamodb",
+       "projectFolder": "eventbridge-schedule-lambda-to-dynamodb",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-lambda-to-dynamodb/README.md",        
       "templateURL": "serverless-patterns/eventbridge-schedule-lambda-to-dynamodb",
       "templateFile": "cdk/src/Cdk/CdkStack.cs"
     }
   },
   "deploy": {
     "text": [
-      "cdk deploy --require-approval never"
+      "cdk deploy"
     ]
   },
   "testing": {
@@ -29,7 +31,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk destroy --require-approval never</code>."
+      "Delete the stack: <code>cdk destroy</code>."
     ]
   },
   "authors": [
