@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification template describing your function.
+Resources:
+  IteratorLambda:
+    Description: An Iterator Lambda Function
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: Iterator
+      Handler: index.handler
+      Runtime: nodejs18.x
+      CodeUri: .
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      InlineCode: |
+        exports.handler = function iterator (event, context, callback) { let index = event.iterator.index; let step = event.iterator.step; let count = event.iterator.count; index = index + step; callback(null, {index,step,count,continue: index < count})}
+  RestartLambda:
+    Description: An Restart Lambda Function
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: Restart
+      Handler: index.handler
+      Runtime: nodejs16.x
+      CodeUri: .
+      Description: ''
+      MemorySize: 128
+      Timeout: 15
+      Policies:
+      - Statement:
+         - Sid: StateMachineAccess
+           Effect: Allow
+           Action:
+           - states:StartExecution
+           Resource: '*'
+      InlineCode: |
+        var aws = require('aws-sdk'); var sfn = new aws.StepFunctions(); exports.handler = function(event, context, callback) { let StateMachineArn = event.restart.StateMachineArn; event.restart.executionCount -= 1; event = JSON.stringify(event); let params = { input: event, stateMachineArn: StateMachineArn }; sfn.startExecution(params, function(err, data) { if (err) callback(err); else callback(null,event); }); }
+  MyStateMachine:
+     Description: State Machine that calls itself and  iterator
+     Type: 'AWS::Serverless::StateMachine'
+     DependsOn:
+     - IteratorLambda
+     - RestartLambda
+     Properties:
+       Name: ContinueAsNew
+       DefinitionUri: 'MyStateMachine.asl.json'
+       Policies:
+       - Statement:
+         - Sid: LambdaAccess
+           Effect: Allow
+           Action:
+           - lambda:InvokeFunction
+           Resource: '*'
+

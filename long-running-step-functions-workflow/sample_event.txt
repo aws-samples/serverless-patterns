@@ -1,0 +1,6 @@
+{
+  "restart": {
+    "StateMachineArn": "arn:aws:states:us-east-1:117759440759:stateMachine:ContinueAsNew",
+    "executionCount": 4
+  }
+}

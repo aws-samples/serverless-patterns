@@ -1,0 +1,62 @@
+{
+    "Comment": "Continue-as-new State Machine Example",
+    "StartAt": "ConfigureCount",
+    "States": {
+        "ConfigureCount": {
+            "Type": "Pass",
+            "Result": {
+                "count": 100,
+                "index": -1,
+                "step": 1
+            },
+            "ResultPath": "$.iterator",
+            "Next": "Iterator"
+        },
+        "Iterator": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:<REGION>:<ACCOUNT_ID>:function:Iterator",
+            "ResultPath": "$.iterator",
+            "Next": "IsCountReached"
+        },
+        "IsCountReached": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.iterator.continue",
+                    "BooleanEquals": true,
+                    "Next": "ExampleWork"
+                }
+            ],
+            "Default": "ShouldRestart"
+        },
+        "ExampleWork": {
+            "Comment": "Your application logic, to run a specific number of times",
+            "Type": "Pass",
+            "Result": {
+              "success": true
+            },
+            "ResultPath": "$.result",
+            "Next": "Iterator"
+        },
+        "ShouldRestart": {
+          "Type": "Choice",
+          "Choices": [
+            {
+              "Variable": "$.restart.executionCount",
+              "NumericGreaterThan": 0,
+              "Next": "Restart"
+            }
+          ],
+          "Default": "Done"
+        },
+        "Restart": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:<REGION>:<ACCOUNT_ID>:function:Restart",
+          "Next": "Done"
+        },
+        "Done": {
+            "Type": "Pass",
+            "End": true 
+        }
+    }
+}
