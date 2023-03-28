@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to handle changes in HealthLake that can be published into an Event-Driven Architecture ecosystem as a data change event.
 
-![Diagram](./HealthLake_CDC.png)
+![Diagram](./pattern.png)
 
 When using this pattern, HealthLake becomes not only a consumer of data but also a producer. By adding this capability to HealthLake, it can be put in the center of a modern distributed Healthcare application and serve as an ingress and egress point.
 
