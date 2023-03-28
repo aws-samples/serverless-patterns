@@ -1,9 +1,9 @@
 locals {
-  bucket_name     = "serverless-land-test-bucket-1233"
+  bucket_name     = "REPLACE_ME_WITH_S3_BUCKET"
   event_bus_name  = "default"
-  container_image = "975616522298.dkr.ecr.us-east-1.amazonaws.com/serverlessland-data:latest"
-  ecs_subnet_id   = "subnet-082e294560d69220c"
-  region          = "us-east-1"
+  container_image = "REPLACE_ME_WITH_ECR_IMAGE_ARN"
+  ecs_subnet_id   = "REPLACE_ME_WITH_SUBNET_ID"
+  region          = "REPLACE_ME_WITH_AWS_REGION"
   
 }
 

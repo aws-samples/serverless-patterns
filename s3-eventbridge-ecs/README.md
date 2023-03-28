@@ -30,16 +30,21 @@ Important: this application uses various AWS services and there are costs associ
     ~~~ code
     cd serverless-patterns/s3-eventbridge-ecs
     
-4. Go to the [Docker directory](src/docker/README.md) and execute the docker command and bash script to do the following:
-    - Create the ECR Repository
-    - Create the task image and push it to the repository
-    - Note the ARNs of the image name for the task. The ARN and image name will be needed in terraform script
+4. Go to the [Docker directory](src/docker/README.md) and execute the docker command as per the Readme file. The docker commands in the file will perform the following:
+    - It will create an ECR Repository in your AWS account in the preferred AWS region
+    - It will create the task docker image and push it to the ECR repository
+    - Once done, login to the AWS console and search for ECR. Note the ARNs of the image name for the task. The ARN and image name will be needed in terraform script
+
+    ![ECR Image ARN](/ecr-task-uri.jpg)
 
 5. Make the following changes in the [terraform script](pattern_s3_eb_ecs.tf):
-    - Put an unique S3 bucket name in line 2
-    - Put the image URI in the line 4
-    - Put a subnet block in line 5
-    - Put the AWS region where the script will deploy resources in line 6
+    - Line 2 - Replace the placeholder "REPLACE_ME_WITH_S3_BUCKET" with an unique S3 bucket name. you can create an S3 bucket with CLI commnand as below :
+        ~~~ code
+        aws s3api create-bucket --bucket your-bucket-name --region aws-region
+
+    - Line 4 - Replace the placeholder "REPLACE_ME_WITH_ECR_IMAGE_ARN" with the image URI, from step 4 above
+    - Line 5 - Replace the placeholder "REPLACE_ME_WITH_SUBNET_ID" with a VPC subnet block from your AWS account
+    - Line 6 - Replace the placeholder "REPLACE_ME_WITH_AWS_REGION" with the AWS region where the script will deploy resources
 
     ~~~~ code
     #Sample Configuration
@@ -63,11 +68,25 @@ Important: this application uses various AWS services and there are costs associ
 
 # Testing
 
-1. Once the terraform script executed successfully, create a folder called 'incoming' inside the newly created S3 bucket and upload a sample csv file
+1. Once the terraform script executed successfully, upload a sample csv file in a folder called 'incoming'.
+   You can follow the below AWS CLI command to upload the file directly inside incoming folder :
+   ~~~~ code
+   aws s3api put-object --bucket your-bucket-name --key incoming/file-name  --body file-name
+
+   Sample CLI command:
+   ~~~~ code
+   aws s3api put-object --bucket test-serverlessland --key incoming/HistoricalData_1669400287621.csv  --body HistoricalData_1669400287621.csv
 
 2. The S3 file upload will trigger an EventBridge Rule which will call the ECS task. The ECS task will execute and print the csv data in the cloudwatch log
 
 3. Check the CloudWatch log group to see the ECS task execution details. the logs can be found in /ecs/serverlessland-dump-env-vars
+   You can use following cli command to get all streams of the cloudwatch logs
+   ~~~~ code
+   aws logs describe-log-streams --log-group-name /ecs/serverlessland-dump-env-vars --log-stream-name-prefix ecs/serverlessland-dump-env-vars/
+
+   You can select a particular stream to see the details
+   ~~~~ code
+   aws logs get-log-events --log-group-name /ecs/serverlessland-dump-env-vars --log-stream-name replace-stream-name-from-above-command
 
 # Cleanup
 
@@ -76,6 +95,6 @@ Important: this application uses various AWS services and there are costs associ
     ~~~ code
     terramform destroy
     
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
