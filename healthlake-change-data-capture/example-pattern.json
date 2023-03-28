@@ -1,5 +1,5 @@
 {
-    "title": "https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html as an Event Producer (CDC)",
+    "title": "Using HealthLake as an Event Producer (CDC)",
     "description": "https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html is fantastic datastore when working with Healthcare data, especially data that is Patient centric.  It comes with a robust API, many integrations to other AWS services and is purely hands-off (serverless).  By adding CDC capabilities it can also be used to extend data beyond it's storage.",
     "language": "Go",
     "level": "300",

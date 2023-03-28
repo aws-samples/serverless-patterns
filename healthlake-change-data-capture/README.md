@@ -1,4 +1,4 @@
-# EventBus Mesh Pattern
+# HealthLake Change Data Capture Pattern
 
 This pattern demonstrates how to handle changes in HealthLake that can be published into an Event-Driven Architecture ecosystem as a data change event.
 
