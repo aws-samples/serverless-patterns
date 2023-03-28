@@ -1,6 +1,6 @@
 # Serverless pattern to integrate EventBridge and ECS-Fargate tasks
 
-![Serverless Pattern Architecture](/s3-eb-ecs.png)
+![Serverless Pattern Architecture](s3-eb-ecs.png)
 
 This serverless pattern uses EventBridge to trigger multiple ECS tasks on Fargate. The ECS task queries the S3 bucket for files and reads them. These ECS tasks can be extended to insert the data to a database, thus speeding up the process of loading data from S3 to a database.
 
