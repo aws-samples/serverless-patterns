@@ -35,7 +35,7 @@ Important: this application uses various AWS services and there are costs associ
     - It will create the task docker image and push it to the ECR repository
     - Once done, login to the AWS console and search for ECR. Note the ARNs of the image name for the task. The ARN and image name will be needed in terraform script
 
-    ![ECR Image ARN](/ecr-task-uri.jpg)
+    ![ECR Image ARN](ecr-task-uri.JPG)
 
 5. Make the following changes in the [terraform script](pattern_s3_eb_ecs.tf):
     - Line 2 - Replace the placeholder "REPLACE_ME_WITH_S3_BUCKET" with an unique S3 bucket name. you can create an S3 bucket with CLI commnand as below :
