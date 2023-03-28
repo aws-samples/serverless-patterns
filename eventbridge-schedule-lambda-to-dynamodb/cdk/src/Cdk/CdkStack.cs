@@ -40,20 +40,20 @@ namespace Cdk
                 TimeToLiveAttribute = "TTL"
             });
 
-            // Create Lambda execution role
-            Role lambdaExecutionRole = new Role(this, functionName + "-execution-role", new RoleProps
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ // Create Lambda execution role
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ Role lambdaExecutionRole = new Role(this, functionName + "-execution-role", new RoleProps
             {
                 AssumedBy = new ServicePrincipal("lambda.amazonaws.com")
             });
 
-            // Add AWS Managed Policies
-            // Note: For demonstartion purpose DynamoDB Full access is provided.
-            // THIS IS NOT RECOMMENDED FOR PRODUCTION ENVIRONMENT
-            // Best practice is to provide least privilege access
-            lambdaExecutionRole.AddManagedPolicy(ManagedPolicy.FromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"));
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ // Add AWS Managed Policies
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ // Note: For demonstartion purpose DynamoDB Full access is provided.
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ // THIS IS NOT RECOMMENDED FOR PRODUCTION ENVIRONMENT
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ // Best practice is to provide least privilege access
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ lambdaExecutionRole.AddManagedPolicy(ManagedPolicy.FromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"));
             lambdaExecutionRole.AddManagedPolicy(ManagedPolicy.FromAwsManagedPolicyName("AmazonDynamoDBFullAccess"));
 
-            // Create a Lambda function to add item to DynamoDB            
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ // Create a Lambda function to add item to DynamoDB            
             Function addItemFunction = new Function(this, functionName, new FunctionProps
             {
                 FunctionName = functionName,
@@ -67,9 +67,9 @@ namespace Cdk
                 Timeout = Duration.Seconds(120)
             });
 
-            // Run every minute. NOTE: THIS SCHEDULE IS ONLY FOR DEMO PURPOSE
-            // Refer https://docs.aws.amazon.com/lambda/latest/dg/tutorial-scheduled-events-schedule-expressions.html for more details
-            var rule = new Rule(this, "Rule", new RuleProps
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ // Run every minute. NOTE: THIS SCHEDULE IS ONLY FOR DEMO PURPOSE
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ // Refer https://docs.aws.amazon.com/lambda/latest/dg/tutorial-scheduled-events-schedule-expressions.html for more details
+ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ var rule = new Rule(this, "Rule", new RuleProps
             {
                 RuleName = ruleName,
                 Schedule = Schedule.Expression("cron(0/1 * ? * * *)"),

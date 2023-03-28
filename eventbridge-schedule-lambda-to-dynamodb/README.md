@@ -44,7 +44,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 ## Testing
 
-1. After deployment, navigate to Amazon DynamoDB table in AWS Console and verify if items are created every minute as per the schedule.
+1. After deployment, navigate to Amazon DynamoDB `users` table in AWS Console and verify if items are created every minute as per the schedule.
 
 ## Cleanup
 
