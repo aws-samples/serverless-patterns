@@ -1,7 +1,7 @@
 {
     "title": "Application Load Balancer with Lambda as target",
     "description": "Create an Application Load Balancer with Lambda as target using Pulumi",
-    "language": "TypeSNode.jscript",
+    "language": "Node.js",
     "level": "200",
     "framework": "Pulumi",
     "introBox": {
