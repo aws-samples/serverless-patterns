@@ -108,7 +108,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		_, err = lambda.NewPermission(ctx, "lambdaPermission", &lambda.PermissionArgs{
+		lambdaPermission, err := lambda.NewPermission(ctx, "lambdaPermission", &lambda.PermissionArgs{
 			Action:    pulumi.String("lambda:InvokeFunction"),
 			Principal: pulumi.String("elasticloadbalancing.amazonaws.com"),
 			Function:  fn.Arn,
@@ -120,7 +120,7 @@ func main() {
 		_, err = lb.NewTargetGroupAttachment(ctx, "targetGroupAttachment", &lb.TargetGroupAttachmentArgs{
 			TargetGroupArn: targetGroup.Arn,
 			TargetId:       fn.Arn,
-		})
+		}, pulumi.DependsOn([]pulumi.Resource{lambdaPermission}))
 		if err != nil {
 			return err
 		}
