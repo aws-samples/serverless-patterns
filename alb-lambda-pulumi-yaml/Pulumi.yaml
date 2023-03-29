@@ -76,4 +76,7 @@ resources:
     properties:
       targetGroupArn: ${targetGroup.arn}
       targetId: ${fn.arn}
+    options:
+      dependsOn:
+        - ${lambdaPermission}
 
