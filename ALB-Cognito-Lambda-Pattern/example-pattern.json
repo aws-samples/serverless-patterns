@@ -1,34 +1,34 @@
 {
   "title": "ALB, Cognito & Lambda Integration",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "description": "Create an ALB, Cognito & Lambda integration to fetch regional metrics",
   "language": "Python",
-  "level": "200",
-  "framework": "CDK",
+  "level": "300",
+  "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
+      "This pattern explains how to deploy a SAM application that integrates an Application Load Balancer, Cognito and Lambda to fetch Lambda regional metrics.",
+      "We will be deploying an Application load balancer in front of Lambda function. Access to Lambda function would be given after authenticating user via AWS Cognito",
+      "Once the authentication is successful, User will be redirected to an HTML page which will display list of Lambda's regional metrics"
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-cognito-lambda",
+      "templateURL": "serverless-patterns/alb-cognito-lambda",
+      "projectFolder": "alb-cognito-lambda",
+      "templateFile": "alb-cognito-lambda/template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "text": "Authenticate users using an Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html"
       },
       {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Using AWS Lambda with an Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-alb.html"
       }
     ]
   },
@@ -44,16 +44,16 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
     {
       "name": "Jainam Shah",
-      "image": "link-to-your-photo.jpg",
+      "image": "https://drive.google.com/file/d/19NrbeT5LdQRAqnOGdEXsPZKvWph3Ba8U/view?usp=sharing",
       "bio": "Cloud Engineer and Technical Account Manager @ AWS",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "linkedin": "https://www.linkedin.com/in/jainamshah92",
+      "twitter": "@imJshah92"
     }
   ]
 }
