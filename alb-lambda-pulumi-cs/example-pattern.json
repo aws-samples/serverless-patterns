@@ -13,10 +13,10 @@
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-lambda-pulumi-yaml",
-            "templateURL": "serverless-patterns/alb-lambda-pulumi-yaml",
-            "projectFolder": "alb-lambda-pulumi-yaml",
-            "templateFile": "alb-lambda-pulumi-ts/Pulumi.yaml"
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-lambda-pulumi-cs",
+            "templateURL": "serverless-patterns/alb-lambda-pulumi-cs",
+            "projectFolder": "alb-lambda-pulumi-cs",
+            "templateFile": "alb-lambda-pulumi-cs/Program.cs"
         }
     },
     "resources": {

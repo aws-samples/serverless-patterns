@@ -115,6 +115,9 @@ return await Deployment.RunAsync(() =>
     {
         TargetGroupArn = targetGroup.Arn,
         TargetId = fn.Arn,
+    }, new CustomResourceOptions
+    {
+        DependsOn = {lambdaPermission}
     });
 
     return new Dictionary<string, object?>
