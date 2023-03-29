@@ -1,5 +1,5 @@
 {
-  "title": "Step Functions to Athena",
+  "title": "ALB, Cognito & Lambda Integration",
   "description": "Create a Step Functions workflow to query Amazon Athena.",
   "language": "Python",
   "level": "200",
@@ -49,9 +49,9 @@
   },
   "authors": [
     {
-      "name": "Your name",
+      "name": "Jainam Shah",
       "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
+      "bio": "Cloud Engineer and Technical Account Manager @ AWS",
       "linkedin": "linked-in-ID",
       "twitter": "twitter-handle"
     }
