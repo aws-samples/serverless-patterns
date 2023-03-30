@@ -35,15 +35,15 @@ Important: this application uses various AWS services and there are costs associ
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
-    * Enter the VPC ID of the default VPC or your custom VPC. Example: vpc-7caert06
-    * Enter the public subnets ID of your VPC. Example: subnet-d1d6f0b6,subnet-f34741dd
-    * Enter the desired name for your Application Load Balancer: Example: patternalb
-    * Enter Certificate ARN of your custom domain. Example: arn:aws:acm:us-west-2:123456789012:certificate/12345678-8388-4033-ba79-de17d5995895
-    * Enter name of subdomain which you will access after deployment. Subdomain will be related to custom domain you created as PreReq. Example: alb.awsuser.myinstance.com
-    * Enter R53HostedZoneId. This will be the Hosted Zone ID present in Route 53 console. Example: Z033456933GAXUUWBYYWZ
-    * Enter ALBHostedZoneId. The host zone ID of the ALB has a specific value that must be set. According to “Elastic Load Balancing endpoints and quotas“, the value for the Tokyo (ap-northeast-1) region is “Z14GRHDCWA56QT”. You can find this information here - https://docs.aws.amazon.com/general/latest/gr/elb.html
-    * Enter Name of your Lambda Function. Example: function-alb-cognito
-    * Enter value of Lambda Layer ARN. You can find ARN in Lambda console. Eg: LambdaLayerARN = arn:aws:lambda:us-west-2:account_id:layer:PrettyTable:1
+    * Enter the VPC ID of the default VPC or your custom VPC. Example: `vpc-7caert06`
+    * Enter the public subnets ID of your VPC. Example: `subnet-d1d6f0b6,subnet-f34741dd`
+    * Enter the desired name for your Application Load Balancer: Example: `patternalb`
+    * Enter Certificate ARN of your custom domain. Example: `arn:aws:acm:us-west-2:123456789012:certificate/12345678-8388-4033-ba79-de17d5995895`
+    * Enter name of subdomain which you will access after deployment. Subdomain will be related to custom domain you created as PreReq. Example: `alb.awsuser.myinstance.com`
+    * Enter R53HostedZoneId. This will be the Hosted Zone ID present in Route 53 console. Example: `Z033456933GAXUUWBYYWZ`
+    * Enter ALBHostedZoneId. The host zone ID of the ALB has a specific value that must be set. According to “Elastic Load Balancing endpoints and quotas“, the value for the Tokyo (ap-northeast-1) region is `Z14GRHDCWA56QT`. You can find this information here - https://docs.aws.amazon.com/general/latest/gr/elb.html
+    * Enter Name of your Lambda Function. Example: `function-alb-cognito`
+    * Enter value of Lambda Layer ARN. You can find ARN in Lambda console. Eg: LambdaLayerARN = `arn:aws:lambda:us-west-2:account_id:layer:PrettyTable:1`
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults. If this command fails, you can run `sam deploy --guided --capabilities CAPABILITY_NAMED_IAM`
 
