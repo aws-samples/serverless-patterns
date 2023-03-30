@@ -1,0 +1,255 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: Setup ALB, Cognito and Lambda integration using AWS SAM template
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC for the ALB
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet for the ALB
+  ALBName:
+    Type: String
+    Description: Name of the Application Load Balancer
+  CertificateARN:
+    Type: String
+    Description: ARN of the ACM Certificate you created in PreReq
+  Subdomain:
+    Description: The ALB subdomain of the dns entry. For example, alb.test.myinstance.com, alb is the subdomain of your custom domain you created.
+    Type: String
+  R53HostedZoneId:
+    Type: String
+    Description: Route53 Hosted Zone to configure the A record for ALB (if in same AWS account)
+  ALBHostedZoneId:
+    Type: String
+    Description: ALB Hosted Zone ID to configure the A record for ALB (Find exact ID based on your region from here - https://docs.aws.amazon.com/general/latest/gr/elb.html)
+  LambdaFunctionName:
+    Type: String
+    Description: Name of your Lambda Function
+  LambdaLayerARN:
+    Type: String
+    Description: ARN of your Lambda function PrettyTable Layer
+Resources:
+  MyLambdaFunctionPermission:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      RoleName: !Sub "${LambdaFunctionName}-role"  
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Principal:
+            Service:
+            - "lambda.amazonaws.com"
+          Action: "sts:AssumeRole"
+      ManagedPolicyArns: 
+      - "arn:aws:iam::aws:policy/AdministratorAccess"
+      Policies:
+      - PolicyName: !Sub "${LambdaFunctionName}-policy"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+            - "logs:CreateLogStream"
+            - "logs:CreateLogGroup"
+            - "logs:PutLogEvents"
+            Resource:
+            - !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaFunctionName}*:*"
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "ALBLambda"
+      Description: An Application Load Balancer Lambda Target that returns regional metrics
+      Handler: index.lambda_handler
+      Runtime: python3.7
+      Role: !GetAtt "MyLambdaFunctionPermission.Arn"
+      Layers:
+        - !Ref LambdaLayerARN
+      InlineCode: |
+        import json
+        import boto3
+        from prettytable import PrettyTable
+        from pathlib import Path
+
+        # PrettyTable
+        TABLE = PrettyTable(['Region', 'Lambda function(s)', 'Code Storage',
+                             'Regional Concurrency', 'Unreserved Concurrency'])
+
+        # AWS Clients for SDK
+        EC2_CLIENT = boto3.client('ec2')
+        AWS_REGIONS = EC2_CLIENT.describe_regions()['Regions']
+
+        # Lists to store data
+        ALL_REGIONS = []
+        FUNCTION_COUNT = []
+        CODE_STORAGE = []
+        CONCURRENCY = []
+        UNRESERVED_CONCURRENCY = []
+
+
+        def format_size(size):
+            """ Format into byes, KB, MB & GB """
+            power = 2**10
+            i = 0
+            power_labels = {0: 'bytes', 1: 'KB', 2: 'MB', 3: 'GB'}
+            while size > power:
+                size /= power
+                i += 1
+            return f"{round(size, 2)} {power_labels[i]}"
+
+
+        def function_metadata():
+            """ return function metadata """
+
+            # Iterate through all regions to find the function's config
+            for region_name in AWS_REGIONS:
+                try:
+                    region_name = region_name['RegionName']
+                    lambda_client = boto3.client('lambda', region_name=region_name)
+                    response = lambda_client.get_account_settings()
+                    CODE_STORAGE.append(format_size(response['AccountUsage']['TotalCodeSize']))
+                    CONCURRENCY.append(response['AccountLimit']['ConcurrentExecutions'])
+                    UNRESERVED_CONCURRENCY.append(
+                        response['AccountLimit']['UnreservedConcurrentExecutions'])
+                    FUNCTION_COUNT.append(response['AccountUsage']['FunctionCount'])
+                    ALL_REGIONS.append(region_name)
+                except Exception as e:
+                    print(e)
+
+
+        def lambda_handler(event, context):
+            """ Main Lambda function """
+
+            function_metadata()
+            for i, j in enumerate(ALL_REGIONS):
+                TABLE.add_row([ALL_REGIONS[i], FUNCTION_COUNT[i], CODE_STORAGE[i],
+                               CONCURRENCY[i], UNRESERVED_CONCURRENCY[i]])
+            # print(TABLE.get_html_string())
+            return {
+                "statusCode": 200,
+                "headers": {'Content-Type': 'text/html'}, 
+                "body": TABLE.get_html_string()
+            }
+      Timeout: 15
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Ref ALBName
+      Scheme: internet-facing 
+      Subnets: !Ref Subnets      
+      SecurityGroups:
+      - !Ref LoadBalancerSecurityGroup
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: LambdaFunctionInvokePermission
+    Properties:
+      TargetType: lambda
+      Targets:
+      - Id: !GetAtt LambdaFunction.Arn
+
+  Listener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      Certificates:
+      - CertificateArn: !Ref CertificateARN
+      DefaultActions: # 1. Authenticate against Cognito User Pool
+      - Type: 'authenticate-cognito'
+        AuthenticateCognitoConfig:
+          OnUnauthenticatedRequest: 'authenticate' # Redirect unauthenticated clients to Cognito login page
+          Scope: 'openid'
+          UserPoolArn: !GetAtt 'UserPool.Arn'
+          UserPoolClientId: !Ref UserPoolClient
+          UserPoolDomain: !Ref UserPoolDomain
+        Order: 1
+      - Type: forward # 2. Forward request to target group (e.g., EC2 instances)
+        TargetGroupArn: !Ref TargetGroup
+        Order: 2
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: 'HTTPS'
+
+  LoadBalancerSecurityGroup: # Security Group for Load Balancer allows incoming HTTPS requests
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Load Balancer'
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: '0.0.0.0/0'
+
+  DnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref R53HostedZoneId
+      Name: !Ref Subdomain
+      Type: A
+      AliasTarget: 
+        DNSName: !GetAtt LoadBalancer.DNSName
+        HostedZoneId: !Ref ALBHostedZoneId
+
+  LambdaFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Action: 'lambda:InvokeFunction'
+      Principal: elasticloadbalancing.amazonaws.com
+
+  UserPool:
+    Type: 'AWS::Cognito::UserPool'
+    Properties:
+      UserPoolName: UserPool-ALB-Cognito-Lambda
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false # Disable self-registration
+        InviteMessageTemplate:
+          EmailSubject: !Sub '${AWS::StackName}: temporary password'
+          EmailMessage: 'Use the username {username} and the temporary password {####} to log in for the first time.'
+          SMSMessage: 'Use the username {username} and the temporary password {####} to log in for the first time.'
+      AutoVerifiedAttributes:
+        - email
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          DeveloperOnlyAttribute: 'false'
+          Mutable: 'true'
+          Required: 'true'
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+          RequireLowercase: false
+          RequireNumbers: false
+          RequireSymbols: false
+          RequireUppercase: false
+          TemporaryPasswordValidityDays: 21
+  UserPoolDomain: # Provides Cognito Login Page
+    Type: 'AWS::Cognito::UserPoolDomain'
+    Properties:
+      UserPoolId: !Ref UserPool
+      Domain: !Select [2, !Split ['/', !Ref 'AWS::StackId']] # Generates a unique domain name
+  UserPoolClient:
+    Type: 'AWS::Cognito::UserPoolClient'
+    Properties:
+      AllowedOAuthFlows:
+      - code # Required for ALB authentication
+      AllowedOAuthFlowsUserPoolClient: true # Required for ALB authentication
+      AllowedOAuthScopes:
+      - email
+      - openid
+      - profile
+      - aws.cognito.signin.user.admin
+      CallbackURLs:
+      - !Sub https://${Subdomain}/oauth2/idpresponse # Redirects to the ALB
+      GenerateSecret: true
+      SupportedIdentityProviders: # Optional: add providers for identity federation
+      - COGNITO
+      UserPoolId: !Ref UserPool
+
+Outputs:
+  LoadBalancerDNSNAme:
+    Value: !Ref Subdomain
