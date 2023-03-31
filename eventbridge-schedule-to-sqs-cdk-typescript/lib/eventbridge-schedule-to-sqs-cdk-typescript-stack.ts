@@ -39,7 +39,7 @@ export class EventbridgeScheduleToSqsCdkTypescriptStack extends cdk.Stack {
     });
 
     // CloudFormation Stack Outputs
-    new CfnOutput(this, 'SCHEDULE NAME', { value: mySchedule.ref });
-    new CfnOutput(this, 'SQS QUEUE NAME', { value: sqsQueue.queueName });
+    new CfnOutput(this, 'SCHEDULE_NAME', { value: mySchedule.ref });
+    new CfnOutput(this, 'SQS_QUEUE_NAME', { value: sqsQueue.queueName });
   }
 }
