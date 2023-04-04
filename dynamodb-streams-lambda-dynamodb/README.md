@@ -1,8 +1,8 @@
-# Leverage AWS CDK, Lambda and DynamoDB Streams to move data from Source to Target DynamoDB table
+# Leverage AWS CDK, Lambda and DynamoDB Streams to copy data from Source to Target DynamoDB table
 
-DynamoDB is being used by thousands of customers globally to build the mission-critical business applications due to various benefits such as scalability, reliability, low latency, high durability etc. While leveraging DynamoDB database, customers come across many scenarios where they want to move data from one DynamoDB table to another at near real-time. This pattern addresses that use-case. 
+DynamoDB is being used by thousands of customers globally to build the mission-critical business applications due to various benefits such as scalability, reliability, low latency, high durability etc. While leveraging DynamoDB database, customers come across many scenarios where they want to copy data from one DynamoDB table to another at near real-time. This pattern addresses that use-case. 
 
-In this pattern, you'll learn how you can leverage .NET based CDK application along-with Lambda function and DynamoDB streams to move data between source and target DynamoDB tables.
+In this pattern, you'll learn how you can leverage .NET based CDK application along-with Lambda function and DynamoDB streams to copy data between source and target DynamoDB tables.
 
 ## Architecture 
 ![architecture diagram](images/architecture.png)
