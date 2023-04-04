@@ -16,6 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 - [Create an AWS account](https://aws.amazon.com) if you do not already have, create them and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Docker Installed](https://docs.docker.com/get-docker/)
 - [Terramform installed](https://www.terraform.io/)
 
 # Deployment Instructions
@@ -30,7 +31,23 @@ Important: this application uses various AWS services and there are costs associ
     ~~~ code
     cd serverless-patterns/s3-eventbridge-ecs
     
-4. Go to the [Docker directory](src/docker/README.md) and execute the docker command as per the Readme file. The docker commands in the file will perform the following:
+4. Go to the [Docker directory](src/docker/README.md) and execute the docker command as per the Readme file.
+    
+    * Build the Docker image first in local
+    ~~~ code
+    docker build -t `<image name>`:latest .
+    
+    * In the Linux and Mac environments, you may need to execute the following command to make the build script executable:
+    ~~~ code
+    chmod 755 build.sh
+
+    * Publish the image to ECR and provide the image name, AWS region and AWS Account Number
+    ~~~ code
+    ./build.sh -i `<image name>` -r `<region>` -a `<account>` 
+
+
+
+    The docker commands in the file will perform the following:
     - It will create an ECR Repository in your AWS account in the preferred AWS region
     - It will create the task docker image and push it to the ECR repository
     - Once done, login to the AWS console and search for ECR. Note the ARNs of the image name for the task. The ARN and image name will be needed in terraform script
@@ -38,12 +55,9 @@ Important: this application uses various AWS services and there are costs associ
     ![ECR Image ARN](ecr-task-uri.JPG)
 
 5. Make the following changes in the [terraform script](pattern_s3_eb_ecs.tf):
-    - Line 2 - Replace the placeholder "REPLACE_ME_WITH_S3_BUCKET" with an unique S3 bucket name. you can create an S3 bucket with CLI commnand as below :
-        ~~~ code
-        aws s3api create-bucket --bucket your-bucket-name --region aws-region
-
+    - Line 2 - Replace the placeholder "REPLACE_ME_WITH_S3_BUCKET" with an unique S3 bucket name. The terraform will create the S3 bucket
     - Line 4 - Replace the placeholder "REPLACE_ME_WITH_ECR_IMAGE_ARN" with the image URI, from step 4 above
-    - Line 5 - Replace the placeholder "REPLACE_ME_WITH_SUBNET_ID" with a VPC subnet block from your AWS account
+    - Line 5 - Replace the placeholder "REPLACE_ME_WITH_SUBNET_ID" with a VPC subnet block from your AWS account. The subnets can come from the default or any existing VPCs in the AWS account
     - Line 6 - Replace the placeholder "REPLACE_ME_WITH_AWS_REGION" with the AWS region where the script will deploy resources
 
     ~~~~ code
@@ -68,7 +82,7 @@ Important: this application uses various AWS services and there are costs associ
 
 # Testing
 
-1. Once the terraform script executed successfully, upload a sample csv file in a folder called 'incoming'.
+1. Once the terraform script executed successfully, upload a sample csv file in the S3 folder called 'incoming'.
    You can follow the below AWS CLI command to upload the file directly inside incoming folder :
    ~~~~ code
    aws s3api put-object --bucket your-bucket-name --key incoming/file-name  --body file-name
@@ -94,6 +108,20 @@ Important: this application uses various AWS services and there are costs associ
 
     ~~~ code
     terramform destroy
+
+2. For deleting the ECS image, go to the Amazon Elastic Container Registry from AWS Console. Search for the repository that contains the image to delete. 
+   On the Repositories: repository_name page, select the box to the left of the image to delete and choose Delete.
+   In the Delete image(s) dialog box, verify that the selected images should be deleted and choose Delete.
+
+    Alternatively you can execute the following command from cli to delete the image:
+
+    * List the images in your repository. Tagged images will have both an image digest as well as a list of associated tags. Untagged images will only have an image digest.
+    ~~~ code
+    aws ecr list-images --repository-name my-repo
+
+    * Delete any unwanted tags for the image by specifying the tag associated with the image you want to delete. When the last tag is deleted from an image, the image is also deleted.
+    ~~~ code
+    aws ecr batch-delete-image --repository-name my-repo --image-ids imageTag=tag1 imageTag=tag2
     
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
