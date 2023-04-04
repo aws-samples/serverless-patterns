@@ -24,27 +24,30 @@ Important: this application uses various AWS services and there are costs associ
 1. Configure AWS CLI to the account and region you want to deploy the application to
 
 2. Create a new directory then navigate to that directory in a terminal and clone the GitHub repository:
-    ~~~ code
+    ``` 
     git clone https://github.com/aws-samples/serverless-patterns
-    
+    ``` 
 3. Change directory to the pattern directory:
-    ~~~ code
+    ``` 
     cd serverless-patterns/s3-eventbridge-ecs
-    
+    ``` 
+
 4. Go to the [Docker directory](src/docker/README.md) and execute the docker command as per the Readme file.
     
     * Build the Docker image first in local
-    ~~~ code
+    ``` 
     docker build -t `<image name>`:latest .
-    
+    ``` 
+
     * In the Linux and Mac environments, you may need to execute the following command to make the build script executable:
-    ~~~ code
+    ``` 
     chmod 755 build.sh
+    ``` 
 
     * Publish the image to ECR and provide the image name, AWS region and AWS Account Number
-    ~~~ code
+    ``` 
     ./build.sh -i `<image name>` -r `<region>` -a `<account>` 
-
+    ``` 
 
 
     The docker commands in the file will perform the following:
@@ -60,7 +63,7 @@ Important: this application uses various AWS services and there are costs associ
     - Line 5 - Replace the placeholder "REPLACE_ME_WITH_SUBNET_ID" with a VPC subnet block from your AWS account. The subnets can come from the default or any existing VPCs in the AWS account
     - Line 6 - Replace the placeholder "REPLACE_ME_WITH_AWS_REGION" with the AWS region where the script will deploy resources
 
-    ~~~~ code
+    ``` 
     #Sample Configuration
     locals {
         bucket_name     = "mybucketname"
@@ -70,13 +73,15 @@ Important: this application uses various AWS services and there are costs associ
         region          = "us-east-1"
 
     }
+    ``` 
 
 6. Execute the following terraform command to deploy the stack
 
-    ~~~~ code
+    ``` 
     terraform init
     terraform plan
     terraform apply -auto-approve
+    ``` 
 
 7. The terraform will create a ECS cluster and deploy the image (created in step 4) in ECS. The script will use the default EventBridge event bus and create S3 notification rule to the default event bus.The rule will listen to the S3 upload events in the incoming folder. The script will provision all the necessary IAM roles and policies to execute the pattern
 
@@ -84,31 +89,32 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Once the terraform script executed successfully, upload a sample csv file in the S3 folder called 'incoming'.
    You can follow the below AWS CLI command to upload the file directly inside incoming folder :
-   ~~~~ code
+   ``` 
    aws s3api put-object --bucket your-bucket-name --key incoming/file-name  --body file-name
+   ``` 
 
    Sample CLI command:
-   ~~~~ code
+   ``` 
    aws s3api put-object --bucket test-serverlessland --key incoming/HistoricalData_1669400287621.csv  --body HistoricalData_1669400287621.csv
-
+   ``` 
 2. The S3 file upload will trigger an EventBridge Rule which will call the ECS task. The ECS task will execute and print the csv data in the cloudwatch log
 
 3. Check the CloudWatch log group to see the ECS task execution details. the logs can be found in /ecs/serverlessland-dump-env-vars
    You can use following cli command to get all streams of the cloudwatch logs
-   ~~~~ code
+   ``` 
    aws logs describe-log-streams --log-group-name /ecs/serverlessland-dump-env-vars --log-stream-name-prefix ecs/serverlessland-dump-env-vars/
-
+   ``` 
    You can select a particular stream to see the details
-   ~~~~ code
+   ``` 
    aws logs get-log-events --log-group-name /ecs/serverlessland-dump-env-vars --log-stream-name replace-stream-name-from-above-command
-
+   ``` 
 # Cleanup
 
 1. For deleting the EventBridge, S3, ECS task and associated IAM roles and policies, execute the following command:
 
-    ~~~ code
+    ``` 
     terramform destroy
-
+    ``` 
 2. For deleting the ECS image, go to the Amazon Elastic Container Registry from AWS Console. Search for the repository that contains the image to delete. 
    On the Repositories: repository_name page, select the box to the left of the image to delete and choose Delete.
    In the Delete image(s) dialog box, verify that the selected images should be deleted and choose Delete.
@@ -116,13 +122,13 @@ Important: this application uses various AWS services and there are costs associ
     Alternatively you can execute the following command from cli to delete the image:
 
     * List the images in your repository. Tagged images will have both an image digest as well as a list of associated tags. Untagged images will only have an image digest.
-    ~~~ code
+    ``` 
     aws ecr list-images --repository-name my-repo
-
+    ``` 
     * Delete any unwanted tags for the image by specifying the tag associated with the image you want to delete. When the last tag is deleted from an image, the image is also deleted.
-    ~~~ code
+    ``` 
     aws ecr batch-delete-image --repository-name my-repo --image-ids imageTag=tag1 imageTag=tag2
-    
+    ``` 
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
