@@ -80,10 +80,9 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
                     }
                 }
             }
-        }
-    ]
-}
-   ```
+        }]
+    }
+    ```
 2. Open command prompt and navigate to the folder where TestData.json file is available. Run the following CLI command to create test items in source DynamoDB table.
     ```
     aws dynamodb batch-write-item --request-items file://TestData.json
