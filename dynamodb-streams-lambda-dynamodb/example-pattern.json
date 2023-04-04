@@ -1,6 +1,6 @@
 {
   "title": "DynamoDB streams to Lambda to DynamoDB",
-  "description": "This AWS CDK application demonstrates how to Leverage AWS CDK, Lambda and DynamoDB Streams to copy data from Source to Target DynamoDB table.",
+  "description": "This application demonstrates how to Leverage AWS CDK, Lambda and DynamoDB Streams to copy data from Source to Target DynamoDB table.",
   "language": ".NET",
   "level": "200",
   "framework": "CDK",
