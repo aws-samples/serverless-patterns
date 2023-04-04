@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - simple HTTP API to Lambda function using python3.9
+
+Resources:
+  # Lambda function
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      # Trigger - HTTP API
+      Events:
+        ApiEvent:
+          Type: HttpApi
+      Handler: index.handler
+      InlineCode: |
+        def handler(event, context):
+            return {'body': 'Hello World! This is the HTTP API', 'statusCode': 200}
+      Runtime: python3.9
+
+Outputs:
+  HttpApiEndpoint:
+    Value: !Ref ServerlessHttpApi
