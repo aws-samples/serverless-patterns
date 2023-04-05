@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda Destinations - OnSuccess to another Lambda, OnFailure to SQS DLQ
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Runtime: nodejs16.x
+    Architectures:
+        - x86_64
+
+Resources:
+  
+  #The Lambda Function which has enabled destinations
+  MainLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:  
+      Handler: app1.handler  
+      CodeUri: src/
+      EventInvokeConfig:
+        DestinationConfig:
+          OnSuccess:
+            Type: Lambda
+            Destination: !GetAtt OnSuccessLambdaFunction.Arn
+          OnFailure:
+            Type: SQS
+            Destination: !GetAtt OnFailureSqsQueue.Arn
+
+  #The SQS Queue destination for lambda failures 
+  OnFailureSqsQueue:
+    Type: AWS::SQS::Queue
+
+  # Allow Lambda to send messages to SQS
+  LambdaToQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: SQS:SendMessage
+          Resource: !GetAtt OnFailureSqsQueue.Arn
+      Queues:
+        - !Ref OnFailureSqsQueue
+
+  #The Lambda Function destination for lambda success
+  OnSuccessLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app2.handler
+      
+Outputs:
+  MainLambdaFunction:
+    Description: "Main Lambda Function"
+    Value: !Ref MainLambdaFunction
+  OnFailureSqsQueue:
+    Description: "OnFailure Sqs Queue"
+    Value: !Ref OnFailureSqsQueue
+  OnSuccessLambdaFunction:
+    Description: "OnSuccess Lambda Function"
+    Value: !Ref OnSuccessLambdaFunction

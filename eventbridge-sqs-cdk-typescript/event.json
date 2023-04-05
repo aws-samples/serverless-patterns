@@ -1,0 +1,8 @@
+[
+  {
+    "Detail": "{\"msg\":\"test\"}",
+    "Source": "my-cdk-application",
+    "DetailType": "message-for-queue",
+    "EventBusName": "<REPLACE WITH EVENTBUS NAME/ARN>"
+  }
+]

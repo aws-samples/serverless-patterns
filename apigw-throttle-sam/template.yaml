@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Throttling example
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Tracing: Active
+    Runtime: python3.9
+    Handler: app.lambda_handler
+  Api:
+    TracingEnabled: true
+
+Resources:
+  ThrottlingApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      MethodSettings:
+        - HttpMethod: "*"
+          ResourcePath: "/*"
+          LoggingLevel: INFO
+          MetricsEnabled: true
+          ThrottlingRateLimit: 2000
+          ThrottlingBurstLimit: 1000
+        - HttpMethod: "POST"
+          ResourcePath: "/"
+          ThrottlingRateLimit: 50
+          ThrottlingBurstLimit: 25
+
+  ThrottlingGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get-function/
+      Architectures:
+      - arm64
+      Events:
+        Throttling:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ThrottlingApi
+            Path: /
+            Method: get
+  
+  ThrottlingPostFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: post-function/
+      Architectures:
+      - arm64
+      Events:
+        Throttling:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ThrottlingApi
+            Path: /
+            Method: post
+
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Join:
+        - ''
+        - - ApplicationInsights-SAM-
+          - Ref: AWS::StackName
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Fn::Join:
+        - ''
+        - - ApplicationInsights-SAM-
+          - Ref: AWS::StackName
+      AutoConfigurationEnabled: 'true'
+    DependsOn: ApplicationResourceGroup
+Outputs:
+  ThrottlingApiUrl:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value: !Sub "https://${ThrottlingApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

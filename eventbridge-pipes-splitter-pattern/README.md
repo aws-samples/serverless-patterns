@@ -2,7 +2,7 @@
 
 ![Splitter Architecture using Pipes](./architecture.png)
 
-This pattern demonstrates the [splitter pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html), takes an event from DynamoDB and splits the event into many events directly into EventBridge.
+This pattern demonstrates the [Splitter pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html). It takes an event from DynamoDB and splits the event into many events using a Lambda enrichment function and sends them to EventBridge.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-splitter-pattern
 
@@ -13,7 +13,6 @@ Important: this application uses various AWS services and there are costs associ
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
 ## Deployment Instructions
 
@@ -21,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
    ```bash
    git clone https://github.com/aws-samples/serverless-patterns
    ```
-2. Change directory to the pattern directory:
+2. Change directory to the pattern's `cdk` directory:
    ```bash
    cd serverless-patterns/eventbridge-pipes-splitter-pattern/cdk
    ```
@@ -42,17 +41,24 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern with create a DDB table and EventBridge pipe to split the event into three events for EventBridge (target). To get started, deploy the pattern and run the command below to insert a new record into DDB.
-
-The new INSERT will trigger EventBridge Pipes and split out the event into three.
+This pattern creates a DDB table and EventBridge Pipe to split Orders inserted into the table into one event per ticket and sends them to EventBridge (target). For illustration purposes, the EventBridge simply routes the events to a CloudWatch log. To see the Splitter in action, insert a new record into DDB.
 
 ```sh
- # Insert info into orders table
+ # Insert a new order with three tickets into orders table
 aws dynamodb put-item \
 --table-name=Orders-Table \
---item '{"id":{"S":"905fa520-4d4a-4850-97c5-1d429f8c23ba"},"userId":{"S":"b507de3e-d9d4-4e88-9e61-28416394777f"},"tickets":{"L":[{"M":{"id":{"S":"5c27a12d-f33f-4b64-8afe-844a8a297660"}}},{"M":{"id":{"S":"2208130e-4f78-48d4-b3e3-bf94912ae71d"}}},{"M":{"id":{"S":"0325bf78-a162-4486-adb1-218aadf41fdc"}}}]}}'
-
+--item '{"id":{"S":"905fa520-4d4a-4850-97c5-1d429f8c23ba"},"userId":{"S":"user123"},"tickets":{"L":[{"M":{"id":{"S":"ticket1"}}},{"M":{"id":{"S":"ticket2"}}},{"M":{"id":{"S":"ticket3"}}}]}}'
 ```
+
+You can see the split events in the CloudWatch logstreams (output reduced for readability):
+```sh
+aws logs tail /aws/events/tickets
+{"id":"04f8c52a-b70b-a0ed-deb0-fbf5ea5ecb17","detail-type":"TicketPurchased","source":"trains.tickets","time":"2023-03-10T03:26:24Z","detail":{"id":"ticket3","orderId":"905fa520-4d4a-4850-97c5-1d429f8c23ba","userId":"user123"}}
+{"id":"763cdb2f-a0d5-4fb2-d39a-ceff74bb0c63","detail-type":"TicketPurchased","source":"trains.tickets","time":"2023-03-10T03:26:24Z","detail":{"id":"ticket2","orderId":"905fa520-4d4a-4850-97c5-1d429f8c23ba","userId":"user123"}}
+{"id":"ee230a02-34b8-b8dd-dcbb-a7d741fb2ac3","detail-type":"TicketPurchased","source":"trains.tickets","time":"2023-03-10T03:26:24Z","detail":{"id":"ticket1","orderId":"905fa520-4d4a-4850-97c5-1d429f8c23ba","userId":"user123"}}
+```
+
+If you want to repeat this action, change the `id` field so that the command results in a new `INSERT`.
 
 ## Delete stack
 
