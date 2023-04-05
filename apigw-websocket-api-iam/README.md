@@ -55,7 +55,7 @@ Once the application is deployed, retrieve the WebSocketURL value from CloudForm
     $ npm install -g wscat
     ```
 
-1. Check connection requires IAM authorization by attempting a connecting to your WebSocketURL by executing the following command:
+1. Check that non-signed connections are rejected by attempting a connecting to your WebSocketURL by executing the following command. A 403 error shows that connections that are not IAM authorized are being rejected.
     ```
     $ wscat -c <YOUR WEBSOCKET URL>
     ```
