@@ -1,6 +1,8 @@
-import * as aws from "@pulumi/aws";
-import * as awsx from "@pulumi/awsx";
-import * as lambda from "./lambda";
+"use strict";
+const pulumi = require("@pulumi/pulumi");
+const aws = require("@pulumi/aws");
+const awsx = require("@pulumi/awsx");
+
 
 const vpc = new awsx.ec2.Vpc("vpc", {
     cidrBlock: "10.0.0.0/16",
@@ -43,9 +45,18 @@ const listener = new aws.lb.Listener("listener", {
     }]
 });
 
-const lambdaFunction = new aws.lambda.CallbackFunction("lambdaFunction", {
+const lambdaRole = new aws.iam.Role("lambda-role", {
+    assumeRolePolicy: aws.iam.assumeRolePolicyForPrincipal(aws.iam.Principals.LambdaPrincipal),
+    managedPolicyArns: [aws.iam.ManagedPolicy.AWSLambdaBasicExecutionRole]
+});
+
+const lambdaFunction = new aws.lambda.Function("lambdaFunction", {
     runtime: aws.lambda.Runtime.NodeJS18dX,
-    callback: lambda.handler,
+    code: new pulumi.asset.AssetArchive({
+        ".": new pulumi.asset.FileArchive("./lambda")
+    }),
+    handler: "index.handler",
+    role: lambdaRole.arn
 });
 
 const lambdaPermission = new aws.lambda.Permission("permission", {
@@ -60,4 +71,4 @@ const targetGroupAttachment = new aws.lb.TargetGroupAttachment("targetGroupAttac
     targetId: lambdaFunction.arn
 }, {dependsOn: [lambdaPermission]});
 
-export const url = loadBalancer.dnsName;
+exports.url = loadBalancer.dnsName;
