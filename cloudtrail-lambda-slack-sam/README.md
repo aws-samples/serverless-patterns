@@ -1,5 +1,7 @@
 # AWS Lambda and Cloudtrail data events
 
+![Concept](./cloudtrail-lambda-slack-sam.png)
+
 This pattern demonstrates how customers can monitor manual invocations of their sensitive lambda functions through slack with the help of Cloudtrail and Cloudwatch Subscription filter.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cloudtrail-lambda-slack-sam
