@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: API with Logs enabled
+
+Globals:
+  Api:
+    OpenApiVersion: 3.0.1
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    DependsOn: ApiCWLRoleArn
+    Properties:
+      StageName: prod
+      MethodSettings:
+        - MetricsEnabled: True
+          ResourcePath: '/*'
+          HttpMethod: '*'
+          LoggingLevel: INFO
+          
+  ApiCWLRoleArn:
+    Type: AWS::ApiGateway::Account
+    Properties: 
+      CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
+
+  CloudWatchRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+        Path: /
+        ManagedPolicyArns:
+          - 'arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'
+
+  MyFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: index.handler
+            Runtime: python3.7
+            InlineCode: | 
+                import json 
+                def handler(event, context): 
+                    return { 
+                "statusCode": 200, 
+                "body": json.dumps({ "message" : "Hello from Lambda!"}), 
+                }
+            Events:
+                HelloWorld:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MyApi
+                        Path: /
+                        Method: get
