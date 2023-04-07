@@ -1,0 +1,61 @@
+{
+  "title": "Automating Deployment of AWS Amplify Apps with Terraform",
+  "description": "Using Infrastructure as Code (IaC) with AWS Amplify for automated deployments at scale",
+  "language": "JavaScript",
+  "level": "300",
+  "framework": "Cloudformation",
+  "introBox": {
+    "headline": "How it works",
+    "text": [        
+      "In this workshop you will create a serverless fullstack Amplify App, backed by an Event-Driven Architecture (EDA), and deploy it all with Terraform! The application will include Storage, a Database, Authentication, and an API.",
+      "You will also learn how to leverage the Amplify Client libraries, and experience the process for customizing the Amplify App.",
+      "Sample data is ingested through the an Amazon S3 Bucket referenced as the Landing Zone S3 Bucket, and can be ingested from any service within or connected to the AWS cloud. For the sake of this demo, example files are in the GitHub Repo  in the resources/sample-media directory.",     
+      "This is an event-driven architecture. An upload to the landing bucket sends the S3 Put operation log to Amazon EventBridge which then triggers the Step Function to run. As a sample, the Step Function simply adds a UUID (Universally Unique Identifier) to the object name, copies it the sample_input_bucket and the sample_output_bucket, and writes the S3 object metadata to DynamoDB.",
+      " ",
+      "Here is the workshop: https://catalog.workshops.aws/amplify-with-terraform"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-amplify",
+      "templateURL": "serverless-patterns/terraform-amplify",
+      "projectFolder": "terraform-amplify",
+      "templateFile": "terraform-amplify/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Full Workshop",
+        "link": "https://catalog.workshops.aws/amplify-with-terraform"
+      },
+      {
+        "text": "AWS Amplify Libraries for JavaScript",
+        "link": "https://docs.amplify.aws/lib/q/platform/js/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See Workshop: https://catalog.workshops.aws/amplify-with-terraform/en-US/introduction"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy --auto-approve</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kevon Mayers",
+      "image": "https://drive.google.com/file/d/1fUFUa9p_qvsZ31vD5ctGI5eMxTGn1CnC/view?usp=sharing",
+      "bio": "Kevon is a Solutions Architect on the AWS Energy & Utilities team, apart of the larger AWS Industries organization. He enjoys full-stack development, using infrastructure as code, and helping customers use technology to solve sustainability and renewable energy challenges. Fun fact, Kevon comes from a non-traditional background. Prior to working at AWS, Kevon was a Studio Manager/Music Producer/Audio Engineer working with the GRAMMYs. He also owns his own production company, where he spends his free time working with artists.",
+      "linkedin": " https://www.linkedin.com/in/kevonmayers/"
+    }
+  ]
+}

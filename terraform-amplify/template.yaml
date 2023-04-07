@@ -1,0 +1,67 @@
+# AWSCloud9SSMAccessRole and AWSCloud9SSMInstanceProfile resources are necessary
+# If using CONNECT_SSM for Cloud9 Environment Connection Type.
+Resources:
+  AWSCloud9SSMAccessRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "AWSCloud9SSMAccessRole"
+      Description: ""
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloud9.amazonaws.com
+                - ec2.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Path: /service-role/
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCloud9SSMInstanceProfile
+        - arn:aws:iam::aws:policy/AdministratorAccess
+  AWSCloud9SSMInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      InstanceProfileName: AWSCloud9SSMInstanceProfile
+      Path: /cloud9/
+      Roles:
+        - !Ref AWSCloud9SSMAccessRole
+
+  TerraformAmplifyWorkshopC9Role:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "TerraformAmplifyWorkshopC9Role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+  TerraformAmplifyC9InstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      InstanceProfileName: TerraformAmplifyC9InstanceProfile
+      Path: /
+      Roles:
+        - !Ref TerraformAmplifyWorkshopC9Role
+
+  TerraformAmplifyC9Env:
+    Type: AWS::Cloud9::EnvironmentEC2
+    Properties:
+      Name: TerraformAmplifyWorkshopIDE
+      AutomaticStopTimeMinutes: 240
+      ConnectionType: CONNECT_SSM
+      Description: Cloud9 Environment to be used to complete the workshop.
+      ImageId: amazonlinux-2-x86_64
+      InstanceType: t2.large
+      Tags:
+        - Key: "Project"
+          Value: "TerraformAmplifyWorkshop"
+    DependsOn: AWSCloud9SSMInstanceProfile
