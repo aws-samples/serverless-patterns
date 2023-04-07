@@ -19,8 +19,7 @@
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-amplify",
       "templateURL": "serverless-patterns/terraform-amplify",
-      "projectFolder": "terraform-amplify",
-      "templateFile": "terraform-amplify/template.yaml"
+      "projectFolder": "terraform-amplify"
     }
   },
   "resources": {
