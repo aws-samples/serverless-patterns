@@ -1,6 +1,6 @@
-# AWS Serverless Webform Sample App
+# Amazon Cloudfront distribution in front of Amazon S3 and an Amazon API Gateway REST API to AWS Lambda to Amazon DynamoDB
 
-This sample application demonstrates a simple webform application sitting in Cloudfront and S3.  The application stores data in DynamoDB via a ```POST``` request to an API Gateway which triggers a simple Lambda function.
+This pattern demonstrates a simple webform application sitting in Cloudfront and S3.  The application stores data in DynamoDB via a ```POST``` request to an API Gateway which triggers a simple Lambda function.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -68,10 +68,6 @@ The web interface allows an end user to enter their personal details and click `
 Open the Cloudfront URL in a browser on your local machine.  Fill out the form with data and click ```Submit```.  Upon submitting, your browser will send a ```POST``` request to the API Gateway and trigger the Lambda to store the data in DynamoDB.
 
 To view the data in DynamoDB, navigate to the DynamoDB service in the AWS console, select ```Tables``` from the left navigation pane and click on the ```serverless-webform-sample-table``` table. In the ```View Table``` page click on ```Explore Table Items``` button and scroll down to ```Items Returned``` to view the data stored in the table.  This data should match the data entered in the previous step.
-
-## Recommendations
-
-To use this code in a production environment, it is recommended to [enable authentication](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html) on the API Gateway ```POST``` method to prevent nefarious activity against the API and unexpected costs.  
 
 ## Cleanup
  
