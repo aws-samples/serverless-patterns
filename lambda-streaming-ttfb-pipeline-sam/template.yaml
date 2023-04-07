@@ -15,7 +15,7 @@ Resources:
     Properties:
       TargetFunctionArn: !Ref StreamingFunction
       AuthType: AWS_IAM
-#      InvokeMode: RESPONSE_STREAM        
+      InvokeMode: RESPONSE_STREAM        
 Outputs:
   StreamingFunction:
     Description: "Streaming Lambda Function ARN"

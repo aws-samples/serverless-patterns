@@ -10,22 +10,19 @@ Resources:
       Timeout: 30
       MemorySize: 512
       AutoPublishAlias: live
-#      FunctionUrlConfig:
-#        AuthType: AWS_IAM
-#        InvokeMode: RESPONSE_STREAM
+      FunctionUrlConfig:
+        AuthType: AWS_IAM
+        InvokeMode: RESPONSE_STREAM
   MyFunctionUrl:
     Type: AWS::Lambda::Url
     Properties:
       TargetFunctionArn: !Ref StreamingFunction
       AuthType: AWS_IAM
-#      InvokeMode: RESPONSE_STREAM       
+      InvokeMode: RESPONSE_STREAM       
 Outputs:
   StreamingFunction:
     Description: "Streaming Lambda Function ARN"
     Value: !GetAtt StreamingFunction.Arn
-#  StreamingFunctionURL:
-#    Description: "Streaming Lambda Function URL"
-#    Value: !GetAtt StreamingFunctionUrl.FunctionUrl
   StreamingFunctionURL:
     Description: "Streaming Lambda Function URL"
     Value: !GetAtt MyFunctionUrl.FunctionUrl

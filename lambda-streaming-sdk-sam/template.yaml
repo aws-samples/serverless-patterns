@@ -12,9 +12,6 @@ Globals:
     MemorySize: 128
     Architectures:
       - x86_64
-    # TODO: Get rid of these layers after deployment
-#    Layers:
-#      - "arn:aws:lambda:::awslayer:StreamingAmazonLinux2"
 
 Resources:
   HappyPathFunction:
