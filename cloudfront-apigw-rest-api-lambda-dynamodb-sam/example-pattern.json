@@ -22,8 +22,8 @@
   "resources": {
     "bullets": [
       {
-        "text": "Amazon API Gateway",
-        "link": "https://aws.amazon.com/api-gateway/"
+        "text": "Amazon API Gateway Developer Guide",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
       }
     ]
   },
