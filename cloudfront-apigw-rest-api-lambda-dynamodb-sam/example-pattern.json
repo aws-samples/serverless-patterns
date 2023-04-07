@@ -1,7 +1,7 @@
 {
   "title": "Amazon Cloudfront distribution in front of Amazon S3 and an Amazon API Gateway REST API to AWS Lambda to Amazon DynamoDB",
   "description": "This pattern creates an Amazon Cloudfront distribution in front of Amazon S3 and an Amazon API Gateway REST API which invokes an AWS Lambda function to store data in an Amazon DynamoDB table.",
-  "language": "Python",
+  "language": "nodejs14.x",
   "level": "300",
   "framework": "SAM",
   "introBox": {
