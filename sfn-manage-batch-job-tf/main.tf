@@ -12,7 +12,7 @@ provider "aws" {
 }
 
 locals {
-  project_name = "start-athena-query"
+  project_name = "manage-batch-job"
 
 }
 
@@ -342,8 +342,8 @@ resource "aws_iam_role_policy_attachment" "state_machine_custom_policy_attachmen
   role       = aws_iam_role.sfn_batch_job_role.id
 }
 
-resource "aws_sfn_state_machine" "sfn_athena" {
-  name     = "state-machine-start-athena-${random_string.random.result}"
+resource "aws_sfn_state_machine" "sfn_batch_job" {
+  name     = "state-machine-manage-batch-job-${random_string.random.result}"
   role_arn = aws_iam_role.sfn_batch_job_role.arn
     definition = templatefile("${path.module}/statemachine/statemachine.asl.json", {
     sns_topic = aws_sns_topic.batch_job.arn,
