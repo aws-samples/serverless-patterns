@@ -1,0 +1,3 @@
+ aws sqs send-message \
+ --queue-url=QUEUE_URL \
+ --message-body '{"Source": "cdk.myapp", "DetailType": "transaction", "Region": "region1" }'

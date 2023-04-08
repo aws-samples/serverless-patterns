@@ -1,0 +1,17 @@
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\bin\Release\net6.0\lambda-api.deps.json
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\bin\Release\net6.0\lambda-api.runtimeconfig.json
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\bin\Release\net6.0\lambda-api.dll
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\bin\Release\net6.0\lambda-api.pdb
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\bin\Release\net6.0\Amazon.Lambda.Core.dll
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\bin\Release\net6.0\Amazon.Lambda.Serialization.SystemTextJson.dll
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\lambda-api.csproj.AssemblyReference.cache
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\lambda-api.GeneratedMSBuildEditorConfig.editorconfig
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\lambda-api.AssemblyInfoInputs.cache
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\lambda-api.AssemblyInfo.cs
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\lambda-api.csproj.CoreCompileInputs.cache
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\lambda-api.csproj.CopyComplete
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\lambda-api.dll
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\refint\lambda-api.dll
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\lambda-api.pdb
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\lambda-api.genruntimeconfig.cache
+C:\vinod\work\dotnet6poc\my-cdk\src\lambda-api\obj\Release\net6.0\ref\lambda-api.dll
