@@ -1,6 +1,6 @@
 # Manage a Batch Job
 
-This workflow use Step Functions, AWS Batch and AWS SNS Topics to start an batch job and send a notification with the result of the execution via SNS with query results. This sample project creates the following:
+This workflow use Step Functions, AWS Batch and AWS SNS Topics to start an batch job and send a notification with the status of the job execution via SNS. This sample project creates the following:
 
 * An AWS Batch job
 * An Amazon SNS topic
