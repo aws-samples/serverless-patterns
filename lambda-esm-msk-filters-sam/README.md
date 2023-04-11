@@ -1,9 +1,162 @@
 # Lambda event filtering using event source mapping for Amazon Managed Streaming for Apache Kafka (Amazon MSK)
 
-AWS Lambda provides *[content filtering options](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) for Amazon MSK and other services. With event pattern content filtering, you can write complex rules so that your Lambda function is only triggered under filtering criteria you specify. This helps reduce traffic to your Lambda functions, simplifies code, and reduces overall cost.
+AWS Lambda provides [content filtering options](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) for Amazon MSK and other services. With event pattern content filtering, you can write complex rules so that your Lambda function is only triggered under filtering criteria you specify. This helps reduce traffic to your Lambda functions, simplifies code, and reduces overall cost.
 
 
 This project includes source code and supporting files that demonstrate various filtering patterns when using Amazon MSK as the source.The SAM template deploys multiple lambda functions. Each of the lambda function uses a different filtering pattern to demonstrate the various comparision operators.
+
+## Requirements
+
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+
+## Deployment Instructions
+
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+1. Change directory to the pattern directory:
+    ```
+    cd serverless-patterns/lambda-esm-msk-filters-sam
+    ```
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+    ```
+    sam build
+    sam deploy --guided
+    ```
+
+## Included scenarios
+**No Filter** - A simple trigger without a filter criteria
+
+**Equals** - A filter checking whether a particular JSON field value equals a string value. Note here we are filtering based on the message payload, and not the message metadata
+```
+{
+   "value":{
+      "kind":[
+         "Event"
+      ]
+   }
+}
+```
+
+**Equals and Numeric (equals)** - A filter checking whether a particular JSON field value equals a string value and a different JSON field value equals a numeric value. Note here we are filtering based on the message payload, and not the message metadata
+```
+{
+   "value":{
+      "kind":[
+         "Event"
+      ],
+      "responseStatus":{
+         "code":[
+            {
+               "numeric":[
+                  "=",
+                  300
+               ]
+            }
+         ]
+      }
+   }
+}
+```
+
+**Numeric (range)** and **Equals**- Multiple filters pattern. One pattern filters by 'Numeric (range) operator'. Another pattern filters by 'Equals' operator. Note here we are filtering based on the message payload, and not the message metadata
+```
+{
+   "value":{
+      "responseStatus":{
+         "code":[
+            {
+               "numeric":[
+                  ">=",
+                  300
+               ]
+            }
+         ]
+      }
+   }
+}
+```
+```
+{
+   "value":{
+      "RBAC":[
+         true
+      ]
+   }
+}
+```
+
+**Not** - A filter checking whether a particular JSON field value is not equal to a string. Note here we are filtering based on the message payload, and not the message metadata
+```
+{
+   "value":{
+      "kind":[
+         {
+            "anything-but":[
+               "Event"
+            ]
+         }
+      ]
+   }
+}
+```
+
+**Begins with** - A filter checking whether a particular JSON field value begins with a string. Note here we are filtering based on the message payload, and not the message metadata
+```
+{
+   "value":{
+      "region":[
+         {
+            "prefix":"us-"
+         }
+      ]
+   }
+}
+```
+
+**Numeric (range)** - A filter checking whether a particular JSON field value is within a numeric range. Note here we are filtering based on the message payload, and not the message metadata
+```
+{
+   "value":{
+      "responseStatus":{
+         "code":[
+            {
+               "numeric":[
+                  ">=",
+                  300,
+                  "<=",
+                  350
+               ]
+            }
+         ]
+      }
+   }
+}
+```
+
+**Begins with** - A filter checking whether a particular plain string value is begins with a string. Note here we are filtering based on the message payload, and not the message metadata
+```
+{
+   "value":{
+      "responseStatus":{
+         "code":[
+            {
+               "numeric":[
+                  ">=",
+                  300,
+                  "<=",
+                  350
+               ]
+            }
+         ]
+      }
+   }
+}
+```
 
 Here are the list of patterns mapped to the lambda functions.
 
