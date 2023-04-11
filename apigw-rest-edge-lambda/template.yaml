@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - REST API Edge-Optimized with Lambda proxy integration
+
+Resources:
+  #Lambda function
+  LambdaEdgeApi:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        def lambda_handler(event, context):
+            return {
+        "statusCode": 200,
+        "body": json.dumps({
+          "message" : "Hello World! This is the Edge-Optimized API"}),
+        }
+      Runtime: python3.9
+      Events:
+        HelloWorld:
+          Type: Api 
+          Properties: 
+            Path: /
+            Method: get
+            RestApiId:
+              Ref: ApiEdgeOptimized
+
+  #Edge-optimized API
+  ApiEdgeOptimized:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      EndpointConfiguration: EDGE
+
+#API endpoint
+Outputs:
+  EndpointUrl:
+    Description: 'REST Edge-optimized endpoint URL'
+    Value: !Sub 'https://${ApiEdgeOptimized}.execute-api.${AWS::Region}.amazonaws.com/prod'
+
+
