@@ -38,7 +38,7 @@ This pattern creates an Amazon API Gateway REST API that integrates directly wit
 
 Below is an illustration of the general Amazon API Gateway Integration pattern.
 
-![alt text](https://github.com/MudassarBashir/serverless-patterns/blob/mmbashir-apigw-rest-api-kinesis-cdk/apigw-rest-api-kinesis-cdk/architecture-diagram.drawio.png?raw=true)
+![alt text](https://github.com/MudassarBashir/serverless-patterns/blob/mmbashir-apigw-rest-api-kinesis-cdk/apigw-rest-api-kinesis-cdk/apigw-kinesis-architecture-diagram.png?raw=true)
 
 ## Testing
 
