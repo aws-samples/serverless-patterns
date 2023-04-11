@@ -31,7 +31,7 @@ This project includes source code and supporting files that demonstrate various 
 ## Included scenarios
 **No Filter** - A simple trigger without a filter criteria
 
-**Equals** - A filter checking whether a particular JSON field value equals a string value. Note here we are filtering based on the message payload, and not the message metadata
+**Equals** - A filter checking whether a particular **JSON** field value equals a string value. Filtering is based on the **message payload**.
 ```
 {
    "value":{
@@ -42,7 +42,7 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Equals and Numeric (equals)** - A filter checking whether a particular JSON field value equals a string value and a different JSON field value equals a numeric value. Note here we are filtering based on the message payload, and not the message metadata
+**Equals and Numeric (equals)** - A filter checking whether a particular **JSON** field value equals a string value and a different JSON field value equals a numeric value. Filtering is based on the **message payload**.
 ```
 {
    "value":{
@@ -63,7 +63,7 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Numeric (range)** and **Equals**- Multiple filters pattern. One pattern filters by 'Numeric (range) operator'. Another pattern filters by 'Equals' operator. Note here we are filtering based on the message payload, and not the message metadata
+**Numeric (range)** and **Equals**- Multiple filters pattern. One pattern filters by 'Numeric (range) operator'. Another pattern filters by 'Equals' operator. Filtering is based on the **message payload**.
 ```
 {
    "value":{
@@ -90,7 +90,7 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Not** - A filter checking whether a particular JSON field value is not equal to a string. Note here we are filtering based on the message payload, and not the message metadata
+**Not** - A filter checking whether a particular **JSON** field value is not equal to a string. Filtering is based on the **message payload**.
 ```
 {
    "value":{
@@ -105,7 +105,7 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Begins with** - A filter checking whether a particular JSON field value begins with a string. Note here we are filtering based on the message payload, and not the message metadata
+**Begins with** - A filter checking whether a particular **JSON** field value begins with a string. Filtering is based on the **message payload**.
 ```
 {
    "value":{
@@ -118,7 +118,7 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Numeric (range)** - A filter checking whether a particular JSON field value is within a numeric range. Note here we are filtering based on the message payload, and not the message metadata
+**Numeric (range)** - A filter checking whether a particular **JSON** field value is within a numeric range. Filtering is based on the **message payload**.
 ```
 {
    "value":{
@@ -138,7 +138,7 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Begins with** - A filter checking whether a particular plain string value is begins with a string. Note here we are filtering based on the message payload, and not the message metadata
+**Begins with** - A filter checking whether a particular **plain** string value is begins with a string. Filtering is based on the **message payload**.
 ```
 {
    "value":{
@@ -155,6 +155,33 @@ This project includes source code and supporting files that demonstrate various 
          ]
       }
    }
+}
+```
+
+**Begins with** - A filter checking whether a particular **plain** string value is begins with a string. Filtering is based on the **message payload**.
+```
+{
+   "value":[
+      {
+         "prefix":"OrderNumber"
+      }
+   ]
+}
+```
+
+**Begins with** - A filter checking whether a particular **plain** string value is begins with a string. Filtering is based on the **message payload** and **message metadata**.
+```
+{
+   "topic":[
+      {
+         "prefix":"ESMFiltersDemoTopic"
+      }
+   ],
+   "value":[
+      {
+         "prefix":"us-west"
+      }
+   ]
 }
 ```
 
