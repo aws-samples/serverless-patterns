@@ -1,8 +1,13 @@
-# lambda-msk-esm
+# Lambda event filtering using event source mapping for Amazon Managed Streaming for Apache Kafka (Amazon MSK)
 
-This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
+AWS Lambda provides *[content filtering options](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) for Amazon MSK and other services. With event pattern content filtering, you can write complex rules so that your Lambda function is only triggered under filtering criteria you specify. This helps reduce traffic to your Lambda functions, simplifies code, and reduces overall cost.
 
-- hello_world - Code for the application's Lambda function.
+
+This project includes source code and supporting files that demonstrate various filtering patterns when using Amazon MSK as the source.The SAM template deploys multiple lambda functions. Each of the lambda function uses a different filtering pattern to demonstrate the various comparision operators.
+
+Here are the list of patterns mapped to the lambda functions.
+
+- fn-filter-events-and-response-code - Function demonstrating 'Equals' and 'Numeric (equals)' Comparison operator                                         
 - events - Invocation events that you can use to invoke the function.
 - tests - Unit tests for the application code. 
 - template.yaml - A template that defines the application's AWS resources.
