@@ -1,6 +1,6 @@
 # Amazon API Gateway to Amazon Kinesis 
 
-This pattern creates an Amazon API Gateway REST API that integrates with an Amazon Kinesis data stream.
+This pattern creates an Amazon API Gateway REST API that integrates with an Amazon Kinesis data stream using AWS Cloud Development Kit (AWS CDK) in Typescript.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -10,8 +10,9 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
+* [Node and NPM](https://nodejs.org/en/download) installed
+* [AWS Cloud Development Kit (AWS CDK)](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) installed
 
 ## Deployment Instructions
 
@@ -23,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd apigw-rest-api-kinesis-cdk/cdk
     ```
-1. Install dependencies
+1. Use npm to install dependencies:
     ```
     npm install
     ```
@@ -34,15 +35,15 @@ Important: this application uses various AWS services and there are costs associ
    
 ## How it works
 
-This pattern creates an Amazon API Gateway REST API that integrates directly with an Amazon Kinesis data stream. The API supports GET requests to list the details of your Kinesis stream and there is no authentication on the API endpoint. 
+The API built in this pattern exposes an HTTP GET method on the API's resource and integrates the method with the [ListStreams](https://docs.aws.amazon.com/kinesis/latest/APIReference/API_ListStreams.html) action in Kinesis to list the streams in the caller's account. There is no authentication on the API endpoint. 
 
-Below is an illustration of the general Amazon API Gateway Integration pattern.
+Below is an illustration of the general Amazon API Gateway Integration pattern:
 
 ![alt text](https://github.com/MudassarBashir/serverless-patterns/blob/mmbashir-apigw-rest-api-kinesis-cdk/apigw-rest-api-kinesis-cdk/apigw-kinesis-architecture-diagram.png?raw=true)
 
 ## Testing
 
-Upon deployment, you will see the API endpoint URL in the Outputs section of your deployed CloudFormation stack. Click on the API URL. It will take this format:
+Upon deployment, you will see the API endpoint URL in the **Outputs** section of your deployed CloudFormation stack. Click on the API URL. It will take this format:
   ```
   https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/{DEPLOYMENT_STAGE}
   ```
@@ -50,7 +51,7 @@ Upon deployment, you will see the API endpoint URL in the Outputs section of you
   
 If the action is successful, the service sends back an HTTP 200 response.
 
-The following data is returned in JSON format by the service.
+The following data is returned in JSON format by the service:
 
   ```json
   {"HasMoreStreams":false,"StreamNames":["temp-stream"],"StreamSummaries":[{"StreamARN":"arn:aws:kinesis:{AWS_REGION}:{AWS_ACCOUNT_NUMBER}:stream/temp-stream","StreamCreationTimestamp":1.681224803E9,"StreamModeDetails":{"StreamMode":"PROVISIONED"},"StreamName":"temp-stream","StreamStatus":"ACTIVE"}]}
@@ -65,14 +66,22 @@ The following data is returned in JSON format by the service.
 
 ## Cleanup
  
-1. Run the command to delete the stack
+1. Run the command to delete the stack:
     ```
     cdk destroy
     ```
+2. Confirm the stack has been deleted:
+    ```
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'ApigwKinesisIntegrationStack')].StackStatus
+    ```
+ 3. You should see a message confirming **DELETE_COMPLETE**
     
 ## Documentation
 
 * [Tutorial: Create a REST API as an Amazon Kinesis proxy in API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-kinesis.html)
+* [How do I use API Gateway as a proxy for another AWS service?](https://repost.aws/knowledge-center/api-gateway-proxy-integrate-service)
+* [Amazon API Gateway API request and response data mapping reference](https://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html)
+* [API Gateway mapping template and access logging variable reference](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html) 
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
