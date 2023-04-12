@@ -1,28 +1,29 @@
+
 {
-  "title": "Amazon API Gateway with caching enable",
-  "description": "Create an API Gateway REST API with Caching enabled using AWS SAM",
-  "language": "Python",
-  "level": "200",
+  "title": "Amazon API Gateway to Amazon DynamoDB CRUD aplication using OpenAPI",
+  "description": "Create a simple CRUD application with no compute",
+  "language": "OpenAPI",
+  "level": "400",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Amazon API Gateway has the ability to create and seamlessly utilize caching clusters in front of your API Gateway REST APIs."
+      "Amazon API Gateway has the ability to transform incoming requests using Apach Velocity Templating Language (VTL) templates. Using vtl, this application builds a CRUD app to save a simple data object to a DynamoDB database."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-caching-sam",
-      "templateURL": "serverless-patterns/apigw-caching-sam",
-      "projectFolder": "apigw-caching-sam",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-ddb-openapi-crud",
+      "templateURL": "serverless-patterns/apigw-ddb-openapi-crud",
+      "projectFolder": "apigw-ddb-openapi-crud",
       "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "API Gateway Caching",
-        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html"
+        "text": "API Gateway VTL",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/rest-api-data-transformations.html"
       }
     ]
   },
