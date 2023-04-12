@@ -6,7 +6,7 @@ This pattern demonstrates how to handle changes in HealthLake that can be publis
 
 When using this pattern, HealthLake becomes not only a consumer of data but also a producer. By adding this capability to HealthLake, it can be put in the center of a modern distributed Healthcare application and serve as an ingress and egress point.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/healthlake-cloudtrail-eventbridge-sfn-cdk
 
 **Important**: this application uses various AWS services (including HealthLake) and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
