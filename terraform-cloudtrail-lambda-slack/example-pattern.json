@@ -3,7 +3,7 @@
   "description": "This pattern demonstrates use of Cloudtrail lambda data events for monitoring invocations via Slack notifications ",
   "language": "Python",
   "level": "200",
-  "framework": "Terraform (with modules)",
+  "framework": "Terraform",
   "introBox": {
     "headline": "How it works",
     "text": [
