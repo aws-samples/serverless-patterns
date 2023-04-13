@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This SAM template deploys a custom scheduled EventBridge task that triggers a SSM association that runs a custom 'Hello World!' SSM document. The EventBridge rule uses a cron schedule to run the SSM association every 15 minutes. The EC2 instances are deployed as targets for the SSM association using tag based rules. "
+      "EventBridge Scheduler Task to run a SSM Association every 15 minutes"
     ]
   },
   "gitHub": {
@@ -54,8 +54,7 @@
       "name": "Joe Losinski",
       "image": "https://avatars.githubusercontent.com/u/128616881?s=400&u=709f313db9eab1162d1874860c96bbd44164f1bf&v=4",
       "bio": "AWS Senior Solutions Architect and Serverless Enthusiast.",
-      "linkedin": "joelosinski",
-      "twitter": "n/a"
+      "linkedin": "joelosinski"
     }
   ]
 }
