@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An application that includes an API Gateway (with an API key) that sends the request to the Lambda function in a vpc. Then, the lambda funciton sends the message to SQS queue
+
+Parameters:
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: "Subnets Ids where function will be deployed. Provide at least two"
+  LambdaSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: "Security group id for lambda function. Make sure traffic from this SG is allowed by SQS and proxy security group."
+Resources:
+# Define the Rest API Gateway with the api key
+  FirstApi:
+     Type: AWS::Serverless::Api
+     Properties:
+       StageName: Dev
+       Auth:
+         ApiKeyRequired: true
+         UsagePlan:
+           CreateUsagePlan: PER_API
+           Quota:
+             Limit: 500
+             Period: DAY
+           Throttle:
+             RateLimit: 10
+             BurstLimit: 5
+# Define the SQS queue
+  FirstSqsQueue:
+    Type: AWS::SQS::Queue
+# Define the Lambda function in vpc to send message to SQS queue
+  LambdaToSQS:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: src/handler.lambda_handler
+      FunctionName: LambdaToSQS
+      Runtime: python3.8
+      CodeUri: .
+      MemorySize: 128
+      Timeout: 30
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroupId
+        SubnetIds: !Ref Subnets
+      Environment:
+        Variables:
+          SQSqueueName: !Ref FirstSqsQueue
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt FirstSqsQueue.QueueName
+      Events:
+        CreateAPI:
+          Type: Api
+          Properties:
+            Path: /sendmessage
+            Method: POST
+            RestApiId: !Ref FirstApi
+  
