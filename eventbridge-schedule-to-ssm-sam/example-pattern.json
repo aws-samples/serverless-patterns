@@ -1,0 +1,61 @@
+{
+  "title": "EventBridge to Systems Manager Associations",
+  "description": "Create an EventBridge Schedule to execute a SSM State Manager Association",
+  "language": "N/A",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This SAM template deploys a custom scheduled EventBridge task that triggers a SSM association that runs a custom 'Hello World!' SSM document. The EventBridge rule uses a cron schedule to run the SSM association every 15 minutes. The EC2 instances are deployed as targets for the SSM association using tag based rules. "
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-ssm-sam",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-ssm-sam",
+      "projectFolder": "eventbridge-schedule-to-ssm-sam",
+      "templateFile": "eventbridge-schedule-to-ssm-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Scheduler User Guide",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "CloudFormation AWS::Scheduler::Schedule",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedule.html"
+      },
+      {
+        "text": "SSM Start_associations_Once SDK Reference",
+        "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ssm/client/start_associations_once.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Joe Losinski",
+      "image": "https://avatars.githubusercontent.com/u/128616881?s=400&u=709f313db9eab1162d1874860c96bbd44164f1bf&v=4",
+      "bio": "AWS Senior Solutions Architect and Serverless Enthusiast.",
+      "linkedin": "joelosinski",
+      "twitter": "n/a"
+    }
+  ]
+}
