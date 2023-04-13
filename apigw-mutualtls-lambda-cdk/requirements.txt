@@ -1,6 +1,0 @@
-aws-cdk.aws-apigateway
-aws-cdk.aws-lambda
-aws-cdk.aws-iam
-aws-cdk.aws-route53
-aws-cdk.aws-route53-targets
-aws-cdk.aws-s3

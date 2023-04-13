@@ -1,3 +1,0 @@
-datasources:
-  default:
-    schema-generate: CREATE_DROP
