@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "An EventBridge Scheduler is created that start State Manager Association once in an AWS Systems Manager every 5 minutes.",
-      "The demo Association will use an Automation Document \"AWS-DisablePublicAccessForSecurityGroup\" to revoke RDP and SSH public access in security group."
+      "The demo Association will use an Automation Document \"AWS-DisablePublicAccessForSecurityGroup\" to revoke RDP and SSH public access in security group.",
       "Along with a scheduler, the CDK stack creates VPC, security group, association, IAM role and policy for Automation and EventBridge Scheduler to assume and start association."
     ]
   },
