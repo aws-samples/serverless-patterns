@@ -1,0 +1,29 @@
+variable "region" {
+    type=string
+    description = "AWS Region where deploying resources"
+    default = "us-east-1"
+}
+
+variable "aws_profile_name" {
+    type=string
+    description = "AWS CLI credentials profile name"
+    default="default"
+}
+
+variable "vpc_cidr" {
+    type=string
+    description = "CIDR block for Batch VPC"
+    default = "10.0.0.0/16"
+}
+
+variable "subnet_cidr" {
+    type=string
+    description = "CIDR block for the Batch subnet"
+    default = "10.0.0.0/24"
+}
+
+variable "remote_cidr_blocks" {
+  type        = list(any)
+  default     = ["10.0.0.0/32"]
+  description = "By default cidr_blocks are locked down. (Update to 0.0.0.0/0 if full public access is needed)"
+}

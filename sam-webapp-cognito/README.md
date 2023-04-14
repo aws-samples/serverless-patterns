@@ -41,15 +41,6 @@ Important: this application uses various AWS services and there are costs associ
 
 This pattern deploys a serverless web application using S3, CloudFront, API Gateway, DynamoDB and Cognito. CloudFront CDN serves static and dynamic content with two separate origins for S3 and API Gateway. It deploys a Cognito user pool and user pool client for authentication. The HTTP API is deployed with default route and basic CORS configuration. The defaul route is intergrated with Lambda written Node.js. HTTP API is protected using JWT authorizer using Cognito as the issuer.
 
-This pattern uses the frontend and lambda code as shown in https://webapp.serverlessworkshops.io/. Once the deployment is complete;
-
-1. Copy the contents of frontend folder to S3 bucket. You can use the command `aws s3 sync ./src/frontend s3://<bucketname-from-stack-output>`
-2. Copy Cognito user pool id, user pool client id and CloudFront domain name from the stack output. Open config.js under /frontend/js/config.js and paste the values stack output to the respective fields.
-
-## Testing
-
-Once the application is deployed, you can test it by entering the cloudfront url in a browser. Goto /register.html to create a Cognito user and /signin.html to login. Refer to https://webapp.serverlessworkshops.io for further information on how the application works.
-
 ## Cleanup
 
 1. Delete the stack

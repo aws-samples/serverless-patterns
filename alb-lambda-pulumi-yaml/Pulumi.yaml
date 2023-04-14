@@ -1,0 +1,82 @@
+name: alb-lambda-pulumi-yaml
+runtime: yaml
+description: A minimal AWS Pulumi YAML program
+outputs:
+  url: ${loadBalancer.dnsName}
+resources:
+  vpc:
+    type: awsx:ec2:Vpc
+    properties:
+      cidrBlock: "10.0.0.0/16"
+      numberOfAvailabilityZones: 2
+      subnetSpecs:
+        - type: Public
+          name: "public-lb-subnet"
+      natGateways:
+        strategy: None
+  securityGroup:
+    type:  aws:ec2:SecurityGroup
+    properties:
+      vpcId: ${vpc.vpcId}
+      ingress:
+        - protocol: tcp
+          fromPort: 80
+          toPort: 80
+          cidrBlocks: 
+            - "0.0.0.0/0"
+  loadBalancer:
+    type: aws:lb:LoadBalancer
+    properties: 
+      securityGroups:
+        - ${securityGroup.id}
+      subnets: ${vpc.publicSubnetIds}
+  targetGroup: 
+    type:  aws:lb:TargetGroup
+    properties: 
+      targetType: lambda
+      vpcId: ${vpc.vpcId}
+  listener: 
+    type: aws:lb:Listener
+    properties:
+      loadBalancerArn: ${loadBalancer.arn}
+      port: 80
+      defaultActions:
+        - type: forward
+          targetGroupArn: ${targetGroup.arn}
+  lambdaRole:
+    type: aws:iam:Role
+    properties:
+      assumeRolePolicy: 
+        fn::toJSON:
+          Version: 2012-10-17
+          Statement:
+            - Action: sts:AssumeRole
+              Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+      managedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  fn: 
+    type: aws:lambda:Function
+    properties:
+      runtime: nodejs18.x
+      handler: index.handler
+      role: ${lambdaRole.arn}
+      code: 
+        fn::fileArchive: ./lambda
+  lambdaPermission:
+    type: aws:lambda:Permission
+    properties:
+      action: lambda:InvokeFunction
+      principal: elasticloadbalancing.amazonaws.com
+      function: ${fn.arn}
+      sourceArn: ${targetGroup.arn}
+  targetGroupAttachment:
+    type: aws:lb:TargetGroupAttachment
+    properties:
+      targetGroupArn: ${targetGroup.arn}
+      targetId: ${fn.arn}
+    options:
+      dependsOn:
+        - ${lambdaPermission}
+
