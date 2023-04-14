@@ -43,7 +43,7 @@ Resources:
           - Sid: "__default_statement_ID"
             Effect: "Allow"
             Principal:
-              AWS: "*"
+              AWS: !Ref 'AWS::AccountId'
             Action:
               - "SNS:GetTopicAttributes"
               - "SNS:SetTopicAttributes"
