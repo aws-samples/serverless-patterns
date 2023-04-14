@@ -1,6 +1,6 @@
-# AWS Service 1 to AWS Service 2
+# AWS API Gateway HTTP API to AWS Lambda
 
-This pattern << explain usage >>
+This pattern creates an Amazon API Gateway HTTP API with an AWS Lambda function integration.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -19,30 +19,43 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd apigw-http-api-lambda-python
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
     ```
-1. During the prompts:
+4. During the prompts:
     * Enter a stack name
-    * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-Explain how the service interaction works.
+This pattern deploys an Amazon API Gateway HTTP API with a Lambda integration. The AWS Lambda function is written in Python3.9. The function returns a small message and a status code to the caller.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Once the application is deployed, retrieve the API ID provided as output and go to API Gateway console. Click on the newly created API, in the stages window, click on the link under 'invoke URL'. You can also make the request from Postman. The URL should look like this : https://[api-id].execute-api.[api-region].amazonaws.com/
+
+Example
+ ``` 
+ https://aabbccddee.execute-api.eu-west-1.amazonaws.com/
+ ``` 
+
+OR open a terminal and execute the curl command
+
+Example
+ ``` 
+ curl https://aabbccddee.execute-api.eu-west-1.amazonaws.com/
+ ``` 
+
+The expected response is : 'Hello World! This is the HTTP API'
 
 ## Cleanup
  

@@ -1,8 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# Amazon API Gateway with caching enable
 
-This pattern << explain usage >>
+This pattern creates an Amazon API Gateway REST APU with caching enabled at the API and method levels.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-caching-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd apigw-caching-sam
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -38,22 +38,21 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+Amazon API Gateway has the ability to create and seamlessly utilize caching clusters in front of your API Gateway REST APIs.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+After deploying, hit the endpoint several times then check for cached responses by viewing the CacheHitCount and CacheMissCount. The following link should take you there. Be sure and update the region to the region you deployed to.
+```
+https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#metricsV2:graph=~(metrics~(~(~'AWS*2fApiGateway~'Count~'ApiName~'cache~'Stage~'Prod)~(~'.~'CacheMissCount~'.~'.~'.~'.)~(~'.~'CacheHitCount~'.~'.~'.~'.))~period~300~stat~'Sum~region~'us-west-2~start~'-PT5M~end~'P0D~view~'bar~stacked~false);query=~'*7bAWS*2fApiGateway*2cApiName*2cStage*7d
+```
 
 ## Cleanup
  
-1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
+Delete the stack
+```bash
+sam delete --stack-name STACK_NAME
+```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 

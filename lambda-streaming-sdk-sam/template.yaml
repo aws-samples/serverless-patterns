@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  lambda
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: nodejs16.x
+    Timeout: 10
+    MemorySize: 128
+    Architectures:
+      - x86_64
+
+Resources:
+  HappyPathFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/happy.handler
+      Description: A Lambda function that streams bytes back to the caller
+
+  MidstreamErrorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/midstream-error.handler
+      Description: A Lambda function that streams bytes back to the caller
+      
+  TimeoutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/happy.handler
+      Description: A Lambda function that streams bytes back to the caller
+      Timeout: 1
+Outputs:
+  HappyPathFunction:
+    Description: "HappyPathFunction ARN"
+    Value: !GetAtt HappyPathFunction.Arn
+  MidstreamErrorFunction:
+    Description: "MidstreamErrorFunction ARN"
+    Value: !GetAtt MidstreamErrorFunction.Arn
+  MidstreamErrorFunction:
+    Description: "MidstreamErrorFunction ARN"
+    Value: !GetAtt MidstreamErrorFunction.Arn
