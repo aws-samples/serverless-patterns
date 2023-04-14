@@ -1,6 +1,6 @@
-# AWS Service 1 to AWS Service 2
+# AWS API Gateway REST Edge-Optimized API to AWS Lambda
 
-This pattern << explain usage >>
+This pattern creates an Amazon API Gateway REST Edge-Optimized API with an AWS Lambda function integration.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -19,30 +19,44 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd apigw-rest-edge-lambda
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
     ```
-1. During the prompts:
+4. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+5. Note the output from the SAM deployment process. It contains the API endpoint.
 
 ## How it works
 
-Explain how the service interaction works.
+This pattern deploys an Amazon API Gateway Rest Edge-Optimized API with a Lambda integration. The AWS Lambda function is written in Python3.9. The function returns a small message and a status code to the caller.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Once the application is deployed, retrieve the API URL provided as output and open it in a new page on the browser. You can also make the request from Postman or from a terminal. The URL should look like this : https://[api-id].execute-api.[api-region].amazonaws.com/
+
+Example
+    ```bash
+    https://aabbccddee.execute-api.eu-west-1.amazonaws.com/
+    ```
+
+OR open a terminal and execute the curl command
+
+Example
+    ```bash
+    curl https://aabbccddee.execute-api.eu-west-1.amazonaws.com/
+    ```
+The expected response is : 'Hello World! This is the Edge-Optimized API'
+
 
 ## Cleanup
  

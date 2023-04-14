@@ -1,0 +1,71 @@
+{
+  "title": "Manage a Container Task (Amazon ECS, Amazon SNS)",
+  "description": "This workflow use Step Functions to trigger a SNS notification on success or failure of a Fargate task",
+  "language": "Python",
+  "simplicity": "1 - Fundamental",
+  "usecase": "",
+  "type": "Standard",
+  "diagram": "/resources/statemachine.png",
+  "videoId": "",
+  "level": "100",
+  "framework": "Terraform",
+  "services": [
+    "AWS Step Functions",
+    "Fargate cluster",
+    "SNS Topic"
+  ],
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+    "This sample project demonstrates how to run an AWS Fargate task, and then send an Amazon SNS notification based on whether that job succeeds or fails. Deploying this sample project will create an AWS Step Functions state machine, a Fargate cluster, and an Amazon SNS topic.\n\nIn this project, Step Functions uses a state machine to call the Fargate task synchronously. It then waits for the task to succeed or fail, and it sends an Amazon SNS topic with a message about whether the job succeeded or failed."
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/step-functions-workflows-collection/tree/main/sfn-manage-container-task-tf/",
+      "templateDir": "sfn-manage-container-task-tf",
+      "templateFile": "main.tf",
+      "ASL": "statemachine/statemachine.asl.json"
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "The AWS Step Functions Workshop",
+        "link": "https://catalog.workshops.aws/stepfunctions/en-US"
+      }
+    ]
+  },
+  "authors": [
+    {
+      "name": "Itziar Olivera Goicolea",
+      "bio": "Itziar is a Technical Account Manager at AWS from Iberia (EMEA).",
+      "linkedin": "itziar-olivera-goicolea-a36438174"
+    }
+  ]
+}
