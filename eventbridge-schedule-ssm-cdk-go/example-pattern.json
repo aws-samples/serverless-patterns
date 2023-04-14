@@ -1,7 +1,7 @@
 {
   "title": "EventBridge Scheduler to Start State Manager Association Once",
   "description": "This pattern will create an EventBridge Scheduler to start State Manager Association once in AWS Systems Manager every 5 minutes.",
-  "language": "GO",
+  "language": "Go",
   "level": "200",
   "framework": "CDK",
   "introBox": {
@@ -23,7 +23,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Working with the AWS CDK in GO",
+        "text": "Working with the AWS CDK in Go",
         "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-go.html"
       },
       {
