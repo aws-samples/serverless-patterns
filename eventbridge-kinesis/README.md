@@ -2,7 +2,7 @@
 
 This pattern creates an EventBridge event bus and rule that publishes matched events to Amazon Kinesis. In this example, the rule filters for specific attributes in the event before sending to the Kinesis Data Stream.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-kinesis
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-kinesis-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
