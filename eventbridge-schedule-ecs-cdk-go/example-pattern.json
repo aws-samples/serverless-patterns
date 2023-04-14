@@ -1,13 +1,13 @@
 {
   "title": "EventBridge Scheduler to Run ECS Task",
   "description": "Simple pattern that run task in Amazon Elastic Container Service cluster every 15 minutes.",
-  "language": "GO",
+  "language": "Go",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample pattern demonstrates how to use EventBridge Scheduler to run task in Amazon Elastic Container Service cluster every 15 minutes and deployed using the AWS CDK for GO."
+      "This sample pattern demonstrates how to use EventBridge Scheduler to run task in Amazon Elastic Container Service cluster every 15 minutes and deployed using the AWS CDK for Go."
     ]
   },
   "gitHub": {
@@ -21,8 +21,8 @@
   "resources": {
     "bullets": [
       {
-        "text": "Working with the AWS CDK in Java",
-        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-java.html"
+        "text": "Working with the AWS CDK in Go",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-go.html"
       },
       {
         "text": "AWS CLI start-execution",
