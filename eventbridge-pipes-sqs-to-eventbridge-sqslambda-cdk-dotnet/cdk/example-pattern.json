@@ -1,74 +1,72 @@
 {
-  "title": "SQS to EventBridge EventBus using EventBridge Pipes with Lambda and SQS as target for EventBridge EventBus",
-  "description": "This pattern uses SQS and triggers EventBridge events which is routed to multiple targets, SQS and Lambda",
-  "language": ".NET",
-  "level": "200",
-  "framework": "CDK",
-  "introBox": {
-    "headline": "How it works",
-    "text": [
-      "SQS queue is polled and messages are sent to EventBridge, Custom events in the EventBridge are routed to multiple destinations, AWS Lambda Function and Amazon SQS in this case "
-    ]
-  },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-eventbridge-sqslambda-cdk-dotnet",
-      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-eventbridge-sqslambda-cdk-dotnet",
-      "projectFolder": "eventbridge-pipes-sqs-to-eventbridge-sqslambda-cdk-dotnet",
-      "templateFile": "cdk/src/MyCdk/MyCdkStack.cs"
-    }
-  },
-  "resources": {
-    "bullets": [
-      {
-        "text": "EventBridge Pipes Documentation",
-        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
-      },
-      {
-        "text": "Cloudformation API for Pipes",
-        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
-      },
-      {
-        "text": "Video explaining EventBridge Pipes",
-        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
-      },
-      {
-        "text": "Learn more about event-driven architecture",
-        "link": "https://serverlessland.com/event-driven-architecture"
-      },
-	   {
-        "text":"Learn more about EventBridge targets",
-        "link":"https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
+    "title": "SQS to EventBridge EventBus using EventBridge Pipes with Lambda and SQS as target for EventBridge EventBus",
+    "description": "This pattern uses SQS and triggers EventBridge events which is routed to multiple targets, SQS and Lambda",
+    "language": ".NET",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "SQS queue is polled and messages are sent to EventBridge, Custom events in the EventBridge are routed to multiple destinations, AWS Lambda Function and Amazon SQS in this case "
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-eventbridge-sqslambda-cdk-dotnet",
+            "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-eventbridge-sqslambda-cdk-dotnet",
+            "projectFolder": "eventbridge-pipes-sqs-to-eventbridge-sqslambda-cdk-dotnet",
+            "templateFile": "cdk/src/MyCdk/MyCdkStack.cs"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "EventBridge Pipes Documentation",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+            },
+            {
+                "text": "Cloudformation API for Pipes",
+                "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+            },
+            {
+                "text": "Video explaining EventBridge Pipes",
+                "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+            },
+            {
+                "text": "Learn more about event-driven architecture",
+                "link": "https://serverlessland.com/event-driven-architecture"
+            },
+            {
+                "text": "Learn more about EventBridge targets",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
 
-      },
-      {
-        "text":"CDK Dotnet reference",
-        "link":"https://docs.aws.amazon.com/cdk/api/v2/dotnet/api/index.html"
+            },
+            {
+                "text": "CDK Dotnet reference",
+                "link": "https://docs.aws.amazon.com/cdk/api/v2/dotnet/api/index.html"
 
-      }
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the Github repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Vinod Krishna Pillai",
+            "bio": "Senior Application Architect with AWS Professional Services"
+        }
     ]
-  },
-  "deploy": {
-    "text": [
-      "cdk deploy"
-    ]
-  },
-  "testing": {
-    "text": [
-      "See the Github repo for detailed testing instructions."
-    ]
-  },
-  "cleanup": {
-    "text": [
-      "Delete the stack: <code>cdk delete</code>."
-    ]
-  },
-  "authors": [
-    {
-      "name": "Vinod Krishna Pillai",
-      "bio": "Senior Application Architect with AWS Professional Services",
-      
-     
-    }
-  ]
 }

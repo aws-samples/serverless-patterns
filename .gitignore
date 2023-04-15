@@ -235,3 +235,5 @@ terraform.rc
 #Ignore Intellij files
 *.iml
 *.idea
+/eventbridge-pipes-sqs-to-eventbridge-sqslambda-cdk-dotnet/cdk/src/.vs/MyCdk/FileContentIndex/12f2b312-a8e7-439c-a69d-a73320f4b9d2.vsidx
+/eventbridge-pipes-sqs-to-eventbridge-sqslambda-cdk-dotnet/cdk/src/.vs/MyCdk/FileContentIndex/f9509609-fa07-47a4-80e9-a006c1f0e042.vsidx
