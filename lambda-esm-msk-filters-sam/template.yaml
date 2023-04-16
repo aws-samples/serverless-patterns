@@ -21,7 +21,7 @@ Resources:
   NoFilterFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: fn-esm-no-filter
+      FunctionName: 1-fn-esm-no-filter
       Events:
         MSKEvent:
           Type: MSK
@@ -39,7 +39,7 @@ Resources:
   FilterEventsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: fn-filter-events
+      FunctionName: 2-fn-filter-events
       Events:
         MSKEvent:
           Type: MSK
@@ -66,7 +66,7 @@ Resources:
   FilterEventsAndResponseCodeFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: fn-filter-events-and-response-code
+      FunctionName: 3-fn-filter-events-and-response-code
       Events:
         MSKEvent:
           Type: MSK
@@ -95,7 +95,7 @@ Resources:
   FilterMultiplePatternsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: fn-filter-multiple-patterns
+      FunctionName: 4-fn-filter-multiple-patterns
       Events:
         MSKEvent:
           Type: MSK
@@ -114,7 +114,7 @@ Resources:
   FilterNotEventKindFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: fn-filter-not-event-kind
+      FunctionName: 5-fn-filter-not-event-kind
       Events:
         MSKEvent:
           Type: MSK
@@ -132,7 +132,7 @@ Resources:
   FilterStartsWithFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: fn-filter-starts-with
+      FunctionName: 6-fn-filter-starts-with
       Events:
         MSKEvent:
           Type: MSK
@@ -149,7 +149,7 @@ Resources:
   FilterBetweenInclusiveFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: fn-filter-between-inclusive
+      FunctionName: 7-fn-filter-between-inclusive
       Events:
         MSKEvent:
           Type: MSK
@@ -166,7 +166,7 @@ Resources:
   FilterOnPlainStringFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: fn-filter-on-plain-string
+      FunctionName: 8-fn-filter-on-plain-string
       Events:
         MSKEvent:
           Type: MSK
@@ -182,7 +182,7 @@ Resources:
   FilterOnPlainStringAndMetadataFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: fn-filter-on-plain-string-metadata
+      FunctionName: 9-fn-filter-on-plain-string-metadata
       Events:
         MSKEvent:
           Type: MSK
@@ -193,7 +193,15 @@ Resources:
               - ESMFiltersDemoTopic
             FilterCriteria:
               Filters:
-                - Pattern: '{"topic":[{"prefix":"ESMFiltersDemoTopic"}],"value":[{"prefix":"us-west"}]}'
+                - Pattern: '{"topic":[{"prefix":"ESMFiltersDemoTopic"}],"value":[{"prefix":"Order"}]}'
+
+  MSKPublishFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: 10-fn-publish-to-msk
+      Timeout: 10
+      CodeUri: src/
+      Handler: msk_publish.lambda_handler
 
 Outputs:
   NoFilterFunction:

@@ -1,1 +1,1 @@
-plain string event payload
+OrderNumber:12345

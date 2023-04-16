@@ -1,4 +1,5 @@
 {
+    "fileNameForValidation": "custom-with-region",
     "kind": "Custom",
     "region": "us-east-1",
     "apiVersion": "audit.k8s.io/v1",

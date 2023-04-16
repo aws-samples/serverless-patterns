@@ -29,9 +29,12 @@ This project includes source code and supporting files that demonstrate various 
     ```
 
 ## Included scenarios
-**No Filter** - A simple trigger without a filter criteria
+1. **No Filter** - A simple trigger without a filter criteria
+    * Function name : 1-fn-esm-no-filter
 
-**Equals** - A filter checking whether a particular **JSON** field value equals a string value. Filtering is based on the **message payload**.
+2. **Equals** - A filter checking whether a particular **JSON** field value equals a string value. Filtering is based on the **message payload**.
+    * Function name : 2-fn-filter-events
+    
 ```
 {
    "value":{
@@ -42,7 +45,9 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Equals and Numeric (equals)** - A filter checking whether a particular **JSON** field value equals a string value and a different JSON field value equals a numeric value. Filtering is based on the **message payload**.
+3. **Equals and Numeric (equals)** - A filter checking whether a particular **JSON** field value equals a string value and a different JSON field value equals a numeric value. Filtering is based on the **message payload**.
+    * Function name : 3-fn-filter-events-and-response-code
+    
 ```
 {
    "value":{
@@ -63,7 +68,9 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Numeric (range)** and **Equals**- Multiple filters pattern. One pattern filters by 'Numeric (range) operator'. Another pattern filters by 'Equals' operator. Filtering is based on the **message payload**.
+4. **Numeric (range)** and **Equals**- Multiple filters pattern. One pattern filters by 'Numeric (range) operator'. Another pattern filters by 'Equals' operator. Filtering is based on the **message payload**.
+    * Function name : 4-fn-filter-multiple-patterns
+    
 ```
 {
    "value":{
@@ -90,7 +97,9 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Not** - A filter checking whether a particular **JSON** field value is not equal to a string. Filtering is based on the **message payload**.
+5. **Not** - A filter checking whether a particular **JSON** field value is not equal to a string. Filtering is based on the **message payload**.
+    * Function name : 5-fn-filter-not-event-kind
+    
 ```
 {
    "value":{
@@ -105,7 +114,9 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Begins with** - A filter checking whether a particular **JSON** field value begins with a string. Filtering is based on the **message payload**.
+6. **Begins with** - A filter checking whether a particular **JSON** field value begins with a string. Filtering is based on the **message payload**.
+    * Function name : 6-fn-filter-starts-with
+    
 ```
 {
    "value":{
@@ -118,7 +129,9 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Numeric (range)** - A filter checking whether a particular **JSON** field value is within a numeric range. Filtering is based on the **message payload**.
+7. **Numeric (range)** - A filter checking whether a particular **JSON** field value is within a numeric range. Filtering is based on the **message payload**.
+    * Function name : 7-fn-filter-between-inclusive
+    
 ```
 {
    "value":{
@@ -138,27 +151,11 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Begins with** - A filter checking whether a particular **plain** string value is begins with a string. Filtering is based on the **message payload**.
-```
-{
-   "value":{
-      "responseStatus":{
-         "code":[
-            {
-               "numeric":[
-                  ">=",
-                  300,
-                  "<=",
-                  350
-               ]
-            }
-         ]
-      }
-   }
-}
-```
 
-**Begins with** - A filter checking whether a particular **plain** string value is begins with a string. Filtering is based on the **message payload**.
+8. **Begins with** - A filter checking whether a particular **plain** string value is begins with a string. Filtering is based on 
+the **message payload**.
+    * Function name : 8-fn-filter-on-plain-string
+
 ```
 {
    "value":[
@@ -169,7 +166,9 @@ This project includes source code and supporting files that demonstrate various 
 }
 ```
 
-**Begins with** - A filter checking whether a particular **plain** string value is begins with a string. Filtering is based on the **message payload** and **message metadata**.
+9. **Begins with** - A filter checking whether a particular **plain** string value is begins with a string. Filtering is based on the **message payload** and **message metadata**.
+    * Function name : 9-fn-filter-on-plain-string-metadata
+
 ```
 {
    "topic":[
@@ -177,11 +176,13 @@ This project includes source code and supporting files that demonstrate various 
          "prefix":"ESMFiltersDemoTopic"
       }
    ],
-   "value":[
-      {
-         "prefix":"us-west"
-      }
-   ]
+   "value":{
+      "region":[
+         {
+            "prefix":"us-"
+         }
+      ]
+   }
 }
 ```
 

@@ -1,4 +1,5 @@
 {
+    "fileNameForValidation": "rbac-is-set",
     "kind": "Event",
     "apiVersion": "audit.k8s.io/v1",
     "level": "Request",
