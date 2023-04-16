@@ -1,16 +1,18 @@
 # Lambda event filtering using event source mapping for Amazon Managed Streaming for Apache Kafka (Amazon MSK)
 
-AWS Lambda provides [content filtering options](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) for Amazon MSK and other services. With event pattern content filtering, you can write complex rules so that your Lambda function is only triggered under filtering criteria you specify. This helps reduce traffic to your Lambda functions, simplifies code, and reduces overall cost.
+AWS Lambda provides [content filtering options for Amazon MSK](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html#filtering-msk-smak) and other services. With event pattern content filtering, you can write complex rules so that your Lambda function is only triggered under filtering criteria you specify. This helps reduce traffic to your Lambda functions, simplifies code, and reduces overall cost.
 
 
-This project includes source code and supporting files that demonstrate various filtering patterns when using Amazon MSK as the source.The SAM template deploys multiple lambda functions. Each of the lambda function uses a different filtering pattern to demonstrate the various comparision operators.
+This project includes a SAM template deploys multiple lambda functions. Each of the lambda function uses different filter criteria. We validate the expected behaviour by publishing different messages to a MSK topic, and verifying that the messages are present or absent in the corresponding function's Cloudwatch logs.
 
-## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+
+## Pre-requisites
+
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* An Amazon MSK cluster and a client machine that is configured to publish messages to a topic on that cluster. [Sample CloudFormation and instructions from Amazon MSK Labs](https://catalog.workshops.aws/msk-labs/en-US/msklambda/gsrschemareg/setup)
 
 ## Deployment Instructions
 
@@ -28,7 +30,10 @@ This project includes source code and supporting files that demonstrate various 
     sam deploy --guided
     ```
 
-## Included scenarios
+## Filtering scenarios
+Each of the Lambda functions uses different [filter comparision operators](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html#filtering-syntax) to demonstrate how to filter events based on the message body and metadata.
+
+
 1. **No Filter** - A simple trigger without a filter criteria
     * Function name : 1-fn-esm-no-filter
 
@@ -185,6 +190,114 @@ the **message payload**.
    }
 }
 ```
+
+## Sample events 
+We use a mix of json and plain text messages to validate the functions are filtering events as expected.
+
+1. **base-json.json**
+```
+{
+    "fileNameForValidation": "base-json",
+    "kind": "Event",
+    "apiVersion": "audit.k8s.io/v1",
+    "level": "Request",
+    "requestReceivedTimestamp": "2023-02-06T10:00:00.000000Z",
+    "user": {
+        "username": "eks:pod-identity-mutating-webhook",
+        "groups": [ "system:authenticated" ]
+    },
+    "sourceIPs": [ "10.0.0.1" ],
+    "RBAC": false,
+    "responseStatus":{
+        "metadata":{},
+        "code":200
+    }
+}
+```
+
+1. **code-is-300.json**
+```
+{
+    "fileNameForValidation": "code-is-300",
+    "kind": "Event",
+    "apiVersion": "audit.k8s.io/v1",
+    "level": "Request",
+    "requestReceivedTimestamp": "2023-02-06T10:00:00.000000Z",
+    "user": {
+        "username": "eks:pod-identity-mutating-webhook",
+        "groups": [ "system:authenticated" ]
+    },
+    "sourceIPs": [ "10.0.0.1" ],
+    "RBAC": false,
+    "responseStatus":{
+        "metadata":{},
+        "code":300
+    }
+}
+```
+
+1. **custom-with-region.json**
+```
+{
+    "fileNameForValidation": "custom-with-region",
+    "kind": "Custom",
+    "region": "us-east-1",
+    "apiVersion": "audit.k8s.io/v1",
+    "level": "Request",
+    "requestReceivedTimestamp": "2023-02-06T10:00:00.000000Z",
+    "user": {
+        "username": "eks:pod-identity-mutating-webhook",
+        "groups": [ "system:authenticated" ]
+    },
+    "sourceIPs": [ "10.0.0.1" ],
+    "RBAC": false,
+    "responseStatus":{
+        "metadata":{},
+        "code":200
+    }
+}
+```
+
+1. **rbac-is-set.json**
+```
+{
+    "fileNameForValidation": "rbac-is-set",
+    "kind": "Event",
+    "apiVersion": "audit.k8s.io/v1",
+    "level": "Request",
+    "requestReceivedTimestamp": "2023-02-06T10:00:00.000000Z",
+    "user": {
+        "username": "eks:pod-identity-mutating-webhook",
+        "groups": [ "system:authenticated" ]
+    },
+    "sourceIPs": [ "10.0.0.1" ],
+    "RBAC": true,
+    "responseStatus":{
+        "metadata":{},
+        "code":200
+    }
+}
+```
+
+1. **plain-string.txt**
+```
+OrderNumber:12345
+```
+
+| Operators                                          | Filter Pattern                                                                                         | Function                             | base-json.json | code-is-300.json | custom-with-region.json | rbac-is-set.json | plain-string.txt |
+|----------------------------------------------------|--------------------------------------------------------------------------------------------------------|--------------------------------------|----------------|------------------|-------------------------|------------------|------------------|
+| None                                               | None                                                                                                   | 1-fn-esm-no-filter                   | Y              | Y                | Y                       | Y                | Y                |
+| String Equals                                      | {"value":{"kind":["Event"]}}                                                                           | 2-fn-filter-events                   | Y              | Y                | N                       | Y                | N                |
+| String Equals and Numeric   Equals(Single pattern) | {"value":{"kind":["Event"],"responseStatus":{"code":[{"numeric":["=",300]}]}}}                         | 3-fn-filter-events-and-response-code | N              | Y                | N                       | N                | N                |
+| String Equals and Numeric   range(2 patterns)      | {"value":{"responseStatus":{"code":[{"numeric":[">=",300]}]}}}      and      {"value":{"RBAC":[true]}} | 4-fn-filter-multiple-patterns        | N              | Y                | N                       | Y                | N                |
+| Not                                                | {"value":{"kind":[{"anything-but":["Event"]}]}}                                                        | 5-fn-filter-not-event-kind           | N              | N                | Y                       | N                | N                |
+| prefix                                             | {"value":{"region":[{"prefix":"us-"}]}}                                                                | 6-fn-filter-starts-with              | N              | N                | Y                       | N                | N                |
+| Numeric range                                      | {"value":{"responseStatus":{"code":[{"numeric":[">=",300,"<=",350]}]}}}                                | 7-fn-filter-between-inclusive        | N              | Y                | N                       | N                | N                |
+| prefix                                             | {"value":[{"prefix":"OrderNumber"}]}                                                                   | 8-fn-filter-on-plain-string          | N              | N                | N                       | N                | Y                |
+| prefix                                             | {"topic":[{"prefix":"ESMFiltersDemoTopic"}],"value":[{"prefix":"Order"}]}                              | 9-fn-filter-on-plain-string-metadata | N              | N                | N                       | N                | Y                |
+
+Y - Message logged in CloudWatch logs
+N - Message not logged in CloudWatch logs
 
 Here are the list of patterns mapped to the lambda functions.
 

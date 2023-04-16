@@ -195,13 +195,6 @@ Resources:
               Filters:
                 - Pattern: '{"topic":[{"prefix":"ESMFiltersDemoTopic"}],"value":[{"prefix":"Order"}]}'
 
-  MSKPublishFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      FunctionName: 10-fn-publish-to-msk
-      Timeout: 10
-      CodeUri: src/
-      Handler: msk_publish.lambda_handler
 
 Outputs:
   NoFilterFunction:
