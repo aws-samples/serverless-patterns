@@ -24,7 +24,11 @@ Important: this application uses various AWS services and there are costs associ
     ```bash
     cd serverless-patterns/eventbridge-schedule-to-step-function-cdk-go/cdk/
     ```
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. (Optional) It might be necessary to download the Golang modules directly from the source:
+    ```bash
+    go env -w GOPROXY=direct
+    ```
+4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```bash
     cdk deploy
     ```
