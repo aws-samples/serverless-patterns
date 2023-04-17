@@ -1,6 +1,6 @@
 {
     "title": "API Gateway REST API to AWS CloudWatch",
-    "description": "Create a REST API that has CloudWatch execution logs enabled.",
+    "description": "Create a REST API that has CloudWatch execution and access logs enabled.",
     "language": "Python",
     "level": "200",
     "framework": "SAM",
@@ -8,16 +8,16 @@
       "headline": "How it works",
       "text": [
         "A REST API is created that has an IAM role with managed policy 'AmazonAPIGatewayPushToCloudWatchLogs' which allows API Gateway to write CloudWatch logs to your account.",
-        "In the API stage, CloudWatch execution logs are enabled with INFO Log level selected to generate execution logs for all requests.",
+        "In the API stage, CloudWatch execution logs are enabled with INFO Log level selected as well as custom access logging to generate execution and access logs for all requests.",
         "The API has a AWS Lambda function integration which returns 'Hello from Lambda' in response."
       ]
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-execution-logs",
-        "templateURL": "serverless-patterns/apigw-execution-logs",
-        "projectFolder": "apigw-execution-logs",
-        "templateFile": "apigw-execution-logs/template.yaml"
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-execution-access-logs",
+        "templateURL": "serverless-patterns/apigw-execution-access-logs",
+        "projectFolder": "apigw-execution-access-logs",
+        "templateFile": "apigw-execution-access-logs/template.yaml"
       }
     },
     "resources": {

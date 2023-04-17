@@ -1,8 +1,8 @@
 # API Gateway REST API to AWS CloudWatch
 
-This pattern creates a REST API that has CloudWatch execution logs enabled with Log level set to INFO and a Lambda function integration.
+This pattern deploys a REST API that has CloudWatch execution logs enabled with Log level set to INFO, and access logs enabled with common context variables. The API has a Lambda function integration.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-execution-logs
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-execution-access-logs
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -42,10 +42,10 @@ A REST API is created that has an IAM role with managed policy 'AmazonAPIGateway
 
 ## Testing
 
-1. Deploy the REST API and select the 'prod' deployment stage. 
-2. Once you make requests to the API i.e. curl https://{api-id}.execute-api.{region}.amazonaws.com/prod/, you will receive a 'Hello from Lambda!' in response.
-3. Navigate to the CloudWatch console, in the left navigation pane, under Logs, choose Log Groups.
-4. The log group's name is in the following format: API-Gateway-Execution-Logs-apiId/stageName. You will see execution log streams generated.
+1. Once you make requests to the API i.e. curl https://{api-id}.execute-api.{region}.amazonaws.com/prod/, you will receive a 'Hello from Lambda!' in response.
+2. Navigate to the CloudWatch console, in the left navigation pane, under Logs, choose Log Groups.
+3. The log group's name is in the following format: API-Gateway-Execution-Logs-apiId/stageName. You will see execution log streams generated.
+4. Access logs will be generated in a separate log group under the name you provided in parameters.
 
 ## Cleanup
  

@@ -1,28 +1,48 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: API with Logs enabled
+Description: REST API with CloudWatch execution and access logs enabled.
 
 Globals:
   Api:
     OpenApiVersion: 3.0.1
 
+Parameters:
+
+# Enter name for CloudWatch access log group 
+ AccessLogGroup:
+   Type: String
+   Default: Enter a name for the CloudWatch access log group
+
 Resources:
+
+# REST API
   MyApi:
     Type: AWS::Serverless::Api
     DependsOn: ApiCWLRoleArn
     Properties:
       StageName: prod
+      AccessLogSetting:
+        DestinationArn: !GetAtt MyLogGroup.Arn
+        Format: "{ \"requestId\":\"$context.requestId\", \"ip\": \"$context.identity.sourceIp\", \"caller\":\"$context.identity.caller\", \"user\":\"$context.identity.user\",\"requestTime\":\"$context.requestTime\", \"httpMethod\":\"$context.httpMethod\",\"resourcePath\":\"$context.resourcePath\", \"status\":\"$context.status\",\"protocol\":\"$context.protocol\", \"responseLength\":\"$context.responseLength\" }"
       MethodSettings:
         - MetricsEnabled: True
           ResourcePath: '/*'
           HttpMethod: '*'
           LoggingLevel: INFO
-          
+
+# CloudWatch access log group
+  MyLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '${AccessLogGroup}'
+
+# Specifies the IAM role that API Gateway uses to write API logs to Amazon CloudWatch Logs
   ApiCWLRoleArn:
     Type: AWS::ApiGateway::Account
     Properties: 
       CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
 
+# IAM Role with 'AmazonAPIGatewayPushToCloudWatchLogs' managed policy
   CloudWatchRole:
       Type: AWS::IAM::Role
       Properties:
@@ -37,6 +57,7 @@ Resources:
         ManagedPolicyArns:
           - 'arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'
 
+# Lambda function
   MyFunction:
         Type: AWS::Serverless::Function
         Properties:
