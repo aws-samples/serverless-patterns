@@ -1,10 +1,10 @@
-# AWS Systems Manager Automation to AWS Step Function
+# AWS Systems Manager Automation to AWS Step Functions
 
-This SAM template deploys an AWS Systems Manger Automation Document that consumes input parameters at execution time and invokes a Step function by passing the parameters as input payload for the Step function. The template also deploys the Lambda function, required IAM permissions to execute the automation and a sample RDS table used to take the snapshot.
+This SAM template deploys an AWS Systems Manger Automation Document that consumes input parameters at execution time and invokes Step functions by passing the parameters as input payload for the Step functions. The template also deploys the Lambda function, required IAM permissions to execute the automation and a sample RDS table used to take the snapshot.
 
 (**Note**: RDS is used in this repo just for demonstration purposes. You may use this pattern across multiple services as needed.)
 
-This Systems Manager Automation Document used in this pattern contains one step that invokes the Step function and Lamda function. However, you can use this in documents with multiple steps as well. To learn more about Systems Manger Documents, refer to https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-ssm-docs.html
+This Systems Manager Automation Document used in this pattern contains one step that invokes the Step functions. However, you can use this in documents with multiple steps as well. To learn more about Systems Manger Documents, refer to https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-ssm-docs.html
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/ssm-lambda.
 
@@ -51,11 +51,11 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-When the Systems Manger Automation Document is invoked, the execution parameters are sent as a payload to invoke the Step function, which takes the snapshot of RDS table's items with the parameters from the automation execution.
+When the Systems Manger Automation Document is invoked, the execution parameters are sent as a payload to invoke the Step functions, which takes the snapshot of RDS table's items with the parameters from the automation execution.
 
 ## Testing
 
-1. After the stack is deployed, navigate to Step function, select the step function name and create new execetion. Enter the bellow values to run the execution.This should be empty initially.
+1. After the stack is deployed, navigate to Step functions, select the Step functions name and create new execetion. Enter the bellow values to run the execution.This should be empty initially.
 
    ```
   {
@@ -80,7 +80,7 @@ When the Systems Manger Automation Document is invoked, the execution parameters
       "count": "2"
     }
     ```  
-3. Graph view will give you the overal proccess of your execution from Start to end.
+3. In Step functions, the Graph view will allow you to observe overal proccess of your execution from Start to end.
    Monitor all the steps while the execution is in progress.
 
 4. Once the Execution Status is "success", you can validate this by navigating to RDS, Snapshots in order to see your newly created snapshots.
