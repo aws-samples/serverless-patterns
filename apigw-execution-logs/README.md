@@ -1,10 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# API Gateway REST API to AWS CloudWatch
 
-This pattern creates a REST API that has execution logs enabled with Log level set to INFO to generate execution logs for all requests. The API triggers a Lambda function.
+This pattern creates a REST API that has CloudWatch execution logs enabled with Log level set to INFO and a Lambda function integration.
 
-
-
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-execution-logs
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -40,11 +38,14 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+A REST API is created that has an IAM role with managed policy 'AmazonAPIGatewayPushToCloudWatchLogs' managed policy which allows API Gateway to write CloudWatch logs to your account. In the API stage, CloudWatch execution logs are enabled with INFO Log level selected to generate execution logs for all requests. The API has a Lambda integration.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+1. Deploy the REST API and select the 'prod' deployment stage. 
+2. Once you make requests to the API i.e. curl https://{api-id}.execute-api.{region}.amazonaws.com/prod/, you will receive a 'Hello from Lambda!' in response.
+3. Navigate to the CloudWatch console, in the left navigation pane, under Logs, choose Log Groups.
+4. The log group's name is in the following format: API-Gateway-Execution-Logs-apiId/stageName. You will see execution log streams generated.
 
 ## Cleanup
  
