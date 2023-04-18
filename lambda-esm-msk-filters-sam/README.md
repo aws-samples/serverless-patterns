@@ -218,7 +218,7 @@ We use a mix of json and plain text messages to validate the functions are filte
 }
 ```
 
-1. **code-is-300.json**
+2. **code-is-300.json**
 ```
 {
     "fileNameForValidation": "code-is-300",
@@ -239,7 +239,7 @@ We use a mix of json and plain text messages to validate the functions are filte
 }
 ```
 
-1. **custom-with-region.json**
+3. **custom-with-region.json**
 ```
 {
     "fileNameForValidation": "custom-with-region",
@@ -261,7 +261,7 @@ We use a mix of json and plain text messages to validate the functions are filte
 }
 ```
 
-1. **rbac-is-set.json**
+4. **rbac-is-set.json**
 ```
 {
     "fileNameForValidation": "rbac-is-set",
@@ -282,7 +282,7 @@ We use a mix of json and plain text messages to validate the functions are filte
 }
 ```
 
-1. **plain-string.txt**
+5. **plain-string.txt**
 ```
 OrderNumber:12345
 ```
@@ -347,4 +347,4 @@ The below table captures the results from the above testing.
     ```bash
     aws cloudformation delete-stack --stack-name lambda-msk-esm-stack
     ```
-1. Delete MSK cluster stack. Instructions - https://catalog.workshops.aws/msk-labs/en-US/msklambda/gsrschemareg/cleanup
+1. If you have created an MSK cluster and bastion environment using the sample instructions, delete the corresponding stack using instructions - https://catalog.workshops.aws/msk-labs/en-US/msklambda/gsrschemareg/cleanup
