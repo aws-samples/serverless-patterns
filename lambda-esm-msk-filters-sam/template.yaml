@@ -5,6 +5,14 @@ Description: >
 
   Sample SAM Template for lambda-msk-esm
 
+Parameters:
+  MSKStreamARN:
+    Type: String
+    Default: "StreamARNNotPassed"
+  MSKTopicName:
+    Type: String
+    Default: "TopicNameNotPassed"
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -27,9 +35,9 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-east-1:986112483391:cluster/MSKCluster-MSK/7f1c907d-54dc-40ff-a87f-683f4f8cb746-14
+            Stream: !Ref MSKStreamARN
             Topics:
-              - ESMFiltersDemoTopic
+              - !Ref MSKTopicName
 
 # 2. this Lambda is invoked for:
 # {
@@ -45,9 +53,9 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-east-1:986112483391:cluster/MSKCluster-MSK/7f1c907d-54dc-40ff-a87f-683f4f8cb746-14
+            Stream: !Ref MSKStreamARN
             Topics:
-              - ESMFiltersDemoTopic
+              - !Ref MSKTopicName
             FilterCriteria:
               Filters:
                 - Pattern: '{"value":{"kind":["Event"]}}'
@@ -72,9 +80,9 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-east-1:986112483391:cluster/MSKCluster-MSK/7f1c907d-54dc-40ff-a87f-683f4f8cb746-14
+            Stream: !Ref MSKStreamARN
             Topics:
-              - ESMFiltersDemoTopic
+              - !Ref MSKTopicName
             FilterCriteria:
               Filters:
                 - Pattern: '{"value":{"kind":["Event"],"responseStatus":{"code":[{"numeric":["=",300]}]}}}'
@@ -101,9 +109,9 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-east-1:986112483391:cluster/MSKCluster-MSK/7f1c907d-54dc-40ff-a87f-683f4f8cb746-14
+            Stream: !Ref MSKStreamARN
             Topics:
-              - ESMFiltersDemoTopic
+              - !Ref MSKTopicName
             FilterCriteria:
               Filters:
                 - Pattern: '{"value":{"responseStatus":{"code":[{"numeric":[">=",300]}]}}}'
@@ -120,9 +128,9 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-east-1:986112483391:cluster/MSKCluster-MSK/7f1c907d-54dc-40ff-a87f-683f4f8cb746-14
+            Stream: !Ref MSKStreamARN
             Topics:
-              - ESMFiltersDemoTopic
+              - !Ref MSKTopicName
             FilterCriteria:
               Filters:
                 - Pattern: '{"value":{"kind":[{"anything-but":["Event"]}]}}'
@@ -138,9 +146,9 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-east-1:986112483391:cluster/MSKCluster-MSK/7f1c907d-54dc-40ff-a87f-683f4f8cb746-14
+            Stream: !Ref MSKStreamARN
             Topics:
-              - ESMFiltersDemoTopic
+              - !Ref MSKTopicName
             FilterCriteria:
               Filters:
                 - Pattern: '{"value":{"region":[{"prefix":"us-"}]}}'
@@ -155,9 +163,9 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-east-1:986112483391:cluster/MSKCluster-MSK/7f1c907d-54dc-40ff-a87f-683f4f8cb746-14
+            Stream: !Ref MSKStreamARN
             Topics:
-              - ESMFiltersDemoTopic
+              - !Ref MSKTopicName
             FilterCriteria:
               Filters:
                 - Pattern: '{"value":{"responseStatus":{"code":[{"numeric":[">=",300,"<=",350]}]}}}'
@@ -172,9 +180,9 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-east-1:986112483391:cluster/MSKCluster-MSK/7f1c907d-54dc-40ff-a87f-683f4f8cb746-14
+            Stream: !Ref MSKStreamARN
             Topics:
-              - ESMFiltersDemoTopic
+              - !Ref MSKTopicName
             FilterCriteria:
               Filters:
                 - Pattern: '{"value":[{"prefix":"OrderNumber"}]}'
@@ -188,12 +196,12 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-east-1:986112483391:cluster/MSKCluster-MSK/7f1c907d-54dc-40ff-a87f-683f4f8cb746-14
+            Stream: !Ref MSKStreamARN
             Topics:
-              - ESMFiltersDemoTopic
+              - !Ref MSKTopicName
             FilterCriteria:
               Filters:
-                - Pattern: '{"topic":[{"prefix":"ESMFiltersDemoTopic"}],"value":[{"prefix":"Order"}]}'
+                - Pattern: '{"topic":[{"prefix":"!Ref MSKTopicName"}],"value":[{"prefix":"Order"}]}'
 
 
 Outputs:

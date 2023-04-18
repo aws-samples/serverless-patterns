@@ -5,7 +5,7 @@ AWS Lambda provides [content filtering options for Amazon MSK](https://docs.aws.
 
 This project includes a SAM template deploys multiple lambda functions. Each of the lambda function uses different filter criteria. We validate the expected behaviour by publishing different messages to a MSK topic, and verifying that the messages are present or absent in the corresponding function's Cloudwatch logs.
 
-
+Important: This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred.
 
 ## Pre-requisites
 
@@ -14,9 +14,11 @@ This project includes a SAM template deploys multiple lambda functions. Each of 
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * An Amazon MSK cluster and a client machine that is configured to publish messages to a topic on that cluster. [Sample CloudFormation and instructions from Amazon MSK Labs](https://catalog.workshops.aws/msk-labs/en-US/msklambda/gsrschemareg/setup). 
 
-(The current project's SAM template does not create an MSK cluster. It creates lambda functions that are invoked when their mapped MSK topic recieves messages)
+The current project's SAM template does not create an MSK cluster. It creates lambda functions that are invoked when their mapped MSK topic recieves messages.
 
 ## Deployment Instructions
+
+1. Follow instructions from [Amazon MSK Labs](https://catalog.workshops.aws/msk-labs/en-US/msklambda/gsrschemareg        /setup) to create an MSK Cluster, and a bastion environment to publish messages to a topic. Notedown the cluster       ARN, and the name of the topic. This information will be passed when deploying the SAM template.
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
@@ -26,10 +28,10 @@ This project includes a SAM template deploys multiple lambda functions. Each of 
     ```
     cd serverless-patterns/lambda-esm-msk-filters-sam
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file. Pass the MSK Cluster and Topic details as parameters to the SAM template:
     ```
     sam build
-    sam deploy --stack-name lambda-msk-esm-stack --resolve-s3 --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
+    sam deploy --stack-name lambda-msk-esm-stack --resolve-s3 --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides MSKStreamARN="ClusterARNFromStep1" MSKTopicName="TopicNameFromStep1"
     ```
 
 ## Filtering scenarios
@@ -290,7 +292,7 @@ OrderNumber:12345
 
 We validate the ESM filters by publishing each of the event messages(base-json.jon, code-is-300.json, custom-with-region.json, rbac-is-set.json, plain-string.txt) to the topic that the functions are mapped to.
 
-On the client machine that is configured to publish messages to the topic run these commands
+Login to the client machine in the bastion environment that is configured to publish messages to the topic and run these commands.
 
 ```
 #setting broker info
@@ -300,7 +302,7 @@ export BOOTSTRAP_SERVERS_CONFIG="enter cluster's bootstrap brokers"
 #export BOOTSTRAP_SERVERS_CONFIG="b-1.mskclustermsk.abcdef.c14.kafka.us-east-1.amazonaws.com:9092,b-3.mskclustermsk.abcdef.c14.kafka.us-east-1.amazonaws.com:9092,b-2.mskclustermsk.abcdef.c14.kafka.us-east-1.amazonaws.com:9092"
 
 #set topic name
-export $ESMFiltersDemoTopic = "enter topic name"
+export ESMFiltersDemoTopic="enter topic name"
 
 #get sample messages from repository
 mkdir test-msk-esm
@@ -317,9 +319,11 @@ jq -rc . rbac-is-set.json | /home/ec2-user/kafka/bin/kafka-console-producer.sh -
 
 ```
 
+Navigate to the CloudWatch log group for each of the lambda functions to validate which events appear in the logs, and which ones are missing. The ones that are missing were filtered out by the ESM filter that was applied to the function.
+
 # Results
 
-The below table captures the results from the about testing.
+The below table captures the results from the above testing.
 
 * Y - Message logged in CloudWatch logs. Event was passed by the Lambda resouce to the function as the filter criteria was met.
 * N - Message not logged in CloudWatch logs. Event was filtered out by the Lambda resouce and event was discarded as the filter criteria was not met.
@@ -340,7 +344,7 @@ The below table captures the results from the about testing.
 
 ## Cleanup
  
-1. Delete the stack
+1. Delete the ESM filter testing stack
     ```bash
     aws cloudformation delete-stack --stack-name lambda-msk-esm-stack
     ```
