@@ -306,7 +306,7 @@ export ESMFiltersDemoTopic="enter topic name"
 #get sample messages from repository
 mkdir test-msk-esm
 cd test-msk-esm/
-git clone git@github.com:nikhilpenmetsa/serverless-patterns.git
+git clone https://github.com/aws-samples/serverless-patterns
 cd serverless-patterns/lambda-esm-msk-filters-sam/events/
 
 #publish messages to topic
@@ -347,4 +347,4 @@ The below table captures the results from the above testing.
     ```bash
     aws cloudformation delete-stack --stack-name lambda-msk-esm-stack
     ```
-1. If you have created an MSK cluster and bastion environment using the sample instructions, delete the corresponding stack using instructions - https://catalog.workshops.aws/msk-labs/en-US/msklambda/gsrschemareg/cleanup
+1. If you have created an MSK cluster and bastion environment using the sample instructions, delete the stack using corresponding [instructions](https://catalog.workshops.aws/msk-labs/en-US/msklambda/gsrschemareg/cleanup)
