@@ -14,11 +14,10 @@ Important: This application uses various AWS services and there are costs associ
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * An Amazon MSK cluster and a client machine that is configured to publish messages to a topic on that cluster. [Sample CloudFormation and instructions from Amazon MSK Labs](https://catalog.workshops.aws/msk-labs/en-US/msklambda/gsrschemareg/setup). 
 
-The current project's SAM template does not create an MSK cluster. It creates lambda functions that are invoked when their mapped MSK topic recieves messages.
 
 ## Deployment Instructions
 
-1. Follow instructions from [Amazon MSK Labs](https://catalog.workshops.aws/msk-labs/en-US/msklambda/gsrschemareg        /setup) to create an MSK Cluster, and a bastion environment to publish messages to a topic. Notedown the cluster       ARN, and the name of the topic. This information will be passed when deploying the SAM template.
+The current project's SAM template does not create an MSK cluster. It creates lambda functions that are invoked when their mapped MSK topic recieves messages. The project relies on an existing MSK Cluster and a topic
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
@@ -31,7 +30,7 @@ The current project's SAM template does not create an MSK cluster. It creates la
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file. Pass the MSK Cluster and Topic details as parameters to the SAM template:
     ```
     sam build
-    sam deploy --stack-name lambda-msk-esm-stack --resolve-s3 --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides MSKStreamARN="ClusterARNFromStep1" MSKTopicName="TopicNameFromStep1"
+    sam deploy --stack-name lambda-msk-esm-stack --resolve-s3 --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides MSKStreamARN="ClusterARN" MSKTopicName="TopicName"
     ```
 
 ## Filtering scenarios
