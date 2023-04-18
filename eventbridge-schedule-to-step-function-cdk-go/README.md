@@ -28,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
     ```bash
     go env -w GOPROXY=direct
     ```
-4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+4. From the command line, use AWS CDK to deploy the AWS resources for the pattern:
     ```bash
     cdk deploy
     ```
