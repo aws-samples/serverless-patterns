@@ -12,7 +12,7 @@
       "Sample data is ingested through the an Amazon S3 Bucket referenced as the Landing Zone S3 Bucket, and can be ingested from any service within or connected to the AWS cloud. For the sake of this demo, example files are in the GitHub Repo  in the resources/sample-media directory.",     
       "This is an event-driven architecture. An upload to the landing bucket sends the S3 Put operation log to Amazon EventBridge which then triggers the Step Function to run. As a sample, the Step Function simply adds a UUID (Universally Unique Identifier) to the object name, copies it the sample_input_bucket and the sample_output_bucket, and writes the S3 object metadata to DynamoDB.",
       "  ",
-      "Here is the workshop: https://catalog.workshops.aws/amplify-with-terraform"
+      "Look in the resources section below to follow to full workshop"
     ]
   },
   "gitHub": {
