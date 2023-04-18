@@ -41,19 +41,21 @@ The AWS services used in this pattern are
     ```
     cd apigw-lambda-sfn-transcribe-translate-polly-sam
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, install serverless library:
     ```
-    sam build
-    sam deploy --guided
+    npm install -g serverless
+    sls -v
     ```
-1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
+1. Run install the libraries for the application:
+    ```
+    npm install
+    ```
+1. Now the deploy the serverless template:
+    ```
+    sls deploy
+    ```
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+1. Note the outputs from the Serverless deployment process. These contain the S3 bucket name where the audio file has to be copied, the state machine arn and websocket API.
 
 ## How it works
 
@@ -63,25 +65,30 @@ API Gateway handles incoming traffic and sends it to the lambda which in turn in
 
 Follow the steps to test the pattern:
 
-1. Copy the audio to the S3 audio input bucket
+1. Copy the audio to the S3 bucket from the output of the deployment step.
     ```bash
-    aws s3 cp audio.mp3 s3://{bucket-name}
+    aws s3 cp audio.ogg s3://{input-bucket-name}
     ```
-1. Run the curl command to invoke the API Gateway
+1. Install the websocket client
     ```bash
-    curl
+    npm install -g wscat
     ```
-1. Play the audio file.
+1. Run websocket client to invoke the API Gateway. Get the API ID from the output of the deployment step
+    ```bash
+    wscat -c  wss://<API-ID>.execute-api.<Region>.amazonaws.com/dev?proto=https
+    ```
+1. On the next prompt, add the input parameters. It can be tested with other language codes as well.
+    ```bash
+    { "bucketName": "<input-bucket-name>", "objectKey": "audio.ogg", "inputLanguageCode": "en-IN", "outputLanguageCode" : "Hindi |hi-IN" }
+    ```
+1. A signed S3 url will be returned as an output containing the audio file. Play the file from the url.
+
 
 ## Cleanup
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sls remove
     ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
