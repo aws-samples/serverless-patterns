@@ -1,0 +1,14 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+@use './base';
+
+.custom-dashboard-container {
+  height: 100%;
+}

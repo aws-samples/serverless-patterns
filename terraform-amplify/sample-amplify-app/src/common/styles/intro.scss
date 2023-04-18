@@ -1,0 +1,32 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+@use '@cloudscape-design/design-tokens/index.scss' as awsui;
+
+.intro-logo {
+  height: 9rem;
+  padding-top: 1rem;
+}
+
+.intro-screenshot {
+  height: 30rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.intro-code-screenshot {
+  padding-right: 2rem;
+}
+
+code {
+  background-color: awsui.$color-background-dropdown-item-hover;
+  padding: 0 0.5rem;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}

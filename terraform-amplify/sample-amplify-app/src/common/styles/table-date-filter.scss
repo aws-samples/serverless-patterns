@@ -1,0 +1,54 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+@use '@cloudscape-design/design-tokens/index.scss' as awsui;
+// @use '~@cloudscape-design/design-tokens' as awsui;
+@use './base';
+
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  order: 0;
+  flex-grow: 10;
+  margin-right: 2rem;
+}
+
+.input-filter {
+  order: 0;
+  flex-grow: 1;
+  flex-shrink: 1;
+  width: auto;
+  max-width: 728px;
+  margin-right: 1rem;
+}
+
+.date-range-filter {
+  flex-basis: 100%;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.filtering-results {
+  margin-left: 1rem;
+  line-height: 3rem;
+  color: awsui.$color-text-form-default;
+}
+
+@media (max-width: 1400px) {
+  .filter-container {
+    margin-right: 0;
+  }
+
+  .input-filter {
+    width: 100%;
+    max-width: none;
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+}

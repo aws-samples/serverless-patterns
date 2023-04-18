@@ -1,0 +1,96 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+@use '@cloudscape-design/design-tokens/index.scss' as awsui;
+
+body {
+  background: awsui.$color-background-layout-main;
+}
+
+#h {
+  display: block;
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1002;
+  margin: 0;
+  background: awsui.$color-background-home-header;
+  font-family: 'Amazon Ember', 'Helvetica Neue', Roboto, Arial, sans-serif;
+}
+// new
+.menu-list {
+  border-bottom: 1px solid #414750; // grey-650
+}
+
+ul.menu-list {
+  display: flex;
+  margin: 0;
+  padding: 0 30px;
+  list-style: none;
+
+  & > li {
+    padding: 0 4px;
+    margin: 13px 0 9px;
+
+    > a {
+      padding: 0 6px;
+    }
+
+    a,
+    div,
+    button,
+    input,
+    label {
+      float: left;
+      color: awsui.$color-foreground-control-default;
+      line-height: 16px;
+    }
+
+    #visual-refresh-toggle {
+      margin-right: 5px;
+      margin-top: 1px;
+    }
+
+    a,
+    a:hover {
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    &.title {
+      font-weight: bold;
+    }
+
+    &.selected > a,
+    &.selected > button {
+      font-weight: bold;
+      color: awsui.$color-text-accent;
+    }
+
+    &.separated {
+      border-left: 1px solid awsui.$color-border-control-default;
+      padding-left: 9px;
+      margin-left: 9px;
+    }
+
+    &.ml-auto {
+      margin-left: auto;
+    }
+  }
+
+  button,
+  button:focus {
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    padding: 0 6px;
+  }
+}

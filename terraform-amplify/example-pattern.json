@@ -1,9 +1,9 @@
 {
   "title": "Automating Deployment of AWS Amplify Apps with Terraform",
   "description": "Using Infrastructure as Code (IaC) with AWS Amplify for automated deployments at scale",
-  "language": "JavaScript",
+  "language": "Node.js",
   "level": "300",
-  "framework": "Cloudformation",
+  "framework": "Terraform",
   "introBox": {
     "headline": "How it works",
     "text": [        
@@ -20,7 +20,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-amplify",
       "templateURL": "serverless-patterns/terraform-amplify",
       "projectFolder": "terraform-amplify", 
-      "templateFile": "terraform-amplify/amplify.yml"
+      "templateFile": "terraform-amplify/terraform-deployment/main.tf"
     }
   },
   "resources": {

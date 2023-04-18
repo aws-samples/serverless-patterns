@@ -1,0 +1,28 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+// .custom-header {
+//   display: flex;
+//   align-items: flex-end;
+//   height: 100%;
+// }
+
+
+
+@use './base';
+
+.custom-header {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.date-time-container > * {
+  min-width: 18rem;
+}

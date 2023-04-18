@@ -1,0 +1,77 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+@use '@cloudscape-design/design-tokens/index.scss' as awsui;
+// @use '~@cloudscape-design/design-tokens' as awsui;
+@use './base';
+
+// 912px is the container breakpoint-s, the viewport breakpoint is 912(container width) + 40(closed side navigation width) + 4(negative margin from grid)
+$viewport-breakpoint-s: 957px;
+$open-navigation-width: 240px;
+
+.custom-home__header {
+  background-color: awsui.$color-background-home-header;
+}
+
+.custom-home__header-title {
+  color: awsui.$color-text-home-header-default;
+}
+
+.custom-home__category,
+.custom-home__header-sub-title {
+  color: awsui.$color-text-home-header-secondary;
+}
+
+@media only screen and (min-width: $viewport-breakpoint-s) {
+  .custom-home__sidebar {
+    // Aligns baseline of text with dark header bottom border
+    margin-top: -86px;
+  }
+  .custom-home__header-cta {
+    // Keeps 32px distance between sidebar cards
+    margin-bottom: 38px;
+  }
+}
+
+.custom-home__header-title > * {
+  max-width: 700px;
+}
+
+.custom-home-image__placeholder:before {
+  content: 'X';
+  display: block;
+  background-color: awsui.$color-background-input-disabled;
+  color: awsui.$color-background-container-content;
+  text-align: center;
+  font-size: 400px;
+  line-height: 400px;
+}
+
+ul.custom-list-separator {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    border-top: 1px solid awsui.$color-border-divider-default;
+    padding: 0.8rem 0;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    &:first-child {
+      padding-top: 0;
+      border-top: none;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
+}

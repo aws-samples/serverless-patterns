@@ -1,0 +1,216 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+@use '@cloudscape-design/design-tokens/index.scss' as awsui;
+// @use '~@cloudscape-design/design-tokens' as awsui;
+
+// Cookie consent (Shortbread) style overwrites
+body #awsccc-sb-ux-c #awsccc-sb-a {
+  // Banner
+  #awsccc-cb-content {
+    padding-left: 60px;
+    padding-right: 60px;
+
+    // Banner text wrapper
+    #awsccc-cb-text {
+      padding-right: 60px;
+    }
+
+    // "Customize" & "Accept all" buttons
+    #awsccc-cb-buttons {
+      & button {
+        border-radius: 20px;
+        padding-left: 20px;
+        padding-right: 20px;
+        & span {
+          font-weight: 900;
+        }
+      }
+
+      // "Accept all" button
+      & .awsccc-u-btn.awsccc-u-btn-primary {
+        // Hardcoded "dark-mode" values for "primary button"
+        $color-text-button-primary-default: #000716;
+        $color-text-button-primary-hover: #000716;
+        $color-text-button-primary-active: #000716;
+
+        $color-background-button-primary-default: #539fe5;
+        $color-background-button-primary-hover: #89bdee;
+        $color-background-button-primary-active: #539fe5;
+
+        background: $color-background-button-primary-default;
+        & span {
+          color: $color-text-button-primary-default;
+        }
+
+        &:hover {
+          background: $color-background-button-primary-hover;
+          & span {
+            color: $color-text-button-primary-hover;
+          }
+        }
+
+        &:active {
+          background: $color-background-button-primary-active;
+          & span {
+            color: $color-text-button-primary-active;
+          }
+        }
+      }
+
+      // "Cancel" button
+      & .awsccc-u-btn.awsccc-u-btn-secondary {
+        // Hardcoded "dark-mode" values for "normal button"
+        $color-text-button-normal-default: #539fe5;
+        $color-text-button-normal-hover: #89bdee;
+        $color-text-button-normal-active: #89bdee;
+
+        $color-border-button-normal-default: #539fe5;
+        $color-border-button-normal-hover: #89bdee;
+        $color-border-button-normal-active: #89bdee;
+
+        $color-background-button-normal-default: #0f1b2a;
+        $color-background-button-normal-hover: #192534;
+        $color-background-button-normal-active: #232f3e;
+
+        background: $color-background-button-normal-default;
+        border: 2px solid $color-border-button-normal-default;
+        & span {
+          color: $color-text-button-normal-default;
+        }
+
+        &:hover {
+          background: $color-background-button-normal-hover;
+          border-color: $color-border-button-normal-hover;
+          & span {
+            color: $color-text-button-normal-hover;
+          }
+        }
+
+        &:active {
+          background: $color-background-button-normal-active;
+          border-color: $color-border-button-normal-active;
+          & span {
+            color: $color-text-button-normal-active;
+          }
+        }
+      }
+    }
+  }
+
+  // Modal container
+  #awsccc-cs-content {
+    $modal-box-shadow: rgba(0, 7, 22, 0.1) 0px 4px 20px 1px;
+    $modal-header-padding: 24px;
+    border-radius: 16px;
+    box-shadow: $modal-box-shadow;
+
+    // Modal header
+    #awsccc-cs-header {
+      background-color: awsui.$color-background-container-header;
+      border-radius: 16px 16px 0 0;
+      padding: $modal-header-padding;
+      border-bottom: none;
+
+      & #awsccc-cs-title h2 {
+        color: awsui.$color-text-heading-default;
+        line-height: 22px;
+        font-size: 24px;
+        font-weight: 900;
+      }
+    }
+
+    // Modal body
+    #awsccc-cs-modalBody {
+      padding: 8px 24px;
+
+      // Categories section container ("Essential", "Performance", "Functional", "Advertising")
+      .awsccc-cs-s-container {
+        border-bottom: 1px solid awsui.$color-border-divider-default;
+        & .awsccc-cs-s-title {
+          line-height: 22px;
+          font-size: 1.17em;
+          font-weight: 700;
+        }
+      }
+
+      // Paragraphs
+      #awsccc-cs-s-paragraph,
+      #awsccc-cs-i-container span {
+        font-size: 14px;
+      }
+    }
+
+    // Modal footer
+    #awsccc-cs-f-c {
+      $modal-footer-padding: 12px 24px;
+
+      border-top: 2px solid awsui.$color-border-divider-default;
+      padding: $modal-footer-padding;
+
+      // "Cancel" & "Save preferences" buttons
+      & button {
+        border-radius: 20px;
+        & span {
+          font-weight: 900;
+        }
+      }
+
+      // "Save preferences" button
+      & .awsccc-u-btn.awsccc-u-btn-primary {
+        background: awsui.$color-background-button-primary-default;
+
+        & span {
+          color: awsui.$color-text-button-primary-default;
+        }
+
+        &:hover {
+          background: awsui.$color-background-button-primary-hover;
+          & span {
+            color: awsui.$color-text-button-primary-hover;
+          }
+        }
+
+        &:active {
+          background: awsui.$color-background-button-primary-active;
+          & span {
+            color: awsui.$color-text-button-primary-active;
+          }
+        }
+      }
+
+      // "Cancel" button
+      & .awsccc-u-btn.awsccc-u-btn-secondary {
+        $color-background-button-normal-default: #fff;
+        $color-background-button-normal-hover: #f2f8fd;
+        $color-background-button-normal-active: #d3e7f9;
+
+        background: $color-background-button-normal-default;
+
+        & span {
+          color: awsui.$color-text-link-default;
+        }
+
+        &:hover {
+          background: $color-background-button-normal-hover;
+          & span {
+            color: awsui.$color-text-link-hover;
+          }
+        }
+
+        &:active {
+          background: $color-background-button-normal-active;
+          & span {
+            color: awsui.$color-text-button-normal-active;
+          }
+        }
+      }
+    }
+  }
+}

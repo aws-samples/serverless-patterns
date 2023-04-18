@@ -1,0 +1,96 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+@use '@cloudscape-design/design-tokens/index.scss' as awsui;
+// @use '~@cloudscape-design/design-tokens' as awsui;
+
+#f {
+  align-items: center;
+  background-color: #0f1b2a;
+  bottom: 0;
+  display: flex;
+  font-family: awsui.$font-family-base;
+  font-size: 14px;
+  gap: 10px;
+  justify-content: space-between;
+  left: 0;
+  margin: 0;
+  min-height: 40px;
+  padding: 10px 40px;
+  position: absolute;
+  right: 0;
+  // z-index should be higher than side navigation
+  z-index: 2000;
+  @media only screen and (max-width: 493px) {
+    padding: 10px 20px;
+  }
+  @media only screen and (max-width: 688px) {
+    flex-wrap: wrap;
+  }
+  @media only screen and (min-width: 1182px) {
+    padding: 2px 40px;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    gap: 10px;
+    margin: 0;
+    flex-wrap: wrap;
+    li,
+    a {
+      color: awsui.$color-text-home-header-secondary;
+      text-decoration: none;
+      .external-link {
+        display: inline-block;
+        position: relative;
+        vertical-align: top;
+        width: 16px;
+        svg {
+          display: inline-block;
+          fill: none;
+          height: 16px;
+          stroke-width: 2px;
+          stroke: currentColor;
+          width: 16px;
+          .stroke-linecap-square {
+            stroke-linecap: square;
+          }
+          .stroke-linejoin-round {
+            stroke-linejoin: round;
+          }
+        }
+      }
+    }
+    a {
+      cursor: pointer;
+    }
+  }
+
+  li:not(:last-child) a {
+    border-right: 1px solid awsui.$color-border-control-default;
+    padding-right: 10px;
+  }
+  .made-with-love {
+    color: awsui.$color-text-home-header-secondary;
+    min-width: 164px;
+    text-align: right;
+    @media only screen and (max-width: 688px) {
+      text-align: left;
+    }
+    img {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 4px;
+      width: 34px;
+      margin-top: 4px;
+    }
+  }
+}

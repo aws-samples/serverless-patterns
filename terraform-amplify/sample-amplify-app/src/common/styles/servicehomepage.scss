@@ -1,0 +1,66 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+@use '@cloudscape-design/design-tokens/index.scss' as awsui;
+
+.custom-home__header {
+  background-color: awsui.$color-background-home-header;
+}
+
+.custom-home__header-title {
+  color: awsui.$color-text-home-header-default;
+}
+
+.custom-home__category,
+.custom-home__header-sub-title {
+  color: awsui.$color-text-home-header-secondary;
+}
+
+@media (min-width: 992px) {
+  .custom-home__sidebar {
+    margin-top: -6rem;
+  }
+}
+
+.custom-home__header-title > * {
+  max-width: 70rem;
+}
+
+.custom-home-image__placeholder:before {
+  content: "X";
+  display: block;
+  background-color: awsui.$color-background-layout-main;
+  color: awsui.$color-background-container-content;
+  text-align: center;
+  font-size: 40rem;
+  line-height: 40rem;
+}
+
+ul.custom-list-separator {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.custom-list-separator li {
+  border-top: 1px solid awsui.$color-border-divider-default;
+  padding: 0.8rem 0;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+ul.custom-list-separator li:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+ul.custom-list-separator li:last-child {
+  padding-bottom: 0;
+}

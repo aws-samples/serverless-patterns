@@ -1,0 +1,161 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+@use '@cloudscape-design/design-tokens/index.scss' as awsui;
+// @use '~@cloudscape-design/design-tokens' as awsui;
+
+body {
+  background: awsui.$color-background-layout-main;
+  position: relative;
+}
+
+#h {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  // corresponds to the z-index in Mezzanine
+  z-index: 1000;
+  margin: 0;
+  background-color: #0f1b2a;
+  font-family: awsui.$font-family-base;
+}
+
+ul.menu-list {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin: 0;
+  padding: 0 40px;
+  list-style: none;
+  font-size: 14px;
+
+  & > li {
+    padding: 0;
+    margin: 0;
+    margin-right: 8px;
+
+    > a {
+      padding: 0 6px;
+    }
+
+    a,
+    div,
+    button,
+    input,
+    label {
+      float: left;
+      color: awsui.$color-text-interactive-default;
+      line-height: 16px;
+    }
+
+    #visual-refresh-toggle {
+      margin-right: 5px;
+      margin-top: 1px;
+    }
+
+    a,
+    a:hover {
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    &.title {
+      font-weight: bold;
+    }
+
+    &.selected > a,
+    &.selected > button {
+      font-weight: bold;
+      color: awsui.$color-text-accent;
+    }
+
+    &.separated {
+      border-left: 1px solid awsui.$color-border-control-default;
+      padding-left: 8px;
+      margin-right: 0;
+      margin-left: 0;
+    }
+
+    &.ml-auto {
+      margin-left: auto;
+    }
+
+    &.separator {
+      width: 2px;
+      height: 16px;
+      background: #e9ebed;
+      padding: 0;
+      margin-right: 24px;
+      margin-left: 24px;
+    }
+  }
+
+  button,
+  button:focus {
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+  }
+
+  li.checkbox-item {
+    margin-right: 0;
+  }
+
+  @media only screen and (max-width: 493px) {
+    padding: 4px 20px;
+    flex-wrap: wrap;
+    height: fit-content;
+
+    .title {
+      flex: 1 1 100%;
+      margin-bottom: 8px;
+    }
+
+    li {
+      width: min-content;
+
+      &.separator {
+        height: 32px;
+      }
+
+      button,
+      a {
+        text-align: left;
+      }
+
+      a {
+        padding: 0;
+      }
+    }
+
+    .ml-auto {
+      display: none;
+    }
+  }
+
+  @media only screen and (max-width: 330px) {
+    li {
+      &.separator {
+        margin: 0 8px;
+      }
+
+      &.selected {
+        margin-right: 4px;
+      }
+
+      &.separated {
+        padding-left: 4px;
+      }
+    }
+  }
+}

@@ -1,0 +1,2 @@
+# 🤖 Dynamic Amplify Configuration
+To automate deployment of the Amplify application, a custom file `amplify-config.js` has been created for you. The inputs of the parameters are Terraform outputs. This enables dynamic creation of the file. When you deploy with Terraform, the necessary outputs are written to the file and configured in `/sample-sample-amplify-app/src/pages/App.jsx` by leveraging the `Amplify.configure()` method. All of this enables you to deploy your Amplify Application with Terraform without having to use the Amplify CLI.

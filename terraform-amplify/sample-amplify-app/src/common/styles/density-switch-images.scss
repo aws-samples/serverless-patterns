@@ -1,0 +1,39 @@
+/************************************************************************
+                            DISCLAIMER
+
+This is just a playground package. It does not comply with best practices
+of using Cloudscape Design components. For production code, follow the
+integration guidelines:
+
+https://cloudscape.design/patterns/patterns/overview/
+************************************************************************/
+@use '@cloudscape-design/design-tokens/index.scss' as awsui;
+// @use '~@cloudscape-design/design-tokens' as awsui;
+
+.density-switch {
+  &-window {
+    stroke: awsui.$color-background-home-header;
+    fill: awsui.$color-background-container-content;
+  }
+  &-top-navigation {
+    fill: awsui.$color-background-button-primary-disabled;
+  }
+  &-header {
+    fill: awsui.$color-background-layout-main;
+  }
+  &-default {
+    fill: awsui.$color-text-body-default;
+  }
+  &-primary {
+    fill: awsui.$color-background-button-primary-default;
+  }
+  &-disabled {
+    fill: awsui.$color-background-control-disabled;
+  }
+  &-secondary {
+    fill: awsui.$color-text-body-secondary;
+  }
+  &-separator {
+    stroke: awsui.$color-border-button-primary-disabled;
+  }
+}

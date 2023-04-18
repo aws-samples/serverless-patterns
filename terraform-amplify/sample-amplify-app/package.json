@@ -1,0 +1,50 @@
+{
+  "name": "sample-qs",
+  "description": "Sample Amplify Web App with backend resourced managed by Terraform.",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "repository": "",
+  "homepage": "./",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "npm run build && vite preview",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@aws-amplify/ui-react": "^4.3.9",
+    "@cloudscape-design/collection-hooks": "^1.0.7",
+    "@cloudscape-design/components": "^3.0.45",
+    "@cloudscape-design/design-tokens": "^3.0.1",
+    "@cloudscape-design/global-styles": "^1.0.1",
+    "@cloudscape-design/test-utils-core": "^1.0.1",
+    "@cloudscape-design/theming-runtime": "^1.0.2",
+    "aws-amplify": "^5.0.14",
+    "child_process": "^1.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.3.0",
+    "sass": "^1.54.8"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.3.0",
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "@vitejs/plugin-react": "^2.0.1",
+    "eslint": "^8.23.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.6.1",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.4",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jsdom": "^20.0.0",
+    "prettier": "^2.7.1",
+    "vite": "^3.0.7",
+    "vitest": "^0.22.1"
+  }
+}
