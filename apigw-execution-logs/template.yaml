@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: REST API with CloudWatch execution and access logs enabled.
+
+Globals:
+  Api:
+    OpenApiVersion: 3.0.1
+
+Parameters:
+
+# Enter name for CloudWatch access log group 
+ AccessLogGroup:
+   Type: String
+   Default: Enter a name for the CloudWatch access log group
+
+Resources:
+
+# REST API
+  MyApi:
+    Type: AWS::Serverless::Api
+    DependsOn: ApiCWLRoleArn
+    Properties:
+      StageName: prod
+      AccessLogSetting:
+        DestinationArn: !GetAtt MyLogGroup.Arn
+        Format: "{ \"requestId\":\"$context.requestId\", \"ip\": \"$context.identity.sourceIp\", \"caller\":\"$context.identity.caller\", \"user\":\"$context.identity.user\",\"requestTime\":\"$context.requestTime\", \"httpMethod\":\"$context.httpMethod\",\"resourcePath\":\"$context.resourcePath\", \"status\":\"$context.status\",\"protocol\":\"$context.protocol\", \"responseLength\":\"$context.responseLength\" }"
+      MethodSettings:
+        - MetricsEnabled: True
+          ResourcePath: '/*'
+          HttpMethod: '*'
+          LoggingLevel: INFO
+
+# CloudWatch access log group
+  MyLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '${AccessLogGroup}'
+
+# Specifies the IAM role that API Gateway uses to write API logs to Amazon CloudWatch Logs
+  ApiCWLRoleArn:
+    Type: AWS::ApiGateway::Account
+    Properties: 
+      CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
+
+# IAM Role with 'AmazonAPIGatewayPushToCloudWatchLogs' managed policy
+  CloudWatchRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+        Path: /
+        ManagedPolicyArns:
+          - 'arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'
+
+# Lambda function
+  MyFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: index.handler
+            Runtime: python3.7
+            InlineCode: | 
+                import json 
+                def handler(event, context): 
+                    return { 
+                "statusCode": 200, 
+                "body": json.dumps({ "message" : "Hello from Lambda!"}), 
+                }
+            Events:
+                HelloWorld:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MyApi
+                        Path: /
+                        Method: get
+Outputs:
+  # API endpoint for testing
+  MyApi:
+    Description: API endpoint URL
+    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/prod/
+  MyLogGroup:
+    Description: Name of the log group
+    Value: !Ref MyLogGroup                        
