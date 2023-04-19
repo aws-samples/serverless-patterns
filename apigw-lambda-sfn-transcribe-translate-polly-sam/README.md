@@ -8,7 +8,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Programming Language
 
-This is a Maven project which uses Node.js and WebPack along with AWS SDK for Javascript.
+This is a Node.js project which uses WebPack along with AWS SDK for Javascript.
 
 ## Services
 
@@ -48,10 +48,12 @@ The AWS services used in this pattern are
     ```
 1. Run install the libraries for the application:
     ```
+    cd src
     npm install
     ```
 1. Now the deploy the serverless template:
     ```
+    cd ..
     sls deploy
     ```
 
