@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd apigw-execution-logs
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -30,6 +30,7 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
+    * Enter a CloudWatch AccessLogGroup Name for the API Gateway logs
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -45,13 +46,17 @@ A REST API is created that has an IAM role with managed policy 'AmazonAPIGateway
 1. Once you make requests to the API i.e. curl https://{api-id}.execute-api.{region}.amazonaws.com/prod/, you will receive a 'Hello from Lambda!' in response.
 2. Navigate to the CloudWatch console, in the left navigation pane, under Logs, choose Log Groups.
 3. The log group's name is in the following format: API-Gateway-Execution-Logs-apiId/stageName. You will see execution log streams generated.
-4. Access logs will be generated in a separate log group under the name you provided in parameters.
+4. You can also view the access logs in a separate log group under the name you provided in parameters.
+5. You can also use AWS SAM to view the logs, specifying the log group name, for example:
+    ``` 
+    sam logs --cw-log-group apigw-execution-logs
+    ``` 
 
 ## Cleanup
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete
     ```
 1. Confirm the stack has been deleted
     ```bash
