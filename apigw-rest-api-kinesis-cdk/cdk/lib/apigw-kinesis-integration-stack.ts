@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { AwsIntegration, RestApi, PassthroughBehavior, MethodResponse, Model } from 'aws-cdk-lib/aws-apigateway'
+import { AwsIntegration, RestApi, PassthroughBehavior, MethodResponse } from 'aws-cdk-lib/aws-apigateway'
 import { Effect, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam'
 import { Stream } from 'aws-cdk-lib/aws-kinesis';
 
@@ -17,8 +17,9 @@ export class ApigwKinesisIntegrationStack extends cdk.Stack {
 
       // RestApi
       const restApi = new RestApi(this, 'ApiKinesisRestApi')
+      
       // Add a resource for Kinesis Streams
-      const streamsResource = restApi.root
+      const streamsResource = restApi.root.addResource('kinesis');
 
       // Role for API Gateway Service to Assume
       const integrationRole = new Role(this, 'ApiGatewayRole', {
@@ -58,5 +59,48 @@ export class ApigwKinesisIntegrationStack extends cdk.Stack {
       };
 
       listStreamsMethod.addMethodResponse(methodResponse);
+
+      const getShardIteratorRequestTemplate = {
+        'ShardId': "$input.params('shard-id')",
+        'ShardIteratorType': 'TRIM_HORIZON',
+        'StreamName': "$input.params('stream-name')",
+      };
+
+      const getShardIteratorMethodOptions = {
+        requestParameters: {
+          ['method.request.querystring.shard-id']: true,
+        },
+      };
+
+      const singleStreamResource = streamsResource.addResource('{stream-name}');
+      const shardIteratorResource = singleStreamResource.addResource('sharditerator');
+
+      // Create GET Method to get a shard iterator on a stream
+      const getShardIteratorMethod = shardIteratorResource.addMethod(
+        'GET',
+        new AwsIntegration({
+          service: 'kinesis',
+          action: 'GetShardIterator',
+          integrationHttpMethod: 'POST',
+          options: {
+            credentialsRole: integrationRole,
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            requestParameters: {
+              ['integration.request.querystring.shard-id']: 'method.request.querystring.shard-id',
+            },
+            requestTemplates: {
+              ['application/json']: JSON.stringify(getShardIteratorRequestTemplate),
+            },
+            integrationResponses: [
+              {
+                statusCode: '200',
+              },
+            ],
+          },
+        }),
+        getShardIteratorMethodOptions,
+      );
+
+      getShardIteratorMethod.addMethodResponse(methodResponse);
   }
 }
