@@ -38,15 +38,6 @@ Important: this application uses various AWS services and there are costs associ
 
     Once you have run `sam deploy --guided --capabilities CAPABILITY_NAMED_IAM` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-5. Note the following output Values from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
-
-    * ```
-      RDSTableName
-      ```
-
-    * ```
-      SystemsManagerAutomationDocumentName
-      ```  
 
 
 ## How it works
@@ -76,7 +67,7 @@ When the Systems Manger Automation Document is invoked, the execution parameters
     {
       "instance_id": "rds_db_name",
       "index": "123",
-      "step": "Step 1",
+      "step": "1",
       "count": "2"
     }
     ```  
