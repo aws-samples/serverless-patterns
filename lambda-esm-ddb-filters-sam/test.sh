@@ -6,6 +6,7 @@
 # Demo template is expected to be deployed to the AWS CLI's default AWS region
 
 command -v aws >/dev/null 2>&1 || { echo >&2 "This script requires AWS CLI (https://aws.amazon.com/cli/) to be installed.  Aborting."; exit 1; }
+command -v jq >/dev/null 2>&1 || { echo >&2 "This script requires jq (https://stedolan.github.io/jq/) to be installed.  Aborting."; exit 1; }
 
 table='table-lambda-esm-filter'
 
