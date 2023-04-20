@@ -25,31 +25,18 @@ namespace DotnetLambdaCloudwatchDashboard
 
             var dashboard = new Dashboard(this, "DotnetCDKDashboard");
 
-            dashboard.AddWidgets(new TextWidget(new TextWidgetProps
-            {
-                Markdown = "# Key Performance Indicators",
-                Width = 24,
-                Height = 1
-            }));
+            
 
             List<Metric> invocations_metrics = new List<Metric>();
             invocations_metrics.Add(dockerImageFunction.MetricInvocations());
-
-            dashboard.AddWidgets(new GraphWidget(new GraphWidgetProps
-            {
-                Title = "Invocations",
-                Left = invocations_metrics.ToArray(),
-                Width = 24
-            }));
-
 
 
             var functionNameDimension = new Dictionary<string, string>();
             functionNameDimension.Add("function_name", dockerImageFunction.FunctionName);
 
-            List<Metric> insights_metrics = new List<Metric>();
+            List<Metric> insightsMetrics = new List<Metric>();
 
-            insights_metrics.Add(new Metric(new MetricProps()
+            insightsMetrics.Add(new Metric(new MetricProps()
             {
                 MetricName = "cpu_total_time",
                 Namespace = "LambdaInsights",
@@ -58,16 +45,11 @@ namespace DotnetLambdaCloudwatchDashboard
                 Period = Duration.Seconds(10)
             }));
 
-            dashboard.AddWidgets(new GraphWidget(new GraphWidgetProps
-            {
-                Title = "Insights - Average CPU Total Time",
-                Left = insights_metrics.ToArray(),
-                Width = 24
-            }));
+            
 
-            List<Metric> insights_metrics_2 = new List<Metric>();
+            List<Metric> insightsMetrics2 = new List<Metric>();
 
-            insights_metrics_2.Add(new Metric(new MetricProps()
+            insightsMetrics2.Add(new Metric(new MetricProps()
             {
                 MetricName = "memory_utilization",
                 Namespace = "LambdaInsights",
@@ -76,12 +58,12 @@ namespace DotnetLambdaCloudwatchDashboard
                 Period = Duration.Seconds(10)
             }));
 
-            List<Metric> custom_metrics = new List<Metric>();
+            List<Metric> customMetrics = new List<Metric>();
 
             var serviceDimension = new Dictionary<string, string>();
             serviceDimension.Add("Service", "ProxyCall");
 
-            custom_metrics.Add(new Metric(new MetricProps()
+            customMetrics.Add(new Metric(new MetricProps()
             {
                 MetricName = "Proxy-Request",
                 Namespace = "MyDotNetApp",
@@ -90,7 +72,7 @@ namespace DotnetLambdaCloudwatchDashboard
                 Period = Duration.Seconds(10)
             }));
 
-            custom_metrics.Add(new Metric(new MetricProps()
+            customMetrics.Add(new Metric(new MetricProps()
             {
                 MetricName = "Proxy-Successful",
                 Namespace = "MyDotNetApp",
@@ -99,22 +81,44 @@ namespace DotnetLambdaCloudwatchDashboard
                 Period = Duration.Seconds(10)
             }));
 
-            var gw_1 = new GraphWidget(new GraphWidgetProps
+            var graphwidget1 = new GraphWidget(new GraphWidgetProps
             {
                 Title = "Custom - Number of Requests & Success",
-                Left = custom_metrics.ToArray(),
+                Left = customMetrics.ToArray(),
                 Width = 6,
                 View = GraphWidgetView.PIE,
             });
 
-            var gw_2 = new GraphWidget(new GraphWidgetProps
+
+            var graphwidget2 = new GraphWidget(new GraphWidgetProps
             {
                 Title = "Insights - Average Memory Utilization",
-                Left = insights_metrics_2.ToArray(),
+                Left = insightsMetrics2.ToArray(),
                 Width = 6
             });
-            dashboard.AddWidgets(gw_1,gw_2);
 
+            dashboard.AddWidgets(new TextWidget(new TextWidgetProps
+            {
+                Markdown = "# Key Performance Indicators",
+                Width = 24,
+                Height = 1
+            }));
+
+            dashboard.AddWidgets(graphwidget1, graphwidget2);
+
+            dashboard.AddWidgets(new GraphWidget(new GraphWidgetProps
+            {
+                Title = "Invocations",
+                Left = invocations_metrics.ToArray(),
+                Width = 24
+            }));
+
+            dashboard.AddWidgets(new GraphWidget(new GraphWidgetProps
+            {
+                Title = "Insights - Average CPU Total Time",
+                Left = insightsMetrics.ToArray(),
+                Width = 24
+            }));
         }
     }
 }
