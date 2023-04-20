@@ -23,7 +23,12 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS Lambda >> Cloudwatch"
+        "text": "AWS Lambda",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Cloudwatch",
+        "link": "https://aws.amazon.com/cloudwatch/"
       }
     ]
   },
