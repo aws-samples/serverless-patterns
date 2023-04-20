@@ -345,6 +345,6 @@ The below table captures the results from the above testing.
  
 1. Delete the ESM filter testing stack
     ```bash
-    aws cloudformation delete-stack --stack-name lambda-msk-esm-stack
+    sam delete --stack-name lambda-msk-esm-stack
     ```
 1. If you have created an MSK cluster and bastion environment using the sample instructions, delete the stack using corresponding [instructions](https://catalog.workshops.aws/msk-labs/en-US/msklambda/gsrschemareg/cleanup)
