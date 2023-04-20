@@ -13,8 +13,6 @@ namespace DotnetLambdaCloudwatchDashboard
             // The code that defines your stack goes here
             DockerImageCode dockerImageCode = DockerImageCode.FromImageAsset("src/lambda/proxy-lambda");
 
-            var layerArn = "arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension:14";
-
             // Lambda from Image
             DockerImageFunction dockerImageFunction = new DockerImageFunction(this,
                 "container-image-lambda-function",
@@ -22,8 +20,7 @@ namespace DotnetLambdaCloudwatchDashboard
                 {
                     Code = dockerImageCode,
                     Description = ".NET 6 Docker Lambda function",
-                    Timeout = Duration.Minutes(1),
-                    InsightsVersion = LambdaInsightsVersion.FromInsightVersionArn(layerArn)
+                    Timeout = Duration.Minutes(1)
                 });
 
             var dashboard = new Dashboard(this, "DotnetCDKDashboard");
@@ -45,14 +42,16 @@ namespace DotnetLambdaCloudwatchDashboard
                 Width = 24
             }));
 
-            List<Metric> insights_metrics = new List<Metric>();
+
 
             var functionNameDimension = new Dictionary<string, string>();
             functionNameDimension.Add("function_name", dockerImageFunction.FunctionName);
 
+            List<Metric> insights_metrics = new List<Metric>();
+
             insights_metrics.Add(new Metric(new MetricProps()
             {
-                MetricName = "memory_utilization",
+                MetricName = "cpu_total_time",
                 Namespace = "LambdaInsights",
                 Statistic = "avg",
                 DimensionsMap = functionNameDimension,
@@ -61,11 +60,21 @@ namespace DotnetLambdaCloudwatchDashboard
 
             dashboard.AddWidgets(new GraphWidget(new GraphWidgetProps
             {
-                Title = "Insights - Average Memory Utilization",
+                Title = "Insights - Average CPU Total Time",
                 Left = insights_metrics.ToArray(),
                 Width = 24
             }));
-            
+
+            List<Metric> insights_metrics_2 = new List<Metric>();
+
+            insights_metrics_2.Add(new Metric(new MetricProps()
+            {
+                MetricName = "memory_utilization",
+                Namespace = "LambdaInsights",
+                Statistic = "avg",
+                DimensionsMap = functionNameDimension,
+                Period = Duration.Seconds(10)
+            }));
 
             List<Metric> custom_metrics = new List<Metric>();
 
@@ -90,12 +99,21 @@ namespace DotnetLambdaCloudwatchDashboard
                 Period = Duration.Seconds(10)
             }));
 
-            dashboard.AddWidgets(new GraphWidget(new GraphWidgetProps
+            var gw_1 = new GraphWidget(new GraphWidgetProps
             {
                 Title = "Custom - Number of Requests & Success",
                 Left = custom_metrics.ToArray(),
-                Width = 24
-            }));
+                Width = 6,
+                View = GraphWidgetView.PIE,
+            });
+
+            var gw_2 = new GraphWidget(new GraphWidgetProps
+            {
+                Title = "Insights - Average Memory Utilization",
+                Left = insights_metrics_2.ToArray(),
+                Width = 6
+            });
+            dashboard.AddWidgets(gw_1,gw_2);
 
         }
     }
