@@ -1,7 +1,7 @@
 {
   "title": "Cloudwatch Dashoard for Lambda",
   "description": "Patterns creates a Lambda Function and Cloudwatch Dashoard with Metrics from Lambda",
-  "language": "dotnet",
+  "language": ".NET",
   "level": "300",
   "framework": "CDK",
   "introBox": {
@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cw-dashboard-lambda-metrics",
       "templateURL": "serverless-patterns/cw-dashboard-lambda-metrics",
       "projectFolder": "cw-dashboard-lambda-metrics",
-      "templateFile": "cw-dashboard-lambda-metrics/cdk.json"
+      "templateFile": "cw-dashboard-lambda-metrics/DotnetLambdaCloudwatchDashboard/DotnetLambdaCloudwatchDashboardStack.cs"
     }
   },
   "resources": {
