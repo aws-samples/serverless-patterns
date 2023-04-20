@@ -39,7 +39,7 @@ The AWS services used in this pattern are
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigw-lambda-sfn-transcribe-translate-polly-sam
+    cd serverless-patterns/apigw-lambda-sfn-transcribe-translate-polly-sam
     ```
 1. From the command line, install serverless library:
     ```
@@ -53,7 +53,6 @@ The AWS services used in this pattern are
     ```
 1. Now the deploy the serverless template:
     ```
-    cd ..
     sls deploy
     ```
 
