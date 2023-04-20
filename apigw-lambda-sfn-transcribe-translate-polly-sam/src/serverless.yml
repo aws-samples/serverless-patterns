@@ -408,9 +408,12 @@ resources:
     StateMachine:
       Value:
         Ref: Orchestrator
-    TranslatorBucket:
+    InputBucket:
       Value:
         Ref: TranslatorBucket
     WebsocketAPI:
       Value:
         Ref: CapstoneWebSocketApi
+    InvokerLambdaName:
+      Value:
+        Ref: InvokerLambda

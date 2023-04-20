@@ -56,7 +56,7 @@ The AWS services used in this pattern are
     sls deploy
     ```
 
-1. Note the outputs from the Serverless deployment process. These contain the S3 bucket name where the audio file has to be copied, the state machine arn and websocket API.
+1. Note the outputs from the Serverless deployment process. These contain the input bucket name where the audio file has to be copied, the state machine arn and websocket API.
 
 ## How it works
 
@@ -66,9 +66,16 @@ API Gateway handles incoming traffic and sends it to the lambda which in turn in
 
 Follow the steps to test the pattern:
 
-1. Copy the audio to the S3 bucket from the output of the deployment step.
+1. Copy the audio to the input bucket (available from the output of the cloudformation stack).
     ```bash
+    cd ..
     aws s3 cp audio.ogg s3://{input-bucket-name}
+    ```
+1. Replace the invoker lambda function name from the output of cloudformation.
+    ```bash
+    aws lambda update-function-code \
+    --function-name  {invoker-lambda-function-name} \
+    --zip-file fileb://invoker.zip
     ```
 1. Install the websocket client
     ```bash
@@ -78,7 +85,7 @@ Follow the steps to test the pattern:
     ```bash
     wscat -c  wss://<API-ID>.execute-api.<Region>.amazonaws.com/dev?proto=https
     ```
-1. On the next prompt, add the input parameters. It can be tested with other language codes as well.
+1. On the next prompt, add the input parameters. Replace the input bucket name. It can be tested with other language codes as well.
     ```bash
     { "bucketName": "<input-bucket-name>", "objectKey": "audio.ogg", "inputLanguageCode": "en-IN", "outputLanguageCode" : "Hindi |hi-IN" }
     ```
@@ -87,8 +94,11 @@ Follow the steps to test the pattern:
 
 ## Cleanup
  
+1. Manually delete the S3 buckets - input bucket and ServerlessDeploymentBucketName (bucket names are available from cloudformation output)
+
 1. Delete the stack
     ```bash
+    cd src
     sls remove
     ```
 ----
