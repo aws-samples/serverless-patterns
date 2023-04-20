@@ -1,0 +1,59 @@
+{
+  "title": "EventBridge pipe with SQS as source, lambda as enrichment and API Destination (API Gateway) as target",
+  "description": "Create an EventBridge pipe to simplify process of pushing items to DynamoDB",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use EventBridge pipe to push and modify messages before sending it to DynamoDB.", 
+      "This pattern is leveraging EventBridge pipe to first integrate 3 services together, simplifying the process by reducing the need for integration code.",
+      "Here, SQS is the EventBridge source and Lambda to enrich the data, before pushing to the target API Destination that invokes an API Gateway."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
+      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
+      "projectFolder": "sfn-athena-cdk-python",
+      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Call Athena with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+      },
+      {
+        "text": "Amazon Athena - Serverless Interactive Query Service",
+        "link": "https://aws.amazon.com/athena/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Your name",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Your bio.",
+      "linkedin": "linked-in-ID",
+      "twitter": "twitter-handle"
+    }
+  ]
+}
