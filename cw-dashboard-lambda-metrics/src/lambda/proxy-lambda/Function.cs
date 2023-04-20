@@ -38,6 +38,6 @@ public class Function
         {
             Metrics.AddMetric("Proxy-Successful", 1, MetricUnit.Count);
         }
-        return response.Content ?? "No content recieved for the request";
+        return string.IsNullOrWhiteSpace(response.Content) ? "No content recieved for the request" : response.Content;
     }
 }
