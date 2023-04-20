@@ -1,9 +1,10 @@
-# AWS Service 1 to AWS Service 2
+# AWS Lambda with Cloudwatch Metrics & Dashboard
 
-This pattern helps build CloudWatch Dashboard with AWS Lambda Metrics. The Dashboard built with 3 widgets,
+This pattern helps build CloudWatch Dashboard with AWS Lambda Metrics. The Dashboard built with 4 widgets,
 1. Invocations - from AWS/Lambda Namespace
-2. memory_utilization - from LambdaInsights Namespace 
-3. Custom Metrics (Proxy-Request & Proxy-Successful) - from Custom Nmespace
+2. memory_utilization - from LambdaInsights Namespace
+3. cpu_total_time - from LambdaInsights Namespace
+4. Custom Metrics (Proxy-Request & Proxy-Successful) - from Custom Namespace
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/
 
