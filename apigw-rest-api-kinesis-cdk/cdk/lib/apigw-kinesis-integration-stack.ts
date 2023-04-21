@@ -60,6 +60,13 @@ export class ApigwKinesisIntegrationStack extends cdk.Stack {
 
       listStreamsMethod.addMethodResponse(methodResponse);
 
+      // Add a resource for operations on a specific Kinesis Stream
+      const singleStreamResource = streamsResource.addResource('{stream-name}');
+      const shardIteratorResource = singleStreamResource.addResource('sharditerator');
+      const recordsResource = singleStreamResource.addResource('records');
+
+      // Create GET method and related resources to get a shard iterator on a stream
+
       const getShardIteratorRequestTemplate = {
         'ShardId': "$input.params('shard-id')",
         'ShardIteratorType': 'TRIM_HORIZON',
@@ -72,10 +79,6 @@ export class ApigwKinesisIntegrationStack extends cdk.Stack {
         },
       };
 
-      const singleStreamResource = streamsResource.addResource('{stream-name}');
-      const shardIteratorResource = singleStreamResource.addResource('sharditerator');
-
-      // Create GET Method to get a shard iterator on a stream
       const getShardIteratorMethod = shardIteratorResource.addMethod(
         'GET',
         new AwsIntegration({
@@ -102,5 +105,44 @@ export class ApigwKinesisIntegrationStack extends cdk.Stack {
       );
 
       getShardIteratorMethod.addMethodResponse(methodResponse);
+
+      // Create GET method and related resources to get records from a stream
+
+      const getRecordsRequestTemplate = {
+        'ShardIterator': "$input.params('Shard-Iterator')",
+      };
+
+      const getRecordsMethodOptions = {
+        requestParameters: {
+          ['method.request.header.Shard-Iterator']: true,
+        },
+      };
+
+      const getRecordsMethod = recordsResource.addMethod(
+        'GET',
+        new AwsIntegration({
+          service: 'kinesis',
+          action: 'GetRecords',
+          integrationHttpMethod: 'POST',
+          options: {
+            credentialsRole: integrationRole,
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            requestParameters: {
+              ['integration.request.header.Shard-Iterator']: 'method.request.header.Shard-Iterator',
+            },
+            requestTemplates: {
+              ['application/json']: JSON.stringify(getRecordsRequestTemplate),
+            },
+            integrationResponses: [
+              {
+                statusCode: '200',
+              },
+            ],
+          },
+        }),
+        getRecordsMethodOptions,
+      );
+
+      getRecordsMethod.addMethodResponse(methodResponse);
   }
 }
