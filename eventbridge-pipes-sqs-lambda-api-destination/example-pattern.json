@@ -14,21 +14,21 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/pjx98/serverless-patterns/tree/pjx98-feature-eventbridge-pipes-sqs-lambda-api-destination/eventbridge-pipes-sqs-lambda-api-destination",
+      "templateURL": "https://github.com/pjx98/serverless-patterns/blob/pjx98-feature-eventbridge-pipes-sqs-lambda-api-destination/eventbridge-pipes-sqs-lambda-api-destination/template.yaml",
+      "projectFolder": "eventbridge-pipes-sqs-lambda-api-destination",
+      "templateFile": "eventbridge-pipes-sqs-lambda-api-destination/template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
       },
       {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs"
       }
     ]
   },
@@ -44,16 +44,15 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: sam delete"
     ]
   },
   "authors": [
     {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "name": "Peh Jing Xiang",
+      "image": "profile-pic.jpg",
+      "bio": "Jing Xiang is an Associate Solutions Architect based in Singapore",
+      "linkedin": "jing-xiang-peh"
     }
   ]
 }

@@ -1,6 +1,6 @@
-# AWS Service 1 to AWS Service 2
+# EventBridge Pipe using SQS as source, Lambda as enrichment, API Destination (API Gateway) as target
 
-This pattern << explain usage >>
+This pattern demonstrates how to use EventBridge pipe to push and modify messages before sending it to DynamoDB. This pattern is leveraging EventBridge pipe to first integrate 3 services together, simplifying the process by reducing the need for integration code. Here, SQS is the EventBridge source, Lambda to enrich the data, before pushing to the target API Destination that invokes an API Gateway.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -12,6 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [AWS Python SDK Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html) installed
 
 ## Deployment Instructions
 
@@ -21,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd eventbridge-pipes-sqs-lambda-api-destination
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -38,22 +39,25 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+EventBridge Pipes helps to integrate various services together, thereby simplifying the process and reducing the need for integration code. Here, we are able to push data from SQS to API Destination via Lambda (enrichment) without any integration code. To take it a step further, the target of the EventBridge Pipe, API Destination, is configured to invoke an API Gateway endpoint which in turn inserts the data into DynamoDB via a Lambda Proxy. The addition of DynamoDB and Lambda proxy is excluded from the EventBridge Pipe, and serves to give you a better visualisation of the outputs of this serverless pattern.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Run the test file (testing.py) located in the testing folder (/testing). 
+```
+cd testing
+python3 testing.py
+```
+We have declared three test items within the test file that will be pushed into the SQS queue to begin the workflow. To ensure that the deployment is running correctly, you should be able to see three test items created in the DynamodB table, with an additional attribute of 'Type: Food' that was inserted via the enrichment lambda.
+
+Take note, ensure that the region and SQS queue url is modified in the testing file (testing.py) accordingly.
 
 ## Cleanup
  
-1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
+Delete the stack
+```
+sam delete
+```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 

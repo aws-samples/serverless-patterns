@@ -32,7 +32,6 @@ Resources:
   
   EnrichmentLogGroup:
     Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${EnrichmentLambdaFunction}
   
@@ -161,7 +160,6 @@ Resources:
 
   FunctionLogGroup:
     Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${Function}
 
@@ -170,3 +168,9 @@ Resources:
     Type: AWS::Serverless::SimpleTable
     Properties:
       TableName: OrderTable
+
+
+Outputs:
+  SourceQueueURL:
+    Description: "SQS queue URL. Do modify the testing file (testing.py) with this url"
+    Value: !Ref SourceQueue
