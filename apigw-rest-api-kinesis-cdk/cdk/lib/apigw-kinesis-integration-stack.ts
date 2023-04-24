@@ -144,5 +144,45 @@ export class ApigwKinesisIntegrationStack extends cdk.Stack {
       );
 
       getRecordsMethod.addMethodResponse(methodResponse);
+          
+      // Create PUT method and related resources to put 1 record from a stream
+      const putRecordRequestTemplate = {
+        "StreamName": "$input.params('stream-name')",
+        "Data": "$util.base64Encode($input.json('$.Data'))",
+        "PartitionKey": "$input.path('$.PartitionKey')",
+      };
+
+      const putRecordMethodOptions = {
+        requestParameters: {
+          ['method.request.header.Content-Type']: true,
+        },
+      };
+
+      const putRecordMethod = recordsResource.addMethod(
+        'PUT',
+        new AwsIntegration({
+          service: 'kinesis',
+          action: 'PutRecord',
+          integrationHttpMethod: 'POST',
+          options: {
+            credentialsRole: integrationRole,
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            requestParameters: {
+              ['integration.request.header.Content-Type']: 'method.request.header.Content-Type',
+            },
+            requestTemplates: {
+              ['application/json']: JSON.stringify(putRecordRequestTemplate),
+            },
+            integrationResponses: [
+              {
+                statusCode: '200',
+              },
+            ],
+          },
+        }),
+        putRecordMethodOptions,
+      );
+
+      putRecordMethod.addMethodResponse(methodResponse);
   }
 }
