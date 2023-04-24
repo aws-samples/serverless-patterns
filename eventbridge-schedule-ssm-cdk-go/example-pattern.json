@@ -14,10 +14,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-ssm-cdk-go",
-      "templateURL": "serverless-patterns/eventbridge-schedule-ssm-cdk-go",
-      "projectFolder": "eventbridge-schedule-ssm-cdk-go",
-      "templateFile": "eventbridge-schedule-ssm-cdk-go/eventbridge-schedule-ssm-cdk-go.go"
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-ssm-cdk-go",
+        "templateURL": "serverless-patterns/eventbridge-schedule-ssm-cdk-go",
+        "projectFolder": "eventbridge-schedule-ssm-cdk-go",
+        "templateFile": "eventbridge-schedule-ssm-cdk-go.go"
     }
   },
   "resources": {
