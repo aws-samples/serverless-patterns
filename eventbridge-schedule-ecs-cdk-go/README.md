@@ -1,6 +1,6 @@
-# EventBridge Scheduler to Run ECS Task
+# Amazon EventBridge Scheduler to Run Amazon Elastic Container Service Task
 
-This pattern will create an [EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) to run a task in Amazon [Elastic Container Service](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/getting-started.html) cluster every 15 minutes. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for GO. 
+This pattern will create an Amazon [EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) to run a task in Amazon [Elastic Container Service](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/getting-started.html) cluster every 15 minutes. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for Go. 
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/eventbridge-schedule-ecs-publish-cdk-go](https://serverlessland.com/patterns/eventbridge-schedule-ecs-cdk-go)
 
@@ -37,7 +37,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-An EventBridge Schedule is created that run a task in an Amazon ECS cluster every 15 minutes. Along with a schedule, the CDK stack creates VPC, ECS Cluster, Fargate Task Definition, Container Definition, an IAM role and policy for EventBridge scheduler to assume and run task in ECS cluster.  
+An Amazon EventBridge Schedule is created that run a task in an Amazon ECS cluster every 15 minutes. Along with a schedule, the CDK stack creates VPC, ECS Cluster, Fargate Task Definition, Container Definition, an IAM role and policy for EventBridge scheduler to assume and run task in ECS cluster.  
 
 ## Testing
 
