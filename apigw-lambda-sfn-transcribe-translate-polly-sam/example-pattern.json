@@ -3,7 +3,7 @@
     "description": "Invoke step function execution from API Gateway to orchestrate workflow across Transcribe, Translate and Polly",
     "language": "Node.js",
     "level": "200",
-    "framework": "sam",
+    "framework": "SAM",
     "introBox": {
       "headline": "How it works",
       "text": [
