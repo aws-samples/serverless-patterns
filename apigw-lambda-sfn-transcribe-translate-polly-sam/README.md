@@ -41,19 +41,13 @@ The AWS services used in this pattern are
     ```
     cd serverless-patterns/apigw-lambda-sfn-transcribe-translate-polly-sam
     ```
-1. From the command line, install serverless library:
+1. Build the stack using sam:
     ```
-    npm install -g serverless
-    sls -v
+    sam build
     ```
-1. Run install the libraries for the application:
+1. Once build succeeded, deploy the stack. Choose options as needed:
     ```
-    cd src
-    npm install
-    ```
-1. Now the deploy the serverless template:
-    ```
-    sls deploy
+    sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
     ```
 
 1. Note the outputs from the Serverless deployment process. These contain the input bucket name where the audio file has to be copied, the state machine arn and websocket API.
@@ -68,14 +62,7 @@ Follow the steps to test the pattern:
 
 1. Copy the audio to the input bucket (available from the output of the cloudformation stack).
     ```bash
-    cd ..
     aws s3 cp audio.ogg s3://{input-bucket-name}
-    ```
-1. Replace the invoker lambda function name from the output of cloudformation.
-    ```bash
-    aws lambda update-function-code \
-    --function-name  {invoker-lambda-function-name} \
-    --zip-file fileb://invoker.zip
     ```
 1. Install the websocket client
     ```bash
@@ -94,12 +81,11 @@ Follow the steps to test the pattern:
 
 ## Cleanup
  
-1. Manually delete the S3 buckets - input bucket and ServerlessDeploymentBucketName (bucket names are available from cloudformation output)
+1. Manually delete all the S3 buckets created by the stack.
 
 1. Delete the stack
     ```bash
-    cd src
-    sls remove
+    sam delete
     ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.

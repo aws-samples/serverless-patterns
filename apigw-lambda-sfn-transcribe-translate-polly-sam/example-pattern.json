@@ -3,7 +3,7 @@
     "description": "Invoke step function execution from API Gateway to orchestrate workflow across Transcribe, Translate and Polly",
     "language": "Node.js",
     "level": "200",
-    "framework": "Serverless",
+    "framework": "sam",
     "introBox": {
       "headline": "How it works",
       "text": [
@@ -23,7 +23,7 @@
     },
     "deploy": {
       "text": [
-        "sls deploy"
+        "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
       ]
     },
     "testing": {
@@ -33,7 +33,7 @@
     },
     "cleanup": {
       "text": [
-        "Delete the stack: <code>sls remove</code>."
+        "Delete the stack: <code>sam delete</code>."
       ]
     },
     "authors": [
