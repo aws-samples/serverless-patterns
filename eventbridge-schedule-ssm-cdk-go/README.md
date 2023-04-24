@@ -1,6 +1,6 @@
 # EventBridge Scheduler to Start State Manager Association Once
 
-This pattern will create an [EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) to start State Manager Association once in AWS [Systems Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/getting-started-launch-managed-instance.html) every 5 minutes. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for GO. 
+This pattern will create an [Amazon EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) schedule to start an [AWS Systems Manager State Manager association](https://docs.aws.amazon.com/systems-manager/latest/userguide/scheduling-automations-state-manager-associations.html) runbook every 5 minutes. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for GO. 
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/eventbridge-schedule-ssm-cdk-go](https://serverlessland.com/patterns/eventbridge-schedule-ssm-cdk-go)
 
@@ -37,11 +37,11 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-An EventBridge Scheduler is created that start State Manager Association once in an AWS Systems Manager every 5 minutes. The demo Association will use an Automation Document "AWS-DisablePublicAccessForSecurityGroup" to revoke RDP and SSH public access in security group.  Along with a scheduler, the CDK stack creates VPC, security group, association, IAM role and policy for Automation and EventBridge Scheduler to assume and start association.  
+An EventBridge Scheduler schedule is created that starts a State Manager association once in AWS Systems Manager every 5 minutes. The demo association will use an automation document `AWS-DisablePublicAccessForSecurityGroup` to revoke RDP and SSH public access in a security group.  Along with a scheduler, the CDK stack creates VPC, security group, association, IAM role, and policy for Automation and EventBridge Scheduler to assume and start association.  
 
 ## Testing
 
-The created security group does not have inbound rule with public RDP and SSH access.  You can manually add public RDP and SSH rule in the target security group.  The public RDP and SSH rules will be revoked in the next EventBridge Scheduler trigger.
+The created security group does not have inbound rule with public RDP and SSH access.  You can manually add public RDP and SSH access in the rule in the target security group.  The public RDP and SSH access rules will be revoked when the next EventBridge Scheduler schedule runs.
 
 ## Cleanup
  
