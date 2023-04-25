@@ -111,6 +111,7 @@ sam logs --stack-name msk-lambda-sasl-nj-sample --tail
     ```bash
     sam delete
     ```
+2. Delete the cloudformation stack that you deployed as prerequisite. 
 
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
