@@ -5,11 +5,11 @@ import { EventBus } from 'aws-cdk-lib/aws-events';
 import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { CfnPipe } from 'aws-cdk-lib/aws-pipes';
-import { AwsCustomResource, PhysicalResourceId, AwsCustomResourcePolicy } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
 
 export interface EventBridgePipesIotCoreStackProps extends cdk.StackProps {
   iotTopicName: string;
+  iotDataEndpoint: string;
   dynamoDbTableName: string;
   apiGateway: {
     restApiName: string;
@@ -43,22 +43,8 @@ export class EventBridgePipesIotCoreStack extends cdk.Stack {
       },
     });
 
-    const getIoTEndpoint = new AwsCustomResource(this, 'IoT-Endpoint', {
-      onCreate: {
-        service: 'Iot',
-        action: 'describeEndpoint',
-        physicalResourceId: PhysicalResourceId.fromResponse('endpointAddress'),
-        parameters: {
-          endpointType: 'iot:Data-ATS',
-        },
-      },
-      policy: AwsCustomResourcePolicy.fromSdkCalls({ resources: AwsCustomResourcePolicy.ANY_RESOURCE }),
-    });
-
-    const IOT_DATA_ENDPOINT = getIoTEndpoint.getResponseField('endpointAddress');
-
     const iotTopicApiEndpoint = iotTopicApi.root.addResource(props?.apiGateway.apiResource!);
-    const iotTopicEndpointSubdomain = IOT_DATA_ENDPOINT.split('.')[0];
+    const iotTopicEndpointSubdomain = props?.iotDataEndpoint.split('.')[0];
     const iotServiceIntegration = new AwsIntegration({
       service: 'iotdata',
       proxy: false,
@@ -81,6 +67,7 @@ export class EventBridgePipesIotCoreStack extends cdk.Stack {
         ],
       },
     });
+
     const methodResponses = [
       {
         statusCode: '200',
@@ -127,7 +114,7 @@ export class EventBridgePipesIotCoreStack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, 'IotDataEndpoint', {
-      value: IOT_DATA_ENDPOINT,
+      value: props?.iotDataEndpoint!,
     });
     new cdk.CfnOutput(this, 'IotTopicName', {
       value: props?.iotTopicName!,
