@@ -2,7 +2,7 @@
   "title": "Cloudformation template to deploy serverless or provisioned MSK Cluster and SAM project with Lambda function to demonstrate SASL authentication",
   "description": "Create a Lambda function that uses an Amazon MSK Topic as an event source.",
   "language": "Node.js",
-  "architectureURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-cfn-sasl-lambda/images/msk-lambda-sasl.png",
+  "architectureURL": "https://github.com/vaibhavjainv/serverless-patterns/tree/vaibhavjainv-feature-msk-cfn-sasl-lambda/msk-cfn-sasl-lambda/images/msk-lambda-sasl.png",
   "videoId": "",
   "level":"200",
   "framework": "SAM",
@@ -39,8 +39,8 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-cfn-sasl-lambda",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-cfn-sasl-lambda/README.md"
+      "repoURL": "https://github.com/vaibhavjainv/serverless-patterns/tree/vaibhavjainv-feature-msk-cfn-sasl-lambda/msk-cfn-sasl-lambda",
+      "readmeURL": "https://github.com/vaibhavjainv/serverless-patterns/tree/vaibhavjainv-feature-msk-cfn-sasl-lambda/msk-cfn-sasl-lambda/README.md"
     },
     "payloads": [
       {
