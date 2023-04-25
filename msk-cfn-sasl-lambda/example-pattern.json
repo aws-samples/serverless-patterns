@@ -1,9 +1,9 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
-  "language": "Python",
+  "title": "Cloudformation template to deploy serverless or provisioned MSK Cluster and SAM project with Lambda function to demonstrate SASL authentication",
+  "description": "Create a Lambda function that uses an Amazon MSK Topic as an event source.",
+  "language": "Node.js",
   "level": "200",
-  "framework": "CDK",
+  "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
