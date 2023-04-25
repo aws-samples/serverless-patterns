@@ -66,7 +66,6 @@ Resources:
                 - kafka-cluster:ReadData
                 - kafka-cluster:AlterGroup
                 - kafka-cluster:DescribeGroup
-                - kafka:*
               Resource: !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:*'
 
 Outputs:

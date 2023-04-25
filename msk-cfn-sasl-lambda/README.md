@@ -25,7 +25,7 @@ Ensure you have met the following:
     - CredentialsSecretArn - ARN for secret manager secret with credentials
     - PrivateSubnetMSKOne, PrivateSubnetMSKTwo, and PrivateSubnetMSKThree - Subent ids
     - SecurityGroupId - Secruity group id
-
+* Complete `Basic Set up` and `SASL/SCRAM authentication` sections in `create-cluster-cfn/README.md` 
 ## Design
 The following diagram describes how MSK and Lambda event driven patter using SASL/SCRAM authentication mechanism.
 ![SASL Diagram](./images/msk-lambda-sasl.png)
@@ -33,11 +33,11 @@ The following diagram describes how MSK and Lambda event driven patter using SAS
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
-    git clone https://github.com/aws-samples/serverless-patterns/kafka-with-lambda-samples
+    git clone https://github.com/aws-samples/serverless-patterns/msk-cfn-sasl-lambda
     ```
 1. Change directory to the pattern directory:
     ```
-    cd kafka-with-lambda-samples/msk-lambda-sasl
+    cd msk-cfn-sasl-lambda
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -96,7 +96,7 @@ The Lambda function’s event payload contains an array of records. Each array i
 ```
 2. Open the Lambda function, check the MSK trigger, if the trigger is disabled, make sure you are using the sane topic name when sending the messages via the producer.
 
-3. Retrieve the topi messages from the logs of Lambda function with the following command. Alternatively you can check in the Lambda logs from the Amazon CloudWatch Logs.
+3. Retrieve the topic messages from the logs of Lambda function with the following command. Alternatively you can check in the Lambda logs from the Amazon CloudWatch Logs.
 
 ```bash
 sam logs --stack-name msk-lambda-sasl-nj-sample --tail
