@@ -1,59 +1,75 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
-  "language": "Python",
-  "level": "200",
+  "title": "EventBridge Pipe targets IoT Core Topic",
+  "description": "Create an EventBridge pipe that publish data to an IoT Core topic",
+  "language": "Typescript",
+  "level": "300",
   "framework": "CDK",
+  "services": {
+    "from": "eventbridge",
+    "to": "iot-data"
+  },
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
+      "This sample project demonstrates how to use an AWS EventBridge Pipe to publish data to an AWS IoT Core Topic. This pattern is leveraging the native integration between the following services: DynamoDB Stream -> EventBridge Pipes -> Api Gateway -> IoT Core.",
+      "This pattern deploys one DynamoDB Table, one EventBridge Pipe and one Api Gateway REST Api."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-ddb-stream-apigateway-iot-core-cdk",
+      "templateURL": "serverless-patterns/eventbridge-pipes-ddb-stream-apigateway-iot-core-cdk",
+      "projectFolder": "eventbridge-pipes-ddb-stream-apigateway-iot-core-cdk",
+      "templateFile": "cdk/lib/cdk-stack.ts"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
       },
       {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs"
+      },
+      {
+        "text": "AWS IoT HTTPS",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/http.html"
+      },
+      {
+        "text": "AWS Solutions Constructs for API Gateway integration to IoT Core",
+        "link": "https://github.com/awslabs/aws-solutions-constructs/tree/58e726ff2050a4d6ff4734a6b556e1f81d97e9aa/source/patterns/%40aws-solutions-constructs/aws-apigateway-iot"
       }
     ]
   },
   "deploy": {
-    "text": [
-      "sam deploy"
-    ]
+    "text": ["cdk deploy"]
   },
   "testing": {
-    "text": [
-      "See the Github repo for detailed testing instructions."
-    ]
+    "text": ["See the Github repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": [
-      "Delete the stack: <code>cdk delete</code>."
-    ]
+    "text": ["Delete the stack: <code>cdk delete</code>."]
   },
   "authors": [
     {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "name": "Mohamad Soufan",
+      "image": "https://pbs.twimg.com/profile_images/1467593280896450562/jRZ4fMWb_400x400.jpg",
+      "bio": "Mohamad is an AWS 5x Certified Cloud Enthusiast who love building solutions with focus on Serverless and Networking. (Majd's twin brother)",
+      "linkedin": "https://www.linkedin.com/in/mohamad-soufan",
+      "twitter": "https://twitter.com/MohamadSoufan4"
+    },
+    {
+      "name": "Majd Soufan",
+      "image": "https://pbs.twimg.com/profile_images/1467263476473090048/JmklQbC8_400x400.jpg",
+      "bio": "Majd is an AWS 5x Certified Cloud Enthusiast who love building solutions with focus on Serverless and Database. (Mohamad's twin brother)",
+      "linkedin": "https://www.linkedin.com/in/majd-soufan",
+      "twitter": "https://twitter.com/Majd95RF"
     }
   ]
 }
