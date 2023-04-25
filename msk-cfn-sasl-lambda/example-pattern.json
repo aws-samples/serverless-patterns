@@ -17,7 +17,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/vaibhavjainv/serverless-patterns/tree/vaibhavjainv-feature-msk-cfn-sasl-lambda/msk-cfn-sasl-lambda"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-cfn-sasl-lambda",
+      "templateURL": "serverless-patterns/msk-cfn-sasl-lambda",
+      "projectFolder": "msk-cfn-sasl-lambda",
+      "templateFile": "msk-cfn-sasl-lambda/create-cluster-cfn/MSKSampleStack.yml"
     }
   },
   "resources": {
