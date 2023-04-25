@@ -44,7 +44,7 @@ An EventBridge Schedule is created that sends a message to an Amazon SNS topic e
 ## Testing
 After the stack has been deployed, you can verify EventBridge is successfully publishing to the topic by viewing the topics "NumberOfMessagesPublished" metric in CloudWatch and verifying positive data points. 
 
-You can also add a subscription to the SNS topic such as an email address or phone number to verify messages are being published to Amazon SNS from EventBridge. 
+You can also add a subscription to the SNS topic such as an email address or phone number to verify messages are being published to Amazon SNS from EventBridge.
 
 ## Cleanup
  
