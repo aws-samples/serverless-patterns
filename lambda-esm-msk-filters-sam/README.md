@@ -300,6 +300,9 @@ export BOOTSTRAP_SERVERS_CONFIG="enter cluster's bootstrap brokers"
 #Sample server config
 #export BOOTSTRAP_SERVERS_CONFIG="b-1.mskclustermsk.abcdef.c14.kafka.us-east-1.amazonaws.com:9092,b-3.mskclustermsk.abcdef.c14.kafka.us-east-1.amazonaws.com:9092,b-2.mskclustermsk.abcdef.c14.kafka.us-east-1.amazonaws.com:9092"
 
+#Create topic if one does not exist
+/home/ec2-user/kafka/bin/kafka-topics.sh --create --topic "enter topic name" --bootstrap-server $BOOTSTRAP_SERVERS_CONFIG
+
 #set topic name
 export ESMFiltersDemoTopic="enter topic name"
 
