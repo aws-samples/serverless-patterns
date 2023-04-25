@@ -54,7 +54,7 @@
     "text": ["See the Github repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>cdk delete</code>."]
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
   },
   "authors": [
     {
