@@ -1,44 +1,40 @@
 {
-  "title": "Cloudformation template to deploy serverless or provisioned MSK Cluster and SAM project with Lambda function to demonstrate SASL authentication",
-  "description": "Create a Lambda function that uses an Amazon MSK Topic as an event source.",
-  "language": "Node.js",
-  "level":"200",
-  "framework": "SAM",
+  "title": "Step Functions to Athena",
+  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern provides two resources - ",
-      " - A CloudFormation template that can be used to deploy serverless or provisioned MSK cluster and Cloud9 instance in the same VPC to interact with the MSK cluster",
-      " - A SAM project with a Lambda Function to demonstrate SASL authentication.",
-      "To test this pattern, first deploy the CloudFormation stack using the template file MSKSampleStack.yml under msk-cfn-sasl-lambda/create-cluster-cfn. You will need to chose if you'd like to provision serverless or provisioned cluster. For both options, all available authentication mechanisms are enabled - TLS, SASL/SCRAM, and IAM for provisioned cluster, and IAM for serverless. Follow msk-cfn-sasl-lambda/create-cluster-cfn/README.md for detailed instructions",
-      "Next step is to deploy the Lambda Function. Follow steps under msk-cfn-sasl-lambda/README.md to deploy and test the Lambda Function.",
-      "Note - Presently MSK with serverless is not supported for SASL authentication, you must use Provisioned option when deplying the MSK cluster." 
+      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
+      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
+      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/vaibhavjainv/serverless-patterns/tree/vaibhavjainv-feature-msk-cfn-sasl-lambda/msk-cfn-sasl-lambda",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
+      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
+      "projectFolder": "sfn-athena-cdk-python",
+      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Using Lambda with Amazon MSK",
-        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+        "text": "Call Athena with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
       },
       {
-        "text": "CloudFormation Provisioned MSK cluster reference",
-        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-msk-cluster.html"
-      },
-      {
-        "text": "CloudFormation serverless MSK cluster reference",
-        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-msk-serverlesscluster.html"
-      } 
+        "text": "Amazon Athena - Serverless Interactive Query Service",
+        "link": "https://aws.amazon.com/athena/"
+      }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy --guided"
+      "sam deploy"
     ]
   },
   "testing": {
@@ -48,36 +44,16 @@
   },
   "cleanup": {
     "text": [
-      "Delete the Lambda Function: <code>sam delete</code>.",
-      "Delete CloudFormation stack to delete the MSK stack and associated resources. "
+      "Delete the stack: <code>cdk delete</code>."
     ]
   },
   "authors": [
     {
-      "name": "Vaibhav Jain",
-      "bio": "AWS - Sr. Application Architect",
-      "linkedin": "https://www.linkedin.com/in/vaibhavjainv/"
-    },
-    {
-      "name": "Paveen Allam",
-      "bio": "Senior Solutions Architect",
-      "image": "https://www.fintail.me/images/pa.jpg",
-      "linkedin": "https://www.linkedin.com/in/pallam/"
-    }, 
-     {
-      "name": "Suraj Tripathi",
-      "bio": "AWS - AppDev Cloud Consultant",
-      "linkedin": "https://www.linkedin.com/in/suraj-tripathi-01b49a140/"
-    },
-    {
-      "name": "Adam Wagner",
-      "bio": "AWS - Principal Serverless Solutions Architect",
-      "linkedin": "https://www.linkedin.com/in/adam-wagner-4bb412/"
-    },
-    {
-      "name": "Indranil Banerjee",
-      "bio": "AWS - Senior Solutions Architect",
-      "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
+      "name": "Your name",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Your bio.",
+      "linkedin": "linked-in-ID",
+      "twitter": "twitter-handle"
     }
   ]
 }
