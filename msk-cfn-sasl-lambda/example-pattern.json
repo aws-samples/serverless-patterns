@@ -7,9 +7,12 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
+      "This pattern provides two resources - ",
+      " - A CloudFormation template that can be used to deploy serverless or provisioned MSK cluster and Cloud9 instance in the same VPC to interact with the MSK cluster",
+      " - A SAM project with a Lambda Function to demonstrate SASL authentication.",
+      "To test this pattern, first deploy the CloudFormation stack using the template file MSKSampleStack.yml under msk-cfn-sasl-lambda/create-cluster-cfn. You will need to chose if you'd like to provision serverless or provisioned cluster. For both options, all available authentication mechanisms are enabled - TLS, SASL/SCRAM, and IAM for provisioned cluster, and IAM for serverless. Follow msk-cfn-sasl-lambda/create-cluster-cfn/README.md for detailed instructions",
+      "Next step is to deploy the Lambda Function. Follow steps under msk-cfn-sasl-lambda/README.md to deploy and test the Lambda Function.",
+      "Note - Presently MSK with serverless is not supported for SASL authentication, you must use Provisioned option when deplying the MSK cluster." 
     ]
   },
   "gitHub": {
