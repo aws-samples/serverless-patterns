@@ -1,0 +1,14 @@
+[
+    {
+      "Source": "manualInput",
+      "DetailType": "manualDetailType",
+      "Detail": "{\"event_type\": \"fin_transaction\",\"customer_type\": \"b2b\",\"customer_name\": \"ABC inc\",\"amount\": \"123.21\",\"date\": \"04\/12\/2023\"}",
+      "EventBusName": "EventBusWithBizTransactions"
+    },
+    {
+        "Source": "manualInput",
+        "DetailType": "manualDetailType",
+        "Detail": "{\"event_type\" : \"fin_transaction\",\"customer_type\": \"b2c\",\"customer_name\":\"XYZ inc\",\"amount\" : \"99.10\",\"date\" : \"04\/12\/2023\" }",
+        "EventBusName": "EventBusWithBizTransactions"
+      }
+  ]

@@ -1,0 +1,61 @@
+{
+    "title": "Sample and Mirror Prod Events to Lower Environments",
+    "description": "This pattern helps sample AWS EventBridge events (select a subset of events based on specific timeframe) and send the events from higher environments (such as production) lower environments (such as dev or stage)",
+    "language": "Python",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "AWS Eventbridge comes with archive feature which can be turned on so that a future playback of events is possible. This pattern uses this feature and automates the process of triggering replay of events for a smaller sampling timeframe (ex. 1 hour) using a step function workflow",
+            "Implemented in CDK."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-events-replay-cdk",
+            "templateURL": "serverless-patterns/eventbridge-events-replay-cdk",
+            "projectFolder": "eventbridge-events-replay-cdk",
+            "templateFile": "eventbridge-events-replay-cdk/python/stack.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text" : "Amazon Eventbridge",
+                "link":"https://aws.amazon.com/eventbridge/"
+            },
+            {
+                "text": "Amazon Eventbridge pipes",
+                "link": "https://aws.amazon.com/eventbridge/pipes"
+            },
+            {
+                "text": "Amazon Kinesis",
+                "link": "https://aws.amazon.com/kinesis/data-streams"
+            }
+           
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy --all"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the Github repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy --all</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Sada Velayutham",
+            "bio": "Builder and a Serverless Enthusiast",
+            "linkedin": "sadavelayutham"
+        }
+    ]
+}
