@@ -57,11 +57,31 @@
   },
   "authors": [
     {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "name": "Vaibhav Jain",
+      "bio": "AWS - Sr. Application Architect",
+      "image": "https://media.licdn.com/dms/image/C4E03AQEqzZWHGT4dBQ/profile-displayphoto-shrink_800_800/0/1580165399872?e=1687392000&v=beta&t=zdxENLnqCpqCz9i1Uf5Yx4YXlR9EYvgxP8N5UTsy6J8",
+      "linkedin": "https://www.linkedin.com/in/vaibhavjainv/"
+    },
+    {
+      "name": "Paveen Allam",
+      "bio": "Senior Solutions Architect",
+      "image": "https://www.fintail.me/images/pa.jpg",
+      "linkedin": "https://www.linkedin.com/in/pallam/"
+    }, 
+     {
+      "name": "Suraj Tripathi",
+      "bio": "AWS - AppDev Cloud Consultant",
+      "linkedin": "https://www.linkedin.com/in/suraj-tripathi-01b49a140/"
+    },
+    {
+      "name": "Adam Wagner",
+      "bio": "AWS - Principal Serverless Solutions Architect",
+      "linkedin": "https://www.linkedin.com/in/adam-wagner-4bb412/"
+    },
+    {
+      "name": "Indranil Banerjee",
+      "bio": "AWS - Senior Solutions Architect",
+      "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
     }
   ]
 }
