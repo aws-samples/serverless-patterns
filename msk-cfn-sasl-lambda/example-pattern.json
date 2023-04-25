@@ -17,10 +17,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/vaibhavjainv/serverless-patterns/tree/vaibhavjainv-feature-msk-cfn-sasl-lambda/msk-cfn-sasl-lambda"
     }
   },
   "resources": {
