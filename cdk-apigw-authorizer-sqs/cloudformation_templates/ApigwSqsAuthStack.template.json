@@ -1,0 +1,597 @@
+{
+ "Parameters": {
+  "storagequeue": {
+   "Type": "String",
+   "Default": "storagequeue-withauth",
+   "Description": "Enter the name of the Amazon SQS queue where events will be stored."
+  },
+  "awsregion": {
+   "Type": "String",
+   "Default": "us-east-1",
+   "Description": "Enter the AWS region name where the resources need to be deployed."
+  },
+  "authorizerneeded": {
+   "Type": "String",
+   "Default": "Yes",
+   "AllowedValues": [
+    "Yes"
+   ],
+   "Description": "Do you need an Custom Authorizer? If Yes, enter a valid Lambda ARN value below."
+  },
+  "lambdaauthorizerarn": {
+   "Type": "String",
+   "Default": "arn:aws:lambda:us-east-1:764551143200:function:apigwRequestAuthorizer",
+   "Description": "If you need a Lambda authorizer, enter the ARN of your Custom Authorizer."
+  }
+ },
+ "Conditions": {
+  "authorizerneededcond": {
+   "Fn::Equals": [
+    "Yes",
+    {
+     "Ref": "authorizerneeded"
+    }
+   ]
+  },
+  "authorizernotneededcond": {
+   "Fn::Equals": [
+    "No",
+    {
+     "Ref": "authorizerneeded"
+    }
+   ]
+  },
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-2"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "Resources": {
+  "storagesqs804AFF47": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": "alias/aws/sqs",
+    "QueueName": {
+     "Ref": "storagequeue"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/storagesqs/Resource"
+   }
+  },
+  "sqspolicyforapigw2BC99F9A": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sqs:SendMessage",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "storagesqs804AFF47",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "sqspolicyforapigw2BC99F9A",
+    "Roles": [
+     {
+      "Ref": "apigwroleDF16DA28"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/sqs-policy-for-apigw/Resource"
+   }
+  },
+  "apigwroleDF16DA28": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": [
+         "apigateway.amazonaws.com",
+         "lambda.amazonaws.com"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "This is the role for apigateway to access SQS queue."
+   },
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/apigw_role/Resource"
+   }
+  },
+  "sqsRequestAuthorizer131B6CB7": {
+   "Type": "AWS::ApiGateway::Authorizer",
+   "Properties": {
+    "Name": "SQSRequestAuthorizer",
+    "RestApiId": {
+     "Ref": "sqsapiwithauth84D3EF87"
+    },
+    "Type": "TOKEN",
+    "AuthorizerUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Fn::Select": [
+         1,
+         {
+          "Fn::Split": [
+           ":",
+           {
+            "Ref": "lambdaauthorizerarn"
+           }
+          ]
+         }
+        ]
+       },
+       ":apigateway:",
+       {
+        "Fn::Select": [
+         3,
+         {
+          "Fn::Split": [
+           ":",
+           {
+            "Ref": "lambdaauthorizerarn"
+           }
+          ]
+         }
+        ]
+       },
+       ":lambda:path/2015-03-31/functions/",
+       {
+        "Ref": "lambdaauthorizerarn"
+       },
+       "/invocations"
+      ]
+     ]
+    },
+    "IdentitySource": "method.request.header.Authorization"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/sqsRequestAuthorizer/Resource"
+   }
+  },
+  "sqsapiwithauth84D3EF87": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "This api will insert data into SQS ",
+       {
+        "Fn::GetAtt": [
+         "storagesqs804AFF47",
+         "QueueName"
+        ]
+       }
+      ]
+     ]
+    },
+    "EndpointConfiguration": {
+     "Types": [
+      "REGIONAL"
+     ]
+    },
+    "Name": "sqsapi-withauth"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/sqsapi-withauth/Resource"
+   }
+  },
+  "sqsapiwithauthCloudWatchRoleDC16617B": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/sqsapi-withauth/CloudWatchRole/Resource"
+   }
+  },
+  "sqsapiwithauthAccountA0937716": {
+   "Type": "AWS::ApiGateway::Account",
+   "Properties": {
+    "CloudWatchRoleArn": {
+     "Fn::GetAtt": [
+      "sqsapiwithauthCloudWatchRoleDC16617B",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "sqsapiwithauth84D3EF87"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/sqsapi-withauth/Account"
+   }
+  },
+  "sqsapiwithauthDeployment04E00C9Eb4b3e148fdc1f6b32349a088a3461630": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "RestApiId": {
+     "Ref": "sqsapiwithauth84D3EF87"
+    },
+    "Description": "Automatically created by the RestApi construct"
+   },
+   "DependsOn": [
+    "sqsapiwithauthsqsPOST8F0B2592",
+    "sqsapiwithauthsqsBBDF005E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/sqsapi-withauth/Deployment/Resource"
+   }
+  },
+  "sqsapiwithauthDeploymentStageprod61A798C8": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "RestApiId": {
+     "Ref": "sqsapiwithauth84D3EF87"
+    },
+    "DeploymentId": {
+     "Ref": "sqsapiwithauthDeployment04E00C9Eb4b3e148fdc1f6b32349a088a3461630"
+    },
+    "StageName": "prod"
+   },
+   "DependsOn": [
+    "sqsapiwithauthAccountA0937716"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/sqsapi-withauth/DeploymentStage.prod/Resource"
+   }
+  },
+  "sqsapiwithauthsqsBBDF005E": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "sqsapiwithauth84D3EF87",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "sqs",
+    "RestApiId": {
+     "Ref": "sqsapiwithauth84D3EF87"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/sqsapi-withauth/Default/sqs/Resource"
+   }
+  },
+  "sqsapiwithauthsqsPOST8F0B2592": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "HttpMethod": "POST",
+    "ResourceId": {
+     "Ref": "sqsapiwithauthsqsBBDF005E"
+    },
+    "RestApiId": {
+     "Ref": "sqsapiwithauth84D3EF87"
+    },
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "sqsRequestAuthorizer131B6CB7"
+    },
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "apigwroleDF16DA28",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "StatusCode": "200"
+      }
+     ],
+     "PassthroughBehavior": "NEVER",
+     "RequestParameters": {
+      "integration.request.header.Content-Type": "'application/x-www-form-urlencoded'"
+     },
+     "RequestTemplates": {
+      "application/json": "Action=SendMessage&MessageBody=$input.body"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "awsregion"
+        },
+        ":sqs:path/",
+        {
+         "Fn::GetAtt": [
+          "storagesqs804AFF47",
+          "QueueName"
+         ]
+        }
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/sqsapi-withauth/Default/sqs/POST/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/01Py07DMBD8lt5dl4hLeyMUcUMNgR8wzlKWxHaw16qC5X/HDyLltDOj3Z2ZhjenI292D+Lm9nIYD0EaCzy8kZAjO3/qTlihgMBmcjZ6QEKjM7l4mj2xpDmyXlLWenDGWwmR5X9hEupjEPzZa5mvHoUD5n4cD68ePOSDAiJDoXjozIRyKaYV9WYqS3mmjzNeBcFNLDy8mxF06+nLWPyt2TYspaB2xv9AK2ylNF4Te4J5MosCXRJvWOp8LX4VrF1K6pVsS7IXSJZDliqKMbJuSUgf7nlzx0+7b4e4t8kVFfC+zj+3cFbwcwEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "ApigwSqsAuthStack/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Outputs": {
+  "sqsapiwithauthEndpointECB718C2": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "sqsapiwithauth84D3EF87"
+      },
+      ".execute-api.",
+      {
+       "Ref": "AWS::Region"
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "sqsapiwithauthDeploymentStageprod61A798C8"
+      },
+      "/"
+     ]
+    ]
+   }
+  }
+ }
+}
