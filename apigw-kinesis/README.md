@@ -1,8 +1,8 @@
-# AWS API Gateway as an Amazon Kinesis proxy 
+# Amazon API Gateway as an Amazon Kinesis proxy 
 
-This pattern deploys a REST API Gateway with an integration of the AWS type to access Kinesis.
+This pattern deploys an Amazon API Gateway REST API with a direct integration to Amazon Kinesis Data Streams.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-kinesis
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
 ## Requirements
