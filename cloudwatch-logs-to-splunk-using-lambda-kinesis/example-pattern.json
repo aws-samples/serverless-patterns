@@ -1,15 +1,15 @@
 {
-  "title": "Stream CloudWatch logs to Splunk near real-time",
-  "description": "This pattern will setup serverless stack with AWS Lambda and Kinesis data stream (KDS) to process continuously streaming CloudWatch logs from different accounts and regions. Lambda receives stream records with CloudWatch log events which it decompress and decode to prepare events to be pushed to Splunk. A log destination ARN need to be configured across all account’s CloudWatch log groups.",
+  "title": "Stream Amazon CloudWatch Logs to Splunk in Near Real-Time",
+  "description": "This pattern sets up a serverless stack with AWS Lambda and Amazon Kinesis Data Stream (KDS) to continuously process streaming CloudWatch logs from different accounts and regions. Lambda receives stream records containing Amazon CloudWatch log events, decompresses and decodes them to prepare events for pushing to Splunk. A log destination Amazon Resource Name (ARN) needs to be configured across all account's CloudWatch log groups.",
   "language": "Python",
   "level": "200",
   "framework": "CDK",
   "introBox": {
-    "headline": "How it works",
+    "headline": "How It Works",
     "text": [
-      "This pattern will setup serverless stack with AWS Lambda and Kinesis data stream (KDS) to process continuously streaming CloudWatch logs from different accounts and regions.",
-      "Lambda receives stream records with CloudWatch log events which it decompress and decode to prepare events to be pushed to Splunk.",
-      "A log destination ARN need to be configured across all accounts CloudWatch log groups as subscription filter for cloutwatch to start streaming logs"
+      "This pattern sets up a serverless stack with AWS Lambda and Amazon Kinesis Data Stream (KDS) to continuously process streaming CloudWatch logs from different accounts and regions.",
+      "Lambda receives stream records containing Amazon CloudWatch log events, decompresses and decodes them to prepare events for pushing to Splunk.",
+      "A log destination ARN needs to be configured across all account's CloudWatch log groups as a subscription filter for Amazon CloudWatch to start streaming logs."
     ]
   },
   "gitHub": {
@@ -23,15 +23,15 @@
   "resources": {
     "bullets": [
       {
-        "text": "Trouble shooting common CDK issues",
+        "text": "Troubleshooting Common AWS CDK Issues",
         "link": "https://docs.aws.amazon.com/cdk/v2/guide/troubleshooting.html#troubleshooting_app_required"
       },
       {
-        "text": "Splunk - About HTTP Event Collector Indexer Acknowledgment. Use this link to configure http event collector at splunk side",
+        "text": "Splunk - About HTTP Event Collector Indexer Acknowledgment. Use this link to configure the HTTP event collector on the Splunk side",
         "link": "https://docs.splunk.com/Documentation/Splunk/9.0.4/Data/AboutHECIDXAck"
       },
       {
-        "text": " How to create LogDestination using command line",
+        "text": "How to Create a LogDestination Using the AWS Command Line Interface (CLI)",
         "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CreateDestination.html"
       }
     ]
@@ -41,12 +41,12 @@
       "git clone https://github.com/aws-samples/serverless-patterns",
       "cd cloudwatch-logs-to-splunk-using-lambda-kinesis",
       "cdk deploy",
-      "Note: Please refer manual steps/instructions after cdk has successfully deployed in Readme.md file"
+      "Note: Please refer to manual steps/instructions after the AWS CDK has successfully deployed in the Readme.md file"
     ]
   },
   "testing": {
     "text": [
-      "See the Github repo for detailed testing instructions in Readme.md file."
+      "See the GitHub repo for detailed testing instructions in the Readme.md file."
     ]
   },
   "cleanup": {

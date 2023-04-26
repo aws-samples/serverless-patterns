@@ -1,6 +1,6 @@
-# Lambda, Kinesis Data Stream, Splunk cloud/Enterprise
+# AWS Lambda, Kinesis Data Stream, Splunk Cloud/Enterprise
 
-This pattern will setup serverless stack with AWS Lambda and Kinesis data stream (KDS) to process continuously streaming CloudWatch logs from different accounts and regions. Lambda receives stream records with CloudWatch log events which it decompress and decode to prepare events to be pushed to Splunk. A log destination ARN need to be configured across all account’s CloudWatch log groups. 
+This pattern will set up a serverless stack with AWS Lambda and Amazon Kinesis Data Stream (KDS) to process continuously streaming Amazon CloudWatch logs from different accounts and regions. AWS Lambda receives stream records with CloudWatch log events, which it decompresses and decodes to prepare events to be pushed to Splunk. A log destination Amazon Resource Name (ARN) needs to be configured across all account's CloudWatch log groups.
 
 Learn more about this pattern at Serverless Land Patterns: https://github.com/aws-samples/serverless-patterns/issues/1204
 
@@ -13,10 +13,8 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS CDK Toolkit Installed]  https://docs.aws.amazon.com/cdk/v2/guide/cli.html
 * You have bootstrapped your account with CDK - https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html
-* Since this pattern will require logs to be ingested in Splunk cloud/enterprise platform. You need to have valid license for the same. For POC purpose you can opt for 14 days trial provided by Splunk with limited functionality. Once you hav valid splunk platform access follow the steps given in below article to create HTTP event collector (HEC) URL and associated token for authentication. Note: Do not opt for indexer acknowledgement while creating HEC.
+* Since this pattern will require logs to be ingested in Splunk cloud/enterprise platform. You need to have a valid license for the same. For POC purpose you can opt for 14 days trial provided by Splunk with limited functionality. Once you have a valid Splunk platform access, follow the steps given in the below article to create an HTTP event collector (HEC) URL and associated token for authentication. Note: Do not opt for indexer acknowledgement while creating HEC.
 Set up and use HTTP Event Collector in Splunk Web https://docs.splunk.com/Documentation/Splunk/9.0.4/Data/UsetheHTTPEventCollector
-
-
 
 ## Deployment Instructions
 
@@ -35,22 +33,22 @@ Set up and use HTTP Event Collector in Splunk Web https://docs.splunk.com/Docume
 1. During the prompts:
     * Process will show changes and take confirmation for deployment with something like "Do you wish to deploy these changes y/n?"
 
-
-    Once your cloudformation stack with name "KinesisDataStreamLogProcessorStack" is successfully deployed. Navigate to cloudformation console > go to stacks > check for status to confirm
+    Once your CloudFormation stack with the name "KinesisDataStreamLogProcessorStack" is successfully deployed, navigate to the CloudFormation console > go to stacks > check for status to confirm
 
 1. Manual steps required after stack deployment
-    The stack will create IAM role required for Log Destination but actual log destination currently not supported or working with CDK. Details on creation you can find in this article(https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CreateDestination.html). Note: Role would have already created by stack only log destination creation will be pending.
-    So you need to perform below small step throuw AWS CLI:
-    1. copy data stream ARN from cloudformation stack > Resources > Data stream with name like 'clw-log-processor-stream'
-        ARN will look like : arn:aws:kinesis:<<Region>>:<<AccountNumber>>:stream/<<data-stream-name>>
-    2. copy log destination IAM role ARN from cloudformation stack> resource with name like 'LogDestinationRole*'
-    3. Enter above ARN details in below command placeholders and run this command in AWS CLI (Refer this link for configuring up AWS CLI https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+    The stack will create the IAM role required for Log Destination, but the actual log destination is currently not supported or working with CDK. Details on creation can be found in this article (https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CreateDestination.html). Note: The role would have already been created by the stack, and only log destination creation will be pending.
+    So you need to perform the below small step through AWS CLI:
+    1. Copy the data
+stream ARN from CloudFormation stack > Resources > Data stream with a name like 'clw-log-processor-stream'
+    ARN will look like : arn:aws:kinesis:<<Region>>:<<AccountNumber>>:stream/<<data-stream-name>>
+2. Copy the log destination IAM role ARN from CloudFormation stack > resource with a name like 'LogDestinationRole*'
+3. Enter the above ARN details in the below command placeholders and run this command in AWS CLI (Refer to this link for configuring up AWS CLI https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
     ```
-    Run below command in AWS CLI
+    Run the below command in AWS CLI
     aws logs put-destination
         –destination-name “<<LogDestination name you wish to give>>”
-        –target-arn “<<Enter kinesis data stream arn created by stack here which is created by stack as part of cdk deploy>>”
-        –role-arn “<<Enter log destination role ARN which is created by stack as part of cdk deploy>>”
+        –target-arn “<<Enter the Kinesis data stream ARN created by the stack here which is created by the stack as part of cdk deploy>>”
+        –role-arn “<<Enter the log destination role ARN which is created by the stack as part of cdk deploy>>”
     ```
     Output should look like below:
 
@@ -65,38 +63,37 @@ Set up and use HTTP Event Collector in Splunk Web https://docs.splunk.com/Docume
         }
     }
     ```
-    4. Please note down ARN of log destination which you can use to configure subscription filter across cloudwatch log groups in same or cross account. 
-    5. You can also get log destination details using below command if you miss noting down. You can also use this step as verification.
+    4. Please note down the ARN of the log destination, which you can use to configure the subscription filter across CloudWatch log groups in the same or cross-account. 
+    5. You can also get log destination details using the below command if you miss noting it down. You can also use this step as verification.
         ```
         aws logs describe-destinations
         ```
-    6. you need to configure Splunk HEC URL and Token in Lambda environment variable.
+    6. You need to configure the Splunk HEC URL and Token in the Lambda environment variable.
 
-    For more information refer below articles
-    Trouble shooting common CDK issues : https://docs.aws.amazon.com/cdk/v2/guide/troubleshooting.html#troubleshooting_app_required
+For more information, refer to the below articles:
+    Troubleshooting common CDK issues: https://docs.aws.amazon.com/cdk/v2/guide/troubleshooting.html#troubleshooting_app_required
     About HTTP Event Collector Indexer Acknowledgment https://docs.splunk.com/Documentation/Splunk/9.0.4/Data/AboutHECIDXAck
-
 
 ## How it works
 
-1. It will create kinesis data stream which will receive streaming logs from cloudwatch log groups. For this cloud watch log groups need to have subscription filter created to log destination.
-2. Kinesis data stream will be trigger or event source for Lambda function. So lambda will receive log streams ingested by various applications via cloudwatch log groups.
-3. Lambda will decompress log streams and decode Base64 strings. It will then send log events to splunk using web api URL provided by splunk platform. 
-4. Log streams will appear near real time in splunk dashboard (search & reporting)
-
+1. It will create a Kinesis data stream, which will receive streaming logs from CloudWatch log groups. For this, CloudWatch log groups need to have a subscription filter created to log destination.
+2. The Kinesis data stream will be the trigger or event source for the Lambda function. So Lambda will receive log streams ingested by various applications via CloudWatch log groups.
+3. Lambda will decompress log streams and decode Base64 strings. It will then send log events to Splunk using the web API URL provided by the Splunk platform. 
+4. Log streams will appear near real-time in the Splunk dashboard (search & reporting)
 
 ## Testing
 
-1. Create simple test lambda function which will perform some operations and write some logs.
-2. The lambda function logs will be visible initially in "/aws/lambda/<function-name>" log group.
-3. Go to cloudwatch console > log groups > click on particular log group > go to subscriptions > create subscription with 'Kinesis Stream' as destination. Use Log destination ARN which you have noted during creating subscription.
-4. You can create API gateway in front of test lambda function or call your function from another test function. Do not use test function capability on lambda console as it doesn't generate logs in required format and certain sections are not populated. This will not be the case if you use lambda behind api gateway or invoke it using other lambda or other invoking mechanism except on console testing.
-5. You can monitor function for success rate. Once your test function and actual log processor function has sucessful invocations. You can go to splunk platform and use 'search and reporting' module to search your logs. Try to log unique strings from your test function so you can find it in splunk almost near real time.
+1. Create a simple test Lambda function that will perform some operations and write some logs.
+2. The Lambda function logs will be visible initially in "/aws/lambda/<function-name>" log group.
+3. Go to the CloudWatch console > log groups > click on a particular log group > go to subscriptions > create subscription with 'Kinesis Stream' as the destination. Use the Log destination ARN, which you have noted during creating the subscription.
+4. You can create an API Gateway
+in front of the test Lambda function or call your function from another test function. Do not use the test function capability on the Lambda console, as it doesn't generate logs in the required format, and certain sections are not populated. This will not be the case if you use Lambda behind an API Gateway or invoke it using another Lambda or other invoking mechanisms except for console testing.
+5. You can monitor the function for success rate. Once your test function and actual log processor function have successful invocations, you can go to the Splunk platform and use the 'search and reporting' module to search your logs. Try to log unique strings from your test function so you can find it in Splunk almost near real-time.
 
-Congratulations ! You have successfully tested end to end flow after this.
+Congratulations! You have successfully tested the end-to-end flow after this.
 
 ## Cleanup
- 
+
 1. Delete the stack
     ```
     cdk destroy
@@ -105,9 +102,8 @@ Congratulations ! You have successfully tested end to end flow after this.
     ```
     bash
     aws cloudformation delete-stack --stack-name STACK_NAME
-
     ```
-1. Confirm the stack has been deleted
+2. Confirm the stack has been deleted
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
