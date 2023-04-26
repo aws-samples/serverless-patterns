@@ -1,7 +1,7 @@
 {
   "title": "EventBridge Pipe targets IoT Core Topic",
   "description": "Create an EventBridge pipe that publish data to an IoT Core topic",
-  "language": "Typescript",
+  "language": "TypeScript",
   "level": "300",
   "framework": "CDK",
   "services": {
