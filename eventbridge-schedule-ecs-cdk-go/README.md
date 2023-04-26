@@ -1,4 +1,4 @@
-# Amazon EventBridge Scheduler to Run Amazon Elastic Container Service Task
+# Amazon EventBridge Scheduler to run Amazon Elastic Container Service Task
 
 This pattern will create an Amazon [EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) to run a task in Amazon [Elastic Container Service](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/getting-started.html) cluster every 15 minutes. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for Go. 
 
