@@ -1,4 +1,4 @@
-# AWS Lambda, Kinesis Data Stream, Splunk Cloud/Enterprise
+# AWS Lambda, Amazon Kinesis Data Stream, Splunk Cloud/Enterprise
 
 This pattern will set up a serverless stack with AWS Lambda and Amazon Kinesis Data Stream (KDS) to process continuously streaming Amazon CloudWatch logs from different accounts and regions. AWS Lambda receives stream records with CloudWatch log events, which it decompresses and decodes to prepare events to be pushed to Splunk. A log destination Amazon Resource Name (ARN) needs to be configured across all account's CloudWatch log groups.
 
