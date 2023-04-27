@@ -43,7 +43,7 @@ Important: this application uses various AWS services and there are costs associ
 
 A CloudWatch dashboard was created to display metrics from the Lambda function. The dashboard includes the following meterics.
 
-- default metrics in the default namespace
+- Default metrics in the Default Namespace
 - Insight metrics that were collected by instrumenting the Docker Lambda function with Lambda Insight 
 - Custom metrics were sent to CloudWatch by Lambda using Powertools. The Lambda function had two custom metrics: one for all requests, and one for successful requests.
 
