@@ -20,6 +20,7 @@ RUN dotnet publish "proxy-lambda.csproj" \
             -p:PublishReadyToRun=true  
 
 FROM base AS final
+ARG INSIGHTSEXTENSION
 RUN curl -O $INSIGHTSEXTENSION && \
     rpm -U lambda-insights-extension.rpm && \
     rm -f lambda-insights-extension.rpm

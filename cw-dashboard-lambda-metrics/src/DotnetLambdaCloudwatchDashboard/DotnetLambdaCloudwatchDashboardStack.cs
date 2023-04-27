@@ -31,11 +31,8 @@ namespace DotnetLambdaCloudwatchDashboard
 
             var dashboard = new Dashboard(this, "DotnetCDKDashboard");
 
-
-
             List<Metric> invocations_metrics = new List<Metric>();
-            invocations_metrics.Add(dockerImageFunction.MetricInvocations());
-
+            invocations_metrics.Add(dockerImageFunction.MetricInvocations(new MetricOptions() { Period = Duration.Seconds(10) }));
 
             var functionNameDimension = new Dictionary<string, string>();
             functionNameDimension.Add("function_name", dockerImageFunction.FunctionName);
