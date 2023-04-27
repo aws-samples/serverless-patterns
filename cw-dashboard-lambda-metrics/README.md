@@ -95,6 +95,8 @@ Run some transactions from AWS Console - Lambda - Testing using the following ev
 
 After running some transactions. Dashboard should start showing the data in graph.
 
+![dashboard](images/../imges/Dashboard.png)
+
 ## Cleanup
  
 Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
