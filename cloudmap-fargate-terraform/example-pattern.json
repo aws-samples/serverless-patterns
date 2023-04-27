@@ -1,7 +1,7 @@
 {
     "title": "Enabling Service Discovery for AWS Fargate",
     "description": "Provision Amazon Elastic Container Service (ECS) resources and deploy ECS service with integration of Cloud Map",
-    "language": "Terraform",
+    "language": "YAML",
     "level": "200",
     "framework": "Terraform",
     "introBox": {
