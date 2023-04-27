@@ -41,7 +41,21 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Cloudwatch Dashboard created on top of the metrics produced by Lambda Function. Along with the default metrics in the default Namespace, Docker Lambda Function instrumented with Lambda Insight to get the Insight Metrics. Lambda uses Powertools to send the custom metrics. In Lambda function we have two custom metrics one for all the requests and one for successful. 
+A CloudWatch dashboard was created to display metrics from the Lambda function. The dashboard includes the following meterics.
+
+- default metrics in the default namespace
+- Insight metrics that were collected by instrumenting the Docker Lambda function with Lambda Insight 
+- Custom metrics were sent to CloudWatch by Lambda using Powertools. The Lambda function had two custom metrics: one for all requests, and one for successful requests.
+
+**Lambda**: Lambda is a serverless computing service offered by AWS. It allows you to run code without provisioning or managing servers. Lambda functions are triggered by events, such as HTTP requests, database changes, or file uploads.
+
+**CloudWatch**: CloudWatch is a monitoring service offered by Amazon Web Services (AWS). It collects and stores metrics from AWS resources, such as EC2 instances, RDS databases, and Lambda functions. CloudWatch can be used to track the performance, health, and usage of AWS resources.
+
+**Lambda Insight**: Lambda Insight is a feature of Lambda that allows you to collect and analyze metrics from your Lambda functions. Lambda Insight can be used to track the performance, health, and usage of your Lambda functions.
+
+**LambdaPowertools**: Powertools is a set of tools that can be used to collect and send custom metrics to CloudWatch. Powertools can be used with a variety of AWS services, including Lambda, EC2, and RDS.
+
+**Custom metrics**: Custom metrics are metrics that are not collected by default by CloudWatch. Custom metrics can be collected by using Powertools or by writing your own code.
 
 ## Testing
 
@@ -54,6 +68,10 @@ Run some transactions from AWS Console - Lambda - Testing using the following ev
         "requestUrl": "https://random.dog/woof.json"
     }
     ```
+
+    ```cmd
+    aws lambda invoke --function-name DotnetLambdaCloudwatchDas-containerimagelambdafunc-CBMehNDHGXiY --payload '{"requestUrl": "https://random.dog/woof.json"}' response_1.json  
+    ```
 - Payload with OK status_code with no response 
 
     ```json
@@ -61,12 +79,18 @@ Run some transactions from AWS Console - Lambda - Testing using the following ev
         "requestUrl": "https://httpbin.org/status/200"
     }
     ```
+    ```cmd
+    aws lambda invoke --function-name DotnetLambdaCloudwatchDas-containerimagelambdafunc-CBMehNDHGXiY --payload '{ "requestUrl": "https://httpbin.org/status/200" }' response_2.json  
+    ```
 - Payload with error status_code with no response 
 
     ```json
     {
         "requestUrl": "https://httpbin.org/status/500"
     }
+    ```
+    ```cmd
+    aws lambda invoke --function-name DotnetLambdaCloudwatchDas-containerimagelambdafunc-CBMehNDHGXiY --payload '{ "requestUrl": "https://httpbin.org/status/500" }' response_3.json  
     ```
 
 After running some transactions. Dashboard should start showing the data in graph.
@@ -79,6 +103,6 @@ cdk destroy
 ```
 
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

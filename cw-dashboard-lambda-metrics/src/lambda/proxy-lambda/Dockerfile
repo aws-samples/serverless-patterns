@@ -1,5 +1,7 @@
 FROM public.ecr.aws/lambda/dotnet:6 AS base
 
+ARG INSIGHTSEXTENSION
+
 FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim as build
 WORKDIR /src
 COPY ["proxy-lambda.csproj", "proxy-lambda/"]
@@ -18,9 +20,10 @@ RUN dotnet publish "proxy-lambda.csproj" \
             -p:PublishReadyToRun=true  
 
 FROM base AS final
-RUN curl -O https://lambda-insights-extension.s3-ap-northeast-1.amazonaws.com/amazon_linux/lambda-insights-extension.rpm && \
+RUN curl -O $INSIGHTSEXTENSION && \
     rpm -U lambda-insights-extension.rpm && \
     rm -f lambda-insights-extension.rpm
 WORKDIR /var/task
+RUN echo $REGION
 COPY --from=publish /app/publish .
 CMD ["proxy-lambda::proxy_lambda.Function::FunctionHandler"]

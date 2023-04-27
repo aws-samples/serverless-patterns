@@ -10,8 +10,14 @@ namespace DotnetLambdaCloudwatchDashboard
     {
         internal DotnetLambdaCloudwatchDashboardStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
+            var assetImageCodeProps = new AssetImageCodeProps
+            {
+                BuildArgs = new Dictionary<string, string> {
+                { "INSIGHTSEXTENSION", "https://lambda-insights-extension.s3-ap-northeast-1.amazonaws.com/amazon_linux/lambda-insights-extension.rpm" }
+                }
+            };
             // The code that defines your stack goes here
-            DockerImageCode dockerImageCode = DockerImageCode.FromImageAsset("src/lambda/proxy-lambda");
+            DockerImageCode dockerImageCode = DockerImageCode.FromImageAsset("src/lambda/proxy-lambda", assetImageCodeProps);
 
             // Lambda from Image
             DockerImageFunction dockerImageFunction = new DockerImageFunction(this,
@@ -25,7 +31,7 @@ namespace DotnetLambdaCloudwatchDashboard
 
             var dashboard = new Dashboard(this, "DotnetCDKDashboard");
 
-            
+
 
             List<Metric> invocations_metrics = new List<Metric>();
             invocations_metrics.Add(dockerImageFunction.MetricInvocations());
@@ -45,7 +51,7 @@ namespace DotnetLambdaCloudwatchDashboard
                 Period = Duration.Seconds(10)
             }));
 
-            
+
 
             List<Metric> insightsMetrics2 = new List<Metric>();
 
