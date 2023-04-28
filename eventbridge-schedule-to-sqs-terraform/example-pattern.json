@@ -1,7 +1,7 @@
 {
 	"title": "EventBridge Scheduler to SQS",
 	"description": "Create an EventBridge Scheduler that sends messages to an SQS queue",
-	"language": "NA",
+	"language": "Python",
 	"level": "200",
 	"framework": "Terraform",
 	"introBox": {
