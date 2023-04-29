@@ -1,0 +1,56 @@
+{
+  "title": "EventBridge Scheduler to start StepFunctions execution on a schedule",
+  "description": "Simple pattern that starts a StepFunctions execution every 5 minutes using Amazon EventBridge Scheduler and CDK",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An EventBridge Scheduler is created that start execution of StepFunctions workflow every 5 minutes using a cron expression.",
+      "Along with a schedule, the CDK stack creates the stepfunctions statemachine."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-stepfunctions-cdk",
+      "templateURL": "serverless-patterns/eventbridge-schedule-stepfunctions-cdk",
+      "projectFolder": "eventbridge-schedule-stepfunctions-cdk/cdk",
+      "templateFile": "lib/evenbridge-schedule-stepfunction-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with the AWS CDK in TypeScript",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html"
+      },
+      {
+        "text": "Getting Started with EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "AWS CLI start-execution",
+        "link": "https://docs.aws.amazon.com/cli/latest/reference/stepfunctions/start-execution.html#start-execution"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the Github repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "Harun Hasdal",
+      "image": "https://avatars.githubusercontent.com/u/4698942",
+      "bio": "AWS Solution Architect. Serverless advocate.",
+      "linkedin": "harunhasdal",
+      "twitter": "@harunhasdal"
+    }
+  ]
+}
