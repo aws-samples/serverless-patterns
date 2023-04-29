@@ -1,11 +1,10 @@
-const {Stack, aws_ec2} = require('aws-cdk-lib');
+const {Stack} = require('aws-cdk-lib');
 const {PrivateApiCustomDomainConstruct} = require('./private-api-custom-domain-construct')
 const apigateway = require('aws-cdk-lib/aws-apigateway');
 const certificatemanager = require('aws-cdk-lib/aws-certificatemanager');
 const {TestingConstruct} = require("./testing-construct");
 
 // replace the values before deploy
-const PRIVATE_VPC_ID = 'vpc-xx000000';
 const PRIVATE_CERTIFICATE_ARN = 'arn:aws:acm:<aws_region>:<account_id>:certificate/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 
 /**
@@ -25,10 +24,9 @@ class SamplePrivateZoneStack extends Stack {
     constructor(scope, id, props) {
         super(scope, id, props);
 
-        const defaultVpc = aws_ec2.Vpc.fromLookup(this, 'defaultVpc', {vpcId: PRIVATE_VPC_ID});
         const certificate = certificatemanager.Certificate.fromCertificateArn(this, 'privateCertificate', PRIVATE_CERTIFICATE_ARN);
         const privateZoneCustomDomain = new PrivateApiCustomDomainConstruct(this, 'PrivateAPICustomDomain', {
-            vpc: defaultVpc, // optional
+            vpc: undefined,
             certificate: certificate,
             privateZone: undefined,
             privateZoneDomain: 'private.domain.com', // required if privateZone is not provided
