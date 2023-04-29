@@ -26,9 +26,9 @@ class SamplePrivateZoneStack extends Stack {
 
         const certificate = certificatemanager.Certificate.fromCertificateArn(this, 'privateCertificate', PRIVATE_CERTIFICATE_ARN);
         const privateZoneCustomDomain = new PrivateApiCustomDomainConstruct(this, 'PrivateAPICustomDomain', {
-            vpc: undefined,
+            vpc: undefined, // optional
             certificate: certificate,
-            privateZone: undefined,
+            privateZone: undefined, // optional
             privateZoneDomain: 'private.domain.com', // required if privateZone is not provided
             serviceFqdn: 'api.private.domain.com'
         });
