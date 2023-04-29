@@ -1,0 +1,57 @@
+{
+  "title": "API Gateway Custom Domain for Private API",
+  "description": "Create a an API Gateway with custom domain support for private API.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK pattern implements the workaround solution described in the additional resources section.",
+      "API calls to the fully qualified name (FQDN), such as private.domain.com, are resolved by Route53 to a Network Load Balancer (NLB) and forwarded to the API Gateway."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-custom-domain-private-api",
+      "templateURL": "serverless-patterns/apigw-custom-domain-private-api",
+      "projectFolder": "apigw-custom-domain-private-api",
+      "templateFile": "apigw-custom-domain-private-api/lib/sample-stack.js"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Blog: Enabling Private APIs with Custom Domain Names (AWS API Gateway)",
+        "link": "https://georgemao.medium.com/enabling-private-apis-with-custom-domain-names-aws-api-gateway-df1b62b0ba7c"
+      },
+      {
+        "text": "Pattern: API Gateway - Custom domain names",
+        "link": "https://serverlessland.com/repos/apigw-private-custom-domain-name"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Delete the stack: <code>cdk destroy --all</code>."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Thiago Pádua",
+      "image": "https://cdn.tgpadua.host/tgpadua.jpg",
+      "bio": "Senior Partner Solutions Architect, Serverless at Amazon Web Services (AWS)",
+      "linkedin": "https://www.linkedin.com/in/thiagopadua/"
+    }
+  ]
+}
