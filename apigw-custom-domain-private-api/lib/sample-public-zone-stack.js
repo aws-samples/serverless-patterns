@@ -1,7 +1,6 @@
 const {Stack} = require('aws-cdk-lib');
 const route53 = require('aws-cdk-lib/aws-route53');
 const apigateway = require('aws-cdk-lib/aws-apigateway');
-
 const {PrivateApiCustomDomainConstruct} = require('./private-api-custom-domain-construct')
 const {TestingConstruct} = require("./testing-construct");
 
