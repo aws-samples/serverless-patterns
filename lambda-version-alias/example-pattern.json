@@ -14,9 +14,9 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ambda-version-alias",
-      "templateURL": "serverless-patterns/ambda-version-alias",
-      "projectFolder": "ambda-version-alias",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-version-alias",
+      "templateURL": "serverless-patterns/lambda-version-alias",
+      "projectFolder": "lambda-version-alias",
       "templateFile": "lambda-version-alias/template.yml"
     }
   },
