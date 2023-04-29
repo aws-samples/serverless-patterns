@@ -16,11 +16,11 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
 ## Sample Stacks
-| Stack                                                                | Description                                             |
-|----------------------------------------------------------------------|---------------------------------------------------------|
-| [SampleStack](tree/main/lib/sample-stack.js)                         | Stack with single private API using Public Hosted Zone  |
-| [SamplePublicZoneStack](tree/main/lib/sample-public-zone-stack.js)   | Stack with three private APIs using Public Hosted Zone  |
-| [SamplePrivateZoneStack](tree/main/lib/sample-private-zone-stack.js) | Stack with three private APIs using Private Hosted Zone |
+| Stack                                                      | Description                                             |
+|------------------------------------------------------------|---------------------------------------------------------|
+| [SampleStack](lib/sample-stack.js)                         | Stack with single private API using Public Hosted Zone  |
+| [SamplePublicZoneStack](lib/sample-public-zone-stack.js)   | Stack with three private APIs using Public Hosted Zone  |
+| [SamplePrivateZoneStack](lib/sample-private-zone-stack.js) | Stack with three private APIs using Private Hosted Zone |
 
 ## Deployment Instructions
 
