@@ -69,7 +69,7 @@ Resources:
   CreateSnapshotLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: reboot.handler
+      Handler: create-snapshot-lamda-function.handler
       CodeUri: ./src
       Runtime: python3.8
       Timeout: 60
@@ -86,7 +86,7 @@ Resources:
   GetSnapshotStatusLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: status.handler
+      Handler: get-snapshot-status-lamda-function.handler
       CodeUri: ./src
       Runtime: python3.8
       Timeout: 60
