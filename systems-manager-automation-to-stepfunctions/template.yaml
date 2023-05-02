@@ -75,6 +75,7 @@ Resources:
       MasterUsername: '{{resolve:secretsmanager:rRDSSecret:SecretString:username}}'
       MasterUserPassword: '{{resolve:secretsmanager:rRDSSecret:SecretString:password}}'
 
+
   CreateSnapshotLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
