@@ -1,0 +1,218 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless WebApp with S3, CloudFront, API Gateway, DynamoDB and Cognito.
+Resources:
+
+  # Origin Access Control to restrict access to S3 bucket by sending authenticated requests to S3.
+  CloudFrontOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties: 
+      OriginAccessControlConfig: 
+        Description: S3 Origin Access Control
+        Name: S3OriginAccessControl
+        OriginAccessControlOriginType: s3
+        SigningBehavior: no-override
+        SigningProtocol: sigv4
+
+  # CloudFront cache policy to cache contents for 3 hours.
+  CachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Comment: Cache for 3hrs
+        Name: !Ref AWS::StackName
+        DefaultTTL: 10800
+        MaxTTL: 10800
+        MinTTL: 10800
+        Name: 3h
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingBrotli: false
+          EnableAcceptEncodingGzip: false
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - x-forwarded-for
+          QueryStringsConfig:
+            QueryStringBehavior: whitelist
+            QueryStrings:
+              - allowed_query_string_param
+
+  CloudfrontDistribution:
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        Comment: "Cloudfront distribution for serverless webapp"
+        DefaultRootObject: "index.html"
+        Enabled: true
+        HttpVersion: http2
+        # List of origins that Cloudfront will connect to
+        Origins:
+          # Origin for static assests in S3
+          - Id: s3-website
+            DomainName: !GetAtt FrontEndS3Bucket.DomainName
+            S3OriginConfig:
+              OriginAccessIdentity:
+                Fn::Sub: ""
+            # Restricting Bucket access through origin access control
+            OriginAccessControlId: !GetAtt CloudFrontOriginAccessControl.Id
+          # Origin for api
+          - Id: api
+            DomainName: !Sub "${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: 
+                - TLSv1.2                  
+        # To connect the CDN to the origins you need to specify behaviours
+        DefaultCacheBehavior:
+          # Compress resources automatically ( gzip )
+          Compress: "true"
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          ForwardedValues:
+            QueryString: false
+          TargetOriginId: s3-website
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: !Ref CachePolicy
+        CacheBehaviors:
+          - PathPattern: /api
+            Compress: "true"
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - DELETE
+              - PATCH
+            TargetOriginId: api
+            ViewerProtocolPolicy: redirect-to-https
+            #AWS managed cache-policy that disables caching. Recommended for API Gateway Origins.
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad 
+
+  # S3 bucket to host static content.
+  FrontEndS3Bucket:
+    Type: AWS::S3::Bucket
+
+  # Bucket policy to restrict access only to CloudFront
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontEndS3Bucket
+      PolicyDocument:
+        # Restricting access to cloudfront only.
+        Statement:
+          - Effect: Allow
+            Action: "s3:GetObject"
+            Resource:
+              - !Sub "arn:aws:s3:::${FrontEndS3Bucket}/*"
+            Principal:
+              Service: "cloudfront.amazonaws.com"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudfrontDistribution}"
+
+  # Cognito User Pool
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: WildRydes
+      AliasAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+
+  # Cognito client
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: WildRydesWeb
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Rides
+      AttributeDefinitions:
+        - AttributeName: Id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  # HTTP API with CORS configuration
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Description: Serverless webapp api
+      FailOnWarnings: true
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+        AllowOrigins:
+          - "*"
+        AllowHeaders:
+          - "*"
+      Auth:
+        Authorizers:
+          OAuth2Authorizer:
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
+              audience:
+                - !Ref UserPoolClient
+        DefaultAuthorizer: OAuth2Authorizer
+
+  # Lambda function with API Gateway as event source and access to DynamoDB table.
+  LamdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs16.x
+      Events:
+        HttpApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /api
+            Method: POST
+      Policies:
+        ## Read more about SAM Policy templates at:
+        ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+        - DynamoDBWritePolicy:
+            TableName: !Ref DynamoTable
+
+Outputs:
+  WebAppDomain:
+    Value: !GetAtt CloudfrontDistribution.DomainName
+  CloudFrontDistributionId:
+    Value: !GetAtt CloudfrontDistribution.Id
+  WebAppS3BucketName:
+    Value: !Ref FrontEndS3Bucket
+  CognitoUserPoolId:
+    Value: !Ref UserPool
+    Export:
+      Name: "UserPool::Id"
+  CognitoUserPoolClientId:
+    Value: !Ref UserPoolClient
+    Export:
+      Name: "UserPoolClient::Id"
+  Issuer:
+    Description: "Url used for issuer on HTTP API JWT tokens"
+    Value: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
+  DynamoDbTable:
+    Value: !Ref DynamoTable
+    Description: DynamoDb Table
+  HttpApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"

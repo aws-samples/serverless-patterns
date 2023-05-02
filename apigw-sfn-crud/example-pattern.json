@@ -1,0 +1,45 @@
+{
+    "title": "Amazon API Gateway, AWS Step Functions, to Amazon DynamoDB CRUD API",
+    "description": "Create a CRUD API with AWS Step Functions",
+    "language": "OpenAPI",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This stack creates a fully functioning CRUD API powered by Amazon API Gateway direct integration to AWS Step Functions and backed by Amazon DynamoDB."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn-crud",
+        "templateURL": "serverless-patterns/apigw-sfn-crud",
+        "projectFolder": "apigw-sfn-crud",
+        "templateFile": "template.yaml"
+      }
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Eric Johnson",
+        "image": "https://serverlessland.com/assets/images/resources/ericdj.jpg",
+        "bio": "Eric Johnson is a Principal Developer Advocate for Serverless Applications at Amazon Web Services and is based in Northern Colorado. Eric is a fanatic about serverless and enjoys helping developers understand how serverless technologies introduces a major paradigm shift in how they approach building and running applications at massive scale with minimal administration overhead. Prior to this, Eric has worked as a developer, solutions architect and AWS Evangelist for an AWS partner company.",
+        "linkedin": "singledigit",
+        "twitter": "edjgeek"
+      }
+    ]
+  }

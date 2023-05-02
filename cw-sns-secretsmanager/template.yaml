@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: Detect and Notify on Amazon Secrets Manager Secret Key Creation, Updation and Deletion using Amazon CloudWatch event and Amazon SNS
+
+Parameters:
+  SNSEndpoint:
+    Type: String
+    Description: Provide your email address to receive notification from SNS
+Resources:
+  EventRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: "detect-secret-key-changes"
+      Description: "A CloudWatch Event Rule that detects changes to secret's manager secret key and publishes change events to an SNS topic for notification."
+      State: "ENABLED"
+      Targets:
+        - Arn:
+            Ref: "SnsTopicEventRule"
+          Id: "target-id1"
+      EventPattern:
+        detail-type:
+          - "AWS API Call via CloudTrail"
+        detail:
+          eventSource:
+            - "secretsmanager.amazonaws.com"
+          eventName:
+            - "CreateSecret"
+            - "UpdateSecret"
+            - "GetSecretValue"
+            - "PutSecretValue"
+  SnsTopicEventRule:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      Subscription:
+        - Endpoint: !Ref SNSEndpoint
+          Protocol: "email"
+      TopicName: "event-rule-action"
+  SnsTopicPolicyEventRule:
+    Type: "AWS::SNS::TopicPolicy"
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: "Allow"
+            Principal:
+              AWS: !Ref 'AWS::AccountId'
+            Action:
+              - "SNS:GetTopicAttributes"
+              - "SNS:SetTopicAttributes"
+              - "SNS:AddPermission"
+              - "SNS:RemovePermission"
+              - "SNS:DeleteTopic"
+              - "SNS:Subscribe"
+              - "SNS:ListSubscriptionsByTopic"
+              - "SNS:Publish"
+              - "SNS:Receive"
+            Resource:
+              Ref: "SnsTopicEventRule"
+            Condition:
+              StringEquals:
+                AWS:SourceOwner:
+                  Ref: "AWS::AccountId"
+          - Sid: "TrustCWEToPublishEventsToMyTopic"
+            Effect: "Allow"
+            Principal:
+              Service: "events.amazonaws.com"
+            Action: "sns:Publish"
+            Resource:
+              Ref: "SnsTopicEventRule"
+      Topics:
+        - Ref: "SnsTopicEventRule"
+Outputs:
+  MySnsTopicName:
+    Description: SNS topic name
+    Value: !GetAtt SnsTopicEventRule.TopicName
+  MySnsTopicArn:
+    Description: SNS topic ARN
+    Value: !Ref SnsTopicEventRule
