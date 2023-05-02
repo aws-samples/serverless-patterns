@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  LargePayloadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Timeout: 30
+      MemorySize: 256
+      AutoPublishAlias: live
+      Policies:
+        - S3ReadPolicy:
+            BucketName: da-public-assets
+  MyFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !Ref LargePayloadFunction
+      AuthType: AWS_IAM
+      InvokeMode: RESPONSE_STREAM
+Outputs:
+  StreamingFunction:
+    Description: "Large Payload Lambda Function ARN"
+    Value: !GetAtt LargePayloadFunction.Arn
+  StreamingFunctionURL:
+    Description: "Streaming Lambda Function URL"
+    Value: !GetAtt MyFunctionUrl.FunctionUrl

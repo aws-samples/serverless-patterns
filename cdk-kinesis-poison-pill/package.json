@@ -1,0 +1,42 @@
+{
+  "name": "sample-functions",
+  "version": "0.1.0",
+  "bin": {
+    "sample-functions": "bin/app.ts"
+  },
+  "scripts": {
+    "build": "cdk synth",
+    "test": "jest",
+    "cdk": "cdk",
+    "ts-node": "ts-node",
+    "clean": "rm -fr cdk.out/ cdk.local.out/",
+    "clean-build": "npm run clean && npm run build"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.5.2",
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "10.17.27",
+    "@types/prettier": "2.6.0",
+    "@types/uuid": "^8.3.4",
+    "aws-cdk": "2.55.1",
+    "aws-cdk-local": "^2.15.0",
+    "aws-sdk": "^2.1071.0",
+    "axios": "^0.27.2",
+    "jest": "^27.5.1",
+    "jest-openapi": "^0.14.2",
+    "openapi-typescript-codegen": "^0.23.0",
+    "ts-jest": "^27.1.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.2",
+    "yargs": "^17.5.1"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-lambda-go-alpha": "2.55.1-alpha.0",
+    "aws-cdk-lib": "2.55.1",
+    "constructs": "^10.0.0",
+    "js-yaml": "^4.1.0",
+    "openapi3-ts": "^3.0.2",
+    "source-map-support": "^0.5.21",
+    "uuid": "^9.0.0"
+  }
+}

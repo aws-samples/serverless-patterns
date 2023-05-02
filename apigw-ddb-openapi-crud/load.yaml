@@ -1,0 +1,26 @@
+config:
+  target: <your api endpoint>
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: Warm up
+    - duration: 30
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 50
+      name: Sustained load
+scenarios:
+  - name: "Scan database"
+    flow:
+      - post:
+          url: "/"
+          json:
+            message: this is the message
+          capture:
+            - json: "$.id"
+              as: messageId
+      - get:
+          url: "/{{ messageId }}"
+

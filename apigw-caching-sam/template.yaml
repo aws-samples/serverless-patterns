@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: APIGW Caching Demo
+
+Resources:
+  CachedApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      # CacheClusterEnabled: True
+      # CacheClusterSize: "118"
+      # MethodSettings:
+      #   - HttpMethod: "*"
+      #     ResourcePath: "/*"
+      #     CacheDataEncrypted: True
+      #     CacheTtlInSeconds: 1440
+      #     CachingEnabled: True
+      #   - HttpMethod: "POST"
+      #     ResourcePath: "/"
+      #     CacheDataEncrypted: True
+      #     CacheTtlInSeconds: 60
+      #     CachingEnabled: True
+
+  CachedFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Timeout: 3
+      MemorySize: 128
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        HelloWorld:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref CachedApi
+            Path: /
+            Method: ANY
+
+Outputs:
+  CachedApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${CachedApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

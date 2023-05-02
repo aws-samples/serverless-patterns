@@ -1,0 +1,222 @@
+Transform: AWS::Serverless-2016-10-31
+Description: A sample SAM template for deploying Lambda functions.
+
+Parameters:
+  S3bucketname:
+    Type: String
+    Description: Enter a unique name for cloudtrail S3 bucket
+
+  SlackWebhookUrl:
+    Type: String
+    Description: Enter your slack channel webhook url
+
+  LambdaList:
+    Type: CommaDelimitedList
+    Description: Enter the list of Lambda functions you want to monitor
+  
+Resources:
+
+  S3bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3bucketname
+  
+  S3bucketpolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3bucketname
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Principal:
+              Service:
+                - "cloudtrail.amazonaws.com"
+            Action:
+              - "s3:GetBucketAcl"
+            Resource: !Join
+            - ''
+            - - 'arn:aws:s3:::'
+              - !Ref S3bucketname
+            Effect: "Allow"
+          - Principal:
+              Service:
+                - "cloudtrail.amazonaws.com"
+            Action:
+              - "s3:PutObject"
+            Resource: !Join
+            - ''
+            - - 'arn:aws:s3:::'
+              - !Ref S3bucketname
+              - /*
+            Effect: "Allow"
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: "bucket-owner-full-control"
+
+
+  LambdaIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaBasicExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Description: This is execution role of Lambda
+
+  RolePolicies:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: LambdaBasicExecutionRolePolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: 
+              - "logs:CreateLogGroup"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+            Resource: 
+              - "*"
+      Roles: 
+        - !Ref LambdaIamRole
+
+  CloudtrailCWIAMrole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "cloudtrail.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Description: This is execution role of Cloudtrail to push logs to cloudwatch
+      Policies:
+        - PolicyName: LambdaBasicExecutionRolePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: 
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: 
+                  - "*"
+      RoleName: CLoudtrailCloudwatchRole
+
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        ZipFile: |
+          import json, os
+          from urllib import request, parse
+          from base64 import b64decode 
+          from io import BytesIO
+          import gzip
+
+          def lambda_handler(event, context):
+              #print (event)   # <--this is the incoming event payload from cloudwatch
+              f = b64decode(event["awslogs"]["data"])
+              buff = BytesIO(f)
+              f = gzip.GzipFile(fileobj=buff)
+              alarm = f.read ().decode('utf-8')
+              alarm = json.loads(alarm)
+              print (alarm)
+              for i in range (len(alarm["logEvents"])):
+                  message = json.loads(alarm["logEvents"][i]["message"])
+                  #print (message) # <--this is the decoded payload we fetch from the event.
+                  
+                  user = message['userIdentity']['arn']
+                  function = message['resources'][0]['ARN']
+                  notification = f"User '{user}' performed {message['eventName']} on function '{function}' at {message['eventTime']}" 
+                  
+                  #notification = f"User {message['userIdentity']['arn']} performed {message['eventName']} on function {message['requestParameters']['functionName']} at {message['eventTime']}" 
+                  print (notification)
+                  
+                  
+                  url = os.environ['url']
+                  headers = {"Content-Type": "application/json"}
+                  payload = bytes(json.dumps({"text": notification}),encoding='utf-8')
+                  
+                  
+                  req =  request.Request(url, data=payload, headers=headers, method="POST")
+                  r = request.urlopen(req)
+                  content = r.read().decode('utf-8')
+                  print(content)
+
+      Description: This function will fetch logs from cloudwatch and push them to slack channel
+      Environment: 
+        Variables:
+          url: !Ref SlackWebhookUrl
+      FunctionName: SlackNotifierLambda
+      Handler: index.lambda_handler
+      PackageType: Zip
+      Role: !GetAtt LambdaIamRole.Arn
+      Runtime: python3.9
+      Timeout: 300
+
+  CloudwatchLogGroup:
+    Type: AWS::Logs::LogGroup
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn: CloudwatchLogGroup
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Principal: "logs.amazonaws.com"
+      SourceArn: !Sub "${CloudwatchLogGroup.Arn}"
+      SourceAccount: !Ref 'AWS::AccountId'
+
+  CWSubscriptionFilter:
+    DependsOn: LambdaPermission
+    Type: AWS::Logs::SubscriptionFilter
+    Properties: 
+      LogGroupName: !Ref CloudwatchLogGroup
+      FilterPattern: "{$.userIdentity.type=\"IAMUser\"}"
+      DestinationArn: !GetAtt LambdaFunction.Arn
+      FilterName: LambdaFilter
+
+  Cloudtrail:
+    Type: AWS::CloudTrail::Trail
+    DependsOn: S3bucketpolicy
+    Properties: 
+      CloudWatchLogsLogGroupArn: !GetAtt CloudwatchLogGroup.Arn
+      CloudWatchLogsRoleArn: !GetAtt CloudtrailCWIAMrole.Arn
+      EventSelectors: 
+        - DataResources:
+            - Type: AWS::Lambda::Function
+              Values: 
+                - !Select [0, !Ref LambdaList]
+                - !Select [1, !Ref LambdaList]             
+          IncludeManagementEvents: false
+          ReadWriteType: All
+      IncludeGlobalServiceEvents: true
+      IsLogging: true
+      IsMultiRegionTrail: true
+      S3BucketName: !Ref S3bucketname
+      S3KeyPrefix: Ctrail
+      TrailName: CloudtrailLambdaSlack
+
+Outputs:
+  CloudtrailName:
+    Description: The name of the new cloudtrail
+    Value: !Ref Cloudtrail
+  CloudwatchLogGroupName:
+    Description: The name of the log group to monitor
+    Value: !Ref CloudwatchLogGroup
+  SlackNotifierLambdaName:
+    Description: The name of the lambda function
+    Value: !Ref LambdaFunction

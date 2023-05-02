@@ -1,0 +1,326 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless Webform Sample
+
+Parameters:
+  HTTPGetFloodRateParam:
+    Description: "A Rate-Based Rule looking for a maximum rate of a single IP address can perform HTTP Get requests in 5 minutes"
+    Type: Number
+    Default: 10000
+    MinValue: 100
+    MaxValue: 20000000
+  HTTPPostFloodRateParam:
+    Description: "A Rate-Based Rule looking for a maximum rate of a single IP address can perform HTTP Post requests in 5 minutes"
+    Type: Number
+    Default: 1000
+    MinValue: 100
+    MaxValue: 20000000
+
+Resources:
+  API:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+
+  SubmitFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/function.js
+      Description: "Stores sample webform data in DynamoDB."
+      Handler: function.handler
+      PackageType: "Zip"
+      Tracing: Active
+      Runtime: "nodejs16.x"
+      Environment:
+        Variables:
+          DatabaseTable: !Ref DynamoDBTable
+      Policies:
+        - DynamoDBWritePolicy: 
+            TableName: !Ref DynamoDBTable
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /submit
+            Method: POST
+            RestApiId: !Ref API
+
+  DynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: EmailAddress
+        Type: String
+        
+  OriginVerifyHeader:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"HEADERVALUE": "RandomHeader"}'
+        GenerateStringKey: "HEADERVALUE"
+        ExcludePunctuation: true
+  
+  CloudFront:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        DefaultCacheBehavior:
+          Compress: true
+          ForwardedValues:
+            QueryString: false
+          TargetOriginId: s3
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: index.html
+        Enabled: true
+        HttpVersion: http2
+        WebACLId: !GetAtt CloudFrontWebACL.Arn
+        Origins:
+          - Id: s3
+            DomainName: !Join [ "", [ !Ref S3Bucket, ".s3.amazonaws.com" ] ]
+            S3OriginConfig:
+              OriginAccessIdentity:
+                !Join [ "", [ "origin-access-identity/cloudfront/", !Ref CloudFrontOriginAccessIdentity ] ]
+          - Id: api
+            DomainName: !Sub "${API}.execute-api.${AWS::Region}.amazonaws.com"
+            OriginPath: /dev
+            OriginCustomHeaders: 
+              - HeaderName: "X-Origin-Verify"
+                HeaderValue: !Join ['', ['{{resolve:secretsmanager:', !Ref OriginVerifyHeader, ':SecretString:HEADERVALUE}}' ]]
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: 
+                - TLSv1.2
+        CacheBehaviors:
+          - AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+            CachedMethods:
+              - HEAD
+              - GET
+              - OPTIONS
+            Compress: false
+            PathPattern: /submit
+            TargetOriginId: api
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            ViewerProtocolPolicy: redirect-to-https
+
+
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub 'CloudFront OAI for serverless webform sample'
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration: 
+          -
+            ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Statement:
+          -
+            Action:
+              - s3:GetObject
+            Effect: Allow
+            Resource: !Join [ "", [ "arn:aws:s3:::", !Ref S3Bucket, "/*" ] ]
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+
+  CloudFrontWebACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      DefaultAction:
+        Allow: {}
+      Scope: CLOUDFRONT
+      VisibilityConfig:
+        SampledRequestsEnabled: True
+        CloudWatchMetricsEnabled: True
+        MetricName: WebformAPIWAFMetric
+      Rules: 
+        - Name: HTTPGetFloodPProtection
+          Priority: 0
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RateBased
+          Statement:
+            RateBasedStatement:
+              Limit: !Ref HTTPGetFloodRateParam
+              AggregateKeyType: IP
+              ScopeDownStatement:
+                ByteMatchStatement:
+                  SearchString: get
+                  FieldToMatch:
+                    Method: {}
+                  TextTransformations:
+                  - Priority: 0
+                    Type: LOWERCASE
+                  PositionalConstraint: EXACTLY
+        - Name: HTTPPostFloodPProtection
+          Priority: 1
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: test
+          Statement:
+            RateBasedStatement:
+              Limit: !Ref HTTPPostFloodRateParam
+              AggregateKeyType: IP
+              ScopeDownStatement:
+                AndStatement:
+                  Statements:
+                  - ByteMatchStatement:
+                      SearchString: submit 
+                      FieldToMatch:
+                        UriPath: {}
+                      TextTransformations:
+                      - Priority: 0
+                        Type: LOWERCASE
+                      - Priority: 1
+                        Type: URL_DECODE
+                      PositionalConstraint: CONTAINS
+                  - ByteMatchStatement:
+                      SearchString: post
+                      FieldToMatch:
+                        Method: {}
+                      TextTransformations:
+                      - Priority: 0
+                        Type: LOWERCASE
+                      PositionalConstraint: EXACTLY
+        - Name: AWS-AWSManagedRulesAmazonIpReputationList
+          Priority: 2
+          OverrideAction:
+            Count: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: MetricForAMRIPRepList
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAmazonIpReputationList
+        - Name: AWS-AWSManagedRulesAnonymousIpList
+          Priority: 3
+          OverrideAction:
+            Count: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: MetricForAMRAnonIpList
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAnonymousIpList
+        - Name: AWS-AWSManagedRulesCommonRuleSet
+          Priority: 4
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: MetricForAMRCRS
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet 
+        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 5
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: MetricForAMRKnownBadInputs
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet 
+        - Name: AWS-AWSManagedRulesBotControl
+          Priority: 6
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: MetricForAMRBotControl
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesBotControlRuleSet
+  
+  APIWebACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      DefaultAction:
+        Block: {}
+      Scope: REGIONAL
+      VisibilityConfig:
+        SampledRequestsEnabled: True
+        CloudWatchMetricsEnabled: True
+        MetricName: WebformAPIWAFMetric
+      Rules: 
+        - Name: X-Origin-Verify-Header
+          Priority: 0
+          Action:
+              Allow: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: X-Origin-Verify-Header
+          Statement:
+            OrStatement:
+              Statements:
+              - ByteMatchStatement:
+                  FieldToMatch:
+                    SingleHeader:
+                      Name: "X-Origin-Verify"
+                  PositionalConstraint: EXACTLY
+                  SearchString: !Join ['', ['{{resolve:secretsmanager:', !Ref OriginVerifyHeader, ':SecretString:HEADERVALUE}}' ]]
+                  TextTransformations:
+                    - Priority: 0
+                      Type: NONE
+              - ByteMatchStatement:
+                  FieldToMatch:
+                    SingleHeader:
+                      Name: "X-Origin-Verify"
+                  PositionalConstraint: EXACTLY
+                  SearchString: !Join ['', ['{{resolve:secretsmanager:', !Ref OriginVerifyHeader, ':SecretString:HEADERVALUE}}' ]]
+                  TextTransformations:
+                    - Priority: 0
+                      Type: NONE
+  APIWAFAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${API}/stages/dev
+      WebACLArn: !GetAtt  APIWebACL.Arn
+      
+Outputs:
+  CloudfrontDomain:
+    Value: !GetAtt CloudFront.DomainName
+    Export:
+      Name: WebformCloudfrontDomain
+  S3BucketName:
+    Value: !Ref S3Bucket
+    Export:
+      Name: WebformS3Bucket
