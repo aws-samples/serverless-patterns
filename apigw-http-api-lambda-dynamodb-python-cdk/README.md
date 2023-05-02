@@ -6,7 +6,7 @@
 
 Creates an [AWS Lambda](https://aws.amazon.com/lambda/) function writing to [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) and invoked by [Amazon API Gateway](https://aws.amazon.com/api-gateway/) REST API. 
 
-![architecture](architecture.png)
+![architecture](docs/architecture.png)
 
 ## Setup
 
