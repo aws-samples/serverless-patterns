@@ -1,5 +1,5 @@
 
-# Lambda with DynamoDB exposed with APIGateway Python CDK!
+# AWS API Gateway HTTP API to AWS Lambda in VPC to DynamoDB CDK Python Sample!
 
 
 ## Overview
