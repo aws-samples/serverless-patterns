@@ -1,4 +1,4 @@
-# EventBridge Scheduler to Amazon SNS
+# Amazon EventBridge Scheduler to Amazon SNS
 
 This pattern will create an EventBridge schedule to send a message to an Amazon SNS topic every 5 minutes. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for Python. 
 
