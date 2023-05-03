@@ -1,0 +1,36 @@
+openapi: "3.0.1"
+info:
+  title: "CQRS Pattern Command API Gateway Example"
+  version: "1.0.0"
+paths:
+  /:
+    post:
+      responses:
+        "200":
+          description: "200 response"
+          content: {}
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [CommandApiGWRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub":"arn:aws:apigateway:${AWS::Region}:dynamodb:action/PutItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "{\n    \"commandResult\"\
+                : \"orderCreated\"
+                \n}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "#set($inputRoot = $input.path('$'))\n{\n    \"TableName\": \"${OrdersTable}\",\n\n    
+            \"Item\": {\n        \"orderid\": {\n            \"S\": \"$inputRoot.orderId\"\n        },\n        
+            \"items\": {\n\n            \"L\": [\n#foreach($item in $inputRoot.items)			\n			{\n                    
+            \"M\": {\n                        \"itemid\": {\n\n                            
+            \"S\": \"$item.itemid\"\n                        },\n                        \"quantity\": {\n\n                            
+            \"N\": \"$item.quantity\"\n                        }\n                    }\n                }
+            #if($foreach.hasNext),#end\n#end				\n            ]\n        },\n\n        \"status\": {\n            
+            \"S\": \"orderCreated\"\n        },\n        \"lastUpdateDate\": {\n\n            
+            \"S\": \"$context.requestTimeEpoch\"\n        }\n    }  \n}"}
+        passthroughBehavior: "when_no_templates"
+components: {}

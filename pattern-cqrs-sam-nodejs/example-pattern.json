@@ -1,0 +1,60 @@
+{
+  "title": "CQRS Design Pattern",
+  "description": "A sample implementation of the command query responsibility segregation (CQRS) design pattern.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to implement the command query responsibility segregation (CQRS) design pattern using AWS Serverless services.",
+      "The Architecture consist of two Amazon API Gateways: One for Command and one for Query service. Command service uses a Amazon DynamoDB table to persist command data directly from API Gateway. An AWS Lambda function then gets the updates from a Amazon DynamoDB Streams and transforms the model to relational form and stores data in Amazon Aurora Serverless DB instance. On the query service, API Gateway exposes two sample methods which integrate with two Lambda functions. Lambda functions executes queries from Aurora Serverless DB and returns query results as response to API requests. Amazon RDS Proxy is used in front of Aurora Serverless to increase scalibility and security."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/pattern-cqrs-sam-nodejs",
+      "templateURL": "serverless-patterns/pattern-cqrs-sam-nodejs",
+      "projectFolder": "pattern-cqrs-sam-nodejs",
+      "templateFile": "pattern-cqrs-sam-nodejs/template.yaml"
+    }
+  },
+  "resources": {
+      "headline": "Additional resources",
+      "bullets": [
+        {
+          "text": "CQRS pattern",
+          "link": "https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/cqrs-pattern.html"
+        },
+        {
+          "text": "Decompose monoliths into microservices by using CQRS and event sourcing",
+          "link": "https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/decompose-monoliths-into-microservices-by-using-cqrs-and-event-sourcing.html"
+        }        
+      ]
+  },
+  "deploy": {
+      "text": [
+        "sam build",
+        "sam deploy --guided"
+      ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tolga Orhon",
+      "image": "https://avatars.githubusercontent.com/u/76494771?v=4",
+      "bio": "Senior Technical Account Manager at AWS, helping people to keep things running. I enjoy Serverless, Event Driven Architectures, Operational Excellence and Optimization.",
+      "linkedin": "tolgaorhon",
+      "twitter": "tolgaorhon"
+    }
+  ]
+}

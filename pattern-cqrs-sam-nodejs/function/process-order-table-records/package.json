@@ -1,0 +1,11 @@
+{
+    "name": "process-order-table-records",
+    "type": "module",
+    "version": "1.0.0",
+    "description": "Lambda function to process DynamoDB stream and write to MySQL",
+    "dependencies": {
+        "@aws-sdk/rds-signer": "latest",
+        "@aws-sdk/util-dynamodb": "latest",
+        "mysql2": "latest"
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "name": "initialize-database",
+    "type": "module",
+    "version": "1.0.0",
+    "description": "Lambda function that initialize database schema after SAM deployment",
+    "dependencies": {
+        "@aws-sdk/rds-signer": "latest",
+        "mysql2": "latest"
+    }
+}
