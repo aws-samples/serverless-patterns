@@ -20,9 +20,9 @@ from aws_cdk.aws_s3_assets import Asset
 from constructs import Construct
 
 ## Constants
+INDEX_NAME = "cwl"
 LOG_GROUP_NAME = "SvlCTCWL/svl_cloudtrail_logs"
 COLLECTION_NAME = "ctcollection"
-INDEX_NAME="cwl"
 CWL_RETENTION = cwl.RetentionDays.THREE_DAYS
 ARN_IAM_USER = boto3.client("sts").get_caller_identity()["Arn"]
 ENCRYPTIONPOLICY = f"""{{"Rules":[{{"ResourceType":"collection","Resource":["collection/{COLLECTION_NAME}"]}}],"AWSOwnedKey":true}}"""
@@ -38,7 +38,7 @@ DATAPOLICY = f"""[
         }},
         {{
           "ResourceType":"index",
-          "Resource":["index/*/*"],
+          "Resource":["index/{COLLECTION_NAME}/{INDEX_NAME}*"],
           "Permission":["aoss:*"]
         }}
     ],
@@ -72,8 +72,6 @@ class OpensearchServerlessStack(Stack):
             security_group_ids=[es_sec_grp.security_group_id],
             subnet_ids=[s.subnet_id for s in vpc.public_subnets],
         )
-
-        # endpoint = ec2.VpcEndpoint(self, "ServerlessCtCWLVPCE")
 
         ###############################################################################
         # Amazon OpenSearch Serverless collection
@@ -130,7 +128,9 @@ class OpensearchServerlessStack(Stack):
         subscription_filter_lambda.add_to_role_policy(
             iam.PolicyStatement(actions=["logs:*"], resources=["*"])
         )
-
+        subscription_filter_lambda.add_environment(
+            "INDEX_NAME", INDEX_NAME
+        )
         #################################################################################
         # The data access policy needs the lambda role ARN to allow writing.
         dap = DATAPOLICY.replace(
