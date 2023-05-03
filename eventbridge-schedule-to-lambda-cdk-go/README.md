@@ -1,4 +1,4 @@
-# Amazon EventBridge Schedule to AWS Lambda
+# Amazon EventBridge Scheduler to AWS Lambda
 
 
 This pattern will create an EventBridge schedule to invoke a Go based Lambda function. The pattern is deployed using the AWS CDK for Go.
