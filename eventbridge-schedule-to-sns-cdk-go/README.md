@@ -1,6 +1,6 @@
 # EventBridge Scheduler to Amazon SNS
 
-This pattern will create an EventBridge schedule to send a message to an Amazon SNS topic every 5 minutes. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for TypeScript. 
+This pattern will create an EventBridge schedule to send a message to an Amazon SNS topic every 5 minutes. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for Python. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS CDK Toolkit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
-* [Node and NPM](https://nodejs.org/en/download/) installed
+* [Go](https://go.dev/dl/) (`1.18` or above) installed
 
 ## Deployment Instructions
 
@@ -22,15 +22,15 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd eventbridge-schedule-to-sns-cdk-typescript
+    cd eventbridge-schedule-to-sns-cdk-go
     ```
 3. From the command line, bootstrap the CDK if you haven't already done so. 
     ```
     cdk bootstrap 
     ```
-4. Install dependencies:
+4. Install the Go required dependencies:
     ```
-    npm install 
+    go build
     ```
 5. Deploy the CDK stack to your default AWS account and region. 
     ```
@@ -42,9 +42,9 @@ Important: this application uses various AWS services and there are costs associ
 An EventBridge Schedule is created that sends a message to an Amazon SNS topic every 5 minutes. Along with a schedule and topic, the CDK stack creates an IAM role and policy for EventBridge scheduler to assume and send messages. 
 
 ## Testing
-After the stack has been deployed, you can verify EventBridge is successfully publishing to the topic by viewing the topics "NumberOfMessagesPublished" metric and verifying positive data points. 
+After the stack has been deployed, you can verify EventBridge is successfully publishing to the topic by viewing the topics "NumberOfMessagesPublished" metric in CloudWatch and verifying positive data points. 
 
-You can also add a subscription to the SNS topic such as an email address or phone number to verify messages are being published to Amazon SNS from EventBridge. 
+You can also add a subscription to the SNS topic such as an email address or phone number to verify messages are being published to Amazon SNS from EventBridge.
 
 ## Cleanup
  

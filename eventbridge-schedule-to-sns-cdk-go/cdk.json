@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/eventbridge-schedule-to-sns-cdk-typescript.ts",
+  "app": "go mod download && go run eventbridge-schedule-to-sns-cdk.go",
   "watch": {
     "include": [
       "**"
@@ -7,13 +7,9 @@
     "exclude": [
       "README.md",
       "cdk*.json",
-      "**/*.d.ts",
-      "**/*.js",
-      "tsconfig.json",
-      "package*.json",
-      "yarn.lock",
-      "node_modules",
-      "test"
+      "go.mod",
+      "go.sum",
+      "**/*test.go"
     ]
   },
   "context": {
@@ -45,6 +41,7 @@
     "@aws-cdk/aws-apigateway:authorizerChangeDeploymentLogicalId": true,
     "@aws-cdk/aws-ec2:launchTemplateDefaultUserData": true,
     "@aws-cdk/aws-secretsmanager:useAttachedSecretResourcePolicyForSecretTargetAttachments": true,
-    "@aws-cdk/aws-redshift:columnId": true
+    "@aws-cdk/aws-redshift:columnId": true,
+    "@aws-cdk/aws-stepfunctions-tasks:enableEmrServicePolicyV2": true
   }
 }
