@@ -1,5 +1,5 @@
 {
-    "title": "Amazon EventBridge Schedule to Amazon SQS",
+    "title": "Amazon EventBridge Scheduler to Amazon SQS",
     "description": "Simple pattern that publishes a message to an SQS queue every 5 minutes.",
     "language": "Java",
     "level": "200",
