@@ -1,5 +1,5 @@
 {
-  "title": "DynamoDB Stream to EventBridge using Input Transformer.",
+  "title": "Amazon DynamoDB to Amazon EventBridge using Amazon Eventbridge Pipes.",
   "description": "This pattern takes a change data capture event from DynamoDB, removes the data type descriptors and sends the simplified event to an EventBridge bus.",
   "language": "TypeScript",
   "level": "200",
