@@ -1,4 +1,4 @@
-# Amazon EventBridge Schedule to Amazon SQS
+# Amazon EventBridge Scheduler to Amazon SQS
 
 This pattern will create an EventBridge schedule to send a message to an Amazon SQS queue every 5 minutes. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for Java.
 
