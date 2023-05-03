@@ -1,5 +1,5 @@
 {
-    "title": "Amazon EventBridge Schedule to AWS Lambda",
+    "title": "Amazon EventBridge Scheduler to AWS Lambda",
     "description": "Creates an EventBridge schedule to invoke a Go based Lambda function every 5 minutes",
     "language": "Go",
     "level": "200",
