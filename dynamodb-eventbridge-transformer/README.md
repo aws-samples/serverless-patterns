@@ -1,4 +1,4 @@
-# AWS DynamoDB Streams to Event Bridge using Input Transformer.
+# Amazon DynamoDB to Amazon EventBridge using Amazon Eventbridge Pipes
 
 This pattern takes a change data capture event from DynamoDB, removes the data type descriptors and sends the simplified event to an EventBridge bus.
 
