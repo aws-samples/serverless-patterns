@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { EventbridgeScheduleToSnsCdkTypescriptStack } from '../lib/eventbridge-schedule-to-sns-cdk-typescript-stack';
+import { PipesFromDynamoStack } from '../lib/pipes-from-dynamo-stack';
 
 const app = new cdk.App();
-new EventbridgeScheduleToSnsCdkTypescriptStack(app, 'EventbridgeScheduleToSnsCdkTypescriptStack', {
+new PipesFromDynamoStack(app, 'PipesFromDynamoStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
