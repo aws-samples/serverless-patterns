@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon API Gateway REST API that integrates with an Amazon Kinesis data stream using AWS Cloud Development Kit (AWS CDK) in Typescript.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: << todo: Add the live URL here >>
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -48,14 +48,17 @@ Below is an illustration of the general Amazon API Gateway Integration pattern:
   ```
   https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod
   ``` 
-   Click on the API URL to invoke the ListStreams API. This command, if successful, will result in an output similar to the following example:
-
+  This will form the base URI for any requests made to the API Gateway. For example, to invoke the ListStreams API, we use the following `curl` commmand:
+```
+curl https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/kinesis
+```
+and get a response similar to the following,
   ```json
   {"HasMoreStreams":false,"StreamNames":["temp-stream"],"StreamSummaries":[{"StreamARN":"arn:aws:kinesis:{AWS_REGION}:{AWS_ACCOUNT_NUMBER}:stream/temp-stream","StreamCreationTimestamp":1.681224803E9,"StreamModeDetails":{"StreamMode":"PROVISIONED"},"StreamName":"temp-stream","StreamStatus":"ACTIVE"}]}
   ```
 
 
-2. Now that you have the details about your stream, you are ready to input some data. For testing the PutRecord API, enter the curl command in the terminal and replace the variables in the brackets with your specific values found in step 1:
+2. Now that we know what streams there are, we can try to insert records. For testing the PutRecord API, enter the following `curl` command in the terminal and replace the variables in the brackets with your specific values found in step 1:
  
 ```
 curl --location --request PUT 'https://{API_ID}.execute-api.{AWS_REGION}.amazonaws.com/prod/kinesis/{STREAM_NAME}/records' \
@@ -66,42 +69,42 @@ curl --location --request PUT 'https://{API_ID}.execute-api.{AWS_REGION}.amazona
     "StreamName": "{STREAM_NAME}"
 }'
 ```
-   This command, if successful, will result in an output similar to the following example:
+   This command, if successful, will result in output similar to the following:
     
   ```json
    {
    "Encryption": "KMS",
    "SequenceNumber": "49546986683135544286507457936321625675700192471156785154",
    "ShardId": "shardId-000000000000"
-    }
+   }
   ```
   
-3. Before you can get data from the stream, you need to obtain the shard iterator for the shard you are interested in. A shard iterator represents the position of the stream and shard from which the consumer will read. For testing the GetShardIterator API, enter the curl command in the terminal and replace the variables in the brackets with your specific values found in step 1:
+3. Before we can get records from a stream, we need to obtain a shard iterator on the stream's shard which contains the record. A shard iterator represents the position of the stream and the shard from which the consumer will read. For testing the GetShardIterator API, enter the following `curl` command in the terminal and replace the variables in the brackets with your specific values found in step 1:
 
     ```
-    curl --location 'https://{API_ID}.execute-api.{AWS_REGION}.amazonaws.com/prod/kinesis/{STREAM_NAME}/sharditerator?shard-id=0' \ --data ''
+    curl --location 'https://{API_ID}.execute-api.{AWS_REGION}.amazonaws.com/prod/kinesis/{STREAM_NAME}/sharditerator?shard-id=0'
     ```
     
-  This command, if successful, will result in an output similar to the following example:
+  This command, if successful, will result in output similar to the following example:
    ```json
    {
     "ShardIterator": "AAAAAAAAAAE1YXZFNAqJi4JXjyGww5DpbNxTQ5kIeRFYKCw2wtZw9zpAKMVolVf3IRN+lASki/fHs2PrDvjHb2Xl41bPojLmz0RlVrjOIoLFdjydDcVgkyF+ma+12RFFOtwXbIumDVTDYOHKx790TWoLCEBKR4RPbhtq0aOm7aTEegMpgi3t0VhpsYp7wB3KlLML31moO+ZKisMCInI0uEPNoxamBF3xysMrOZ/ZFR9fX/fYXk7SMg=="
 }
    ```
    
-4. The shard iterator specifies the position in the shard from which you want to start reading data records sequentially. If there are no records available in the portion of the shard that the iterator points to, the GetRecords API returns an empty list. Note that it might take multiple calls to get to a portion of the shard that contains records. For testing the GetRecords API, enter the curl command in the terminal and replace the variables in the brackets with your specific values found in step 1, as well as the value of "ShardIterator" value found in step 3:
+4. The shard iterator specifies the position in the shard from which you want to start reading data records sequentially. If there are no records available in the portion of the shard that the iterator points to, the GetRecords API returns an empty list. Note that it might take multiple calls to get to a portion of the shard that contains records. For testing the GetRecords API, enter the following `curl` command in the terminal and replace the variables in the brackets with your specific values found in step 1, as well as the value of "ShardIterator" value found in step 3:
 
    ```
-   curl --location 'https://{API_ID}.execute-api.{AWS_REGION}.amazonaws.com/prod/kinesis/{STREAM_NAME}/records' \ --header 'Shard-Iterator: {SHARD_ITERATOR}' \ --data ''
-    ```
+   curl --location 'https://{API_ID}.execute-api.{AWS_REGION}.amazonaws.com/prod/kinesis/{STREAM_NAME}/records' \ --header 'Shard-Iterator: {SHARD_ITERATOR}'
+   ```
 
-This command, if successful, will result in an output similar to the following example:
+This command, if successful, will result in output similar to the following example (if records are found):
     
    ```json
    {
   "Records":[ {
     "Data":"abc123",
-    "PartitionKey":"123”,
+    "PartitionKey":"123",
     "ApproximateArrivalTimestamp": 1.441215410867E9,
     "SequenceNumber":"49544985256907370027570885864065577703022652638596431874"
   } ],
@@ -114,13 +117,13 @@ This command, if successful, will result in an output similar to the following e
     
 ## Cleanup
  
-1. Run the command to delete the stack:
+1. Run this command to delete the stack:
     ```
     cdk destroy
     ```
 2. Confirm the stack has been deleted:
     ```
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'ApigwKinesisIntegrationStack')].StackStatus
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'ApigwKinesisIntegrationStack')].StackStatus"
     ```
  3. You should see a message confirming **DELETE_COMPLETE**
     

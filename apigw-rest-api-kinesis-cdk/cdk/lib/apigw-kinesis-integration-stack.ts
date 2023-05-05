@@ -146,6 +146,7 @@ export class ApigwKinesisIntegrationStack extends cdk.Stack {
       getRecordsMethod.addMethodResponse(methodResponse);
           
       // Create PUT method and related resources to put 1 record from a stream
+
       const putRecordRequestTemplate = {
         "StreamName": "$input.params('stream-name')",
         "Data": "$util.base64Encode($input.json('$.Data'))",
