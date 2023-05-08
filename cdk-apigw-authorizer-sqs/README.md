@@ -1,4 +1,4 @@
-# Welcome to a CDK Python project for deploying Queue-Based Leveling pattern!
+# CDK Python project for deploying Queue-Based Leveling pattern!
 
 This pattern also referred to as Queue-Based leveling pattern can be useful when desigining Event driven architectures (EDA). Customers facing performance issues, when processing synchronous and webhook call, during extremely high peak traffic can avoid such situations by adapting this architectural strategy. A SQS queue will acts as a buffer for these synchronous requests and permits you to decouple the sender from the receiver. This pattern offers an easy solution to bridge the gap using AWS services that can easily plugin to customers existing architecture.
 
