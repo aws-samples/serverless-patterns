@@ -2,7 +2,7 @@
 
 This AWS CDK application demonstrates how to attach, configure and access Amazon EFS from AWS Lambda function.
 
-This pattern outlines a solution on accessing the Elastic File System (EFS) from an AWS Lambda. An ideal use case to connect to EFS from AWS Lambda is to process files shared across multiple components of the application. When a upstream components writes data to a file and a backend task needs to process the data for downstream component, utilizing a file storage with AWS Lambda yields desired results. EFS is a serverless, no maintenance file system that can be accessed from various AWS resources.
+This pattern provides a solution for accessing the Elastic File System (EFS) from an AWS Lambda. An ideal use case for connecting to EFS from AWS Lambda is processing files shared across multiple components of an application. When an upstream component writes data to a file, and a backend task needs to process the data for a downstream component, using file storage with AWS Lambda yields the desired results. EFS is a serverless, maintenance-free file system that can be accessed by various AWS resources.
 
 ## Architecture 
 ![architecture diagram](images/architecture.png)
