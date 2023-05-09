@@ -1,5 +1,5 @@
 {
-  "title": "EventBridge Scheduler to AWS Systems Manager State Manager Associations",
+  "title": "Amazon EventBridge Scheduler to AWS Systems Manager State Manager Associations",
   "description": "Create an EventBridge scheduler to run SSM Associations",
   "language": "Python",
   "level": "200",
