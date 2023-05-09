@@ -1,6 +1,6 @@
-# EventBridge Pipe using SQS as source, Lambda as enrichment, API Destination (API Gateway) as target
+# Amazon SQS to Amazon API Gatewy using Amazon Eventbridge Pipes with enrichment
 
-This pattern demonstrates how to use EventBridge pipe to push and modify messages before sending it to DynamoDB. This pattern is leveraging EventBridge pipe to first integrate 3 services together, simplifying the process by reducing the need for integration code. Here, SQS is the EventBridge source, Lambda to enrich the data, before pushing to the target API Destination that invokes an API Gateway.
+This pattern demonstrates how to use an EventBridge pipe to push and modify events before sending it to DynamoDB. This pattern is leveraging EventBridge pipe to first integrate 3 services together, simplifying the process by reducing the need for integration code. Here, SQS is the EventBridge source, Lambda to enrich the data, before pushing to the target API Destination that invokes an API Gateway.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
