@@ -1,6 +1,6 @@
 {
-  "title": "EventBridge pipe with SQS as source, lambda as enrichment and API Destination (API Gateway) as target",
-  "description": "Create an EventBridge pipe to simplify process of pushing items to DynamoDB",
+  "title": "Amazon SQS to Amazon API Gatewy using Amazon Eventbridge Pipes with enrichment",
+  "description": "Create an EventBridge pipe to simplify process of pushing items to Amazon DynamoDB",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
