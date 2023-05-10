@@ -1,0 +1,198 @@
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - How to schedule a SSM State Manager Association execution with Eventbridge
+
+Parameters:
+  #Pull the latest AMI IDs from Amazon's public SSM parameter store
+  LatestAmiIdLinux:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+  LatestAmiIdWindows:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: "/aws/service/ami-windows-latest/Windows_Server-2022-English-Core-Base"
+
+Resources:
+  #S3 Bucket used to store SSM State Manager Association Run Output
+  SSMAssocLogs:
+    Type: AWS::S3::Bucket
+
+  #IAM Role associated with SSM and EC2 instances
+  SSMInstanceRole: 
+    Type : AWS::IAM::Role
+    Properties:
+      Path: /
+      Policies:
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                  - s3:ListBucket
+                Resource: 
+                  - !Sub 'arn:${AWS::Partition}:s3:::${SSMAssocLogs}/*'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${SSMAssocLogs}'
+                Effect: Allow
+          PolicyName: s3-instance-bucket-policy
+      ManagedPolicyArns:
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy'
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Principal:
+            Service:
+            - "ec2.amazonaws.com"
+            - "ssm.amazonaws.com"
+          Action: "sts:AssumeRole"
+
+  #EC2 Instance Role
+  SSMInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Roles:
+      - !Ref SSMInstanceRole
+
+  #Deploy a standard EC2 t3.small AML2 and Windows Server 2022 instance as targets for our SSM document
+  EC2InstanceLinux:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: !Ref LatestAmiIdLinux
+      InstanceType: "t3.small"
+      IamInstanceProfile: !Ref SSMInstanceProfile
+      Tags:
+      - Key: 'HelloWorld'
+        Value: 'true'
+  EC2InstanceWindows:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: !Ref LatestAmiIdWindows
+      InstanceType: "t3.small"
+      IamInstanceProfile: !Ref SSMInstanceProfile
+      Tags:
+      - Key: 'HelloWorld'
+        Value: 'true'
+
+  #Create the SSM Document the State Manager Association will Run
+  HelloWorldDocument:
+    Type: AWS::SSM::Document
+    Properties:
+      DocumentFormat: YAML
+      DocumentType: Command
+      Content:
+        schemaVersion: '2.2'
+        description: 'HelloWorld! script that can run on Windows and Linux'
+        parameters:
+          Message:
+            type: String
+            description: 'Echo Parameter'
+            default: 'Hello World!'
+        mainSteps:
+          - action: aws:runPowerShellScript
+            name: runCommandsWindows
+            precondition:
+              StringEquals:
+              - platformType
+              - Windows
+            inputs:
+              timeoutSeconds: '60'
+              runCommand:
+              - 'Write-Output {{Message}}'
+          - action: aws:runShellScript
+            name: runCommandsLinux
+            precondition:
+              StringEquals:
+              - platformType
+              - Linux
+            inputs:
+              timeoutSeconds: '60'
+              runCommand:
+              - 'echo {{Message}}'
+
+
+  #Deploy a new SSM State Manager Association
+  EchoStateManagerAssociation:
+    Type: AWS::SSM::Association
+    DependsOn: 
+    - HelloWorldDocument
+    - EC2InstanceLinux
+    Properties:
+      AssociationName: 'Cross-platform-Hello-World'
+      Name: !Ref HelloWorldDocument
+      WaitForSuccessTimeoutSeconds: 300
+      Targets:
+        - Key: tag:HelloWorld
+          Values:
+          - 'true'
+      OutputLocation:
+        S3Location: 
+          OutputS3BucketName: !Ref SSMAssocLogs
+          OutputS3KeyPrefix: 'logs/'
+      
+  #Eventbridge Scheduler IAM Role used to start the State Manager Association
+  EchoScheduleRole: 
+    Type: AWS::IAM::Role
+    DependsOn: EchoStateManagerAssociation
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: SSM-StateManager-AssociationExec
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ssm:StartAssociationsOnce'
+                Resource:
+                  - '*'
+                  
+  #Eventbridge schedule that will run every 15 mins to execute a state manager association 
+  StateManagerAssociationSchedule:
+    Type: AWS::Scheduler::Schedule
+    DependsOn: EchoScheduleRole
+    Properties:
+      Description: Eventbridge schedule the runs a SSM association every day 
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      ScheduleExpression: 'cron(0,15,30,45 * * * ? *)' 
+      Target:
+        #Input is custom to the resource API we are invoking since this is a universal target. For SSM Associations, we need to specify the AssociationID in a string containing a well-formated JSON
+        #Ref https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-targets-universal.html for additional information on scheduling universal targets
+        Input: !Sub
+          - '{"AssociationIds": ["${assocID}"]}'
+          - assocID: !GetAtt EchoStateManagerAssociation.AssociationId
+        Arn: arn:aws:scheduler:::aws-sdk:ssm:startAssociationsOnce
+        RoleArn: !GetAtt EchoScheduleRole.Arn
+  
+
+#Resource Creation Outputs
+Outputs:
+  EC2Windows:
+    Description: 'EC2 Windows Server instance id'
+    Value: !Ref EC2InstanceWindows
+  EC2Linux:
+    Description: 'EC2 Linux instance id'
+    Value: !Ref EC2InstanceLinux
+  S3Bucket:
+    Description: 'S3 bucket were SSM association output is located'
+    Value: !Ref SSMAssocLogs
+  SSMAssocID:
+    Description: 'The SSM State Manager AssociationID'
+    Value: !GetAtt EchoStateManagerAssociation.AssociationId
+  EBSchedule:
+    Description: 'Eventbridge Scheduler ARN'
+    Value: !GetAtt StateManagerAssociationSchedule.Arn
+

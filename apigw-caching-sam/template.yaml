@@ -7,19 +7,19 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      CacheClusterEnabled: True
-      CacheClusterSize: "118"
-      MethodSettings:
-        - HttpMethod: "*"
-          ResourcePath: "/*"
-          CacheDataEncrypted: True
-          CacheTtlInSeconds: 1440
-          CachingEnabled: True
-        - HttpMethod: "POST"
-          ResourcePath: "/"
-          CacheDataEncrypted: True
-          CacheTtlInSeconds: 60
-          CachingEnabled: True
+      # CacheClusterEnabled: True
+      # CacheClusterSize: "118"
+      # MethodSettings:
+      #   - HttpMethod: "*"
+      #     ResourcePath: "/*"
+      #     CacheDataEncrypted: True
+      #     CacheTtlInSeconds: 1440
+      #     CachingEnabled: True
+      #   - HttpMethod: "POST"
+      #     ResourcePath: "/"
+      #     CacheDataEncrypted: True
+      #     CacheTtlInSeconds: 60
+      #     CachingEnabled: True
 
   CachedFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
