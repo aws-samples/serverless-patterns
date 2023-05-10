@@ -1,4 +1,3 @@
-# Amazon API Gateway REST API with AWS Lambda proxy integration
 # Amazon API Gateway REST API with AWS Lambda proxy integration to Amazon QLDB
 
 The CDK stack creates an Amazon API Gateway REST API endpoint with AWS Lambda function proxy integration.
