@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon EventBridge Rule to AWS Systems Manager Automation
+
+Parameters:
+  MetadataHttpPutResponseHopLimit:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 64
+    Description: The value to use when setting the HttpPutResponseHopLimit property.
+
+Resources:
+  RuleAssumeRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "events.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - iam:PassRole
+                Resource:
+                  - !GetAtt AutomationAssumeRole.Arn
+                Effect: Allow
+          PolicyName: PassRolePolicy
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - ssm:StartAutomationExecution
+                Resource:
+                  - !Sub "arn:aws:ssm:${AWS::Region}::automation-definition/AWSSupport-ConfigureEC2Metadata:$DEFAULT"
+                Effect: Allow
+          PolicyName: StartAutomationPolicy
+  AutomationAssumeRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ssm.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - ec2:DescribeInstances
+                  - ec2:ModifyInstanceMetadataOptions
+                  - ssm:GetAutomationExecution
+                  - ssm:StartAutomationExecution
+                Resource:
+                  - "*"
+                Effect: Allow
+          PolicyName: ConfigureEC2MetadataPolicy
+  EventBridgeRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Trigger AWSSupport-ConfigureEC2Metadata document to disable IMDSv1 when an EC2 Instance is started."
+      EventPattern:
+        source:
+          - "aws.ec2"
+        detail-type:
+          - "EC2 Instance State-change Notification"
+        detail:
+          state:
+            - "running"
+      Targets:
+        - Arn: !Sub "arn:aws:ssm:${AWS::Region}::automation-definition/AWSSupport-ConfigureEC2Metadata"
+          Id: "DisableIMDSv1Rule"
+          RoleArn: !GetAtt RuleAssumeRole.Arn
+          InputTransformer:
+            InputPathsMap:
+              "instance": "$.detail.instance-id"
+            InputTemplate: !Sub |
+              {
+                "InstanceId": ["<instance>"],
+                "HttpPutResponseHopLimit": ["${MetadataHttpPutResponseHopLimit}"],
+                "EnforceIMDSv2": ["required"],
+                "MetadataAccess": ["enabled"],
+                "AutomationAssumeRole": ["${AutomationAssumeRole.Arn}"]
+              }
