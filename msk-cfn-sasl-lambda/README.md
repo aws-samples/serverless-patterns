@@ -20,7 +20,8 @@ Ensure you have met the following:
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* Follow instructions in `create-cluster-cfn/README.md` to deploy a provisioned MSK cluster, and make a note of following from the cloud formation output - 
+* Deploy a provisioned Amazon MSK cluster - 
+   Please follow instructions in `create-cluster-cfn/README.md` to deploy a provisioned MSK cluster. SASL/SCRAM authentication is only available for provisioned Amazon MSK cluster. So while deploying the stack, select `EnvType` as `Provisoned`. After deployment, make a note of following from the cloud formation output - 
     - ProvisionedMSKArn - MSK cluster arn
     - CredentialsSecretArn - ARN for secret manager secret with credentials
     - PrivateSubnetMSKOne, PrivateSubnetMSKTwo, and PrivateSubnetMSKThree - Subent ids
