@@ -2,7 +2,7 @@
     "title": "API Gateway to Lambda to DynamoDb",
     "description": "Create a Lambda function in VPC that receives a request from API Gateway and inserts a record into a DynamoDB table using VPC endpoint.",
     "language": "python",
-    "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
+    "architectureURL": "docs/architecture.png",
     "videoId": "",
     "level": "200",
     "framework": "CDK",
