@@ -17,7 +17,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [.Net Core](https://dotnet.microsoft.com/en-us/download/dotnet)
     - 6.0 for the Lambda Function - https://dotnet.microsoft.com/en-us/download/dotnet/6.0
-* [Docker](https://docs.docker.com/get-docker/) installed and running
+* [Docker](https://docs.docker.com/get-docker/) installed and running on Architecture: x86_64
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
 ## Deployment Instructions
@@ -96,6 +96,31 @@ Run some transactions from AWS Console - Lambda - Testing using the following ev
 After running some transactions. Dashboard should start showing the data in graph.
 
 ![dashboard](images/../imges/Dashboard.png)
+
+## Troubleshooting
+
+Upon running '__cdk deploy__' you may get the following error if the docker running on Architecture: aarch64. 
+
+```
+Step 14/18 : RUN curl -O $INSIGHTSEXTENSION &&     rpm -U lambda-insights-extension.rpm &&     rm -f lambda-insights-extension.rpm
+ ---> Running in bff1e66de372
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 4071k  100 4071k    0     0  2542k      0  0:00:01  0:00:01 --:--:-- 2544k
+	package AWSLogsLambdaInsights-1.0-1.x86_64 is intended for a different architecture
+The command '/bin/sh -c curl -O $INSIGHTSEXTENSION &&     rpm -U lambda-insights-extension.rpm &&     rm -f lambda-insights-extension.rpm' returned a non-zero code: 1
+[100%] fail: docker build --build-arg INSIGHTSEXTENSION=https://lambda-insights-extension.s3-ap-northeast-1.amazonaws.com/amazon_linux/lambda-insights-extension.rpm --tag cdkasset-98f861d5f5f78870913de01418525525ea5b88e4628825836a7e6550e762df53 . exited with error code 1: The command '/bin/sh -c curl -O $INSIGHTSEXTENSION &&     rpm -U lambda-insights-extension.rpm &&     rm -f lambda-insights-extension.rpm' returned a non-zero code: 1
+
+ ❌ Building assets failed: Error: Building Assets Failed: Error: Failed to build one or more assets. See the error messages above for more information.
+    at buildAllStackAssets (/usr/local/lib/node_modules/aws-cdk/lib/index.js:400:115268)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async CdkToolkit.deploy (/usr/local/lib/node_modules/aws-cdk/lib/index.js:400:143766)
+    at async exec4 (/usr/local/lib/node_modules/aws-cdk/lib/index.js:455:51984)
+
+Building Assets Failed: Error: Failed to build one or more assets. See the error messages above for more information.
+```
+
+Please make sure your host has docker Architecture: x86_64.
 
 ## Cleanup
  
