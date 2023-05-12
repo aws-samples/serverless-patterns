@@ -57,14 +57,25 @@ Resources:
                   !GetAtt "Iterate.Arn"
                 ]
 
+  rRDSSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+         Name: RDSDBcredentials
+         GenerateSecretString:
+              SecretStringTemplate: '{"username:": "admin"}'
+              GenerateStringKey: "password"
+              PasswordLength: 15
+
   RDSDatabase:
     Type: AWS::RDS::DBInstance
+    DependsOn: rRDSSecret
     Properties:
       AllocatedStorage: '5'
       DBInstanceClass: db.t2.small
       Engine: mysql
       MasterUsername: rdsdb
-      MasterUserPassword: rdsPassworddb
+      #MasterUserPassword: !Ref rRDSSecret
+      MasterUserPassword: '{{resolve:secretsmanager:RDSDBcredentials:SecretString:password}}'
 
   CreateSnapshotLambdaFunction:
     Type: AWS::Serverless::Function
