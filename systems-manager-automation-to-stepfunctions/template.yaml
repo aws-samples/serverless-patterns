@@ -74,7 +74,6 @@ Resources:
       DBInstanceClass: db.t2.small
       Engine: mysql
       MasterUsername: rdsdb
-      #MasterUserPassword: !Ref rRDSSecret
       MasterUserPassword: '{{resolve:secretsmanager:RDSDBcredentials:SecretString:password}}'
 
   CreateSnapshotLambdaFunction:
