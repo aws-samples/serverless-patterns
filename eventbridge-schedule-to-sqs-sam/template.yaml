@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  TargetSQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: EventBridgeTargetQueue
+  SqsSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      ScheduleExpression: 'rate(5 minute)'
+      Name: SqsSendMessageSchedule
+      Description: Sends a message to SQS every 5 minutes
+      Target:
+        Arn: !GetAtt TargetSQSQueue.Arn
+        Input: "This message was sent using EventBridge Scheduler!"
+        RoleArn: !GetAtt SchedulerRole.Arn
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: SqsSendMessagePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt TargetSQSQueue.Arn
+
+
+      
