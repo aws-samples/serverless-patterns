@@ -1,0 +1,18 @@
+{
+    "fileNameForValidation": "custom-with-region",
+    "kind": "Custom",
+    "region": "us-east-1",
+    "apiVersion": "audit.k8s.io/v1",
+    "level": "Request",
+    "requestReceivedTimestamp": "2023-02-06T10:00:00.000000Z",
+    "user": {
+        "username": "eks:pod-identity-mutating-webhook",
+        "groups": [ "system:authenticated" ]
+    },
+    "sourceIPs": [ "10.0.0.1" ],
+    "RBAC": false,
+    "responseStatus":{
+        "metadata":{},
+        "code":200
+    }
+}
