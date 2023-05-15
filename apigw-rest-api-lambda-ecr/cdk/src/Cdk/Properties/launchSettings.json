@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Cdk": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:54812;http://localhost:54813"
+    }
+  }
+}
