@@ -1,0 +1,53 @@
+{
+  "title": "Amazon API Gateway to Amazon Kinesis",
+  "description": "Create an Amazon API Gateway to Amazon Kinesis REST API",
+  "language": "Typescript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon Kinesis data stream using AWS Cloud Development Kit (AWS CDK) in Typescript."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-kinesis-cdk",
+      "projectFolder": "apigw-rest-api-kinesis-cdk",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-kinesis-cdk/README.md",
+      "templateURL": "serverless-patterns/apigw-rest-api-kinesis-cdk",
+      "templateFile": "cdk/lib/apigw-kinesis-integration-stack.ts"
+    }
+  },
+  "download":{
+    "text": [
+      "git clone git clone https://github.com/aws-samples/serverless-patterns/ cd serverless-patterns/apigw-rest-api-kinesis-cdk"
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mudassar Bashir",
+      "bio": "Solution Architect at Amazon Web Services.",
+      "linkedin": "mudassar-bashir",
+      "name": "Brittany Ly",
+      "bio": "Solution Architect at Amazon Web Services",
+      "linkedin": "brittany-ly"
+
+    }
+  ]
+}
