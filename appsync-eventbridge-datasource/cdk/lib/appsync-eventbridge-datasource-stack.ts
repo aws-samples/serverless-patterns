@@ -1,4 +1,4 @@
-import { Stack, StackProps } from "aws-cdk-lib";
+import { Stack, StackProps, CfnOutput } from "aws-cdk-lib";
 import * as appsync from "aws-cdk-lib/aws-appsync";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { EventBus } from "aws-cdk-lib/aws-events";
@@ -20,6 +20,21 @@ export class AppSyncEventBridgeStack extends Stack {
 
     // Event resolver
     this.eventBridgeResolver(appSyncApi, eventBus);
+
+
+    new CfnOutput(this, 'AppsyncGraphqlUrl', {
+      value: appSyncApi.graphqlUrl,
+      description: 'The Appsync Stack graphqlUrl',
+      exportName: 'GraphqlUrl',
+    });
+
+    new CfnOutput(this, 'AppsyncApiKey', {
+      value: appSyncApi.apiKey ? appSyncApi.apiKey : "Undefined",
+      description: 'The Appsync ApiKey',
+      exportName: 'ApiKey',
+    });
+
+
   }
 
   private createAppSyncStack() {
