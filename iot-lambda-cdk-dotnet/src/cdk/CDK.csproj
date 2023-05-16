@@ -14,15 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- CDK Construct Library dependencies -->
-    <PackageReference Include="Amazon.CDK.AWS.Events" Version="1.200.0" />
-    <PackageReference Include="Amazon.CDK.AWS.Events.Targets" Version="1.200.0" />
-    <PackageReference Include="Amazon.CDK.AWS.IoT.Actions" Version="1.200.0" />
-    <PackageReference Include="Amazon.CDK.AWS.Lambda" Version="1.200.0" />
-
-    <!-- jsii Roslyn analyzers (un-comment to obtain compile-time checks for missing required props
-    <PackageReference Include="Amazon.Jsii.Analyzers" Version="*" PrivateAssets="all" />
-    -->
+    <PackageReference Include="Amazon.CDK.AWS.IoT.Actions.Alpha" Version="2.79.1-alpha.0" />
+    <PackageReference Include="Amazon.CDK.AWS.IoT.Alpha" Version="2.79.1-alpha.0" />
+    <PackageReference Include="Amazon.CDK.Lib" Version="2.79.1" />
   </ItemGroup>
 
 </Project>

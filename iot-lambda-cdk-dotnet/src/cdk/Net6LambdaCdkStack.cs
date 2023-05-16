@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+
 using Amazon.CDK;
 using Amazon.CDK.AWS.Events;
 using EventTargets = Amazon.CDK.AWS.Events.Targets;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.IoT;
-using Amazon.CDK.AWS.IoT.Actions;
+using Amazon.CDK.AWS.IoT.Alpha;
+using Amazon.CDK.AWS.IoT.Actions.Alpha;
 using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.Logs;
 using Constructs;
