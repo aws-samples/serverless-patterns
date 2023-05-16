@@ -19,9 +19,25 @@
       "templateFile": "cdk/lib/apigw-kinesis-integration-stack.ts"
     }
   },
-  "download":{
-    "text": [
-      "git clone git clone https://github.com/aws-samples/serverless-patterns/ cd serverless-patterns/apigw-rest-api-kinesis-cdk"
+"resources": {
+    "headline": "Documentation",
+    "bullets": [
+      {
+        "text": "Tutorial: Create a REST API as an Amazon Kinesis proxy in API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-kinesis.html"
+      },
+      {
+        "text": "How do I use API Gateway as a proxy for another AWS service?",
+        "link": "https://repost.aws/knowledge-center/api-gateway-proxy-integrate-service"
+      },
+      {
+        "text": "Amazon API Gateway API request and response data mapping reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html"
+      },
+      {
+        "text": "API Gateway mapping template and access logging variable reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html"
+      }
     ]
   },
   "deploy": {
