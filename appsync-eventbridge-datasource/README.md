@@ -65,7 +65,7 @@ In the AWS Console, browse to the AWS Appsync Service and find the `AppSyncEvent
 3. Click the execute query button on the top
 4. The event get published to the custom event bus and the success response should appear on the right side. 
 
-![Send "putEvent" mutation request](docs/images/putEvent.png)
+![Send "putEvent" mutation request](docs/images/PutEvent.png)
 
 ## Delete stack
 
