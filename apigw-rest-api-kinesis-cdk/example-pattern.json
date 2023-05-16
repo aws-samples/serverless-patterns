@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon Kinesis Data Stream using the AWS Cloud Development Kit (AWS CDK) in Typescript."
+      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon Kinesis data stream using AWS Cloud Development Kit (AWS CDK) in Typescript."
     ]
   },
   "gitHub": {
@@ -31,7 +31,7 @@
   },
   "testing": {
     "text": [
-      "See the Github repo README for detailed testing instructions."
+      "See the Github repo for detailed testing instructions."
     ]
   },
   "cleanup": {
@@ -42,10 +42,10 @@
   "authors": [
     {
       "name": "Mudassar Bashir",
-      "bio": "Solutions Architect at Amazon Web Services.",
+      "bio": "Solution Architect at Amazon Web Services.",
       "linkedin": "mudassar-bashir",
       "name": "Brittany Ly",
-      "bio": "Solutions Architect at Amazon Web Services",
+      "bio": "Solution Architect at Amazon Web Services",
       "linkedin": "brittany-ly"
 
     }
