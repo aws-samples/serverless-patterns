@@ -27,6 +27,30 @@ Important: this application uses various AWS services and there are costs associ
    ```bash
    npm install
    ```
+4. Fill in the iot core Endpoint:
+
+Follow the steps in the [inputs](###inputs) section to fetch your account iot core endpoint and fill it in the `cdk.ts` file
+
+```typescript
+#!/usr/bin/env node
+const app = new cdk.App();
+
+const IOT_EVENTS_TOPIC_NAME = "iot-test-topic";
+const IOT_DATA_ENDPOINT = "{paste your endpoint here}"; // You must replace this with aws iot endpoint found in IotCore settings
+.
+.
+.
+
+new EventBridgePipesIotCoreStack(app, "EventBridgePipesIotCoreStack", {
+  iotDataEndpoint: IOT_DATA_ENDPOINT,
+  iotTopicName: IOT_EVENTS_TOPIC_NAME,
+  .
+  .
+  .
+});
+
+```
+
 4. From the command line, configure AWS CDK:
    ```bash
    cdk bootstrap ACCOUNT-NUMBER/REGION # e.g.
