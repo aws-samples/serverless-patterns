@@ -29,7 +29,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 4. Fill in the iot core Endpoint:
 
-Follow the steps in the [inputs](###inputs) section to fetch your account iot core endpoint and fill it in the `cdk.ts` file
+Follow the steps in the [inputs](#inputs) section to fetch your account iot core endpoint and fill it in the `cdk.ts` file
 
 ```typescript
 #!/usr/bin/env node
