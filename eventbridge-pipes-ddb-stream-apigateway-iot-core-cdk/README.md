@@ -2,6 +2,8 @@
 
 This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying a DynamoDb Table with a Stream configured to an EventBridge Pipe. Items data tunneled through Pipe will target an API Gateway endpoint that uses AWS direct integration to publish the a message to a pre-configured IoT Core Topic with the item data.
 
+![Architecture](assets/DDB%20-_%20EB%20Pipe%20-_%20API%20Gateway%20-_%20IoT%20Core%20Topic%20Pattern.svg)
+
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-ddb-stream-apigateway-iot-core-cdk.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
