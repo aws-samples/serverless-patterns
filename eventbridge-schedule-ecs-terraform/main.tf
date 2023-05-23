@@ -8,11 +8,12 @@ terraform {
 }
 
 locals{
-   region        = "REPLACE_ME_WITH_AWS_REGION"
-   container_image = "amazon/amazon-ecs-sample"
-   availability_zones = "REPLACE_ME_WITH_AWS_AVAILABILITY_ZONES"
-   public_subnets     = "REPLACE_ME_WITH_AWS_PUBLIC_SUBNETS"
-   private_subnets    = "REPLACE_ME_WITH_AWS_PRIVATE_SUBNETS"
+  region              = "REPLACE_ME_WITH_AWS_REGION"
+  container_image     = "amazon/amazon-ecs-sample"
+  vpc_cidr            = "REPLACE_ME_WITH_AWS_VPC_CIDRS"
+  availability_zones  = "REPLACE_ME_WITH_AWS_AVAILABILITY_ZONES"
+  public_subnets      = "REPLACE_ME_WITH_AWS_PUBLIC_SUBNETS"
+  private_subnets     = "REPLACE_ME_WITH_AWS_PRIVATE_SUBNETS"
 }
 
 provider "aws" {
@@ -57,7 +58,7 @@ output "ScheduleName" {
 
 ### VPC, Subnets and SG ###
 resource "aws_vpc" "prod-vpc" {
-    cidr_block = "10.10.0.0/16"
+    cidr_block = local.vpc_cidr
     enable_dns_support = "true" #gives you an internal domain name
     enable_dns_hostnames = "true" #gives you an internal host name
     instance_tenancy = "default"    

@@ -25,15 +25,17 @@ Important: this application uses various AWS services and there are costs associ
     ```
 3. Make the following changes in the [terraform script](main.tf):
     - Line 11 - Replace the placeholder "REPLACE_ME_WITH_AWS_REGION" with the AWS region where the script will deploy resources
-    - Line 13 - Replace the placeholder "REPLACE_ME_WITH_AWS_AVAILABILITY_ZONES" with the AWS availability zones where the script will deploy resources. It can be an array of availability zones
-    - Line 14 - Replace the placeholder "REPLACE_ME_WITH_AWS_PUBLIC_SUBNETS" with the AWS subnets that will be public and associated with the vpc. It can be an array of subnets
-    - Line 15 - Replace the placeholder "REPLACE_ME_WITH_AWS_PRIVATE_SUBNETS" with the AWS private subnets that will be associated with the vpc. It can be an array of subnets
+    - Line 13 - Replace the placeholder "REPLACE_ME_WITH_AWS_VPC_CIDRS" with the AWS VPC CIDRs that will be associated with the vpc
+    - Line 14 - Replace the placeholder "REPLACE_ME_WITH_AWS_AVAILABILITY_ZONES" with the AWS availability zones where the script will deploy resources. It can be an array of availability zones
+    - Line 15 - Replace the placeholder "REPLACE_ME_WITH_AWS_PUBLIC_SUBNETS" with the AWS subnets that will be public and associated with the vpc. It can be an array of subnets
+    - Line 16 - Replace the placeholder "REPLACE_ME_WITH_AWS_PRIVATE_SUBNETS" with the AWS private subnets that will be associated with the vpc. It can be an array of subnets
 
      ``` 
     #Sample Configuration
         locals{
            region        = "us-east-1"
            container_image = "amazon/amazon-ecs-sample"
+           vpc_cidr = "10.10.0.0/16"
            availability_zones = ["us-east-1a", "us-east-1b"]
            public_subnets     = ["10.10.100.0/24", "10.10.101.0/24"]
            private_subnets    = ["10.10.0.0/24", "10.10.1.0/24"]
