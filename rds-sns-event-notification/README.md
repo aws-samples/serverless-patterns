@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Amazon RDS to Amazon SNS
 
 RDS Event Subscriptions allow users to configure notifications for RDS Events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances.
 
