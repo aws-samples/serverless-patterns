@@ -71,7 +71,7 @@ An Amazon EventBridge Schedule is created that run the sample task in an Amazon 
     ```
     terraform destroy
     ```
-   Note sometimes Terraform will timeout if there are actives tasks are running on the Amazon ECS cluster. Please stop the tasks from Amazon ECS cluser console before running terraform destroy command
+   Note sometimes Terraform will timeout if active tasks are running on the Amazon Elastic Container Service cluster. Please stop the tasks from Amazon ECS cluser console before running terraform destroy command
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 

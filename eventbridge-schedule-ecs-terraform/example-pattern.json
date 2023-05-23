@@ -1,7 +1,7 @@
 {
   "title": "Amazon EventBridge Schedule to Amazon Elastic Container Service",
   "description": "Creates an EventBridge schedule to invoke an Amazon Elastic Container Service task every 5 minutes",
-  "language": "Python",
+  "language": "",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -12,10 +12,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-ecs-terraform-python",
-      "templateURL": "serverless-patterns/eventbridge-schedule-ecs-terraform-python",
-      "projectFolder": "eventbridge-schedule-ecs-terraform-python",
-      "templateFile": "eventbridge-schedule-ecs-terraform-python/main.tf"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-ecs-terraform",
+      "templateURL": "serverless-patterns/eventbridge-schedule-ecs-terraform",
+      "projectFolder": "eventbridge-schedule-ecs-terraform",
+      "templateFile": "eventbridge-schedule-ecs-terraform/main.tf"
     }
   },
   "resources": {
