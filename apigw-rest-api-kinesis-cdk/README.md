@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon API Gateway REST API that integrates with an Amazon Kinesis data stream using AWS Cloud Development Kit (AWS CDK) in Typescript.
 
-Learn more about this pattern at Serverless Land Patterns: serverlessland.com/patterns/apigw-kinesis-typescript-cdk
+Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/apigw-kinesis-typescript-cdk](https://serverlessland.com/patterns/apigw-kinesis-typescript-cdk)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
