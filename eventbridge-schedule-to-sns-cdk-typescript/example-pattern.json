@@ -15,7 +15,7 @@
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-sns-cdk-typescript",
         "templateURL": "serverless-patterns/eventbridge-schedule-to-sns-cdk-typescript",
         "projectFolder": "eventbridge-schedule-to-sns-cdk-typescript",
-        "templateFile": "eventbridge-schedule-to-sns-cdk-typescript/lib/eventbridge-schedule-to-sns-cdk-typescript-stack.ts"
+        "templateFile": "lib/eventbridge-schedule-to-sns-cdk-typescript-stack.ts"
       }
     },
     "resources": {
