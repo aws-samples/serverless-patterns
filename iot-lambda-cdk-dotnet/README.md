@@ -59,7 +59,7 @@ The easiest way to test is using the MQTT test client.
 ## Cleanup
 
 Delete the stack: 
-    ```bash
+   ```bash
     cdk destroy
    ``` 
 
