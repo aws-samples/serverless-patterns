@@ -57,11 +57,12 @@ The easiest way to test is using the MQTT test client.
 
 
 ## Cleanup
- 
+
 Delete the stack: 
     ```bash
-    cdk destroy 
-    ```
+    cdk destroy
+   ``` 
+
 ----
 Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
