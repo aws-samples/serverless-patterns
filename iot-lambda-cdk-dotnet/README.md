@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd iot-lambda-cdk-dotnet\src\cdk
+    cd iot-lambda-cdk-dotnet
     ```
 1. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -59,7 +59,7 @@ The easiest way to test is using the MQTT test client.
 ## Cleanup
  
 Delete the stack: 
-    ```
+    ```bash
     cdk destroy 
     ```
 ----
