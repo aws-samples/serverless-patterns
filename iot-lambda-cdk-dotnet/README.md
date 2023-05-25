@@ -23,9 +23,9 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd iot-lambda-cdk-dotnet
+    cd iot-lambda-cdk-dotnet\src\cdk
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     cdk deploy 
     ```
@@ -58,8 +58,11 @@ The easiest way to test is using the MQTT test client.
 
 ## Cleanup
  
-Delete the stack: cdk destroy.
+Delete the stack: 
+    ```
+    cdk destroy 
+    ```
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
