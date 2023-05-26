@@ -34,7 +34,7 @@ The following diagram describes how MSK and Lambda event driven patter using SAS
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
-    git clone https://github.com/aws-samples/serverless-patterns/msk-cfn-sasl-lambda
+    git clone https://github.com/aws-samples/serverless-patterns.git
     ```
 1. Change directory to the pattern directory:
     ```
