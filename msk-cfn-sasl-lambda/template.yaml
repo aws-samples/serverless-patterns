@@ -66,6 +66,7 @@ Resources:
                 - kafka-cluster:ReadData
                 - kafka-cluster:AlterGroup
                 - kafka-cluster:DescribeGroup
+                - kafka:ListScramSecrets
               Resource: !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:*'
 
 Outputs:
