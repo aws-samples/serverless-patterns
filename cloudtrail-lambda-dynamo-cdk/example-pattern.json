@@ -1,0 +1,57 @@
+{
+  "title": "Check Resource Tag Compliance Using CloudTrail, Lambda and Dynamo",
+  "description": "Creates a CloudTrail trail for resource creation, and checks for the required tags to determine complaince",
+  "language": "Typescript and Python (for lambda functions)",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to use CloudTrail events to check the tags of resources that have been created. The relevant resources are stored in a DynamoDB table",
+      "which then gets sent to Lambda to check if the required tags are present. Compliance is updated on the DynamoDB table (true/false)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudtrail-lambda-dynamo-cdk",
+      "templateURL": "serverless-patterns/cloudtrail-lambda-dynamo-cdk",
+      "projectFolder": "cloudtrail-lambda-dynamo-cdk",
+      "templateFile": "src/lib/tag-compliance-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Call Athena with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+      },
+      {
+        "text": "Amazon Athena - Serverless Interactive Query Service",
+        "link": "https://aws.amazon.com/athena/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mia Alarcon Chong",
+      "image": "",
+      "bio": "AWS Cloud Application Developer",
+      "linkedin": "mialarcon"
+    }
+  ]
+}
