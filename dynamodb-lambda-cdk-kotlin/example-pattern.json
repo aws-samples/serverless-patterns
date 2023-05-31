@@ -1,7 +1,7 @@
 {
   "title": "DynamoDB Stream to AWS Lambda using CDK in Kotlin",
   "description": "Create an AWS Lambda function that receives DynamoDB change items.",
-  "language": "Kotlin",
+  "language": "Java",
   "level": "200",
   "framework": "CDK",
   "introBox": {
