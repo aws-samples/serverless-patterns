@@ -22,10 +22,7 @@
   },
   "deploy": {
     "text": [
-      "cd serverless"
-      "gradle shadow"
-      "cd ../stack"
-      "cdk deploy"
+        "See the Github repo for detailed deploy instructions."
     ]
   },
   "testing": {
