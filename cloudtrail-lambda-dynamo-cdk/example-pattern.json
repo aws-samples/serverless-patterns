@@ -13,7 +13,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudtrail-lambda-dynamo-cdk",
+      "repoURL": "",
       "templateURL": "serverless-patterns/cloudtrail-lambda-dynamo-cdk",
       "projectFolder": "cloudtrail-lambda-dynamo-cdk",
       "templateFile": "src/lib/tag-compliance-stack.ts"
@@ -22,24 +22,24 @@
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "text": "",
+        "link": ""
       }
     ]
   },
   "deploy": {
     "text": [
-      "cdk deploy"
+      ["cdk deploy"]
     ]
   },
   "testing": {
     "text": [
-      "See the Github repo for detailed testing instructions."
+      ["See the Github repo for detailed testing instructions."]
     ]
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk destroy</code>."
+      ["cdk destroy"]
     ]
   },
   "authors": [
