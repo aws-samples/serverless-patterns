@@ -5,53 +5,22 @@ from aws_cdk import (
     aws_iam as iam,
     aws_lambda as lambdafun
 )
+import os
 
 class ApigwSqsAuthStack(core.Stack):
 
     def __init__(self, scope: core.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-# Define Parameters that customers can use in properties of constructs.
-        storage_sqs_queue_name = core.CfnParameter(self, "storagequeue", type="String",
-            default='storagequeue-withauth',
-            description="Enter the name of the Amazon SQS queue where events will be stored."
-        )
-        aws_region_name = core.CfnParameter(self, "awsregion", type="String",
-            default='us-east-1',
-            description="Enter the AWS region name where the resources need to be deployed."
-        )
-        need_an_authorizer = core.CfnParameter(self, "authorizerneeded", type="String",
-                allowed_values= ["Yes"],
-                default="Yes",
-                description= "Do you need an Custom Authorizer? If Yes, enter a valid Lambda ARN value below.",
-    
-        )       
-        authorizer_lambda_arn = core.CfnParameter(self, "lambdaauthorizerarn", type="String",
-            default='arn:aws:lambda:us-east-1:764551143200:function:apigwRequestAuthorizer',
-            description="If you need a Lambda authorizer, enter the ARN of your Custom Authorizer."
-        )
-    
-# Based on the need an authorizer value, create a condition.     
-        authorizer_needed = core.CfnCondition(self,"authorizerneededcond",
-            expression=core.Fn.condition_equals("Yes", need_an_authorizer.value_as_string)
-        )
-        authorizer_not_needed = core.CfnCondition(self,"authorizernotneededcond",
-            expression=core.Fn.condition_equals("No", need_an_authorizer.value_as_string)
-        )
 # If Lambda function ARN is provided, create the function from ARN.     
         authorizer_function = lambdafun.Function.from_function_arn(self, 
                     "Function", 
-                    authorizer_lambda_arn.value_as_string
+                    os.getenv("authorizer_lambda_arn",default=NotImplemented)
         )
-# Create the authorizer function only if the authorizer_flag = yes. 
-
-        #authorizer_function.condition = authorizer_needed
-        #((authorizer_function.node.default_child) lambdafun.CfnFunction).cfnOptions.condition = authorizer_needed
-
 # Create a SQS queue for storing message that APIGateway will receive.
         sqs_queue = sqs.Queue(self, 
                     'storagesqs',          
-                    queue_name = storage_sqs_queue_name.value_as_string,
+                    queue_name = os.getenv("storage_sqs_queue_name","apigwstoragequeue"),
                     encryption = sqs.QueueEncryption.KMS_MANAGED
         )
         
@@ -101,7 +70,7 @@ class ApigwSqsAuthStack(core.Stack):
 
         apigw_method = apigw.root.add_resource('sqs').add_method('POST',
             apigateway.AwsIntegration(
-                region = aws_region_name.value_as_string,
+                region = os.getenv("aws_region_name","us-east-1"),
                 service = 'sqs',
                 integration_http_method = 'POST',
                 path = sqs_queue.queue_name, 

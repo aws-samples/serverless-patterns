@@ -22,7 +22,6 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [CDK Installed](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) 
 * [Create Lambda authorizer from blueprint](https://github.com/awslabs/aws-apigateway-lambda-authorizer-blueprints/blob/master/blueprints/python/api-gateway-authorizer-python.py)
@@ -34,34 +33,19 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
 ```
-git clone https://github.com/aws-samples/pattern-apigw-auth-sqs.git
+git clone https://github.com/aws-samples/serverless-patterns/cdk-apigw-authorizer-sqs.git
 ```
 2. Change directory
 ```
-cd pattern-apigw-auth-sqs
+cd cdk-apigw-authorizer-sqs
 ```
 3. To generate a cloudformation templates (optional)
-* With Token Autorizer
-    ```
-    cdk synth ApigwSqsAuthStack -o ./cloudformation_templates
-    ```
-* Without a Token Autorizer
-    ```
-    cdk synth ApigwSqsStack -o ./cloudformation_templates
-    ```
+```
+aws_region_name=<aws_region_name> storage_sqs_queue_name=<user_friendly-SQS_Queue_name> authorizer_lambda_arn=<arn:aws:lambda:<aws_region>:<aws_account>:function:<lambda_function_name> cdk synth
+```
 4. To deploy AWS resources as a CDK project
-   ##### Paramters needed for CDK 
-    * storagequeue=Name of the SQS queue where you want data to be sent
-    * awsregion=AWS region where you want the APIGW, SQS and token authoizer to be created.
-    * lambdaauthorizerarn=ARN of the lambda which implemented the token authorizer validation logic.
-
-* To deploy infrastructure with a Token Authorizer
 ```
-cdk deploy ApigwSqsAuthStack --parameters storagequeue=<queue-name> --parameters awsregion=<AWS region> --parameters lambdaauthorizerarn=<arn:aws:lambda:<AWS Region>:<AWS Account>:function:<Function name>
-```
-* To deploy infrastructure without a Token Authorizer
-```
-cdk deploy ApigwSqsAuthStack --parameters storagequeue=<queue-name> --parameters awsregion=<AWS Region> 
+aws_region_name=<aws_region_name> storage_sqs_queue_name=<user_friendly-SQS_Queue_name> authorizer_lambda_arn=<arn:aws:lambda:<aws_region>:<aws_account>:function:<lambda_function_name> cdk deploy ApigwSqsAuthStack
 ```
 
 ## How it works

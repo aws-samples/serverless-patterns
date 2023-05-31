@@ -5,34 +5,17 @@ from aws_cdk import (
     aws_iam as iam,
     aws_lambda as lambdafun
 )
+import os
 
 class ApigwSqsStack(core.Stack):
 
     def __init__(self, scope: core.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-# Define Parameters that customers can use in properties of constructs.
-        storage_sqs_queue_name = core.CfnParameter(self, "storagequeue", type="String",
-            default='storagequeue-noauth',
-            description="Enter the name of the Amazon SQS queue where events will be stored."
-        )
-        aws_region_name = core.CfnParameter(self, "awsregion", type="String",
-            default='us-east-1',
-            description="Enter the AWS region name where the resources need to be deployed."
-        )
-        need_an_authorizer = core.CfnParameter(self, "authorizerneeded", type="String",
-                allowed_values= ["No"],
-                default="No",
-                description= "This stack does not take create an Authorizer.",
-    
-        )       
-        
-
-
 # Create a SQS queue for storing message that APIGateway will receive.
         sqs_queue = sqs.Queue(self, 
                     'storagesqs',          
-                    queue_name = storage_sqs_queue_name.value_as_string,
+                    queue_name = os.getenv("storage_sqs_queue_name","apigwstoragequeue"),
                     encryption = sqs.QueueEncryption.KMS_MANAGED
         )
         
@@ -77,7 +60,7 @@ class ApigwSqsStack(core.Stack):
 
         apigw_method = apigw.root.add_resource('sqs').add_method('POST',
             apigateway.AwsIntegration(
-                region = aws_region_name.value_as_string,
+                region = os.getenv("aws_region_name","us-east-1"),
                 service = 'sqs',
                 integration_http_method = 'POST',
                 path = sqs_queue.queue_name, 
