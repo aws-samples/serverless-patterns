@@ -28,24 +28,22 @@ Resources:
         IntegrationHttpMethod: POST
         RequestTemplates:
           "application/json": "{
-            \"statusCode\": 200      
-          }"
+            \"statusCode\": 200
+            }"
         IntegrationResponses:
-          -
-          ResponseParameters:
+        - ResponseParameters:
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
-          StatusCode: 200
+          StatusCode: '200'
         Type: AWS
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
       MethodResponses:
-        -
-          ResponseParameters:
+        - ResponseParameters:
             method.response.header.Access-Control-Allow-Headers: true
             method.response.header.Access-Control-Allow-Methods: true
             method.response.header.Access-Control-Allow-Origin: true
-          StatusCode: 200
+          StatusCode: '200'
       OperationName: 'helloworld'
       ResourceId: !Ref ApiGatewayResource
       RestApiId: !Ref ApiGatewayRestApi
@@ -57,24 +55,22 @@ Resources:
       HttpMethod: OPTIONS
       Integration:
         IntegrationResponses:
-          -
-          ResponseParameters:
+        - ResponseParameters:
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
-          StatusCode: 200
+          StatusCode: '200'
         Type: MOCK
         RequestTemplates:
           "application/json": "{
-            \"statusCode\": 200      
-          }"
+            \"statusCode\": 200
+            }"
       MethodResponses:
-        -
-          ResponseParameters:
+        - ResponseParameters:
             method.response.header.Access-Control-Allow-Headers: true
             method.response.header.Access-Control-Allow-Methods: true
             method.response.header.Access-Control-Allow-Origin: true
-          StatusCode: 200
+          StatusCode: '200'
       OperationName: 'helloworld'
       ResourceId: !Ref ApiGatewayResource
       RestApiId: !Ref ApiGatewayRestApi
