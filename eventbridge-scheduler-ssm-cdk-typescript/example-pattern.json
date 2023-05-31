@@ -1,13 +1,13 @@
 {
-  "title": "EventBridge Scheduler to AWS Systems Manager State Manager Associations",
-  "description": "Create an EventBridge scheduler to run SSM Associations",
+  "title": "Amazon EventBridge Scheduler to AWS Systems Manager State Manager associations",
+  "description": "Create an Amazon EventBridge Scheduler event to run AWS Systems Manager State Manager associations",
   "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to create an EventBridge scheduler to run SSM Associations using AWS Cloud Development Kit (CDK) for TypeScript."
+      "This pattern demonstrates how to create an Amazon EventBridge Scheduler to run AWS Systems Manager State Manager associations using AWS Cloud Development Kit (CDK) for TypeScript."
     ]
   },
   "gitHub": {
@@ -21,7 +21,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Getting Started with EventBridge Scheduler",
+        "text": "Getting Started with Amazon EventBridge Scheduler",
         "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
       },
       {
