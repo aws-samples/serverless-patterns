@@ -3,7 +3,7 @@
   "description": "API Gateway REST API with Lambda non-proxy integration and CORS enabled for GET and OPTIONS methods",
   "language": "Python",
   "level": "200",
-  "framework": "CloudFormation",
+  "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
