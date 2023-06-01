@@ -1,0 +1,52 @@
+{
+  "title": "Language translator using secure synchronous state-machine",
+  "description": "Building a secure instantaneous language translator using AWS serverless services",
+  "language": "JavaScript",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An API Gateway's REST API endpoint for fectching Authentication token, using Amazon WebSockets for authenticating users and invoking Synchronous Step-function"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-cognito-sfn-sync",
+      "templateURL": "serverless-patterns/apigw-websocket-api-cognito-sfn-sync",
+      "projectFolder": "apigw-websocket-api-cognito-sfn-sync",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Authorizer for controlling and managing access to a WebSocket API in API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-control-access.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+        "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"    ]
+  },
+  "testing": {
+    "text": ["See the Github repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+      {
+        "name": "Avinandan Bandyopadhyay",
+        "image": "./Profile.jpg",
+        "bio": "Solutions Architect, AWS India"
+      }
+  ]
+}
