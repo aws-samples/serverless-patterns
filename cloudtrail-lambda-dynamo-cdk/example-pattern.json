@@ -1,7 +1,7 @@
 {
   "title": "Check Resource Tag Compliance Using CloudTrail, Lambda and Dynamo",
   "description": "Creates a CloudTrail trail for resource creation, and checks for the required tags to determine complaince",
-  "language": "Typescript and Python (for lambda functions)",
+  "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
