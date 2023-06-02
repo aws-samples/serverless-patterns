@@ -1,5 +1,5 @@
 {
-    "title": "CloudTrail to Lambda to Amazon OpenSearch",
+    "title": "Amazon CloudTrail to AWS Lambda to Amazon OpenSearch",
     "description": "Create an OpenSearch cluster in VPC that receives CloudTrail CloudWatch logs from Lambda.",
     "language": "python",
     "architectureURL": "docs/architecture.png",
