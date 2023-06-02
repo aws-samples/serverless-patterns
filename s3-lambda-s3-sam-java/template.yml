@@ -38,9 +38,9 @@ Resources:
   sourceconfigbckt:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: sourceconfigbckt
+      BucketName: "sourceservlerlesslambdapatternbckt"
 
   destinationconfigbckt:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: destinationconfigbckt
+      BucketName: "destinationservlerlesslambdapatternbckt"
