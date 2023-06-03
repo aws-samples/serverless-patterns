@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Pattern to demonstrate integration of AppSync, Lambda and Kendra.
+
+Resources:
+
+  AppSyncApiLogsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: MyApiLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+
+  AppSyncApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: "appsync-kendra-api"
+      AuthenticationType: "API_KEY"
+      LogConfig:
+        CloudWatchLogsRoleArn: !GetAtt AppSyncApiLogsRole.Arn
+        FieldLogLevel: ALL
+      XrayEnabled: True
+
+  AppSyncApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties: 
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Description: API key for my AppSync API
+
+  AppSyncSchema:
+    Type: "AWS::AppSync::GraphQLSchema"
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Definition: |
+        type Query {
+          searchKendra(query: String!): String
+        }
+  
+  AppSyncResolver:
+    Type: 'AWS::AppSync::Resolver'
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId  # replace with your API resource
+      TypeName: Query  # replace with your type name
+      FieldName: searchKendra  # replace with your field name
+      DataSourceName: !GetAtt AppSyncLambdaDataSource.Name  # replace with your data source resource
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "operation": "Invoke",
+          "payload": $util.toJson($context.arguments)
+        }
+      ResponseMappingTemplate: |
+        $util.toJson($context.result)
+
+  AppSyncLambdaDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: "LambdaDataSource"
+      Type: "AWS_LAMBDA"
+      ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !GetAtt KendraQueryLambda.Arn
+
+  AppSyncLambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: AppSyncLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt KendraQueryLambda.Arn
+
+  AppSyncS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub aws-kendra-${AWS::AccountId}
+
+  KendraIndex:
+    Type: "AWS::Kendra::Index"
+    Properties: 
+      Name: "app-sync-index"
+      Edition: DEVELOPER_EDITION
+      RoleArn: !GetAtt KendraRole.Arn
+  
+  KendraDataSource:
+    Type: AWS::Kendra::DataSource
+    Properties:
+      IndexId: !Ref KendraIndex
+      Name: KendraDataSource
+      Type: S3
+      DataSourceConfiguration:
+        S3Configuration:
+          BucketName: !Ref AppSyncS3Bucket
+          InclusionPrefixes:
+            - documents/
+      Description: My Kendra data source
+      RoleArn: !GetAtt KendraRole.Arn
+
+  KendraRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - kendra.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: KendraPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+  
+  KendraQueryLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Environment:
+        Variables:
+          KENDRA_INDEX_ID: !Ref KendraIndex
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - kendra:Query
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: "*"
+
+
+Outputs:
+  KendraQueryLambda:
+    Description: "Lambda function to query Kendra"
+    Value: !GetAtt KendraQueryLambda.Arn
+  AppSyncApiUrl:
+    Description: "The URL of the AppSync API"
+    Value: !GetAtt AppSyncApi.GraphQLUrl
+   
