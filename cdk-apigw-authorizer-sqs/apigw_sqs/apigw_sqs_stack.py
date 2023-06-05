@@ -6,19 +6,27 @@ from aws_cdk import (
     aws_lambda as lambdafun
 )
 import os
+import json
 
 class ApigwSqsStack(core.Stack):
 
     def __init__(self, scope: core.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+# Get config values from cdk.out.context
+        params = self.node.try_get_context("params")
+
+        sqs_queue_name = params["storage_sqs_queue_name"]
+        aws_region =params["aws_region_name"]
+       
+       
 # Create a SQS queue for storing message that APIGateway will receive.
         sqs_queue = sqs.Queue(self, 
                     'storagesqs',          
-                    queue_name = os.getenv("storage_sqs_queue_name","apigwstoragequeue"),
+                    queue_name = sqs_queue_name,
                     encryption = sqs.QueueEncryption.KMS_MANAGED
         )
-        
+
 # Create an inline Policy document that grants permission to access SQS queue
         sqs_inline_policy = iam.Policy(self, "sqs-policy-for-apigw",
             statements=[iam.PolicyStatement(
@@ -26,6 +34,7 @@ class ApigwSqsStack(core.Stack):
                 resources=[sqs_queue.queue_arn]
             )]
         )
+
 # Create an IAM  apigateway execution role.
         apigw_role = iam.Role(self, "apigw_role",
                     assumed_by=iam.CompositePrincipal(
@@ -60,7 +69,7 @@ class ApigwSqsStack(core.Stack):
 
         apigw_method = apigw.root.add_resource('sqs').add_method('POST',
             apigateway.AwsIntegration(
-                region = os.getenv("aws_region_name","us-east-1"),
+                region = aws_region,
                 service = 'sqs',
                 integration_http_method = 'POST',
                 path = sqs_queue.queue_name, 

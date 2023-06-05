@@ -12,7 +12,7 @@ from aws_cdk import core
 from apigw_sqs.apigw_sqs_stack import ApigwSqsStack
 from apigw_sqs.apigw_sqs_auth_stack import ApigwSqsAuthStack
 app = core.App()
-ApigwSqsStack(app, "ApigwSqsStack")
+#ApigwSqsStack(app, "ApigwSqsStack")
 ApigwSqsAuthStack(app,"ApigwSqsAuthStack")
 
 app.synth()

@@ -1,4 +1,4 @@
-# CDK Python project for deploying Queue-Based Leveling pattern!
+# CDK Python project for deploying Queue-Based Leveling pattern
 
 This pattern also referred to as Queue-Based leveling pattern can be useful when desigining Event driven architectures (EDA). Customers facing performance issues, when processing synchronous and webhook call, during extremely high peak traffic can avoid such situations by adapting this architectural strategy. A SQS queue will acts as a buffer for these synchronous requests and permits you to decouple the sender from the receiver. This pattern offers an easy solution to bridge the gap using AWS services that can easily plugin to customers existing architecture.
 
@@ -39,13 +39,43 @@ git clone https://github.com/aws-samples/serverless-patterns/cdk-apigw-authorize
 ```
 cd cdk-apigw-authorizer-sqs
 ```
-3. To generate a cloudformation templates (optional)
+3. To manually create a virtualenv on MacOS and Linux:
 ```
-aws_region_name=<aws_region_name> storage_sqs_queue_name=<user_friendly-SQS_Queue_name> authorizer_lambda_arn=<arn:aws:lambda:<aws_region>:<aws_account>:function:<lambda_function_name> cdk synth
+$ python3 -m venv .venv
 ```
-4. To deploy AWS resources as a CDK project
+4. After the init process completes and the virtualenv is created, you can use the following to activate virtualenv.
 ```
-aws_region_name=<aws_region_name> storage_sqs_queue_name=<user_friendly-SQS_Queue_name> authorizer_lambda_arn=<arn:aws:lambda:<aws_region>:<aws_account>:function:<lambda_function_name> cdk deploy ApigwSqsAuthStack
+$ source .venv/bin/activate
+``` 
+6. After activating your virtual environment for the first time, install the app's standard dependencies:
+```
+python -m pip install -r requirements.txt
+```
+7. Install aws_sqs module
+```
+python -m pip install aws-cdk.aws-sqs
+```
+8. Install APIGateway Module
+```
+python -m pip install aws-cdk.aws-apigateway
+```
+9. Update 'cdk-apigw-authorizer-sqs/cdk.context.json' file with your application specific parameters
+```
+{
+    "params":{
+        "aws_region_name":"<aws_region_name>",
+        "storage_sqs_queue_name":"<user_friendly-SQS_Queue_name>",
+        "authorizer_lambda_arn":"<arn:aws:lambda:<aws_region>:<aws_account>:function:<lambda_function_name>"
+    }
+}
+``` 
+10. To generate a cloudformation templates (optional)
+```
+cdk synth
+```
+11. To deploy AWS resources as a CDK project
+```
+cdk deploy 
 ```
 
 ## How it works
@@ -57,7 +87,7 @@ At the end of the deployment the CDK output will list stack outputs, and an API 
 
 Test the api invocation using curl:
 ```
-curl -X POST "https://<apigateway-id>.execute-api.us-east-1.amazonaws.com/prod/sqs" -H "Authorization:testtoken"  -H "Content-Type: application/json" --data '{"status": "ok"}'
+curl -X POST "https://<apigateway-id>.execute-api.<aws-region>.amazonaws.com/prod/sqs" -H "Authorization:testtoken"  -H "Content-Type: application/json" --data '{"status": "ok"}'
 ```
 If the execution is successful, you will get  response similar to
 ```
