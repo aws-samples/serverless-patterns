@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description:  API Gateway REST API with Lambda Proxy integration and CORS enabled
+
+Resources:
+    ApiGatewayRestApi:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Description: API with Cors Support
+        EndpointConfiguration:
+          Types:
+            - REGIONAL
+        Name: cors-api
+
+    ApiGatewayResource:
+      Type: AWS::ApiGateway::Resource
+      Properties:
+        ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+        PathPart: 'helloworld'
+        RestApiId: !Ref ApiGatewayRestApi
+    
+    ApiGatewayGetMethod:
+      Type: AWS::ApiGateway::Method
+      Properties:
+        AuthorizationType: NONE
+        HttpMethod: GET
+        Integration:
+          IntegrationHttpMethod: POST
+          IntegrationResponses:
+           -
+            ResponseParameters:
+               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+               method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS'"
+               method.response.header.Access-Control-Allow-Origin: "'*'"
+            StatusCode: '200'
+          Type: AWS
+          Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+        MethodResponses:
+         -
+           ResponseParameters:
+             method.response.header.Access-Control-Allow-Headers: true
+             method.response.header.Access-Control-Allow-Methods: true
+             method.response.header.Access-Control-Allow-Origin: true
+           StatusCode: '200'
+        OperationName: 'helloworld'
+        ResourceId: !Ref ApiGatewayResource
+        RestApiId: !Ref ApiGatewayRestApi
+
+    ApiGatewayOptionsMethod:
+      Type: AWS::ApiGateway::Method
+      Properties:
+        AuthorizationType: NONE
+        HttpMethod: OPTIONS
+        Integration:
+          IntegrationHttpMethod: POST
+          Type: AWS_PROXY
+          Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionOptions.Arn}/invocations"
+        OperationName: 'helloworld'
+        ResourceId: !Ref ApiGatewayResource
+        RestApiId: !Ref ApiGatewayRestApi
+
+    MyFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: index.handler
+            Runtime: python3.7
+            InlineCode: | 
+                import json 
+                def handler(event, context): 
+                    return { 
+                "statusCode": 200, 
+                "body": json.dumps({ "message" : "Hello from Lambda!"}), 
+                }
+
+    MyFunctionPermission:
+        Type: AWS::Lambda::Permission
+        DependsOn:
+        - ApiGatewayRestApi
+        Properties:
+          Action: lambda:InvokeFunction
+          FunctionName: !Ref MyFunction
+          Principal: apigateway.amazonaws.com
+    
+    MyFunctionOptions:
+        Type: AWS::Serverless::Function
+        DependsOn: ApiGatewayRestApi
+        Properties:
+            Handler: index.handler
+            Runtime: python3.7
+            InlineCode: | 
+                import json 
+                def handler(event, context): 
+                    return { 
+                        "statusCode": 200, 
+                        "headers": {
+                            "Access-Control-Allow-Origin": '*',
+                            "Access-Control-Allow-Headers": 'Content-Type,Authorization,X-AMZ-Date,X-Api-Key,X-AMZ-Security-Token',
+                            "Access-Control-Allow-Methods": 'GET,POST,OPTIONS'
+                            }
+                }
+
+    MyFunctionOptionsPermission:
+        Type: AWS::Lambda::Permission
+        DependsOn:
+        - ApiGatewayRestApi
+        Properties:
+          Action: lambda:InvokeFunction
+          FunctionName: !Ref MyFunctionOptions
+          Principal: apigateway.amazonaws.com
+
+    Deployment:
+      Type: AWS::ApiGateway::Deployment
+      DependsOn: ApiGatewayGetMethod
+      Properties:
+        RestApiId: !Ref ApiGatewayRestApi
+        StageName: prod
