@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 * [Create two AWS accounts for cross account setup](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have, create them and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) iinstalled and configure two profiles with credentials for the individual accounts as below:
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configure two profiles with credentials for the individual accounts as below:
     ```
     [default]
     [crossaccount]
@@ -29,7 +29,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd step-function-lambda-function-crossaccount-terraform
+    cd sns-lambda-crossregion-crossaccount-encrypted-terraform
     ```
 1. From the command line, initialize terraform to to downloads and installs the providers defined in the configuration:
     ```
@@ -41,23 +41,28 @@ Important: this application uses various AWS services and there are costs associ
     ```
 
 1. During the prompts
-    #var.region
-    - Enter a value: {enter the region for deployment}
+    #var.kmsAlias
+    - Enter a KMS key alias name that you want:
 
-    #var.prefix {enter any name to associate with resources}
-    - Enter a value:
+    #var.lambdaAccountId {enter the account ID where you want to create Lambda function}
+    - Enter a account ID:
 
+    #var.lambda_region {enter the region where you want to create your Lambda function}
+    - Enter a region: (example: us-east-2)
+
+    #var.snsAccountId {enter the account ID where you want to create SNS }
+    - Enter a account ID:
+
+    #var.sns_region {enter the region where you want to create your SNS}
+    - Enter a region: (example: us-west-2)
 ## Testing
 
-1. You can start the execution of the Step Function using the following CLI command
-    ```
-    aws stepfunctions start-execution --state-machine-arn STATE_MACHINE_ARN --input "{ \"payload\": \"testing\"}"
-    ```
+1. Login in to SNS account and publish a message.
 
-1. You will find the STATE_MACHINE_ARN in the outputs of the SAM template.
+1. Now login in to the account where Lambda function is deployed and check the CloudWatch logs of the function. 
 
 ## Cleanup
- 
+ de
 1. Change directory to the pattern directory:
     ```
     cd serverless-patterns/step-function-lambda-function-crossaccount-terraform
