@@ -1,0 +1,48 @@
+{
+    "title": "Send Customised email to the subscribed Email Address",
+    "description": "Create an Event pattern which triggers the Lambda function to send email to the subscribed endpoint",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample pattern allows users to quickly deploy an Event pattern which triggers the Lambda function to send email to the subscribed endpoint.",
+        "By using this pattern, users can ensure that they will recieve an email as soon as the state of any Alarm changes",
+        "This pattern can be useful in scenarios where there is a need to integrate with custom notifications based upon the state of Alarm change"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-custom-notif",
+        "templateURL": "serverless-patterns/sns-custom-notif",
+        "projectFolder": "sns-custom-notif",
+        "templateFile": "sns-custom-notif/template.yaml"
+      }
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: sam delete --stack-name <stackname>"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Dev Arora",
+        "image": "https://photos.google.com/share/AF1QipMJiom7Ip4M9s2bU9z_CLaaPaXbqfpZ7hM3Ju2NDw6WMzYhXCu8SYBw2H8-H8WMrw/photo/AF1QipM2SpuoQkJNLmMSkt4x39zDzQqgu5pE1UCVa2g?key=NzZlRG1SLUgzTEZ0VlZVc1NUZlQwSm1zc3hwSlVn",
+        "bio": "I am a Cloud Support Engineer (Serverless) at AWS and I love to solve complex problems."
+      }
+    ]
+  }
+
+  
+  

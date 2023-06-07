@@ -1,0 +1,44 @@
+{
+    "title": "Compress Image from one S3 bucket to another",
+    "description": "Create a S3 bucket to upload a high quality image which will trigger a Lambda function to compress the image and the compressed image will be uploaded to a destination bucket. Finally, sending the notification to SNS topic with Email subscription",
+    "language": "Node",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample pattern allows users to quickly deploy a source and destination S3 bucket along with the Lambda function which will compress the image.",
+        "By using this pattern, users can ensure that they will recieve an email as soon as the compressed image is uploaded to the destination bucket."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-image-compression",
+        "templateURL": "serverless-patterns/sns-image-compression",
+        "projectFolder": "sns-image-compression",
+        "templateFile": "sns-image-compression/template.yaml"
+      }
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: sam delete --stack-name <stackname>"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Dev Arora",
+        "image": "https://photos.google.com/share/AF1QipMJiom7Ip4M9s2bU9z_CLaaPaXbqfpZ7hM3Ju2NDw6WMzYhXCu8SYBw2H8-H8WMrw/photo/AF1QipM2SpuoQkJNLmMSkt4x39zDzQqgu5pE1UCVa2g?key=NzZlRG1SLUgzTEZ0VlZVc1NUZlQwSm1zc3hwSlVn",
+        "bio": "I am a Cloud Support Engineer (Serverless) at AWS and I love to solve complex problems."
+      }
+    ]
+  }

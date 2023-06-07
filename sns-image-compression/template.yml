@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Compress image using Lambda and send notification to client using SNS
+
+Parameters:
+  UncompressedBucketName:
+    Type: String
+    Description: "Bucket for storing full resolution images"
+
+  CompressedBucketName:
+    Type: String
+    Description: "Bucket for storing compressed images"
+
+  EmailEndpoint:
+    Type: String
+    Default: mymail@mail.com
+    Description: Email address to subscribe to Alarm SNS topic. (Donot forget to confirm subscribtion)
+
+Resources:
+
+# Create SNS topic
+  NotificationSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      FifoTopic: false
+      TopicName: !Sub '${AWS::StackName}-AlarmNotification'
+
+# Create Subscription
+  NotificationSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !Ref EmailEndpoint
+      Protocol: email
+      TopicArn: !Ref NotificationSNSTopic
+
+  UncompressedBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref UncompressedBucketName
+
+  CompressedBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref CompressedBucketName
+
+  ImageCompressorLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/index.handler
+      Runtime: nodejs16.x
+      Timeout: 60
+      Environment:
+        Variables:
+          NotificationSNSTopic: !Ref NotificationSNSTopic
+          UNCOMPRESSED_BUCKET: !Ref UncompressedBucketName
+          COMPRESSED_BUCKET: !Ref CompressedBucketName
+      Policies:
+        - S3ReadPolicy:
+           BucketName: !Ref UncompressedBucketName
+        - S3ReadPolicy:
+           BucketName: !Ref CompressedBucketName
+        - S3WritePolicy:
+            BucketName: !Ref CompressedBucketName
+        - SNSPublishMessagePolicy:
+            TopicName: !Sub '${AWS::StackName}-AlarmNotification'
+      Events:
+        CompressImageEvent:
+          Type: S3
+          Properties:
+            Bucket: !Ref UncompressedBucket
+            Events: s3:ObjectCreated:*
+      FunctionName: !Sub '${AWS::StackName}-imageCompressionLambda'
