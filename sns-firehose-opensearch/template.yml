@@ -2,12 +2,9 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  NewUserName:
+  AdminUserArn:
     Type: String
-    Description: Enter a name for a new user to be created
-  NewUserPassword:
-    Type: String
-    Description: Enter login password for user
+    Description: Enter ARN for any User with admin rights
 
 
 Resources:
@@ -35,23 +32,51 @@ Resources:
               - Sid: Aoss
                 Effect: Allow
                 Action:
-                  - 'aoss:*'
+                - 'aoss:GetAccessPolicy'
+                - 'aoss:CreateAccessPolicy'
+                - 'aoss:UpdateSecurityConfig'
+                - 'aoss:UpdateVpcEndpoint'
+                - 'aoss:UpdateSecurityPolicy'
+                - 'aoss:ListAccessPolicies'
+                - 'aoss:ListSecurityPolicies'
+                - 'aoss:UpdateAccessPolicy'
+                - 'aoss:DeleteSecurityPolicy'
+                - 'aoss:UntagResource'
+                - 'aoss:GetSecurityPolicy'
+                - 'aoss:ListTagsForResource'
+                - 'aoss:BatchGetCollection'
+                - 'aoss:ListSecurityConfigs'
+                - 'aoss:CreateSecurityConfig'
+                - 'aoss:CreateSecurityPolicy'
+                - 'aoss:TagResource'
+                - 'aoss:DeleteVpcEndpoint'
+                - 'aoss:BatchGetVpcEndpoint'
+                - 'aoss:GetPoliciesStats'
+                - 'aoss:ListVpcEndpoints'
+                - 'aoss:UpdateAccountSettings'
+                - 'aoss:GetAccountSettings'
+                - 'aoss:GetSecurityConfig'
+                - 'aoss:CreateVpcEndpoint'
+                - 'aoss:DeleteSecurityConfig'
+                - 'aoss:ListCollections'
+                - 'aoss:DeleteAccessPolicy'
+                - 'aoss:CreateCollection'
                 Resource: '*'
 
-  IAMUser:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref NewUserName
-      LoginProfile: 
-          Password: !Ref NewUserPassword
-          PasswordResetRequired: true
-      ManagedPolicyArns:
-      - 'arn:aws:iam::aws:policy/AdministratorAccess'
+  # IAMUser:
+  #   Type: AWS::IAM::User
+  #   Properties:
+  #     UserName: !Ref NewUserName
+  #     LoginProfile: 
+  #         Password: !Ref NewUserPassword
+  #         PasswordResetRequired: true
+  #     ManagedPolicyArns:
+  #     - 'arn:aws:iam::aws:policy/AdministratorAccess'
 
-  IAMUserAccessKey:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref IAMUser
+  # IAMUserAccessKey:
+  #   Type: AWS::IAM::AccessKey
+  #   Properties:
+  #     UserName: !Ref IAMUser
 
 
   TestCollection:
@@ -91,7 +116,7 @@ Resources:
       Policy: !Sub >-
         [{"Description":"Access for Admin","Rules":[{"ResourceType":"index","Resource":["index/test-collection/testindex"],"Permission":["aoss:*"]},
         {"ResourceType":"collection","Resource":["collection/test-collection"],"Permission":["aoss:*"]}],
-        "Principal":["${IAMUser.Arn}"]}]
+        "Principal":["${AdminUserArn}"]}]
 
   TestAccessPolicyKinesis:
     Type: 'AWS::OpenSearchServerless::AccessPolicy'
@@ -181,13 +206,13 @@ Resources:
 
 
 Outputs:
-  IAMUserAccessKeyId:
-    Value: !Ref IAMUserAccessKey
-    Description: Access key ID for the IAM user
+  # IAMUserAccessKeyId:
+  #   Value: !Ref IAMUserAccessKey
+  #   Description: Access key ID for the IAM user
 
-  IAMUserSecretAccessKey:
-    Value: !GetAtt IAMUserAccessKey.SecretAccessKey
-    Description: Secret access key for the IAM user
+  # IAMUserSecretAccessKey:
+  #   Value: !GetAtt IAMUserAccessKey.SecretAccessKey
+  #   Description: Secret access key for the IAM user
 
   KinesisArn:
     Value: !GetAtt MyKinesisFirehoseStream.Arn
