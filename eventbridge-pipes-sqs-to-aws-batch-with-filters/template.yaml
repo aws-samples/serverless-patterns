@@ -11,11 +11,11 @@ Parameters:
     Type: 'AWS::EC2::VPC::Id'
   PrivateSubnet1:
     ConstraintDescription: The subnet IDs must be within an existing VPC
-    Description: Public or external subnets for the availability zones
+    Description: Private subnets for the availability zones
     Type: String
   PrivateSubnet2:
     ConstraintDescription: The subnet IDs must be within an existing VPC
-    Description: Public or external subnets for the availability zones
+    Description: Private subnets for the availability zones
     Type: String
 
 Resources:
