@@ -1,6 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+  NewUserName:
+    Type: String
+    Description: Enter a name for a new user to be created
+  NewUserPassword:
+    Type: String
+    Description: Enter login password for user
+
+
 Resources:
 
   MyFirehoseStreamRole:
@@ -32,9 +41,9 @@ Resources:
   IAMUser:
     Type: AWS::IAM::User
     Properties:
-      UserName: Admin
+      UserName: !Ref NewUserName
       LoginProfile: 
-          Password: Admin@123
+          Password: !Ref NewUserPassword
           PasswordResetRequired: true
       ManagedPolicyArns:
       - 'arn:aws:iam::aws:policy/AdministratorAccess'
