@@ -33,7 +33,12 @@ Important: this application uses various AWS services and there are costs associ
 
    - Enter a stack name
    - Enter the desired AWS Region
+   - Enter existing VPC ID
+   - Enter private subnet 1
+   - Enter private subnet 2
    - Allow SAM CLI to create IAM roles with the required permissions.
+
+   `Note: Ensure that you have a Nat Gateway configured.`
 
    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
