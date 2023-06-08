@@ -109,6 +109,9 @@ Resources:
     Properties:
       VpcId: !Ref VpcId
       GroupDescription: 'Security Group for Batch job'
+      SecurityGroupEgress:
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: '-1'
 
   JobSGIngress:
     Type: AWS::EC2::SecurityGroupIngress
