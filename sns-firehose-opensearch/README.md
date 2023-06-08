@@ -1,5 +1,7 @@
 # AWS SNS to AWS Firehose to AWS Opensearch 
 
+![Concept](./sns-firehose-opensearch.jpg)
+
 Cloudwatch Alarms triggers SNS notifications which are send to a Kinesis Firehose Delivery Stream subscription. The Firehose forwards the notification data to Opensearch collection for analysis using custom dashboards.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/sns-firehose-opensearch](https://serverlessland.com/patterns/sns-firehose-opensearch)
