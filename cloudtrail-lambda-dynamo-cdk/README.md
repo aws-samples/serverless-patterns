@@ -1,6 +1,6 @@
 # AWS Service 1 to AWS Service 2
 
-This pattern << explain usage >>
+This pattern shows how to leverage CloudTrail resource creation API calls to check for required tags and determine compliance. The resources used in this pattern include CloudTrail, S3, Lambda, and DynamoDB which are all deployed via CDK. From the CloudTrail logs stored in S3, the relevant resource creation events are populated into a DynamoDB table via Lambda. The items written into the table are then checked for the required tags to determine compliance. 
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -11,7 +11,8 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Node.js installed](https://nodejs.org/en/download)
+* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (AWS CDK) v2 installed
 
 ## Deployment Instructions
 
@@ -21,38 +22,48 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd serverless-patterns/cloudtrail-lambda-dynamo-cdk/src
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. Run the following command to install the required project dependencies
     ```
-    sam deploy --guided
+    npm install
     ```
-1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
-
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
-
-## How it works
-
-Explain how the service interaction works.
-
+1. Use the following command to generate the AWS CloudFormation template for your CDK application:
+    ```
+    cdk synth
+    ```
+1. Use the following command to deploy the AWS resources for this pattern into your AWS account:
+    ```
+    cdk deploy
+    ```
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Once the CDK stack has deployed successfully, you can take the following steps to ensure the pattern is working appropriately:
+1. Using the AWS CLI, create a bucket using the following command:
+    ```
+    aws s3api create-bucket --bucket {bucket-name} --region {your AWS region}
+    ```
+    If the S3 bucket creation was successful, you should receive the following response:
+    ```
+    {
+        "Location": "/{bucket-name}"
+    }
+    ```
+    You can also open the AWS Management Console, navigate to S3, and confirm the created bucket is listed there.
+
+1. Navigate to DynamoDB
+
+1. Select the table created for this pattern
+
+1. Click 'Explore table items'
+
+1. Within about 5 minutes or less, you should see a new item populated in the DynamoDB table specifying the ARN of the newly created bucket. The 'is_compliant' column should be set to 'false' since the bucket was created with no tags. 
 
 ## Cleanup
  
 1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    cdk destroy
     ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
