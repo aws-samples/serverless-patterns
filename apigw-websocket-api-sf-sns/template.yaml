@@ -1,0 +1,283 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >
+  Serverless patterns - This CloudFormation template will help you to deploy API Gateway WebSocket API which integrates with AWS Step Functions and SNS to process food delivery order with real time updates
+
+Parameters:
+  ApiStageName:
+    Description: Name of WebSocket API stage
+    Type: String
+    Default: production
+  SNSArn:
+    Description: ARN of the SNS topic for WebSocket disconnect notification
+    Type: String
+    AllowedPattern: "^arn:aws:sns:[a-zA-Z0-9-]+:\\d+:[a-zA-Z0-9-_]+$"
+
+  SFActivityArn:
+    Description: ARN of a state machine activity to MOCK different stages of human-approval process of food delivery
+    Type: String
+    AllowedPattern: "^arn:aws:states:[a-zA-Z0-9-]+:\\d+:activity:[a-zA-Z0-9-_]+$"
+
+Resources:
+#######################################################
+#   Data storage for order tracking
+#######################################################
+  FoodOrderTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AWS::StackName}-orderTable
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TimeToLiveSpecification:
+        AttributeName:  ttl
+        Enabled: true
+
+
+#######################################################
+#   API Gateway
+#######################################################
+  WebSocketApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-WebSocketApi"
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - ConnectRoute
+      - DisconnectRoute
+      - sendOrder
+
+    Properties:
+      ApiId: !Ref WebSocketApi
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: !Ref ApiStageName
+      DeploymentId: !Ref Deployment
+      ApiId: !Ref WebSocketApi
+
+
+#######################################################
+#   Connect route 
+#######################################################
+
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $connect
+      AuthorizationType: NONE
+      RouteResponseSelectionExpression: '$default'
+      OperationName: ConnectRoute
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref ConnectRouteIntegration
+
+  ConnectRouteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: MOCK
+      RequestTemplates:
+        "200": '{"statusCode":200}'
+      TemplateSelectionExpression: '200'
+      PassthroughBehavior: 'WHEN_NO_MATCH'
+
+
+  ConnectRouteResponse: 
+    Type: AWS::ApiGatewayV2::RouteResponse
+    Properties:
+      RouteId: !Ref ConnectRoute
+      ApiId: !Ref WebSocketApi
+      RouteResponseKey: $default
+
+  ConnectRouteIntegrationResponse:
+    Type: AWS::ApiGatewayV2::IntegrationResponse
+    Properties: 
+      ApiId: !Ref WebSocketApi
+      IntegrationId: !Ref ConnectRouteIntegration
+      IntegrationResponseKey: /200/
+      TemplateSelectionExpression: \$default
+      ResponseTemplates:
+        "200": '{"statusCode":, "message":"order initiated"}'
+
+#######################################################
+#   Disconnect route 
+#######################################################
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $disconnect
+      OperationName: DisconnectRoute
+      Target: !Join
+        - /
+        - -  integrations
+          - !Ref DisconnectRouteIntegration
+  APIGWRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+          - Action:
+            - "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Path: /
+      Policies: 
+        - PolicyName: SNSSFAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - "sns:Publish"
+                  - "states:StartExecution"
+                Resource:
+                  - !Ref SNSArn
+                  - !Sub '${orderWorkflow}'
+
+  DisconnectRouteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:sns:action/Publish"
+      CredentialsArn: !Sub "${APIGWRole.Arn}"
+      IntegrationMethod: POST
+      ContentHandlingStrategy: CONVERT_TO_TEXT
+      RequestParameters: 
+        integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+      RequestTemplates: 
+        $default: !Sub 'Action=Publish&TopicArn=$util.urlEncode("${SNSArn}")&Message=$util.urlEncode("${!context}")'
+      TemplateSelectionExpression: request.body.action
+
+  DisconnectRouteIntegrationResponse:
+    Type: AWS::ApiGatewayV2::IntegrationResponse
+    Properties: 
+      ApiId: !Ref WebSocketApi
+      IntegrationId: !Ref DisconnectRouteIntegration
+      IntegrationResponseKey: /200/
+      TemplateSelectionExpression: \$default
+
+#######################################################
+#   sendOrder route 
+#######################################################
+  sendOrder:
+    Type: AWS::ApiGatewayV2::Route
+    Properties: 
+      ApiId: !Ref WebSocketApi
+      RouteKey: sendOrder
+      AuthorizationType: NONE
+      ModelSelectionExpression: $request.body.action
+      RequestModels:
+        sendOrder: orderModel
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref sendOrderRouteIntegration
+
+  sendOrderRouteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS
+      IntegrationMethod: POST
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:states:action/StartExecution"
+      CredentialsArn: !Sub "${APIGWRole.Arn}"
+      TemplateSelectionExpression: \$default
+      RequestTemplates: 
+        "$default":
+          Fn::Sub: >
+            #set ( $order = $input.path('$.orderDetails'))
+            #set ($cust =$input.path('$.customerId'))
+            #set( $ttl = $context.requestTimeEpoch + 7776000) 
+            #set ($restaurant =$input.path('$.restaurantDetails'))
+            {
+                "input":"{\"connectionId\" : \"${!context.connectionId}\", \"ttl\":\"$ttl\",\"apigwrequestid\":\"${!context.extendedRequestId}\",\"orderDetails\":\"$order\",\"customerId\":\"$cust\",\"restaurantDetails\":\"$restaurant\"}",
+                "stateMachineArn": "${orderWorkflow}"
+            }
+  sendOrderRouteResponse:
+    Type: AWS::ApiGatewayV2::RouteResponse
+    Properties:
+      RouteId: !Ref sendOrder
+      ApiId: !Ref WebSocketApi
+      RouteResponseKey: $default
+
+  sendOrderRouteIntegrationResponse:
+    Type: AWS::ApiGatewayV2::IntegrationResponse
+    Properties: 
+      ApiId: !Ref WebSocketApi
+      IntegrationId: !Ref sendOrderRouteIntegration
+      IntegrationResponseKey: $default
+
+  foodOrderModel:
+    Type: AWS::ApiGatewayV2::Model
+    Properties:
+      ApiId: !Ref WebSocketApi
+      ContentType: application/json
+      Description: this model helps us to ensure that all the required parameters are passed on to the State Machine
+      Name: orderModel
+      Schema: 
+        $schema: http://json-schema.org/draft-04/schema#
+        title: orderInputModel
+        type: object
+        properties:
+          orderDetails: 
+            type: string
+          customerId:
+            type: string
+          restaurantDetails:
+            type: string
+        required:
+          - orderDetails
+          - customerId
+          - restaurantDetails
+#######################################################
+#   state machine to initiate food delivery process
+#######################################################
+  orderWorkflow:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: sfn/statemachine.asl.json
+      DefinitionSubstitutions:
+        WSAPIEndpoint: !Sub "${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com" 
+        mockActivity: !Ref SFActivityArn
+        foodTable: !Sub ${FoodOrderTable}
+      Type: STANDARD
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - execute-api:Invoke
+              - execute-api:ManageConnections
+            Resource: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*'
+          - Effect: Allow
+            Action: 
+              - dynamodb:PutItem
+            Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${FoodOrderTable}'
+
+Outputs:
+  APIEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStageName}"
+

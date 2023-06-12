@@ -1,0 +1,148 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "createOrder",
+  "States": {
+    "createOrder": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName": "${foodTable}",
+        "Item": {
+          "orderId": {
+            "S.$": "$.connectionId"
+          },
+          "orderDetails": {
+            "S.$": "$.orderDetails"
+          },
+          "customerId": {
+            "S.$": "$.customerId"
+          },
+          "restaurantDetails": {
+            "S.$": "$.restaurantDetails"
+          },
+          "ttl": {
+            "S.$": "$.ttl"
+          }
+        }
+      },
+      "Next": "sendOrderUpdate",
+      "ResultPath": null
+    },
+    "sendOrderUpdate": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::apigateway:invoke",
+      "Parameters": {
+        "ApiEndpoint": "${WSAPIEndpoint}",
+        "Method": "POST",
+        "Stage": "production",
+        "Path.$": "States.Format('/@connections/{}', $.connectionId)",
+        "RequestBody": {
+          "Payload.$": "States.Format('Order initiated! Preparing {} and looking for a delivery partner!',$.orderDetails)"
+        },
+        "AuthType": "IAM_ROLE"
+      },
+      "ResultPath": null,
+      "Next": "parallelState"
+    },
+    "parallelState": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "prepareFood",
+          "States": {
+            "prepareFood": {
+              "Type": "Task",
+              "Resource": "${mockActivity}",
+              "Next": "orderPreparedNotification",
+              "ResultPath": null
+            },
+            "orderPreparedNotification": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::apigateway:invoke",
+              "Parameters": {
+                "ApiEndpoint": "${WSAPIEndpoint}",
+                "Method": "POST",
+                "Stage": "production",
+                "Path.$": "States.Format('/@connections/{}', $.connectionId)",
+                "RequestBody": {
+                  "Payload.$": "States.Format('Order {} prepared! It will reach you soon.',$.orderDetails)"
+                },
+                "AuthType": "IAM_ROLE"
+              },
+              "End": true,
+              "ResultPath": null,
+              "OutputPath": "$.orderDetails"
+            }
+          }
+        },
+        {
+          "StartAt": "findDeliveryPartner",
+          "States": {
+            "findDeliveryPartner": {
+              "Type": "Task",
+              "Resource": "${mockActivity}",
+              "Next": "deliveryPartnerFoundNotification",
+              "ResultPath": "$.name"
+            },
+            "deliveryPartnerFoundNotification": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::apigateway:invoke",
+              "Parameters": {
+                "ApiEndpoint": "${WSAPIEndpoint}",
+                "Method": "POST",
+                "Stage": "production",
+                "Path.$": "States.Format('/@connections/{}', $.connectionId)",
+                "RequestBody": {
+                  "Payload.$": "States.Format('Delivery partner {} assigned!',$.name.name)"
+                },
+                "AuthType": "IAM_ROLE"
+              },
+              "End": true,
+              "ResultPath": null,
+              "OutputPath": "$.name.name"
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.order",
+      "Next": "orderOnTheWay"
+    },
+    "orderOnTheWay": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::apigateway:invoke",
+      "Parameters": {
+        "ApiEndpoint": "${WSAPIEndpoint}",
+        "Method": "POST",
+        "Stage": "production",
+        "Path.$": "States.Format('/@connections/{}', $.connectionId)",
+        "RequestBody": {
+          "Payload.$": "States.Format('Tasty food is on its way! {} is bringing {}!',$.order[1],$.order[0])"
+        },
+        "AuthType": "IAM_ROLE"
+      },
+      "ResultPath": null,
+      "Next": "agentOMW"
+    },
+    "agentOMW": {
+      "Type": "Task",
+      "Resource": "${mockActivity}",
+      "Next": "foodDelivered",
+      "ResultPath": null
+    },
+    "foodDelivered": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::apigateway:invoke",
+      "Parameters": {
+        "ApiEndpoint": "${WSAPIEndpoint}",
+        "Method": "POST",
+        "Stage": "production",
+        "Path.$": "States.Format('/@connections/{}', $.connectionId)",
+        "RequestBody": {
+          "Payload.$": "States.Format('{} delivered by {}!',$.order[0],$.order[1])"
+        },
+        "AuthType": "IAM_ROLE"
+      },
+      "End": true
+    }
+  }
+}
