@@ -1,8 +1,8 @@
 {
-  "name": "src",
+  "name": "tag-compliance",
   "version": "0.1.0",
   "bin": {
-    "src": "bin/src.js"
+    "tag-compliance": "bin/tag-compliance.js"
   },
   "scripts": {
     "build": "tsc",
