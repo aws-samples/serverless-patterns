@@ -1,8 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# Cloudtrail to Lambda with DynamoDB
 
 This pattern shows how to leverage CloudTrail resource creation API calls to check for required tags and determine compliance. The resources used in this pattern include CloudTrail, S3, Lambda, and DynamoDB which are all deployed via CDK. From the CloudTrail logs stored in S3, the relevant resource creation events are populated into a DynamoDB table via Lambda. The items written into the table are then checked for the required tags to determine compliance. 
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns:[Create an AWS account](https://serverlessland.com/patterns/cloudtrail-lambda-dynamodb-cdk)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
