@@ -1,0 +1,52 @@
+{
+  "title": "AWS Lambda and AWS MSK CloudFormation Template",
+  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "language": "Python3",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
+      "templateURL": "serverless-patterns/MSK-Lambda-Ec2Client-VPC-CFtemplate",
+      "projectFolder": "MSK-Lambda-Ec2Client-VPC-CFtemplate",
+      "templateFile": "MSK-Lambda-Ec2Client-VPC-CFtemplate/template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Lambda with Amazon MSK",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+    "Get bootstrap server from MSK cluster in order to create topics. Navigate to your complete MSK cluster, and select “Client information”\n\nYou will see Authentication type as “PlainText” and next to it the Private Endpoint which is what we need\n\nAlt text\n\nHead over to your Ec2 machine and connect. For this Tutorial I used Ec2 instance connect. You should be able to access your instance with instance connect right away.\n\nWithin the Terminal I have already installed Java on the client machine and have downloaded apache Kafka 2.13 version, so you are ready to start creating topics.\n\nIf you run “ls” within the terminal, you will see kafka is already installed.\n\nAlt text\n\nWith your BootstrapServerString, run the below command to create your first topic mytopic\n\nCreate Topic\n /home/ec2-user/kafka_2.13-2.8.1/bin/kafka-topics.sh --create --bootstrap-server BootstrapServerstring --replication-factor 2 --partitions 1 --topic mytopic \n\nIf there is no issues with the command, you should receive a “create topic” message, example below.\n\nAlt text\n\nWe can now start are Kafka producer and write messages to are newly created topic “mytopic”, again replace the bootstrapserverstring with the bootstrap server details from your MSK cluster. Then you can start writing messages\n\nStart Producer\n /home/ec2-user/kafka_2.13-2.8.1/bin/kafka-console-producer.sh --broker-list BootstrapServerstring --producer.config --topic mytopic \n\nExample below\nAlt text\n\nFor testing, I would encourage that we duplicate the ec2 window and run the consumer command to check everything is working.\n\nYou can duplicate the window by right clicking the Ec2 window in your browser and navigating to “duplicate window”\n\nAlt text\n\nWe have a fresh window open, we can consumer from this window. DO NOT CLOSE OTHER WINDOW, it will cut off the producer.\n\nAgain replace the bootstrapserverstring with the bootstrap server details from your MSK cluster. Please see the below command to consume messages on ec2\n\n /home/ec2-user/kafka_2.13-2.8.1/bin/kafka-console-consumer.sh --bootstrap-server BootstrapServerstring --topic mytopic --from-beginning \n\nThis will pull all the messages from the producer from the beginning. Example below.\n\nAlt text\n\nSetting up ESM in Lambda for MSK.\n\nFirst, I would like to high a common misunderstanding with MSK and lambda, When you create a Lambda Event Source Mapping (aka trigger) to an MSK cluster, the trigger will use the VPC settings configured on the target MSK cluster (security group and subnets), rather than the VPC settings of the associated Lambda function.\n\nTo allow lambda to consume messages from the MSK cluster, we must add an inbound rule in our security group “MSK-sg” from itself.\n\nI have attached a image below for better understanding, Note the security group IDs. \n\nAlt text\n\nOnce done we can head over to our lambda function to configure the ESM, Function name “MSKLambdaConsumer”\n\nOnce there, click the “add trigger” button to start off.\n\nFor this tutorial, keep things simple to start receiving messages from Kafka to lambda. Afterwards you can play again with configuration between lambda and Kafka if you wish.\n\nSample configuration below,\n\nAlt text\n\nNote this can take a few minutes to activate.\n\nOnce the trigger is enabled, we can head back to the producer and start send messages. Lambda will then start consuming the messages.\n\nIn the producer, you can just insert random messages for lambda to consumer for this tutorial.\nAlt text\n\nOnce processed, you can check the cloudwatch logs and verify that the messages were correctly process from the python lambda function.\n\nIt will also include data on topic, partition, offset, timestamp and other values. Feel free to edit code depending on use case."
+    ]
+    },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Edward McGrath",
+      "image": "/Users/mcgedwa/Documents/serverless-patterns/MSK-Lambda-Ec2Client-VPC-CFtemplate/linkedinphoto.png",
+      "bio": "AWS Cloud Support Engineer @AWS",
+      "linkedin": "ed-mcgrath-it"
+    }
+  ]
+}

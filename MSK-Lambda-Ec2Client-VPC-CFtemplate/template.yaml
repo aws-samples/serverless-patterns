@@ -1,0 +1,340 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template for creating an MSK cluster and Lambda function
+
+Parameters:
+  VpcCIDR:
+    Description: CIDR block for the VPC
+    Type: String
+    Default: 10.0.0.0/16
+
+Resources:
+  MSKCFVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MSKCFVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MSKCFVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: us-east-1a
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MSKCFVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: us-east-1b
+
+  PublicSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MSKCFVPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: us-east-1c
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MSKCFVPC
+
+  PublicRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+
+  PublicRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+
+  PublicRouteTableAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet3
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MSKCFVPC
+      CidrBlock: 10.0.4.0/24
+      AvailabilityZone: us-east-1a
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MSKCFVPC
+      CidrBlock: 10.0.5.0/24
+      AvailabilityZone: us-east-1b
+
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MSKCFVPC
+      CidrBlock: 10.0.6.0/24
+      AvailabilityZone: us-east-1c
+  
+  PrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MSKCFVPC
+
+  PrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway1
+
+  PrivateRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateRouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MSKCFVPC
+
+  PrivateRoute2:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway2
+
+  PrivateRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2
+      SubnetId: !Ref PrivateSubnet2
+
+  PrivateRouteTable3:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MSKCFVPC
+
+  PrivateRoute3:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable3
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway3
+
+  PrivateRouteTableAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable3
+      SubnetId: !Ref PrivateSubnet3
+
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt ElasticIP1.AllocationId
+      SubnetId: !Ref PublicSubnet1
+
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt ElasticIP2.AllocationId
+      SubnetId: !Ref PublicSubnet2
+
+  NatGateway3:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt ElasticIP3.AllocationId
+      SubnetId: !Ref PublicSubnet3
+
+  ElasticIP1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  ElasticIP2:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  ElasticIP3:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: MSK-sg
+      GroupDescription: Security group for MSK
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9094
+          ToPort: 9094
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9092
+          ToPort: 9092
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref MSKCFVPC
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Lambda-MSK-ExecutionRole-CF1
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+
+  MSKCluster:
+    Type: AWS::MSK::Cluster
+    Properties:
+      ClusterName: MSK-Demo-CF
+      KafkaVersion: 2.8.1
+      NumberOfBrokerNodes: 3
+      BrokerNodeGroupInfo:
+        InstanceType: kafka.m5.large
+        SecurityGroups:
+          - !Ref SecurityGroup
+        ClientSubnets:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+          - !Ref PrivateSubnet3
+      EncryptionInfo:
+        EncryptionInTransit:
+          InCluster: false
+          ClientBroker: PLAINTEXT
+
+  MSKInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref MSKInstanceRole
+
+  MSKInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: MSKInstanceRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonMSKFullAccess
+
+        
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    DependsOn:
+     - VPCGatewayAttachment
+    Properties:
+      ImageId: ami-0715c1897453cabd1
+      InstanceType: t2.large
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: "0"
+          GroupSet:
+            - !Ref SecurityGroup
+          SubnetId: !Ref PublicSubnet1
+      IamInstanceProfile: !Ref MSKInstanceProfile
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          cd /home/ec2-user/
+          sudo yum -y install java-11
+          wget https://archive.apache.org/dist/kafka/2.8.1/kafka_2.13-2.8.1.tgz
+          tar -xzf kafka_2.13-2.8.1.tgz
+          cd /kafka_2.13-2.8.1/bin
+      Tags:
+        - Key: Name
+          Value: MyMSKEC2Instance
+
+    
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: MSKLambdaConsumer
+      Runtime: python3.9
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import base64
+
+          def lambda_handler(event, context):
+              # Iterate through keys
+              for key in event['records']:
+                  print('Key:', key)
+                  # Iterate through records
+                  for record in event['records'][key]:
+                      print('Record:', record)
+                      # Decode base64
+                      msg = base64.b64decode(record['value']).decode('utf-8')
+                      print('Message:', msg)
+
+
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+          - !Ref PrivateSubnet3
+
+Outputs:
+  VpcId:
+    Description: VPC ID
+    Value: !Ref MSKCFVPC
+  PublicSubnets:
+    Description: Public subnets
+    Value: !Join [",", [!Ref PublicSubnet1, !Ref PublicSubnet2, !Ref PublicSubnet3]]
+  PrivateSubnets:
+    Description: Private subnets
+    Value: !Join [",", [!Ref PrivateSubnet1, !Ref PrivateSubnet2, !Ref PrivateSubnet3]]
