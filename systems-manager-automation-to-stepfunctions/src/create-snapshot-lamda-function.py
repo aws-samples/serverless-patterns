@@ -18,13 +18,13 @@ def handler(event, context):
     
     params = {
         'DBSnapshotIdentifier'  : 'rds-snapshot-{}'.format(timestamp),
-        'DBInstanceIdentifier'  : '{}'.format(event['ssm_automation_parameters']['instance_id'])
+        'DBInstanceIdentifier'  : '{}'.format(event['ssm_automation_parameters']['db_instance_id'])
     }
     
     try:
        response = client.create_db_snapshot(**params,)
          #DBSnapshotIdentifier  = 'rds_snapshot_{}'.format{timestamp},
-         #DBInstanceIdentifier  = event['ssm_automation_parameters']['instance_id'],
+         #DBInstanceIdentifier  = event['ssm_automation_parameters']['db_instance_id'],
         #)
     
     except botocore.exceptions.ClientError as e:
