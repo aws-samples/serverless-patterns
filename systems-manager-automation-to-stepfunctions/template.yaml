@@ -77,6 +77,7 @@ Resources:
       AllocatedStorage: '5'
       DBInstanceClass: db.t2.small
       Engine: mysql
+      StorageEncrypted: true
       MasterUsername: '{{resolve:secretsmanager:RDSDBSec:SecretString:username}}'
       MasterUserPassword: '{{resolve:secretsmanager:RDSDBSec:SecretString:password}}'
 
