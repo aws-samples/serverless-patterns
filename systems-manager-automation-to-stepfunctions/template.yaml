@@ -138,12 +138,6 @@ Resources:
         parameters:
           DocumentInput:
             type: String
-          # indexInput:
-          #   type: String
-          # stepInput:
-          #   type: String
-          # countInput:
-          #   type: String
 
         mainSteps:
         - name: execute_statemachine
@@ -171,7 +165,6 @@ Resources:
         iterator_lambda_arn: !GetAtt Iterate.Arn
 
 Outputs:
-
   StateMachine:
     Value: !Ref StateMachine
     Description: Step function workflow Arn 
