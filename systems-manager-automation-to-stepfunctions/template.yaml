@@ -26,8 +26,12 @@ Resources:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
-                Action: states:StartExecution
-                Resource: !GetAtt StateMachine.Arn
+                Action: 
+                 - states:DescribeExecution
+                 - states:StartExecution
+                Resource: 
+                  - !GetAtt StateMachine.Arn
+                  - "arn:aws:states:us-east-1:*:execution:stepfunction:*"
 
   StepFunctionExecutionRole:
     Type: AWS::IAM::Role
@@ -60,9 +64,9 @@ Resources:
   rRDSSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
-         Name: RDSDBcredentials
+         Name: RDSDBSec
          GenerateSecretString:
-              SecretStringTemplate: '{"username:": "admin"}'
+              SecretStringTemplate: '{"username": "admin"}'
               GenerateStringKey: "password"
               PasswordLength: 15
 
@@ -73,8 +77,9 @@ Resources:
       AllocatedStorage: '5'
       DBInstanceClass: db.t2.small
       Engine: mysql
-      MasterUsername: '{{resolve:secretsmanager:RDSDBcredentials:SecretString:username}}'
-      MasterUserPassword: '{{resolve:secretsmanager:RDSDBcredentials:SecretString:password}}'
+      StorageEncrypted: true
+      MasterUsername: '{{resolve:secretsmanager:RDSDBSec:SecretString:username}}'
+      MasterUserPassword: '{{resolve:secretsmanager:RDSDBSec:SecretString:password}}'
 
   CreateSnapshotLambdaFunction:
     Type: AWS::Serverless::Function
@@ -134,12 +139,6 @@ Resources:
         parameters:
           DocumentInput:
             type: String
-          indexInput:
-            type: String
-          stepInput:
-            type: String
-          countInput:
-            type: String
 
         mainSteps:
         - name: execute_statemachine
@@ -151,10 +150,7 @@ Resources:
               {
                 "ssm_automation_parameters":
                   {
-                    "instance_id": "{{DocumentInput}}",
-                    "index": "{{indexInput}}",
-                    "step": "{{stepInput}}",
-                    "count": "{{countInput}}"
+                    "db_instance_id": "{{DocumentInput}}"
                   }
               }
 
@@ -170,7 +166,6 @@ Resources:
         iterator_lambda_arn: !GetAtt Iterate.Arn
 
 Outputs:
-
   StateMachine:
     Value: !Ref StateMachine
     Description: Step function workflow Arn 
