@@ -1,4 +1,4 @@
-# Cloudtrail to Lambda with DynamoDB
+# Check Resource Tag Compliance Using CloudTrail, DynamoDB, and Lambda
 
 This pattern shows how to leverage CloudTrail resource creation API calls to check for required tags and determine compliance. The resources used in this pattern include CloudTrail, S3, Lambda, and DynamoDB which are all deployed via CDK. From the CloudTrail logs stored in S3, the relevant resource creation events are populated into a DynamoDB table via Lambda. The items written into the table are then checked for the required tags to determine compliance. 
 
@@ -8,7 +8,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS 
+s.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node.js installed](https://nodejs.org/en/download)
