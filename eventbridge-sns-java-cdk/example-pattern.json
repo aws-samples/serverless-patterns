@@ -14,7 +14,10 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sns-java-cdk",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sns-java-cdk/README.md"
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sns-java-cdk/README.md",
+      "projectFolder": "eventbridge-sns-java-cdk",
+      "templateFile": "eventbridge-sns-java-cdk/src/main/java/com/myorg/CdkEventBridgeSnsStack.java",
+      "templateURL": "serverless-patterns/eventbridge-sns-java-cdk"
     }
   },
   "resources": {
@@ -50,7 +53,7 @@
       "image": "https://avatars.githubusercontent.com/u/9155962",
       "bio": "Matt Ridehalgh is a Solutions Architect at AWS.",
       "linkedin": "matthew-ridehalgh",
-      "twitter": "@mrideh"
+      "twitter": "mrideh"
     }
   ]
 }
