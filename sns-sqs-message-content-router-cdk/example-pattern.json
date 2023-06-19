@@ -1,40 +1,36 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
-  "language": "Python",
+  "title": "Content based router with SNS and SQS filters",
+  "description": "Create an SNS topic and multiple SQS queues with content filtered based on configurable criteria.",
+  "language": "Typescript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
+      "This CDK project demonstrates how to create a Message Content-based routing pattern using Amazon SNS and Amazon SQS.",
+      "The number of Queues and the Filters are dynamically defined inside the stackconfiguration.json file. The solution can be adapted for any specific requirement.",
+      "This architecture is an implementation of the Integration pattern: Content-Based Message Router explained in the Integration Patterns book."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-message-content-router-cdk",
+      "templateURL": "serverless-patterns/sns-sqs-message-content-router-cdk",
+      "projectFolder": "sns-sqs-message-content-router-cdk",
+      "templateFile": "sns-sqs-message-content-router-cdk/src/Cdk/CdkStack.ts"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
-      },
-      {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Amazon SNS subscription filter policies",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-subscription-filter-policies.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "cdk deploy"
     ]
   },
   "testing": {
@@ -44,14 +40,14 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>cdk destroy</code>."
     ]
   },
   "authors": [
     {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
+      "name": "Raffaele Garofalo (Raf)",
+      "image": "https://avatars.githubusercontent.com/raffaeu",
+      "bio": "Raffaele Garofalo (Raf) is a Senior Solutions Architect at AWS and member of the AWS Serverless TFC (Technical Field Communities).",
       "linkedin": "linked-in-ID",
       "twitter": "twitter-handle"
     }
