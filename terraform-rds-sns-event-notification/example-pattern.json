@@ -1,0 +1,57 @@
+{
+	"title": "RDS Instance Event Subscription for Failure, Low Storage and Availability Events",
+	"description": "RDS Event Subscriptions allow users to configure notifications for RDS Events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances.",
+	"language": "",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"RDS Event Subscriptions allow users to configure notifications for RDS Events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-rds-sns-event-notification",
+			"templateURL": "serverless-patterns/terraform-rds-sns-event-notification",
+			"projectFolder": "terraform-rds-sns-event-notification",
+			"templateFile": "terraform-rds-sns-event-notification/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "Working with Amazon RDS event notification",
+				"link": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Events.html"
+			},
+			{
+				"text": "Creating an Amazon RDS DB instance",
+				"link": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html#USER_CreateDBInstance.Creating"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+		          "terraform init",
+		          "terraform apply"
+		        ]
+	},
+	"testing": {
+		"text": ["See the Github repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": [
+		          "terraform destroy",
+		          "terraform show"
+		        ]
+	},
+	"authors": [
+		{
+			"name": "Makendran G",
+			"image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
+			"bio": "Cloud Support Engineer @ AWS",
+			"linkedin": "https://www.linkedin.com/in/makendran",
+			"twitter": "@MakendranG"
+		}
+	]
+}
