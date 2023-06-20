@@ -1,0 +1,231 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  AdminUserArn:
+    Type: String
+    Description: Enter ARN for any User with admin rights
+
+
+Resources:
+
+  MyFirehoseStreamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - firehose.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonOpenSearchServiceFullAccess'
+        - 'arn:aws:iam::aws:policy/AmazonOpenSearchIngestionFullAccess'
+        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+      Policies:
+      - PolicyName: AllowAoSS
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+              - Sid: Aoss
+                Effect: Allow
+                Action:
+                - 'aoss:GetAccessPolicy'
+                - 'aoss:CreateAccessPolicy'
+                - 'aoss:UpdateSecurityConfig'
+                - 'aoss:UpdateVpcEndpoint'
+                - 'aoss:UpdateSecurityPolicy'
+                - 'aoss:ListAccessPolicies'
+                - 'aoss:ListSecurityPolicies'
+                - 'aoss:UpdateAccessPolicy'
+                - 'aoss:DeleteSecurityPolicy'
+                - 'aoss:UntagResource'
+                - 'aoss:GetSecurityPolicy'
+                - 'aoss:ListTagsForResource'
+                - 'aoss:BatchGetCollection'
+                - 'aoss:ListSecurityConfigs'
+                - 'aoss:CreateSecurityConfig'
+                - 'aoss:CreateSecurityPolicy'
+                - 'aoss:TagResource'
+                - 'aoss:DeleteVpcEndpoint'
+                - 'aoss:BatchGetVpcEndpoint'
+                - 'aoss:GetPoliciesStats'
+                - 'aoss:ListVpcEndpoints'
+                - 'aoss:UpdateAccountSettings'
+                - 'aoss:GetAccountSettings'
+                - 'aoss:GetSecurityConfig'
+                - 'aoss:CreateVpcEndpoint'
+                - 'aoss:DeleteSecurityConfig'
+                - 'aoss:ListCollections'
+                - 'aoss:DeleteAccessPolicy'
+                - 'aoss:CreateCollection'
+                Resource: '*'
+
+  # IAMUser:
+  #   Type: AWS::IAM::User
+  #   Properties:
+  #     UserName: !Ref NewUserName
+  #     LoginProfile: 
+  #         Password: !Ref NewUserPassword
+  #         PasswordResetRequired: true
+  #     ManagedPolicyArns:
+  #     - 'arn:aws:iam::aws:policy/AdministratorAccess'
+
+  # IAMUserAccessKey:
+  #   Type: AWS::IAM::AccessKey
+  #   Properties:
+  #     UserName: !Ref IAMUser
+
+
+  TestCollection:
+    Type: 'AWS::OpenSearchServerless::Collection'
+    Properties:
+      Name: test-collection
+      Type: SEARCH
+      Description: Search collection
+    DependsOn: 
+      - EncryptionPolicy
+      - SecurityPolicy
+
+  EncryptionPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: test-encryption-policy
+      Type: encryption
+      Description: Encryption policy for test collection
+      Policy: >-
+        {"Rules":[{"ResourceType":"collection","Resource":["collection/test-collection"]}],"AWSOwnedKey":true}
+
+  SecurityPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: logs-network-policy
+      Type: network
+      Description: Network policy for test collections
+      Policy: >-
+        [{"Rules":[{"ResourceType":"collection","Resource":["collection/test-collection"]}, {"ResourceType":"dashboard","Resource":["collection/test-collection"]}],"AllowFromPublic":true}]
+
+  TestAccessPolicy:
+    Type: 'AWS::OpenSearchServerless::AccessPolicy'
+    Properties:
+      Name: test-access-policy
+      Type: data
+      Description: Access policy for my-collection
+      Policy: !Sub >-
+        [{"Description":"Access for Admin","Rules":[{"ResourceType":"index","Resource":["index/test-collection/testindex"],"Permission":["aoss:*"]},
+        {"ResourceType":"collection","Resource":["collection/test-collection"],"Permission":["aoss:*"]}],
+        "Principal":["${AdminUserArn}"]}]
+
+  TestAccessPolicyKinesis:
+    Type: 'AWS::OpenSearchServerless::AccessPolicy'
+    Properties:
+      Name: test-access-policy-for-kinesis
+      Type: data
+      Description: Access policy for my-collection
+      Policy: !Sub >-
+        [{"Description":"Access for Kinesis","Rules":[{"ResourceType":"index","Resource":["index/test-collection/testindex"],"Permission":["aoss:*"]},
+        {"ResourceType":"collection","Resource":["collection/test-collection"],"Permission":["aoss:*"]}],
+        "Principal":["${MyFirehoseStreamRole.Arn}"]}]
+
+
+  MySNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: MySNSDemoTopic
+
+  MyKFS3Bucket:
+    Type: AWS::S3::Bucket
+
+  MyKinesisFirehoseStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    DependsOn: TestCollection
+    Properties:
+      DeliveryStreamName: MyFirehoseStream
+      AmazonOpenSearchServerlessDestinationConfiguration:
+        CollectionEndpoint: !GetAtt TestCollection.CollectionEndpoint
+        IndexName: testindex
+        RoleARN: !GetAtt MyFirehoseStreamRole.Arn
+        S3Configuration: 
+            BucketARN: !GetAtt MyKFS3Bucket.Arn
+            Prefix: kf
+            RoleARN: !GetAtt MyFirehoseStreamRole.Arn
+
+  SNSSubscriptionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - sns.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess'
+
+  KinesisSNSSubscription:
+    Type: AWS::SNS::Subscription
+    DependsOn: MyKinesisFirehoseStream
+    Properties: 
+      TopicArn: !Ref MySNSTopic
+      Protocol: firehose
+      Endpoint: !GetAtt MyKinesisFirehoseStream.Arn
+      SubscriptionRoleArn: !GetAtt SNSSubscriptionRole.Arn
+
+  LambdaInvocationsAnomalyDetector:
+    Type: AWS::CloudWatch::AnomalyDetector
+    Properties:
+      MetricName: Invocations
+      Namespace: AWS/Lambda
+      Stat: Sum
+
+  LambdaInvocationsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Lambda invocations
+      AlarmName: LambdaInvocationsAlarm
+      ComparisonOperator: LessThanLowerOrGreaterThanUpperThreshold
+      EvaluationPeriods: 1
+      Metrics:
+      - Expression: ANOMALY_DETECTION_BAND(m1, 2)
+        Id: ad1
+      - Id: m1
+        MetricStat:
+          Metric:
+            MetricName: Invocations
+            Namespace: AWS/Lambda
+          Period: !!int 86400
+          Stat: Sum
+      ThresholdMetricId: ad1
+      TreatMissingData: breaching
+      AlarmActions: 
+        - !Ref MySNSTopic
+
+
+Outputs:
+  # IAMUserAccessKeyId:
+  #   Value: !Ref IAMUserAccessKey
+  #   Description: Access key ID for the IAM user
+
+  # IAMUserSecretAccessKey:
+  #   Value: !GetAtt IAMUserAccessKey.SecretAccessKey
+  #   Description: Secret access key for the IAM user
+
+  KinesisArn:
+    Value: !GetAtt MyKinesisFirehoseStream.Arn
+    Description: Kinesis firehose
+
+  SNSTopic:
+    Value: !Ref MySNSTopic
+    Description: SNS Topic
+
+  OpenSearchCollection:
+    Value: !GetAtt TestCollection.CollectionEndpoint
+    Description: Opensearch Collection
+
+  OpenSearchCollectionDashboard:
+    Value: !GetAtt TestCollection.DashboardEndpoint
+    Description: Opensearch Collection
