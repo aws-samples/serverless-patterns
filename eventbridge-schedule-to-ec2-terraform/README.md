@@ -1,9 +1,8 @@
 # AWS Service 1 to AWS Service 2
 
-This pattern will create an [EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) to submit an [AWS Batch](https://docs.aws.amazon.com/batch/latest/userguide/Batch_GetStarted.html) job from a job definition every 5 minutes. The pattern is deployed using Terraform to create the required VPC, Batch and EventBridge Scheduler resources. 
+This pattern will create two [EventBridge schedules](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) that will start and stop a given array of instance-ids. You can control the start/stop time and timezone of your choosing. This example will start instances at 8:00am and stop them at 17:00am US/Eastern timezone. The pattern is deployed using Terraform to create the required VPC, EC2 and EventBridge Scheduler resources. 
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-schedule-to-batch-terraform
-
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-schedule-to-ec2-terraform
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
@@ -21,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/eventbridge-schedule-to-batch-terraform
+    cd serverless-patterns/eventbridge-schedule-to-ec2-terraform
     ```
 1. From the command line, initialize Terraform:
     ```
@@ -35,12 +34,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-An Amazon EventBridge Schedule is created that submits an AWS Batch job from a job definition every 5 minutes. The Terraform stack creates a VPC, Batch compute environment, jobs and job queues, and EventBridge Scheduler that invokes the submitJob API to run the AWS Batch job.
+An Amazon EventBridge Schedule is created that is used to start and stop EC2 instances in at AWS account. The Terraform stack creates a VPC, EC2 instance, and EventBridge Scheduler that invokes the startInstances and stopInstances APIs on the EC2 instance.
 
-## Testing
-
-1. After deployment, view the schedule created in the Amazon EventBridge console under Scheduler>Schedules. 
-2. From the AWS Batch console, navigate to the Jobs section. The schedule will trigger a new job every 5 minutes, which will be visable in the Jobs section. You can also view the job status from the Dashboard section of the AWS Batch console in the Job queue overview. 
 
 ## Cleanup
  
