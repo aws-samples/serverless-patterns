@@ -1,7 +1,7 @@
 {
   "title": "Content based router with SNS and SQS filters",
   "description": "Create an SNS topic and multiple SQS queues with content filtered based on configurable criteria.",
-  "language": "Typescript",
+  "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
