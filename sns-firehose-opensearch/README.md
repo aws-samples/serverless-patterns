@@ -4,7 +4,7 @@
 
 Cloudwatch Alarms triggers SNS notifications which are send to a Kinesis Firehose Delivery Stream subscription. The Firehose forwards the notification data to Opensearch collection for analysis using custom dashboards.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/sns-firehose-opensearch](https://serverlessland.com/patterns/sns-firehose-opensearch)
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sns-kinesis-data-firehose-opensearch-sam-python
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
