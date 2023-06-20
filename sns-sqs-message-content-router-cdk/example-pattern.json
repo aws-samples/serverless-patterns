@@ -9,7 +9,8 @@
     "text": [
       "This CDK project demonstrates how to create a Message Content-based routing pattern using Amazon SNS and Amazon SQS.",
       "The number of Queues and the Filters are dynamically defined inside the stackconfiguration.json file. The solution can be adapted for any specific requirement.",
-      "This architecture is an implementation of the Integration pattern: Content-Based Message Router explained in the Integration Patterns book."
+      "This architecture is an implementation of the Integration pattern: Content-Based Message Router explained in the Integration Patterns book.",
+      "The content can be filtered by attributes or by message body which grants full flexibility."
     ]
   },
   "gitHub": {
@@ -17,7 +18,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-message-content-router-cdk",
       "templateURL": "serverless-patterns/sns-sqs-message-content-router-cdk",
       "projectFolder": "sns-sqs-message-content-router-cdk",
-      "templateFile": "sns-sqs-message-content-router-cdk/src/Cdk/CdkStack.ts"
+      "templateFile": "sns-sqs-message-content-router-cdk/src/lib/src-stack.ts"
     }
   },
   "resources": {
@@ -48,8 +49,8 @@
       "name": "Raffaele Garofalo (Raf)",
       "image": "https://avatars.githubusercontent.com/raffaeu",
       "bio": "Raffaele Garofalo (Raf) is a Senior Solutions Architect at AWS and member of the AWS Serverless TFC (Technical Field Communities).",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "linkedin": "raffaeu",
+      "twitter": "raffaeu"
     }
   ]
 }

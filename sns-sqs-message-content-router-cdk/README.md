@@ -1,8 +1,8 @@
-# Amazon SNS to Amazon SQS by filtering content
+# Amazon SNS to Amazon SQS by filtering content (Message-content router pattern)
 
-This pattern creates an SNS topic and various SQS destination queues. Messages received by the SNS topic are routed to various SQS queues according to routing logic.
+This pattern creates an SNS topic and various SQS destination queues. Messages received by the SNS topic are routed to various SQS queues according to routing logic. The pattern is an implementation of the Integration pattern: "Content-Based Message route" available here: [https://www.enterpriseintegrationpatterns.com/patterns/messaging/ContentBasedRouter.html](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ContentBasedRouter.html)
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here [https://serverlessland.com/patterns/sns-sqs-message-content-router-cdk](https://serverlessland.com/patterns/sns-sqs-message-content-router-cdk)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/sns-sqs-message-content-router-cdk](https://serverlessland.com/patterns/sns-sqs-message-content-router-cdk)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -31,20 +31,47 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The CDK Stack pick-up a configuration from `stackconfiguration.js` stored inside the `src` folder. This files contains a JSON structure that describe the routing logic. The stack will also create a DeadQueue letter for each Queue and a Default Queue for messages that do not match any
+The CDK Stack pick-up a configuration from `stackconfiguration.json` stored inside the `src` folder. This files contains a JSON structure that describe the routing logic. The stack will also create a DeadQueue letter for each Queue.
+
+The parameter `IsAttribute` specifies to CDK if the filter is of type attribute or content.
 
 ```json
 {
     "Sns": {
-        "Name": "The name of the SNS Topic"
+        "TopicName": "content-router"
     },
     "Sqs": [
         {
-            "Name": "The name of the SQS queue",
-            "ContentFilter": "True - the filter will act on the message content; False - the filter will act on the message attribute",
-            "Filter: {
-                "Name": "The property name of the filter",
-                "Values": ["value1", "value2"]
+            "QueueName": "country-usa",
+            "IsAttribute": true,
+            "Filter": {
+                "FilterName": "country",
+                "FilterValues": [
+                    "united states of america",
+                    "usa"
+                ]
+            }
+        },
+        {
+            "QueueName": "country-germany",
+            "IsAttribute": true,
+            "Filter": {
+                "FilterName": "country",
+                "FilterValues": [
+                    "germany",
+                    "de"
+                ]
+            }
+        },
+        {
+            "QueueName": "language-english",
+            "IsAttribute": false,
+            "Filter": {
+                "FilterName": "language",
+                "FilterValues": [
+                    "english",
+                    "en"
+                ]
             }
         }
     ]
@@ -65,7 +92,7 @@ Message Body:
    "Message":"Test Message to be received by Queue3 only"
 }
 Message Attribute:
-Type - String; Name - Filter1Name; Value - Filter1Value1   
+Type - String; Name - country; Value - usa   
 ```
 
 **Scenario-2 Content based**
@@ -77,7 +104,9 @@ Message body based filter. Copy Json to the message body and add attibutes given
 Message Body:
 {
    "Message":"Test Message to be received by Queue2 only",
-   "Filter1Name":"Filter1Value1"
+   "Filter":{
+        "Language": ["en"]
+   }
 }   
 ```
 
