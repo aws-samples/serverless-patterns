@@ -1,6 +1,7 @@
 {
   "title": "API WebSocket to SNS with request validation",
   "description": "Create a WebSocket API to send notification via SNS topic with request validation",
+  "language": "Python",
   "level": "300",
   "framework": "SAM",
   "introBox": {
