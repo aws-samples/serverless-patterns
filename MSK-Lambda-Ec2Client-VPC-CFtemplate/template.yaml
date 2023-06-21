@@ -338,3 +338,4 @@ Outputs:
   PrivateSubnets:
     Description: Private subnets
     Value: !Join [",", [!Ref PrivateSubnet1, !Ref PrivateSubnet2, !Ref PrivateSubnet3]]
+
