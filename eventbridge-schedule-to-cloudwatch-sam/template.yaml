@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  CloudWatchSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      ScheduleExpression: 'rate(1 minute)'
+      Name: CloudWatchCustomMetric
+      Description: Sends custom metrics to CloudWatch every 1 minutes
+      Target:
+        Arn: "arn:aws:scheduler:::aws-sdk:cloudwatch:putMetricData"
+        Input: '{
+                  "MetricData": [
+                    {
+                      "MetricName": "Scheduler",
+                      "Dimensions": [
+                        {"Name": "Schedule", "Value": "Schedule"}
+                      ], 
+                      "Unit": "Count", 
+                      "Value": 1
+                    }
+                  ], 
+                  "Namespace": "CustomScheduled"
+                }'
+        RoleArn: !GetAtt SchedulerRole.Arn
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: scheduler-put-metric-to-cloudwatch
+          PolicyDocument: 
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                Resource: "*"
+
+
+
+      
