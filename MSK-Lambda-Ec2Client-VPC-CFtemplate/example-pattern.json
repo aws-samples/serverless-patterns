@@ -1,7 +1,7 @@
 {
   "title": "AWS Lambda and AWS MSK CloudFormation Template",
   "description": "Create a Step Functions workflow to query Amazon Athena.",
-  "language": "Python3",
+  "language": "Python",
   "level": "200",
   "framework": "CDK",
   "introBox": {
