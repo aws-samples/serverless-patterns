@@ -16,7 +16,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/diwakarkvs/serverless-patterns/tree/diwakarkvs-feature-apigw-authorizer-sqs/cdk-apigw-authorizer-sqs",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns.git",
       "templateURL": "serverless-patterns/cdk-apigw-authorizer-sqs",
       "projectFolder": "cdk-apigw-authorizer-sqs",
       "templateFile": "apigw_sqs/apigw_sqs_auth_stack.py"
