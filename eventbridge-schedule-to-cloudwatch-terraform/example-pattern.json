@@ -12,7 +12,7 @@
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-batch-terraform",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-cloudwatch-terraform",
         "templateURL": "serverless-patterns/eventbridge-schedule-to-cloudwatch-terraform",
         "projectFolder": "eventbridge-schedule-to-cloudwatch-terraform",
         "templateFile": "eventbridge-schedule-to-cloudwatch-terraform/main.tf"
