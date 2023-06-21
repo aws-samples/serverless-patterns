@@ -29,7 +29,7 @@ Important: this application uses various AWS services and there are costs associ
 1. run `CDK Destroy <stack id>` for the specified stack that used this construct
 
 ```
-git clone https://github.com/aws-samples/serverless-patterns/lambda-s3-polly-cdk
+git clone https://github.com/aws-samples/serverless-patterns/lambda-s3-translate-cdk
 ```
 
 Each subdirectory contains additional installation and usage instructions. 
