@@ -6,7 +6,7 @@ The key components of this architecture are DynamoDB as source and EventBridge a
 
 To demonstrate the end-to-end message flow, the Lambda function writes sample data to the DynamoDB table.
 
-The pattern uses an input transformer to change the event's structure from DynamoDB's response format, which includes data type descriptors, to a simpler JSON structure. The input transformer also allows us to transform the list using the following notation: `<$.dynamodb.NewImage.list.L[*].S>`
+The pattern uses an input transformer to change the event's structure from DynamoDB's response format, which includes data type descriptors, to a simpler JSON structure. The input transformer also allows us to transform the list using the following notation: `<$.dynamodb.NewImage.Items.L[*].S>`
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/claim-check-pattern-cdk
 
