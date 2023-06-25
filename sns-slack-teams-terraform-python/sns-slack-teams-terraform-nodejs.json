@@ -1,0 +1,66 @@
+{
+  "title": "A terraform pattern to setup SNS and Slack intergration",
+  "description": "A terraform pattern to setup services to enable SNS and slack integration",
+  "language": "Node.JS",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample pattern demonstrates how to use AWS SNS and Lambda function to deliver notifications to your slack channels.",
+      "This pattern uses terraform to setup the AWS serverless services and provides you with a setup ready to be integrated with your slack channel",
+      "This pattern deploys one SNS topic and one Lambda function"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-slack-terraform",
+      "templateURL": "serverless-patterns/sns-slack-terraform-nodejs",
+      "projectFolder": "sns-slack-terraform-nodejs",
+      "templateFile": "sns-slack-terraform-nodejs/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Setup SNS topic",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-create-topic.html"
+      },
+      {
+        "text": "Create Lambda function",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html"
+      },{
+        "text": "Add lambda function as subscriber to a SNS topic",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/lambda-console.html"
+      },
+      {
+        "text": "Add your slack/MS teams and channel configuration to the Lambda function",
+        "link": "https://repost.aws/knowledge-center/sns-lambda-webhooks-chime-slack-teams"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply --auto-approve"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Send a message to SNS:",
+      "aws sns publish --topic-arn ENTER_YOUR_SNS_TOPIC_ARN --subject testSubject --message testMessage",
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy --auto-approve"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ajay Vasant",
+      "image": "link-to-your-photo.jpg",
+      "bio": "I am a Cloud Computing enthusiast working as Cloud Support Engineer at Amazon Web Services.",
+      "linkedin": "https://www.linkedin.com/in/ajay-vasant-545155ab",
+    }
+  ]
+}
