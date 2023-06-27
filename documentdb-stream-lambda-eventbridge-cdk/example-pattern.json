@@ -1,0 +1,81 @@
+{
+  "title": "DocumentDB Lambda Stream",
+  "description": "Create an DocumentDB stream that publish events to EventBridge",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "services": {
+    "from": "documentdb",
+    "to": "eventbridge"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use AWS Lambda with DocumentDB to capture changes that occur on data collections and send events to EventBridge. This pattern is leveraging the native integration between the following services: DocumentDB Stream -> Lambda -> EventBridge.",
+      "This pattern deploys one DocumentDB cluster, one EventBridge bus and one Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/documentdb-stream-lambda-eventbridge-cdk",
+      "templateURL": "serverless-patterns/documentdb-stream-lambda-eventbridge-cdk",
+      "projectFolder": "documentdb-stream-lambda-eventbridge-cdk",
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs"
+      },
+      {
+        "text": "AWS IoT HTTPS",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/http.html"
+      },
+      {
+        "text": "AWS Solutions Constructs for API Gateway integration to IoT Core",
+        "link": "https://github.com/awslabs/aws-solutions-constructs/tree/58e726ff2050a4d6ff4734a6b556e1f81d97e9aa/source/patterns/%40aws-solutions-constructs/aws-apigateway-iot"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mohamad Soufan",
+      "image": "https://pbs.twimg.com/profile_images/1467593280896450562/jRZ4fMWb_400x400.jpg",
+      "bio": "Mohamad is an AWS 5x Certified Cloud Enthusiast who love building solutions with focus on Serverless and Networking. (Majd's twin brother)",
+      "linkedin": "/mohamad-soufan",
+      "twitter": "@MohamadSoufan4"
+    },
+    {
+      "name": "Majd Soufan",
+      "image": "https://pbs.twimg.com/profile_images/1467263476473090048/JmklQbC8_400x400.jpg",
+      "bio": "Majd is an AWS 5x Certified Cloud Enthusiast who love building solutions with focus on Serverless and Database. (Mohamad's twin brother)",
+      "linkedin": "/majd-soufan",
+      "twitter": "@Majd95RF"
+    }
+  ]
+}
