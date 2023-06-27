@@ -2,22 +2,21 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, PutCommand} = require('@aws-sdk/lib-dynamodb');
 const tableName = process.env.TABLE_NAME;
 
-const messageWithEmptyList = {
-    "id": "111",
-    "list": []
+const testOrderWithoutItem = {
+    "orderID": "111",
+    "Items": []
 };
-const messageWithOneItemList = {
-    "id": "222",
-    "list": ["One"]
+const testOrderWithOneItem = {
+    "orderID": "222",
+    "Items": ["One"]
 };
-const messageWithMultipleItemList = {
-    "id": "333",
-    "list": ["One", "Two", "Three"]
+const testOrderWithThreeItems = {
+    "orderID": "333",
+    "Items": ["One", "Two", "Three"]
 };
 
 
 async function writeToDb(item) {
-    // put the message in the table
     const params = {
         TableName: tableName,
         Item: item
@@ -30,8 +29,7 @@ async function writeToDb(item) {
 
 exports.handler = async function (event, context) {
     
-    var items = [messageWithEmptyList, messageWithOneItemList, messageWithMultipleItemList];
-
+    var items = [testOrderWithoutItem, testOrderWithOneItem, testOrderWithThreeItems];
     console.log("items:", items);
 
     var result = await Promise.all(items.map(writeToDb))
@@ -40,7 +38,7 @@ exports.handler = async function (event, context) {
     const resonse = {
         eventType: "Some_Event_Type",
         ids: items
-                .map(element => element.id)
+                .map(element => element.orderID)
     }
     console.log('response:', resonse);
     return resonse;

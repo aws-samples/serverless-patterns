@@ -12,41 +12,40 @@ export class PipesFromDynamoStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    //dynamodb table "dataOrigin" with DynamoDB stream enabled
-    const dataOriginTable = new dynamodb.Table(this, 'dataOriginTable', {
+    // the DynamoDB table that orders are written to
+    const shoppingOrderTable = new dynamodb.Table(this, 'shoppingOrderTable', {
       partitionKey: {
-        name: 'id',
+        name: 'orderID',
         type: dynamodb.AttributeType.STRING
       },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       stream: dynamodb.StreamViewType.NEW_IMAGE
     });
 
-    // lambda function to write to dynamodb 
-    const writeDemoData = new lambda.Function(this, 'writeDemoData', {
-      functionName: 'writeDemoData',
+    // the Lambda function that creates three sample orders for testing
+    const sampleOrderCreationFunction = new lambda.Function(this, 'sampleOrderCreationFunction', {
+      functionName: 'sampleOrderCreationFunction',
       runtime: lambda.Runtime.NODEJS_18_X,
       code: lambda.Code.fromAsset('lib/lambda'),
-      handler: 'writeDemoData.handler',
+      handler: 'sampleOrderCreationFunction.handler',
       environment: {
-        TABLE_NAME: dataOriginTable.tableName,
+        TABLE_NAME: shoppingOrderTable.tableName,
       }
     });
 
-    // target event bus
-    const targetEventBus = new events.EventBus(this, 'targetEventBus', {
-      eventBusName: 'targetEventBus'
+    const eventBus = new events.EventBus(this, 'pipesFromDynamoStackEventBus', {
+      eventBusName: 'pipesFromDynamoStackEventBus'
     });
 
-    // create an Amazon EventBridge rule to send all events to Amazon CloudWatch Logs:
-    const targetLogRule = new events.Rule(this, 'targetLogRule', {
-      ruleName: 'targetLogRule',
-      eventBus: targetEventBus,
+    // All events on the eventBus are written to Amazon CloudWatch Logs for visualization
+    const catchAllLogRule = new events.Rule(this, 'catchAllLogRule', {
+      ruleName: 'catchAllLogRule',
+      eventBus: eventBus,
       eventPattern: {
         source: events.Match.prefix(''),
       },
-      targets: [new targets.CloudWatchLogGroup(new logs.LogGroup(this, 'TargetLogGroup', {
-        logGroupName: '/aws/events/targetLog',
+      targets: [new targets.CloudWatchLogGroup(new logs.LogGroup(this, 'PipesFromDynamoStackLogGroup', {
+        logGroupName: '/aws/events/pipesFromDynamoStackLogGroup/catchallLogGroup',
         removalPolicy: cdk.RemovalPolicy.DESTROY,
       }))],
     });
@@ -55,15 +54,13 @@ export class PipesFromDynamoStack extends cdk.Stack {
       assumedBy: new iam.ServicePrincipal('pipes.amazonaws.com'),
     });
 
-    dataOriginTable.grantReadWriteData(writeDemoData);
-    dataOriginTable.grantStreamRead(pipeRole);
-    targetEventBus.grantPutEventsTo(pipeRole);
+    shoppingOrderTable.grantReadWriteData(sampleOrderCreationFunction);
+    shoppingOrderTable.grantStreamRead(pipeRole);
+    eventBus.grantPutEventsTo(pipeRole);
 
-    // create an EventBridge Pipe that streams data from dataOriginTable to targetEventBus
-     const pipe = new pipes.CfnPipe(this, 'pipe', {
+    const newAndModifiedOrdersPipe = new pipes.CfnPipe(this, 'pipe', {
       roleArn: pipeRole.roleArn,
-      source: dataOriginTable.tableStreamArn!,
-      target: targetEventBus.eventBusArn,
+      source: shoppingOrderTable.tableStreamArn!,
       sourceParameters: {
         dynamoDbStreamParameters: {
           startingPosition: 'LATEST',
@@ -75,8 +72,9 @@ export class PipesFromDynamoStack extends cdk.Stack {
           }],
         },
       },
+      target: eventBus.eventBusArn,
       targetParameters: {
-        inputTemplate: '{"id": <$.dynamodb.NewImage.id.S>, "list": <$.dynamodb.NewImage.list.L[*].S>}',
+        inputTemplate: '{"orderID": <$.dynamodb.NewImage.orderID.S>, "Items": <$.dynamodb.NewImage.Items.L[*].S>}',
       }
     });
   }
