@@ -5,22 +5,7 @@ import { DocumentDbStreamLambdaEventBridgeStack } from '../lib/cdk-stack';
 
 const app = new cdk.App();
 
-const IOT_EVENTS_TOPIC_NAME = 'iot-test-topic';
-const IOT_DATA_ENDPOINT = '{paste your endpoint here}'; // You must replace this with aws iot endpoint found in IotCore settings
-const DYNAMODB_TABLE_NAME = 'iot-events-table';
-const REST_API_NAME = 'iot-rest-api';
-const REST_API_RESOURCE = 'iot';
-const PIPE_NAME = 'iot-pipe';
-
 new DocumentDbStreamLambdaEventBridgeStack(app, 'EventBridgePipesIotCoreStack', {
-  iotTopicName: IOT_EVENTS_TOPIC_NAME,
-  iotDataEndpoint: IOT_DATA_ENDPOINT,
-  dynamoDbTableName: DYNAMODB_TABLE_NAME,
-  apiGateway: {
-    restApiName: REST_API_NAME,
-    apiResource: REST_API_RESOURCE,
-  },
-  pipeName: PIPE_NAME,
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */

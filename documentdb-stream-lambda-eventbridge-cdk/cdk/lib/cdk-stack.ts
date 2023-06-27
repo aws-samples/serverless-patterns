@@ -1,127 +1,184 @@
-import * as cdk from 'aws-cdk-lib';
-import { RestApi, EndpointType, AwsIntegration } from 'aws-cdk-lib/aws-apigateway';
-import { AttributeType, BillingMode, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
-import { EventBus } from 'aws-cdk-lib/aws-events';
-import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
-import { StartingPosition } from 'aws-cdk-lib/aws-lambda';
-import { CfnPipe } from 'aws-cdk-lib/aws-pipes';
 import { Construct } from 'constructs';
+import {
+  App,
+  Stack,
+  StackProps,
+  Duration,
+  CfnOutput,
+  RemovalPolicy,
+  aws_ec2 as ec2,
+  aws_rds as rds,
+  aws_iam as iam,
+  custom_resources as cr,
+  aws_lambda as lambda,
+  aws_lambda_nodejs as nodejs,
+  aws_events as events,
+  aws_docdb as docdb,
+  aws_secretsmanager as secrets,
+} from 'aws-cdk-lib';
 
-export interface DocumentDbStreamLambdaEventBridgeStackProps extends cdk.StackProps {
-  iotTopicName: string;
-  iotDataEndpoint: string;
-  dynamoDbTableName: string;
-  apiGateway: {
-    restApiName: string;
-    apiResource: string;
-  };
-  pipeName: string;
-}
-export class DocumentDbStreamLambdaEventBridgeStack extends cdk.Stack {
+export interface DocumentDbStreamLambdaEventBridgeStackProps extends StackProps {}
+export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
   constructor(scope: Construct, id: string, props?: DocumentDbStreamLambdaEventBridgeStackProps) {
     super(scope, id, props);
 
     // The code that defines your stack goes here
-    const eventsTable = new Table(this, 'Iot-Table', {
-      tableName: props?.dynamoDbTableName,
-      partitionKey: { name: 'pk', type: AttributeType.STRING },
-      sortKey: { name: 'sk', type: AttributeType.STRING },
-      billingMode: BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      stream: StreamViewType.NEW_AND_OLD_IMAGES,
-    });
 
     // default event bus
-    const defaultEventBus = EventBus.fromEventBusName(this, 'Default-Event-Bus', 'default');
+    const defaultEventBus = events.EventBus.fromEventBusName(this, 'Default-Event-Bus', 'default');
 
-    const iotTopicApi = new RestApi(this, 'Iot-Rest-Api', {
-      restApiName: props?.apiGateway.restApiName,
-      endpointTypes: [EndpointType.REGIONAL],
-      defaultCorsPreflightOptions: { allowOrigins: ['*'] },
-      deployOptions: {
-        stageName: 'dev',
+    const vpc = ec2.Vpc.fromLookup(this, 'default-vpc-id', {
+      isDefault: true,
+    });
+
+    const docDbSg = new ec2.SecurityGroup(this, 'DocDB-SG', {
+      vpc: vpc,
+    });
+
+    docDbSg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(27017));
+
+    const cluster = new docdb.DatabaseCluster(this, 'Database', {
+      masterUser: {
+        username: 'myuser', // NOTE: 'admin' is reserved by DocumentDB
+        excludeCharacters: '"@/:', // optional, defaults to the set "\"@/" and is also used for eventually created rotations
+        secretName: 'DocumentDBSecret', // optional, if you prefer to specify the secret name
+      },
+      dbClusterName: 'DocDbCluster',
+      securityGroup: docDbSg,
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MEDIUM),
+      engineVersion: '4.0.0',
+      instances: 1,
+      vpc,
+    });
+
+    new ec2.InterfaceVpcEndpoint(this, 'VPC Endpoint for Secrets', {
+      vpc,
+      service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+      subnets: {
+        subnets: vpc.publicSubnets,
+      },
+      securityGroups: [docDbSg],
+    });
+
+    const lambdaVpcEndpoint = new ec2.InterfaceVpcEndpoint(this, 'VPC Endpoint for Lambda to enable CDC', {
+      vpc,
+      service: ec2.InterfaceVpcEndpointAwsService.LAMBDA,
+      subnets: {
+        subnets: vpc.publicSubnets,
+      },
+      securityGroups: [docDbSg],
+    });
+
+    const userCreatedLambda = new nodejs.NodejsFunction(this, 'UserCreatedLambda', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'main',
+      entry: 'src/lambdas/user-created.ts',
+      timeout: Duration.seconds(60),
+      vpc,
+      securityGroups: [docDbSg],
+      environment: {
+        DEFAULT_EVENT_BUS: defaultEventBus.eventBusName,
+      },
+    });
+    const usersCdcLambda = new nodejs.NodejsFunction(this, 'UsersCdcLambda', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'main',
+      entry: 'src/lambdas/users-cdc.ts',
+      timeout: Duration.seconds(60),
+      vpc,
+      securityGroups: [docDbSg],
+      environment: {
+        DEFAULT_EVENT_BUS: defaultEventBus.eventBusName,
       },
     });
 
-    const iotTopicApiEndpoint = iotTopicApi.root.addResource(props?.apiGateway.apiResource!);
-    const iotTopicEndpointSubdomain = props?.iotDataEndpoint.split('.')[0];
-    const iotServiceIntegration = new AwsIntegration({
-      service: 'iotdata',
-      proxy: false,
-      subdomain: iotTopicEndpointSubdomain,
-      path: `topics/${props?.iotTopicName}`,
-      integrationHttpMethod: 'POST',
-      options: {
-        credentialsRole: new Role(this, 'Iot-Topic-Endpoint-Role', {
-          assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
-          managedPolicies: [
-            { managedPolicyArn: 'arn:aws:iam::aws:policy/AWSIoTDataAccess' },
-            { managedPolicyArn: 'arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs' },
-          ],
-        }),
-        integrationResponses: [
-          {
-            statusCode: '200',
-            responseParameters: { 'method.response.header.Content-Type': 'integration.response.header.Content-Type' },
-          },
+    defaultEventBus.grantPutEventsTo(usersCdcLambda);
+
+    usersCdcLambda.addToRolePolicy(
+      new iam.PolicyStatement({
+        sid: 'LambdaESMNetworkingAccess',
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'ec2:CreateNetworkInterface',
+          'ec2:DescribeNetworkInterfaces',
+          'ec2:DescribeVpcs',
+          'ec2:DeleteNetworkInterface',
+          'ec2:DescribeSubnets',
+          'ec2:DescribeSecurityGroups',
+          'kms:Decrypt',
         ],
-      },
+        resources: ['*'],
+      })
+    );
+    usersCdcLambda.addToRolePolicy(
+      new iam.PolicyStatement({
+        sid: 'LambdaDocDBESMAccess',
+        effect: iam.Effect.ALLOW,
+        actions: ['rds:DescribeDBClusters', 'rds:DescribeDBClusterParameters', 'rds:DescribeDBSubnetGroups'],
+        resources: ['*'],
+      })
+    );
+    usersCdcLambda.addToRolePolicy(
+      new iam.PolicyStatement({
+        sid: 'LambdaDocDBESMGetSecretValueAccess',
+        effect: iam.Effect.ALLOW,
+        actions: ['secretsmanager:GetSecretValue'],
+        resources: [`arn:aws:secretsmanager:${this.region}:${this.account}:secret:DocumentDBSecret`],
+      })
+    );
+
+    const enableCdcLambda = new nodejs.NodejsFunction(this, 'EnableCdcLambdaCustomResource', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'main',
+      entry: 'cdk/lambdas/enable-cdc-cr.ts',
+      vpc,
+      securityGroups: [docDbSg],
     });
 
-    const methodResponses = [
-      {
-        statusCode: '200',
-        responseParameters: {
-          'method.response.header.Content-Type': true,
-        },
-      },
-    ];
-    iotTopicApiEndpoint.addMethod('POST', iotServiceIntegration, { methodResponses });
+    enableCdcLambda.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'lambda:CreateEventSourceMapping',
+          'lambda:UpdateEventSourceMapping',
+          'lambda:DeleteEventSourceMapping',
+        ],
+        resources: ['arn:aws:lambda:*'],
+      })
+    );
 
-    const pipeRole = new Role(this, 'Events-Role', {
-      assumedBy: new ServicePrincipal('pipes.amazonaws.com'),
-    });
-
-    eventsTable.grantStreamRead(pipeRole);
-    defaultEventBus.grantPutEventsTo(pipeRole);
-
-    const { account, region } = cdk.Stack.of(this);
-    const apiStage = iotTopicApi.deploymentStage.stageName;
-    const apiId = iotTopicApi.restApiId;
-    const apiMethod = 'POST';
-    const apiPath = props?.apiGateway.apiResource;
-    const targetEndpointArn = `arn:aws:execute-api:${region}:${account}:${apiId}/${apiStage}/${apiMethod}/${apiPath}`;
-    // Create new Pipe
-    const eventsPipe = new CfnPipe(this, 'Events-Pipe', {
-      name: props?.pipeName,
-      roleArn: pipeRole.roleArn,
-      //@ts-ignore
-      source: eventsTable.tableStreamArn,
-      sourceParameters: {
-        dynamoDbStreamParameters: {
-          startingPosition: StartingPosition.LATEST,
-          batchSize: 1,
-        },
-        filterCriteria: {
-          filters: [
+    const awsSDKCall: cr.AwsSdkCall = {
+      service: 'Lambda',
+      action: 'invoke',
+      parameters: {
+        FunctionName: enableCdcLambda.functionName,
+        Payload: JSON.stringify({
+          cdcStreams: [
             {
-              pattern: '{"eventName" : ["INSERT", "MODIFY"] }',
+              cdcFunctionName: userCreatedLambda.functionName,
+              collectionName: 'users',
             },
           ],
-        },
+          databaseName: 'docdb',
+          clusterArn: cluster.clusterIdentifier,
+          authUri: cluster.secret?.secretValue,
+          date: new Date(),
+        }),
       },
-      target: targetEndpointArn,
+      physicalResourceId: cr.PhysicalResourceId.of(`batchJobsCdc`),
+    };
+    const customResource = new cr.AwsCustomResource(this, 'InvokeBatchJobsCdc', {
+      onCreate: awsSDKCall,
+      onUpdate: awsSDKCall,
+      policy: cr.AwsCustomResourcePolicy.fromSdkCalls({
+        resources: cr.AwsCustomResourcePolicy.ANY_RESOURCE,
+      }),
     });
 
-    new cdk.CfnOutput(this, 'IotDataEndpoint', {
-      value: props?.iotDataEndpoint!,
-    });
-    new cdk.CfnOutput(this, 'IotTopicName', {
-      value: props?.iotTopicName!,
-    });
+    enableCdcLambda.grantInvoke(customResource);
 
-    new cdk.CfnOutput(this, 'DynamoDBTableName', {
-      value: eventsTable.tableName,
+    new CfnOutput(this, 'Docdb-endpoint', {
+      value: `${cluster.clusterEndpoint.hostname}`,
     });
   }
 }
