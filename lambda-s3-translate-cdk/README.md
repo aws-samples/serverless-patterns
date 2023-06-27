@@ -1,11 +1,7 @@
-# S3 Triggered Lambda Function that starts an Amazon Translate Job and points to another S3 bucket for results
-
-This repo contains serverless patterns showing how to setup a Lambda with an S3 *object created* trigger that starts a basic, Amazon Translate Job. The resulting speech is placed into another S3 bucket.
+# S3 Triggered Lambda Function that starts an Amazon Translate Job and stores result into another S3 bucket
+This repo contains serverless patterns showing how to setup a Lambda with an S3 *object created* trigger that starts a basic, Amazon Translate Job. The result is placed into another S3 bucket.
 
 ![Demo Project Solution Architecture Diagram](architecture.png)
-
-- Learn more about these patterns at https://serverlessland.com/patterns.
-- To learn more about submitting a pattern, read the [publishing guidelines page](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -35,6 +31,6 @@ git clone https://github.com/aws-samples/serverless-patterns/lambda-s3-translate
 Each subdirectory contains additional installation and usage instructions. 
 
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 ----
 
