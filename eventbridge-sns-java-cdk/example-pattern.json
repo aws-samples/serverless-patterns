@@ -1,5 +1,5 @@
 {
-  "title": "Amazon Eventbridge to Amazon SNS",
+  "title": "Amazon EventBridge to Amazon SNS",
   "description": "Create an EventBridge rule that invokes an SNS topic.",
   "language": "Java",
   "level": "200",
@@ -14,9 +14,8 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sns-java-cdk",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sns-java-cdk/README.md",
       "projectFolder": "eventbridge-sns-java-cdk",
-      "templateFile": "eventbridge-sns-java-cdk/src/main/java/com/myorg/CdkEventBridgeSnsStack.java",
+      "templateFile": "src/main/java/com/myorg/CdkEventBridgeSnsStack.java",
       "templateURL": "serverless-patterns/eventbridge-sns-java-cdk"
     }
   },
