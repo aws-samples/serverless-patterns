@@ -54,15 +54,13 @@
       "name": "Thi Nguyen",
       "image": "https://drive.google.com/file/d/188LpzUvUmHt1o7vzbwKw32S-fYabL-qY/view?usp=sharing",
       "bio": "Solutions Architect @ AWS",
-      "linkedin": "https://www.linkedin.com/in/ndthi",
-      "twitter": ""
+      "linkedin": "https://www.linkedin.com/in/ndthi"
     },
     {
       "name": "Vijay Konade",
-      "image": "",
+      "image": "vijay.png",
       "bio": "Cloud Support Eng @ AWS",
-      "linkedin": "",
-      "twitter": ""
+      "linkedin": "https://www.linkedin.com/in/vijay-konade-14427479/"
     }
   ]
 }

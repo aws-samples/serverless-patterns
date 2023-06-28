@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# API Gateway, Lambda, DynamoDB, Kinesis, Lambda
 
 This pattern explains how to deploy a SAM application with Amazon API Gateway, AWS Lambda, and Amazon DynamoDB and Stream to Kinesis and finaly trigger a Lambda. When an HTTP POST request is made to the Amazon API Gateway endpoint, the AWS Lambda function is invoked and inserts an item into the Amazon DynamoDB table, then an event will be pushed into Kinesis and trigger a Lambda function
 
