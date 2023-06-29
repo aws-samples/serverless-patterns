@@ -1,6 +1,6 @@
 # AWS AppSync to Amazon DynamoDB - Single table design - JS Resolvers
 
-This pattern creates an AppSync API with a schema and a javascript pipeline resolver to a DynamoDB table following the single table design model. The pattern uses the new [`GraphQLApi` resource for AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-graphqlapi.html).
+This pattern creates an AppSync API with a schema and a javascript pipeline resolver to query a DynamoDB table following the single table design model. The pattern uses the new [`GraphQLApi` resource for AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-graphqlapi.html).
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appsync-dynamodb-singletable-js-resolver
 
