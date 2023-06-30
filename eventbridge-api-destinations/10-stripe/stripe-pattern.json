@@ -1,0 +1,77 @@
+{
+  "title": "EventBridge API Destinations to Stripe",
+  "description": "Create an API destination in EventBridge for Stripe APIs.",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern configures an EventRule, that routes to the EventBridge API destination in EventBridge for Stripe to create a new product object API.",
+      "Once deployed, the pattern allows a user to send events easily through to create specific goods or services for supporting the product experience at Stripe. The pattern creates the following resources: ",
+      "EventBridge Event Bus",
+      "EventBridge Rule",
+      "EventBridge Connection",
+      "EventBridge API Destination",
+      "IAM Role",
+      "SQS Queue",
+      "SQS Queue Policy",
+      "The EventBridge Rule uses the API Destination and Connection as a target, SQS Queue as a Dead Letter Queue (DLQ), and the IAM role as its role. The created IAM role has the permission to allow InvokeApiDestination access to the EventBridge Rule.",
+	  "If using the custom named IAM role in this pattern, it requires the explicit acknowledgement that the stack template contains certain capabilities in order for AWS CloudFormation to create the stack. When using the AWS SAM CLI, the --capabilities=CAPABILITY_NAMED_IAM parameter can be added to the deployment command to explicitly acknowledge.",
+	  "To send events, go to the EventBridge Event Bus details. Select the Send events button. Select the Event Bus created by the pattern, \"StripeEventBus\". Enter \"MyStripeTestApp\" for the source. Enter \"MyStripeTestAppDetailType\" for the detail type. Enter Event details in json format for a creating a product (https://stripe.com/docs/api/products) API call.",
+	  "The Stripe API uses API keys to authenticate requests (https://stripe.com/docs/api/authentication.) Before using the pattern, obtain an API Key from Stripe and update the CloudFormation template parameter \"StripeAPIKeyValue\" using Bearer auth."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations",
+      "templateURL": "serverless-patterns/eventbridge-api-destinations",
+      "projectFolder": "eventbridge-api-destinations",
+      "templateFile": "eventbridge-api-destinations/10-stripe/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Stripe Docs",
+        "link": "https://stripe.com/docs"
+      },
+      {
+        "text": "Stripe API Documentation",
+        "link": "https://stripe.com/docs/api"
+      },
+	  {
+        "text": "Using API destinations with Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/using-api-destinations-with-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+	  "cd ./10-stripe",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "1. From a command line in this directory, send a test event to EventBridge simulating a \"Payment failed\" event: <code>aws events put-events --entries file://testEvent.json</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME.</code>",
+	  "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus</code>\""
+    ]
+  },
+  "authors": [
+    {
+      "name": "Diana \"Di\" Dow",
+      "image": "https://badgephotos.corp.amazon.com/?uid=didow",
+      "bio": "AWS Technical Account Manager",
+      "linkedin": "https://www.linkedin.com/in/diana-d-17a713/"
+    }
+  ]
+}
