@@ -1,0 +1,22 @@
+type Item @aws_iam {
+  PK: String!
+  SK: String!
+  data: String!
+}
+
+type Mutation {
+  onCreateItem (
+    PK: String!,
+    SK: String!,
+    data: String!
+  ): Item @aws_iam
+}
+
+type Subscription {
+  onCreateItem(PK: String, SK: String, data: String): Item
+  @aws_subscribe(mutations: ["onCreateItem"])
+}
+
+type Query {
+  getItem(PK: String!, SK: String!): Item
+}
