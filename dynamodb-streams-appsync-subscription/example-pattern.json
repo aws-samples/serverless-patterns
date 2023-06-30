@@ -9,7 +9,7 @@
     "text": [
       "In some of your projects, you might want to be able to listen to changes made on your database that are not performed through client-side mutations.",
       "This sample project creates an AppSync API allowing you to listen to new items being created on a specific DynamoDB table through AWS AppSync subscriptions.",
-      "With this pattern, a Lambda function will be invoked that will in turn call an AppSync mutation with data source set as `None`. An AppSync subscription will be subscribed to that mutation allowing end users to be notified of a newly created DynamoDB item."
+      "With this pattern, a Lambda function will be invoked for every new item created on a DynamoDB table. It will in turn call an AppSync mutation with data source set as `None`. An AppSync subscription will be subscribed to that mutation allowing end users to be notified of a newly created DynamoDB item."
     ]
   },
   "gitHub": {
