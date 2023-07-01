@@ -29,7 +29,7 @@
       {
         "text": "AWS Re:Post - Listen to external DB changes using AppSync",
         "link": "https://repost.aws/knowledge-center/appsync-notify-subscribers-real-time"
-      },
+      }
     ]
   },
   "deploy": {

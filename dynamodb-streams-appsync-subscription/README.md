@@ -36,7 +36,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This template creates an AppSync api. Any new item being created on the DynamoDB table created with this example will invoke a Lambda function that will in turn call an AppSync mutation with data source set as `None`. An AppSync subscription will be subscribed to that mutation allowing end users to be notified of a newly created DynamoDB item.trigger an AppSync subscription.
+This template creates an AppSync api. Any new item being created on the DynamoDB table created with this example will invoke a Lambda function that will in turn call an AppSync mutation with data source set as `None`. An AppSync subscription will be subscribed to that mutation allowing end users to be notified of a newly created DynamoDB item.
 
 More information is available [here](https://repost.aws/knowledge-center/appsync-notify-subscribers-real-time).
 
