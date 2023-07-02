@@ -58,6 +58,5 @@ const appsync = async (variables: Message): Promise<void> => {
   const signed = await signer.sign(requestToBeSigned)
   const request = new Request(APP_SYNC_API, signed)
 
-  const response = await fetch(request)
-  const body = await response.json()
+  await fetch(request)
 }
