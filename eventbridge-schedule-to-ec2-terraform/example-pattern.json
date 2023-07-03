@@ -1,6 +1,7 @@
 {
     "title": "EventBridge Scheduler to start and stop EC2 instances Monday to Friday",
     "description": "Simple pattern that starts and stops given EC2 instances based on time of day, timezone and days of week",
+    "language": "",
     "level": "300",
     "framework": "Terraform",
     "introBox": {

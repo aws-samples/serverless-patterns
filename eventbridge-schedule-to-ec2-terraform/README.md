@@ -1,5 +1,5 @@
 # EventBridge Scheduler to start and stop EC2 instances
-This pattern will create two EventBridge schedules that will start and stop a given array of instance-ids. You can control the start/stop time and timezone of you chosing. This example will start instances at 7:00am and stop them at 18:00am Europe/London timezone.
+This pattern will create two EventBridge schedules that will start and stop a given array of instance-ids. You can control the start/stop time and timezone of you chosing. This example will start instances at 8:00am and stop them at 17:00am US/Eastern, Monday-Friday.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-schedule-to-ec2-terraform.
 
