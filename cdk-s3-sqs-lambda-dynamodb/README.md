@@ -62,7 +62,7 @@ Use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2
     ```
     Verify the lambda function cloudwatch logs for successfull processing of csv file
    
-    Verify the dynamodb table that the revord was inserted
+    Verify the dynamodb table that the record was inserted
   
     ```
 
