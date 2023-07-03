@@ -141,13 +141,9 @@ The result of this query should show parent 1 along with child 1 and 3.
 
 ## Cleanup
  
-1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+1. Delete the stack, Enter `Y` to confirm deleting the stack and folder.
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
