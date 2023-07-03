@@ -7,7 +7,7 @@ Resources:
     Properties:
       ScheduleExpression: 'rate(1 minute)'
       Name: CloudWatchCustomMetric
-      Description: Sends custom metrics to CloudWatch every 1 minutes
+      Description: Sends custom metrics to CloudWatch every minute on a schedule
       Target:
         Arn: "arn:aws:scheduler:::aws-sdk:cloudwatch:putMetricData"
         Input: '{
