@@ -1,6 +1,7 @@
 {
   "title": "Amazon EventBridge Scheduler to AWS Batch",
   "description": "Schedule AWS Batch jobs using Amazon EventBridge Scheduler",
+  "language": "",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
