@@ -1,6 +1,7 @@
 {
     "title": "Amazon EventBridge Scheduler to Amazon CloudWatch",
     "description": "Use EventBridge Scheduler to insert custom metric data into CloudWatch on a schedule",
+    "language" : "",
     "level": "200",
     "framework": "Terraform",
     "introBox": {

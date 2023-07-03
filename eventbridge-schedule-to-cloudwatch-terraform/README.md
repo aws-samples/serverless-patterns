@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Amazon EventBridge Scheduler to Amazon CloudWatch
 
 This pattern will create an [EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) to publish [custom metrics to Amazon Cloudwatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html). The pattern is deployed using Terraform to create the EventBridge Scheduler and IAM resources required for Scheduler to interact with CloudWatch. 
 
