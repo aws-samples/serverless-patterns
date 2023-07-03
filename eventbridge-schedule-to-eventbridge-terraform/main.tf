@@ -98,7 +98,7 @@ resource "aws_scheduler_schedule" "eventbridge-schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = "rate(1 minutes)" # 
+  schedule_expression = "rate(5 minutes)" # 
   schedule_expression_timezone = "US/Eastern" # Default is UTC
   description = "Rate schedule to EventBridge custom bus"
 
