@@ -50,22 +50,21 @@ lambda is configured to read messages from the SQS queues, process them and inse
 
 
 
-
 ## Testing
 
 Use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) to invoke the step function. The function name is in the outputs of the AWS CDK deployment
 
  1. Upload the sample csv file from data folder to the s3 bucket name from the output of cloudformation stack
     ```
-   s3 cp ./data/test.csv s3://BUCKET_NAME/test.csv
+    s3 cp ./data/test.csv s3://BUCKET_NAME/test.csv
     ```
  2. View S3 bucket to see files created in the previously empty bucket: You should see a file has been saved to the S3 bucket:
-     ```
-   Verify the lambda function cloudwatch logs for successfull processing of csv file
+    ```
+    Verify the lambda function cloudwatch logs for successfull processing of csv file
    
-  Verify the dynamodb table that the revord was inserted
+    Verify the dynamodb table that the revord was inserted
   
-     ```
+    ```
 
 ## Cleanup
 
