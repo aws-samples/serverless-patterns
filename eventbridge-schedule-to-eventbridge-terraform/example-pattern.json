@@ -1,14 +1,14 @@
 {
-    "title": "Amazon EventBridge Scheduler to Amazon CloudWatch",
-    "description": "Use EventBridge Scheduler to insert custom metric data into CloudWatch on a schedule",
+    "title": "Amazon EventBridge Scheduler to Amazon EventBridge",
+    "description": "Use EventBridge Scheduler to publish an EventBridge event every 5 minutes using templated targets",
     "language": "",
-    "level": "200",
+    "level": "300",
     "framework": "Terraform",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This sample project demonstrates how to use Amazon EventBridge Scheduler to publish your own metrics to CloudWatch on a schedule. This pattern leverages templated targets with EventBridge Scheduler to talk directly to CloudWatch using the PutEvents API operation.",
-        "This pattern deploys an EventBridge Schedule and the required IAM resource for Scheduler to interact with CloudWatch."
+        "This project uses Terraform to create an Schedule that sends custom events to EventBridge that are matched to rules and use CloudWatch as a target to visualize the event pattern matches. The Terraform creates a schedule, EventBridge bus and rules as well as the IAM resources required for Scheduler to interact with EventBridge and CloudWatch.",
+        "This pattern uses templated targets to interact with EventBridge directly."
       ]
     },
     "gitHub": {
@@ -26,8 +26,8 @@
           "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/scheduler.html"
         },
         {
-          "text": "Publish custom metrics to Amazon CloudWatch",
-          "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html"
+          "text": "Send custom events to Amazon EventBridge",
+          "link": "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html"
         }
       ]
     },
