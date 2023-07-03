@@ -13,7 +13,7 @@
   "introBox": {
       "headline": "How it works",
       "text": [
-          "This pattern registers the lambda function as the target for the Application Load Balancer.",
+          "This pattern registers the lambda function as the target for the Application Load Balancer using the serverless framework.",
           "",
           "When the load balancer endpoint is hit in the browser, if the specified URL (`/hello`) path matches, it triggers the lambda function & the file (hello) is downloaded in your local system with the output from lambda function."
       ]
