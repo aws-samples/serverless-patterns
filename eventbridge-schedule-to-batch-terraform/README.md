@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Amazon EventBridge Scheduler to AWS Batch
 
 This pattern will create an [EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) to submit an [AWS Batch](https://docs.aws.amazon.com/batch/latest/userguide/Batch_GetStarted.html) job from a job definition every 5 minutes. The pattern is deployed using Terraform to create the required VPC, Batch and EventBridge Scheduler resources. 
 
