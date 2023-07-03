@@ -26,19 +26,16 @@ Important: this application uses various AWS services and there are costs associ
      ```
      npm install
      ```
- 4. This project uses typescript as client language for AWS CDK. Run the given command to compile typescript to javascript:
-     ```
-     npm run build
-     ```
- 5. Synthesize CloudFormation template from the AWS CDK app:
+
+ 4. Synthesize CloudFormation template from the AWS CDK app:
      ```
      cdk synth
      ```
- 6. Deploy the stack to your default AWS account and region. This command should deploy the serverless workflow to your AWS account.
+ 5. Deploy the stack to your default AWS account and region. This command should deploy the serverless workflow to your AWS account.
      ```
      cdk deploy
      ```
- 8. Browse to the AWS cloudformation console to verify successful deployment of the stack
+ 6. Browse to the AWS cloudformation console to verify successful deployment of the stack
 
 ## How it works
 
