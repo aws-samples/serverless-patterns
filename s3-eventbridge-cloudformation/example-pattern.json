@@ -1,9 +1,9 @@
 {
 	"title": "S3 to EventBridge to SNS",
 	"description": "Publish events directly from S3 to EventBridge and send notifications to SNS when an object is created. This template creates an S3 bucket that publishes events to Amazon EventBridge. When an object is uploaded to the bucket, the EventBridge is triggered and a SNS notification is sent.",
-	"language": "",
+	"language": "YAML",
 	"level": "200",
-	"framework": "CloudFormation",
+	"framework": "SAM",
 	"introBox": {
 		"headline": "How it works",
 		"text": [
