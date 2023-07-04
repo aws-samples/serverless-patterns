@@ -1,10 +1,10 @@
 # AWS IoT Core to Amazon SNS to Amazon SQS
 
-This pattern contains a sample AWS CFN stack to create an IoT Rule with a SNS action, a SNS Topic and a SQS standard Queue subscribed to the SNS topic.
+This pattern contains a sample AWS SAM stack to create an IoT Rule with a SNS action, a SNS Topic and a SQS standard Queue subscribed to the SNS topic.
 
 When a message is published to the IoT topic defined in the IoT Rule, this message will be published to the SNS topic and finally the message will be delivered to the SQS queue subscribed to the SNS topic
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-sns-sqs-cfn
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-sns-sqs-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -29,9 +29,9 @@ Important: this application uses various AWS services and there are costs associ
    cd serverless-patterns/iot-sns-sqs-cfn
    ```
 
-1. From the command line, use AWS CLI to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```
-   aws cloudformation create-stack --stack-name <NameOfTheStack> --template-body file://template.yaml
+   sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
    ```
 1. You can also use AWS CloudFormation console and paste the template.yml file in the designer and deploy it by passing the below required parameters.
 
@@ -63,14 +63,9 @@ Log into the AWS Console, browse to AWS IoT Core:
 
 ## Cleanup
  
-1. Change directory to the pattern directory:
-    ```
-    cd iot-sns-sqs-cfn
-    ```
-
 1. Delete the stack
    ```bash
-   aws cloudformation delete-stack --stack-name <NameOfTheStack>
+   sam delete
    ```
 
 ----

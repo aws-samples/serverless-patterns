@@ -1,5 +1,5 @@
 {
-  "title": "IoT Core to SNS to SQS",
+  "title": "AWS IoT Core to Amazon SNS to Amazon SQS",
   "description": "Create a IoT Rule with a SNS action that delivers messages to a SQS queue.",
   "language": "",
   "level": "200",
@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-sns-sqs-terraform",
       "templateURL": "serverless-patterns/iot-sns-sqs-terraform",
       "projectFolder": "iot-sns-sqs-terraform",
-      "templateFile": "iot-sns-sqs-terraform/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {

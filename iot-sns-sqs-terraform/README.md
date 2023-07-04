@@ -1,6 +1,6 @@
 # AWS IoT Core to Amazon SNS to Amazon SQS
 
-This pattern contains a sample terraform template to create an IoT Rule with a SNS action, a SNS Topic and a SQS standard Queue subscribed to the SNS topic.
+This pattern contains a sample Terraform template to create an IoT Rule with a SNS action, a SNS Topic and a SQS standard Queue subscribed to the SNS topic.
 
 When a message is published to the IoT topic defined in the IoT Rule, this message will be published to the SNS topic and finally the message will be delivered to the SQS queue subscribed to the SNS topic
 
@@ -68,11 +68,6 @@ Log into the AWS Console, browse to AWS IoT Core:
 
 ## Cleanup
  
-1. Change directory to the pattern directory:
-    ```
-    cd iot-sns-sqs-terraform
-    ```
-
 1. Delete all created resources by terraform
     ```bash
     terraform destroy
