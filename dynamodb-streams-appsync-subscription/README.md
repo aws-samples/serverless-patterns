@@ -25,6 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
+    sam build
     sam deploy --guided
     ```
 4. During the prompts:
