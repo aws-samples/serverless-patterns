@@ -1,7 +1,7 @@
 {
   "title": "Event driven vulnerability scanning with EventBridge and Lambda",
   "description": "This pattern listens to Amazon Inspector events and triggers downstream consumers",
-  "language": "",
+  "language": "YAMl",
   "level": "200",
   "framework": "SAM",
   "introBox": {
