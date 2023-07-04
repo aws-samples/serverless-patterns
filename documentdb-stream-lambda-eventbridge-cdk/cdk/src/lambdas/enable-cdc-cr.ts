@@ -39,7 +39,7 @@ const enableCdcCr = async (event: any) => {
         ],
         DocumentDBEventSourceConfig: {
           DatabaseName: 'docdb',
-          CollectionName: 'messages',
+          CollectionName: 'products',
           FullDocument: 'UpdateLookup',
         },
       })
