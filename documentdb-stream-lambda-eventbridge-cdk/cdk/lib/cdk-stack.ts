@@ -14,6 +14,7 @@ import {
   aws_lambda_nodejs as nodejs,
   aws_events as events,
   aws_docdb as docdb,
+  aws_events_targets as targets,
   aws_secretsmanager as secrets,
   SecretValue,
 } from 'aws-cdk-lib';
@@ -180,6 +181,15 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
     });
 
     enableCdcLambda.grantInvoke(customResource);
+
+    const userCreatedRule = new events.Rule(this, 'UserCreatedRule', {
+      eventBus: defaultEventBus,
+      eventPattern: {
+        source: ['docdb.cdc'],
+        detailType: ['userCreated'],
+      },
+      targets: [new targets.LambdaFunction(userCreatedLambda)],
+    });
 
     new CfnOutput(this, 'Docdb-endpoint-hostname', {
       value: `${cluster.clusterEndpoint.hostname}`,
