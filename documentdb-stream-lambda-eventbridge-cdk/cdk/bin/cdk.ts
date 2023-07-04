@@ -5,7 +5,11 @@ import { DocumentDbStreamLambdaEventBridgeStack } from '../lib/cdk-stack';
 
 const app = new cdk.App();
 
-new DocumentDbStreamLambdaEventBridgeStack(app, 'EventBridgePipesIotCoreStack', {
+new DocumentDbStreamLambdaEventBridgeStack(app, 'DocumentDbStreamLambdaEventBridgeStack', {
+  env: {
+    region: process.env.CDK_DEFAULT_REGION,
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+  },
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */

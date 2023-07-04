@@ -15,6 +15,7 @@ import {
   aws_events as events,
   aws_docdb as docdb,
   aws_secretsmanager as secrets,
+  SecretValue,
 } from 'aws-cdk-lib';
 
 export interface DocumentDbStreamLambdaEventBridgeStackProps extends StackProps {}
@@ -40,7 +41,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
     const cluster = new docdb.DatabaseCluster(this, 'Database', {
       masterUser: {
         username: 'myuser', // NOTE: 'admin' is reserved by DocumentDB
-        excludeCharacters: '"@/:', // optional, defaults to the set "\"@/" and is also used for eventually created rotations
+        // excludeCharacters: '[!@#$%^&*()_+-=\\[]{}|;\':",./<>?`~]', // optional, defaults to the set "\"@/" and is also used for eventually created rotations
         secretName: 'DocumentDBSecret', // optional, if you prefer to specify the secret name
       },
       dbClusterName: 'DocDbCluster',
@@ -76,6 +77,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       timeout: Duration.seconds(60),
       vpc,
       securityGroups: [docDbSg],
+      allowPublicSubnet: true,
       environment: {
         DEFAULT_EVENT_BUS: defaultEventBus.eventBusName,
       },
@@ -87,6 +89,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       timeout: Duration.seconds(60),
       vpc,
       securityGroups: [docDbSg],
+      allowPublicSubnet: true,
       environment: {
         DEFAULT_EVENT_BUS: defaultEventBus.eventBusName,
       },
@@ -130,9 +133,10 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
     const enableCdcLambda = new nodejs.NodejsFunction(this, 'EnableCdcLambdaCustomResource', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'main',
-      entry: 'cdk/lambdas/enable-cdc-cr.ts',
+      entry: 'src/lambdas/enable-cdc-cr.ts',
       vpc,
       securityGroups: [docDbSg],
+      allowPublicSubnet: true,
     });
 
     enableCdcLambda.addToRolePolicy(
@@ -143,7 +147,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
           'lambda:UpdateEventSourceMapping',
           'lambda:DeleteEventSourceMapping',
         ],
-        resources: ['arn:aws:lambda:*'],
+        resources: ['*'],
       })
     );
 
@@ -160,14 +164,14 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
             },
           ],
           databaseName: 'docdb',
-          clusterArn: cluster.clusterIdentifier,
-          authUri: cluster.secret?.secretValue,
+          clusterArn: `arn:aws:rds:${this.region}:${this.account}:cluster:${cluster.clusterIdentifier}`,
+          authUri: cluster.secret?.secretArn,
           date: new Date(),
         }),
       },
-      physicalResourceId: cr.PhysicalResourceId.of(`batchJobsCdc`),
+      physicalResourceId: cr.PhysicalResourceId.of(`enableCdcLambda`),
     };
-    const customResource = new cr.AwsCustomResource(this, 'InvokeBatchJobsCdc', {
+    const customResource = new cr.AwsCustomResource(this, 'InvokeEnableCdcLambda', {
       onCreate: awsSDKCall,
       onUpdate: awsSDKCall,
       policy: cr.AwsCustomResourcePolicy.fromSdkCalls({
@@ -177,8 +181,20 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
 
     enableCdcLambda.grantInvoke(customResource);
 
-    new CfnOutput(this, 'Docdb-endpoint', {
+    new CfnOutput(this, 'Docdb-endpoint-hostname', {
       value: `${cluster.clusterEndpoint.hostname}`,
+    });
+    new CfnOutput(this, 'Docdb-endpoint-port', {
+      value: `${cluster.clusterEndpoint.port}`,
+    });
+    new CfnOutput(this, 'Docdb-cluster-identifier', {
+      value: `${cluster.clusterIdentifier}`,
+    });
+    new CfnOutput(this, 'Docdb-cluster-resource-identifier', {
+      value: `${cluster.clusterResourceIdentifier}`,
+    });
+    new CfnOutput(this, 'Docdb-cluster-secret-arn', {
+      value: `${cluster.secret?.secretArn}`,
     });
   }
 }
