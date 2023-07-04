@@ -17,7 +17,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Deployment Instructions
 
 1. Within your CDK Python module directory(where all your cdk stacks are located) create a constructs folder and within the constructs folder, create an assets folder.
-2. Place the `lambda_s3_translate_cdk.py` file in the constructs folder you created and the `file-uploaded-trigger` folder in the assets folder you created.
+2. Place the `lambda_s3_translate_cdk.py` file in the constructs folder you created and then place the lambda_function.py file in the assets folder you created.
 3. In your terminal run `CDK Deploy` for the specified stack that uses this construct
 
 ### Removing the resources
