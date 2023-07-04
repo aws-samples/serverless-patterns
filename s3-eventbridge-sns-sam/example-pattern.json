@@ -1,9 +1,9 @@
 {
-	"title": "S3 to EventBridge to SNS",
+	"title": "Amazon S3 to Amazon EventBridge to Amazon SNS",
 	"description": "Publish events directly from S3 to EventBridge and send notifications to SNS when an object is created. This template creates an S3 bucket that publishes events to Amazon EventBridge. When an object is uploaded to the bucket, the EventBridge is triggered and a SNS notification is sent.",
 	"language": "",
 	"level": "200",
-	"framework": "CloudFormation",
+	"framework": "SAM",
 	"introBox": {
 		"headline": "How it works",
 		"text": [
@@ -12,10 +12,10 @@
 	},
 	"gitHub": {
 		"template": {
-			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-cloudformation",
-			"templateURL": "serverless-patterns/s3-eventbridge-cloudformation",
-			"projectFolder": "s3-eventbridge-cloudformation",
-			"templateFile": "s3-eventbridge-cloudformation/template.yaml"
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-sam",
+			"templateURL": "serverless-patterns/s3-eventbridge-sam",
+			"projectFolder": "s3-eventbridge-sam",
+			"templateFile": "template.yaml"
 		}
 	},
 	"resources": {
@@ -35,13 +35,13 @@
 		]
 	},
 	"deploy": {
-		"text": ["aws cloudformation create-stack --stack-name <NameOfTheStack> --template-body file://template.yaml"]
+		"text": ["sam deploy --guided"]
 	},
 	"testing": {
 		"text": ["See the Github repo for detailed testing instructions."]
 	},
 	"cleanup": {
-		"text": ["Delete the stack: <code>aws cloudformation delete-stack --stack-name <NameOfTheStack></code>"]
+		"text": ["Delete the stack: <code>sam delete</code>"]
 	},
 	"authors": [
 		{

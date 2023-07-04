@@ -3,7 +3,7 @@ Resources:
   MyS3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: !Sub 'serverlessland-s3-eventbridge-bucket-${AWS::StackName}'
+      BucketName: !Sub 'serverlessland-${AWS::StackName}'
       NotificationConfiguration:
         EventBridgeConfiguration:
           EventBridgeEnabled: 'true'

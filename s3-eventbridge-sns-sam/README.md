@@ -2,7 +2,7 @@
 
 Publish events directly from S3 to EventBridge and send notifications to SNS when an object is created. This template creates an S3 bucket that publishes events to Amazon EventBridge. When an object is uploaded to the bucket, the EventBridge is triggered and a SNS notification is sent.
 
-Learn more about this pattern at Serverless Land Patterns:https://serverlessland.com/patterns/s3-eventbridge-cloudformation
+Learn more about this pattern at Serverless Land Patterns:https://serverlessland.com/patterns/s3-eventbridge-sns-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,11 +21,11 @@ Important: this application uses various AWS services and there are costs associ
    ```
 1. Change directory to the pattern directory:
    ```
-   cd s3-eventbridge-cloudformation
+   cd s3-eventbridge-sam
    ```
-1. From the command line, use AWS CLI to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```
-   aws cloudformation create-stack --stack-name <NameOfTheStack> --template-body file://template.yaml
+   sam deploy --guided
    ```
 1. You can also use AWS CloudFormation console and paste the template.yml file in the designer and deploy it by passing the below required parameters.
 
@@ -51,15 +51,11 @@ This template creates an S3 bucket that publishes events to Amazon EventBridge, 
 
 ## Cleanup
 
-1. Change directory to the pattern directory:
-    ```
-    cd s3-eventbridge-cloudformation
-    ```
 1. Delete all files from the S3 bucket
 
 1. Delete the stack
    ```bash
-   aws cloudformation delete-stack --stack-name <NameOfTheStack>
+   sam delete
    ```
 
 ---
