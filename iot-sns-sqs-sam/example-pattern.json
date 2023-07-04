@@ -14,7 +14,7 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-sns-sqs-sam",
-      "templateURL": "serverless-patterns/iot-sns-sqs-cfn",
+      "templateURL": "serverless-patterns/iot-sns-sqs-sam",
       "projectFolder": "iot-sns-sqs-sam",
       "templateFile": "template.yaml"
     }
