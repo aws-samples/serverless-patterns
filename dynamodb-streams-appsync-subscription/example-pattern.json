@@ -1,7 +1,7 @@
 {
   "title": "DynamoDB Streams to AppSync subscription",
   "description": "Listen to DynamoDB changes using AppSync subscriptions",
-  "language": "Typescript",
+  "language": "TypeScript",
   "level": "300",
   "framework": "SAM",
   "introBox": {
