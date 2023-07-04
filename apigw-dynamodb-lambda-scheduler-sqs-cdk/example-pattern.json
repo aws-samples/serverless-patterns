@@ -7,7 +7,8 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates a sample to delay processing of data or workflow using an Amazon EventBridge Scheduler. A schedule that invokes a target one-time or at regular intervals defined by a cron or rate expression. EventBridge scheduling functionality that provides scheduling functionality independent of Event buses and rules. You can create a schedule to invoke targets such as AWS Batch.",
+      "This pattern demonstrates a sample to delay processing of Dynamodb stream with EventBridge Scheduler. EventBridge Scheduler invokes a target one-time or at regular intervals defined by a cron or rate expression. This service provides scheduling functionality independent of Event buses and rules. You can create a schedule to invoke targets such as Amazon SQS, or AWS Batch.",
+      "Amazon DynamoDB streams are used to deliver event payload to the handlers in near real time. This pattern will help customers with usecases such as process stream events at a predefined time window, as well as triggring one target AWS service from EventBridge Scheduler.",
       "With Amazon EventBrdige Schedule you can invoke more than 270 AWS services and over 6,000 API operations. Without the need to provision and manage infrastructure, or integrate with multiple services, EventBridge Scheduler provides you with the ability to deliver schedules at scale and reduce maintenance costs.",
       "This pattern deploys one Amazon APIGateway, two AWS Lambda Functions, one Amazon DynamoDB Stream, one Amazon SQS queue, and two Amazon EventBridge Schedule Groups."
     ]
@@ -52,7 +53,7 @@
       "name": "Shashank Shrivastava",
       "image": "https://media.licdn.com/dms/image/D5603AQGrfCgpj_j3mw/profile-displayphoto-shrink_400_400/0/1673343619283?e=1684972800&v=beta&t=SoHAsTjGcrIlf9ToRrNX64I71rhp4MH0Kd9hrTk1bqw",
       "bio": "Sr. Cloud Application Architect at Amazon Web Services.",
-      "linkedin": "https://www.linkedin.com/in/shashank-shrivastava-85788b38/",
+      "linkedin": "shashank-shrivastava-85788b38/",
       "twitter": "@shashanksaid"
     }
   ]

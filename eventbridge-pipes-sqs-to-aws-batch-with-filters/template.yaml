@@ -1,0 +1,205 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SQS to AWS Batch Job Queue
+
+Parameters:
+  ServiceName:
+    Type: String
+    Default: sqs-pipes-batch-service
+  VpcId:
+    ConstraintDescription: This must be an existing VPC within the working region.
+    Type: 'AWS::EC2::VPC::Id'
+  PrivateSubnet1:
+    ConstraintDescription: The subnet IDs must be within an existing VPC
+    Description: Private subnets for the availability zones
+    Type: String
+  PrivateSubnet2:
+    ConstraintDescription: The subnet IDs must be within an existing VPC
+    Description: Private subnets for the availability zones
+    Type: String
+
+Resources:
+  Source:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-queue
+
+  ComputeEnvironment:
+    Type: AWS::Batch::ComputeEnvironment
+    Properties:
+      Type: MANAGED
+      State: ENABLED
+      ServiceRole: !Ref ServiceRole
+      ComputeResources:
+        Type: FARGATE
+        MaxvCpus: 1
+        Subnets:
+         - !Ref PrivateSubnet1
+         - !Ref PrivateSubnet2
+        SecurityGroupIds:
+          - !Ref JobSG
+
+  ServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - 'batch.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole'
+
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: SourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource: !GetAtt Source.Arn
+        - PolicyName: !Sub ${AWS::StackName}-target-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'batch:SubmitJob'
+                Resource: 
+                  - !Sub ${JobDefinition}
+              - Effect: Allow
+                Action:
+                  - 'batch:SubmitJob'
+                Resource: !Sub ${JobQueue}
+              - Effect: Allow
+                Action:
+                  - 'batch:SubmitJob'
+                Resource: !Sub arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job/Parameter
+
+  JobQueue:
+    Type: AWS::Batch::JobQueue
+    Properties:
+      ComputeEnvironmentOrder:
+        - ComputeEnvironment: !Ref ComputeEnvironment
+          Order: 1
+      Priority: 1000
+      State: ENABLED
+
+  JobSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VpcId
+      GroupDescription: 'Security Group for Batch job'
+      SecurityGroupEgress:
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: '-1'
+
+  JobSGIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref JobSG
+      IpProtocol: "-1"
+      SourceSecurityGroupId: !Ref JobSG
+
+  JobDefinition:
+    Type: AWS::Batch::JobDefinition
+    Properties:
+      Type: container
+      JobDefinitionName: !Ref AWS::StackName
+      PlatformCapabilities:
+        - FARGATE
+      Timeout:
+        AttemptDurationSeconds: 60
+      RetryStrategy:
+        Attempts: 1
+      ContainerProperties:
+        Command:
+          - echo
+          - Ref::orderId
+        Image: 'public.ecr.aws/amazonlinux/amazonlinux:latest'
+        NetworkConfiguration:
+          AssignPublicIp: DISABLED
+        ResourceRequirements:
+          - Type: VCPU
+            Value: "1"
+          - Type: MEMORY
+            Value: "2048"
+        JobRoleArn: !GetAtt ExecutionRole.Arn
+        ExecutionRoleArn: !GetAtt ExecutionRole.Arn
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            "awslogs-group": !Ref LogGroup
+            "awslogs-stream-prefix": "prefix"
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'ecs-tasks.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref ServiceName
+      RetentionInDays: 14
+
+  Pipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: !Sub ${AWS::StackName}-sqs-eb
+      Description: 'Pipe from SQS to EventBridge'
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt Source.Arn
+      SourceParameters:
+        FilterCriteria:
+          Filters:
+            - Pattern: '{"body":{"type":["OrderCreated"]}}'
+        SqsQueueParameters:
+          BatchSize: 1
+          MaximumBatchingWindowInSeconds: 30
+      Target: !Ref JobQueue
+      TargetParameters:
+        BatchJobParameters:
+          JobDefinition: !Ref JobDefinition
+          JobName: "Parameter"
+          Parameters:
+            "orderId": $.body.orderId
+        InputTemplate: |
+          {
+            "orderId": "<$.body.orderId>",
+            "customerId": "<$.body.customerId>"
+          }
+
+Outputs: 
+  SourceSQSURL: 
+    Description: "URL of new Amazon SQS Queue"
+    Value: !Ref Source

@@ -1,0 +1,2 @@
+aws-cdk.core>=1.189.0
+aws-cdk.assertions>=1.189.0

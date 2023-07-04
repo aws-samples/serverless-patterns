@@ -1,6 +1,6 @@
 # Amazon API Gateway with caching enable
 
-This pattern creates an Amazon API Gateway REST APU with caching enabled at the API and method levels.
+This pattern creates an Amazon API Gateway REST API with caching enabled at the API and method levels.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-caching-sam
 

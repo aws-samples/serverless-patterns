@@ -107,8 +107,8 @@ describe('SQS Test Functions', () => {
                     StreamViewType: "NEW_IMAGE"
                 }
             }),
-            UpdateReplacePolicy: Match.exact('Retain'),
-            DeletionPolicy: Match.exact('Retain')
+            UpdateReplacePolicy: Match.exact('Delete'),
+            DeletionPolicy: Match.exact('Delete')
         });
     });
 

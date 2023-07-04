@@ -18,7 +18,7 @@
     "@types/node": "10.17.27",
     "@types/prettier": "2.6.0",
     "@types/uuid": "^8.3.4",
-    "aws-cdk": "2.55.1",
+    "aws-cdk": "2.80.0",
     "aws-cdk-local": "^2.15.0",
     "aws-sdk": "^2.1071.0",
     "axios": "^0.27.2",
@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@aws-cdk/aws-lambda-go-alpha": "2.55.1-alpha.0",
-    "aws-cdk-lib": "2.55.1",
+    "aws-cdk-lib": "2.80.0",
     "constructs": "^10.0.0",
     "js-yaml": "^4.1.0",
     "openapi3-ts": "^3.0.2",

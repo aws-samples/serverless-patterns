@@ -1,0 +1,176 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template to enrich Amazon EventBridge Pipes data 
+
+Resources:
+  #Source SQS
+  SourceQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt SourceQueueDLQ.Arn
+        maxReceiveCount: 5
+      QueueName: !Sub ${AWS::StackName}-source-queue
+  #DLQ for source
+  SourceQueueDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-DLQ
+    
+  # Enrichment Lambda Function
+  EnrichmentLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-Enrichment-lambda
+      CodeUri: src/
+      Handler: enrichment.lambda_handler
+      Runtime: python3.9
+      MemorySize: 128
+      Timeout: 15
+      Architectures:
+        - arm64
+  
+  EnrichmentLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${EnrichmentLambdaFunction}
+  
+  # Target
+  TargetApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub ${AWS::StackName}-api-gateway
+      StageName: Prod
+      DefinitionBody:
+        openapi: '3.0'
+        info: {}
+        paths:
+          /:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+
+  # Setting up API Destination
+  TargetApiDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: !Sub ${AWS::StackName}-api-destinations
+      ConnectionArn: !GetAtt TargetConnection.Arn
+      InvocationEndpoint: !Sub "https://${TargetApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+      HttpMethod: POST 
+      InvocationRateLimitPerSecond: 10
+      
+  # Setting up Connections 
+  TargetConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      Description: 'My connection with an API key'
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: ApiKey
+          ApiKeyValue: KeyValue
+
+  # Role for EventBridge Pipes to read from SQS and call pipe to enrich data with Lambda and send to API Destination
+  EventBridgePipesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ReadSQS
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource: !GetAtt SourceQueue.Arn
+        - PolicyName: InvokeApiDest
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:InvokeApiDestination'
+                Resource: !GetAtt TargetApiDestination.Arn
+        - PolicyName: InvokeLambdaEnrichment
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunction'
+                Resource: !GetAtt EnrichmentLambdaFunction.Arn
+  
+  # Pipes definition
+  SqsToLambdaToApiDestination:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: 'SqsToLambdaToApiDestination'
+      RoleArn: !GetAtt EventBridgePipesRole.Arn
+      Source: !GetAtt SourceQueue.Arn
+      SourceParameters:
+        SqsQueueParameters:
+          BatchSize: 1
+      Enrichment: !GetAtt EnrichmentLambdaFunction.Arn
+      Target: !GetAtt TargetApiDestination.Arn
+  
+  # Lambda Proxy 
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-lambdaToDynamoDB
+      CodeUri: src/
+      Handler: lambdaToDynamoDB.lambda_handler
+      Runtime: python3.9
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DynamoDBTable
+          TABLE_ARN: !GetAtt DynamoDBTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
+      Events:
+        ApiPOST:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+            RestApiId: !Ref TargetApiGateway
+      Architectures:
+        - arm64
+
+  FunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Function}
+
+  # DynamoDB 
+  DynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: OrderTable
+
+
+Outputs:
+  SourceQueueURL:
+    Description: "SQS queue URL. Do modify the testing file (testing.py) with this url"
+    Value: !Ref SourceQueue

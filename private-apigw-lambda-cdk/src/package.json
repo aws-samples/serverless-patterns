@@ -7,7 +7,7 @@
         "@aws-cdk/aws-apigateway": "^1.89.0",
         "@aws-cdk/aws-lambda": "^1.89.0",
         "@aws-cdk/core": "^1.89.0",
-        "aws-cdk": "^1.89.0"
+        "aws-cdk": "2.80.0"
     },
     "devDependencies": {
         "@types/aws-lambda": "^8.10.72",

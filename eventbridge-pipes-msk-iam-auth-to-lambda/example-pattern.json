@@ -10,7 +10,7 @@
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/eventbridge-pipes-msk-iam-auth-to-lambda",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-msk-iam-auth-to-lambda",
         "templateURL": "serverless-patterns/eventbridge-pipes-msk-iam-auth-to-lambda",
         "projectFolder": "eventbridge-pipes-msk-iam-auth-to-lambda",
         "templateFile": "template.yaml"
