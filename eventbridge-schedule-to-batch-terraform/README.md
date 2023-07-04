@@ -1,8 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# Amazon EventBridge Scheduler to AWS Batch
 
 This pattern will create an [EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) to submit an [AWS Batch](https://docs.aws.amazon.com/batch/latest/userguide/Batch_GetStarted.html) job from a job definition every 5 minutes. The pattern is deployed using Terraform to create the required VPC, Batch and EventBridge Scheduler resources. 
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-schedule-to-batch-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd eventbridge-schedule-to-batch-terraform
     ```
 1. From the command line, initialize Terraform:
     ```
