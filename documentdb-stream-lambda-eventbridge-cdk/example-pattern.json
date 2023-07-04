@@ -1,6 +1,6 @@
 {
   "title": "DocumentDB Lambda Stream",
-  "description": "Create an DocumentDB stream that publish events to EventBridge",
+  "description": "Create a DocumentDB stream that publishes events to EventBridge",
   "language": "TypeScript",
   "level": "300",
   "framework": "CDK",
@@ -12,7 +12,7 @@
     "headline": "How it works",
     "text": [
       "This sample project demonstrates how to use AWS Lambda with DocumentDB to capture changes that occur on data collections and send events to EventBridge. This pattern is leveraging the native integration between the following services: DocumentDB Stream -> Lambda -> EventBridge.",
-      "This pattern deploys one DocumentDB cluster, one EventBridge bus and one Lambda function."
+      "This pattern deploys one EventBridge bus and one Lambda function."
     ]
   },
   "gitHub": {
@@ -26,20 +26,12 @@
   "resources": {
     "bullets": [
       {
-        "text": "EventBridge Pipes Documentation",
-        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+        "text": "DocumentDB Documentation",
+        "link": "https://docs.aws.amazon.com/documentdb/latest/developerguide/get-started-guide.html"
       },
       {
-        "text": "Cloudformation API for Pipes",
-        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
-      },
-      {
-        "text": "Video explaining EventBridge Pipes",
-        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs"
-      },
-      {
-        "text": "AWS IoT HTTPS",
-        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/http.html"
+        "text": "Tutorial: Using AWS Lambda with Amazon DocumentDB Streams",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html"
       },
       {
         "text": "AWS Solutions Constructs for API Gateway integration to IoT Core",
@@ -48,19 +40,13 @@
     ]
   },
   "deploy": {
-    "text": [
-      "cdk deploy"
-    ]
+    "text": ["cdk deploy"]
   },
   "testing": {
-    "text": [
-      "See the Github repo for detailed testing instructions."
-    ]
+    "text": ["See the Github repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": [
-      "Delete the stack: <code>cdk destroy</code>."
-    ]
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
   },
   "authors": [
     {

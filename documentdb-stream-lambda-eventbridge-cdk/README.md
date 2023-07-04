@@ -1,8 +1,8 @@
-# AWS EventBridge Pipes from DynamoDB Stream To IoT Core Topic via API Gateway AWS Integration
+# AWS DocumentDB Stream To EventBridge via AWS Lambda Integration
 
-This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying a DynamoDb Table with a Stream configured to an EventBridge Pipe. Items data tunneled through Pipe will target an API Gateway endpoint that uses AWS direct integration to publish the a message to a pre-configured IoT Core Topic with the item data.
+This project contains a sample AWS Cloud Development Kit (AWS CDK) template for configuring and deploying a CDC Stream (Similar to DynamoDB Stream) for AWS DocumentDB using AWS Lambda and EventBridge. The stream will processes changes and send them to an EventBridge Bus for further processing.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-ddb-stream-apigateway-iot-core-cdk.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/documentdb-stream-lambda-eventbridge-cdk.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 2. Change directory to the pattern directory:
    ```bash
-   cd serverless-patterns/eventbridge-pipes-ddb-stream-apigateway-iot-core-cdk/cdk
+   cd serverless-patterns/documentdb-stream-lambda-eventbridge-cdk/cdk
    ```
 3. Install dependencies:
    ```bash
@@ -37,25 +37,18 @@ Important: this application uses various AWS services and there are costs associ
    ```bash
    cdk deploy
    ```
-6. Note: The AWS CDK deployment process will output the DynamoDB table name, the API endpoint and the IoT Core Topic name used for testing this project
+6. Note: The AWS CDK deployment process will output the DocumentDB name, the Lambda ARN used as a CDC Stream, the EventBridge Bus used for receiving the changes from the stream
 
 ## How it works
 
-This pattern follows a _functionless_ approach to achieve a full-circle event propagation, and report the change back to the client.
+This pattern will use an already existing AWS DocumentDB Database and attach a lambda function that will stream any change detected to the items in the aforementioned database.
 
 The following resources will be provisioned:
 
-- A DynamoDB Table that stores data and configured with a DDB Stream
-- An EventBridge Pipe configured as a target for the DDB Stream
-- A REST Api configured as a target for the EventBridge Pipe
-- The REST Api configures a path `iot` with a POST request and an AWS Direct Service Integration to IoT Data
-- An IoT Core Topic & IoT Core Endpoint to publish data to
-
-IoT Core is an AWS service that covers a wide verity of use cases. One important feature that can be leveraged in serverless event driven architectures, is the scalable pub/sub topic based api.
-
-NOTICE: the pattern doesn't use AWS Lambda at any stage to propagate the data change
-
-**_Disclaimer:_** This pattern doesn't favor one architectural pattern over another. It is merely an example of using _functionless_ development with IoT Core
+- A Lambda Function that process the changes from an already existing DocumentDB Database and sends them to an EventBridge Bus
+- An EventBridge Bus that will receive changes from the Lambda and publish them to an EventBridge Rule
+- An EventBridge Rule that receive the changes for bus and publish them to given targets for further processing
+- A Lambda Function that acts as a target for the EventBridge Rule and further process the changes
 
 ## Testing
 
@@ -63,12 +56,11 @@ To test this pattern you will need to use both the AWS Console and the AWS CLI.
 
 ### Inputs
 
-Every AWS account has an IoT Core Endpoint associated with it. You can find your endpoint as follows:
+This pattern attaches a CDC Lambda Stream to an already existing DocumentDB Stream. So, it requires the following:
 
-1. Open the AWS IoT Console in a browser window.
-2. Click on `Settings`
-3. Under `Device data endpoint` copy the `Endpoint`
-4. Navigate to the `bin/cdk.ts` file and paste that string for the value of the `IOT_DATA_ENDPOINT`
+1. DocumentDB Cluster ARN
+2. AWS Secret Manager ARN for the Database
+3.
 
 ### AWS Console Part
 
@@ -135,11 +127,11 @@ aws dynamodb put-item \
 
 ## Resources
 
-1. [AWS IoT HTTPS](https://docs.aws.amazon.com/iot/latest/developerguide/http.html)
-2. [AWS Solutions Constructs for API Gateway integration to IoT Core](https://github.com/awslabs/aws-solutions-constructs/tree/58e726ff2050a4d6ff4734a6b556e1f81d97e9aa/source/patterns/%40aws-solutions-constructs/aws-apigateway-iot)
+1. [Get Started with Amazon DocumentDB](https://docs.aws.amazon.com/documentdb/latest/developerguide/get-started-guide.html)
+2. [Tutorial: Using AWS Lambda with Amazon DocumentDB Streams](https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html)
 
 ---
 
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
