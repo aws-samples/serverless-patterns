@@ -16,7 +16,7 @@
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-translate-cdk",
         "templateURL": "serverless-patterns/lambda-s3-translate-cdk",
         "projectFolder": "pattern",
-        "templateFile": "assets/lambda-s3-translate-cdk.py"
+        "templateFile": "lambda-s3-translate-cdk.py"
       }
     },
     "resources": {
