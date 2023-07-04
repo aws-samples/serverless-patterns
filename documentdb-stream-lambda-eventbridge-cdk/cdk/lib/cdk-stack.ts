@@ -131,7 +131,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       })
     );
 
-    const enableCdcLambda = new nodejs.NodejsFunction(this, 'EnableCdcLambdaCustomResource', {
+    const enableCdcLambdaCR = new nodejs.NodejsFunction(this, 'EnableCdcLambdaCustomResource', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'main',
       entry: 'src/lambdas/enable-cdc-cr.ts',
@@ -140,14 +140,10 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       allowPublicSubnet: true,
     });
 
-    enableCdcLambda.addToRolePolicy(
+    enableCdcLambdaCR.addToRolePolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        actions: [
-          'lambda:CreateEventSourceMapping',
-          'lambda:UpdateEventSourceMapping',
-          'lambda:DeleteEventSourceMapping',
-        ],
+        actions: ['lambda:CreateEventSourceMapping', 'lambda:UpdateEventSourceMapping', 'lambda:DeleteEventSourceMapping'],
         resources: ['*'],
       })
     );
@@ -156,11 +152,11 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       service: 'Lambda',
       action: 'invoke',
       parameters: {
-        FunctionName: enableCdcLambda.functionName,
+        FunctionName: enableCdcLambdaCR.functionName,
         Payload: JSON.stringify({
           cdcStreams: [
             {
-              cdcFunctionName: userCreatedLambda.functionName,
+              cdcFunctionName: usersCdcLambda.functionName,
               collectionName: 'users',
             },
           ],
@@ -180,7 +176,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       }),
     });
 
-    enableCdcLambda.grantInvoke(customResource);
+    enableCdcLambdaCR.grantInvoke(customResource);
 
     const userCreatedRule = new events.Rule(this, 'UserCreatedRule', {
       eventBus: defaultEventBus,
