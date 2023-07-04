@@ -1,22 +1,15 @@
 import { Construct } from 'constructs';
 import {
-  App,
   Stack,
   StackProps,
   Duration,
-  CfnOutput,
-  RemovalPolicy,
   aws_ec2 as ec2,
-  aws_rds as rds,
   aws_iam as iam,
   custom_resources as cr,
   aws_lambda as lambda,
   aws_lambda_nodejs as nodejs,
   aws_events as events,
-  aws_docdb as docdb,
   aws_events_targets as targets,
-  aws_secretsmanager as secrets,
-  SecretValue,
 } from 'aws-cdk-lib';
 
 export interface DocumentDbStreamLambdaEventBridgeStackProps extends StackProps {
