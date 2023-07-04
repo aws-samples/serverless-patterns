@@ -19,9 +19,16 @@ import {
   SecretValue,
 } from 'aws-cdk-lib';
 
-export interface DocumentDbStreamLambdaEventBridgeStackProps extends StackProps {}
+export interface DocumentDbStreamLambdaEventBridgeStackProps extends StackProps {
+  databaseName: string;
+  collectionName: string;
+  docDbClusterId: string;
+  docDbClusterSecretArn: string;
+  vpcId?: string;
+  securityGroupId: string;
+}
 export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
-  constructor(scope: Construct, id: string, props?: DocumentDbStreamLambdaEventBridgeStackProps) {
+  constructor(scope: Construct, id: string, props: DocumentDbStreamLambdaEventBridgeStackProps) {
     super(scope, id, props);
 
     // The code that defines your stack goes here
@@ -29,29 +36,15 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
     // default event bus
     const defaultEventBus = events.EventBus.fromEventBusName(this, 'Default-Event-Bus', 'default');
 
-    const vpc = ec2.Vpc.fromLookup(this, 'default-vpc-id', {
-      isDefault: true,
-    });
+    const vpc = !!props.vpcId
+      ? ec2.Vpc.fromLookup(this, 'custom-vpc', {
+          vpcId: props.vpcId,
+        })
+      : ec2.Vpc.fromLookup(this, 'default-vpc', {
+          isDefault: true,
+        });
 
-    const docDbSg = new ec2.SecurityGroup(this, 'DocDB-SG', {
-      vpc: vpc,
-    });
-
-    docDbSg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(27017));
-
-    const cluster = new docdb.DatabaseCluster(this, 'Database', {
-      masterUser: {
-        username: 'myuser', // NOTE: 'admin' is reserved by DocumentDB
-        // excludeCharacters: '[!@#$%^&*()_+-=\\[]{}|;\':",./<>?`~]', // optional, defaults to the set "\"@/" and is also used for eventually created rotations
-        secretName: 'DocumentDBSecret', // optional, if you prefer to specify the secret name
-      },
-      dbClusterName: 'DocDbCluster',
-      securityGroup: docDbSg,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MEDIUM),
-      engineVersion: '4.0.0',
-      instances: 1,
-      vpc,
-    });
+    const docDbSg = ec2.SecurityGroup.fromLookupById(this, 'DocDB-SG', props.securityGroupId);
 
     new ec2.InterfaceVpcEndpoint(this, 'VPC Endpoint for Secrets', {
       vpc,
@@ -71,22 +64,10 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       securityGroups: [docDbSg],
     });
 
-    const userCreatedLambda = new nodejs.NodejsFunction(this, 'UserCreatedLambda', {
+    const productsCdcLambda = new nodejs.NodejsFunction(this, 'ProductsCdcLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'main',
-      entry: 'src/lambdas/user-created.ts',
-      timeout: Duration.seconds(60),
-      vpc,
-      securityGroups: [docDbSg],
-      allowPublicSubnet: true,
-      environment: {
-        DEFAULT_EVENT_BUS: defaultEventBus.eventBusName,
-      },
-    });
-    const usersCdcLambda = new nodejs.NodejsFunction(this, 'UsersCdcLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'main',
-      entry: 'src/lambdas/users-cdc.ts',
+      entry: 'src/lambdas/products-cdc.ts',
       timeout: Duration.seconds(60),
       vpc,
       securityGroups: [docDbSg],
@@ -96,9 +77,9 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       },
     });
 
-    defaultEventBus.grantPutEventsTo(usersCdcLambda);
+    defaultEventBus.grantPutEventsTo(productsCdcLambda);
 
-    usersCdcLambda.addToRolePolicy(
+    productsCdcLambda.addToRolePolicy(
       new iam.PolicyStatement({
         sid: 'LambdaESMNetworkingAccess',
         effect: iam.Effect.ALLOW,
@@ -114,7 +95,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
         resources: ['*'],
       })
     );
-    usersCdcLambda.addToRolePolicy(
+    productsCdcLambda.addToRolePolicy(
       new iam.PolicyStatement({
         sid: 'LambdaDocDBESMAccess',
         effect: iam.Effect.ALLOW,
@@ -122,7 +103,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
         resources: ['*'],
       })
     );
-    usersCdcLambda.addToRolePolicy(
+    productsCdcLambda.addToRolePolicy(
       new iam.PolicyStatement({
         sid: 'LambdaDocDBESMGetSecretValueAccess',
         effect: iam.Effect.ALLOW,
@@ -156,13 +137,13 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
         Payload: JSON.stringify({
           cdcStreams: [
             {
-              cdcFunctionName: usersCdcLambda.functionName,
-              collectionName: 'users',
+              cdcFunctionName: productsCdcLambda.functionName,
+              collectionName: 'products',
             },
           ],
           databaseName: 'docdb',
-          clusterArn: `arn:aws:rds:${this.region}:${this.account}:cluster:${cluster.clusterIdentifier}`,
-          authUri: cluster.secret?.secretArn,
+          clusterArn: `arn:aws:rds:${this.region}:${this.account}:cluster:${props.docDbClusterId}`,
+          authUri: props.docDbClusterSecretArn,
           date: new Date(),
         }),
       },
@@ -178,29 +159,25 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
 
     enableCdcLambdaCR.grantInvoke(customResource);
 
-    const userCreatedRule = new events.Rule(this, 'UserCreatedRule', {
+    const productCreatedLambda = new nodejs.NodejsFunction(this, 'ProductCreatedLambda', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'main',
+      entry: 'src/lambdas/product-created.ts',
+      timeout: Duration.seconds(60),
+      vpc,
+      securityGroups: [docDbSg],
+      allowPublicSubnet: true,
+      environment: {
+        DEFAULT_EVENT_BUS: defaultEventBus.eventBusName,
+      },
+    });
+    const productCreatedRule = new events.Rule(this, 'ProductCreatedRule', {
       eventBus: defaultEventBus,
       eventPattern: {
         source: ['docdb.cdc'],
-        detailType: ['userCreated'],
+        detailType: ['productCreated'],
       },
-      targets: [new targets.LambdaFunction(userCreatedLambda)],
-    });
-
-    new CfnOutput(this, 'Docdb-endpoint-hostname', {
-      value: `${cluster.clusterEndpoint.hostname}`,
-    });
-    new CfnOutput(this, 'Docdb-endpoint-port', {
-      value: `${cluster.clusterEndpoint.port}`,
-    });
-    new CfnOutput(this, 'Docdb-cluster-identifier', {
-      value: `${cluster.clusterIdentifier}`,
-    });
-    new CfnOutput(this, 'Docdb-cluster-resource-identifier', {
-      value: `${cluster.clusterResourceIdentifier}`,
-    });
-    new CfnOutput(this, 'Docdb-cluster-secret-arn', {
-      value: `${cluster.secret?.secretArn}`,
+      targets: [new targets.LambdaFunction(productCreatedLambda)],
     });
   }
 }

@@ -27,7 +27,12 @@ export interface DocumentDbStackProps extends StackProps {
 }
 
 export class DocumentDbStack extends Stack {
-  constructor(scope: Construct, id: string, props?: DocumentDbStackProps) {
+  public readonly clusterId: string;
+  public readonly secretArn: string;
+  public readonly securityGroupId: string;
+  public readonly vpcId: string;
+
+  constructor(scope: Construct, id: string, props: DocumentDbStackProps) {
     super(scope, id, props);
 
     const vpc = ec2.Vpc.fromLookup(this, 'default-vpc-id', {
@@ -35,7 +40,7 @@ export class DocumentDbStack extends Stack {
     });
 
     const docDbSg = new ec2.SecurityGroup(this, 'DocDB-SG', {
-      vpc: vpc,
+      vpc,
     });
 
     docDbSg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(MONGO_DB_PORT));
@@ -43,15 +48,20 @@ export class DocumentDbStack extends Stack {
     const cluster = new docdb.DatabaseCluster(this, 'Database', {
       masterUser: {
         username: 'myuser', // NOTE: 'admin' is reserved by DocumentDB
-        secretName: 'DocumentDBSecret', // optional, if you prefer to specify the secret name
+        secretName: props.secretName, // optional, if you prefer to specify the secret name
       },
       dbClusterName: 'DocDbCluster',
       securityGroup: docDbSg,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MEDIUM),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO),
       engineVersion: '4.0.0',
       instances: 1,
       vpc,
     });
+
+    this.clusterId = cluster.clusterIdentifier;
+    this.secretArn = cluster.secret?.secretArn!;
+    this.securityGroupId = docDbSg.securityGroupId;
+    this.vpcId = vpc.vpcId;
 
     new CfnOutput(this, 'Docdb-endpoint-hostname', {
       value: `${cluster.clusterEndpoint.hostname}`,
