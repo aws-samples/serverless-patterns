@@ -1,7 +1,7 @@
 {
 	"title": "RDS Instance Event Subscription for Failure, Low Storage and Availability Events",
 	"description": "RDS Event Subscriptions allow users to configure notifications for RDS Events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances.",
-	"language": "",
+	"language": "YAML",
 	"level": "200",
 	"framework": "Terraform",
 	"introBox": {
