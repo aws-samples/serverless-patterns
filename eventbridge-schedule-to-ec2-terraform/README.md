@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# EventBridge Scheduler to start and stop EC2 instances Monday to Friday
 
 This pattern will create two [EventBridge schedules](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) that will start and stop a given array of instance-ids. You can control the start/stop time and timezone of your choosing. This example will start instances at 8:00am and stop them at 17:00am US/Eastern timezone. The pattern is deployed using Terraform to create the required VPC, EC2 and EventBridge Scheduler resources. 
 
