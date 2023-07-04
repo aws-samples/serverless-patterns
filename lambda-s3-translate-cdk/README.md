@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ### Removing the resources
 
-1. run `CDK Destroy <stack id>` for the specified stack that used this construct
+1. run `cdk destroy <stack id>` for the specified stack that used this construct
 
 ```
 git clone https://github.com/aws-samples/serverless-patterns/lambda-s3-translate-cdk
