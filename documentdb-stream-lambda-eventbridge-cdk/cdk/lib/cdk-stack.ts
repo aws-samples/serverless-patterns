@@ -106,7 +106,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
         sid: 'LambdaDocDBESMGetSecretValueAccess',
         effect: iam.Effect.ALLOW,
         actions: ['secretsmanager:GetSecretValue'],
-        resources: [`arn:aws:secretsmanager:${this.region}:${this.account}:secret:DocumentDBSecret`],
+        resources: [props.docDbClusterSecretArn],
       })
     );
 
