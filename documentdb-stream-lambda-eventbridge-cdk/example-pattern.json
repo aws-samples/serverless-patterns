@@ -30,6 +30,10 @@
         "link": "https://docs.aws.amazon.com/documentdb/latest/developerguide/get-started-guide.html"
       },
       {
+        "text": "Enabling Amazon DocumentDB Change Streams",
+        "link": "https://docs.aws.amazon.com/documentdb/latest/developerguide/change_streams.html#change_streams-enabling"
+      },
+      {
         "text": "Tutorial: Using AWS Lambda with Amazon DocumentDB Streams",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html"
       }
