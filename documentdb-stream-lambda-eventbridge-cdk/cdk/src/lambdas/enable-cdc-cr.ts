@@ -29,7 +29,7 @@ const enableCdcCrHandler = async (event: CdcEvent) => {
     const mongoCdcStreams = event.cdcStreams.map((stream: CdcStream) =>
       enableMongoChangeStream(mongoClient, event.databaseName, stream.collectionName)
     );
-    const responses = await Promise.all(mongoCdcStreams);
+    const responses = await Promise.allSettled(mongoCdcStreams);
 
     console.log('Mongo CDC Stream Responses:', JSON.stringify(responses, null, 2));
     await mongoClient.close();

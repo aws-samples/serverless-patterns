@@ -37,6 +37,5 @@ const writeMongoPublicKeyToTmp = async () => {
 
 export async function enableMongoChangeStream(mongoClient: MongoClient, databaseName: string, collectionName: string) {
   const db = mongoClient.db(databaseName);
-  const result = await db.admin().command({ modifyChangeStreams: 1, database: databaseName, collection: collectionName, enable: true });
-  console.log('modified Change Streams for mongo:', JSON.stringify(result, null, 2));
+  return db.admin().command({ modifyChangeStreams: 1, database: databaseName, collection: collectionName, enable: true });
 }
