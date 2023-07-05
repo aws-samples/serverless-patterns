@@ -1,0 +1,61 @@
+{
+  "title": "Serverless csv data load template",
+  "description": "Creates a serverless pattern to store and process csv data using s3, sqs, lambda and dynamodb services",
+  "language": "Python., Typescript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+             "The AWS CDK  template deploys s3 bucket, SQS queue, lambda and DynamoDB table."
+            
+             "SQS queue is configured to listen to s3 create object events"
+            
+             "Lambda is configured to read messages from the SQS queues, process them and insert records into DynamoDB table named EmployeeInfo."
+
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-s3-sqs-lambda-dynamodb",
+      "templateURL": "serverless-patterns/cdk-s3-sqs-lambda-dynamodb",
+      "projectFolder": "cdk-s3-sqs-lambda-dynamodb",
+      "templateFile": "cdk-s3-sqs-lambda-dynamodb/lib/my-cdk-project-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "S3 event notification types and detinations",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html"
+      },
+      {
+        "text": "Configuring SQS queue to use with Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#events-sqs-queueconfig"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Create Stack: <code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shashi Shankar",
+      "image": "./serverless-patterns/cdk-s3-sqs-lambda-dynamodb/assets/shankey28.jpg",
+      "bio": "Shashi Shankar is a Sr Cloud Architect at PwC Advisory services",
+      "linkedin": "https://www.linkedin.com/in/shashi-shankar-3a61a0a/",
+    }
+  ]
+}
