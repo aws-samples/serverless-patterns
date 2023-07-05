@@ -42,3 +42,7 @@ const patternStack = new DocumentDbStreamLambdaEventBridgeStack(app, 'DocumentDb
 
 // patternStack.addDependency(docDbStack);
 app.synth();
+
+// export const PEMFILE = '/tmp/my.pem'
+// import { writeFile } from 'node:fs/promises'
+// await writeFile(PEMFILE, SSL_CA)
