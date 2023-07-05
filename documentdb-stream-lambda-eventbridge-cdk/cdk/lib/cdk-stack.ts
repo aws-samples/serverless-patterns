@@ -17,8 +17,10 @@ export interface DocumentDbStreamLambdaEventBridgeStackProps extends StackProps 
   collectionName: string;
   docDbClusterId: string;
   docDbClusterSecretArn: string;
-  vpcId?: string;
   securityGroupId: string;
+  vpcId?: string;
+  vpcLambdaEndpointExist?: boolean;
+  vpcSecretManagerEndpointExist?: boolean;
 }
 export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
   constructor(scope: Construct, id: string, props: DocumentDbStreamLambdaEventBridgeStackProps) {
@@ -39,24 +41,27 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
 
     const docDbSg = ec2.SecurityGroup.fromLookupById(this, 'DocDB-SG', props.securityGroupId);
 
-    new ec2.InterfaceVpcEndpoint(this, 'VPC Endpoint for Secrets', {
-      vpc,
-      service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
-      subnets: {
-        subnets: vpc.publicSubnets,
-      },
-      securityGroups: [docDbSg],
-    });
+    if (!props.vpcSecretManagerEndpointExist) {
+      new ec2.InterfaceVpcEndpoint(this, 'VPC Endpoint for Secrets', {
+        vpc,
+        service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+        subnets: {
+          subnets: vpc.publicSubnets,
+        },
+        securityGroups: [docDbSg],
+      });
+    }
 
-    const lambdaVpcEndpoint = new ec2.InterfaceVpcEndpoint(this, 'VPC Endpoint for Lambda to enable CDC', {
-      vpc,
-      service: ec2.InterfaceVpcEndpointAwsService.LAMBDA,
-      subnets: {
-        subnets: vpc.publicSubnets,
-      },
-      securityGroups: [docDbSg],
-    });
-
+    if (!props.vpcLambdaEndpointExist) {
+      const lambdaVpcEndpoint = new ec2.InterfaceVpcEndpoint(this, 'VPC Endpoint for Lambda to enable CDC', {
+        vpc,
+        service: ec2.InterfaceVpcEndpointAwsService.LAMBDA,
+        subnets: {
+          subnets: vpc.publicSubnets,
+        },
+        securityGroups: [docDbSg],
+      });
+    }
     const productsCdcLambda = new nodejs.NodejsFunction(this, 'ProductsCdcLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'main',

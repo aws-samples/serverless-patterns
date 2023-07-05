@@ -20,6 +20,8 @@ const patternStack = new DocumentDbStreamLambdaEventBridgeStack(app, 'DocumentDb
   docDbClusterId: docDbStack.clusterId,
   docDbClusterSecretArn: docDbStack.secretArn,
   securityGroupId: docDbStack.securityGroupId,
+  vpcLambdaEndpointExist: false,
+  vpcSecretManagerEndpointExist: false,
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
