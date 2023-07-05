@@ -26,11 +26,30 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
   constructor(scope: Construct, id: string, props: DocumentDbStreamLambdaEventBridgeStackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
-
     // default event bus
     const defaultEventBus = events.EventBus.fromEventBusName(this, 'Default-Event-Bus', 'default');
 
+    const { vpc, docDbSg } = this.validateProps(props);
+
+    const productsCdcLambda = createProductsCdcLambda(this, {
+      vpc,
+      docDbSg,
+      defaultEventBus,
+      docDbClusterSecretArn: props.docDbClusterSecretArn,
+    });
+
+    createEnableCdcLambdaCustomResource(scope, {
+      vpc,
+      docDbSg,
+      productsCdcLambda,
+      docDbClusterId: props.docDbClusterId,
+      docDbClusterSecretArn: props.docDbClusterSecretArn,
+    });
+
+    createProductCreatedLambda(scope, { vpc, docDbSg, defaultEventBus });
+  }
+
+  private validateProps(props: DocumentDbStreamLambdaEventBridgeStackProps) {
     const vpc = !!props.vpcId
       ? ec2.Vpc.fromLookup(this, 'custom-vpc', {
           vpcId: props.vpcId,
@@ -62,120 +81,154 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
         securityGroups: [docDbSg],
       });
     }
-    const productsCdcLambda = new nodejs.NodejsFunction(this, 'ProductsCdcLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'main',
-      entry: 'src/lambdas/products-cdc.ts',
-      timeout: Duration.seconds(60),
-      vpc,
-      securityGroups: [docDbSg],
-      allowPublicSubnet: true,
-      environment: {
-        DEFAULT_EVENT_BUS: defaultEventBus.eventBusName,
-      },
-    });
-
-    defaultEventBus.grantPutEventsTo(productsCdcLambda);
-
-    productsCdcLambda.addToRolePolicy(
-      new iam.PolicyStatement({
-        sid: 'LambdaESMNetworkingAccess',
-        effect: iam.Effect.ALLOW,
-        actions: [
-          'ec2:CreateNetworkInterface',
-          'ec2:DescribeNetworkInterfaces',
-          'ec2:DescribeVpcs',
-          'ec2:DeleteNetworkInterface',
-          'ec2:DescribeSubnets',
-          'ec2:DescribeSecurityGroups',
-          'kms:Decrypt',
-        ],
-        resources: ['*'],
-      })
-    );
-    productsCdcLambda.addToRolePolicy(
-      new iam.PolicyStatement({
-        sid: 'LambdaDocDBESMAccess',
-        effect: iam.Effect.ALLOW,
-        actions: ['rds:DescribeDBClusters', 'rds:DescribeDBClusterParameters', 'rds:DescribeDBSubnetGroups'],
-        resources: ['*'],
-      })
-    );
-    productsCdcLambda.addToRolePolicy(
-      new iam.PolicyStatement({
-        sid: 'LambdaDocDBESMGetSecretValueAccess',
-        effect: iam.Effect.ALLOW,
-        actions: ['secretsmanager:GetSecretValue'],
-        resources: [props.docDbClusterSecretArn],
-      })
-    );
-
-    const enableCdcLambdaCR = new nodejs.NodejsFunction(this, 'EnableCdcLambdaCustomResource', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'main',
-      entry: 'src/lambdas/enable-cdc-cr.ts',
-      vpc,
-      securityGroups: [docDbSg],
-      allowPublicSubnet: true,
-    });
-
-    enableCdcLambdaCR.addToRolePolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ['lambda:CreateEventSourceMapping', 'lambda:UpdateEventSourceMapping', 'lambda:DeleteEventSourceMapping'],
-        resources: ['*'],
-      })
-    );
-
-    const awsSDKCall: cr.AwsSdkCall = {
-      service: 'Lambda',
-      action: 'invoke',
-      parameters: {
-        FunctionName: enableCdcLambdaCR.functionName,
-        Payload: JSON.stringify({
-          cdcStreams: [
-            {
-              cdcFunctionName: productsCdcLambda.functionName,
-              collectionName: 'products',
-            },
-          ],
-          databaseName: 'docdb',
-          clusterArn: `arn:aws:rds:${this.region}:${this.account}:cluster:${props.docDbClusterId}`,
-          authUri: props.docDbClusterSecretArn,
-          date: new Date(),
-        }),
-      },
-      physicalResourceId: cr.PhysicalResourceId.of(`enableCdcLambda`),
-    };
-    const customResource = new cr.AwsCustomResource(this, 'InvokeEnableCdcLambda', {
-      onCreate: awsSDKCall,
-      onUpdate: awsSDKCall,
-      policy: cr.AwsCustomResourcePolicy.fromSdkCalls({
-        resources: cr.AwsCustomResourcePolicy.ANY_RESOURCE,
-      }),
-    });
-
-    enableCdcLambdaCR.grantInvoke(customResource);
-
-    const productCreatedLambda = new nodejs.NodejsFunction(this, 'ProductCreatedLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'main',
-      entry: 'src/lambdas/product-created.ts',
-      timeout: Duration.seconds(60),
-      vpc,
-      securityGroups: [docDbSg],
-      allowPublicSubnet: true,
-      environment: {
-        DEFAULT_EVENT_BUS: defaultEventBus.eventBusName,
-      },
-    });
-    const productCreatedRule = new events.Rule(this, 'ProductCreatedRule', {
-      eventBus: defaultEventBus,
-      eventPattern: {
-        source: ['products.cdc'],
-        detailType: ['productCreated'],
-      },
-      targets: [new targets.LambdaFunction(productCreatedLambda)],
-    });
+    return { vpc, docDbSg };
   }
+}
+
+interface CreateProductsCdcLambdaProps {
+  vpc: ec2.IVpc;
+  docDbSg: ec2.ISecurityGroup;
+  defaultEventBus: events.IEventBus;
+  docDbClusterSecretArn: string;
+}
+function createProductsCdcLambda(scope: Construct, { defaultEventBus, docDbClusterSecretArn, docDbSg, vpc }: CreateProductsCdcLambdaProps) {
+  const productsCdcLambda = new nodejs.NodejsFunction(scope, 'ProductsCdcLambda', {
+    runtime: lambda.Runtime.NODEJS_18_X,
+    handler: 'main',
+    entry: 'src/lambdas/products-cdc.ts',
+    timeout: Duration.seconds(60),
+    vpc,
+    securityGroups: [docDbSg],
+    allowPublicSubnet: true,
+    environment: {
+      DEFAULT_EVENT_BUS: defaultEventBus.eventBusName,
+    },
+  });
+
+  defaultEventBus.grantPutEventsTo(productsCdcLambda);
+
+  productsCdcLambda.addToRolePolicy(
+    new iam.PolicyStatement({
+      sid: 'LambdaESMNetworkingAccess',
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'ec2:CreateNetworkInterface',
+        'ec2:DescribeNetworkInterfaces',
+        'ec2:DescribeVpcs',
+        'ec2:DeleteNetworkInterface',
+        'ec2:DescribeSubnets',
+        'ec2:DescribeSecurityGroups',
+        'kms:Decrypt',
+      ],
+      resources: ['*'],
+    })
+  );
+  productsCdcLambda.addToRolePolicy(
+    new iam.PolicyStatement({
+      sid: 'LambdaDocDBESMAccess',
+      effect: iam.Effect.ALLOW,
+      actions: ['rds:DescribeDBClusters', 'rds:DescribeDBClusterParameters', 'rds:DescribeDBSubnetGroups'],
+      resources: ['*'],
+    })
+  );
+  productsCdcLambda.addToRolePolicy(
+    new iam.PolicyStatement({
+      sid: 'LambdaDocDBESMGetSecretValueAccess',
+      effect: iam.Effect.ALLOW,
+      actions: ['secretsmanager:GetSecretValue'],
+      resources: [docDbClusterSecretArn],
+    })
+  );
+  return productsCdcLambda;
+}
+
+interface CreateEnableCdcLambdaCustomResourceProps {
+  vpc: ec2.IVpc;
+  docDbSg: ec2.ISecurityGroup;
+  productsCdcLambda: nodejs.NodejsFunction;
+  docDbClusterId: string;
+  docDbClusterSecretArn: string;
+}
+function createEnableCdcLambdaCustomResource(
+  scope: Construct,
+  { docDbSg, vpc, productsCdcLambda, docDbClusterId, docDbClusterSecretArn }: CreateEnableCdcLambdaCustomResourceProps
+) {
+  const enableCdcLambdaCR = new nodejs.NodejsFunction(scope, 'EnableCdcLambdaCustomResource', {
+    runtime: lambda.Runtime.NODEJS_18_X,
+    handler: 'main',
+    entry: 'src/lambdas/enable-cdc-cr.ts',
+    vpc,
+    securityGroups: [docDbSg],
+    allowPublicSubnet: true,
+  });
+
+  enableCdcLambdaCR.addToRolePolicy(
+    new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['lambda:CreateEventSourceMapping', 'lambda:UpdateEventSourceMapping', 'lambda:DeleteEventSourceMapping'],
+      resources: ['*'],
+    })
+  );
+
+  const awsSDKCall: cr.AwsSdkCall = {
+    service: 'Lambda',
+    action: 'invoke',
+    parameters: {
+      FunctionName: enableCdcLambdaCR.functionName,
+      Payload: JSON.stringify({
+        cdcStreams: [
+          {
+            cdcFunctionName: productsCdcLambda.functionName,
+            collectionName: 'products',
+          },
+        ],
+        databaseName: 'docdb',
+        clusterArn: `arn:aws:rds:${Stack.of(scope).region}:${Stack.of(scope).account}:cluster:${docDbClusterId}`,
+        authUri: docDbClusterSecretArn,
+        date: new Date(),
+      }),
+    },
+    physicalResourceId: cr.PhysicalResourceId.of(`enableCdcLambda`),
+  };
+  const customResource = new cr.AwsCustomResource(scope, 'InvokeEnableCdcLambda', {
+    onCreate: awsSDKCall,
+    onUpdate: awsSDKCall,
+    policy: cr.AwsCustomResourcePolicy.fromSdkCalls({
+      resources: cr.AwsCustomResourcePolicy.ANY_RESOURCE,
+    }),
+  });
+
+  enableCdcLambdaCR.grantInvoke(customResource);
+
+  return { enableCdcLambdaCR, customResource };
+}
+
+interface CreateProductCreatedLambdaProps {
+  vpc: ec2.IVpc;
+  docDbSg: ec2.ISecurityGroup;
+  defaultEventBus: events.IEventBus;
+}
+function createProductCreatedLambda(scope: Construct, { docDbSg, vpc, defaultEventBus }: CreateProductCreatedLambdaProps) {
+  const productCreatedLambda = new nodejs.NodejsFunction(scope, 'ProductCreatedLambda', {
+    runtime: lambda.Runtime.NODEJS_18_X,
+    handler: 'main',
+    entry: 'src/lambdas/product-created.ts',
+    timeout: Duration.seconds(60),
+    vpc,
+    securityGroups: [docDbSg],
+    allowPublicSubnet: true,
+    environment: {
+      DEFAULT_EVENT_BUS: defaultEventBus.eventBusName,
+    },
+  });
+  const productCreatedRule = new events.Rule(scope, 'ProductCreatedRule', {
+    eventBus: defaultEventBus,
+    eventPattern: {
+      source: ['products.cdc'],
+      detailType: ['productCreated'],
+    },
+    targets: [new targets.LambdaFunction(productCreatedLambda)],
+  });
+
+  return { productCreatedLambda, productCreatedRule };
 }
