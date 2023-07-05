@@ -21,7 +21,7 @@ const enableCdcCrHandler = async (event: CdcEvent) => {
   console.log('ENV:', process.env);
   const secret = await fetchSecretValue(event.secretName);
 
-  const mongoClient = initializeMongoClient(event.databaseName, secret);
+  const mongoClient = await initializeMongoClient(event.databaseName, secret);
 
   try {
     await mongoClient.connect();

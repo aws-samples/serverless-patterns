@@ -47,6 +47,8 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       docDbClusterId: props.docDbClusterId,
       docDbClusterSecretArn: props.docDbClusterSecretArn,
       secretName: props.secretName,
+      databaseName: props.databaseName,
+      collectionName: props.collectionName,
     });
 
     createProductCreatedLambda(this, { vpc, docDbSg, defaultEventBus });
@@ -162,10 +164,21 @@ interface CreateEnableCdcLambdaCustomResourceProps {
   secretName: string;
   docDbClusterId: string;
   docDbClusterSecretArn: string;
+  databaseName: string;
+  collectionName: string;
 }
 function createEnableCdcLambdaCustomResource(
   scope: Construct,
-  { docDbSg, vpc, productsCdcLambda, docDbClusterId, docDbClusterSecretArn, secretName }: CreateEnableCdcLambdaCustomResourceProps
+  {
+    docDbSg,
+    vpc,
+    productsCdcLambda,
+    docDbClusterId,
+    docDbClusterSecretArn,
+    secretName,
+    databaseName,
+    collectionName,
+  }: CreateEnableCdcLambdaCustomResourceProps
 ) {
   const enableCdcLambdaCR = new nodejs.NodejsFunction(scope, 'EnableCdcLambdaCustomResource', {
     runtime: lambda.Runtime.NODEJS_18_X,
@@ -189,22 +202,32 @@ function createEnableCdcLambdaCustomResource(
     })
   );
 
+  enableCdcLambdaCR.addToRolePolicy(
+    new iam.PolicyStatement({
+      sid: 'LambdaGetSecretValueAccessForDocDB',
+      effect: iam.Effect.ALLOW,
+      actions: ['secretsmanager:GetSecretValue'],
+      resources: [docDbClusterSecretArn],
+    })
+  );
+
   const awsSDKCall: cr.AwsSdkCall = {
     service: 'Lambda',
     action: 'invoke',
     parameters: {
       FunctionName: enableCdcLambdaCR.functionName,
       Payload: JSON.stringify({
-        secretName,
-        authUri: docDbClusterSecretArn,
-        clusterArn: `arn:aws:rds:${Stack.of(scope).region}:${Stack.of(scope).account}:cluster:${docDbClusterId}`,
-        databaseName: 'docdb',
         cdcStreams: [
           {
             cdcFunctionName: productsCdcLambda.functionName,
-            collectionName: 'products',
+            collectionName,
           },
         ],
+        secretName,
+        databaseName,
+        authUri: docDbClusterSecretArn,
+        clusterArn: `arn:aws:rds:${Stack.of(scope).region}:${Stack.of(scope).account}:cluster:${docDbClusterId}`,
+        date: new Date(),
       }),
     },
     physicalResourceId: cr.PhysicalResourceId.of(`enableCdcLambda`),
