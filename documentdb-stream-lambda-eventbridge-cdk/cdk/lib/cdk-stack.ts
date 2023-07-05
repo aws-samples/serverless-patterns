@@ -174,6 +174,11 @@ function createEnableCdcLambdaCustomResource(
     vpc,
     securityGroups: [docDbSg],
     allowPublicSubnet: true,
+    bundling: {
+      sourceMap: true,
+      minify: true,
+      externalModules: [], // this is necessary because with NODEJS_18_X the bundled version of the sdk is not the recent one
+    },
   });
 
   enableCdcLambdaCR.addToRolePolicy(
@@ -194,13 +199,12 @@ function createEnableCdcLambdaCustomResource(
           {
             cdcFunctionName: productsCdcLambda.functionName,
             collectionName: 'products',
+            databaseName: 'docdb',
+            secretName: secretName,
+            clusterArn: `arn:aws:rds:${Stack.of(scope).region}:${Stack.of(scope).account}:cluster:${docDbClusterId}`,
+            authUri: docDbClusterSecretArn,
           },
         ],
-        databaseName: 'docdb',
-        secretName: secretName,
-        clusterArn: `arn:aws:rds:${Stack.of(scope).region}:${Stack.of(scope).account}:cluster:${docDbClusterId}`,
-        authUri: docDbClusterSecretArn,
-        date: new Date(),
       }),
     },
     physicalResourceId: cr.PhysicalResourceId.of(`enableCdcLambda`),
