@@ -6,9 +6,13 @@ import { DocumentDbStack } from '../lib/db-stack';
 
 const app = new cdk.App();
 
-const docDbStack = new DocumentDbStack(app, 'DocumentDbStack', {
-  secretName: 'DocumentDBSecret',
-});
+// const docDbStack = new DocumentDbStack(app, 'DocumentDbStack', {
+//   secretName: 'DocumentDBSecret',
+//   env: {
+//     region: process.env.CDK_DEFAULT_REGION,
+//     account: process.env.CDK_DEFAULT_ACCOUNT,
+//   },
+// });
 
 const patternStack = new DocumentDbStreamLambdaEventBridgeStack(app, 'DocumentDbStreamLambdaEventBridgeStack', {
   env: {
@@ -17,9 +21,9 @@ const patternStack = new DocumentDbStreamLambdaEventBridgeStack(app, 'DocumentDb
   },
   databaseName: 'docdb',
   collectionName: 'products',
-  docDbClusterId: docDbStack.clusterId,
-  docDbClusterSecretArn: docDbStack.secretArn,
-  securityGroupId: docDbStack.securityGroupId,
+  docDbClusterId: 'docdbcluster',
+  docDbClusterSecretArn: 'arn:aws:secretsmanager:us-east-2:640999649296:secret:DocumentDBSecret-HMIA1G',
+  securityGroupId: 'sg-06a7bec23b05bb040',
   vpcLambdaEndpointExist: false,
   vpcSecretManagerEndpointExist: false,
   /* If you don't specify 'env', this stack will be environment-agnostic.
@@ -34,4 +38,4 @@ const patternStack = new DocumentDbStreamLambdaEventBridgeStack(app, 'DocumentDb
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
 
-patternStack.addDependency(docDbStack);
+// patternStack.addDependency(docDbStack);

@@ -38,7 +38,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       docDbClusterSecretArn: props.docDbClusterSecretArn,
     });
 
-    createEnableCdcLambdaCustomResource(scope, {
+    createEnableCdcLambdaCustomResource(this, {
       vpc,
       docDbSg,
       productsCdcLambda,
@@ -46,7 +46,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       docDbClusterSecretArn: props.docDbClusterSecretArn,
     });
 
-    createProductCreatedLambda(scope, { vpc, docDbSg, defaultEventBus });
+    createProductCreatedLambda(this, { vpc, docDbSg, defaultEventBus });
   }
 
   private validateProps(props: DocumentDbStreamLambdaEventBridgeStackProps) {
