@@ -1,4 +1,7 @@
 import { CreateEventSourceMappingCommand, LambdaClient } from '@aws-sdk/client-lambda';
+import { fetchSecretValue } from '../clients/secret-manager';
+import { initializeMongoClient, enableMongoChangeStream } from '../clients/mongo';
+
 const lambdaClient = new LambdaClient({
   region: process.env.AWS_REGION!,
 });
@@ -6,6 +9,25 @@ const lambdaClient = new LambdaClient({
 const enableCdcCr = async (event: any) => {
   console.log('Event:', event);
   console.log('ENV:', process.env);
+  const secret = await fetchSecretValue(event.secretName);
+
+  const mongoClient = initializeMongoClient(event.databaseName, secret);
+
+  try {
+    await mongoClient.connect();
+
+    const mongoCdcStreams = event.cdcStreams.map((stream: { cdcFunctionName: string; collectionName: string }) =>
+      enableMongoChangeStream(mongoClient, event.databaseName, stream.collectionName)
+    );
+    const responses = await Promise.all(mongoCdcStreams);
+
+    console.log('Mongo CDC Stream Responses:', JSON.stringify(responses, null, 2));
+    await mongoClient.close();
+  } catch (error: any) {
+    await mongoClient.close();
+    console.error('Error in enabling CDC on Mongo:', error);
+    throw error;
+  }
   try {
     const eventSourceMappings = event.cdcStreams.map((stream: { cdcFunctionName: string; collectionName: string }) =>
       lambdaClient.send(
@@ -27,23 +49,6 @@ const enableCdcCr = async (event: any) => {
 
     const responses = await Promise.all(eventSourceMappings);
 
-    // const responses = await lambdaClient.send(
-    //   new CreateEventSourceMappingCommand({
-    //     FunctionName: 'DocumentDbStreamLambdaEve-UserCreatedLambdaAB3AB66-gCYp2th38DnS',
-    //     EventSourceArn: 'arn:aws:rds:us-east-2:640999649296:cluster:docdbcluster',
-    //     BatchSize: 100,
-    //     StartingPosition: 'AT_TIMESTAMP',
-    //     StartingPositionTimestamp: new Date(),
-    //     SourceAccessConfigurations: [
-    //       { Type: 'BASIC_AUTH', URI: 'arn:aws:secretsmanager:us-east-2:640999649296:secret:DocumentDBSecret-5qwSpF' },
-    //     ],
-    //     DocumentDBEventSourceConfig: {
-    //       DatabaseName: 'docdb',
-    //       CollectionName: 'products',
-    //       FullDocument: 'UpdateLookup',
-    //     },
-    //   })
-    // );
     console.log('Responses:', JSON.stringify(responses, null, 2));
     // const errors = responses.filter(
     //   (response) => response.status === 'rejected' && response.reason.name !== 'ResourceConflictException'
@@ -60,7 +65,7 @@ const enableCdcCr = async (event: any) => {
       PhysicalResourceId: '-' + new Date().toISOString(),
     };
   } catch (error: any) {
-    console.error('Error in enabling CDC:', error);
+    console.error('Error in enabling Event Source Mapping on Lambda:', error);
     throw error;
   }
 };

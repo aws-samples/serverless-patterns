@@ -24,8 +24,10 @@
     "@aws-sdk/client-docdb": "^3.272.0",
     "@aws-sdk/client-eventbridge": "^3.245.0",
     "@aws-sdk/client-lambda": "^3.245.0",
+    "@aws-sdk/client-secrets-manager": "^3.363.0",
     "aws-cdk-lib": "2.76.0",
     "constructs": "^10.0.0",
+    "mongodb": "^5.6.0",
     "source-map-support": "^0.5.21"
   }
 }
