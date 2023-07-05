@@ -7,9 +7,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-             "The AWS CDK  template deploys s3 bucket, SQS queue, lambda and DynamoDB table."
+             "The AWS CDK  template deploys s3 bucket, SQS queue, lambda and DynamoDB table.",
             
-             "SQS queue is configured to listen to s3 create object events"
+             "SQS queue is configured to listen to s3 create object events",
             
              "Lambda is configured to read messages from the SQS queues, process them and insert records into DynamoDB table named EmployeeInfo."
 
