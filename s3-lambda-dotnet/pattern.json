@@ -1,0 +1,60 @@
+{
+  "title": "S3 to .NET Lambda",
+  "description": "Automate the creation of thumbnail images from new images on Amazon S3 leveraging Lambda and .NET",
+  "language": "C#",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a S3 bucket for image hosting with a Lambda triggered by new images that will create thumbnails.",
+      "Generate .NET 6 docker image for the function, deploy Lambda with the function, create folder 'images' in the newly created S3 bucket, upload images to images folder in the new S3 bucket.",
+      "When a .jpeg is uploaded, Lambda creates new thumbnail folder in S3 and writes the resized image."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-dotnet",
+      "templateURL": "serverless-patterns/s3-lambda-dotnet",
+      "projectFolder": "s3-lambda-dotnet",
+      "templateFile": "s3-lambda-dotnet/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using an Amazon S3 trigger to invoke a Lambda function",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Building Lambda functions with C#",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-csharp.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo readme for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Empty the S3 bucket",
+      "sam delete --stack-name STACK_NAME"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Garrett Johnson",
+      "image": "",
+      "bio": "Garrett is a Sr. Solutions Architect at AWS based in Utah.",
+      "linkedin": "garrett-johnson-30998247"
+    }
+  ]
+}
