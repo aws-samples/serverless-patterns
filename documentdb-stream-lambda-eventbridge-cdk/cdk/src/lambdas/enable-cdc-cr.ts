@@ -45,7 +45,7 @@ const enableCdcCrHandler = async (event: CdcEvent) => {
           FunctionName: stream.cdcFunctionName,
           EventSourceArn: event.clusterArn,
           BatchSize: 100,
-          StartingPosition: 'TRIM_HORIZON',
+          StartingPosition: 'LATEST',
           SourceAccessConfigurations: [{ Type: 'BASIC_AUTH', URI: event.authUri }],
           DocumentDBEventSourceConfig: {
             DatabaseName: event.databaseName,
