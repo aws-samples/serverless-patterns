@@ -1,28 +1,39 @@
-import { PutEventsCommand } from '@aws-sdk/client-eventbridge'
-import { eventBridgeClient } from '../clients/eventbridge'
-import { DocumentDBStreamEvent } from '../types/documentdb-stream-event'
+import { PutEventsCommand } from '@aws-sdk/client-eventbridge';
+import { eventBridgeClient } from '../clients/eventbridge';
+import { DocumentDBStreamEvent } from '../types/documentdb-stream-event';
 
-const usersCdc = async (
-  event: DocumentDBStreamEvent
-): Promise<void> => {
-  console.log(JSON.stringify(event, null, 2))
-  const { events } = event
-  const eventBridgeEvents = events.map(event => ({
+const productsCdc = async (event: DocumentDBStreamEvent): Promise<void> => {
+  console.log(JSON.stringify(event, null, 2));
+  const { events } = event;
+  const eventBridgeEvents = events.map((event) => ({
     EventBusName: process.env.DEFAULT_EVENT_BUS! || 'default',
     Detail: JSON.stringify({
       documentKey: event.event.documentKey,
       fullDocument: event.event.fullDocument || {},
-      updateDescription: event.event.updateDescription || {}
+      updateDescription: event.event.updateDescription || {},
     }),
-    DetailType: event.event.fullDocument?.template || 'delete_device',
-    Source: 'Users_CDC'
-  }))
+    DetailType: getEventType(event.event.operationType),
+    Source: 'products.cdc',
+  }));
   const response = await eventBridgeClient.send(
     new PutEventsCommand({
-      Entries: eventBridgeEvents
+      Entries: eventBridgeEvents,
     })
-  )
-  console.log('EventBridge Response', response)
+  );
+  console.log('EventBridge Response', response);
+};
+
+function getEventType(operationType: string) {
+  switch (operationType) {
+    case 'insert':
+      return 'productCreated';
+    case 'update':
+      return 'productUpdated';
+    case 'delete':
+      return 'productDeleted';
+    default:
+      return 'UnknownEvent';
+  }
 }
 
-export const main = usersCdc
+export const main = productsCdc;

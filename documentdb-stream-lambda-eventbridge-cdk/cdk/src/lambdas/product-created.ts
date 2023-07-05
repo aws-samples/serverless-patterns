@@ -1,5 +1,7 @@
 import { EventBridgeEvent } from 'aws-lambda';
 
-const userCreated = async (event: EventBridgeEvent<string, string>): Promise<void> => {};
+const productCreated = async (event: EventBridgeEvent<string, string>): Promise<void> => {
+  console.log('Product Created with Event: ', event);
+};
 
-export const main = userCreated;
+export const main = productCreated;

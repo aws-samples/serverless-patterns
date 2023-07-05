@@ -172,7 +172,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
     const productCreatedRule = new events.Rule(this, 'ProductCreatedRule', {
       eventBus: defaultEventBus,
       eventPattern: {
-        source: ['docdb.cdc'],
+        source: ['products.cdc'],
         detailType: ['productCreated'],
       },
       targets: [new targets.LambdaFunction(productCreatedLambda)],
