@@ -8,6 +8,9 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
+    "esbuild": "rm -rf dist && esbuild ./src/lambdas/* --bundle --entry-names=[dir]/[name]/index --sourcemap --platform=node --target=node18.14 --outdir=dist",
+    "package": "cd dist && for f in * ; do ([ -d \"$f\" ] && cd $f && zip ../$f.zip *) ; done",
+    "bundle": "npm run esbuild && npm run package",
     "cdk": "cdk"
   },
   "devDependencies": {
@@ -21,10 +24,6 @@
     "typescript": "~4.9.5"
   },
   "dependencies": {
-    "@aws-sdk/client-docdb": "^3.272.0",
-    "@aws-sdk/client-eventbridge": "^3.245.0",
-    "@aws-sdk/client-lambda": "^3.245.0",
-    "@aws-sdk/client-secrets-manager": "^3.363.0",
     "aws-cdk-lib": "2.76.0",
     "constructs": "^10.0.0",
     "mongodb": "^5.6.0",

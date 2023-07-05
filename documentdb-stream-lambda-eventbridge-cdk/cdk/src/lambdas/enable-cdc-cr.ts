@@ -6,7 +6,16 @@ const lambdaClient = new LambdaClient({
   region: process.env.AWS_REGION!,
 });
 
-const enableCdcCr = async (event: any) => {
+type CdcStream = {
+  cdcFunctionName: string;
+  authUri: string;
+  secretName: string;
+  clusterArn: string;
+  databaseName: string;
+  collectionName: string;
+};
+
+const enableCdcCrHandler = async (event: any) => {
   console.log('Event:', event);
   console.log('ENV:', process.env);
   const secret = await fetchSecretValue(event.secretName);
@@ -29,17 +38,16 @@ const enableCdcCr = async (event: any) => {
     throw error;
   }
   try {
-    const eventSourceMappings = event.cdcStreams.map((stream: { cdcFunctionName: string; collectionName: string }) =>
+    const eventSourceMappings = event.cdcStreams.map((stream: CdcStream) =>
       lambdaClient.send(
         new CreateEventSourceMappingCommand({
           FunctionName: stream.cdcFunctionName,
-          EventSourceArn: event.clusterArn,
+          EventSourceArn: stream.clusterArn,
           BatchSize: 100,
-          StartingPosition: 'AT_TIMESTAMP',
-          StartingPositionTimestamp: new Date(),
-          SourceAccessConfigurations: [{ Type: 'BASIC_AUTH', URI: event.authUri }],
+          StartingPosition: 'TRIM_HORIZON',
+          SourceAccessConfigurations: [{ Type: 'BASIC_AUTH', URI: stream.authUri }],
           DocumentDBEventSourceConfig: {
-            DatabaseName: event.databaseName,
+            DatabaseName: stream.databaseName,
             CollectionName: stream.collectionName,
             FullDocument: 'UpdateLookup',
           },
@@ -47,20 +55,18 @@ const enableCdcCr = async (event: any) => {
       )
     );
 
-    const responses = await Promise.all(eventSourceMappings);
+    const responses = await Promise.allSettled(eventSourceMappings);
 
     console.log('Responses:', JSON.stringify(responses, null, 2));
-    // const errors = responses.filter(
-    //   (response) => response.status === 'rejected' && response.reason.name !== 'ResourceConflictException'
-    // );
-    // if (errors.length > 0) {
-    //   const errorsMessages = errors.map((error) => {
-    //     if (error.status === 'rejected') {
-    //       return error?.reason.name;
-    //     }
-    //   });
-    //   throw new Error(errorsMessages.join(','));
-    // }
+    const errors = responses.filter((response) => response.status === 'rejected' && response.reason.name !== 'ResourceConflictException');
+    if (errors.length > 0) {
+      const errorsMessages = errors.map((error) => {
+        if (error.status === 'rejected') {
+          return error?.reason.name;
+        }
+      });
+      throw new Error(errorsMessages.join(','));
+    }
     return {
       PhysicalResourceId: '-' + new Date().toISOString(),
     };
@@ -70,4 +76,4 @@ const enableCdcCr = async (event: any) => {
   }
 };
 
-export const main = enableCdcCr;
+export const main = enableCdcCrHandler;

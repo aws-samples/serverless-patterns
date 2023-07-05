@@ -1,0 +1,24 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-docdb": "^3.360.0",
+    "@aws-sdk/client-eventbridge": "^3.360.0",
+    "@aws-sdk/client-lambda": "3.360.0",
+    "@aws-sdk/client-secrets-manager": "^3.363.0",
+    "mongodb": "^5.6.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.89",
+    "@types/node": "10.17.27",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  },
+  "author": "",
+  "license": "ISC"
+}

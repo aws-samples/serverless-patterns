@@ -22,9 +22,11 @@ const patternStack = new DocumentDbStreamLambdaEventBridgeStack(app, 'DocumentDb
   databaseName: 'docdb',
   collectionName: 'products',
   docDbClusterId: 'docdbcluster',
+  secretName: 'DocumentDBSecret',
   docDbClusterSecretArn: 'arn:aws:secretsmanager:us-east-2:640999649296:secret:DocumentDBSecret-HMIA1G',
   securityGroupId: 'sg-06a7bec23b05bb040',
   vpcLambdaEndpointExist: false,
+  vpcEventBridgeEndpointExist: false,
   vpcSecretManagerEndpointExist: false,
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
@@ -39,3 +41,4 @@ const patternStack = new DocumentDbStreamLambdaEventBridgeStack(app, 'DocumentDb
 });
 
 // patternStack.addDependency(docDbStack);
+app.synth();

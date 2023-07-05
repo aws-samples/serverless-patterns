@@ -13,6 +13,7 @@ import {
 } from 'aws-cdk-lib';
 
 export interface DocumentDbStreamLambdaEventBridgeStackProps extends StackProps {
+  secretName: string;
   databaseName: string;
   collectionName: string;
   docDbClusterId: string;
@@ -20,6 +21,7 @@ export interface DocumentDbStreamLambdaEventBridgeStackProps extends StackProps 
   securityGroupId: string;
   vpcId?: string;
   vpcLambdaEndpointExist?: boolean;
+  vpcEventBridgeEndpointExist?: boolean;
   vpcSecretManagerEndpointExist?: boolean;
 }
 export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
@@ -44,6 +46,7 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       productsCdcLambda,
       docDbClusterId: props.docDbClusterId,
       docDbClusterSecretArn: props.docDbClusterSecretArn,
+      secretName: props.secretName,
     });
 
     createProductCreatedLambda(this, { vpc, docDbSg, defaultEventBus });
@@ -75,6 +78,16 @@ export class DocumentDbStreamLambdaEventBridgeStack extends Stack {
       const lambdaVpcEndpoint = new ec2.InterfaceVpcEndpoint(this, 'VPC Endpoint for Lambda to enable CDC', {
         vpc,
         service: ec2.InterfaceVpcEndpointAwsService.LAMBDA,
+        subnets: {
+          subnets: vpc.publicSubnets,
+        },
+        securityGroups: [docDbSg],
+      });
+    }
+    if (!props.vpcEventBridgeEndpointExist) {
+      const eventBridgeVpcEndpoint = new ec2.InterfaceVpcEndpoint(this, 'VPC Endpoint for EventBridge to enable CDC', {
+        vpc,
+        service: ec2.InterfaceVpcEndpointAwsService.EVENTBRIDGE,
         subnets: {
           subnets: vpc.publicSubnets,
         },
@@ -146,12 +159,13 @@ interface CreateEnableCdcLambdaCustomResourceProps {
   vpc: ec2.IVpc;
   docDbSg: ec2.ISecurityGroup;
   productsCdcLambda: nodejs.NodejsFunction;
+  secretName: string;
   docDbClusterId: string;
   docDbClusterSecretArn: string;
 }
 function createEnableCdcLambdaCustomResource(
   scope: Construct,
-  { docDbSg, vpc, productsCdcLambda, docDbClusterId, docDbClusterSecretArn }: CreateEnableCdcLambdaCustomResourceProps
+  { docDbSg, vpc, productsCdcLambda, docDbClusterId, docDbClusterSecretArn, secretName }: CreateEnableCdcLambdaCustomResourceProps
 ) {
   const enableCdcLambdaCR = new nodejs.NodejsFunction(scope, 'EnableCdcLambdaCustomResource', {
     runtime: lambda.Runtime.NODEJS_18_X,
@@ -160,6 +174,11 @@ function createEnableCdcLambdaCustomResource(
     vpc,
     securityGroups: [docDbSg],
     allowPublicSubnet: true,
+    bundling: {
+      sourceMap: true,
+      minify: true,
+      externalModules: [], // this is necessary because with NODEJS_18_X the bundled version of the sdk is not the recent one
+    },
   });
 
   enableCdcLambdaCR.addToRolePolicy(
@@ -180,12 +199,12 @@ function createEnableCdcLambdaCustomResource(
           {
             cdcFunctionName: productsCdcLambda.functionName,
             collectionName: 'products',
+            databaseName: 'docdb',
+            secretName: secretName,
+            clusterArn: `arn:aws:rds:${Stack.of(scope).region}:${Stack.of(scope).account}:cluster:${docDbClusterId}`,
+            authUri: docDbClusterSecretArn,
           },
         ],
-        databaseName: 'docdb',
-        clusterArn: `arn:aws:rds:${Stack.of(scope).region}:${Stack.of(scope).account}:cluster:${docDbClusterId}`,
-        authUri: docDbClusterSecretArn,
-        date: new Date(),
       }),
     },
     physicalResourceId: cr.PhysicalResourceId.of(`enableCdcLambda`),
