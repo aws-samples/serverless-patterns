@@ -6,16 +6,17 @@ const lambdaClient = new LambdaClient({
   region: process.env.AWS_REGION!,
 });
 
-type CdcStream = {
-  cdcFunctionName: string;
+type CdcStream = { cdcFunctionName: string; collectionName: string };
+
+type CdcEvent = {
+  cdcStreams: CdcStream[];
   authUri: string;
   secretName: string;
   clusterArn: string;
   databaseName: string;
-  collectionName: string;
 };
 
-const enableCdcCrHandler = async (event: any) => {
+const enableCdcCrHandler = async (event: CdcEvent) => {
   console.log('Event:', event);
   console.log('ENV:', process.env);
   const secret = await fetchSecretValue(event.secretName);
@@ -25,7 +26,7 @@ const enableCdcCrHandler = async (event: any) => {
   try {
     await mongoClient.connect();
 
-    const mongoCdcStreams = event.cdcStreams.map((stream: { cdcFunctionName: string; collectionName: string }) =>
+    const mongoCdcStreams = event.cdcStreams.map((stream: CdcStream) =>
       enableMongoChangeStream(mongoClient, event.databaseName, stream.collectionName)
     );
     const responses = await Promise.all(mongoCdcStreams);
@@ -42,12 +43,12 @@ const enableCdcCrHandler = async (event: any) => {
       lambdaClient.send(
         new CreateEventSourceMappingCommand({
           FunctionName: stream.cdcFunctionName,
-          EventSourceArn: stream.clusterArn,
+          EventSourceArn: event.clusterArn,
           BatchSize: 100,
           StartingPosition: 'TRIM_HORIZON',
-          SourceAccessConfigurations: [{ Type: 'BASIC_AUTH', URI: stream.authUri }],
+          SourceAccessConfigurations: [{ Type: 'BASIC_AUTH', URI: event.authUri }],
           DocumentDBEventSourceConfig: {
-            DatabaseName: stream.databaseName,
+            DatabaseName: event.databaseName,
             CollectionName: stream.collectionName,
             FullDocument: 'UpdateLookup',
           },

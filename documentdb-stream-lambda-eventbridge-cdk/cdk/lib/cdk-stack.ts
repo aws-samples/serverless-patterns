@@ -195,14 +195,14 @@ function createEnableCdcLambdaCustomResource(
     parameters: {
       FunctionName: enableCdcLambdaCR.functionName,
       Payload: JSON.stringify({
+        secretName,
+        authUri: docDbClusterSecretArn,
+        clusterArn: `arn:aws:rds:${Stack.of(scope).region}:${Stack.of(scope).account}:cluster:${docDbClusterId}`,
+        databaseName: 'docdb',
         cdcStreams: [
           {
             cdcFunctionName: productsCdcLambda.functionName,
             collectionName: 'products',
-            databaseName: 'docdb',
-            secretName: secretName,
-            clusterArn: `arn:aws:rds:${Stack.of(scope).region}:${Stack.of(scope).account}:cluster:${docDbClusterId}`,
-            authUri: docDbClusterSecretArn,
           },
         ],
       }),
