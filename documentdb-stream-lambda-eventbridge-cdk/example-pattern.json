@@ -2,7 +2,7 @@
   "title": "DocumentDB Lambda Stream",
   "description": "Create a DocumentDB stream that publishes events to EventBridge",
   "language": "TypeScript",
-  "level": "300",
+  "level": "400",
   "framework": "CDK",
   "services": {
     "from": "documentdb",
@@ -32,10 +32,6 @@
       {
         "text": "Tutorial: Using AWS Lambda with Amazon DocumentDB Streams",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html"
-      },
-      {
-        "text": "AWS Solutions Constructs for API Gateway integration to IoT Core",
-        "link": "https://github.com/awslabs/aws-solutions-constructs/tree/58e726ff2050a4d6ff4734a6b556e1f81d97e9aa/source/patterns/%40aws-solutions-constructs/aws-apigateway-iot"
       }
     ]
   },

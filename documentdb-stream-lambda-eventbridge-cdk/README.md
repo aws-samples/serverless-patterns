@@ -46,6 +46,7 @@ This pattern will use an already existing AWS DocumentDB Database and attach a l
 The following resources will be provisioned:
 
 - A Lambda Function that process the changes from an already existing DocumentDB Database and sends them to an EventBridge Bus
+- An AWS CDK Custom Resource Lambda Function that enables the CDC of DocumentDB onto the stream Lambda Function
 - A VPC Endpoint for the AWS Lambda Service (This is crucial to enabling the Lambda Event Source Mapping off of the DocumentDB Database)
 - A VPC Endpoint for the AWS Secret Manager Service (This is crucial to allow the Lambda Event Source Mapping off of the DocumentDB Database)
 - An EventBridge Bus that will receive changes from the Lambda and publish them to an EventBridge Rule
@@ -62,8 +63,10 @@ This pattern attaches a CDC Lambda Stream to an already existing DocumentDB Stre
 
 1. DocumentDB Cluster ARN
 2. AWS Secret Manager ARN for the Database
-3. AWS VPC ID where the DocumentDB Cluster is provisioned
+3. AWS VPC ID where the DocumentDB Cluster is provisioned (if not provided will use default VPC)
 4. AWS Security Group ID for the DocumentDB Cluster
+5. DocumentDB Database Name
+6. DocumentDB Collection Name
 
 ### AWS Console Part
 
