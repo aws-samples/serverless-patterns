@@ -185,6 +185,7 @@ function createEnableCdcLambdaCustomResource(
     handler: 'main',
     entry: 'src/lambdas/enable-cdc-cr.ts',
     vpc,
+    timeout: Duration.seconds(30),
     securityGroups: [docDbSg],
     allowPublicSubnet: true,
     bundling: {
