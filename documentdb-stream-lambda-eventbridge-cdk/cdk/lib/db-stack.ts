@@ -34,7 +34,7 @@ export class DocumentDbStack extends Stack {
       },
       dbClusterName: 'DocDbCluster',
       securityGroup: docDbSg,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MEDIUM),
       engineVersion: '4.0.0',
       instances: 1,
       vpc,
