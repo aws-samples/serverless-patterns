@@ -1,0 +1,68 @@
+{
+  "title": "Cross account AMI monitoring automation using Terraform",
+  "description": "Setup auditing and monitoring for cross account shared Amazon Machine Image(AMI)",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This solution will help customers to create auditing and monitoring solution for cross accounts shared AWS AMI. This will also alert customers when any de-registered AMI is still getting used in any AWS Service. This pattern will help customers to provide insights about AMI usage and reduce any production issue in case any de-registered AMI is referred in customers production account."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cross-account-ami-monitoring-automation-terraform",
+      "templateURL": "serverless-patterns/cross-account-ami-monitoring-automation-terraform",
+      "projectFolder": "cross-account-ami-monitoring-automation-terraform",
+      "templateFile": "cross-account-ami-monitoring-automation-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "test": "AWS Lambda function best practices",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html"
+      },
+      {
+        "test": "AWS AMI sharing across AWS Accounts",
+        "link": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/sharingamis-explicit.html"
+      },
+      {
+        "test": "Best practices for Lambda function with Python",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html"
+      },
+      {
+        "test": "AMI sharing across AWS accounts",
+        "link": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/sharingamis-explicit.html"
+      },
+      {
+        "text": "Launch EC2 using custom AMI",
+        "link": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Naveen Suthar",
+      "image": "https://avatars.githubusercontent.com/naveen-amzn",
+      "bio": "DevOps Consultant at AWS Professional Services, AWS 4X Certified, Terraform Certified",
+      "linkedin": "https://www.linkedin.com/in/naveenrsuthar"
+    }
+  ]
+}
