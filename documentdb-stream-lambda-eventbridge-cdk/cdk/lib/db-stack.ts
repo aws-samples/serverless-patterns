@@ -45,20 +45,20 @@ export class DocumentDbStack extends Stack {
     this.securityGroupId = docDbSg.securityGroupId;
     this.vpcId = vpc.vpcId;
 
-    new CfnOutput(this, 'Docdb-endpoint-hostname', {
-      value: `${cluster.clusterEndpoint.hostname}`,
+    new CfnOutput(this, 'Docdb-vpc-id', {
+      value: this.vpcId,
     });
     new CfnOutput(this, 'Docdb-endpoint-port', {
-      value: `${cluster.clusterEndpoint.port}`,
+      value: cluster.clusterEndpoint.port.toString(),
     });
     new CfnOutput(this, 'Docdb-cluster-identifier', {
-      value: `${cluster.clusterIdentifier}`,
+      value: cluster.clusterIdentifier,
     });
-    new CfnOutput(this, 'Docdb-cluster-resource-identifier', {
-      value: `${cluster.clusterResourceIdentifier}`,
+    new CfnOutput(this, 'Docdb-security-groupId', {
+      value: this.securityGroupId,
     });
     new CfnOutput(this, 'Docdb-cluster-secret-arn', {
-      value: `${cluster.secret?.secretArn}`,
+      value: cluster.secret?.secretArn!,
     });
   }
 }
