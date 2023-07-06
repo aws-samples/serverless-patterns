@@ -42,6 +42,18 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 This pattern will use an already existing Amazon DocumentDB Database and attach a lambda function that will stream any change detected to the items in the aforementioned database.
+Technically, there are 2 parts to attach and configure the stream:
+
+1. Enable Change Stream on the Mongo database collection in DocumentDB
+2. Create and configure an Event Source Mapping on a specific lambda for that database collection
+
+This solution creates an AWS CDK Custom Resource backed by a Lambda. This CR lambda does the following:
+
+1. Takes a lambda function name as an input to use it as the DocumentDB Stream
+2. Fetches the DocDB secret from Secrets Manager
+3. Creates a connection with DocDB Cluster
+4. Enables the Change Stream on a specific database-collection combination
+5. Creates and configures an Event Source mapping on the given lambda from step(1)
 
 The following resources will be provisioned:
 
@@ -55,7 +67,7 @@ The following resources will be provisioned:
 
 ## Testing
 
-To test this pattern you will need to use both the AWS Console and the AWS CLI.
+There are multiple ways to test this pattern. A convenient way to test it is using AWS Cloud9 Environment from the AWS Console & using the AWS CLI in conjunction.
 
 ### Inputs
 
@@ -70,58 +82,62 @@ This pattern attaches a CDC Lambda Stream to an already existing Amazon Document
 
 ### AWS Console Part
 
-1. Open the AWS IoT Console in the second browser window.
-2. In the AWS IoT Core Console, in the `Test` section (left-side pane), select the `MQTT test client`.
-3. Under the `Subscribe to a topic` subscribe to `iot-test-topic` topic.
-4. Open a terminal window and run the following DynamoDB CLI put command to put an item in the DynamoDB table. Before running the command you must edit the {DynamoDBTableName} placeholder with the name of the deployed DynamoDB table. This is printed in the stack outputs on the console by `cdk deploy` command. Note that this requires AWS CLI v2.
+If you don't have a functioning AWS Cloud9 Environment you can follow the first 2 steps in [this tutorial](https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html#docdb-cloud9-environment) to create one. NOTE: make sure your DocumentDB Cluster Security Group allow TCP communication to your AWS Cloud9 Security Group on port 27017
+
+1. Open the AWS Cloud9 Console and connect to the database. NOTE: connection guidelines can be found on the DocumentDB specific cluster Console
+2. Deploy the solution using the [deployment instructions](#Delployment_Instructions) and wait for the deployment to finish
+3. In the AWS Cloud9 Console run the following command to insert a new item
 
 ```bash
-aws dynamodb put-item \
---table-name "DYNAMODB_TABLE_NAME" \
---item {dynamodb item} \
-
-# Example
-aws dynamodb put-item \
-    --table-name iot-events-table \
-    --item pk={S="MESSAGE#1234"},sk={S="CHANNEL#1231"},messageId={S="1234"}
+db.products.insert({"TestProduct":"Cool Product"})
 ```
 
-5. Switch back to the `MQTT test client` and check if you got the stream item you used in the CLI call. For the example above you should see the following output in the `MQTT test client` window, on the `iot-test-topic` topic:
+4. Check the AWS Console for the Stream Lambda for logs on the streamed item
 
-```json
-{
-  "eventID": "5017fda64d0f565da62a8d92f462969a",
-  "eventName": "INSERT",
-  "eventVersion": "1.1",
-  "eventSource": "aws:dynamodb",
-  "awsRegion": "us-east-1",
-  "dynamodb": {
-    "ApproximateCreationDateTime": 1682398613,
-    "Keys": {
-      "sk": {
-        "S": "CHANNEL#1231"
-      },
-      "pk": {
-        "S": "MESSAGE#1234"
-      }
-    },
-    "NewImage": {
-      "sk": {
-        "S": "CHANNEL#1231"
-      },
-      "messageId": {
-        "S": "1234"
-      },
-      "pk": {
-        "S": "MESSAGE#1234"
-      }
-    },
-    "SequenceNumber": "100000000033474848853",
-    "SizeBytes": 69,
-    "StreamViewType": "NEW_AND_OLD_IMAGES"
-  },
-  "eventSourceARN": "arn:aws:dynamodb:us-east-1:{{account-number}}:table/iot-events-table/stream/2023-04-25T04:46:13.030"
-}
+#### Useful Commands on Cloud9
+
+command to list items in a database collection (e.g. products collection)
+
+```bash
+ db.products.find( {} ).pretty()
+```
+
+command to insert a new item in a database collection (e.g. products collection)
+
+```bash
+db.products.insert({"TestProduct":"Cool Product"})
+```
+
+command to list change streams in a cluster
+
+```bash
+ cursor = new DBCommandCursor(db, db.runCommand({aggregate: 1,pipeline: [{$listChangeStreams: 1}], cursor:{}}));
+```
+
+command to enable the change stream on a database collection (e.g. products collection)
+
+```bash
+db.adminCommand({modifyChangeStreams: 1,database: "docdb",collection: "products", enable: true});
+```
+
+command to disable the change stream on a database collection (e.g. products collection)
+
+```bash
+db.adminCommand({modifyChangeStreams: 1,database: "docdb",collection: "products", enable: false});
+```
+
+#### Useful Commands on AWS CLI
+
+command to list Event Source Mappings for all lambdas in the account
+
+```bash
+aws lambda list-event-source-mappings
+```
+
+command to delete Event Source Mappings for all lambdas in the account
+
+```bash
+aws lambda delete-event-source-mapping --uuid=f2799dc0-55a4-4b7b-bbd7-95e3dc4e51f7
 ```
 
 ## Cleanup

@@ -1,6 +1,6 @@
 {
   "title": "DocumentDB Lambda Stream",
-  "description": "Create a DocumentDB stream that publishes events to EventBridge",
+  "description": "Create a DocumentDB stream that publishes events to EventBridge for an already existing cluster",
   "language": "TypeScript",
   "level": "400",
   "framework": "CDK",
