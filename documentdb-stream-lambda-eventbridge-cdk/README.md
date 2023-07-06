@@ -57,13 +57,13 @@ This solution creates an AWS CDK Custom Resource backed by a Lambda. This CR lam
 
 The following resources will be provisioned:
 
-- A Lambda Function that process the changes from an already existing Amazon DocumentDB Database and sends them to an EventBridge Bus
+- A Lambda Function that processes the changes from an already existing Amazon DocumentDB Database and sends them to an EventBridge Bus
 - An AWS CDK Custom Resource Lambda Function that enables the CDC of Amazon DocumentDB onto the stream Lambda Function
 - A VPC Endpoint for the AWS Lambda Service (This is crucial to enabling the Lambda Event Source Mapping off of the Amazon DocumentDB Database)
 - A VPC Endpoint for the AWS Secret Manager Service (This is crucial to allow the Lambda Event Source Mapping off of the Amazon DocumentDB Database)
 - An EventBridge Bus that will receive changes from the Lambda and publish them to an EventBridge Rule
-- An EventBridge Rule that receive the changes for bus and publish them to given targets for further processing
-- A Lambda Function that acts as a target for the EventBridge Rule and further process the changes
+- An EventBridge Rule that receives the changes for the bus and publishes them to given targets for further processing
+- A Lambda Function that acts as a target for the EventBridge Rule and further processes the changes
 
 ## Testing
 
@@ -85,7 +85,7 @@ This pattern attaches a CDC Lambda Stream to an already existing Amazon Document
 If you don't have a functioning AWS Cloud9 Environment you can follow the first 2 steps in [this tutorial](https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html#docdb-cloud9-environment) to create one. NOTE: make sure your DocumentDB Cluster Security Group allow TCP communication to your AWS Cloud9 Security Group on port 27017
 
 1. Open the AWS Cloud9 Console and connect to the database. NOTE: connection guidelines can be found on the DocumentDB specific cluster Console
-2. Deploy the solution using the [deployment instructions](#Delployment_Instructions) and wait for the deployment to finish
+2. Deploy the solution using the [deployment instructions](#deployment-instructions) and wait for the deployment to finish
 3. In the AWS Cloud9 Console run the following command to insert a new item
 
 ```bash
