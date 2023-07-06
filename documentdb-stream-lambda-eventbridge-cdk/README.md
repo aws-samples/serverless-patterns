@@ -85,7 +85,7 @@ This pattern attaches a CDC Lambda Stream to an already existing Amazon Document
 If you don't have a functioning AWS Cloud9 Environment you can follow the first 2 steps in [this tutorial](https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html#docdb-cloud9-environment) to create one. NOTE: make sure your DocumentDB Cluster Security Group allow TCP communication to your AWS Cloud9 Security Group on port 27017
 
 1. Open the AWS Cloud9 Console and connect to the database. NOTE: connection guidelines can be found on the DocumentDB specific cluster Console
-2. Deploy the solution using the [deployment instructions](#Delployment_Instructions) and wait for the deployment to finish
+2. Deploy the solution using the [deployment instructions](#deployment-instructions) and wait for the deployment to finish
 3. In the AWS Cloud9 Console run the following command to insert a new item
 
 ```bash
