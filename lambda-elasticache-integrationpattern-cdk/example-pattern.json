@@ -24,11 +24,19 @@
   "resources": {
     "bullets": [
       {
+        "text": "What is AWS Lambda",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "What is Amazon ElastiCache",
+        "link": "https://aws.amazon.com/elasticache/"
+      },
+      {
         "text": "How to test Lambda with AWS Console",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html"
       },
       {
-        "text": "Further reading AWS Handson with ElastiCache",
+        "text": "Further handson with ElastiCache",
         "link": "https://aws.amazon.com/getting-started/hands-on/boosting-mysql-database-performance-with-amazon-elasticache-for-redis/"
       }
     ]
