@@ -1,0 +1,59 @@
+{
+  "title": "AWS Lamda to Amazon ElastiCache integration pattern",
+  "description": "Create a Redis Cluster in Amazon ElastiCache and read write with a Lambda function.",
+  "language": "Typescript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Customers may want to connect to ElastiCache from their core lambda function for use cases that involve fast read-write operations and improve latency of applications.",
+      "In application like Leader board, Queue/wait-list , API rate limiting & Quota management, etc. that are built on Serverless platform , the core computing lambda function would integrate with a either Redis or Memcache on Amazon ElastiCache.",
+      " This documentation provides a quick start guide to launch Redis cluster in Amazon ElastiCache in a defined VPC and  creates a lambda function that read writes from the Cache.",
+      "Customers can further modify the code in lambda function as per their requirements. You can configure Memcached by modifying the cdk config and change lambda code appropriately."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-elasticache-integrationpattern-cdk",
+      "templateURL": "serverless-patterns/lambda-elasticache-integrationpattern-cdk",
+      "projectFolder": "lambda-elasticache-integrationpattern-cdk",
+      "templateFile": "lambda-elasticache-integrationpattern-cdk/lib/lambda-elasticache-integrationpattern-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "How to test Lambda with AWS Console",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html"
+      },
+      {
+        "text": "Further reading AWS Handson with ElastiCache",
+        "link": "https://aws.amazon.com/getting-started/hands-on/boosting-mysql-database-performance-with-amazon-elasticache-for-redis/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Readme.md file of Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sushanth Kothapally",
+      "image": "https://avatars.githubusercontent.com/u/10820054?v=4",
+      "bio": "Sushanth is a Solutions Architect at AWS. He is passionate about solving technical problems to meet business objectives.",
+      "linkedin": "sushanthkothapally"
+    }
+  ]
+}
