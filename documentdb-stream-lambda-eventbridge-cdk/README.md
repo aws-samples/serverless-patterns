@@ -2,6 +2,8 @@
 
 This project contains a sample AWS Cloud Development Kit (AWS CDK) template for configuring and deploying a CDC Stream (Similar to DynamoDB Stream) for Amazon DocumentDB using AWS Lambda and EventBridge. The stream will processes changes and send them to an EventBridge Bus for further processing.
 
+![Architecture](assets/DocumentDBStream.svg)
+
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/documentdb-stream-lambda-eventbridge-cdk.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
