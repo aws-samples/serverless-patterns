@@ -1,4 +1,4 @@
-# EventBridge Scheduler to SQS
+# EventBridge Scheduler to Step Functions
 
 This pattern uses EventBridge Scheduler to start the execution of a Step Functions State Machine every minute.
 
