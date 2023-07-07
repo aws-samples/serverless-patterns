@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Sends notifications from S3 to SNS, then to SQS when an object is created
+
+Parameters:
+  BucketName:
+    Type: String
+    Default: bucket-1
+  QueueName:
+    Type: String
+    Default: queue-1
+  TopicName:
+    Type: String
+    Default: topic-1
+
+Resources:
+  # Create SQS Topic
+  SQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref QueueName
+
+  # Create SQS Queue
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    DependsOn:
+      - SQSQueue
+    Properties:
+      TopicName: !Ref TopicName
+      Subscription:
+        - Endpoint: !GetAtt SQSQueue.Arn
+          Protocol: sqs
+
+  # Create S3 Bucket
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DependsOn:
+      - SNSTopicPolicy
+    Properties:
+      BucketName: !Ref BucketName
+      NotificationConfiguration:
+        TopicConfigurations:
+          - Topic: !Ref SNSTopic
+            Event: "s3:ObjectCreated:*"
+
+  # Attach SQS Policy to allow SNS to send messages
+  SQSQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    DependsOn:
+      - SNSTopic
+    Properties:
+      Queues:
+        - !Ref SQSQueue
+      PolicyDocument:
+        Statement:
+          - Sid: AllowSNSTopic
+            Effect: Allow
+            Principal:
+              Service:
+                - "sns.amazonaws.com"
+                - "localhost:4566"
+            Action:
+              - sqs:SendMessage
+            Resource: !Ref SQSQueue
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref SNSTopic
+
+  # Attach SNS Policy to allow S3 to publish notifications
+  SNSTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    DependsOn:
+      - SNSTopic
+    Properties:
+      Topics:
+        - !Ref SNSTopic
+      PolicyDocument:
+        Statement:
+          - Sid: AllowS3Bucket
+            Effect: Allow
+            Principal:
+              Service:
+                - "s3.amazonaws.com"
+                - "localhost:4566"
+            Action:
+              - sns:Publish
+            Resource: !Ref SNSTopic
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Join ["", ["arn:aws:s3:::", !Ref BucketName]]
+
+Outputs:
+  S3BucketArn:
+    Description: S3 Bucket Arn
+    Value: !GetAtt S3Bucket.Arn
+  SQSQueueArn:
+    Description: SQS Queue Arn
+    Value: !GetAtt SQSQueue.Arn
+  SNSTopicArn:
+    Description: SNS Topic Arn
+    Value: !Ref SNSTopic
