@@ -58,7 +58,6 @@ Resources:
             Principal:
               Service:
                 - "sns.amazonaws.com"
-                - "localhost:4566"
             Action:
               - sqs:SendMessage
             Resource: !Ref SQSQueue
@@ -81,7 +80,6 @@ Resources:
             Principal:
               Service:
                 - "s3.amazonaws.com"
-                - "localhost:4566"
             Action:
               - sns:Publish
             Resource: !Ref SNSTopic
