@@ -53,7 +53,7 @@ class LambdaS3TranslateCdkStack(Stack):
                                                                                         's3:ListBucket'],
                                                                                 resources=[
                                                                                     self.input_bucket.bucket_arn,
-                                                                                    self.input_bucket.bucket_arn + '/*'
+                                                                                    self.input_bucket.bucket_arn+'/*'
                                                                                 ]
                                                                         )
                                                         ]
