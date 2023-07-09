@@ -1,0 +1,10 @@
+{
+  "Comment": "Sample SF to call with SQS throught EventBridge pipes",
+  "StartAt": "Pass",
+  "States": {
+    "Pass": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}

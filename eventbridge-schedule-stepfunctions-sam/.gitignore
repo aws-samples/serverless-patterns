@@ -1,0 +1,4 @@
+/src/node_modules
+samconfig.toml
+node_modules
+.env

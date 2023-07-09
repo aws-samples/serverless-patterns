@@ -1,0 +1,161 @@
+
+name: New repo suggestion form
+description: |
+            To suggest a GitHub repo for inclusion in the Serverless Repo Collection, please complete the following form in full:
+title: "New repo - "
+body:
+  - type: textarea 
+    id: description
+    attributes:
+      label: Description
+      description: Describe what this project does (100-200 words)
+    validations:
+      required: true
+  - type: input 
+    id: language
+    attributes:
+      label: language
+      description: (e.g. "English")
+    validations:
+      required: true
+  - type: input 
+    id: runtime
+    attributes:
+      label: runtime
+      description: (e.g. "Python")
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: Level
+      description: choose from 100(beginner) to 400 (expert) 
+      options:
+        - "100"
+        - "200"
+        - "300"
+        - "400"
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      description: choose from the options below 
+      options:
+        - "Application"
+        - "Examples"
+        - "Tips"
+        - "Workshop"
+  - type: dropdown
+    id: usecase
+    attributes:
+      label: Use case
+      description: choose from the options below 
+      options:
+        - "Backend"
+        - "Interactive workload"
+        - "Observability"
+        - "Performance"
+    validations:
+      required: true
+  - type: input
+    id: image
+    attributes:
+      label: Primary image
+      description: (500x300 pixels, JPG or PNG) - provide link
+    validations:
+      required: true
+  - type: input
+    id: iac
+    attributes:
+      label: IaC framework 
+      description: (e.g. "AWS SAM", "AWS CDK", "Terraform")
+    validations:
+      required: true
+  - type: checkboxes
+    id: services
+    attributes:
+      label: AWS Serverless services used
+      options:
+        - label: Amazon API Gateway
+          required: false
+        - label: Amazon DynamoDB
+          required: false
+        - label: Amazon EventBridge
+          required: false
+        - label: AWS IoT
+          required: false
+        - label: AWS Lambda
+          required: false
+        - label: Amazon Rekognition
+          required: false
+        - label: Amazon S3
+          required: false
+        - label: AWS Step Functions
+          required: false
+        - label: Amazon SNS
+          required: false
+        - label: Amazon SQS
+          required: false
+        - label: Amazon Transcribe
+          required: false
+        - label: Amazon Translate
+          required: false
+  - type: input
+    id: headline
+    attributes:
+      label: Description headline
+      description: (max 160 chars)
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Repo URL
+      description: Link to repo
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: Additional resources 
+      description: Additional resources (URLs, up to 5)
+  - type: markdown
+    attributes:
+      value: |
+        Please provide some information about the project Author:
+  - type: input
+    id: AuthorName
+    attributes:
+      label: Author Name  
+  - type: input
+    id: AuthorImage
+    attributes:
+      label: Author Image URL 
+  - type: textarea
+    id: AuthorBio
+    attributes:
+      label: Author Bio 
+      description: (up to 255 chars)
+  - type: input
+    id: AuthorTwitter
+    attributes:
+      label: Author Twitter handle 
+  - type: input
+    id: AuthorLinkedIn
+    attributes:
+      label: Author LinkedIn URL 
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to add a repo!
+  - type: input
+    id: leave
+    attributes:
+      label: leave
+      description: Leave blank
+labels: ["repo-issue"]
+assignees: 
+  - jbesw
+  - bls20AWS

@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: An example Lambda function using the Secrets Manager Lambda Extension
+
+#When you "sam build" it will ask you to provide a name for your secret. The default is "MySecret"
+Parameters:
+  SecretName:
+    Description: Secret Name
+    Type: String
+    Default: MySecret
+    AllowedPattern: ^[a-zA-Z0-9_.-/]*$
+
+Resources:
+  #Make a secret
+  MySecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Ref SecretName
+      Description: "Secret with dynamically generated secret password."
+      GenerateSecretString:
+        PasswordLength: 30
+        ExcludeCharacters: '"@/\'
+
+  #Make a lambda function
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello_world/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Layers:
+        - arn:aws:lambda:us-east-1:177933569100:layer:AWS-Parameters-and-Secrets-Lambda-Extension:2 #This layer is specific to us-east-1. Layers for other regions can be found here: https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets_lambda.html#retrieving-secrets_lambda_ARNs
+      Environment:
+        Variables:
+          SECRET_NAME: !Ref SecretName
+          PARAMETERS_SECRETS_EXTENSION_HTTP_PORT: "2773" #2773 is the default, but we go ahead and explicility set it to the default value anyways
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref MySecret
+
+Outputs:
+  MySecret:
+    Value: !Ref MySecret
+    Description: MySecret ARN
+  MySecretName:
+    Value: !Ref SecretName
+    Description: SecretName
+  HelloWorldFunction:
+    Value: !Ref HelloWorldFunction
+    Description: HelloWorldFunction Lambda Function

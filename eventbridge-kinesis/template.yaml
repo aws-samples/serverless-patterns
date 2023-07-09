@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Sample template to deliver events from Amazon EventBridge to Kinesis Stream
+
+Resources:
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "test-bus"
+      
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: "test-stream"
+      ShardCount: 1
+      
+  EventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: "test-rule"
+      EventBusName: !GetAtt EventBus.Arn
+      Description: "Send matched events to Kinesis Data Stream"
+      Targets: 
+        - Arn: !GetAtt KinesisStream.Arn
+          Id: "kinesis-stream-target"
+          RoleArn: !GetAtt 
+            - EventBridgeIAMrole
+            - Arn
+      EventPattern:
+        source:
+          - "my-application"
+          
+  EventBridgeIAMrole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub events.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: EventBridgeInvokeKinesis
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "kinesis:PutRecord"
+                  - "kinesis:PutRecords"
+                Resource:
+                  - !GetAtt KinesisStream.Arn
+                  

@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Canary example for API Gateway rest api
+
+Resources:
+  CrudAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      TracingEnabled: true
+      # CanarySetting:
+      #   PercentTraffic: 5
+      AccessLogSetting:
+        DestinationArn: !GetAtt CrudLogGroup.Arn
+        Format: >
+          {"requestId":"$context.requestId",
+          "waf-error":"$context.waf.error",
+          "waf-status":"$context.waf.status",
+          "waf-latency":"$context.waf.latency",
+          "waf-response":"$context.wafResponseCode",
+          "authenticate-error":"$context.authenticate.error",
+          "authenticate-status":"$context.authenticate.status",
+          "authenticate-latency":"$context.authenticate.latency",
+          "authorize-error":"$context.authorize.error",
+          "authorize-status":"$context.authorize.status",
+          "authorize-latency":"$context.authorize.latency",
+          "integration-error":"$context.integration.error",
+          "integration-status":"$context.integration.status",
+          "integration-latency":"$context.integration.latency",
+          "integration-requestId":"$context.integration.requestId",
+          "integration-integrationStatus":"$context.integration.integrationStatus",
+          "response-latency":"$context.responseLatency",
+          "status":"$context.status"}
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './api.yaml'
+
+  CrudLogGroup:
+    Type: AWS::Logs::LogGroup
+
+  CrudDDB:
+    Type: AWS::Serverless::SimpleTable
+
+  CrudRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "apigateway.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: DDBCrudPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Action:
+              - dynamodb:DeleteItem
+              - dynamodb:UpdateItem
+              - dynamodb:CreateItem
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:Query
+              Effect: Allow
+              Resource: !GetAtt CrudDDB.Arn
+
+
+Outputs:
+  CrudApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${CrudAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

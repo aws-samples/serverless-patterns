@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```bash
-    cd ambda-efs-cdk
+    cd lambda-efs-cdk
     ```
 1. Create a virtual environment for python:
     ```bash

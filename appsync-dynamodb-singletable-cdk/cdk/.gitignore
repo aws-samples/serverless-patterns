@@ -1,5 +1,6 @@
-*.js
+.eslintrc.js
 !jest.config.js
+!lib/**/*.js
 *.d.ts
 node_modules
 

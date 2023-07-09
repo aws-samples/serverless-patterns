@@ -1,0 +1,46 @@
+{
+  "title": "S3 to EventBridge Claim Check pattern with event enrichment",
+  "description": "Event-driven claim check pattern using S3 and EventBridge. Using Lambda to transform events into domain events with enrichment and presgined urls.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern will run when a file is uploaded to an s3 bucket. The events are transformed into domain events and presigned urls are generated for the content in the buckets for downstream consumers."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-to-eventbridge-claim-check-pattern",
+      "templateURL": "serverless-patterns/s3-to-eventbridge-claim-check-pattern",
+      "projectFolder": "s3-to-eventbridge-claim-check-pattern",
+      "templateFile": "lib/s3-to-eventbridge-automatic-claim-check-pattern-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Claim Check messaging pattern",
+        "link": "https://www.enterpriseintegrationpatterns.com/StoreInLibrary.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.jpg",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

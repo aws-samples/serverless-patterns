@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: AWS-SAM-APIGW-Lambda-SnapStart
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 2048
+    Timeout: 29
+
+Resources:
+  UnicornStoreSpringApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+
+  UnicornStoreSpringFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.unicorn.store.StreamLambdaHandler
+      CodeUri: UnicornFunction
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
+          AWS_SERVERLESS_JAVA_CONTAINER_INIT_GRACE_TIME: 500
+          PRODUCT_TABLE_NAME: !Ref UnicornTable
+      AutoPublishAlias: live
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UnicornTable
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+            RestApiId: !Ref UnicornStoreSpringApi
+
+  UnicornTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: PK
+        Type: String
+
+Outputs:
+  UnicornEndpoint:
+    Description: API Gateway Unicorn Endpoint
+    Value:
+      Fn::Sub: https://${UnicornStoreSpringApi}.execute-api.${AWS::Region}.amazonaws.com/prod/

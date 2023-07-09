@@ -78,6 +78,7 @@ typings/
 
 # dotenv environment variables file
 .env
+output.zip
 
 
 ### OSX ###
@@ -171,7 +172,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+
 lib64/
 parts/
 sdist/
@@ -183,6 +184,11 @@ var/
 # Serverless directories
 /*/.serverless/
 /*/.build/
+=======
+
+# Serverless.tf / Terraform
+**/builds/*
+
 =======
 # Terraform
 **/*.terraform*
@@ -226,3 +232,6 @@ terraform.rc
 #Ignore lock file
 .terraform.lock.hcl
 
+#Ignore Intellij files
+*.iml
+*.idea

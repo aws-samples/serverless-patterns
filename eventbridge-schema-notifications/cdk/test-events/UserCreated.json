@@ -1,0 +1,9 @@
+[
+    {
+      "Source": "myapp.users",
+      "Detail": "{ \"key1\": \"value1\", \"key10\": \"value2\" }",
+      "Resources": ["resource1", "resource2"],
+      "DetailType": "UserCreated",
+      "EventBusName": "demo-bus"
+    }
+  ]

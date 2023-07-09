@@ -1,0 +1,12 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "description": "L@E Auth Function",
+  "main": "app.js",
+  "author": "SAM CLI",
+  "license": "MIT",
+  "dependencies": {
+    "aws-jwt-verify": "^3.2.0",
+    "@aws-sdk/client-ssm": "^3.241.0"
+  }
+}

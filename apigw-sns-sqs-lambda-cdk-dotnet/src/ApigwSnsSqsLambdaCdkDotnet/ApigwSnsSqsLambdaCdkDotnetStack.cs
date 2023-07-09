@@ -30,9 +30,9 @@ namespace ApigwSnsSqsLambdaCdkDotnet
 
             var lambdaCarChangeQueueNonPremium = new Function(this, "nonPremiumWorkerHandler", new FunctionProps
             {
-                Runtime = Runtime.DOTNET_CORE_3_1,
+                Runtime = Runtime.DOTNET_6,
                 Handler = "ApiEventHandler::ApiEventHandler.Function::SQSHandler",
-                Code = Code.FromAsset("./src/lambdaHandler/ApiEventHandler/src/ApiEventHandler/bin/Debug/netcoreapp3.1"),
+                Code = Code.FromAsset("./src/lambdaHandler/ApiEventHandler/src/ApiEventHandler/bin/Debug/net6.0"),
 
             });
 
@@ -47,29 +47,27 @@ namespace ApigwSnsSqsLambdaCdkDotnet
 
             topicCarPriceChange.AddSubscription(new SqsSubscription(queueCarChangeQueuPremium));
 
-            IEnumerable<string?> commands = new[]
+            var buildOption = new BundlingOptions()
             {
-                "cd /asset-input",
-                "export DOTNET_CLI_HOME=\"/tmp/DOTNET_CLI_HOME\"",
-                "export PATH=\"$PATH:/tmp/DOTNET_CLI_HOME/.dotnet/tools\"",
-                "dotnet tool install -g Amazon.Lambda.Tools",
-                "dotnet lambda package -o output.zip",
-                "unzip -o -d /asset-output output.zip"
+                Image = Runtime.DOTNET_6.BundlingImage,
+                User = "root",
+                OutputType = BundlingOutput.ARCHIVED,
+                Command = new string[]{
+                    "/bin/sh",
+                    "-c",
+                    " dotnet tool install -g Amazon.Lambda.Tools"+
+                    " && dotnet build"+
+                    " && dotnet lambda package --output-package /asset-output/function.zip"
+                }
             };
+
             var lambdaCarChangeQueuePremium = new Function(this, "premiumWorkerHandler", new FunctionProps
             {
-                Runtime = Runtime.DOTNET_CORE_3_1,
+                Runtime = Runtime.DOTNET_6,
                 Handler = "Lambdas::Lambdas.Function::SQSHandler",
                 Code = Code.FromAsset("./src/lambdaHandler/ApiEventHandler/src/ApiEventHandler", new AssetOptions
                 {
-                    Bundling = new BundlingOptions
-                    {
-                        Image = Runtime.DOTNET_CORE_3_1.BundlingImage,
-                        Command = new[]
-                      {
-                          "bash", "-c", string.Join(" && ", commands)
-                      }
-                    }
+                    Bundling = buildOption
 
                 })
 

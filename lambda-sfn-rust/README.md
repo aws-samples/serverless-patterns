@@ -1,4 +1,4 @@
-# Invoke an AWS Step Functions workflow from AWS Lambda, with logging enabled
+# Invoke an AWS Step Functions workflow from AWS Lambda
 
 The SAM template deploys a Lambda function, a Step Functions Express workflow, a Log group and the IAM resources required to run the application. A Lambda function uses the AWS SDK to asyncronously invoke the Express workflow, passing the event body as a string. The Express Workflow results are logged in Amazon CloudWatch Logs. The Lambda function returns the Express Workflow execution ARN and startDate.
 

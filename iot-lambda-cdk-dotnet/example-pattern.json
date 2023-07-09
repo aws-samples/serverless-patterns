@@ -1,0 +1,56 @@
+{
+    "title":"AWS IoT Core to AWS Lambda based on IoT rule",
+    "description":"Deploys a Lambda function, an IoT thing, and the minimal IAM resources required to run the application",
+    "language":".NET",
+    "level":"200",
+    "framework":"CDK",
+    "introBox":{
+       "headline":"How it works",
+       "text":[
+          "This pattern contains a sample AWS CDK stack to create an IoT rule with an AWS Lambda function.",
+          "When an IoT event is sent to an IoT topic, a Lambda function is invoked. This pattern configures a Lambda function to poll this event. The function is invoked with a payload containing the contents of the message event."
+       ]
+    },
+    "gitHub":{
+       "template":{
+          "repoURL":"https://github.com/aws-samples/serverless-patterns/tree/main/iot-lambda-cdk-dotnet",
+          "templateURL":"serverless-patterns/iot-lambda-cdk-dotnet",
+          "projectFolder":"iot-lambda-cdk-dotnet",
+          "templateFile":"src/cdk/Net6LambdaCdkStack.cs"
+       }
+    },
+    "resources":{
+       "bullets":[
+          {
+             "text":"AWS IoT Core",
+             "link":"https://docs.aws.amazon.com/iot/latest/developerguide/what-is-aws-iot.html"
+          },
+          {
+             "text":"AWS Lambda",
+             "link":"https://aws.amazon.com/lambda/"
+          }
+       ]
+    },
+    "deploy":{
+       "text":[
+          "cdk deploy"
+       ]
+    },
+    "testing":{
+       "text":[
+          "See the GitHub repo for detailed testing instructions."
+       ]
+    },
+    "cleanup":{
+       "text":[
+          "Delete the stack: <code>cdk delete</code>."
+       ]
+    },
+    "authors":[
+        {
+            "name": "Harvey Raju",
+            "image": "https://avatars.githubusercontent.com/u/23328766?v=4",
+            "bio": "Harvey Raju is a Lead Consultant at Amazon Web Services."
+        }
+    ]
+ }

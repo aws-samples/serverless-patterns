@@ -1,0 +1,16 @@
+# terraform
+
+/.terraform
+/terraform.lock.hcl
+*.tfstate*
+*.tfstate.backup
+*.tfvars
+
+# Go build artifacts
+
+*.o
+*.a
+*.exe
+*.test
+*.prof
+main

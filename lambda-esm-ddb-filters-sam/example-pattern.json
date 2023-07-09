@@ -1,0 +1,57 @@
+{
+    "title": "AWS Event Source Mapping for Lambda from Amazon DynamoDB Stream",
+    "description": "Sample Lambda ESM Filter rules for DynamoDB Stream triggers",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "Use this code to test out different trigger filters for your Lambda functions. You can use event filtering to control which events Lambda sends to your function for processing. You can use this template to explore and test how to configure event filtering for Amazon DynamoDB Stream messages triggering a Lambda function.",
+        "The SAM template deploys multiple Lambda functions, a single stream-enabled Amazon DynamoDB Table and the permissions required to run the application. The template enforces 3 days retention period for all AWS Lambda CloudWatch logs. All AWS Lambda functions are deployed to NodeJS 18 runtime running on ARM64 processors powered by AWS Graviton."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-esm-ddb-filters-sam/",
+        "templateURL": "serverless-patterns/lambda-esm-ddb-filters-sam",
+        "projectFolder": "lambda-esm-ddb-filters-sam",
+        "templateFile": "lambda-esm-ddb-filters-sam/template.yaml"
+      }
+    },
+    "resources": {
+      "headline": "Additional resources",
+      "bullets": [
+        {
+          "text": "Lambda event filtering",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam build",
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "headline": "Testing",
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "headline": "Cleanup",
+      "text": [
+        "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+      ]
+    },
+    "authors": [
+        {
+          "name": "Dmitry Gulin",
+          "image": "https://s.gravatar.com/avatar/223055bd132d244f6a96c3aef7453a5a",
+          "bio": "Senior Modernization Architect, AWS",
+          "linkedin": "dmitry-gulin"
+        }
+    ]
+}

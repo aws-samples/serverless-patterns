@@ -34,7 +34,6 @@ Resources:
                 - green
                 - red
                 - blue
-            
 
   ProcessFunction:
     Type: AWS::Serverless::Function
@@ -49,12 +48,22 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref MainApi
-            Path: /
+            Path: /{id}
             Method: post
+            RequestParameters:
+              - method.request.querystring.order:
+                  Required: true
+                  Caching: true
+              # - method.request.path.id:
+              #     Required: true
+              - method.request.header.custom-agent:
+                  Required: true
             RequestModel:
               Model: Vehicle # Links available model
               Required: true # requires validation
-              ValidateBody: true #Validates the request body. This can also be ValidateHeader
+              ValidateBody: true #Validates the request body.
+              ValidateParameters: true #Validates the request header
+
             
 Outputs:
   ProcessApi:

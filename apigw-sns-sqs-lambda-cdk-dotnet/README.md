@@ -11,7 +11,7 @@ Important: This application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
-* [.NET](https://dotnet.microsoft.com/en-us/download/dotnet/3.1) (.NET Core 3.1) installed
+* [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) installed
 
 ## Deployment Instructions
 

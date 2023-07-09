@@ -1,0 +1,109 @@
+{
+  "Comment": "This state machine updates the status of a booked transaction in the DB, waits for payment to be made and then updates again or passes",
+  "StartAt": "Change Apartment Status",
+  "States": {
+    "Change Apartment Status": {
+      "Type": "Task",
+      "Resource": "${DDBUpdateItem}",
+      "Parameters": {
+        "TableName": "${DDBTable}",
+        "Key": {
+          "Id": {
+            "S.$": "$.details.accountId"
+          }
+        },
+        "ConditionExpression": "attribute_exists(Id)",
+        "UpdateExpression": "SET bookedStatus = :bookedStatus",
+        "ExpressionAttributeValues": {
+          ":bookedStatus": {
+            "S.$": "$.details.bookedStatus"
+          }
+        }
+      },
+      "Next": "Wait",
+      "ResultPath": "$.updateResult",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Comment": "Items Doesn't Exist",
+          "Next": "Fail",
+          "ResultPath": "$.updateError"
+        }
+      ]
+    },
+    "Wait": {
+      "Type": "Wait",
+      "Seconds": 60,
+      "Next": "Get Booking Status"
+    },
+    "Get Booking Status": {
+      "Type": "Task",
+      "Resource": "${DDBGetItem}",
+      "Parameters": {
+        "TableName": "${DDBTable}",
+
+        "Key": {
+          "id": {
+            "S.$": "$.details.accountId"
+          }
+        }
+      },
+      "Next": "Has the Apartment been Paid ?",
+      "ResultPath": "$.getItem",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Comment": "Couldn't find item",
+          "Next": "Fail"
+        }
+      ]
+    },
+    "Has the Apartment been Paid ?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.getItem.Item.Id.S",
+              "StringEquals": "1234567"
+            },
+            {
+              "Variable": "$.getItem.Item.bookedStatus.S",
+              "StringEquals": "Paid"
+            }
+          ],
+          "Next": "Apartment Paid"
+        }
+      ],
+      "Default": "Not Paid(Revert Apartment Status)"
+    },
+    "Not Paid(Revert Apartment Status)": {
+      "Type": "Task",
+      "Resource": "${DDBUpdateItem}",
+      "Parameters": {
+        "TableName": "${DDBTable}",
+
+        "Key": {
+          "Id": {
+            "S.$": "$.getItem.Item.Id.S"
+          }
+        },
+        "UpdateExpression": "SET bookedStatus = :bookedStatus",
+        "ExpressionAttributeValues": {
+          ":bookedStatus": {
+            "S": "PENDING"
+          }
+        }
+      },
+      "End": true,
+      "ResultPath": "$.notPaid"
+    },
+    "Fail": {
+      "Type": "Fail"
+    },
+    "Apartment Paid": {
+      "End": true,
+      "Type": "Pass"
+    }
+  }
+}

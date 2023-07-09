@@ -1,0 +1,20 @@
+{
+  "name": "cdk-cognito-fargate",
+  "version": "0.1.0",
+  "bin": {
+    "cdk-cognito-fargate": "bin/cdk-cognito-fargate.js"
+  },
+  "scripts": {
+    "build": "echo \"The build step is not required when using JavaScript!\" && exit 0",
+    "cdk": "cdk",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "aws-cdk": "2.80.0",
+    "jest": "^29.3.1"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.80.0",
+    "constructs": "^10.0.0"
+  }
+}

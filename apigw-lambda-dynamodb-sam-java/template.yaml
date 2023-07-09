@@ -5,7 +5,7 @@ Description: AWS-SAM-APIGW-Lambda-DDB
 Globals:
   Function:
     Runtime: java11
-    MemorySize: 3072
+    MemorySize: 3008
     Timeout: 25
 
   Api:

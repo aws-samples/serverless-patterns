@@ -1,0 +1,46 @@
+{
+  "title": "EventBridge event enrichment with AWS Lambda",
+  "description": "Enrich events with Lambda and put them back onto the event bus for downstream consumers",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern will produce events with enrichment flag. Enricher (Lambda function) picks up the event, enriches then puts the event back onto the bus. Downstream consumers get the enriched event"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-enrichment-with-lambda",
+      "templateURL": "serverless-patterns/eventbridge-enrichment-with-lambda",
+      "projectFolder": "eventbridge-enrichment-with-lambda",
+      "templateFile": "lib/single-bus-enrichment-with-lambda.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Content rnricher messaging pattern",
+        "link": "https://www.enterpriseintegrationpatterns.com/DataEnricher.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.jpg",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

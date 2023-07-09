@@ -1,0 +1,65 @@
+{
+  "title": "Amazon EventBridge to Amazon Firehose Delivery Stream to Amazon S3 using .Net CDK",
+  "description": "Creates EventBridge, Firehose Delivery Stream, and S3 bucket. Apply Firehose DynamicPartitioningConfiguration to parse the input message to extract department value to use it to create S3 partition",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When user send message to EventBridge bus, message will get routed to EventBridge rule based on 'DetailType'.",
+      "Then EventBridge rule send 'Detail' field value from message to rule target Firehose delivery stream.",
+      "Once message reach at Firehose delivery stream, message will get process by JsonParsingEngine to read 'Department' field value, this value used for S3 prefix.",
+      "After message processing, message will get delivred to targeted S3 bucket by following calculated S3 prefix based on 'Department' field value."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-firehose-s3-cdk",
+      "templateURL": "serverless-patterns/eventbridge-firehose-s3-cdk",
+      "projectFolder": "eventbridge-firehose-s3-cdk",
+      "templateFile": "eventbridge-firehose-s3-cdk/src/CdkStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Kinesis Data Firehose Delivery Stream",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/basic-create.html"
+      },
+      {
+        "text": "Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-get-started.html"
+      },
+      {
+        "text": "Amazon S3",
+        "link": "https://aws.amazon.com/s3/?nc=sn&loc=0"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy EventBridgeFirehoseS3Stack"]
+  },
+  "testing": {
+    "text": [
+      "Send message to EventBridge by using command at project root level - aws events put-events --entries file://SampleEvent.json",
+      "Navigate to S3 bucket created by CDK and confirm message has saved at path {department}/{event message file}",
+      "Please note: Firehose delivery stream buffer is configured for 60secs (default time), so please wait for 1-2 mins after event send command to get the message in S3 bucket"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: cdk destroy EventBridgeFirehoseS3Stack",
+      "Confirm the stack has been deleted: aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'EventBridgeFirehoseS3Stack')].StackStatus\""
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vikramsinha Patil",
+      "image": "",
+      "bio": "Cloud Application Architect at AWS",
+      "linkedin": "https://www.linkedin.com/in/vikramsinha-patil-834a4b2b",
+      "twitter": ""
+    }
+  ]
+}
