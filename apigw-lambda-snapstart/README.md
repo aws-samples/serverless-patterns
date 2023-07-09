@@ -1,13 +1,23 @@
 # Amazon API Gateway, AWS Lambda and Amazon DynamoDB with Lambda SnapStart for Java
 
+This pattern demonstrates how to create a synchronous REST API using API Gateway, AWS Lambda and DynamoDB.
+This pattern is built using [Spring Boot 3](https://spring.io/projects/spring-boot) and leverages the
+[AWS Serverless Java Container](https://github.com/awslabs/aws-serverless-java-container) for seamless integration with
+AWS Lambda. This pattern also demonstrates the usage of [SnapStart](https://aws.amazon.com/blogs/compute/reducing-java-cold-starts-on-aws-lambda-functions-with-snapstart/)
+to improve startup performance.
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-snapstart.
+
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Java 17](https://aws.amazon.com/corretto/)
 * [Maven](https://maven.apache.org/)
 * [CURL](https://curl.se/)
+* [jq](https://jqlang.github.io/jq/)
 
 ## Deployment Instructions
 
