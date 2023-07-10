@@ -39,12 +39,12 @@
 	"testing": {
 		"text": ["See the Github repo for detailed testing instructions."]
 	},
-	"cleanup": {
-		"text": [
-		          "terraform destroy",
-		          "terraform show"
-		        ]
-	},
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>terraform destroy</code>.",
+            "Confirm the stack has been deleted: <code>terraform show</code>."
+        ]
+    },
 	"authors": [
 		{
 			"name": "Makendran G",
