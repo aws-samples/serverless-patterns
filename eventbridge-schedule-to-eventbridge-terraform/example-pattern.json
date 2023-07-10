@@ -1,22 +1,22 @@
 {
-    "title": "Amazon EventBridge Scheduler to Amazon Eventbridge",
+    "title": "Amazon EventBridge Scheduler to Amazon EventBridge",
     "description": "Use EventBridge Scheduler to send custom events to EventBridge on a schedule",
     "language": "",
     "level": "300",
     "framework": "Terraform",
     "introBox": {
-      "headline": "How it works",
-      "text": [
-        "This sample project demonstrates how to use Amazon EventBridge Scheduler to send custom events to Amazon EventBridge on a schedule. This pattern leverages templated targets with EventBridge Scheduler to talk directly to EventBridge using the PutEvents API operation.",
-        "The pattern is deployed using Terraform to create the EventBridge Scheduler, EventBridge bus and rules as well as the IAM resources required for Scheduler to interact with EventBridge and CloudWatch."
-      ]
+        "headline": "How it works",
+        "text": [
+            "This sample project shows how to use Amazon EventBridge Scheduler to send custom events to Amazon EventBridge on a schedule. This pattern uses templated targets with EventBridge Scheduler to talk directly to EventBridge using the PutEvents API operation.",
+            "The pattern is deployed using Terraform to create the EventBridge Scheduler, EventBridge bus and rules, as well as the IAM resources required for Scheduler to interact with EventBridge and CloudWatch."
+        ]
     },
     "gitHub": {
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-eventbridge-terraform",
         "templateURL": "serverless-patterns/eventbridge-schedule-to-eventbridge-terraform",
         "projectFolder": "eventbridge-schedule-to-eventbridge-terraform",
-        "templateFile": "eventbridge-schedule-to-eventbridge-terraform/main.tf"
+        "templateFile": main.tf"
       }
     },
     "resources": {
@@ -26,7 +26,7 @@
           "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/scheduler.html"
         },
         {
-          "text": "Send custom events to Amazon Eventbridge",
+          "text": "Send custom events to Amazon EventBridge",
           "link": "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html"
         }
       ]
