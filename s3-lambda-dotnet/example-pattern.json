@@ -4,6 +4,10 @@
   "language": "C#",
   "level": "200",
   "framework": "SAM",
+  "services": {
+    "from": "s3",
+    "to": "lambda"
+  },
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -54,7 +58,7 @@
       "name": "Garrett Johnson",
       "image": "",
       "bio": "Garrett is a Sr. Solutions Architect at AWS based in Utah.",
-      "linkedin": "garrett-johnson-30998247"
+      "linkedin": "/garrett-johnson-30998247"
     }
   ]
 }
