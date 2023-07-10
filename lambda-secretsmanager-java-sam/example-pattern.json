@@ -19,34 +19,38 @@
     }
   },
   "resources": {
-    "build": {
+    "bullets": [{
+      "text": "Retrieve AWS Secrets Manager secrets in Java applications",
+      "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets_cache-java.html"
+    }]
+  },
+  "build": {
       "text": [
         "sam build"
       ]
     },
-    "deploy": {
-      "text": [
-        "sam deploy --guided"
-      ]
-    },
-    "testing": {
-      "text": [
-        "See the Github repo for detailed testing instructions."
-      ]
-    },
-    "cleanup": {
-      "text": [
-        "Delete the stack: <code>sam delete</code>."
-      ]
-    },
-
-    "authors": [
-      {
-        "name": "Paras Jain",
-        "image": "https://avatars.githubusercontent.com/u/583119?v=4",
-        "bio": "Paras is a Technical Account Manager with AWS based out of Herndon, Virginia, USA. He is a member of Serverless Technical Field community",
-        "linkedin": "parasjain01",
-        "twitter": "parasjain01"
-      }
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
     ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Paras Jain",
+      "image": "https://avatars.githubusercontent.com/u/583119?v=4",
+      "bio": "Paras is a Technical Account Manager with AWS based out of Herndon, Virginia, USA. He is a member of Serverless Technical Field community",
+      "linkedin": "parasjain01",
+      "twitter": "parasjain01"
+    }
+  ]
 }
