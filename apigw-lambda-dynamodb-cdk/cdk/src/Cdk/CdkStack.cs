@@ -16,14 +16,18 @@ namespace Cdk
         {
             var tableName = "MyCdkTable";
             
-            var buildCommands = new[]
+            var buildOption = new BundlingOptions()
             {
-                "cd /asset-input",
-                "export DOTNET_CLI_HOME=\"/tmp/DOTNET_CLI_HOME\"",
-                "export PATH=\"$PATH:/tmp/DOTNET_CLI_HOME/.dotnet/tools\"",
-                "dotnet tool install -g Amazon.Lambda.Tools",
-                "dotnet lambda package -o output.zip",
-                "unzip -o -d /asset-output output.zip"
+                Image = Runtime.DOTNET_6.BundlingImage,
+                User = "root",
+                OutputType = BundlingOutput.ARCHIVED,
+                Command = new string[]{
+                    "/bin/sh",
+                    "-c",
+                    " dotnet tool install -g Amazon.Lambda.Tools"+
+                    " && dotnet build"+
+                    " && dotnet lambda package --output-package /asset-output/function.zip"
+                }
             };
             
             var dynamoDbTable = new Table(this, "MyCdkTable", new TableProps()
@@ -55,7 +59,7 @@ namespace Cdk
             
             var handler = new Function(this, "DynamoDbHandler", new FunctionProps()
             {
-                Runtime = Runtime.DOTNET_CORE_3_1,
+                Runtime = Runtime.DOTNET_6,
                 Timeout = Duration.Seconds(30),
                 Environment = new Dictionary<string, string>(1)
                 {
@@ -63,14 +67,7 @@ namespace Cdk
                 },
                 Code = Code.FromAsset("code/src/DynamoDbLambda", new AssetOptions()
                 {
-                    Bundling = new BundlingOptions
-                    {
-                        Image  = Runtime.DOTNET_CORE_3_1.BundlingImage,
-                        Command = new []
-                        {
-                            "bash", "-c", string.Join(" && ", buildCommands)
-                        }
-                    }
+                    Bundling = buildOption
                 }),
                 Handler = "DynamoDbLambda::DynamoDbLambda.Function::FunctionHandler",
                 Role = lambdaHandlerRole
