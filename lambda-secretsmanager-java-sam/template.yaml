@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Lambda function retrieving a secret from Secrets Manager using AWS SDK for Java
+
+##########################################################################
+#  Parameters & Globals                                                  #
+##########################################################################
+Globals:
+  Function:
+    Tracing: Active
+    Tags:
+      Application: lambda-secretsmanager-java-sam
+Parameters:
+  SecretName:
+    Description: Secret Name
+    Type: String
+    Default: MySecret
+    AllowedPattern: ^[a-zA-Z0-9_.-/]*$
+Resources:
+  ##########################################################################
+  #  Lambda functions                                                      #
+  ##########################################################################
+  GetSecretFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: GetSecret
+      CodeUri: GetSecretFunction
+      Handler: com.example.App::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          SECRET_NAME: !Ref SecretName
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref MySecret
+  ##########################################################################
+  #  Secret                                                         #
+  ##########################################################################
+  MySecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: !Ref SecretName
+      Description: "Secret with dynamically generated secret password."
+      GenerateSecretString:
+        PasswordLength: 30
+        ExcludeCharacters: '"@/\'
+
+##########################################################################
+#  OUTPUTS                                                               #
+##########################################################################
+Outputs:
+  MySecret:
+    Value: !Ref MySecret
+    Description: MySecret ARN
+  MySecretName:
+    Value: !Ref SecretName
+    Description: SecretName
+  GetSecretFunction:
+    Value: !Ref GetSecretFunction
+    Description: GetSecretFunction Lambda Function
