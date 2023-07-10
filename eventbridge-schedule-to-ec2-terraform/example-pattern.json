@@ -5,14 +5,14 @@
     "framework": "Terraform",
     "introBox": {
       "headline": "How it works",
-      "text": ["Creates a scheulde that turns on instances at 08:00 and turns them off at 17:00 Monday to Friday using the US/Eastern timezone."]
+      "text": ["Creates a schedule that turns on instances at 08:00 and turns them off at 17:00 Monday to Friday using the US/Eastern timezone."]
     },
     "gitHub": {
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-ec2-terrafrom",
         "templateURL": "serverless-patterns/eventbridge-schedule-to-ec2-terraform",
         "projectFolder": "eventbridge-schedule-to-ec2-terraform",
-        "templateFile": "eventbridge-schedule-to-ec2-terraform/main.tf"
+        "templateFile": "main.tf"
       }
     },
     "resources": {
