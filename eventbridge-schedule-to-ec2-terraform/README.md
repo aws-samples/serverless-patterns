@@ -37,6 +37,12 @@ Important: this application uses various AWS services and there are costs associ
 
 An Amazon EventBridge Schedule is used to start and stop an EC2 instance. The Terraform stack creates a VPC, EC2 instance and EventBridge Scheduler that invokes the startInstance and stopInstance API on a schedule.
 
+## Testing
+
+1. After deployment, view the schedule created in the Amazon EventBridge console under Scheduler>Schedules. 
+2. View the `ec2-start-schedule`. Navigate to the *Target* tab and note the `Payload` value which is in the format: `{"InstanceIds":["i-006c2e9f4e706bf48"]}`
+3. Navigate to the EC2 console and find the EC2 instance from the `Payload` value. Check the instance is powered on during 08:00 and 17:00 in the US/Eastern timezone.
+
 ## Cleanup
  
 1. Delete all created resources and follow prompts:
