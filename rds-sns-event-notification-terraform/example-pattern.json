@@ -1,13 +1,13 @@
 {
-	"title": "RDS Instance Event Subscription for Failure, Low Storage and Availability Events",
-	"description": "RDS Event Subscriptions allow users to configure notifications for RDS Events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances.",
+	"title": "Amazon RDS instance event notification to Amazon SNS",
+	"description": "Amazon RDS event subscriptions allow users to configure notifications for RDS events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS instances.",
 	"language": "YAML",
 	"level": "200",
 	"framework": "Terraform",
 	"introBox": {
 		"headline": "How it works",
 		"text": [
-			"RDS Event Subscriptions allow users to configure notifications for RDS Events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances."
+			"RDS event subscriptions allow users to configure notifications for RDS events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances."
 		]
 	},
 	"gitHub": {
@@ -15,7 +15,7 @@
 			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-rds-sns-event-notification",
 			"templateURL": "serverless-patterns/terraform-rds-sns-event-notification",
 			"projectFolder": "terraform-rds-sns-event-notification",
-			"templateFile": "terraform-rds-sns-event-notification/main.tf"
+			"templateFile": "main.tf"
 		}
 	},
 	"resources": {
