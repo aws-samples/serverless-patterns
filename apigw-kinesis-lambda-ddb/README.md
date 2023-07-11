@@ -51,10 +51,14 @@ Once the application is deployed:
 - Retrieve the username and password from Secrets Manager in AWS Console.
 - Invoke the endpoint from Postman using some json payload and verify the payload saved in DynamoDB.
 
-Example POST Request: https://{RestApiEndpoint}.execute-api.us-east-1.amazonaws.com/submit/{streamName}/{eventId}
+Request:
+- Request URL: https://{RestApiEndpoint}.execute-api.us-east-1.amazonaws.com/submit/{streamName}/{eventId}
+    - streamName - This is the name of kinesis stream created i.e., GatewayEventsStream
+    - eventId - Value in this attribute is used to choose PartitionKey in Kinesis stream. This example uses a single shard but when multiple shards are used, this eventId should be unique to share the load with multiple shards. Example: 55ad376f-86bf-4b06-9d3a-23237464dbd4
+- Request Method: POST
 - Request Header: "Content-Type: application/json"
 - Request Header: "Authorization: Basic <credentials>" (where credentials is the Base64 encoding of ID and password joined by a single colon :)
-- Request Body: {"eventId":"value1", "message":"event message for testing"}
+- Request Body: {"eventId":"value1", "message":"event message for testing"} (This could be any JSON payload)
 
 ## Cleanup
 
