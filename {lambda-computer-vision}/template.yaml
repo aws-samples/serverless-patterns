@@ -1,0 +1,163 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: The serverless services deployment for Amazon Rekognitin Custom Labels for wind turbines blog post
+Parameters:
+  MyDynamoDBTable:
+    Description: The Amazon DynamoDB table to be created for storing inference results
+    Type: String
+    Default: MyRekognitioNResultTable
+  InputBucketNamePrefix:
+    Description: The S3 bucket to continously receive turbine photos from drones
+    Type: String
+    Default: windturbine-pictures
+  CustomLabelsEndpoint:
+    Description: The ARN of the deployed Amazon Rekognition Custom Labels
+    Type: String
+    Default: arn:aws:rekognition:region-xxx-xx/xx/xx
+  MyEmailAdress:
+    Description: Your email adress to receive notifications
+    Type: String
+    Default: email@example.com
+  MyLabelListToBeNotified:
+    Description: Any set of issues (wear, icing, corrosion) separated by comma
+    Type: String
+    Default: "icing,wear,corrosion"
+  ThresholdForNotification:
+    Description: The percentage of threshold to get notification (enter 75 if 75%)
+    Type: Number
+    Default: 75
+Resources:
+  InputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${InputBucketNamePrefix}-get-photo
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+  MyCustomRekognitionLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: MyCustomRekognitionLambda.lambda_handler
+      Runtime: python3.8
+      CodeUri: ./MyCustomRekognitionLambda
+      Description: An S3 Create Object that triggers this Lambda Function
+      MemorySize: 128
+      Timeout: 3
+      Policies:
+        - Statement:
+            - Sid: MyCustomLabelsLabelsPolicy1
+              Effect: Allow
+              Action:
+                - rekognition:CreateProject
+                - rekognition:CreateProjectVersion
+                - rekognition:StartProjectVersion
+                - rekognition:StopProjectVersion
+                - rekognition:DescribeProjects
+                - rekognition:DescribeProjectVersions
+                - rekognition:DetectCustomLabels
+                - rekognition:DeleteProject
+                - rekognition:DeleteProjectVersion
+              Resource: !Ref CustomLabelsEndpoint
+            - Sid: MyCustomLabelsLabelsPolicy2
+              Effect: Allow
+              Action:
+                - s3:List*
+                - s3:Get*
+              Resource: "*"
+        - DynamoDBWritePolicy:
+            TableName: !Ref MyDynamoDBTable
+      Environment:
+        Variables:
+          Confidence_Threshold: 0
+          CustomLabels_ModelArn:
+            Ref: CustomLabelsEndpoint
+          DynamoDB_Table:
+            Ref: MyDynamoDBTable
+      Events:
+        BucketEvent:
+          Type: S3
+          Properties:
+            Bucket: !Ref InputBucket
+            Events: "s3:ObjectCreated:*"
+  MyDynamodbLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: MyDynamodbLambda.lambda_handler
+      Runtime: python3.8
+      CodeUri: ./MyDynamodbLambda
+      Description: An Dynamodb Create Object that triggers this Lambda Function
+      MemorySize: 128
+      Timeout: 3
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref MyDynamoDBTable
+        - SNSCrudPolicy:
+            TopicName: !GetAtt MySNSTopic.TopicName
+        - Statement:
+            - Sid: MyDynamodLambdaS3PresignPolicy
+              Effect: Allow
+              Action:
+                - s3:Get*
+                - S3:Create*
+              Resource:
+                - !GetAtt InputBucket.Arn
+                - !Join ["/", [!GetAtt InputBucket.Arn, "*"]]
+      Environment:
+        Variables:
+          AlarmingLabelList: !Ref MyLabelListToBeNotified
+          TopicArn: !Ref MySNSTopic
+          Threshold: !Ref ThresholdForNotification
+      Events:
+        TableEvent:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt OutputTable.StreamArn
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 1
+            Enabled: true
+  LambdaInvokePermission1:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName: !GetAtt MyCustomRekognitionLambda.Arn
+      Action: "lambda:InvokeFunction"
+      Principal: "s3.amazonaws.com"
+      SourceAccount: !Sub ${AWS::AccountId}
+      SourceArn: !GetAtt InputBucket.Arn
+  LambdaInvokePermission2:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName: !GetAtt MyDynamodbLambda.Arn
+      Action: "lambda:InvokeFunction"
+      Principal: "dynamodb.amazonaws.com"
+      SourceAccount: !Sub ${AWS::AccountId}
+      SourceArn: !GetAtt OutputTable.Arn
+  OutputTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName:
+        Ref: MyDynamoDBTable
+      AttributeDefinitions:
+        - AttributeName: ID
+          AttributeType: S
+        - AttributeName: TimeStamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ID
+          KeyType: HASH
+        - AttributeName: TimeStamp
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+  MySubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !Ref MyEmailAdress
+      Protocol: email
+      TopicArn: !Ref MySNSTopic
+  MySNSTopic:
+    Type: AWS::SNS::Topic
