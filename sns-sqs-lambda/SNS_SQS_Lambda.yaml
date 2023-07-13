@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  SNSTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties: 
+     TopicName: SNSServerLessPatternTopic
+     Subscription:
+      - Endpoint:
+          Fn::GetAtt:
+            - "MyQueueServerLessPattern"
+            - "Arn"
+        Protocol: "sqs"
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 4a1dceb8-54fd-4790-9df0-d6f4dbed73ad
+  MyQueueServerLessPattern:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+     QueueName : ServerLessPatternQueue
+     VisibilityTimeout: 720
+  LambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+     Handler: LambdaFunctoin.handler
+     Role: !GetAtt LambdaExecutionRole.Arn
+     Runtime: python3.7
+     Timeout: 120
+     MemorySize: 512
+     Code : 
+      ZipFile : |
+        import json
+          def lambda_handler(event, context):
+              print(event)           
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+     AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+     ManagedPolicyArns : 
+            - 'arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole'
+  EventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !GetAtt LambdaFunction.Arn
+      EventSourceArn: !GetAtt MyQueueServerLessPattern.Arn
