@@ -12,9 +12,9 @@
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-m2m-oauth-apigw-oauth-cdk",
-        "templateURL": "serverless-patterns/cognito-m2m-oauth-apigw-oauth-cdk",
-        "projectFolder": "cognito-m2m-oauth-apigw-oauth-cdk",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-m2m-oauth-apigw-cdk",
+        "templateURL": "serverless-patterns/cognito-m2m-oauth-apigw-cdk",
+        "projectFolder": "cognito-m2m-oauth-apigw-cdk",
         "templateFile": "src/lib/cdk-cognito-oauth-authorizer-stack.ts"
       }
     },
