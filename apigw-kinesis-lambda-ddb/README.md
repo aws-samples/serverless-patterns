@@ -52,7 +52,8 @@ Once the application is deployed:
 - Invoke the endpoint from Postman using some json payload and verify the payload saved in DynamoDB.
 
 Request:
-- Request URL: https://{RestApiEndpoint}.execute-api.us-east-1.amazonaws.com/{gatewayStage}/submit/{streamName}/{eventId}
+- Request URL: https://{RestApiEndpoint}.execute-api.{Region}.amazonaws.com/{gatewayStage}/submit/{streamName}/{eventId}
+    - Region - Name of AWS Resion, Example: us-east-1
     - gatewayStage - Name of the API Gateway Stage. A stage is a named reference to a deployment, which is a snapshot of the API. "prod" is the stage name used in the SAM template.
     - streamName - This is the name of kinesis stream created i.e., GatewayEventsStream
     - eventId - Value in this attribute is used to choose PartitionKey in Kinesis stream. This example uses a single shard but when multiple shards are used, this eventId should be unique to share the load with multiple shards. Example: 55ad376f-86bf-4b06-9d3a-23237464dbd4
@@ -61,17 +62,14 @@ Request:
 - Request Header: "Authorization: Basic <credentials>" (where credentials is the Base64 encoding of ID and password joined by a single colon :)
 - Request Body: {"eventId":"value1", "message":"event message for testing"} (This could be any JSON payload)
 
+Example URL: https://abc1234def.execute-api.us-east-1.amazonaws.com/prod/submit/GatewayEventsStream/55ad376f-86bf-4b06-9d3a-23237464dbd4
+
 ## Cleanup
 
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
-
 This pattern was contributed by Ravi Kiran Ganji.
 
 ----
