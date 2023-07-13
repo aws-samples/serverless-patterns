@@ -52,7 +52,8 @@ Once the application is deployed:
 - Invoke the endpoint from Postman using some json payload and verify the payload saved in DynamoDB.
 
 Request:
-- Request URL: https://{RestApiEndpoint}.execute-api.us-east-1.amazonaws.com/submit/{streamName}/{eventId}
+- Request URL: https://{RestApiEndpoint}.execute-api.us-east-1.amazonaws.com/{gatewayStage}/submit/{streamName}/{eventId}
+    - gatewayStage - Name of the API Gateway Stage. A stage is a named reference to a deployment, which is a snapshot of the API. "prod" is the stage name used in the SAM template.
     - streamName - This is the name of kinesis stream created i.e., GatewayEventsStream
     - eventId - Value in this attribute is used to choose PartitionKey in Kinesis stream. This example uses a single shard but when multiple shards are used, this eventId should be unique to share the load with multiple shards. Example: 55ad376f-86bf-4b06-9d3a-23237464dbd4
 - Request Method: POST
