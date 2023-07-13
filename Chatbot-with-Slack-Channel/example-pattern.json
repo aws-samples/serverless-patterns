@@ -1,0 +1,46 @@
+{
+    "title": "SNS to Chatbot to Slack Integration via CFN",
+    "description": "Creating a Slack channel SNS subscription via AWS Chatbot",
+    "language": "YAML",
+    "level": "200",
+    "framework": "CFN",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This is a sample project where the message will be published from SNS topic to slack channel subscription."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/Chatbot-with-Slack-Channel",
+        "templateURL": "serverless-patterns/Chatbot-with-Slack-Channel",
+        "projectFolder": "Chatbot-with-Slack-Channel",
+        "templateFile": "sns-lambda-slack-integration-SAM/SNS-Chatbot-Slack.yaml"
+      }
+    },
+
+    "deploy": {
+      "text": [
+        "CFN deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Tanya Gupta",
+        "image": "",
+        "bio": "AWS Cloud Support Engineer",
+        "linkedin": "",
+        "twitter": ""
+      }
+    ]
+  }
