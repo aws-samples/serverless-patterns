@@ -58,7 +58,7 @@ curl --location 'https://<your cognito custom domain>/oauth2/token' \
 3. API Gateway uses the Cognito Authorizer to authenticate and authorize the request.
 
 ```
-curl --location 'https://7scdlnkrc5.execute-api.eu-west-2.amazonaws.com/prod/user' \
+curl --location 'https:/<apigw endpoint>/prod/user' \
 --header 'Authorization: <token you get from step 1>'
 ```
 4. If the authorization is successful, the request is forwarded to an AWS Lambda function for further processing.
