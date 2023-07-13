@@ -1,7 +1,7 @@
 {
   "title": "S3 to .NET Lambda",
   "description": "Automate the creation of thumbnail images from new images on Amazon S3 leveraging Lambda and .NET",
-  "language": "C#",
+  "language": ".NET",
   "level": "200",
   "framework": "SAM",
   "services": {
