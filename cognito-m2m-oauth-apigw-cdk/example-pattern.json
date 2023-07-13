@@ -7,7 +7,7 @@
     "introBox": {
       "headline": "How it works",
       "text": [
-        "The pipe uses a filter to discard unwanted messages and an input transformer to select which attributes to keep for the remaining messages."
+        "Get OAuth 2.0 access tokens from Cognito User Pool and use them to access API Gateway resources"
       ]
     },
     "gitHub": {
