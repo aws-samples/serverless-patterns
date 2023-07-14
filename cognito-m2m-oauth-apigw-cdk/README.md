@@ -38,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates an Amazon API gateway HTTP API endpoint. The endpoint uses service integrations to directly connect to Amazon EventBridge. An EventBridge rule sends all events to Cloudwatch Logs.
+This pattern get OAuth 2.0 access tokens from Cognito User Pool and use them to access API Gateway resources.
 
 ## Testing
 
@@ -73,6 +73,6 @@ cdk destroy
 ```
 
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
