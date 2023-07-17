@@ -1,6 +1,6 @@
 {
     "title": "Amazon API Gateway to Amazon Kinesis with AWS Lambda as Consumer",
-    "description": "Create a REST API Gateway which performs PutRecords API Call to Kinesis Data stream and stream is having Lmabda function to consume the incoming record",
+    "description": "Create a REST API Gateway which performs PutRecords API Call to Kinesis Data stream and stream is having Lambda function to consume the incoming record",
     "language": "Python",
     "level": "300",
     "framework": "SAM",
