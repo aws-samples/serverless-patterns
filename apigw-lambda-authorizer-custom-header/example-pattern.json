@@ -1,5 +1,5 @@
 {
-    "title": "AWS API Gateway API with AWS Lambda Token Authorizer and mapping template adding custom headers",
+    "title": "Amazon API Gateway REST API with AWS Lambda Token Authorizer with custom headers",
     "description": "Create an API with a mapping template that enriches the request with additional data from Lambda Token Authorizer.",
     "language": "Node.js",
     "level": "200",
