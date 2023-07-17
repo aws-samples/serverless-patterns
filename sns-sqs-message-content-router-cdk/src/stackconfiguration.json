@@ -1,0 +1,40 @@
+{
+    "Sns": {
+        "TopicName": "content-router"
+    },
+    "Sqs": [
+        {
+            "QueueName": "country-usa",
+            "IsAttribute": true,
+            "Filter": {
+                "FilterName": "country",
+                "FilterValues": [
+                    "united states of america",
+                    "usa"
+                ]
+            }
+        },
+        {
+            "QueueName": "country-germany",
+            "IsAttribute": true,
+            "Filter": {
+                "FilterName": "country",
+                "FilterValues": [
+                    "germany",
+                    "de"
+                ]
+            }
+        },
+        {
+            "QueueName": "language-english",
+            "IsAttribute": false,
+            "Filter": {
+                "FilterName": "language",
+                "FilterValues": [
+                    "english",
+                    "en"
+                ]
+            }
+        }
+    ]
+}
