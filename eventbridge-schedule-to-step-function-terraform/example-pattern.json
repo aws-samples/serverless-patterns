@@ -1,5 +1,5 @@
 {
-	"title": "EventBridge Scheduler to Step Functions",
+	"title": "Amazon EventBridge Scheduler to AWS Step Functions",
 	"description": "Create an EventBridge Scheduler that executes a Step Functions State Machine",
 	"language": "Python",
 	"level": "200",
