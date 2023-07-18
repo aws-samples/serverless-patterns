@@ -11,7 +11,7 @@ This aproach can be used to inject data that downstream legacy systems expect an
 * Only if the value of 'authorizationToken' header is 'allow', API Gateway will successfully call the HTTP backend and return a 200. 
 * For any other case, API Gateway will return a 403 error.
 
-TODO: Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-lambda-authorizer](https://serverlessland.com/patterns/apigw-lambda-authorizer)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-lambda-authorizer-custom-header](https://serverlessland.com/patterns/apigw-lambda-authorizer-custom-header)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
