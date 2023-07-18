@@ -54,7 +54,7 @@ Check the CloudWatch logs of the Lambda function to see the SNS event JSON.
 
 1. Delete the stack 
     ```
-    aws cloudformation delete-stack —stack-name STACK_NAME
+    sam delete
     ```
 2. Confirm the stack has been deleted 
     ```
