@@ -39,7 +39,7 @@
     },
     "cleanup": {
       "text": [
-        "Delete the stack: <code>same delete</code>."
+        "Delete the stack: <code>sam delete</code>."
       ]
     },
     "authors": [
