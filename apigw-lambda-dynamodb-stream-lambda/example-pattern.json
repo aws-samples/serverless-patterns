@@ -1,6 +1,6 @@
 {
   "title": "API Gateway to Lambda, DynamoDB, Kinesis, Lambda integration",
-  "description": "Create a api to trigger Lambda, Save to DynamoDB, strean message to DynamoDB Stream and trigger a Lambda",
+  "description": "API to trigger a Lambda function which save to DynamoDB, stream messages (with DynamoDB Stream) and trigger a Lambda function",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
