@@ -62,6 +62,6 @@ Check the CloudWatch logs of the Lambda function to see the SNS event JSON.
     ```
 
 ----
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
