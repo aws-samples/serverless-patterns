@@ -1,0 +1,8 @@
+[ 
+		  { 
+			 "DetailType": "StripeAppDetailType",
+			 "EventBusName": "StripeEventBus",
+			 "Source": "StripeApp",
+			 "Detail": "{\"name\":\"Mystic 8 Button\",\"description\":\"A modern Magic 8 ball that can be used as a desk toy.\"}"
+		  }
+]

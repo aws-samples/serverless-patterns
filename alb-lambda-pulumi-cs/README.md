@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Pulumi](https://www.pulumi.com/docs/get-started/install/) installed
-* [.NET Core](https://dotnet.microsoft.com/en-us/download) installed and configured
+* [.NET 6](https://dotnet.microsoft.com/en-us/download) installed and configured
 
 ## Deployment Instructions
 
