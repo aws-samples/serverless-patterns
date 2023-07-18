@@ -1,6 +1,6 @@
 # Amazon API Gateway integration with Amazon Kinesis Stream with AWS Lambda function as consumer 
 
-This pattern will help you to deploy Amazon API Gateway API integration with Amazon Kinesis Stream and it will deploy Lambda function as a consumer for deployed Amazon Kinesis Stream.
+This pattern will help you to deploy Amazon API Gateway integration with Amazon Kinesis Stream and it will deploy a Lambda function as a consumer for deployed Amazon Kinesis Stream.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-kinesis-lambda
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
