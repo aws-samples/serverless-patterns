@@ -1,4 +1,4 @@
-# Amazon DynamoDB Streams to Appsync Subscription
+# Amazon DynamoDB Streams to AppSync Subscription
 
 This pattern creates an AppSync API allowing you to listen to new items being created on a specific DynamoDB table through AWS AppSync subscriptions. With this pattern, a Lambda function will be invoked that will in turn call an AppSync mutation with data source set as `None`. An AppSync subscription will be subscribed to that mutation allowing end users to be notified of a newly created DynamoDB item.
 
