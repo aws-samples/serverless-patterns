@@ -3,11 +3,6 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   .NET Image resizing service
 
-Parameters:
-  BucketName:
-    Type: String
-    Description: "REQUIRED: Unique S3 bucket name to use for the app."
-
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -20,7 +15,7 @@ Resources:
   SourceBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref BucketName
+      BucketName: !Sub "imageresizer-${AWS::AccountId}"
 
   ResizerFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -41,11 +36,11 @@ Resources:
                     Value: '.jpeg'
       Policies:
         - S3FullAccessPolicy:
-            BucketName: !Ref BucketName
+            BucketName: !Sub "imageresizer-${AWS::AccountId}/*"
 
 Outputs:
-  BucketName:
-    Value: !Ref BucketName
+  SourceBucketName:
+    Value: !Ref SourceBucket
     Description: S3 Bucket for object storage
   FunctionArn:
     Value: !Ref ResizerFunction
