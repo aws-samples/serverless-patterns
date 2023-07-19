@@ -4,7 +4,7 @@ Description: AWS-SAM-APIGW-Lambda-SnapStart
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java17
     MemorySize: 2048
     Timeout: 29
 
@@ -13,23 +13,28 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
+      TracingEnabled: true
 
   UnicornStoreSpringFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: com.unicorn.store.StreamLambdaHandler
       CodeUri: UnicornFunction
+      Tracing: Active
       Environment:
         Variables:
-          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
           AWS_SERVERLESS_JAVA_CONTAINER_INIT_GRACE_TIME: 500
-          PRODUCT_TABLE_NAME: !Ref UnicornTable
+          UNICORN_TABLE_NAME: !Ref UnicornTable
+          POWERTOOLS_LOG_LEVEL: INFO
+          POWERTOOLS_SERVICE_NAME: unicorn
+          POWERTOOLS_METRICS_NAMESPACE: UnicornApplication
       AutoPublishAlias: live
       SnapStart:
         ApplyOn: PublishedVersions
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UnicornTable
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
       Events:
         ApiEvents:
           Type: Api
@@ -42,7 +47,7 @@ Resources:
     Type: AWS::Serverless::SimpleTable
     Properties:
       PrimaryKey:
-        Name: PK
+        Name: id
         Type: String
 
 Outputs:
