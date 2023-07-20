@@ -11,9 +11,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys a Amazon S3 bucket for image hosting with a AWS Lambda function triggered by new images that will create thumbnails.",
-      "Generate .NET 6 docker image for the function, deploy Lambda with the function, create folder 'images' in the newly created S3 bucket, upload images to images folder in the new S3 bucket.",
-      "When a .jpeg is uploaded, Lambda creates new thumbnail folder in S3 and writes the resized image."
+      "This pattern deploys an Amazon S3 bucket for image hosting with an AWS Lambda function that gets invoked when new images are added to the bucket. The Lambda function uses .NET 6 to create a thumbnail of the image and save the thumbnail back to the same S3 bucket."
     ]
   },
   "gitHub": {
