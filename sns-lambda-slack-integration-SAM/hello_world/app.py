@@ -6,7 +6,8 @@ http = urllib3.PoolManager()
 def lambda_handler(event, context):
     print(event)
 
-    url = 'https://hooks.slack.com/workflows/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'
+    # Enter slack URL below.
+    url = 'https://hooks.slack.com/workflows/{your webhook url}'
     msg = {
         'channel': '#sns-topic-slack-integration',
         'Message': event['Records'][0]['Sns']['Message'],
