@@ -1,0 +1,10 @@
+{
+  "name": "lambda",
+  "version": "0.1.0",
+  "dependencies": {
+    "aws-cdk-lib": "2.33.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.119"
+  }
+}
