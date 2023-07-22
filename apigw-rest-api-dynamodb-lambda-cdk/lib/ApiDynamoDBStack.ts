@@ -5,6 +5,7 @@ import { Effect, Policy, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk
 import { Construct } from 'constructs';
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import * as path from 'path';
 
 export class ApiDynamoDBStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -21,10 +22,10 @@ export class ApiDynamoDBStack extends Stack {
       tableName: modelName,
       stream: StreamViewType.NEW_AND_OLD_IMAGES
     });
-
+    
     const lambdaFunction = new lambda.Function(this, 'Function', {
       code: lambda.Code.fromAsset('./src'),
-      handler: 'index.handler',
+      handler: 'index.handlerAAAA',
       functionName: 'TableStreamHandler',
       runtime: lambda.Runtime.NODEJS_16_X,
     });
