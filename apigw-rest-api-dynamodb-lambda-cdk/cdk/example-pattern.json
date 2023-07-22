@@ -1,0 +1,61 @@
+{
+    "title": "Amazon API Gateway to Amazon DynamoDB and Trigger Event to AWS Lambda as a consumer",
+    "description": "Create a REST API Gateway which performs PutRecords API to save to DynamoDB and the stream is consumed by a Lambda function",
+    "language": "Python",
+    "level": "300",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern will help you to deploy Amazon API Gateway API integration with Amazon DynamoDB and it will deploy Lambda function as a consumer for deployed Amazon DynamoDB Stream.",
+        "In this pattern, Lambda function is logging the decoded message which was received from the Amazon Kinesis Stream."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-dynamodb-lambda-cdk",
+        "templateURL": "serverless-patterns/apigw-rest-dynamodb-lambda-cdk",
+        "projectFolder": "apigw-rest-dynamodb-lambda-cdk",
+        "templateFile": "apigw-rest-dynamodb-lambda-cdk/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Tutorial: Create a REST API as an Amazon Kinesis proxy in API Gateway",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-kinesis.html"
+        },
+        {
+          "text": "Kinesis Data Stream PutRecord API",
+          "link": "https://docs.aws.amazon.com/kinesis/latest/APIReference/API_PutRecord.html"
+        },
+        {
+          "text": "Using AWS Lambda with Amazon Kinesis",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Thi Nguyen",
+        "image": "https://drive.google.com/file/d/188LpzUvUmHt1o7vzbwKw32S-fYabL-qY/view?usp=sharing",
+        "bio": "Solutions Architect @ AWS",
+        "linkedin": "https://www.linkedin.com/in/ndthi"
+      } 
+    ]
+  }                      

@@ -1,8 +1,10 @@
 import { RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { AwsIntegration, Cors, RestApi } from 'aws-cdk-lib/aws-apigateway';
-import { Table, BillingMode, AttributeType } from 'aws-cdk-lib/aws-dynamodb';
+import { Table, BillingMode, AttributeType, StreamViewType } from 'aws-cdk-lib/aws-dynamodb';
 import { Effect, Policy, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 export class ApiDynamoDBStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -16,8 +18,22 @@ export class ApiDynamoDBStack extends Stack {
         type: AttributeType.STRING
       },
       removalPolicy: RemovalPolicy.DESTROY,
-      tableName: modelName
+      tableName: modelName,
+      stream: StreamViewType.NEW_AND_OLD_IMAGES
     });
+
+    const lambdaFunction = new lambda.Function(this, 'Function', {
+      code: lambda.Code.fromAsset('./src'),
+      handler: 'index.handler',
+      functionName: 'TableStreamHandler',
+      runtime: lambda.Runtime.NODEJS_16_X,
+    });
+
+    lambdaFunction.addEventSource(new DynamoEventSource(dynamoDBTable, {
+      startingPosition: lambda.StartingPosition.LATEST,
+    }));
+
+    dynamoDBTable.grantStreamRead(lambdaFunction);
 
     const getPolicy = new Policy(this, 'getPolicy', {
       statements: [
