@@ -25,9 +25,9 @@ export class ApiDynamoDBStack extends Stack {
     
     const lambdaFunction = new lambda.Function(this, 'Function', {
       code: lambda.Code.fromAsset(path.join(__dirname, '../src')),
-      handler: 'index.handler',
+      handler: 'messageHandler.lambda_handler',
       functionName: 'TableStreamHandler',
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.PYTHON_3_10,
     });
 
     lambdaFunction.addEventSource(new DynamoEventSource(dynamoDBTable, {

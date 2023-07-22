@@ -30,6 +30,9 @@ The following diagram illustrates the solutions architect
 1. Install dependencies
     ```
     npm install
+	cd src
+	pip install aws-xray-sdk --target .
+	pip install aws_lambda_powertools --target .
     ```
 
 1. Deploy the stack to your default AWS account and region. The output of this command should give you the HTTP API URL.
