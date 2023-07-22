@@ -63,8 +63,10 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 	* Choose the **Body** tab. Choose **raw** and select **JSON** from the drop-down list. Enter the following into the text box: 
 	```
 	{
-		"pk": "foo",
-		"data": "blah blah blah"
+		"id":"14",
+    	"name":"Do some thing",
+    	"description":"Do some thing",
+    	"customer":"John"
 	}
 	```
 	* Choose **Send** to submit the request and receive a "200 OK" response.
