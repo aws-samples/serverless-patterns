@@ -1,9 +1,9 @@
 {
   "title": "DynamoDB Streams to trigger SNS messaging",
   "description": "Create an asynchronous DynamoDB Streams trigger to SNS.",
-  "language": "yaml",
+  "language": "Python",
   "level": "200",
-  "framework": "CloudFormation",
+  "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
