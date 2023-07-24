@@ -3,7 +3,7 @@
     "description": "Creating a Slack channel SNS subscription via AWS Chatbot",
     "language": "YAML",
     "level": "200",
-    "framework": "CFN",
+    "framework": "SAM",
     "introBox": {
       "headline": "How it works",
       "text": [
