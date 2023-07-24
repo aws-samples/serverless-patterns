@@ -1,0 +1,57 @@
+{
+  "title": "DynamoDB Streams to trigger SNS messaging",
+  "description": "Create an asynchronous DynamoDB Streams trigger to SNS.",
+  "language": "yaml",
+  "level": "200",
+  "framework": "CloudFormation",
+  "introBox": {
+    "headline": "DynamoDB Streams to trigger SNS messaging",
+    "text": [
+      "**NOTE** - Edit the CloudFormation template in a Code Editor like Visual Studio Code and replace “Endpoint: abcd@gmail.com”, with your own personal email.",
+      
+      "This blog will teach you how to create a trigger for Amazon SNS messaging every time an item is created in an Amazon DynamoDB table via DynamoDB streams. In 30 minutes, you will deploy the Cloudformation template which will create the following resources:"
+      "1. Amazon DynamoDB table (Name: MyTable) - Will have a hash and sort key"
+      "2. Lambda Function (Name: MyLambda)  - includes the DynamoDB streams trigger + Invoke the SNS Publish API"
+      "3. SNS Topic Created with Email (Name:  - User will need to subscribe"
+    
+      "After deploying the Cloudformation template resources, you will then go to your email that you inputted and verify your SNS email (check spam if you cannot find it in your inbox). Once that is done, navigate to DynamoDB and to MyTable. Click on Actions > Create Item. Create a random item and save/submit it. An email will be sent to you."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/DynamoDBtoSNS",
+      "templateURL": "serverless-patterns/DynamoDBtoSNS",
+      "projectFolder": "DynamoDBtoSNS",
+      "templateFile": "DynamoDBtoSNS/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon SNS - Notification Service ",
+        "link": "https://aws.amazon.com/sns/"
+      },
+      {
+        "text": "Amazon DynamoDB - NoSQL Database",
+        "link": "https://aws.amazon.com/dynamodb/"
+      },
+      {
+        "text": "AWS Lambda - Serverless Computing",
+        "link": "https://aws.amazon.com/lambda/"
+      }
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Navigate to the Cloudformation console, select the stack and select the Delete option."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Khush Patel",
+      "image": "/static/IMG_6994 (6).jpg",
+      "bio": "Khush is a Solution Architect with AWS for Energy.",
+      "linkedin": "https://www.linkedin.com/in/khushpatel11/"
+    }
+  ]
+}

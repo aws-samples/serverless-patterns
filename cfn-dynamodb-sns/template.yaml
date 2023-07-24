@@ -1,0 +1,75 @@
+Resources:
+  MyDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: MyTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: N
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+  MyLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: MyLambdaExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
+
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: MyLambda
+      Runtime: python3.9
+      Handler: index.lambda_function.handler
+      Role: !GetAtt MyLambdaExecutionRole.Arn
+      Code: 
+        ZipFile: |
+          import boto3
+
+          def lambda_handler(event, context):
+              sns_client = boto3.client('sns')
+              message = "Hi, you have just received data in your DynamoDB table"
+              sns_client.publish(
+                  TopicArn='arn:aws:sns:us-east-1:811514538970:MySNS',
+                  Message=message
+              )
+        
+
+  MyDynamoDBStreamEventSource:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 1
+      EventSourceArn: !GetAtt MyDynamoDBTable.StreamArn
+      FunctionName: !Ref MyLambdaFunction
+      StartingPosition: TRIM_HORIZON
+
+  MySNS:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: MySNS
+
+  MySNSSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: email
+      Endpoint: abcd@gmail.com
+      TopicArn: !Ref MySNS
