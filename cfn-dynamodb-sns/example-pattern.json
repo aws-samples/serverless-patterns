@@ -5,7 +5,7 @@
   "level": "200",
   "framework": "CloudFormation",
   "introBox": {
-    "headline": "DynamoDB Streams to trigger SNS messaging",
+    "headline": "How it works",
     "text": [
       "**NOTE** - Edit the CloudFormation template in a Code Editor like Visual Studio Code and replace “Endpoint: abcd@gmail.com”, with your own personal email.",
       
@@ -19,10 +19,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/DynamoDBtoSNS",
-      "templateURL": "serverless-patterns/DynamoDBtoSNS",
-      "projectFolder": "DynamoDBtoSNS",
-      "templateFile": "DynamoDBtoSNS/template.yaml"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cfn-dynamodb-sns",
+      "templateURL": "serverless-patterns/cfn-dynamodb-sns",
+      "projectFolder": "cfn-dynamodb-sns",
+      "templateFile": "cfn-dynamodb-sns/template.yaml"
     }
   },
   "resources": {
@@ -41,6 +41,16 @@
       }
     ]
   },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
   "cleanup": {
     "text": [
       "Navigate to the Cloudformation console, select the stack and select the Delete option."
@@ -49,7 +59,7 @@
   "authors": [
     {
       "name": "Khush Patel",
-      "image": "/static/IMG_6994 (6).jpg",
+      "image": "/static/pfp.jpg",
       "bio": "Khush is a Solution Architect with AWS for Energy.",
       "linkedin": "https://www.linkedin.com/in/khushpatel11/"
     }
