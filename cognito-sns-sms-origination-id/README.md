@@ -16,7 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Cloud Devolpment Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed
 
 ## Getting Started
-The entire solution is built on CDK typescript and CustomSMSSender Lambda function in Python3.7. The instructions below shows the prerequisities, deployment instructions and testing steps.
+The entire solution is built on CDK typescript and CustomSMSSender Lambda function in Node.js 18.x. The instructions below shows the prerequisities, deployment instructions and testing steps.
 
 
 ### Prerequisites
