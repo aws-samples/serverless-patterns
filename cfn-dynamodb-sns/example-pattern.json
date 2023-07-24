@@ -9,10 +9,10 @@
     "text": [
       "**NOTE** - Edit the CloudFormation template in a Code Editor like Visual Studio Code and replace “Endpoint: abcd@gmail.com”, with your own personal email.",
       
-      "This blog will teach you how to create a trigger for Amazon SNS messaging every time an item is created in an Amazon DynamoDB table via DynamoDB streams. In 30 minutes, you will deploy the Cloudformation template which will create the following resources:"
-      "1. Amazon DynamoDB table (Name: MyTable) - Will have a hash and sort key"
-      "2. Lambda Function (Name: MyLambda)  - includes the DynamoDB streams trigger + Invoke the SNS Publish API"
-      "3. SNS Topic Created with Email (Name:  - User will need to subscribe"
+      "This blog will teach you how to create a trigger for Amazon SNS messaging every time an item is created in an Amazon DynamoDB table via DynamoDB streams. In 30 minutes, you will deploy the Cloudformation template which will create the following resources:",
+      "1. Amazon DynamoDB table (Name: MyTable) - Will have a hash and sort key",
+      "2. Lambda Function (Name: MyLambda)  - includes the DynamoDB streams trigger + Invoke the SNS Publish API",
+      "3. SNS Topic Created with Email (Name:  - User will need to subscribe",
     
       "After deploying the Cloudformation template resources, you will then go to your email that you inputted and verify your SNS email (check spam if you cannot find it in your inbox). Once that is done, navigate to DynamoDB and to MyTable. Click on Actions > Create Item. Create a random item and save/submit it. An email will be sent to you."
     ]
