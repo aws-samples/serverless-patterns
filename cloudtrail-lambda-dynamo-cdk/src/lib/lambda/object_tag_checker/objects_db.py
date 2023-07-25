@@ -2,12 +2,13 @@ from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Attr
 import logging
 logger = logging.getLogger('dynamodb_resource')
-class Resources:
+
+class Objects:
     def __init__(self, db_client, table_name):
         self.dyn_client = db_client
         self.table = self.dyn_client.Table(table_name)
 
-    def scan_resources(self):
+    def scan_objects(self):
         try:
             response = self.table.scan(FilterExpression=Attr('is_compliant').eq(False))     
 
@@ -25,7 +26,7 @@ class Resources:
         try:
             response = self.table.update_item(
                 Key = {
-                    "resource_arn": item.resource_arn,
+                    "object_arn": item.object_arn,
                 },
                 UpdateExpression = update_expression,
                 ExpressionAttributeValues = attribute_values,
