@@ -92,6 +92,7 @@ Amazon Cognito can be customized using lambda triggers for different flows. This
 <img src="./images/cognito-sns-sms-id.jpg" alt="architecture" width="100%"/>
 
 ### Testing
+To trigger Custom SMS Sender Lambda "CustomSMSSender_SignUp" [event](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-sms-sender.html#trigger-source) from Amazon Cognito and send MFA SMS code 
 
 1. Run the below CLI command, replace the --client-id with CognitoSnsSmsOriginationIdentityStack.cognitocustomsmssenderclientappid output, update other inputs fields and phone number 
 
@@ -109,7 +110,7 @@ Amazon Cognito can be customized using lambda triggers for different flows. This
  
 1. Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted
     ```
-    cdk deploy --all
+    cdk destroy --all
     ```
 
 ----
