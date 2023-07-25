@@ -13,7 +13,9 @@ namespace DotnetLambdaCloudwatchDashboard
             var assetImageCodeProps = new AssetImageCodeProps
             {
                 BuildArgs = new Dictionary<string, string> {
-                { "INSIGHTSEXTENSION", "https://lambda-insights-extension.s3-ap-northeast-1.amazonaws.com/amazon_linux/lambda-insights-extension.rpm" }
+                //ARM - https://lambda-insights-extension-arm64.s3-ap-northeast-1.amazonaws.com/amazon_linux/lambda-insights-extension-arm64.rpm 
+                { "URL", "https://lambda-insights-extension.s3-ap-northeast-1.amazonaws.com/amazon_linux/" },
+                {"INSIGHTSEXTENSION","lambda-insights-extension.rpm"}
                 }
             };
             // The code that defines your stack goes here

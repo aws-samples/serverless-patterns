@@ -1,5 +1,6 @@
 FROM public.ecr.aws/lambda/dotnet:6 AS base
 
+ARG URL
 ARG INSIGHTSEXTENSION
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim as build
@@ -21,9 +22,10 @@ RUN dotnet publish "proxy-lambda.csproj" \
 
 FROM base AS final
 ARG INSIGHTSEXTENSION
-RUN curl -O $INSIGHTSEXTENSION && \
-    rpm -U lambda-insights-extension.rpm && \
-    rm -f lambda-insights-extension.rpm
+RUN curl -O $URL$INSIGHTSEXTENSION && \
+    rpm -U $INSIGHTSEXTENSION && \
+    rm -f $INSIGHTSEXTENSION
+
 WORKDIR /var/task
 RUN echo $REGION
 COPY --from=publish /app/publish .
