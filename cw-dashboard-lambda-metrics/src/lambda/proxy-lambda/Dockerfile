@@ -21,8 +21,12 @@ RUN dotnet publish "proxy-lambda.csproj" \
             -p:PublishReadyToRun=true  
 
 FROM base AS final
+ARG URL
 ARG INSIGHTSEXTENSION
-RUN curl -O $URL$INSIGHTSEXTENSION && \
+
+ENV FULLURL=$URL$INSIGHTSEXTENSION
+RUN echo $FULLURL
+RUN curl -O $FULLURL && \
     rpm -U $INSIGHTSEXTENSION && \
     rm -f $INSIGHTSEXTENSION
 
