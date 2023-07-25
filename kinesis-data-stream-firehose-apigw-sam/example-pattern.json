@@ -2,6 +2,7 @@
   "title": "Kinesis Data Stream to API Gateway via Data Firehose",
   "description": "POST data received by Kinesis Data Stream to HTTP Endpoint securely using Kinesis Data Firehose",
   "level": "200",
+  "language": "Python",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
