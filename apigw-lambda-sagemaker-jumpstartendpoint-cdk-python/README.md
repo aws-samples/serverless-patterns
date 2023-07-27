@@ -1,6 +1,6 @@
 # Accessing AWS Sagemaker Endpoint via API Gateway and Lambda
 
-This pattern deploys a Sagemaker Jumpstart model (Flan T5 XL) endpoint using AWS Sagemaker. It also adds a lambda and an API Gateway serve the endpoint
+This pattern deploys a Sagemaker Jumpstart model (Flan T5 XL) endpoint. It also adds a lambda and an API Gateway query the endpoint
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-sagemaker-jumpstartendpoint-cdk-python
 
@@ -59,7 +59,7 @@ Important: this application uses various AWS services and there are costs associ
 
 2. The pattern also adds a lambda and an API Gateway query the endpoint
 
-3. The API Gateway is protected using an API Key. ```x-api-key``` header needs to be added to the HTTP request.
+3. The API Gateway is protected using an API Key. To query the Api Gateway, ```x-api-key``` header needs to be added to the HTTP request
  
 
 ## Testing
