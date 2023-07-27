@@ -10,7 +10,7 @@ from constructs import Construct
 from util.sagemaker_endpoint_construct import SageMakerEndpointConstruct
 from datetime import datetime
 
-class CdkStablediffusionPythonStack(Stack):
+class ApigwLambdaSagemakerJumpstartendpointStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, model_info, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -19,7 +19,7 @@ class CdkStablediffusionPythonStack(Stack):
         instance_count_param = self.node.try_get_context("instance_count_param")
         instance_count = int(instance_count_param) if instance_count_param else 1
 
-        role = iam.Role(self, "Gen-AI-SageMaker-Policy", assumed_by=iam.ServicePrincipal("sagemaker.amazonaws.com"))
+        role = iam.Role(self, "SageMaker-Policy", assumed_by=iam.ServicePrincipal("sagemaker.amazonaws.com"))
         role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"))
 
         sts_policy = iam.Policy(self, "sm-deploy-policy-sts",
@@ -62,11 +62,11 @@ class CdkStablediffusionPythonStack(Stack):
         role.attach_inline_policy(ecr_policy)
 
         # Generate a unique model name
-        model_name = f"SDTxt2Img-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        model_name = f"JumpstartModel-{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
         # Create a SageMaker endpoint that can be used to generate images from text
-        endpoint = SageMakerEndpointConstruct(self, "TXT2IMG",
-                                              project_prefix=f"GenAIDemo-{instance_count}",
+        endpoint = SageMakerEndpointConstruct(self, "Jumpstart",
+                                              project_prefix=f"Jumpstart-{instance_count}",
                                               role_arn=role.role_arn,
                                               model_name=model_name,
                                               model_bucket_name=model_info["model_bucket_name"],
@@ -91,7 +91,7 @@ class CdkStablediffusionPythonStack(Stack):
         endpoint.node.add_dependency(logs_policy)
         endpoint.node.add_dependency(ecr_policy)
 
-        ssm.StringParameter(self, "txt2img_endpoint", parameter_name="txt2img_endpoint",
+        ssm.StringParameter(self, "Jumpstart_endpoint", parameter_name="Jumpstart_endpoint",
                             string_value=endpoint.endpoint_name)
 
         # Create a Lambda function to invoke the SageMaker endpoint
@@ -121,29 +121,29 @@ class CdkStablediffusionPythonStack(Stack):
         # Create the REST API Gateway
         api = apigateway.RestApi(
             self,
-            "StableDiffusionAPI",
-            rest_api_name="StableDiffusionAPI"
+            "APIForSagemakerEndpoint",
+            rest_api_name="APIForSagemakerEndpoint"
         )
 
         # Store the API Gateway URL in an SSM Parameter
         ssm.StringParameter(
             self,
             "api_gateway_url",
-            parameter_name="/StableDiffusionAPI/URL",
+            parameter_name="/SagemakerAPI/URL",
             string_value=api.url,
         )
 
         # Add the usage plan
         usage_plan = api.add_usage_plan(
-            "StableDiffusionAPIUsagePlan",
-            name="StableDiffusionAPIUsagePlan",
+            "APIForSagemakerUsagePlan",
+            name="APIForSagemakerUsagePlan",
             throttle=apigateway.ThrottleSettings(
                 rate_limit=1000,
                 burst_limit=2000
             )
         )
         # Create the API key
-        api_key = api.add_api_key("StableDiffusionAPIKey")
+        api_key = api.add_api_key("SagemakerAPIKey")
 
         # Associate the API key with the usage plan
         usage_plan.add_api_key(api_key)
@@ -152,7 +152,7 @@ class CdkStablediffusionPythonStack(Stack):
         ssm.StringParameter(
             self,
             "api_gateway_key",
-            parameter_name="/StableDiffusionAPI/APIKey",
+            parameter_name="/SagemakerAPI/APIKey",
             string_value=api_key.key_id,  # Store the API key value
         )
 

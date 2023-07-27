@@ -1,6 +1,6 @@
 # AWS Service 1 to AWS Service 2
 
-This pattern deploys a Stable diffusion model endpoint using AWS Sagemaker. It also adds a lambda and an API Gateway serve the endpoint
+This pattern deploys a Sagemaker Jumpstart model (Flan T5 XL) endpoint using AWS Sagemaker. It also adds a lambda and an API Gateway serve the endpoint
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-sagemaker-jumpstartendpoint-cdk-python
 
@@ -36,7 +36,6 @@ Important: this application uses various AWS services and there are costs associ
 4. Install the project dependencies
 
    ```sh
-cdk deploy
    python -m pip install -r requirements.txt
    ```
 
@@ -56,7 +55,13 @@ cdk deploy
 
 ## How it works
 
-Explain how the service interaction works.
+1. This pattern deploys a Sagemaker Jumpstart model (Flan T5 XL) endpoint using AWS Sagemaker. The model can be changed by changing the ```MODEL_ID``` attribute in app.py file
+
+2. The pattern also adds a lambda and an API Gateway query the endpoint
+
+3. The API Gateway is protected using an API Key. ```x-api-key``` header needs to be added to the HTTP request.
+
+It also adds a lambda and an API Gateway serve the endpoint. 
 
 ## Testing
 
@@ -64,25 +69,22 @@ Explain how the service interaction works.
 
 2. Retreive the API key from AWS Console
 
-3. Sample HTTP request to the API Gateway:
+3. Send a sample HTTP request to the API Gateway:
    ```
    POST /prod/generateimage HTTP/1.1
    Host: <Host URL of the API Gateway>
    x-api-key: <Retreive the key from AWS Console>
    Cache-Control: no-cache
    {
-   "query": {
-      "prompt": "surprize me",
-      "negative_prompt": "(deformed iris, deformed pupils), (text), out of frame, low quality, jpeg artifacts, (bad art:1.1), plain, dull, (blurry:1.4), disfigured, bad art, deformed, poorly drawn, strange colors, blurry, boring, sketch, lacklustre, religious figure, religion, race, nudity, cropped",
-      "width": 512,
-      "height": 512,
-      "num_images_per_prompt": 1,
-      "num_inference_steps": 50,
-      "guidance_scale": 7.5
-   }
+    "query": {
+        "text_inputs": "A step by step recipe to make butter chicken:",
+        "max_length": 5000
+    }
    }
 
    ```
+
+4.  The API Gateway should respond with a JSON formatted response from the Sagamaker endpoint
 
 
 ## Cleanup
