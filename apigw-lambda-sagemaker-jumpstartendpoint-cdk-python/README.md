@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Accessing AWS Sagemaker Endpoint via API Gateway and Lambda
 
 This pattern deploys a Sagemaker Jumpstart model (Flan T5 XL) endpoint using AWS Sagemaker. It also adds a lambda and an API Gateway serve the endpoint
 
@@ -55,17 +55,16 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-1. This pattern deploys a Sagemaker Jumpstart model (Flan T5 XL) endpoint using AWS Sagemaker. The model can be changed by changing the ```MODEL_ID``` attribute in app.py file
+1. This pattern deploys a Sagemaker Jumpstart model (Flan T5 XL from HuggingFace) endpoint using AWS Sagemaker. The model can be changed by changing the ```MODEL_ID``` attribute in app.py file
 
 2. The pattern also adds a lambda and an API Gateway query the endpoint
 
 3. The API Gateway is protected using an API Key. ```x-api-key``` header needs to be added to the HTTP request.
-
-It also adds a lambda and an API Gateway serve the endpoint. 
+ 
 
 ## Testing
 
-1. Retrieve the Host URL of the API Gateway
+1. Retrieve the Host URL of the API Gateway from AWS Console
 
 2. Retreive the API key from AWS Console
 
