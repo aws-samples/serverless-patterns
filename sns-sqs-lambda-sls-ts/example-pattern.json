@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to creates a SNS topic with an SQS subscription that is consumed by a Lambda consumer ",
+      "This sample project demonstrates how to creates a SNS topic with an SQS subscription that is consumed by a Lambda consumer "
     ]
   },
   "gitHub": {
