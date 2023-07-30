@@ -1,9 +1,0 @@
-consumer:
-  handler: src/functions/consumer.handler
-  description: Consumes an SQS event
-  events:
-    - sqs:
-        arn:
-          Fn::GetAtt:
-            - TestQueue
-            - Arn
