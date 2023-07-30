@@ -1,0 +1,13 @@
+Resources:
+  # Creates an SNS Topic
+  TestTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: test-topic
+  TestSubscription:
+    # Creates an SNS subscription
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: sqs
+      TopicArn: !Ref TestTopic
+      Endpoint: !GetAtt TestQueue.Arn

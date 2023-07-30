@@ -1,0 +1,56 @@
+{
+  "title": "SNS subscription protocol SQS with a Lambda consumer",
+  "description": "Creates a SNS topic with an SQS subscription that is consumed by a Lambda consumer",
+  "language": "Typescript",
+  "level": "200",
+  "framework": "Serverless framework",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to creates a SNS topic with an SQS subscription that is consumed by a Lambda consumer ",
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-lambda-sls-ts",
+      "templateURL": "serverless-patterns/sns-sqs-lambda-sls-ts",
+      "projectFolder": "sns-sqs-lambda-sls-ts",
+      "templateFile": "serverless.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Simple Queue Service",
+        "link": "https://aws.amazon.com/sqs/"
+      },
+      {
+        "text": "Simple Notification Service",
+        "link": "https://aws.amazon.com/sns/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>sls deploy --stage dev</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>sls remove --stage dev</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Erick Medina",
+      "imageURL": "https://media.licdn.com/dms/image/C5103AQHH5D2EXUOzbA/profile-displayphoto-shrink_200_200/0/1517373698963?e=1696464000&v=beta&t=2PMr89gS_KRF8zzA7l4mJdQfWJ-hCJxwxH0fPTpyXl0",
+      "bio": "Erick is a software Engineer",
+      "linkedin": "https://www.linkedin.com/in/erick-lavielle-613593124/"
+    }
+  ]
+}
