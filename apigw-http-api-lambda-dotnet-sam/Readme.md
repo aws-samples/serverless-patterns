@@ -1,9 +1,7 @@
-# ASP.NET Core Web API Serverless Application
+# ASP.NET Core Web API Serverless Application with AWS SAM
 
-This project shows how to run an ASP.NET Core Web API project as an AWS Lambda exposed through Amazon API Gateway. The NuGet package [Amazon.Lambda.AspNetCoreServer](https://www.nuget.org/packages/Amazon.Lambda.AspNetCoreServer) contains a Lambda function that is used to translate requests from API Gateway into the ASP.NET Core framework and then the responses from ASP.NET Core back to API Gateway.
+This project shows how to use AWS SAM for an ASP.NET Core Web API project using a AWS Lambda function exposed through Amazon API Gateway. 
 
-
-For more information about how the Amazon.Lambda.AspNetCoreServer package works and how to extend its behavior view its [README](https://github.com/aws/aws-lambda-dotnet/blob/master/Libraries/src/Amazon.Lambda.AspNetCoreServer/README.md) file in GitHub.
 
 ## Requirements
 
@@ -76,6 +74,13 @@ curl $ApiUrl
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
+
+## Resources
+
+For more .NET templates, view the .NET Lambda Tools Blueprints https://github.com/aws/aws-lambda-dotnet/tree/master/Blueprints
+The NuGet package [Amazon.Lambda.AspNetCoreServer](https://www.nuget.org/packages/Amazon.Lambda.AspNetCoreServer) contains a Lambda function that is used to translate requests from API Gateway into the ASP.NET Core framework and then the responses from ASP.NET Core back to API Gateway.
+
+For more information about how the Amazon.Lambda.AspNetCoreServer package works and how to extend its behavior view its [README](https://github.com/aws/aws-lambda-dotnet/blob/master/Libraries/src/Amazon.Lambda.AspNetCoreServer/README.md) file in GitHub.
 
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
