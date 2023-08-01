@@ -21,7 +21,8 @@ The entire solution is built on CDK typescript and CustomSMSSender Lambda functi
 
 ### Prerequisites
 * Amazon SNS SMS account is moved out of [SMS Sandbox](https://aws.amazon.com/blogs/compute/introducing-the-sms-sandbox-for-amazon-sns/)
-* Dedicated [originating identity](https://docs.aws.amazon.com/sns/latest/dg/channels-sms-originating-identities-origination-numbers.html)
+* Dedicated OriginationNumber or SenderID registered with [Aamazon SNS](https://docs.aws.amazon.com/sns/latest/dg/channels-sms-originating-identities-origination-numbers.html) 
+
 
 
 ### Deployment Instructions
@@ -84,6 +85,9 @@ The entire solution is built on CDK typescript and CustomSMSSender Lambda functi
     cdk deploy --all
     ```
 
+ **Note:** Make sure you deploy this solution in AWS Region you have dedicated [OriginationNumber](https://docs.aws.amazon.com/sns/latest/dg/channels-sms-originating-identities-origination-numbers.html) or SenderID registered with Aamazon SNS for the country you want to send SMS messages. 
+
+
 ### How it works
 Amazon Cognito can be customized using lambda triggers for different flows. This solution uses the [custom SMS sender lambda trigger](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-sms-sender.html) to dynamically identify the country code using phone number library and set the origination id from the origination configuration file and send SMS message.
 
@@ -92,19 +96,51 @@ Amazon Cognito can be customized using lambda triggers for different flows. This
 <img src="./images/cognito-sns-sms-id.jpg" alt="architecture" width="100%"/>
 
 ### Testing
-To trigger Custom SMS Sender Lambda "CustomSMSSender_SignUp" [event](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-sms-sender.html#trigger-source) from Amazon Cognito and send MFA SMS code 
 
-1. Run the below CLI command, replace the --client-id with CognitoSnsSmsOriginationIdentityStack.cognitocustomsmssenderclientappid output, update other inputs fields and phone number 
+How to test this pattern and send SMS message from Amazon Cognito CustomSMSSender Lambda function. 
+
+ **Note:** Make sure you edited orignationIdConfig.json in Step 3 and added dedicated [OriginationNumber](https://docs.aws.amazon.com/sns/latest/dg/channels-sms-originating-identities-origination-numbers.html) or SenderID registered with Aamazon SNS for the country you want to test. If there is no OriginationNumber or SenderID configured for the country, Amazon SNS will use default settings.
+
+For example:
+* If you want to Send SMS messages to US phonenumber you will need have Toll-Free Number or 10DLC or Short Code registered with Aamazon SNS
+
+Testing mechanisms  using AWS CLI: 
+
+In this test we will trigger Amazon Cognito "CustomSMSSender_SignUp" [event](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-sms-sender.html#trigger-source) from Amazon Cognito and send MFA SMS code 
+
+1. Run the below CLI command, replace the --client-id with cognitocustomsmssenderclientappid from CDK output, and update other inputs fields: TestUserEmail, TestUserName, TestPhonenumber, AWSRegion 
 
     ```
-    aws cognito-idp sign-up --client-id <cognitocustomsmssenderclientappid> --username <TestUserEmail> --password <Password> --user-attributes Name="email",Value="<TestUserEmail>" Name="name",Value="<TestUserName>" Name="phone_number",Value="<phone-number-with-countrycode>" --region 
+    aws cognito-idp sign-up --client-id <cognitocustomsmssenderclientappid> --username <TestUserEmail> --password <Password> --user-attributes Name="email",Value="<TestUserEmail>" Name="name",Value="<TestUserName>" Name="phone_number",Value="<TestPhonenumber>" --region <AWSRegion>
     ``` 
     **Example:**
     ```
     aws cognito-idp sign-up --client-id 781hakalbosbt4tu0g6s236uk9 --username jane@example.com --password Test@654321 --user-attributes Name="email",Value="jane@example.com" Name="name",Value="Jane" Name="phone_number",Value="+12223334444" --region us-west-2
     ```
-    
     **Note:** Password Requirements 8-character minimum length and at least 1 number, 1 lowercase letter, and 1 special character
+
+    CLI command response:
+    ```
+    {
+    "UserConfirmed": false,
+    "CodeDeliveryDetails": {
+        "Destination": "+********2076",
+        "DeliveryMedium": "SMS",
+        "AttributeName": "phone_number"
+    },
+    "UserSub": "e68c3847-f1bb-4399-a642-361bcee259c5"
+    }
+    ```
+2. You can verify the CustomSMSSender Lambda function cognito-customsmssender CloudWatch log to check origination identities used to SMS messages 
+
+    Go to Lambda function cognito-customsmssender CloudWatch logs
+
+    * **Sample log with origination identities used from orignationIdConfig.json file**
+    <img src="./images/orignationIdConfig-used.png" alt="architecture" width="100%"/>
+
+
+    * **Sample log if no origination identities configured orignationIdConfig.json file for destination country** 
+    <img src="./images/no-orignationIdConfig.png" alt="architecture" width="100%"/>
 
 ### Cleanup
  

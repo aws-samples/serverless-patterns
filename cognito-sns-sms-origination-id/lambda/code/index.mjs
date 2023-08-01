@@ -56,9 +56,9 @@ function getSMSMessageAttributes(phoneNumber) {
     // Get ISO country code of the phoneNumber
     let isoCountryCode = getISOCode(phoneNumber);
     // Check if origination configuration has orgination identites configured for destination  country code
-    let originationId  = Object.keys(orignationIdConfig[isoCountryCode]);
-    let originationType = originationId[0];
     if (isoCountryCode in orignationIdConfig) {
+        let originationId  = Object.keys(orignationIdConfig[isoCountryCode]);
+        let originationType = originationId[0];
         // Check if ISO country code has orignation number or sender id
         switch (originationType) {
             case "SenderID":
@@ -95,10 +95,14 @@ function getSMSMessageAttributes(phoneNumber) {
                 return smsMessageAttributes;
             default:
                 //Default SMS message attributes if no orgination Id configured
+                console.log("No Origination number used:" + originationNumber);
                 return smsMessageAttributes;
         }
+    }else {
+        //Default SMS message attributes if no orgination Id configured
+        console.log("No origination identity configured for country code:"+ isoCountryCode);
+        return smsMessageAttributes;
     }
-    return smsMessageAttributes
 }
 //main lambda handler
 export const handler = async (event) => {
