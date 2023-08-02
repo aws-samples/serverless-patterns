@@ -37,12 +37,12 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-* The AWS SAM output specifies the Kinesis Data Stream name value for `MyKinesisStream`.
-* Replace  `<KinesisDataStreamName>` in the following command with the copied name of the Kinesis Data Stream in above step to get the test command.
+* The AWS SAM output specifies the Kinesis Data Streams name value for `MyKinesisStream`.
+* Replace  `<KinesisDataStreamName>` in the following command with the copied name of the Kinesis Data Streams in above step to get the test command.
   ```
   aws kinesis put-record --stream-name <KinesisDataStreamName> --partition-key 001 --data $(echo -n "{\"hello\" : \"world\"}" | base64)
   ```
-* Run the above command a few times and check the logs of Test Lambda Function to see the records put to Kinesis Data Stream
+* Run the above command a few times and check the logs of the test Lambda function to see the records put to Kinesis Data Streams.
 
 ## AWS Documentation
 - [Stream data to an HTTP endpoint with Amazon Kinesis Data Firehose](https://aws.amazon.com/blogs/big-data/stream-data-to-an-http-endpoint-with-amazon-kinesis-data-firehose/)
