@@ -95,7 +95,7 @@ Run some transactions from AWS Console - Lambda - Testing using the following ev
 
 After running some transactions. Dashboard should start showing the data in graph.
 
-![dashboard](../imges/Dashboard.png)
+![dashboard](../images/Dashboard.png)
 
 ## Troubleshooting
 
