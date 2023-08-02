@@ -26,16 +26,20 @@ Important: this application uses various AWS services and there are costs associ
 2. Change the working directory to this pattern's directory
 
    ```sh
-   cd serverless-patterns/iot-sns-sqs-cfn
+   iot-sns-sqs-sam
    ```
 
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
-   ```
-   sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
-   ```
-1. You can also use AWS CloudFormation console and paste the template.yml file in the designer and deploy it by passing the below required parameters.
+    ```
+    sam deploy --guided
+    ```
+1. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region
+    * Enter Secret Name. To use default, click Enter.
+    * Allow SAM CLI to create IAM roles with the required permissions.
 
-   - Enter a stack name
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 ## How it works
 
