@@ -122,7 +122,12 @@ Building Assets Failed: Error: Failed to build one or more assets. See the error
 
 Please make sure your host has docker Architecture: x86_64.
 
-For ARM64, please use the URL - https://lambda-insights-extension-arm64.s3-ap-northeast-1.amazonaws.com/amazon_linux/ & INSIGHTSEXTENSION - lambda-insights-extension-arm64.rpm in the DotnetLambdaCloudwatchDashboardStack.cs.
+For ARM64,
+
+Update the DotnetLambdaCloudwatchDashboardStack.cs 
+- URL - https://lambda-insights-extension-arm64.s3-ap-northeast-1.amazonaws.com/amazon_linux/ &
+- INSIGHTSEXTENSION - lambda-insights-extension-arm64.rpm
+
 
 ## Cleanup
  
