@@ -95,7 +95,7 @@ Run some transactions from AWS Console - Lambda - Testing using the following ev
 
 After running some transactions. Dashboard should start showing the data in graph.
 
-![dashboard](../images/Dashboard.png)
+![dashboard](images/Dashboard.png)
 
 ## Troubleshooting
 
@@ -124,7 +124,7 @@ Please make sure your host has docker Architecture: x86_64.
 
 For ARM64,
 
-Update the DotnetLambdaCloudwatchDashboardStack.cs 
+Update the [DotnetLambdaCloudwatchDashboardStack.cs](src/DotnetLambdaCloudwatchDashboard/DotnetLambdaCloudwatchDashboardStack.cs)
 - URL - https://lambda-insights-extension-arm64.s3-ap-northeast-1.amazonaws.com/amazon_linux/ &
 - INSIGHTSEXTENSION - lambda-insights-extension-arm64.rpm
 
