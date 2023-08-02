@@ -1,9 +1,9 @@
 {
-  "title": "SNS subscription protocol SQS with a Lambda consumer",
-  "description": "Creates a SNS topic with an SQS subscription that is consumed by a Lambda consumer",
-  "language": "Typescript",
+  "title": "Amazon SNS to Amazon SQS to a Lambda consumer",
+  "description": "Creates an SNS topic with a SQS subscription that is consumed by a Lambda consumer",
+  "language": "TypeScript",
   "level": "200",
-  "framework": "Serverless framework",
+  "framework": "Serverless Framework,",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -21,11 +21,11 @@
   "resources": {
     "bullets": [
       {
-        "text": "Simple Queue Service",
+        "text": "Amazon Simple Queue Service",
         "link": "https://aws.amazon.com/sqs/"
       },
       {
-        "text": "Simple Notification Service",
+        "text": "Amazon Simple Notification Service",
         "link": "https://aws.amazon.com/sns/"
       }
     ]
