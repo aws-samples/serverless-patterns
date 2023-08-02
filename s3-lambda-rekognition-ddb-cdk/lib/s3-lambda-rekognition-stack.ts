@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as eventsources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as ddb from 'aws-cdk-lib/aws-dynamodb';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import { CfnOutput } from 'aws-cdk-lib'; 
 import { Construct } from 'constructs';
 
 export class S3LambdaRekognitionStack extends Stack {
@@ -52,6 +53,10 @@ lambdaFunction.role?.attachInlinePolicy(
   }))
 
 
+new CfnOutput(this, 'bucketName', {
+  value: bucket.bucketName,
+  description: 'The name of the s3 bucket created.',
+});
 
 }
 }

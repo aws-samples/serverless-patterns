@@ -41,13 +41,13 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 ## Testing
 
-1. Run the command below to upload an image to S3 bucket created in the stack. The bucket name should be `S3LambdaRekognitionStack-rekognitiontableXXXX-XXXX`. The image file name can be the can relate to the object in the image. Ex: "Lion.jpg".
+1. Run the command below to upload an image to S3 bucket created in the stack which is outputted via the console in the output as `S3LambdaRekognitionStack.bucketName`. The bucket name should be `s3lambdarekognitionstack-imagesbucketdxxxxxxx-xxxxxx`. The image file name can relate to the object in the image. Ex: "Lion.jpg".
 
    ```
    aws s3 cp <your_image>.jpg s3://[S3BucketName]/<your_image>.jpg
    ```
 
-2. You should see the Rekognition label output in your DynamoDB table
+2. You should see the Rekognition label output in your DynamoDB table.
 
 ## Cleanup
 
