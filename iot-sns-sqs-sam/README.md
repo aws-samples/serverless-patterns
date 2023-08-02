@@ -26,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
 2. Change the working directory to this pattern's directory
 
    ```sh
-   iot-sns-sqs-sam
+   cd iot-sns-sqs-sam
    ```
 
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
