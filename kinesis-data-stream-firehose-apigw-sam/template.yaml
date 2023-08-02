@@ -144,4 +144,7 @@ Outputs:
     Description: API Gateway endpoint URL
     Value:
       Fn::Sub: "https://${MyApiGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+  MyKinesisStream:
+    Description: Kinesis Data Stream name
+    Value: !Ref MyKinesisStream     
   

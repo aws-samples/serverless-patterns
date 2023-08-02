@@ -1,6 +1,6 @@
-# Kinesis Data Stream to API Gateway via Data Firehose
+# Amazon Kinesis Data Streams to Amazon API Gateway via Amazon Kinesis Data Firehose
 
-This sample project demonstrates how to send data received by Kinesis Data Stream to a HTTP Endpoint with Authorization (here API Gateway REST API) using Kinesis Firehose
+This sample project demonstrates how to send data received by Kinesis Data Streams to a HTTP endpoint with authorization (here API Gateway REST API) using Kinesis Data Firehose.
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/kinesis-data-stream-firehose-apigw-sam).
 
@@ -37,8 +37,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-* Visit [Kinesis Management Console](https://us-east-1.console.aws.amazon.com/kinesis/home)
-* Select 'Data streams', copy name of the Data Stream having prefix `firehose-apigw-MyKinesisStream-`.
+* The AWS SAM output specifies the Kinesis Data Stream name value for `MyKinesisStream`.
 * Replace  `<KinesisDataStreamName>` in the following command with the copied name of the Kinesis Data Stream in above step to get the test command.
   ```
   aws kinesis put-record --stream-name <KinesisDataStreamName> --partition-key 001 --data $(echo -n "{\"hello\" : \"world\"}" | base64)
@@ -55,5 +54,3 @@ Important: this application uses various AWS services and there are costs associ
     ```bash
     sam delete
     ```
-
-
