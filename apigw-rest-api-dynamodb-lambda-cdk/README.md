@@ -57,7 +57,7 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 1. Invoke the DynamoDB **PutItem** action to add a new item to the DynamoDB table:
 	* Enter the API URL with the **prod** stage as the path:.
 	```
-	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/id
+	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/awsomedynamodb
 	```
 	* Select **POST** as the HTTP method from the drop-down list to the left of the address bar.
 	* Choose the **Body** tab. Choose **raw** and select **JSON** from the drop-down list. Enter the following into the text box: 
@@ -73,11 +73,11 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 	* Open the DynamoDB console and select the table which was created to confirm that the item has been added.
 	* Change the values for `pk` or `data` in the POST body and repeat this process to add multiple items to the DynamoDB table.
 
-1. Invoke the DynamoDB **Query** action to query items by artist in the DynamoDB table:
+1. Invoke the DynamoDB **Query** action to query all items by artist in the DynamoDB table:
 	* Enter the Invoke URL in the address bar. Add **/prod/foo** to the URL path.
 	* Add **/foo** to the URL path. This defines the ID that you want to query.
 	```
-	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/${pk}
+	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/awsomedynamodb
 	```
 	* Select **GET** as the HTTP method from the drop-down list to the left of the address bar.
 	* Choose the **Body** tab. Choose **none**.
@@ -85,6 +85,31 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 	```
 		{
 			"Count": 1,
+			"Items": [
+				{
+					"pk": {
+						"S": "foo"
+					},
+					"data": {
+						"S": "blah blah blah"
+					}
+				}
+			],
+			"ScannedCount": 1
+		}
+	```
+1. Invoke the DynamoDB **Query** action to query specific item by artist in the DynamoDB table:
+	* Enter the Invoke URL in the address bar. Add **/prod/foo** to the URL path.
+	* Add **/foo** to the URL path. This defines the ID that you want to query.
+	```
+	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/awsomedynamodb/{id}
+	```
+	* Select **GET** as the HTTP method from the drop-down list to the left of the address bar.
+	* Choose the **Body** tab. Choose **none**.
+	* Choose **Send** to submit the request and receive a "200 OK" response with a list of the matching results. Example: 
+	```
+		{
+			"Count": x,
 			"Items": [
 				{
 					"pk": {
