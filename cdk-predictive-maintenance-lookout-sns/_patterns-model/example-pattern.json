@@ -1,0 +1,63 @@
+{
+  "title": "Predictive Maintenance using Amazon Lookout for Equipment and SNS",
+  "description": "Create a pipeline for ingesting sensor data, ML anamoly detection and sns notification",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to build a predictive maintenance pipeline using Amazon Lookout for equipment.",
+      "Your sensor data will be ingested using IoT and Kinesis in real time and stored in an s3 bucket where Amazon Lookout for equipment",
+      "will use ML anomaly detection to predict equipment failure. You will be notified using SNS"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-predictive-maintenance-lookout-sns",
+      "templateURL": "serverless-patterns/cdk-predictive-maintenance-lookout-sns",
+      "projectFolder": "cdk-predictive-maintenance-lookout-sns",
+      "templateFile": "cdk/app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Lookout for Equipment",
+        "link": "https://https://aws.amazon.com/lookout-for-equipment/"
+      },
+      {
+        "text": "Iot Device Simulator",
+        "link": "https://docs.aws.amazon.com/solutions/latest/iot-device-simulator/solution-overview.html"
+      },
+      {
+        "text": "Video Instructions",
+        "link": "https://www.youtube.com/watch?v=N_eCUxrsPr0"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Godswill Iroh",
+      "image": "https://drive.google.com/file/d/1ySQPGr3bOfPJSD-zO32yqef4eH2Bds1f/view?usp=sharing",
+      "bio": "Godswill was an Intern at AWS for Energy",
+      "linkedin": "https://www.linkedin.com/in/god-swill-iroh-79a936170/",
+      "twitter": "twitter-handle"
+    }
+  ]
+}
