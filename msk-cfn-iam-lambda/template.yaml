@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  simple_kafka_consumer_sam
+
+  Sample SAM Template for simple_kafka_consumer_sam
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  LambdaMSKConsumerPythonFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: HandlerKafka/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            BatchSize: 10
+            MaximumBatchingWindowInSeconds: 300
+            Stream: !Join [ '', ["arn:", "aws:", "kafka:", !Ref "AWS::Region" , ":" ,!Ref "AWS::AccountId", ":", "cluster/", !Ref MSKClusterName, "/" , !Ref MSKClusterId] ]
+            Topics:
+              - !Ref MSKTopic
+      Policies:
+      - Statement:
+        - Sid: KafkaClusterPermissionsPolicy
+          Effect: Allow
+          Action:
+          - kafka-cluster:Connect
+          - kafka-cluster:DescribeGroup
+          - kafka-cluster:DescribeCluster
+          - kafka-cluster:AlterCluster
+          - kafka-cluster:AlterClusterDynamicConfiguration
+          - kafka-cluster:WriteDataIdempotently
+          - kafka-cluster:AlterGroup
+          - kafka-cluster:DescribeTopic
+          - kafka-cluster:ReadData
+          - kafka-cluster:DescribeClusterDynamicConfiguration
+          Resource: 
+          - !Join ['', ["arn:", "aws:", "kafka:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "cluster/", !Ref MSKClusterName, "/" , !Ref MSKClusterId]]
+          - !Join ['', ["arn:", "aws:", "kafka:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "topic/", !Ref MSKClusterName, "/" , !Ref MSKClusterId, "/*"]]
+          - !Join ['', ["arn:", "aws:", "kafka:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "group/", !Ref MSKClusterName, "/" , !Ref MSKClusterId, "/*"]]
+          
+        - Sid: KafkaPermissionsPolicy
+          Effect: Allow
+          Action:
+          - kafka:DescribeClusterV2
+          - kafka:GetBootstrapBrokers
+          Resource: '*'
+          
+        - Sid: EC2PermissionsPolicy
+          Effect: Allow
+          Action:
+          - ec2:DescribeSecurityGroups
+          - ec2:DescribeSubnets
+          - ec2:DescribeVpcs
+          - ec2:CreateNetworkInterface
+          - ec2:DescribeNetworkInterfaces
+          - ec2:DeleteNetworkInterface
+          Resource: '*'
+Parameters:
+  MSKClusterName:
+    Type: String
+    Description: Enter the name of the MSK Cluster
+  MSKClusterId:
+    Type: String
+    Description: Enter the ID of the MSK Cluster
+  MSKTopic:
+    Type: String
+    Description: Enter the name of the MSK Topic
+Outputs:
+  LambdaMSKConsumerPythonFunction:
+    Description: "Topic Consumer Lambda Function ARN"
+    Value: !GetAtt LambdaMSKConsumerPythonFunction.Arn
