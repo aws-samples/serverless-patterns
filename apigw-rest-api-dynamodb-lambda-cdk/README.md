@@ -98,6 +98,7 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 			"ScannedCount": 1
 		}
 	```
+	
 1. Invoke the DynamoDB **Query** action to query specific item by artist in the DynamoDB table:
 	* Enter the Invoke URL in the address bar. Add **/prod/foo** to the URL path.
 	* Add **/foo** to the URL path. This defines the ID that you want to query.
