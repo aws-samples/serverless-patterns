@@ -1,6 +1,6 @@
 {
     "title": "Amazon IoT Core to Amazon SNS to Amazon SQS",
-    "description": "Create a IoT rule with an SNS action that delivers messages to an SQS queue.",
+    "description": "Create an IoT rule with an SNS action that delivers messages to an SQS queue.",
     "language": "",
     "level": "200",
     "framework": "SAM",
@@ -38,12 +38,12 @@
     },
     "testing": {
         "text": [
-            "See the Github repo for detailed testing instructions."
+            "See the GitHub repo for detailed testing instructions."
         ]
     },
     "cleanup": {
         "text": [
-            "<code>sam delete</code>."
+            "Delete the stack: <code>sam delete</code>."
         ]
     },
 	"authors": [
