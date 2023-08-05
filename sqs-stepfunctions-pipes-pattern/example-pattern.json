@@ -1,0 +1,64 @@
+{
+  "title": "SQS to Step Functions with EventBridge Pipes",
+  "description": "This pattern demonstrates a seamless integration between an SQS queue and AWS Step Functions using AWS EventBridge Pipes. It enables direct routing of messages from an SQS queue into a Step Functions state machine, which orchestrates the processing flow and manages AWS Lambda invocation errors. When Lambda encounters an error, the erroneous message is directed to an SQS Dead Letter Queue (DLQ) for further inspection or reprocessing.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Upon sending a message to the SQS queue, the EventBridge Pipe routes the message to the designated Step Functions state machine. The state machine then orchestrates the message processing flow and manages the Lambda function invocation.",
+      "If the Lambda function encounters an error during processing, the message is directed to a Dead Letter Queue (DLQ) for further inspection or reprocessing."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns",
+      "templateURL": "serverless-patterns/sqs-stepfunctions-pipes-pattern",
+      "projectFolder": "sqs-stepfunctions-pipes-pattern",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Simple Queue Service (SQS)- Fully Managed Message Queues",
+        "link": "https://aws.amazon.com/sqs/"
+      },
+      {
+        "text": "AWS Step Functions - Serverless Orchestration Service",
+        "link": "https://aws.amazon.com/step-functions/"
+      },
+      {
+        "text": "AWS Lambda - Event-driven, Serverless Computing Platform",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Amazon EventBridge Pipes - Seamless integration with other services",
+        "link": "https://aws.amazon.com/eventbridge/pipes/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Retrieve the Queue URL from the outputs of the SAM deployment and send a test message using AWS CLI. Monitor the Step Functions state machine to observe the execution. If the Lambda function fails, check the DLQ for the erroneous message."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "To delete the deployed resources, use: sam delete --stack-name YOUR_STACK_NAME. Replace YOUR_STACK_NAME with the name you provided for your stack during deployment."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mohammed Atiq",
+      "image": "https://i.postimg.cc/N0804zKg/photo.jpg",
+      "bio": "Solutions Architect at AWS and Serverless enthusiast."
+    }
+  ]
+}
