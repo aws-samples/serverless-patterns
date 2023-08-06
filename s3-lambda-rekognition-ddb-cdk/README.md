@@ -1,6 +1,6 @@
-# Use Event Driven Architecture (EDA) to detect labels using S3, Lambda, Rekognition, and DynamoDB with Cloud Development Kit (CDK)
+# Detect labels in pictures using Amazon S3, AWS Lambda, Amazon Rekognition, and Amazon DynamoDB with Amazon Cloud Development Kit (AWS CDK)
 
-This pattern demonstrates how to detect labels using an event driven architecture.
+This pattern shows how to detect labels using an event driven architecture.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/
 
@@ -22,7 +22,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
    ```
    cd s3-lambda-rekognition-ddb-cdk
    ```
-3. Run below command to install required dependancies:
+3. Run below command to install required dependencies:
 
    ```
    npm install
@@ -39,15 +39,51 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
    cdk deploy --all
    ```
 
+The CDK stack outputs the S3 bucket and DynamoDB table names which you can use for testing.
+
 ## Testing
 
-1. Run the command below to upload an image to S3 bucket created in the stack which is outputted via the console in the output as `S3LambdaRekognitionStack.bucketName`. The bucket name should be `s3lambdarekognitionstack-imagesbucketdxxxxxxx-xxxxxx`. The image file name can relate to the object in the image. Ex: "Lion.jpg".
+1. Have an image that Rekognition can generate a labekl. For example a lion from [Wikipedia](https://en.wikipedia.org/wiki/Lion).
+2. Run the following command to upload the image to an S3 bucket. Replace `<your_image.jpg>` with your image file name.
+    Replace `<S3BucketName>` with the name of the S3 bucket from the CDK outputs.
+
+```
+   aws s3 cp <your_image.jpg> s3://<3BucketName>
+```
+
+For example: `aws s3 cp ./Lion.jpg s3://s3lambdarekognitionstack-imagesbucketd8e2a22e-123456789012`
+
+The Lambda function triggers on the S3 object upload, calls Rekognition to get the image labels, and writes the labels to DynamoDB.
+
+1. Retrieve the Rekognition label output from the DynamoDB table. Replace `<DDBTableName>` with the name of the DynamoDB table from the CDK outputs.
 
    ```
-   aws s3 cp <your_image>.jpg s3://[S3BucketName]/<your_image>.jpg
+   aws dynamodb scan --table-name <DDBTableName>
    ```
 
-2. You should see the Rekognition label output in your DynamoDB table.
+For example: `aws dynamodb scan --table-name S3LambdaRekognitionStack-rekognitiontable70ADE0DF-1234567890123`
+
+3. You should see the Rekognition label output from DynamoDB displayed.
+
+For example: 
+
+```
+{
+    "Items": [
+        {
+            "file_name": {
+                "S": "Lion.jpg"
+            },
+            "labels": {
+                "S": "{\"Labels\": [{\"Name\": \"Animal\", \"Confidence\": 99.99979400634766, \"Instances\": [], \"Parents\": [], \"Aliases\": [], \"Categories\": [{\"Name\": \"Animals and Pets\"}]}, {\"Name\": \"Lion\", \"Confidence\": 99.99979400634766, \"Instances\": [{\"BoundingBox\": {\"Width\": 0.650372326374054, \"Height\": 0.6257815361022949, \"Left\": 0.23760296404361725, \"Top\": 0.1613311469554901}, \"Confidence\": 99.9444808959961}], \"Parents\": [{\"Name\": \"Animal\"}, {\"Name\": \"Mammal\"}, {\"Name\": \"Wildlife\"}], \"Aliases\": [], \"Categories\": [{\"Name\": \"Animals and Pets\"}]}, {\"Name\": \"Mammal\", \"Confidence\": 99.99979400634766, \"Instances\": [], \"Parents\": [{\"Name\": \"Animal\"}], \"Aliases\": [], \"Categories\": [{\"Name\": \"Animals and Pets\"}]}, {\"Name\": \"Wildlife\", \"Confidence\": 99.99979400634766, \"Instances\": [], \"Parents\": [{\"Name\": \"Animal\"}], \"Aliases\": [], \"Categories\": [{\"Name\": \"Animals and Pets\"}]}], \"LabelModelVersion\": \"3.0\", \"ResponseMetadata\": {\"RequestId\": \"08092028-bb58-49a7-bd5d-07208646e203\", \"HTTPStatusCode\": 200, \"HTTPHeaders\": {\"x-amzn-requestid\": \"08092028-bb58-49a7-bd5d-07208646e203\", \"content-type\": \"application/x-amz-json-1.1\", \"content-length\": \"812\", \"date\": \"Fri, 04 Aug 2023 17:01:31 GMT\"}, \"RetryAttempts\": 0}}"
+            }
+        }
+    ],
+    "Count": 1,
+    "ScannedCount": 1,
+    "ConsumedCapacity": null
+}
+```
 
 ## Cleanup
 
@@ -60,4 +96,4 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-# This project was developed with the assistance of AWS CodeWhisperer
+## This project was developed with the assistance of Amazon CodeWhisperer

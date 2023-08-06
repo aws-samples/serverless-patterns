@@ -58,5 +58,11 @@ new CfnOutput(this, 'bucketName', {
   description: 'The name of the s3 bucket created.',
 });
 
+new CfnOutput(this, 'DynamoDBTable', {
+    value: dynamoTable.tableName,
+    description: 'The name of the DynamoDB table created.',
+  });
+  
+
 }
 }
