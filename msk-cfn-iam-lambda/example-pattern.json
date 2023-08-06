@@ -1,5 +1,5 @@
 {
-  "title": "AWS Lambda function subscribed to an MSK Topic using IAM auth",
+  "title": "AWS Lambda function subscribed to an Amazon MSK topic using IAM auth",
   "description": "Creates a Lambda function that uses an Amazon MSK topic as an event source with IAM authentication.",
   "language": "Python",
   "level": "200",
@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern provides a Lambda function along with an Event Source Mapping to a Kafka topic.",
-      "It requires that you already have an Amazon Managed Streaming for Kafka(Amazon MSK) cluster setup with a topic created. If you don't already have an MSK Cluster ",
+      "It requires that you already have an Amazon Managed Streaming for Kafka(Amazon MSK) cluster setup with a topic created. If you don't already have an MSK cluster ",
       "you can use the example in this pattern https://serverlessland.com/patterns/msk-cfn-sasl-lambda (linked in the resources) to deploy a cluster.",
       "This pattern works with either a Provisioned or Serverless MSK cluster as long as the cluster is configured to use IAM authentication. ",
       "For detailed deployment instructions instructions see the README "
@@ -25,7 +25,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Amazon MSK Cluster Pattern",
+        "text": "Amazon MSK Cluster pattern",
         "link": "https://serverlessland.com/patterns/msk-cfn-sasl-lambda"
       },
       {
