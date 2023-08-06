@@ -29,12 +29,21 @@ To use the AWS SAM CLI, you need the following tools.
 * AWS SAM CLI - [Install the AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 * Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
 
-To deploy your application for the first time, run the following in your shell which deploy your application to AWS, with a series of prompts:
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns.git
+    ```
+1. Change directory to the pattern directory:
+    ```
+    cd msk-lambda-iam-python-sam
+    ```
 
-```bash
-sam deploy --guided
-```
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+    ```
+    sam deploy --guided
+    ```
 
+1. During the prompts:
 * **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
 * **AWS Region**: The AWS region you want to deploy your app to.
 * **Parameter MSKClusterName**: The name of the MSKCluster, eg. msk-test-cluster
@@ -48,7 +57,9 @@ sam deploy --guided
 * **SAM configuration file [samconfig.toml]**: Name of the configuration file to store configuration information locally
 * **SAM configuration environment [default]**: Environment for storing deployment information locally
 
-You should get a message "Successfully created/updated stack - <StackName> in <Region>" if all goes well
+You should get a message "Successfully created/updated stack - <StackName> in <Region>" if all goes well.
+
+Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 ## How it works
 
