@@ -24,7 +24,7 @@ The following diagram illustrates the solutions architect
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigw-rest-api-dynamodb-lambda-cdk/cdk
+    cd apigw-rest-api-dynamodb-lambda-cdk
     ```
 
 1. Install dependencies
@@ -37,6 +37,7 @@ The following diagram illustrates the solutions architect
 
 1. Deploy the stack to your default AWS account and region. The output of this command should give you the HTTP API URL.
     ```
+	cd ..
     cdk deploy
     ```
 
@@ -87,11 +88,17 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 			"Count": 1,
 			"Items": [
 				{
-					"pk": {
+					"AWSomeDynamoDBId": {
 						"S": "foo"
 					},
-					"data": {
+					"name": {
 						"S": "blah blah blah"
+					},
+					"description": {
+						"S": "blah blah blah"
+					},
+					"Id": {
+						"S": "string"
 					}
 				}
 			],
@@ -113,11 +120,17 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 			"Count": x,
 			"Items": [
 				{
-					"pk": {
+					"AWSomeDynamoDBId": {
 						"S": "foo"
 					},
-					"data": {
+					"name": {
 						"S": "blah blah blah"
+					},
+					"description": {
+						"S": "blah blah blah"
+					},
+					"Id": {
+						"S": "string"
 					}
 				}
 			],
