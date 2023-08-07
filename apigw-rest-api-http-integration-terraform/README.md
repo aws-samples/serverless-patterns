@@ -34,7 +34,11 @@ Important: this application uses various AWS services and there are costs associ
 5. From the command line, run:
     ```
     terraform apply --auto-approve
-
+    ```
+6. Enter a value for any HTTP GET url that you would like to integrate with API Gateway, for example :
+   ```
+   Enter a value : http://petstore-demo-endpoint.execute-api.com/petstore/pets
+    ```
 ## Testing
 
 The stack will output the **api endpoint**. Visit that URL in your browser or make an HTTP request to the endpoint using *curl* to test the HTTP integration.
