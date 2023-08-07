@@ -23,7 +23,7 @@
 	"resources": {
 		"bullets": [
 			{
-				"text": "Lambda Web Adapter Github project",
+				"text": "Lambda Web Adapter GitHub project",
 				"link": "https://github.com/awslabs/aws-lambda-web-adapter"
 			},
 			{
@@ -36,7 +36,7 @@
 		"text": ["cdk deploy"]
 	},
 	"testing": {
-		"text": ["See the Github repo for detailed testing instructions."]
+		"text": ["See the GitHub repo for detailed testing instructions."]
 	},
 	"cleanup": {
 		"text": ["Delete the stack: <code>cdk destroy</code>."]

@@ -34,7 +34,7 @@
 		"text": ["cdk deploy"]
 	},
 	"testing": {
-		"text": ["See the Github repo for detailed testing instructions."]
+		"text": ["See the GitHub repo for detailed testing instructions."]
 	},
 	"cleanup": {
 		"text": ["Delete the stack: <code>cdk destroy</code>."]
