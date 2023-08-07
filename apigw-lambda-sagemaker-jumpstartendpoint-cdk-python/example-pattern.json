@@ -1,15 +1,15 @@
 {
-  "title": "Accessing AWS Sagemaker Endpoint via API Gateway and Lambda",
-  "description": "This pattern deploys a Sagemaker Jumpstart model (Flan T5 XL) endpoint. It also adds a lambda and an API Gateway to query the endpoint",
+  "title": "Accessing Amazon SageMaker Endpoint via API Gateway and Lambda",
+  "description": "This pattern deploys a SageMaker Jumpstart model (Flan T5 XL) endpoint. It also uses a Lambda function and API Gateway to integrate the endpoint",
   "language": "Python",
   "level": "300",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys a Sagemaker Jumpstart model (Flan T5 XL from HuggingFace) endpoint using AWS Sagemaker. The model can be changed by modifying the MODEL_ID attribute in app.py file.",
-      "The pattern also adds a lambda and an API Gateway query the endpoint.",
-      "The API Gateway is protected using an API Key. To query the Api Gateway, x-api-key header needs to be added to the HTTP request."
+      "This pattern deploys a Amazon SageMaker Jumpstart model (Flan T5 XL from HuggingFace) endpoint using Amazon SageMaker. The model can be changed by modifying the MODEL_ID attribute in app.py file.",
+      "The pattern also adds a Lambda function with API Gateway integration to query the endpoint.",
+      "The API Gateway is protected using an API Key. To query the API Gateway endpoint, x-api-key header needs to be added to the HTTP request."
     ]
   },
   "gitHub": {
