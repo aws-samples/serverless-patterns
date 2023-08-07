@@ -1,0 +1,62 @@
+{
+    "title": "Amazon S3, AWS Lambda, Amazon Rekognition and IoT Core to detect PPE",
+    "description": "Send a IoT Core message when a worker is not in PPE (Personal Protective Equipment) compliance.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to deliver an event-driven mechanism to send an IoT core message for images uploaded to S3.",
+            "Implemented in CDK."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-rekognition-iot-cdk",
+            "templateURL": "serverless-patterns/s3-lambda-rekognition-iot-cdk",
+            "projectFolder": "s3-lambda-rekognition-iot-cdk",
+            "templateFile": "s3-lambda-rekognition-iot-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Using AWS Lambda with Amazon S3",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
+              },
+              {
+                "text": "Rekognition PPE API",
+                "link": "https://docs.aws.amazon.com/rekognition/latest/dg/ppe-detection.html"
+            },
+            {
+                "text": "Using Lambda with IoT Core Data Plane",
+                "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iot-data.html"
+            }
+            
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy --all"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy --all</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Chris Peter Francis",
+            "image": "https://media.licdn.com/dms/image/D5603AQGSCw1U075kjQ/profile-displayphoto-shrink_800_800/0/1679337668977?e=2147483647&v=beta&t=18EMAaL8Qrm0hpxVVR525WEImFw1cyHrASNg3iYw6k4",
+            "bio": "Chris is a Solution Architect for AWS Energy. Serverless advocate and enthusiast.",
+            "linkedin": "chrispf"
+        }
+    ]
+}

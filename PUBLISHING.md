@@ -65,7 +65,7 @@ Push your code to the remote repos and [create a pull request](https://docs.gith
 
     If this is the first push to the remote origin repo, you will be asked to Connect to GitHub to authorize the connection. Sometimes the pop-up window appears behind other windows.
 
-1. Go to the [upstream repo](https://github.com/aws-samples/serverless-patterns) in Github and click "Compare & pull request".
+1. Go to the [upstream repo](https://github.com/aws-samples/serverless-patterns) in GitHub and click "Compare & pull request".
     1. Enter an appropriate title:
         
         Example title: `New serverless pattern - lambda-aurora-serverless`
@@ -126,4 +126,4 @@ Delete any unnecessary local and origin branches.
 1. API Gateway HTTP API to Lambda: [Website](https://serverlessland.com/patterns/apigw-lambda) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda)
 2. API Gateway REST API to DynamoDB: [Website](https://serverlessland.com/patterns/apigw-dynamodb) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-dynamodb)
 3. Lambda to SSM Parameter Store: [Website](https://serverlessland.com/patterns/lambda-ssm) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ssm-parameter)
-4. Lambda to S3 via a Custom Resource: [Website](https://serverlessland.com/patterns/lambda-s3-cfn) | [Github](https://github.com/aws-samples/serverless-patterns/tree/main/cfn-custom-resource-s3-create)
+4. Lambda to S3 via a Custom Resource: [Website](https://serverlessland.com/patterns/lambda-s3-cfn) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/cfn-custom-resource-s3-create)

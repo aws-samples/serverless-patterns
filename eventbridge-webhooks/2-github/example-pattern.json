@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This stack deploys an inbound webhook that subscribes to events from Github and receives them on an Amazon EventBridge event bus for further processing.",
+      "This stack deploys an inbound webhook that subscribes to events from GitHub and receives them on an Amazon EventBridge event bus for further processing.",
       "EventBridge is a serverless event bus that enables you to build scalable event-driven applications by routing events between your own applications, third-party SaaS applications, and other AWS services.",
       "This pattern deploys one Lambda function with a fURL, one Secrets Manager secret, and a CloudWatch alarm."
     ]
@@ -35,7 +35,7 @@
   },
   "testing": {
     "text": [
-      "See the Github repo for detailed testing instructions."
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
