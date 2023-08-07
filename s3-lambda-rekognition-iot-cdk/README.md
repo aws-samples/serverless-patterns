@@ -1,6 +1,6 @@
-# Use Event Driven Architecture (EDA) to promote worker safety using S3, Lambda, Rekognition, and IoT
+# Use event-driven architecture (EDA) to promote worker safety using Amazon S3, AWS Lambda, Amazon Rekognition, and AWS IoT Core
 
-This pattern demonstrates how to detect if individuals are wearing the correct Personal  Protective Equipment and sends an alert via IoT Core. This pattern is compatible with the published AWS IoT Puppy Park workshop. 
+This pattern demonstrates how to detect if individuals are wearing the correct personal protective equipment (PPE) and sends an alert via IoT Core. This pattern is compatible with the published [AWS IoT Puppy Park workshop](https://catalog.workshops.aws/iot-puppy-park). 
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/
 
