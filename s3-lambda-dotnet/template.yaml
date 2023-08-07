@@ -29,9 +29,11 @@ Resources:
           Properties:
             Bucket: !Ref SourceBucket
             Events: s3:ObjectCreated:*
-            Filter: 
+            Filter:
               S3Key:
                 Rules:
+                  - Name: prefix
+                    Value: 'images/'
                   - Name: suffix
                     Value: '.jpeg'
       Policies:
