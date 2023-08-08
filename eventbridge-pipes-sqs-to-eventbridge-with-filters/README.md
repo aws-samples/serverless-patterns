@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 1. Change directory to the pattern directory:
    ```
-   cd eventbridge-sfn
+   cd serverless-patterns/eventbridge-pipes-sqs-to-eventbridge-with-filters
    ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```

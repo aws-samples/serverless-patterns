@@ -27,6 +27,15 @@ Resources:
             Action:
               - sts:AssumeRole
       Policies:
+        - PolicyName: CloudWatch
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:*'
+                  - 'cloudwatch:*'
+                Resource: '*'
         - PolicyName: SourcePolicy
           PolicyDocument:
             Version: 2012-10-17
