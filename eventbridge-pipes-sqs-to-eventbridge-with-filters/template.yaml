@@ -27,6 +27,19 @@ Resources:
             Action:
               - sts:AssumeRole
       Policies:
+        - PolicyName: CloudWatch
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:PutLogEvents'
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:DescribeLogStreams'
+                  - 'logs:DescribeLogGroups'
+                  - 'cloudwatch:PutMetricData'
+                Resource: '*'
         - PolicyName: SourcePolicy
           PolicyDocument:
             Version: 2012-10-17
