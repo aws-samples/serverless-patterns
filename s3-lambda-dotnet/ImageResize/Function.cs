@@ -17,6 +17,7 @@ namespace ImageResize;
 public class Function
 {
     IAmazonS3 S3Client { get; set; }
+    
 
     /// <summary>
     /// Default constructor. This constructor is used by Lambda to construct the instance. When invoked in a Lambda environment
@@ -39,7 +40,7 @@ public class Function
 
     public async Task<string> FunctionHandler(S3Event evnt, ILambdaContext context)
     {
-        string[] fileExtentions = new string[] { ".jpg", ".jpeg" };
+        string[] fileExtensions = new string[] { ".jpg", ".jpeg" };
         var s3Event = evnt.Records?[0].S3;
         if (s3Event == null)
         {
@@ -51,7 +52,7 @@ public class Function
             foreach (var record in evnt.Records)
             {
                 LambdaLogger.Log("----> File: " + record.S3.Object.Key);
-                if (!fileExtentions.Contains(Path.GetExtension(record.S3.Object.Key).ToLower()))
+                if (!fileExtensions.Contains(Path.GetExtension(record.S3.Object.Key).ToLower()))
                 {
                     LambdaLogger.Log("File Extension is not supported - " + s3Event.Object.Key);
                     continue;
