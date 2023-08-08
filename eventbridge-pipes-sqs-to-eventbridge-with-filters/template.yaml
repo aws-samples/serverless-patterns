@@ -33,8 +33,12 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - 'logs:*'
-                  - 'cloudwatch:*'
+                  - 'logs:PutLogEvents'
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:DescribeLogStreams'
+                  - 'logs:DescribeLogGroups'
+                  - 'cloudwatch:PutMetricData'
                 Resource: '*'
         - PolicyName: SourcePolicy
           PolicyDocument:
