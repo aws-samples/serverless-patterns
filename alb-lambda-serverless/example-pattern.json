@@ -1,0 +1,66 @@
+{
+  "title": "Application Load Balancer with Lambda as a target",
+  "description": "Create an Application Load Balancer with Lambda as target using Serverless Framework",
+  "language": "Node.js",
+  "architectureURL": "",
+  "videoId": "",
+  "level": "100",
+  "framework": "Serverless Framework",
+  "services": {
+      "from": "alb",
+      "to": "lambda"
+  },
+  "introBox": {
+      "headline": "How it works",
+      "text": [
+          "This pattern registers the lambda function as the target for the Application Load Balancer using the serverless framework.",
+          "",
+          "When the load balancer endpoint is hit in the browser, if the specified URL (`/hello`) path matches, it triggers the lambda function & the file (hello) is downloaded in your local system with the output from lambda function."
+      ]
+  },
+  "gitHub": {
+      "template": {
+          "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-lambda-serverless",
+          "templateURL": "serverless-patterns/alb-lambda-serverless",
+          "projectFolder": "alb-lambda-serverless",
+          "templateFile": "serverless.yml"
+      }
+  },
+  "resources": {
+      "headline": "Additional resources",
+      "bullets": [
+          {
+              "text": "Using AWS Lambda with an Application Load Balancer",
+              "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-alb.html"
+          },
+          {
+              "text": "Lambda functions as targets - Elastic Load Balancing",
+              "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/lambda-functions.html"
+          }
+      ]
+  },
+  "deploy": {
+      "text": [
+          "<code>serverless deploy --verbose</code>"
+      ]
+  },
+  "testing": {
+      "text": [
+          "See the GitHub repo for detailed testing instructions."
+      ]
+  },
+  "cleanup": {
+      "text": [
+          "<code>serverless remove --verbose</code>."
+      ]
+  },
+  "authors": [
+      {
+          "headline": "Presented by Anjali Modi, Software Engineer, Distinction-Dev",
+          "name": "Anjali Modi",
+          "bio": "Anjali Modi is a Software Engineer working for developing Serverless solutions at Distinction-Dev, India",
+          "linkedin":"https://www.linkedin.com/in/anjali-modi-068045119/",
+          "imageURL": "https://1.gravatar.com/avatar/51f84b006e95184c3943b4d5e17b1ac3"
+      }
+  ]
+}

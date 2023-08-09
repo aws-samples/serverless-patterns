@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  IotSnsSqsCfnQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: IotSnsSqsCfnQueue
+      VisibilityTimeout: 300
+  IotSnsSqsCfnTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      TopicName: IotSnsSqsCfnTopic
+  IotSnsSqsCfnSubscription:
+    Type: 'AWS::SNS::Subscription'
+    Properties:
+      TopicArn: !Ref IotSnsSqsCfnTopic
+      Protocol: sqs
+      Endpoint: !GetAtt IotSnsSqsCfnQueue.Arn
+  ExampleQueuePolicy:
+    Type: 'AWS::SQS::QueuePolicy'
+    Properties:
+      Queues:
+        - !Ref IotSnsSqsCfnQueue
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowSNSMessages
+            Effect: Allow
+            Principal:
+              AWS: '*'
+            Action: 'SQS:SendMessage'
+            Resource: !GetAtt IotSnsSqsCfnQueue.Arn
+            Condition:
+              ArnEquals:
+                'aws:SourceArn': !Ref IotSnsSqsCfnTopic
+  IotSnsSqsCfnRule:
+    Type: 'AWS::IoT::TopicRule'
+    Properties:
+      RuleName: IotSnsSqsCfnRule
+      TopicRulePayload:
+        Sql: SELECT * FROM 'device/data'
+        AwsIotSqlVersion: 2016-03-23
+        Actions:
+          - Sns:
+              TargetArn: !Ref IotSnsSqsCfnTopic
+              RoleArn: !GetAtt Role.Arn
+  Role:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: myrole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: iot.amazonaws.com
+            Action: 'sts:AssumeRole'
+  IamPolicyForLambda:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: mypolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 'sns:Publish'
+            Resource: !Ref IotSnsSqsCfnTopic
+      Roles:
+        - !Ref Role

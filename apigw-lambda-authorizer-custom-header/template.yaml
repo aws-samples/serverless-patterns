@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Serverless Pattern - Amazon API Gateway using Lambda Authorizer and Mapping Template to inject customer HTTP headers
+Transform: AWS::Serverless-2016-10-31
+Globals:
+  Function:
+    Runtime: nodejs18.x
+Resources:
+  # REST API
+  AppApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: apigw-lambda-authorizer-mapping-template
+      Description: API Gateway using Lambda Authorizer and Mapping Template to inject customer HTTP headers with additional data.
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyLambdaTokenAuthorizer
+        Authorizers:
+          MyLambdaTokenAuthorizer:
+            FunctionArn: !GetAtt AuthorizerFunction.Arn
+            Identity:
+              Header: AuthorizationToken
+            AuthorizerPayloadFormatVersion: 2.0
+            EnableSimpleResponses: true
+      DefinitionBody:
+        swagger: "2.0"
+        paths:
+          /:
+            get:
+                x-amazon-apigateway-integration:
+                  httpMethod: GET
+                  passthroughBehavior: when_no_templates
+                  type: http
+                  uri: "https://httpbin.org/get"
+                  responses:
+                    "200":
+                      statusCode: '200'
+                  requestTemplates:
+                    application/json: |
+                      {
+                        #set($enrichmentHeaderValue = "$context.authorizer.enrichment")
+                        #set($context.requestOverride.header.enrichmentHeader = $enrichmentHeaderValue)
+                      }
+                responses:
+                  "200":
+                      statusCode: '200'
+
+  # Authorizer function
+  AuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: authorizer.handler
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        EntryPoints: 
+        - authorizer.js
+Outputs:
+  # API Gateway endpoint to be used during tests
+  AppApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"

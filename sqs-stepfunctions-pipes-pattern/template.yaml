@@ -1,0 +1,114 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A SAM template that integrates SQS with Step Functions through EventBridge Pipes. Messages are fetched from SQS and processed by a Step Function workflow. The template also creates a Lambda function and a DLQ for error handling.
+
+Resources:
+  MyQueue:
+    Type: AWS::SQS::Queue
+
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.11
+      ReservedConcurrentExecutions: 0
+      Timeout: 600
+      
+  StatesExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - states.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+        - PolicyName: StatesExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt MyLambdaFunction.Arn
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                Resource: !GetAtt DeadLetterQueue.Arn
+  
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/StateMachine.asl.json
+      Role: !GetAtt StatesExecutionRole.Arn
+      DefinitionSubstitutions:
+        MyLambdaFunctionArn: !GetAtt MyLambdaFunction.Arn
+        DeadLetterQueueUrl: !Ref DeadLetterQueue
+  
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-source-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource: !GetAtt MyQueue.Arn
+        - PolicyName: !Sub ${AWS::StackName}-target-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'states:StartExecution'
+                Resource:
+                  - !GetAtt MyStateMachine.Arn
+  Pipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: !Sub ${AWS::StackName}-pipe
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt MyQueue.Arn
+      SourceParameters:
+        SqsQueueParameters:
+          BatchSize: 1
+      Target: !GetAtt MyStateMachine.Arn
+      TargetParameters:
+        StepFunctionStateMachineParameters:
+           InvocationType: 'FIRE_AND_FORGET'
+
+Outputs:
+  MyQueueUrl:
+    Description: "URL of the newly created SQS queue"
+    Value: !Ref MyQueue
+  DeadLetterQueueUrl:
+    Description: "URL of the DLQ"
+    Value: !Ref DeadLetterQueue
+  MyLambdaFunction:
+    Description: "ARN of the Lambda function"
+    Value: !GetAtt MyLambdaFunction.Arn
+  MyStateMachine:
+    Description: "ARN of the State Machine"
+    Value: !Ref MyStateMachine

@@ -1,0 +1,59 @@
+{
+  "title": "DynamoDB Streams to AppSync subscription",
+  "description": "Listen to DynamoDB changes using AppSync subscriptions",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In some of your projects, you might want to be able to listen to changes made on your database that are not performed through client-side mutations.",
+      "This sample project creates an AppSync API allowing you to listen to new items being created on a specific DynamoDB table through AWS AppSync subscriptions.",
+      "With this pattern, a Lambda function will be invoked for every new item created on a DynamoDB table. It will in turn call an AppSync mutation with data source set as `None`. An AppSync subscription will be subscribed to that mutation allowing end users to be notified of a newly created DynamoDB item."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-streams-appsync-subscription",
+      "templateURL": "serverless-patterns/dynamodb-streams-appsync-subscription",
+      "projectFolder": "dynamodb-streams-appsync-subscription",
+      "templateFile": "dynamodb-streams-appsync-subscription/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Appsync",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "AWS Re:Post - Listen to external DB changes using AppSync",
+        "link": "https://repost.aws/knowledge-center/appsync-notify-subscribers-real-time"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alexis Philippart de Foy",
+      "image": "https://media.licdn.com/dms/image/C4D03AQFyN5GLrFk-0g/profile-displayphoto-shrink_800_800/0/1586853008031?e=1693440000&v=beta&t=0BtjX92oZxhHUrrIzh55wah8V1OiwOAOyigPtfAcZdo",
+      "bio": " I am a Startup Solutions Architect, Serverless enthusiast and former Startup Founder.",
+      "linkedin": "apdf",
+      "twitter": "@aphilippartd"
+    }
+  ]
+}

@@ -22,14 +22,15 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cdk-vpc-lambda-stepfunctions
+    cd cdk-vpc-lambda-sfn
     ```
 3. To deploy from the command line use the following:
     ```bash
+      npm install
       npx cdk bootstrap aws://accountnumber/region
       npm run lambda
       npx cdk synth
-      npx cdk deploy
+      npx cdk deploy --all
     ```
 
 ## How it works

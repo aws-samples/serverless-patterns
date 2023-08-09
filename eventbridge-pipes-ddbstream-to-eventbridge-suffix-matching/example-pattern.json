@@ -1,0 +1,55 @@
+{
+  "title": "DynamoDB stream to EventBridge Bus using EventBridge Pipes using suffix matching",
+  "description": "Raise events from changes in DynamoDB using EventBridge Pipes and suffix filtering.",
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["EventBridge Pipe used to connect DynamoDB stream (new and old images) directly into an EventBridge bus with custom source and detail-type. Only items that match the suffix rule are forwarded on the bus"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-ddbstream-to-eventbridge-suffix-matching",
+      "templateURL": "serverless-patterns/eventbridge-pipes-ddbstream-to-eventbridge-suffix-matching",
+      "projectFolder": "",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Visuals",
+        "link": "https://serverlessland.com/serverless/visuals/eventbridge"
+      },
+      {
+        "text": "Suffix filtering",
+        "link": "https://serverlessland.com/serverless/visuals/eventbridge/suffix-filtering"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["Deploy the stack: <code>sam deploy</code>."]
+  },
+  "testing": {
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.png",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

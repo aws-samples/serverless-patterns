@@ -1,7 +1,7 @@
 {
   "title": "Event driven vulnerability scanning with EventBridge and Lambda",
   "description": "This pattern listens to Amazon Inspector events and triggers downstream consumers",
-  "language": "",
+  "language": "YAMl",
   "level": "200",
   "framework": "SAM",
   "introBox": {
@@ -28,7 +28,7 @@
     "text": ["sam deploy --guided"]
   },
   "testing": {
-    "text": ["See the README in the Github repo for detailed testing instructions."]
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
   },
   "cleanup": {
     "text": ["Delete the stack: <code>sam delete</code>."]

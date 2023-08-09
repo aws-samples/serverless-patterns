@@ -14,7 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) installed and configured 
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [.Net Core 3.1 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/3.1) installed
+* [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) installed
 
 ## Deployment Instructions
 

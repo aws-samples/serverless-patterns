@@ -1,0 +1,54 @@
+{
+    "title": "EventBridge Scheduler to start and stop EC2 instances Monday to Friday",
+    "description": "Simple pattern that starts and stops given EC2 instances based on time of day, timezone and days of week",
+    "level": "300",
+    "framework": "Terraform",
+    "introBox": {
+      "headline": "How it works",
+      "text": ["Creates a schedule that turns on instances at 08:00 and turns them off at 17:00 Monday to Friday using the US/Eastern timezone."]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-ec2-terrafrom",
+        "templateURL": "serverless-patterns/eventbridge-schedule-to-ec2-terraform",
+        "projectFolder": "eventbridge-schedule-to-ec2-terraform",
+        "templateFile": "main.tf"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Introducing Amazon EventBridge Scheduler",
+          "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+        },
+        {
+          "text": "Amazon EventBridge Scheduler Docs",
+          "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "terraform apply"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>terraform destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Ian Lodge",
+        "image": "https://avatars.githubusercontent.com/u/135351711?v=4",
+        "bio": "Ian is a Solutions Architect at Amazon Web Services based in the US.",
+        "linkedin": "https://www.linkedin.com/in/ian-lodge"
+      }
+    ]
+  }
+  

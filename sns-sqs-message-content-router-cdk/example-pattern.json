@@ -1,0 +1,56 @@
+{
+  "title": "Content based router with SNS and SQS filters",
+  "description": "Create an SNS topic and multiple SQS queues with content filtered based on configurable criteria.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK project demonstrates how to create a Message Content-based routing pattern using Amazon SNS and Amazon SQS.",
+      "The number of Queues and the Filters are dynamically defined inside the stackconfiguration.json file. The solution can be adapted for any specific requirement.",
+      "This architecture is an implementation of the Integration pattern: Content-Based Message Router explained in the Integration Patterns book.",
+      "The content can be filtered by attributes or by message body which grants full flexibility."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-message-content-router-cdk",
+      "templateURL": "serverless-patterns/sns-sqs-message-content-router-cdk",
+      "projectFolder": "sns-sqs-message-content-router-cdk",
+      "templateFile": "sns-sqs-message-content-router-cdk/src/lib/src-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon SNS subscription filter policies",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-subscription-filter-policies.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Raffaele Garofalo (Raf)",
+      "image": "https://avatars.githubusercontent.com/raffaeu",
+      "bio": "Raffaele Garofalo (Raf) is a Senior Solutions Architect at AWS and member of the AWS Serverless TFC (Technical Field Communities).",
+      "linkedin": "raffaeu",
+      "twitter": "raffaeu"
+    }
+  ]
+}
