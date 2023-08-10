@@ -9,7 +9,7 @@
     "text": [
       "This pattern provides a Lambda function along with an Event Source Mapping to a Kafka topic ",
       "It requires that you already have a Managed Streaming for Kafka(MSK) Cluster setup with a topic created. If you don't already have an MSK Cluster ",
-      "you can use the example in this pattern https://serverlessland.com/patterns/msk-cfn-sasl-lambda (linked in the resources) to deploy a cluster."
+      "You can use the example in this pattern https://serverlessland.com/patterns/msk-cfn-sasl-lambda (linked in the resources) to deploy a cluster.",
       "This pattern will work with either a provisioned or serverless MSK cluster as long as the cluster is configured to use IAM authentication. ",
       "For detailed deployment instructions instructions see the README "
     ]
