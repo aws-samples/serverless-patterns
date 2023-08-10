@@ -1,0 +1,60 @@
+{
+    "title": "APIGateway to S3 and DynamoDB fronted by Cloudfront",
+    "description": "Create a landing page to collect user data using Cloudfront, APIGateway, S3 and DynamoDB.",
+    "language": "",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to create a fast, scalable and completely serverless Landing page to collect user data usingusing Cloudfront, APIGateway, S3 and DynamoDB. This pattern is leveraging the native integration between these 4 services which means only YAML-based, structured language is used to define the implementation.",
+        "This pattern creates a simple webpage routed through CloudFront and served from S3 by APIGateway where the user can input some data submit it, where the submit request gets directly uploaded to DynamoDB thanks to the direct integration with APIGateway",
+        "This pattern deploys one CloudFront Distribution, one REST API Gatway, one S3 Bucket and one DynamoDB table."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-apigw-rest-api-dynamodb",
+        "templateURL": "serverless-patterns/cloudfront-apigw-rest-api-dynamodb",
+        "projectFolder": "cloudfront-apigw-rest-api-dynamodb",
+        "templateFile": "cloudfront-apigw-rest-api-dynamodb/template.yml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Using Amazon API Gateway as a proxy for DynamoDB",
+          "link": "https://aws.amazon.com/blogs/compute/using-amazon-api-gateway-as-a-proxy-for-dynamodb/"
+        },
+        {
+          "text": "Create a REST API as an Amazon S3 proxy in API Gateway",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-s3.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "aws cloudformation deploy --template-file template.yml --stack-name cloudfront-apigw-rest-api-dynamodb --capabilities CAPABILITY_IAM"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>aws cloudformation delete-stack --stack-name cloudfront-apigw-rest-api-dynamodb</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Jon Loinaz",
+        "image": "",
+        "bio": "AWS Solutions Architect.",
+        "linkedin": "jonloinaz",
+        "twitter": ""
+      }
+    ]
+  }
+  
