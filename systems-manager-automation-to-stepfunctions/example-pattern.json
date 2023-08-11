@@ -1,5 +1,5 @@
 {
-    "title": "Systems Manager automation to Step Functions",
+    "title": "Amazon Systems Manager automation to AWS Step Functions",
     "description": "Create SSM automation document that invokes Step functions.",
     "language": "Python",
     "level": "200",
@@ -7,7 +7,7 @@
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This pattern demonstrates how to invoke Step Functions from a Systems Manager automation document ",
+        "This pattern demonstrates how to invoke a Step Function from a Systems Manager automation document ",
         "It pass's the document run time execution parameters as input payload for the Step Functions. ",
         "This pattern creates the Snapshot of RDS database"
       ]
