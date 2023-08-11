@@ -1,0 +1,89 @@
+{
+  "title": "Lambda function that is subscribed to an MSK Topic",
+  "description": "Create a Lambda function that uses an Amazon MSK Topic as an event source with IAM Authentication.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern provides a Lambda function along with an Event Source Mapping to a Kafka topic ",
+      "It requires that you already have a Managed Streaming for Kafka(MSK) Cluster setup with a topic created. If you don't already have an MSK Cluster ",
+      "You can use the example in this pattern https://serverlessland.com/patterns/msk-cfn-sasl-lambda (linked in the resources) to deploy a cluster.",
+      "This pattern will work with either a provisioned or serverless MSK cluster as long as the cluster is configured to use IAM authentication. ",
+      "For detailed deployment instructions instructions see the README "
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-lambda-nodejs-sam",
+      "templateURL": "serverless-patterns/msk-lambda-nodejs-sam",
+      "projectFolder": "msk-lambda-nodejs-sam",
+      "templateFile": "msk-lambda-nodejs-sam/template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "MSK Cluster Pattern",
+        "link": "https://serverlessland.com/patterns/msk-cfn-sasl-lambda"
+      },
+      {
+        "text": "Using Lambda with Amazon MSK",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+      },
+      {
+        "text": "CloudFormation Provisioned MSK cluster reference",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-msk-cluster.html"
+      },
+      {
+        "text": "CloudFormation serverless MSK cluster reference",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-msk-serverlesscluster.html"
+      } 
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Lambda Function: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vaibhav Jain",
+      "bio": "AWS - Sr. Application Architect",
+      "image": "https://media.licdn.com/dms/image/C4E03AQEqzZWHGT4dBQ/profile-displayphoto-shrink_800_800/0/1580165399872?e=1687392000&v=beta&t=zdxENLnqCpqCz9i1Uf5Yx4YXlR9EYvgxP8N5UTsy6J8",
+      "linkedin": "https://www.linkedin.com/in/vaibhavjainv/"
+    },
+    {
+      "name": "Paveen Allam",
+      "bio": "Senior Solutions Architect",
+      "image": "https://www.fintail.me/images/pa.jpg",
+      "linkedin": "https://www.linkedin.com/in/pallam/"
+    }, 
+     {
+      "name": "Suraj Tripathi",
+      "bio": "AWS - AppDev Cloud Consultant",
+      "linkedin": "https://www.linkedin.com/in/suraj-tripathi-01b49a140/"
+    },
+    {
+      "name": "Adam Wagner",
+      "bio": "AWS - Principal Serverless Solutions Architect",
+      "linkedin": "https://www.linkedin.com/in/adam-wagner-4bb412/"
+    },
+    {
+      "name": "Indranil Banerjee",
+      "bio": "AWS - Senior Solutions Architect",
+      "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
+    }
+  ]
+}
