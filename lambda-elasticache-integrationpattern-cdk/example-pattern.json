@@ -7,10 +7,10 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Customers may want to connect to ElastiCache from their core lambda function for use cases that involve fast read-write operations and improve latency of applications.",
-      "In application like Leader board, Queue/wait-list , API rate limiting & Quota management, etc. that are built on Serverless platform , the core computing lambda function would integrate with a either Redis or Memcache on Amazon ElastiCache.",
-      " This documentation provides a quick start guide to launch Redis cluster in Amazon ElastiCache in a defined VPC and  creates a lambda function that read writes from the Cache.",
-      "Customers can further modify the code in lambda function as per their requirements. You can configure Memcached by modifying the cdk config and change lambda code appropriately."
+      "Users may want to connect to ElastiCache from their core Lambda function for use cases that involve fast read-write operations and improve latency of applications.",
+      "In an application like a leader board, queue/wait-list , API rate limiting & quota management, etc. that are built on Serverless platform , the core computing Lambda function would integrate with a either Redis or Memcache on Amazon ElastiCache.",
+      "This pattern provides a quick start guide to launch a Redis cluster in Amazon ElastiCache in a defined VPC and creates a Lambda function that read writes from that cache.",
+      "Users can further modify the code in the Lambda function as per their requirements. You can configure Memcached by modifying the cdk config and change Lambda code appropriately."
     ]
   },
   "gitHub": {
@@ -48,7 +48,7 @@
   },
   "testing": {
     "text": [
-      "See the Readme.md file of Github repo for detailed testing instructions."
+      "See the README.md file of GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
