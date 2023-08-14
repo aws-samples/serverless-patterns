@@ -16,9 +16,11 @@ resource "aws_api_gateway_integration" "Integration" {
   resource_id = aws_api_gateway_method.RootMethodGet.resource_id
   http_method = aws_api_gateway_method.RootMethodGet.http_method
   type        = "HTTP_PROXY"
-  uri         = var.GetHttpUrl
+  
+  # Replace the following url with your own HTTP url
+  uri                     = "http://petstore-demo-endpoint.execute-api.com/petstore/pets"
   integration_http_method = "GET"
-  depends_on = [ aws_api_gateway_method.RootMethodGet ]
+  depends_on              = [aws_api_gateway_method.RootMethodGet]
 }
 resource "aws_api_gateway_deployment" "Deployment" {
   rest_api_id = aws_api_gateway_rest_api.AppApi.id
