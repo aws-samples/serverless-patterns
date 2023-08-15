@@ -7,9 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This CDK project demonstrates integration with Amazon Connect by invoking API Gateway endpoints.
-      Many Connect customers would want to invoke adhoc tasks for their connect agents. These contact center agents 
-      can then perform subsequent task based on the actions listed in this task"
+      "This CDK project demonstrates integration with Amazon Connect by invoking API Gateway endpoints. Many Connect customers would want to invoke adhoc tasks for their connect agents. These contact center agents can then perform subsequent task based on the actions listed in this task"
     ]
   },
   "gitHub": {
