@@ -1,0 +1,58 @@
+{
+  "title": "API Gateway REST API to invoke Amazon Connect Task",
+  "description": "Create an API Gateway REST API that is protected with a Lambda token authorizer and integrates with AmazonSQS",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK project demonstrates integration with Amazon Connect by invoking API Gateway endpoints.
+      Many Connect customers would want to invoke adhoc tasks for their connect agents. These contact center agents 
+      can then perform subsequent task based on the actions listed in this task"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns.git",
+      "templateURL": "serverless-patterns/cdk-apigw-connect-start_task",
+      "projectFolder": "cdk-apigw-connect-start_task",
+      "templateFile": "cdk_apigw_connect_start_task/cdk_apigw_connect_start_task_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Solutions Construct for Amazon Connect",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_connect/README.html"
+      },
+      {
+        "text": "AWS Solutions construct for APIGateway",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_apigatewayv2.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "CDK deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sai Kotagiri",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Sai Kotagiri is a Partner Solutions Architect at Amazon Web Services based in New York metropolitan area. Sai has over 20 years of experience focusing on digital transformation and IT strategy",
+      "linkedin": "https://www.linkedin.com/in/sai-diwakar-kotagiri-1251928/"
+    }
+  ]
+}
