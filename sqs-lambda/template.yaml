@@ -13,7 +13,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs18.x
       Timeout: 3
       MemorySize: 128
       Events:
