@@ -1,0 +1,65 @@
+{
+  "title": "Schema validation for Apache Kafka with EventBridge Pipes",
+  "description": "EventBridge Pipes schema validation via Lambda enrichment and Confluent Schema Registry",
+  "language": "Python",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "Event schema validation for Apache Kafka with EventBridge Pipes and Confluent Schema Registry",
+    "text": [
+      "This pattern allows you to perform event schema validaton for events consumed by Amazon EventBridge Pipes from a self managed Apache Kafka stream as source using Confluent Schema Registry.",
+      "This pattern sets up an EventBridge pipe with the following key elements:",
+      "1. The source of the pipe is a Kafka cluster deployed Confluent Platform or Confluent Cloud. EventBridge Pipes reads messages from the Kafka stream in batches and provides these to the enrichment function as an event payload.",
+      "2. The enrichment step of the pipe consists of a Lambda function that validates the incoming messages against Confluent Schema Registry and deserializes the message from Avro before returning it.",
+      "3. The target of this pattern is an EventBridge custom event bus which is synchronously invoked by EventBridge Pipes with the events returned by the enrichment Lambda function. EventBridge Pipes supports a variety of other targets, including Lambda, AWS Step Functions, Amazon API Gateway, API destinations, and more.",
+      "The Python enrichment function uses the confluent-kafka library for schema validation and Avro deserialization.",
+      "Furthermore, it uses Powertools for AWS Lambda (Python) to implement Serverless best practices such as logging, tracing, secrets handling, typing, and JSON schema validation for incoming requests.",
+      "See the GitHub repo for a more detailed pattern description."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/pipes-schema-validation-confluent",
+      "templateURL": "serverless-patterns/pipes-schema-validation-confluent",
+      "projectFolder": "pipes-schema-validation-confluent",
+      "templateFile": "pipes-schema-validation-confluent/infrastructure/kafka_confluent_validate.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes: Self managed Apache Kafka stream as a source",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html"
+      },
+      {
+        "text": "Confluent Schema Registry",
+        "link": "https://docs.confluent.io/platform/current/schema-registry/index.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["See the GitHub repo for detailed deployment instructions."]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "Pascal Vogel",
+      "image": "https://avatars.githubusercontent.com/u/100202393?v=4",
+      "bio": "Pascal Vogel is a Solutions Architect at Amazon Web Services (AWS).",
+      "linkedin": "pascal-vogel",
+      "twitter": "pvogel_"
+    },
+    {
+      "name": "Andrea Amorosi",
+      "image": "https://avatars.githubusercontent.com/u/7353869?v=4",
+      "bio": "Andrea Amorosi is a Senior Partner Solutions Architect at Amazon Web Services (AWS).",
+      "linkedin": "dreamorosi",
+      "twitter": "dreamorosi"
+    }
+  ]
+}
