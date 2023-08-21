@@ -1,6 +1,6 @@
 # Event schema validation for Apache Kafka with EventBridge Pipes and Confluent Schema Registry
 
-This pattern allows you to perform event schema validaton for events consumed by [Amazon EventBridge Pipes](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html) from a [self managed Apache Kafka stream as source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html) using [Confluent Schema Registry](https://gitlab.aws.dev/pbv/pipes-schema-validation).
+This pattern allows you to perform event schema validation for events consumed by [Amazon EventBridge Pipes](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html) from a [self managed Apache Kafka stream as source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html) using [Confluent Schema Registry](https://gitlab.aws.dev/pbv/pipes-schema-validation).
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/pipes-schema-validation-confluent
 
