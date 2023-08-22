@@ -1,0 +1,63 @@
+service: fargate-eventbridge-serverless
+frameworkVersion: '3'
+provider:
+  name: aws
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'ap-south-1'}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+       - s3:CreateBucket
+      Resource: arn:aws:s3:::${self:custom.destinationBucket}/*
+  ecr:
+    images:
+      hello-task:
+        path: ./
+        file: Dockerfile
+
+custom:
+  destinationBucket: ${self:service}-${self:provider.stage}-destination-bucket
+
+fargate:
+  clusterName: fargate-eventbridge-serverless
+  containerInsights: true
+  memory: '0.5GB'
+  cpu: 256
+  architecture: X86_64
+  vpc:
+    assignPublicIp: true
+    securityGroupIds:
+      - sg-1234
+    subnetIds:
+      - subnet-1234
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+       - s3:PutObject
+      Resource: arn:aws:s3:::${self:custom.destinationBucket}/*
+
+  tasks:
+    hello-task:
+      name: hello-task
+      image: hello-task
+      vpc:
+        assignPublicIp: true
+        securityGroupIds:
+          - sg-1234
+        subnetIds:
+          - subnet-1234
+      memory: '0.5GB'
+      cpu: 256
+      schedule: cron(0/10 * * * ? *)
+      environment:
+        DESTINATION_BUCKET: ${self:custom.destinationBucket}
+
+resources:
+  Resources:
+    DestinationBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.destinationBucket}
+
+plugins:
+  - serverless-fargate
