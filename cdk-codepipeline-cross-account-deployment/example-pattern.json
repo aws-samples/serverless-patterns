@@ -1,0 +1,62 @@
+{
+    "title": "Step Functions to Athena",
+    "description": "Create a Step Functions workflow to query Amazon Athena.",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to use a single CodePipeline to deploy your stacks across multiple accounts. This example specifically uses a stack with a CloudFront distribution in front of an S3 Bucket to serve as a static website.",
+        "After deploying the CDK, the stack will continue to be re-deployed to both accounts as you make changes to the project via the CodeCommit repository.",
+        "This pattern uses a CodePipeline with a CodeCommit repository and CodeBuild; as well as an S3 Bucket and a CloudFront distribution and OAI to access objects in the bucket"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-codepipeline-cross-account-deployment",
+        "templateURL": "serverless-patterns/cdk-codepipeline-cross-account-deployment",
+        "projectFolder": "aws_serverless_pattern_cdk_crossaccount_deployment",
+        "templateFile": "aws_serverless_pattern_cdk_crossaccount_deployment/aws_serverless_pattern_cdk_crossaccount_deployment_stack.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Bootstrap AWS environments for CDK",
+          "link": "https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html"
+        },
+        {
+          "text": "CDK - Stacks",
+          "link": "https://docs.aws.amazon.com/cdk/v2/guide/stacks.html"
+        },
+        {
+          "text": "CloudFront - restricting access to an Amazon S3 origin",
+          "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "See the GitHub repo for detailed deployment instructions."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Cody Currie",
+        "image": "link-to-your-photo.jpg",
+        "bio": "Associate DevOps Consultant on the AWS Professional Services Team serving customers in the West Coast and Southwest regions of the United States",
+        "linkedin": "https://www.linkedin.com/in/cody-currie-3805b1161"
+      }
+    ]
+  }
