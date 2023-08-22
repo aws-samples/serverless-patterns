@@ -1,0 +1,52 @@
+{
+  "title": "Serverless Document Processing and Identification using Textract and Comprehend with CDK",
+  "description": "To analyse and identify the uploaded document whether it is a valid Government ID. Implemented in CDK",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to analyze and identify the uploaded document as a valid government issued ID. Implemented with CDK (Python)"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-textract-comprehend",
+      "templateURL": "serverless-patterns/s3-lambda-textract-comprehend",
+      "projectFolder": "cdk-s3-lambda-textract-comprehend-s3",
+      "templateFile": "cdk-s3-lambda-textract-comprehend-s3"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Document Detection with Textract and Comprehend",
+        "link": "https://docs.aws.amazon.com/textract/latest/dg/textract-to-comprehend.html"            
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for deleting instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Paul Kannan",
+      "image": "https://github.com/paulkannan/Cloudformation/blob/main/IMG-0484.JPG",
+      "bio": "I am a Technical Account Manager, Serverless Developer, DevOps & Big Data Architect. I specialize in architecting and developing Serverless solutions.",
+      "linkedin": "https://www.linkedin.com/in/paulkannan/"        
+    }
+  ]
+}
