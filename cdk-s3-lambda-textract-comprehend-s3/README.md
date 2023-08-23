@@ -1,7 +1,7 @@
 # s3-lambda-textract-comprehend-s3
 ![image](https://github.com/paulkannan/New-serverless-pattern-s3-lambda-textract-comprehend-s3/assets/46925641/f5dbe7a8-a9ef-423a-bf39-8ca201107b19)
 
-This pattern demonstrates the usage of AWS serverless services to extract data from the uploaded document with Textract and validate the extracted data for Identification of Document by Comprehend confidence scores. If the Comprehend confidence score is <0.7, the submitted document is classified into valid Government issued ID otherwise as invalid ID. 
+This pattern demonstrates the usage of AWS serverless services to extract data from the uploaded document with Textract and validate the extracted data for Identification of Document by Comprehend confidence scores. If the Comprehend confidence score is >0.7, the submitted document is classified into valid Government issued ID otherwise as invalid ID. 
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
