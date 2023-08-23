@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to aggregate all your events from multiple Eventbus (in the same region) to a central Eventbus in a different region. This pattern is deployed using Terraform to create a central EventBridge bus, Eventbridge rules on fan-in buses and all IAM resources required. The Eventbuses to aggregate can be defined in terraform.tfvars file (Sample ARNs is provided, replace with Eventbus ARNs as needed). The provider.tf file also lists the AWS regions of the fan-in Eventbus and central Eventbus (replace these based on where your Eventbuses exist and where you want your central bus to be created).
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-fan-in-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
