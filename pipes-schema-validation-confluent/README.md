@@ -122,7 +122,7 @@ See [Pipes batching and concurrency](https://docs.aws.amazon.com/eventbridge/lat
 
 This pattern sets up an EventBridge pipe with the following key elements:
 
-1. The **source** of the pipe is a Kafka cluster deployed Confluent Platform or Confluent Cloud. EventBridge Pipes reads messages from the Kafka stream in batches and provides these to the enrichment function as an event payload.
+1. The **source** of the pipe is a Kafka cluster deployed on Confluent Platform or Confluent Cloud. EventBridge Pipes reads messages from the Kafka stream in batches and provides these to the enrichment function as an event payload.
 
 1. The **enrichment** step of the pipe consists of a Lambda function that validates the incoming messages against Confluent Schema Registry and deserializes the message from Avro before returning it.
 
