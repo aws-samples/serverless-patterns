@@ -1,6 +1,6 @@
 # Event schema validation for Apache Kafka with EventBridge Pipes and Confluent Schema Registry
 
-This pattern allows you to perform event schema validation for events consumed by [Amazon EventBridge Pipes](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html) from a [self managed Apache Kafka stream as source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html) using [Confluent Schema Registry](https://gitlab.aws.dev/pbv/pipes-schema-validation).
+This pattern allows you to perform event schema validation and transformation from Avro to JSON for events consumed by [Amazon EventBridge Pipes](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html) from a [self managed Apache Kafka stream as source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html) using [Confluent Schema Registry](https://gitlab.aws.dev/pbv/pipes-schema-validation).
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/pipes-schema-validation-confluent
 
@@ -134,7 +134,7 @@ The function performs the following tasks:
 
 1. For each event in the batch passed to the function, it validates that all expected fields (such as `topic` , `key`, and `value`) are present using the [Powertools validation utility](https://docs.powertools.aws.dev/lambda/python/latest/utilities/validation/).
 
-1. In the messages polled by the EventBridge pipe from the Kafka stream, the `key` and `value` of the message are Base64 encoded. Therefore, for each message contained in the batch passed to the function, the function decodes both the `key` and the `value`.
+1. In the messages polled by the EventBridge pipe from the Kafka stream, the `key` and `value` of the message are `base64` encoded. Therefore, for each message contained in the batch passed to the function, the function decodes both the `key` and the `value`.
 
 1. The message `value` is deserialized using the `confluent-kafka` [`AvroDeserializer`](https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#schemaregistry-avro-deserializer).
 
@@ -150,39 +150,27 @@ The function performs the following tasks:
 
 1. Deploy this pattern using the above deployment instructions. The EventBridge pipe will start polling messages from the Kafka stream.
 
-   Polled message batches are passed to the enrichment Lambda function and have the following format. The `value` field is `base64`-encoded using an Avro schema
+   Polled message batches are passed to the enrichment Lambda function and have the following format. Note that the `key` field is `base64`-encoded and the `value` field is serialized in [Apache Avro](https://avro.apache.org/) as well as `base64`-encoded at this point.
 
    ```json
    [
      {
        "topic": "topic_0",
-       "partition": 3,
-       "offset": 261350,
-       "timestamp": 1692625627671,
+       "partition": 0,
+       "offset": 261757,
+       "timestamp": 1692895006657,
        "timestampType": "CREATE_TIME",
-       "key": "MTU3MDI4Mg==",
-       "value": "AAABhqG86azdhFjU178BDkl0ZW1fNzgCPOBEGU8XQA5DaXR5XzU5DFN0YXRlX/rsCg==",
+       "key": "MTU3MTMxNA==",
+       "value": "AAABhqH4tviNoljk578BEEl0ZW1fOTkzoYJ7grf4BkAOQ2l0eV83NA5TdGF0ZV843oEK",
        "headers": [
          // ...
        ],
-       "bootstrapServers": "smk://<Kafka cluster bootstrap server endpoint>",
+       "bootstrapServers": "smk://pkc-ymrq7.us-east-2.aws.confluent.cloud:9092",
        "eventSource": "SelfManagedKafka",
-       "eventSourceKey": "topic_0-3"
+       "eventSourceKey": "topic_0-0"
      },
      {
-       "topic": "topic_0",
-       "partition": 1,
-       "offset": 261940,
-       "timestamp": 1692625627512,
-       "timestampType": "CREATE_TIME",
-       "key": "MTU3MDI4MQ==",
-       "value": "AAABhqHU7qOY1lfS178BDEl0ZW1fMzdmq+Md6hpADkNpdHlfMzgQU3RhdGVfNzak0wg=",
-       "headers": [
-         // ...
-       ],
-       "bootstrapServers": "smk://<Kafka cluster bootstrap server endpoint>",
-       "eventSource": "SelfManagedKafka",
-       "eventSourceKey": "topic_0-1"
+       // Additional messages in batch
      }
    ]
    ```
@@ -192,16 +180,16 @@ The function performs the following tasks:
    ```json
    {
      "topic": "topic_0",
-     "key": "1570282",
+     "key": "1571314",
      "value": {
-       "ordertime": 1512463243870,
-       "orderid": 1570282,
-       "itemid": "Item_78",
-       "orderunits": 5.827244831262762,
+       "ordertime": 1516406508988,
+       "orderid": 1571314,
+       "itemid": "Item_993",
+       "orderunits": 2.871443766969904,
        "address": {
-         "city": "City_59",
-         "state": "State_",
-         "zipcode": 88893
+         "city": "City_74",
+         "state": "State_8",
+         "zipcode": 82031
        }
      }
    }
@@ -212,25 +200,25 @@ The function performs the following tasks:
    ```json
    {
      "version": "0",
-     "id": "05b30da6-a23f-5a2e-c7cd-6268b7cada91",
+     "id": "50b08aa0-4ca1-6141-455e-9ab3c9e5b09c",
      "detail-type": "Event from SelfManagedKafka",
-     "source": "Pipe pipe-09cskCabc123",
+     "source": "Pipe pipe-NFoZAWVCFV0j",
      "account": "217510216024",
-     "time": "2023-08-21T15:36:24Z",
-     "region": "us-east-1",
+     "time": "2023-08-24T16:36:53Z",
+     "region": "eu-west-1",
      "resources": [],
      "detail": {
        "topic": "topic_0",
-       "key": "1571307",
+       "key": "1571314",
        "value": {
-         "ordertime": 1489840159594,
-         "orderid": 1571307,
-         "itemid": "Item_154",
-         "orderunits": 2.249184025016022,
+         "ordertime": 1516406508988,
+         "orderid": 1571314,
+         "itemid": "Item_993",
+         "orderunits": 2.871443766969904,
          "address": {
-           "city": "City_7",
-           "state": "State_",
-           "zipcode": 10485
+           "city": "City_74",
+           "state": "State_8",
+           "zipcode": 82031
          }
        }
      }
