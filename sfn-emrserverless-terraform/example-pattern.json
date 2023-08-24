@@ -1,7 +1,7 @@
 {
   "title": "Design an AWS Step Functions workflow which runs a job on Amazon EMR Serverless.",
-  "description": "This pattern involves an AWS Step Functions State Machine which has the ability to run a job on Amazon EMR Serverless. It provisions all the required resources using Terraform for Infrastructure as Code (IaC).",
-  "language": "Terraform",
+  "description": "This pattern has a AWS Step Functions State Machine which will provide a workflow with the capability to run a job on Amazon EMR Serverless. It provisions all the required resources using Terraform for Infrastructure as Code (IaC).",
+  "language": "",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
