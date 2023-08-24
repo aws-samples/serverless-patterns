@@ -28,8 +28,6 @@ This should display the version number of the CDK CLI, indicating that the insta
 Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
 git clone https://github.com/aws-samples/serverless-patterns
 
-Change directory to the pattern directory: **cd _patterns-model**
-
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 This project is set up like a standard Python project.  The initialization process also creates a virtualenv within this project, stored under the `.venv`
