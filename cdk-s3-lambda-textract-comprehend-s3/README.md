@@ -90,12 +90,9 @@ When a file (pdf,jpeg, png) is uploaded to S3, the event will trigger a Lambda f
 **Testing**
 Provide steps to trigger the integration and show what should be observed if successful.
 
-**Cleanup**
-Delete the stack
+Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
+
 cdk destroy
-Confirm the stack has been deleted
-aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
