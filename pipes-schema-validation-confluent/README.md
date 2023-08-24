@@ -33,7 +33,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a secret called `confluent-schema-registry-secret` for the Confluent Cloud Schema Registry endpoint and credentials in the AWS Region you want to set up the EventBridge pipe.
 
-   Make sure the plaintext secret fits the following format:
+   Make sure the plaintext secret matches the following format:
 
    ```json
    {
