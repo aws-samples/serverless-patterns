@@ -3,15 +3,7 @@
 
 This pattern demonstrates the usage of AWS serverless services to extract data from the uploaded document with Textract and validate the extracted data for Identification of Document by Comprehend confidence scores. If the Comprehend confidence score is >0.7, the submitted document is classified into valid Government issued ID otherwise as invalid ID. 
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
-
-
 Important: This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
-
-
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
-
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
