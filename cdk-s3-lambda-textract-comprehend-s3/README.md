@@ -88,11 +88,13 @@ command.
 When a file (pdf,jpeg, png) is uploaded to S3, the event will trigger a Lambda function (S3Event). The Lambda will pass the file to textract to extract the data. Textract will extract the contents and the output will be passed to Comprehend to identify the type of Document with entity & PII detection and confidence score. Based on the entity & PII detection and confidence score (>0.7), the documents are identified as valid Government ID (Driving License,Aadhaar, NREGA, PAN, Passport). The identified documents are stored in S3 valid docs bucket and unidentified documents are stored in invalid docs folder.
 
 **Testing**
-Provide steps to trigger the integration and show what should be observed if successful.
+use unit_test to assert the resources created by CDK
 
+**Cleanup**
 Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
-
-cdk destroy
+```
+$ cdk destroy
+```
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
