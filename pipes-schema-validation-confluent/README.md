@@ -150,7 +150,7 @@ The function performs the following tasks:
 
 1. Deploy this pattern using the above deployment instructions. The EventBridge pipe will start polling messages from the Kafka stream.
 
-   Polled message batches are passed to the enrichment Lambda function and have the following format:
+   Polled message batches are passed to the enrichment Lambda function and have the following format. The `value` field is `base64`-encoded using an Avro schema
 
    ```json
    [
