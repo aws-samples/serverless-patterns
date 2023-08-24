@@ -138,7 +138,7 @@ The function performs the following tasks:
 
 1. The message `value` is deserialized using the `confluent-kafka` [`AvroDeserializer`](https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#schemaregistry-avro-deserializer).
 
-1. The function returns a list of deserialized messages to the EventBridge pipe, which will then invoke the target for each of them.
+1. The function returns a list of deserialized events to the EventBridge pipe, which will then invoke the target for each of them.
 
 1. Messages for which processing failed are sent to an Amazon SQS dead letter queue.
 
