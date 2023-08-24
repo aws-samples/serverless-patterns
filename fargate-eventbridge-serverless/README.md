@@ -11,6 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git CLI](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * [NodeJS](https://nodejs.org/en/download/) (LTS version) installed
 * [Serverless Framework CLI](https://www.serverless.com/framework/docs/getting-started) installed
+* [Docker Desktop](https://docs.docker.com/desktop/) installed
 
 ## Deployment Instructions
 
@@ -26,7 +27,7 @@ Important: this application uses various AWS services and there are costs associ
     cd serverless-patterns/fargate-eventbridge-serverless
     ```
 
-1. Replace the subnet and security group ids in serverless.yml file to your default ids.
+1. Open Docker Desktop and keep it running in the background.
 
 1. From the command line, use Serverless Framework to deploy the AWS resources for the pattern as specified in the serverless.yml file:
 
@@ -42,13 +43,15 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-- The image is constructed directly from the Dockerfile that is provided.
+- Make sure you have all the things configured mentioned in Requirements section.
+- The image is constructed directly from the Dockerfile that is provided using Docker Desktop.
 - The image is pushed to Amazon Elastic Container Repository (ECR).
 - Fargate Task role is created.
 - Fargate Execution role is created.
 - The S3 bucket for output is created.
 - The ECS cluster is created.
 - The Task Definition is created. This also passes the environment variable to the scheduled task.
+- Networking resources are created.
 - Finally EventBridge Rule is created for running task every 10th minute of the hour.
 
 ## Testing
@@ -60,7 +63,6 @@ To test the deployment, you can verify by going to the output S3 bucket and find
     "timestamp": 1692648300534
     }
     ```
-
 
 ## Cleanup
 
