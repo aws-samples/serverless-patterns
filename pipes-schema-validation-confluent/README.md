@@ -20,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Store your Confluent secrets in a secret called `confluent-secret` in AWS Secrets Manager in the AWS Region you want to set up the EventBridge pipe.
 
-   Make sure the plaintext secret fits the following format:
+   Make sure the plaintext secret matches the following format:
 
    ```json
    {
