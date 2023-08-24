@@ -108,7 +108,7 @@ See the [EventBridge Pipes User Guide](https://docs.aws.amazon.com/eventbridge/l
 
 ## Configuring the EventBridge pipe
 
-EventBridge Pipes allows you to configure how message are consumed from your Kafka stream via several parameters. Adjust these paramters in the CDK stack by editing the [CfnPipe](https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_pipes/CfnPipe.html) resource:
+EventBridge Pipes allows you to configure how message are consumed from your Kafka stream via several parameters. Adjust these parameters in the CDK stack by editing the [CfnPipe](https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_pipes/CfnPipe.html) resource:
 
 - `maximum_batching_window_in_seconds`: the maximum length of a time to wait for events.
 - `batch_size`: the maximum number of records to include in each batch.
