@@ -1,16 +1,15 @@
 {
-  "title": "Serverless csv data load template",
-  "description": "Creates a serverless pattern to store and process csv data using s3, sqs, lambda and dynamodb services",
+  "title": "Process files uploaded to S3 with SQS, Lambda and DynamoDB",
+  "description": "Creates a serverless pattern to store and process csv data using Amazon S3, Amazon SQS, AWS Lambda and Amazon DynamoDB services",
   "language": "Python",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-             "The AWS CDK  template deploys s3 bucket, SQS queue, lambda and DynamoDB table.",
-             "SQS queue is configured to listen to s3 create object events",
-             "Lambda is configured to read messages from the SQS queues, process them and insert records into DynamoDB table named EmployeeInfo."
-
+       "This AWS CDK template deploys an S3 bucket, SQS queue, Lambda function and DynamoDB table.",
+       "The SQS queue is configured to listen to S3 create object events",
+       "Lambda function is configured to read messages from the SQS queues, process them and insert records into DynamoDB table named EmployeeInfo."
     ]
   },
   "gitHub": {
@@ -40,7 +39,7 @@
   },
   "testing": {
     "text": [
-      "See the Github repo for detailed testing instructions."
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
