@@ -143,9 +143,7 @@ resource "aws_iam_role_policy" "click_logger_emr_serverless_inline_policy" {
                 "${aws_s3_bucket.job_source_s3_bucket.arn}",
                 "${aws_s3_bucket.job_source_s3_bucket.arn}/*",
                 "${aws_s3_bucket.output_s3_bucket.arn}",
-                "${aws_s3_bucket.output_s3_bucket.arn}/*",
-                "arn:aws:s3:::us-east-1-clicklogger-dev-firehose-delivery-078876706719",
-                "arn:aws:s3:::us-east-1-clicklogger-dev-firehose-delivery-078876706719/*"
+                "${aws_s3_bucket.output_s3_bucket.arn}/*"
             ]
         },
         {
