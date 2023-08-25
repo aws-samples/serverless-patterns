@@ -47,7 +47,7 @@ This pattern get OAuth 2.0 access tokens from Cognito User Pool and use them to 
 ```
 curl --location 'https://<your cognito custom domain>/oauth2/token' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
---header 'Authorization: Basic NGJmYjl1Y3Y3NGoxMmI3bnRuZTg4ZG8ybnM6ZGlsdHQxYmlmNHV1dnA2NWt0czlhY2h0cGRxODFhZ2phdGVvaWdyZmwzcnF2dGw2anA2' \
+--header 'Authorization: Basic {YOUR_TOKEN}' \
 --header 'Cookie: XSRF-TOKEN=80b94546-34ea-4378-9cbb-fe5779e9b132; cognito-fl="W10="' \
 --data-urlencode 'grant_type=client_credentials' \
 --data-urlencode 'scope=integration-OauthResourceServer/read'
