@@ -1,0 +1,4 @@
+aws-cdk-lib==2.91.0
+constructs>=10.0.0,<11.0.0
+boto3==1.28.22
+jsii==1.85
