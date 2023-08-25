@@ -1,0 +1,56 @@
+{
+  "title": "AWS SNS to Kinesis Firehose to OpenSearch Dashboard",
+  "description": "Analysing Cloudwatch Alarms in OpenSearch",
+  "language": "typescript",
+  "level": "200",
+  "framework": "cdk",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Messages are sent to an SNS topic, and SNS fans out the messages to a Kinesis Data Firehose delivery stream. Firehose then streams and delivers the messages to OpenSearch, where the streaming data is loaded and indexed for analysis and searching. Additionally, failed data is backed up using an S3 bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-firehose-opensearch-cdk-typescript",
+      "templateURL": "serverless-patterns/sns-firehose-opensearch-cdk-typescript",
+      "projectFolder": "sns-firehose-opensearch-cdk-typescript",
+      "templateFile": "sns-firehose-opensearch-cdk-typescript/lib/sns-firehose-opensearch-cdk-typescript-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Fanout to Kinesis Data Firehose delivery streams",
+          "link": "https://docs.amazonaws.cn/en_us/sns/latest/dg/sns-firehose-as-subscriber.html"
+      },
+      {
+        "text": "Introducing message archiving and analytics for Amazon SNS",
+          "link": "https://aws.amazon.com/blogs/compute/introducing-message-archiving-and-analytics-for-amazon-sns/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Leon Wang",
+      "image": "https://drive.google.com/file/d/1cPkmsCOQBFdmv5_70AfyDvTDxBRX-doQ/view?usp=sharing",
+      "bio": "I am a Cloud Support Engineer at AWS who loves coding",
+      "linkedin": "https://www.linkedin.com/in/leon-wang-23a6988a/"
+    }
+  ]
+}
