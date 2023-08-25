@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates Amazon Kinesis Data Streams integrate with AWS Lambda using the AWS CDK in Java.",
+      "This pattern creates an Amazon Kinesis Data Stream that integrates with AWS Lambda using the AWS CDK in Java.",
       "In this example, the Kinesis data stream is used as an event source for the AWS Lambda (Java) function which processes the data from the stream and catches any failures."
     ]
   },
