@@ -38,13 +38,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The AWS CDK  template deploys s3 bucket, SQS queue, lambda and DynamoDB table 
-
-SQS queue is configured to listen to s3 create object events
-
-lambda is configured to read messages from the SQS queues, process them and insert records into DynamoDB table named EmployeeInfo 
-
-
+1. The AWS CDK  template deploys S3 bucket, SQS queue, lambda and DynamoDB table 
+2. SQS queue is configured to listen to s3 create object events
+3. Lambda function is configured to read messages from the SQS queue, process messages and insert records into the DynamoDB table named EmployeeInfo.
 
 ## Testing
 
@@ -56,10 +52,8 @@ Use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2
     ```
  2. View S3 bucket to see files created in the previously empty bucket: You should see a file has been saved to the S3 bucket:
     ```
-    Verify the lambda function cloudwatch logs for successfull processing of csv file
-   
-    Verify the dynamodb table that the record was inserted
-  
+    Verify the Lambda function CloudWatch logs for successfull processing of csv file
+    Verify the DynamoDB table that the expected record was inserted
     ```
 
 ## Cleanup
