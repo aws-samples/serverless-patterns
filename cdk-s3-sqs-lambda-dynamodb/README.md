@@ -1,7 +1,6 @@
-# AWS pattern for s3->sqs->lambda->dynamodb
+# AWS pattern for S3 to SQS to Lambda and DynamoDB
 
-This CDK  pattern creates a serverless data processing workflow using s3, sqs, lambda and dynamodb
-
+This CDK pattern creates a serverless data processing workflow using Amazon S3, Amazon SQS, AWS Lambda and Amazon DynamoDB.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
