@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Change the working directory to this pattern's directory
     ```
-    cd cognito-m2m-oauth-apigw-cdk/cdk
+    cd cognito-m2m-oauth-apigw-cdk/src
     ```
 
 1. Install dependencies
