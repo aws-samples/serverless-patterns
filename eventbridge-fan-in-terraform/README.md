@@ -1,6 +1,9 @@
 # Amazon Eventbridge Eventbus fan-in to Central Eventbus to different region
 
-This pattern demonstrates how to aggregate all your events from multiple Eventbus (in the same region) to a central Eventbus in a different region. This pattern is deployed using Terraform to create a central EventBridge bus, Eventbridge rules on fan-in buses and all IAM resources required. The Eventbuses to aggregate can be defined in terraform.tfvars file (Sample ARNs is provided, replace with Eventbus ARNs as needed). The provider.tf file also lists the AWS regions of the fan-in Eventbus and central Eventbus (replace these based on where your Eventbuses exist and where you want your central bus to be created).
+This pattern demonstrates how to aggregate all your events from multiple Eventbus (in the same region) to a central Eventbus in a different region. This allows you to centrally accumulate events coming in from different event sources for downstream consumption.
+
+This pattern is deployed using Terraform to create a central EventBridge bus, Eventbridge rules on fan-in buses and all IAM resources required. The Eventbuses to aggregate can be defined in terraform.tfvars file (Sample ARNs is provided, replace with Eventbus ARNs as needed). The provider.tf file also lists the AWS regions of the fan-in Eventbus and central Eventbus (replace these based on where your Eventbuses exist and where you want your central bus to be created).
+
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-fan-in-terraform
 
@@ -19,15 +22,19 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
     cd eventbridge-fan-in-terraform
     ```
-1. From the command line, initialize Terraform:
+3. In the provider.tf file, add the regions where the Eventbuses exist in the provider block with alias "others". Also add the region where you want the central Eventbus to be created in the provider block with alias "central"
+
+4. In the terraform.tfvars file, add the ARNs of the Eventbuses you want to aggregate. Note that these Eventbus should exist in the same region
+
+5. From the command line, initialize Terraform:
     ```
     terraform init
     ```
-1. From the command line, apply the configuration in the main.tf file and follow the prompts:
+6. From the command line, apply the configuration in the main.tf file and follow the prompts:
      ```
     terraform apply
     ```
