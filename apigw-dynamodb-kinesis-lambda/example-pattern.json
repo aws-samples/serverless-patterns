@@ -1,0 +1,57 @@
+{
+    "title": "REST API that executes a PutItem API call to Amazon DynamoDB table. Amazon DynamoDB table has Amazon Kinesis Data stream to capture item-level changes in your table. The stream is then consumed by a Lambda function.",
+    "description": "Create a REST API Gateway which performs PutItem API Call to Amazon DynamoDB. Amazon DynamoDB table has Amazon Kinesis Data stream to capture item-level changes in your table, and replicates the changes to a Kinesis data stream. Next, AWS Lambda will consume those changes from Amazon Kinesis.",
+    "language": "Python",
+    "level": "300",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern will help you to deploy Amazon API Gateway API integration with Amazon DynamoDB. Additionally, Amazon DynamoDB table has Amazon Kinesis Data stream to capture item-level changes in your table and replicates the changes to a Kinesis data stream.",
+"Lastly, AWS Lambda will consume those changes from Amazon Kinesis to log the decoded message which was received from the Amazon Kinesis Stream."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-dynamodb-kinesis-lambda",
+        "templateURL": "serverless-patterns/apigw-dynamodb-kinesis-lambda",
+        "projectFolder": "apigw-dynamodb-kinesis-lambda",
+        "templateFile": "apigw-dynamodb-kinesis-lambda/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Using Amazon API Gateway as a proxy for DynamoDB",
+          "link": "https://aws.amazon.com/blogs/compute/using-amazon-api-gateway-as-a-proxy-for-dynamodb/"
+        },
+        {
+          "text": "Amazon DynamoDB PutItem API",
+          "link": "https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Vijay Konade",
+        "image": "img/vijay.png",
+        "bio": "Cloud Support Engineer @ AWS",
+        "linkedin": "https://www.linkedin.com/in/vijay-konade-14427479/"
+      }
+    ]
+  }                      
