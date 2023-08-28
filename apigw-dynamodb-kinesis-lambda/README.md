@@ -2,7 +2,7 @@
 
 This pattern will help you to deploy Amazon API Gateway, Amazon DynamoDB, Amazon Kinesis Data stream, AWS Lambda. You can use deployed API Gateway's endpoint URL to make HTTP POST request to make PutItem API call to Amazon DynamoSB table. Amazon DynamoDB table has Amazon Kinesis Data stream to capture item-level changes in your table, and replicates the changes to a Kinesis data stream. Next, AWS Lambda will consume those changes from Amazon Kinesis.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-dynamodb-kinesis-lambda Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-dynamodb-kinesis-lambda-python-sam. Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details.
 
 ## Requirements
 
