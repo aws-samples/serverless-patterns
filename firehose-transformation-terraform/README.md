@@ -1,5 +1,4 @@
 # Kinesis Firehose Data Transformation with Lambda (Terraform)
-# Transform incoming source data and deliver the transformed data to destinations.
 
 The purpose of this pattern is to deploy the infrastructure necessary to enable Kinesis Data Firehose data transformation.
 
@@ -9,7 +8,7 @@ The transformed data is sent from Lambda to Kinesis Data Firehose. Kinesis Data 
 
 In this project, the data transformation lambda will modify the value of 'HEALTHCARE' to 'MODERN_HEALTHCARE' for demonstration purposes.
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/kinesis-firehose-data-transformation-lambda-terraform).
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/firehose-transformation-terraform).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -31,7 +30,7 @@ Important: this application uses various AWS services and there are costs associ
 2. Change the working directory to this pattern's directory
 
    ```sh
-   cd serverless-patterns/kinesis-firehose-data-transformation-lambda-terraform
+   cd serverless-patterns/firehose-transformation-terraform
    ```
 
 3. From the command line, initialize terraform to  to downloads and installs the providers defined in the configuration:
@@ -89,7 +88,7 @@ To test this project, follow the below steps:
 
 1. Change directory to the pattern directory:
     ```sh
-    cd serverless-patterns/kinesis-firehose-data-transformation-lambda-terraform
+    cd serverless-patterns/firehose-transformation-terraform
     ```
 
 2. Delete all created resources
