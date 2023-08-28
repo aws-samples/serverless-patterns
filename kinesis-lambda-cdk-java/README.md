@@ -1,4 +1,4 @@
-# Amazon API Gateway Canary Deployment
+# Kinesis Data Streams integration with Lambda using the AWS CDK in Java
 
 This pattern creates an Amazon [Kinesis Data Stream](https://docs.aws.amazon.com/streams/latest/dev/introduction.html) and an AWS [Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html), using the AWS Cloud Development Kit (AWS CDK) in Java.
 
