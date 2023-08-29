@@ -59,7 +59,7 @@ Once the CDK stack has deployed successfully, you can take the following steps t
 
 1. Click 'Explore table items'
 
-1. Within 5 minutes or less, you should see a new item populated into the DynamoDB table specifying the ARN of the uploaded object. The ‘is_compliant’ column should be set to ‘false’ since the object was uploaded with no tags.
+1. Within a couple minutes, you should see a new item populated into the DynamoDB table specifying the ARN of the uploaded object. The ‘is_compliant’ column should be set to ‘false’ since the object was uploaded with no tags.
 
 ## Cleanup
  

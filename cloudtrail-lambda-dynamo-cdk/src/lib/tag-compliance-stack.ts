@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { Duration } from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudtrail from 'aws-cdk-lib/aws-cloudtrail';
@@ -119,7 +120,7 @@ export class TagComplianceStack extends cdk.Stack {
     populateDynamoFn.addToRolePolicy(lambdaS3Read);
 
     // function that checks the resources put into Dynamo for the tags specified in this function (go to function code to edit)
-    const resourceTagCheckerFn = new lambda.Function(this, 'objectTagCheckerFunction', {
+    const objectTagCheckerFn = new lambda.Function(this, 'objectTagCheckerFunction', {
       functionName: 'object-tag-checker',
       runtime: lambda.Runtime.PYTHON_3_10,
       handler: 'index.lambda_handler',
@@ -130,7 +131,9 @@ export class TagComplianceStack extends cdk.Stack {
       events: [
         new eventsources.DynamoEventSource(table, {
           startingPosition: lambda.StartingPosition.LATEST,
-          batchSize: 100
+          batchSize: 100,
+          retryAttempts: 1,
+          maxRecordAge: Duration.seconds(300)
         })
       ]
     });
@@ -147,18 +150,17 @@ export class TagComplianceStack extends cdk.Stack {
     });
 
     // allows lambda to scan and update the dynamodb table
-    const lambdaScanUpdateDynamo = new iam.PolicyStatement({
+    const lambdaUpdateDynamo = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
-        "dynamodb:Scan",
         "dynamodb:UpdateItem"
       ],
       resources: [table.tableArn]
     });
 
-    resourceTagCheckerFn.addToRolePolicy(lambdaGetObjectTags);
-    resourceTagCheckerFn.addToRolePolicy(lambdaScanUpdateDynamo);
-    resourceTagCheckerFn.role?.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaDynamoDBExecutionRole'));
+    objectTagCheckerFn.addToRolePolicy(lambdaGetObjectTags);
+    objectTagCheckerFn.addToRolePolicy(lambdaUpdateDynamo);
+    objectTagCheckerFn.role?.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaDynamoDBExecutionRole'));
   }
 }
 
