@@ -2,7 +2,7 @@
 
 This pattern shows how to leverage CloudTrail resource creation API calls to check for required S3 object tags and determine compliance. The resources used in this pattern include CloudTrail, S3, Lambda, and DynamoDB which are all deployed via CDK. From the CloudTrail logs stored in S3, PutObject events are populated into a DynamoDB table via Lambda. The items written into the table are then checked for the required tags to determine compliance. 
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://github.com/aws-samples/serverless-patterns/tree/main/cloudtrail-lambda-dynamo-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -28,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     npm install
     ```
-1. Open the lambda function object_tag_checker.py, and on line 40 replace the example keys with your required keys:
+1. Open the lambda function object_tag_checker.py, and on line 40 replace the example keys with your required keys. These are the keys you require to be present on every S3 object created:
     ```
     required_keys = {"Key1", "Key2", "Key3", "Key4"}
     ```
@@ -52,6 +52,9 @@ Once the CDK stack has deployed successfully, you can take the following steps t
     test/test_file.txt to s3://<bucket-name>/test_file.txt
     ```
     You can also open the AWS Management Console, navigate to S3, and confirm the uploaded file is found in the S3 bucket you specified.
+
+    An alternative way to upload a file to a bucket is doing so via the AWS console: https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html 
+
 
 1. Navigate to DynamoDB
 
