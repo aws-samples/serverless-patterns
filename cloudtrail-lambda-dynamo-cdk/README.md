@@ -28,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     npm install
     ```
-1. Open the lambda function object_tag_checker.py, and on line 40 replace the example keys with your required keys:
+1. Open the lambda function cloudtrail-lambda-dynamo-cdk/src/lib/lambda/object_tag_checker/index.py, and on line 17 replace the example keys with your required keys:
     ```
     required_keys = {"Key1", "Key2", "Key3", "Key4"}
     ```
@@ -45,21 +45,29 @@ Important: this application uses various AWS services and there are costs associ
 Once the CDK stack has deployed successfully, you can take the following steps to ensure the pattern is working appropriately:
 1. Using the AWS CLI, upload the test_file.txt found in the src folder to the S3 bucket of your choosing using the following command:
     ```
-    aws s3 cp test/test_file.txt s3://<bucket-name>
+    aws s3 cp test/test_file.txt s3://<bucket-name>/est/test_file1.txt
     ```
     If the file upload was successful, you should receive the following response:
     ```
-    test/test_file.txt to s3://<bucket-name>/test_file.txt
+    upload test/test_file.txt to s3://<bucket-name>/test_file1.txt
     ```
     You can also open the AWS Management Console, navigate to S3, and confirm the uploaded file is found in the S3 bucket you specified.
 
-1. Navigate to DynamoDB
+1. Using the AWS CLI, upload and tag the test_file.txt found in the src folder to the S3 bucket of your choosing using the following command:
+   ```
+   aws s3 cp test/test_file.txt s3://<bucket-name>/test_file2.txt
+   aws s3api put-object-tagging \
+       --bucket <bucket-name> \
+       --key test_file2.txt \
+       --tagging '{"TagSet": [{ "Key": "Key1", "Value": "key1_value" },{ "Key": "Key2", "Value": "key2_value" },{ "Key": "Key3", "Value": "key3_value" },{ "Key": "Key4", "Value": "key4_value" }]}'
 
-1. Select the table created for this pattern
+   ```
+
+1. In DynamoDB console, Navigate to DynamoDB, "s3-objects-table" table created for this pattern
 
 1. Click 'Explore table items'
 
-1. Within 5 minutes or less, you should see a new item populated into the DynamoDB table specifying the ARN of the uploaded object. The ‘is_compliant’ column should be set to ‘false’ since the object was uploaded with no tags.
+1. Within a couple of minutes, you should see a new item spopulated into the DynamoDB table specifying the ARN of the uploaded objects. The ‘is_compliant’ column should be set to ‘false’ for test_file1.txt since the object was uploaded with no tags and set to ‘true’ for test_file2.txt.
 
 ## Cleanup
  

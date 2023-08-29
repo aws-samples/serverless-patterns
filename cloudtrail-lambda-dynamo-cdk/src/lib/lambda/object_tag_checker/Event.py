@@ -5,8 +5,7 @@ class Event:
         self.is_compliant = is_compliant
         self.object_key = object_key
         self.tags = None
-        
-    
+
     def validate_compliance(self, required_keys):
         result = self.tags.difference(required_keys)
         if result:
