@@ -114,7 +114,6 @@ public class InfrastructureStack extends Stack {
                         .functionName("KinesisLambdaClient")
                         .reservedConcurrentExecutions(1)
                         .timeout(Duration.seconds(10))
-                        .logRetention(RetentionDays.ONE_WEEK)
                         .build())
                 .build());
     }
