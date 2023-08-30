@@ -10,6 +10,7 @@
 * [AWS CDK Toolkit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
 * [Java 11+](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html) installed
 * [Docker](https://docs.docker.com/get-docker/) Installed
+
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -38,6 +39,8 @@
     ```bash
     cdk deploy
     ```
+   Alternatively infrastructure/deploy.sh can be used to build and deploy the stack
+
 6. Note the outputs of CDK and copy the Kinesis Resource Name. Use the copied stream name in the producer.sh file which will be used in the next step to put records in to the stream created.
 
 ## How it works
