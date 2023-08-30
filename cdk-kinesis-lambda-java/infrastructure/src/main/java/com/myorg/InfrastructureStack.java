@@ -5,8 +5,6 @@ import java.util.List;
 
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.BundlingOptions;
-import software.amazon.awscdk.CfnOutput;
-import software.amazon.awscdk.CfnOutputProps;
 import software.amazon.awscdk.services.lambda.*;
 import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.lambda.eventsources.KinesisEventSourceProps;
@@ -17,14 +15,6 @@ import software.amazon.awscdk.DockerVolume;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
-import software.amazon.awscdk.services.apigatewayv2.alpha.AddRoutesOptions;
-import software.amazon.awscdk.services.apigatewayv2.alpha.HttpApi;
-import software.amazon.awscdk.services.apigatewayv2.alpha.HttpApiProps;
-import software.amazon.awscdk.services.apigatewayv2.alpha.HttpMethod;
-import software.amazon.awscdk.services.apigatewayv2.alpha.PayloadFormatVersion;
-import software.amazon.awscdk.services.apigatewayv2.integrations.alpha.HttpLambdaIntegration;
-import software.amazon.awscdk.services.apigatewayv2.integrations.alpha.HttpLambdaIntegrationProps;
-import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.s3.assets.AssetOptions;
 
 import static java.util.Collections.singletonList;
@@ -58,39 +48,6 @@ public class InfrastructureStack extends Stack {
                 ))
                 .user("root")
                 .outputType(ARCHIVED);
-
-//        Function kinesisLambdaClientFunction = new Function(this, "kinesisLambdaClientFunction", FunctionProps.builder()
-//                .runtime(Runtime.JAVA_11)
-//                .code(Code.fromAsset("../software/", AssetOptions.builder()
-//                        .bundling(builderOptions
-//                                .command(kinesisLambdaClientPackagingInstructions)
-//                                .build())
-//                        .build()))
-//                .handler("helloworld.App")
-//                .memorySize(1024)
-//                .timeout(Duration.seconds(10))
-//                .logRetention(RetentionDays.ONE_WEEK)
-//                .build());
-
-//        HttpApi httpApi = new HttpApi(this, "sample-api", HttpApiProps.builder()
-//                .apiName("sample-api")
-//                .build());
-//
-//        httpApi.addRoutes(AddRoutesOptions.builder()
-//                .path("/one")
-//                .methods(singletonList(HttpMethod.GET))
-//                .integration(new HttpLambdaIntegration("kinesisLambdaClientFunction", kinesisLambdaClientFunction, HttpLambdaIntegrationProps.builder()
-//                        .payloadFormatVersion(PayloadFormatVersion.VERSION_2_0)
-//                        .build()))
-//                .build());
-
-//        httpApi.addRoutes(AddRoutesOptions.builder()
-//                .path("/two")
-//                .methods(singletonList(HttpMethod.GET))
-//                .integration(new HttpLambdaIntegration("functionTwo", functionTwo, HttpLambdaIntegrationProps.builder()
-//                        .payloadFormatVersion(PayloadFormatVersion.VERSION_2_0)
-//                        .build()))
-//                .build());
 
         new KinesisStreamsToLambda(this, "KinesisToLambdaPattern", new KinesisStreamsToLambdaProps.Builder()
                 .kinesisEventSourceProps(new KinesisEventSourceProps.Builder()
