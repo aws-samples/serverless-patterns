@@ -2,7 +2,7 @@
 
 This pattern demonstrates how you can setup a fully serverless setup to integrate your SNS topic with a Slack/Teams channel. This provisions AWS resources for you and you just need to integrate your Slack/Teams webhooks to get it running.
 
-[Learn more about this pattern at Serverless Land Patterns](https://serverlessland.com/repos/sns-slack-teams-integration-cdk-python)
+[Learn more about this pattern at Serverless Land Patterns](https://serverlessland.com/patterns/sns-slack-teams-integration-cdk-python)
 
 [SNS & Slack/Teams integration diagram](https://github.com/ajayv-AWS/Img/blob/870961eb05a4732ea2ee6a36af8ad1fd6a7ef206/SNS-teams-slack.drawio.png?raw=true)
 
