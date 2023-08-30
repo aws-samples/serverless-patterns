@@ -1,0 +1,69 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ReadCode",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:GetObjectVersion"
+            ],
+            "Resource": [
+                "${s3_bucket_arn}/${file_key}"
+            ]
+        },
+        {
+            "Sid": "ListCloudwatchLogGroups",
+            "Effect": "Allow",
+            "Action": [
+                "logs:DescribeLogGroups"
+            ],
+            "Resource": [
+                "arn:aws:logs:${aws_region}:${account_id}:log-group:*"
+            ]
+        },
+        {
+            "Sid": "ListCloudwatchLogStreams",
+            "Effect": "Allow",
+            "Action": [
+                "logs:DescribeLogStreams"
+            ],
+            "Resource": [
+                "arn:aws:logs:${aws_region}:${account_id}:log-group:/aws/kinesis-analytics/${application_name}:log-stream:*"
+            ]
+        },
+        {
+            "Sid": "PutCloudwatchLogs",
+            "Effect": "Allow",
+            "Action": [
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:${aws_region}:${account_id}:log-group:/aws/kinesis-analytics/${application_name}:log-stream:${log_stream_name}"
+            ]
+        },
+        {
+            "Sid": "ReadInputStream",
+            "Effect": "Allow",
+            "Action": "kinesis:*",
+            "Resource": "arn:aws:kinesis:${aws_region}:${account_id}:stream/${stream_name}"
+        },
+        {
+            "Sid": "WriteObjects",
+            "Effect": "Allow",
+            "Action": [
+                "s3:Abort*",
+                "s3:DeleteObject*",
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:ListBucket",
+                "s3:PutObject"
+            ],
+            "Resource": [
+                "${s3_bucket_arn}",
+                "${s3_bucket_arn}/*"
+            ]
+        }
+    ]
+}
