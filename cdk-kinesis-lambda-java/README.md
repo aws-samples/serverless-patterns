@@ -47,18 +47,17 @@ This Kinesis-Lambda integration pattern makes use of the aws-kinesisstreams-lamb
 Lambda get triggered based on the events from Kinesis DataStreams. For any error in invocation of Lambda, event is persisted in the dead letter SQS queue.
 
 ## Testing
-
 Update the producer.sh file with Kinesis stream name which got created. Update the number of messages to get published in to the stream by updating the number in loop as shown in the below statement
 
 while [ $a -lt 24 ]
 
-From the command line  
+From the command line
 
-    ```bash
-    cd ../software
-    cd KinesisCliProducers
-    sh producers.sh
-    ```
+   ```bash
+   cd ../software
+   cd KinesisCliProducers
+   sh producers.sh
+   ```
 This will publish the messages in the Kinesis and lambda gets triggered based on that.
 
 ## Cleanup
