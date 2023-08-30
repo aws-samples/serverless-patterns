@@ -28,7 +28,7 @@
     cd infrastructure
     ```
 4. From the command line, Synthesize the cdk stack to emits the synthesized CloudFormation template. Set up will make sure to build and package
-   the lambda functions residing in [software](/software) directory.
+   the lambda functions residing in software directory.
 
     ```bash
     cdk synth
@@ -42,22 +42,30 @@
 
 ## How it works
 
-This Kinesis-Lambda integration pattern example makes use of the [AWS Solution construct](https://docs.aws.amazon.com/solutions/latest/constructs/aws-kinesisstreams-lambda.html) to create the infrastructure.
+This Kinesis-Lambda integration pattern makes use of the aws-kinesisstreams-lambda [Solution construct](https://docs.aws.amazon.com/solutions/latest/constructs/aws-kinesisstreams-lambda.html) to create the infrastructure.
 
+Lambda get triggered based on the events from Kinesis DataStreams. For any error in invocation of Lambda, event is persisted in the dead letter SQS queue.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Update the producer.sh file with Kinesis stream name which got created. Update the number of messages to get published in to the stream by updating the number in loop as shown in the below statement
+
+while [ $a -lt 24 ]
+
+From the command line  
+
+    ```bash
+    cd ../software
+    cd KinesisCliProducers
+    sh producers.sh
+    ```
+This will publish the messages in the Kinesis and lambda gets triggered based on that.
 
 ## Cleanup
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    cdk destroy
     ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
