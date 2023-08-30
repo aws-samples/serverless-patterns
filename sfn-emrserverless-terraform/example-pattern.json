@@ -1,0 +1,65 @@
+{
+  "title": "AWS Step Functions to Amazon EMR Serverless",
+  "description": "This pattern has a AWS Step Functions State Machine which will provide a workflow with the capability to run a job on Amazon EMR Serverless. It provisions all the required resources using Terraform for Infrastructure as Code (IaC).",
+  "language": "",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern involves an AWS Step Functions State Machine which has the ability to run a job on Amazon EMR Serverless. It provisions all the required resources using Terraform for Infrastructure as Code (IaC)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-emrserverless-terraform",
+      "templateURL": "serverless-patterns/sfn-emrserverless-terraform",
+      "projectFolder": "sfn-emrserverless-terraform",
+      "templateFile": "sfn-emrserverless-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS SDK service integrations",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html#supported-services-awssdk-list"
+      },
+      {
+        "text": "Run a data processing job on Amazon EMR Serverless with AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/big-data/run-a-data-processing-job-on-amazon-emr-serverless-with-aws-step-functions/"
+      },
+      {
+        "text": "AWS Step Functions adds integration for 35 services including EMR Serverless",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2023/02/aws-step-functions-integration-35-services-emr-serverless/"
+      },
+      {
+        "text": "AWS Step Functions Developer Guide",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply --auto-approve"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo Readme for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy --auto-approve"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Naveen Balaraman",
+      "image": "https://avatars.githubusercontent.com/navbalaraman",
+      "bio": "Sr. Cloud Application Architect passionate about Containers, Serverless Applications, Architecting Microservices and helping customers leverage the power of Cloud.",
+      "linkedin": "https://www.linkedin.com/in/naveen-balaraman-96bb1a19/"
+    }
+  ]
+}
