@@ -42,7 +42,8 @@
 
 ## How it works
 
-Explain how the service interaction works.
+This Kinesis-Lambda integration pattern example makes use of the [AWS Solution construct](https://docs.aws.amazon.com/solutions/latest/constructs/aws-kinesisstreams-lambda.html) to create the infrastructure.
+
 
 ## Testing
 
