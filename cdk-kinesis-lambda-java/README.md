@@ -1,6 +1,7 @@
-# AWS Service 1 to AWS Service 2
+# Kinesis DataStreams with Lambda Integration
 
-This pattern << explain usage >>
+
+This pattern explain the integration of 
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
