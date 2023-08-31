@@ -33,7 +33,7 @@
   },
   "deploy": {
     "text": [
-      "cdk deploy"
+      "cdk deploy --parameters SNSEndpoint=EmailID --parameters RDSInstanceName=RDSInstanceName"
     ]
   },
   "testing": {
