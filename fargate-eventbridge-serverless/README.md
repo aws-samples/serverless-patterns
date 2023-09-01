@@ -1,6 +1,6 @@
 # Leveraging Fargate for Scheduled Jobs
 
-This pattern contains a sample cloudformation template to deploy a scheduled AWS Fargate task using EventBridge running on an Amazon Elastic Container Service (ECS) cluster. The docker image is pushed to Amazon Elastic Container Registry (ECR) using cloudformation template without having to pre-push the image to ECR or another container library. The serverless framework plugin for fargate, `serverless-fargate` is used to deploy tasks on ECS Cluster. This task runs every 10th minute of the hour and a simple file containing JSON is put in S3 bucket. 
+This pattern contains a sample serverless framework template to deploy a scheduled AWS Fargate task using EventBridge running on an Amazon Elastic Container Service (ECS) cluster. The docker image is pushed to Amazon Elastic Container Registry (ECR) using serverless framework template without having to pre-push the image to ECR or another container library. The serverless framework plugin for fargate, `serverless-fargate` is used to deploy tasks on ECS Cluster. This task runs every 10th minute of the hour using Eventbridge Scheduler and a simple file containing JSON is put in S3 bucket. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,10 +21,10 @@ Important: this application uses various AWS services and there are costs associ
     git clone https://github.com/aws-samples/serverless-patterns
     ```
 
-1. Change directory to the fargate-eventbridge pattern directory:
+1. Change directory to the pattern directory:
 
     ``` sh
-    cd serverless-patterns/fargate-eventbridge-serverless
+    cd fargate-eventbridge-serverless
     ```
 
 1. Open Docker Desktop and keep it running in the background.
