@@ -1,0 +1,20 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "kinesisanalytics.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole",
+            "Condition": {
+                "StringEquals": {
+                    "aws:SourceAccount": "${account_id}"
+                },
+                "ArnEquals": {
+                    "aws:SourceArn": "arn:aws:kinesisanalytics:${aws_region}:${account_id}:application/${application_name}"
+                }
+            }
+        }
+    ]
+}
