@@ -17,18 +17,23 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Deployment Instructions
 
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ```
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-2. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/kinesis-lambda-cdk-typescript
-    ```
-3. From the command line, use AWS CDK to deploy the AWS resources for the serverless application as specified in the MyServerlessApplicationStack.java file:
-    ```
-    cdk deploy
-    ```
+1.Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+
+```node
+git clone https://github.com/aws-samples/serverless-patterns
+```
+
+2.Change directory to the pattern directory:
+
+```node
+cd serverless-patterns/kinesis-lambda-cdk-typescript
+```
+
+3.From the command line, use AWS CDK to deploy the AWS resources for the serverless application as specified in the MyServerlessApplicationStack.java file:
+
+```node
+cdk deploy
+```
 
 ## How it works
 
@@ -38,12 +43,13 @@ When data is sent to the Kinesis data stream, the Lambda function will be trigge
 
 From the command line, run the following command to send a single data record to the Kinesis data stream. Note that you must edit the {MyServerlessApplicationStack.KinesisLambda-KinesisStream} with the Kinesis data stream ARN that is deployed. This is provided in the MyServerlessApplicationStack deployment outputs.
 
-```
+```node
 aws kinesis put-record --stream-name {MyServerlessApplicationStack.KinesisLambda-KinesisStream} --partition-key 123 --data testdata
 ```
 
 You will see output as below:
-```
+
+```node
 {
     "ShardId": "shardId-000000000000",
     "SequenceNumber":"49644233305086035939298432546400484303012441668144070658",
@@ -56,9 +62,11 @@ This will trigger the lambda which you can verify by checking the CloudWatch log
 ## Cleanup
 
 1. From the command line the AWS CDK to delete the Serverless application stack
-   ```
+
+```node
    cdk destroy
-   ```
+```
+
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
