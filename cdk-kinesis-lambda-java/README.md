@@ -1,4 +1,4 @@
-# Kinesis DataStreams with Lambda Integration
+# Kinesis Data Streams with Lambda Integration
 
 ![architecture diagram](architecture.png)
 
