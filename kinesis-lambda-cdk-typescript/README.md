@@ -57,7 +57,7 @@ You will see output as below:
 }
 ```
 
-This will trigger the lambda which you can verify by checking the CloudWatch logs under tab Monitor.
+This will trigger the lambda function which you can verify by checking the CloudWatch logs under tab Monitor.
 
 ## Cleanup
 
