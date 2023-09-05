@@ -15,7 +15,7 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-lambda-cdk-typescript",
-      "templateURL": "kinesis-lambda-cdk-typescript",
+      "templateURL": "serverless-patterns/kinesis-lambda-cdk-typescript",
       "projectFolder": "kinesis-lambda-cdk-typescript",
       "templateFile": "kinesis-lambda-cdk-typescript/src/bin/app.ts"
     }
