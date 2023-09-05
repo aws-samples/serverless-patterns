@@ -2,7 +2,7 @@
 
 This pattern shows how to leverage CloudTrail resource creation API calls to check for required S3 object tags and determine compliance. The resources used in this pattern include CloudTrail, S3, Lambda, and DynamoDB which are all deployed via CDK. From the CloudTrail logs stored in S3, PutObject events are populated into a DynamoDB table via Lambda. The items written into the table are then checked for the required tags to determine compliance. 
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cloudtrail-lambda-dynamodb-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -45,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 Once the CDK stack has deployed successfully, you can take the following steps to ensure the pattern is working appropriately:
 1. Using the AWS CLI, upload the test_file.txt found in the src folder to the S3 bucket of your choosing using the following command:
     ```
-    aws s3 cp test/test_file.txt s3://<bucket-name>/test/test_file1.txt
+    aws s3 cp test/test_file.txt s3://<bucket-name>/est/test_file1.txt
     ```
     If the file upload was successful, you should receive the following response:
     ```

@@ -23,7 +23,7 @@ export class TagComplianceStack extends cdk.Stack {
     });
 
     // random generated number appended to bucket name, to create unique name
-    const generatedNum = Math.ceil(Math.random() * 10);
+    const generatedNum = Math.ceil(Math.random() * 100);
 
     const cloudtrail_bucket = new s3.Bucket(this, 'objectCreationLogs', {
       bucketName: `object-creation-logs-${generatedNum}`, // name may be changed, need to make sure bucket name doesn't already exist
