@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use AWS Lambda(Java) to subscribe for events from Kinesis DataStream with error handling to avoid redundant message processing",
+      "This sample project demonstrates how to use AWS Lambda (Java runtime) to subscribe to events from a Kinesis Data Stream with error handling to avoid redundant message processing",
       "This example creates the pattern with AWS Solution constructs using AWS CDK in Java"
     ]
   },
