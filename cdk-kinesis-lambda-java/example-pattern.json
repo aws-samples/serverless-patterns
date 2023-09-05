@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-kinesis-lambda-java",
       "templateURL": "serverless-patterns/cdk-kinesis-lambda-java",
       "projectFolder": "cdk-kinesis-lambda-java",
-      "templateFile": " cdk-kinesis-lambda-java/infrastructure/src/main/java/com/myorg/InfrastructureStack.java"
+      "templateFile": "infrastructure/src/main/java/com/myorg/InfrastructureStack.java"
     }
   },
   "resources": {
