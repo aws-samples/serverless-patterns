@@ -1,5 +1,5 @@
 {
-  "title": "Amazon Kinesis Data Streams triggers AWS Lambda",
+  "title": "Amazon Kinesis Data Streams to AWS Lambda",
   "description": "Create a serverless app using Amazon Kinesis Data Streams and AWS Lambda.",
   "language": "TypeScript",
   "level": "200",
