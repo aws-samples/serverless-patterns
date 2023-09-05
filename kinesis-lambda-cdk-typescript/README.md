@@ -61,7 +61,7 @@ This will trigger the lambda function which you can verify by checking the Cloud
 
 ## Cleanup
 
-1. From the command line the AWS CDK to delete the Serverless application stack
+1. From the command line run this AWS CDK command to delete the Serverless application stack
 
 ```node
    cdk destroy
