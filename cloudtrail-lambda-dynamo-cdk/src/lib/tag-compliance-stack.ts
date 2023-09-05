@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { Duration } from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudtrail from 'aws-cdk-lib/aws-cloudtrail';
@@ -11,24 +12,21 @@ export class TagComplianceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const region = cdk.Aws.REGION;
-    const accountId = cdk.Aws.ACCOUNT_ID;
-
-    const table = new dynamodb.Table(this, 'resourceCreationTable', {
-      tableName: 'resource-creation-table',
+    const table = new dynamodb.Table(this, 's3ObjectsTable', {
+      tableName: 's3-objects-table',
       partitionKey: {
-        name: 'resource_arn', // name may be changed
+        name: 'object_arn', 
         type: dynamodb.AttributeType.STRING
       },
       stream: dynamodb.StreamViewType.NEW_IMAGE,
-      removalPolicy: cdk.RemovalPolicy.DESTROY // can be adjusted as deemed necessary
+      removalPolicy: cdk.RemovalPolicy.DESTROY 
     });
 
     // random generated number appended to bucket name, to create unique name
     const generatedNum = Math.ceil(Math.random() * 10);
 
-    const bucket = new s3.Bucket(this, 'resourceCreationLogs', {
-      bucketName: `resource-creation-logs-${generatedNum}`, // name may be changed, need to make sure bucket name already doesn't exist
+    const cloudtrail_bucket = new s3.Bucket(this, 'objectCreationLogs', {
+      bucketName: `object-creation-logs-${generatedNum}`, // name may be changed, need to make sure bucket name doesn't already exist
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.S3_MANAGED,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -43,13 +41,13 @@ export class TagComplianceStack extends cdk.Stack {
         effect: iam.Effect.ALLOW,
         principals: [cloudtrailPrincipal],
         actions:["s3:GetBucketAcl"],
-        resources:[bucket.bucketArn],
+        resources:[cloudtrail_bucket.bucketArn],
       }),
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         principals:[cloudtrailPrincipal],
         actions:["s3:PutObject"],
-        resources: [bucket.arnForObjects(`AWSLogs/*`)],
+        resources: [cloudtrail_bucket.arnForObjects(`AWSLogs/*`)],
         conditions: {
           "StringEquals": {
             "s3:x-amz-acl": "bucket-owner-full-control"
@@ -60,16 +58,25 @@ export class TagComplianceStack extends cdk.Stack {
 
     // adding the IAM statements to the bucket policy
     for(const statement of bucket_policy_statements) {
-      bucket.addToResourcePolicy(statement);
+      cloudtrail_bucket.addToResourcePolicy(statement);
     }
 
-    new cloudtrail.Trail(this, 'resourceCreationTrail', {
-      trailName: 'resource-creation-trail',
-      bucket: bucket,
+    const trail = new cloudtrail.Trail(this, 'objectCreationTrail', {
+      trailName: 'object-creation-trail',
+      bucket: cloudtrail_bucket,
       isMultiRegionTrail: true,
-      includeGlobalServiceEvents: true,
-      managementEvents: cloudtrail.ReadWriteType.WRITE_ONLY
+      includeGlobalServiceEvents: true
     });
+
+
+    trail.addEventSelector(
+      cloudtrail.DataResourceType.S3_OBJECT, 
+      ['arn:aws:s3:::'],
+      {
+        readWriteType: cloudtrail.ReadWriteType.WRITE_ONLY,
+        includeManagementEvents: false
+      }
+    )
 
     // function that gets cloudtrail events from the s3 bucket and populates to dynamo table
     const populateDynamoFn = new lambda.Function(this, 'populateDynamoFunction', {
@@ -79,10 +86,10 @@ export class TagComplianceStack extends cdk.Stack {
       code: lambda.Code.fromAsset('lib/lambda/populate_dynamo'),
       environment: {
         'TABLE_NAME': table.tableName,
-        'BUCKET_NAME': bucket.bucketName
+        'CLOUDTRAIL_BUCKET_NAME': cloudtrail_bucket.bucketName
       },
       events: [
-        new eventsources.S3EventSource(bucket, {
+        new eventsources.S3EventSource(cloudtrail_bucket, {
           events: [s3.EventType.OBJECT_CREATED]
         })
       ]
@@ -103,8 +110,8 @@ export class TagComplianceStack extends cdk.Stack {
         "s3:ListBucket"
       ],
       resources: [
-        bucket.bucketArn,
-        bucket.bucketArn + "/*"
+        cloudtrail_bucket.bucketArn,
+        cloudtrail_bucket.bucketArn + "/*"
       ]
     });
 
@@ -113,51 +120,47 @@ export class TagComplianceStack extends cdk.Stack {
     populateDynamoFn.addToRolePolicy(lambdaS3Read);
 
     // function that checks the resources put into Dynamo for the tags specified in this function (go to function code to edit)
-    const resourceTagCheckerFn = new lambda.Function(this, 'resourceTagCheckerFunction', {
-      functionName: 'resource-tag-checker',
+    const objectTagCheckerFn = new lambda.Function(this, 'objectTagCheckerFunction', {
+      functionName: 'object-tag-checker',
       runtime: lambda.Runtime.PYTHON_3_10,
       handler: 'index.lambda_handler',
-      code: lambda.Code.fromAsset('lib/lambda/resource_tag_checker'),
+      code: lambda.Code.fromAsset('lib/lambda/object_tag_checker'),
       environment: {
         'TABLE_NAME': table.tableName
       },
       events: [
         new eventsources.DynamoEventSource(table, {
           startingPosition: lambda.StartingPosition.LATEST,
-          batchSize: 100
+          batchSize: 100,
+          retryAttempts: 1,
+          maxRecordAge: Duration.seconds(300)
         })
       ]
     });
 
     // allows lambda to get the tags for specified resources
-    const lambdaGetTags = new iam.PolicyStatement({
+    const lambdaGetObjectTags = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
-        "s3:GetBucketTagging",
-        "lambda:ListTags",
-        "dynamodb:ListTagsOfResource",
-        "dax:ListTags"
+        "s3:GetObjectTagging",
       ],
       resources: [
-        `arn:aws:dynamodb:${region}:${accountId}:table/*`,
         'arn:aws:s3:::*',
-        `arn:aws:lambda:${region}:${accountId}:function:*`,
-        `arn:aws:dax:${region}:${accountId}:cache/*`
       ]
     });
 
     // allows lambda to scan and update the dynamodb table
-    const lambdaScanUpdateDynamo = new iam.PolicyStatement({
+    const lambdaUpdateDynamo = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
-        "dynamodb:Scan",
         "dynamodb:UpdateItem"
       ],
       resources: [table.tableArn]
     });
 
-    resourceTagCheckerFn.addToRolePolicy(lambdaGetTags);
-    resourceTagCheckerFn.addToRolePolicy(lambdaScanUpdateDynamo);
-    resourceTagCheckerFn.role?.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaDynamoDBExecutionRole'));
+    objectTagCheckerFn.addToRolePolicy(lambdaGetObjectTags);
+    objectTagCheckerFn.addToRolePolicy(lambdaUpdateDynamo);
+    objectTagCheckerFn.role?.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaDynamoDBExecutionRole'));
   }
 }
+
