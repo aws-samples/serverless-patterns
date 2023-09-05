@@ -49,7 +49,7 @@ This Kinesis-Lambda integration pattern makes use of the aws-kinesisstreams-lamb
 
 Lambda get triggered based on the events from Kinesis DataStreams. For any error in invocation of Lambda, event is persisted in the dead letter SQS queue.
 
-In the example Kinesis Event Source configured with, maxretryattempt as 1, bisectBatchOnError set to true, and reportBatchItemFailures set to true with batch size of 3.
+In the example the Kinesis Event Source is configured with `maxretryattempt` as 1, bisectBatchOnError set to true, and `reportBatchItemFailures` set to true with batch size of 3.
 
 Lambda code has been updated to handle exception on any error due to event processing as per the best practice to return the sequence number. Using this configuration and approach duplicate message reprocessing can be avoided. 
 
