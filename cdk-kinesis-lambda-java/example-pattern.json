@@ -1,0 +1,54 @@
+{
+  "title": "Kinesis to Lambda with error handling",
+  "description": "Create a Java Lambda function with Event Source as Kinesis Data source",
+  "language": "Java",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use AWS Lambda (Java runtime) to subscribe to events from a Kinesis Data Stream with error handling to avoid redundant message processing",
+      "This example uses AWS CDK constructs"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-kinesis-lambda-java",
+      "templateURL": "serverless-patterns/cdk-kinesis-lambda-java",
+      "projectFolder": "cdk-kinesis-lambda-java",
+      "templateFile": "infrastructure/src/main/java/com/myorg/InfrastructureStack.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS CDK Construct for Kinesis and Lambda",
+        "link": "https://docs.aws.amazon.com/solutions/latest/constructs/aws-kinesisstreams-lambda.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shiva Mahalingam",
+      "image": "",
+      "bio": "Solutions Architect @ AWS",
+      "linkedin": "shivamahalingam",
+      "twitter": ""
+    }
+  ]
+}
