@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern creates an Amazon Kinesis Data Stream that integrates with AWS Lambda using AWS CDK in TypeScript.",
-      "In this example, the Kinesis data stream is used as an event source for the AWS Lambda (Node) function which",
+      "In this example, the Kinesis Data Stream is used as an event source for the lambda function which",
       "processes the data from the stream and catches any failures."
     ]
   },
