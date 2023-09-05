@@ -1,6 +1,6 @@
 {
   "title": "Amazon Kinesis Data Streams to AWS Lambda",
-  "description": "Create a serverless app using Amazon Kinesis Data Streams and AWS Lambda.",
+  "description": "A serverless example to connect Amazon Kinesis Data Streams to AWS Lambda.",
   "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
