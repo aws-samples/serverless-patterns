@@ -1,5 +1,5 @@
 {
-  "title": "Kinesis to Lambda Integration with Error Handling",
+  "title": "Kinesis to Lambda with error handling",
   "description": "Create a Java Lambda function with Event Source as Kinesis Data source",
   "language": "Java",
   "level": "200",
