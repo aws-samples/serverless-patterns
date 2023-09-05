@@ -68,17 +68,16 @@ Kinesis Data Firehose can invoke a Lambda function to transform incoming source 
 aws s3 ls s3://{destination bucket name} --recursive --human-readable --summarize
 ```
 
-Or nagivate to the S3 console and manually verify that the demo data has been sent to S3
+Or navigate to the S3 console and manually verify that the demo data has been sent to S3
 
 ## Cleanup
- 
+1. Delete objects in S3
+    ```bash
+    aws s3 rm s3://{destination bucket name} --recursive
+    ```
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
