@@ -66,7 +66,7 @@ From the command line
    cd KinesisCliProducers
    sh producers.sh
    ```
-This will publish the messages in the Kinesis and lambda gets triggered based on that.
+This will publish the messages in the Kinesis stream and the lambda function gets triggered based on that.
 
 ## Cleanup
  
