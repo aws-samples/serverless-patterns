@@ -56,7 +56,6 @@ def update_keys(item):
 
 
 def check_compliance(objects):
-
     for i in objects:
         try:
             tags_set = set()
