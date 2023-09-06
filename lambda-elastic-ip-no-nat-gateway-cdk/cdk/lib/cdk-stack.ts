@@ -11,6 +11,7 @@ interface AssociateLambdaToElasticIpCRProps {
     vpc: cdk.aws_ec2.IVpc;
     publicSubnet: cdk.aws_ec2.Subnet;
     securityGroup: cdk.aws_ec2.SecurityGroup;
+    functionName: string;
 }
 export class LambdaElasticIpStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props: LambdaElasticIpStackProps) {
@@ -54,10 +55,10 @@ export class LambdaElasticIpStack extends cdk.Stack {
 
         const elasticIP = new cdk.aws_ec2.CfnEIP(this, 'Lambda-Elastic-Ip', {});
 
-        this.associateLambdaToElasticIpCR({ elasticIP, vpc, publicSubnet, securityGroup });
+        this.associateLambdaToElasticIpCR({ elasticIP, vpc, publicSubnet, securityGroup, functionName: publicFunction.functionName });
     }
 
-    private associateLambdaToElasticIpCR({ elasticIP, publicSubnet, securityGroup, vpc }: AssociateLambdaToElasticIpCRProps) {
+    private associateLambdaToElasticIpCR({ elasticIP, publicSubnet, securityGroup, vpc, functionName }: AssociateLambdaToElasticIpCRProps) {
         const associateElasticIpFunctionCR = new cdk.aws_lambda_nodejs.NodejsFunction(this, 'Associate-Elastic-IP-CR', {
             memorySize: 128,
             handler: 'handler',
@@ -94,6 +95,7 @@ export class LambdaElasticIpStack extends cdk.Stack {
                     availabilityZone: publicSubnet.availabilityZone,
                     allocationId: elasticIP.attrAllocationId,
                     staticIp: elasticIP.ref,
+                    functionName,
                     date: new Date(),
                 }),
             },
