@@ -1,7 +1,8 @@
 {
   "title": "API WebSocket to SNS with request validation",
   "description": "Create a WebSocket API to send notification via SNS topic with request validation",
-  "level": "300",
+  "language": "Terraform"
+  "level": "200",
   "framework": "Terraform",
   "introBox": {
     "headline": "How it works",
@@ -52,9 +53,10 @@
   },
   "authors": [
     {
-      "name": "Dushyant P",
+      "name": "Dushyant Pal",
+      "image": "https://drive.google.com/file/d/1nHLKNYGM4UaYa9sewd9lTQLEJpoZfDem/view"
       "bio": "Cloud Engineer, Serverless team at AWS Sydney, Australia"
-      
+      "linkedIn": "https://www.linkedin.com/in/dushyant-pal-b331996"
     }
   ]
 }
