@@ -67,7 +67,7 @@ chmod +x kinesis-producer/*.sh;
 ./kinesis-producer/without-poison-pill-put-records.sh
 ```
 
-- Navigate to AWS Console, and then to Cloudwatch, Log groups, and select the log group KinesisDataStreamProcessorLog and the latest Log stream
+- Navigate to AWS Console, and then to Cloudwatch, Log groups, select the log group and the latest Log stream
 - In the logs, you should see all the 3 messages processed without any exception. 
 
 ### Scenario 2: Put messages with the Poision pill
@@ -82,8 +82,12 @@ chmod +x kinesis-producer/*.sh;
 
 ## Validation
 After the Scenario 2, the invalid/poison pill message is put in the SQS queue for the further research. 
-Replace the account number in the validation-scripts/read-sqs-queue.sh and run the script as below to see the message details. 
+Replace the AWSACCOUNTID with the AWS account number in the validation-scripts/read-sqs-queue.sh 
 
+```
+vi validation-scripts/read-sqs-queue.sh
+```
+Run the script as below to see the message details. 
 ```
 chmod +x validation-scripts/read-sqs-queue.sh;
 ./validation-scripts/read-sqs-queue.sh
