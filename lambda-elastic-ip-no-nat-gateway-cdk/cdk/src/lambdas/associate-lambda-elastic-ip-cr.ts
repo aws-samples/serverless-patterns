@@ -37,6 +37,14 @@ export const handler: Handler = async (event: AssociateLambdaElasticIpEvent) => 
                     Name: 'availability-zone',
                     Values: [event.availabilityZone],
                 },
+                {
+                    Name: 'status',
+                    Values: ['in-use'],
+                },
+                {
+                    Name: 'description',
+                    Values: [`AWS Lambda VPC ENI-${event.functionName}*`],
+                },
             ],
             AllocationIds: [allocationId],
             MaxResults: 10,
@@ -44,7 +52,7 @@ export const handler: Handler = async (event: AssociateLambdaElasticIpEvent) => 
         };
 
         const DescribeNetworkInterfacesCommandResponse = await client.send(new DescribeNetworkInterfacesCommand(DescribeAddressesRequest));
-        console.log('DescribeNetworkInterfacesCommandResponse:', DescribeNetworkInterfacesCommandResponse);
+        console.log('DescribeNetworkInterfacesCommandResponse:', JSON.stringify(DescribeNetworkInterfacesCommandResponse, null, 2));
 
         console.log('Associating Lambda to Elastic IP...');
 
