@@ -14,8 +14,7 @@ export const handler: Handler = async (event: AssociateLambdaElasticIpEvent) => 
     try {
         console.log('Fetching Lambda network interface ID associated with the elastic ip...');
 
-        // DescribeAddressesRequest
-        const DescribeAddressesRequest = {
+        const DescribeNetworkInterfacesCommandRequest = {
             Filters: [
                 {
                     Name: 'interface-type',
@@ -51,18 +50,22 @@ export const handler: Handler = async (event: AssociateLambdaElasticIpEvent) => 
             DryRun: false,
         };
 
-        const DescribeNetworkInterfacesCommandResponse = await client.send(new DescribeNetworkInterfacesCommand(DescribeAddressesRequest));
+        console.log('DescribeNetworkInterfacesCommandRequest:', JSON.stringify(DescribeNetworkInterfacesCommandRequest, null, 2));
+
+        const DescribeNetworkInterfacesCommandResponse = await client.send(
+            new DescribeNetworkInterfacesCommand(DescribeNetworkInterfacesCommandRequest),
+        );
         console.log('DescribeNetworkInterfacesCommandResponse:', JSON.stringify(DescribeNetworkInterfacesCommandResponse, null, 2));
 
         console.log('Associating Lambda to Elastic IP...');
 
-        // AssociateAddressRequest
         const AssociateAddressRequest = {
             AllocationId: allocationId,
             DryRun: false,
             NetworkInterfaceId: DescribeNetworkInterfacesCommandResponse.NetworkInterfaces![0].NetworkInterfaceId,
         };
 
+        console.log('AssociateAddressRequest:', AssociateAddressRequest);
         const AssociateAddressCommandResponse = await client.send(new AssociateAddressCommand(AssociateAddressRequest));
         console.log('AssociateAddressCommandResponse:', AssociateAddressCommandResponse);
 
