@@ -5,4 +5,5 @@ export type AssociateLambdaElasticIpEvent = {
     allocationId: string;
     staticIp: string;
     availabilityZone: string;
+    functionName: string;
   };
