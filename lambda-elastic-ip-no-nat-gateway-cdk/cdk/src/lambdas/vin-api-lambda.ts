@@ -8,6 +8,7 @@ export const handler: Handler = async () => {
     try {
         const response = await httpsGet(thirdPartyUrl);
         console.log(`your random VIN is: ${response}`);
+        return response;
     } catch (error: any) {
         console.error(`Error Fetching VIN: ${error.message}`);
         throw error;
