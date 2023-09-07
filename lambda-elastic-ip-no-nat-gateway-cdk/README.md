@@ -30,8 +30,10 @@ Important: This application uses various AWS services and there are costs associ
    ```bash
    cd serverless-patterns/lambda-elastic-ip-no-nat-gateway-cdk/cdk
    ```
-3. Install dependencies:
+3. Install dependencies for both the infrastructure project and the typescript project:
    ```bash
+   npm install
+   cd src
    npm install
    ```
 
@@ -67,19 +69,18 @@ app.synth();
 
 ## How it works
 
-This pattern allows you to assign your lambda function a static public IP address that you can use to interact with APIs that require whitelisted IPs without the need to provision a NAT Gateway. Therefore, this pattern will save almost $33/month in NAT Gateway costs.
+This pattern allows you to assign your lambda function a static public IP address that you can use to interact with APIs that require whitelisted IPs without the need to provision a NAT Gateway. Therefore, this pattern will save almost **$33/month** in NAT Gateway costs.
 
 
 The following resources will be provisioned:
 
 - A Lambda function to test the pattern
 - An Elastic IP to associate with the Lambda function
-- A public subnet in the default VPC
 - A custom resource with Lambda function to associate the Elastic IP with the test lambda's ENI
 
-Since AWS manages the provisioning of any Lambda ENI, we cannot access that ENI in CDK code. Therefore, to automate the process, we have to associate the Elastic IP with the ENI in a custom resource after the deployment occurs.
+Since AWS manages the provisioning of any Lambda ENI, we cannot access that ENI in CDK code. Therefore, to automate the process, we have to associate the Elastic IP with the ENI in a custom resource after the deployment occurs and the ENI is provisioned.
 
-**_Disclaimer:_** This pattern is best suited for non-production environments since it is not multi-AZ nor highly scalable.
+##### **NOTE:** This pattern is best suited for non-production environments since it is not multi-AZ nor highly scalable.
 
 ## Testing
 
@@ -90,7 +91,7 @@ To test this pattern, you must use both the AWS Console and the AWS CLI.
 1. Open the AWS Lambda Console
 2. Navigate to `vin-api-lambda`
 3. Test the lambda with any payload
-4. A random vin should be returned and logged.
+4. The lambda shouldn't time out and a random vin should be returned and logged.
 
 
 ## Cleanup
