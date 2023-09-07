@@ -1,18 +1,18 @@
 import { Handler } from 'aws-lambda';
-import { EC2Client, AssociateAddressCommand, DescribeAddressesCommand, DescribeNetworkInterfacesCommand } from '@aws-sdk/client-ec2'; // ES Modules import
+import { EC2Client, AssociateAddressCommand, DescribeNetworkInterfacesCommand } from '@aws-sdk/client-ec2'; // ES Modules import
 import { AssociateLambdaElasticIpEvent } from '../types/associate-lambda-elastic-ip-event';
 const client = new EC2Client();
 
 export const handler: Handler = async (event: AssociateLambdaElasticIpEvent) => {
-    console.log('Associating Lambda to Elastic IP Custom Resource:', event);
-    console.log('environment', process.env);
+    console.log('Associating Lambda to Elastic IP Custom Resource Event:', event);
+    console.log('Environment', process.env);
     const allocationId = process.env.ELASTIC_IP_ALLOCATION_ID;
     if (!allocationId) {
         throw new Error(`Error allocation id cannot be null or empty. '${allocationId}'`);
     }
-    console.log(`allocation id from env: ${allocationId}`);
+    console.log(`Allocation id from env: ${allocationId}`);
     try {
-        console.log('Fetching Lambda network interface ID associated with the elastic ip...');
+        console.log('Fetching lambda network interface ID associated with the elastic ip...');
 
         const DescribeNetworkInterfacesCommandRequest = {
             Filters: [
@@ -56,13 +56,17 @@ export const handler: Handler = async (event: AssociateLambdaElasticIpEvent) => 
             new DescribeNetworkInterfacesCommand(DescribeNetworkInterfacesCommandRequest),
         );
         console.log('DescribeNetworkInterfacesCommandResponse:', JSON.stringify(DescribeNetworkInterfacesCommandResponse, null, 2));
+        const returnedNetworkInterfaces = DescribeNetworkInterfacesCommandResponse.NetworkInterfaces;
+        if (!returnedNetworkInterfaces?.length) {
+            throw new Error(`No network interface is associated with this lambda function ${event.functionName}`);
+        }
 
         console.log('Associating Lambda to Elastic IP...');
 
         const AssociateAddressRequest = {
             AllocationId: allocationId,
             DryRun: false,
-            NetworkInterfaceId: DescribeNetworkInterfacesCommandResponse.NetworkInterfaces![0].NetworkInterfaceId,
+            NetworkInterfaceId: returnedNetworkInterfaces[0].NetworkInterfaceId,
         };
 
         console.log('AssociateAddressRequest:', AssociateAddressRequest);

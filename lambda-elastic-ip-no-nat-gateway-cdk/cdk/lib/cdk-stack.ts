@@ -2,39 +2,35 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 export interface LambdaElasticIpStackProps extends cdk.StackProps {
-    availabilityZone?: string;
-    cidrBlock?: string;
+    vpcId?: string;
+    subnetId?: string;
+    securityGroupId?: string;
 }
 
 interface AssociateLambdaToElasticIpCRProps {
     elasticIP: cdk.aws_ec2.CfnEIP;
     vpc: cdk.aws_ec2.IVpc;
-    publicSubnet: cdk.aws_ec2.Subnet;
-    securityGroup: cdk.aws_ec2.SecurityGroup;
+    publicSubnet: cdk.aws_ec2.ISubnet;
+    securityGroup: cdk.aws_ec2.ISecurityGroup;
     functionName: string;
 }
 export class LambdaElasticIpStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props: LambdaElasticIpStackProps) {
         super(scope, id, props);
 
-        const vpc = cdk.aws_ec2.Vpc.fromLookup(this, 'Default-VPC', { isDefault: true });
-        const publicSubnet = new cdk.aws_ec2.Subnet(this, 'Elastic-IP-Lambda-Subnet', {
-            vpcId: vpc.vpcId,
-            availabilityZone: props.availabilityZone || 'us-east-1e',
-            cidrBlock: props.cidrBlock || '172.31.96.0/20',
-            mapPublicIpOnLaunch: true,
-        });
-        const routeTableId = vpc.publicSubnets[0].routeTable.routeTableId;
-        const routeTableAssociation = new cdk.aws_ec2.CfnSubnetRouteTableAssociation(this, 'rt-s-association', {
-            subnetId: publicSubnet.subnetId,
-            routeTableId,
-        });
-        const securityGroup = new cdk.aws_ec2.SecurityGroup(this, 'Elastic-IP-Lambda-Security-Group', {
-            vpc,
-            allowAllOutbound: true,
-            description:
-                'This is a security group for a vpc attached lambda that uses elastic ip to have outbound communication without the need for a NAT solution',
-        });
+        const vpc = cdk.aws_ec2.Vpc.fromLookup(this, 'Default-VPC', { isDefault: !props.vpcId, vpcId: props.vpcId });
+        const securityGroup = !!props.securityGroupId
+            ? cdk.aws_ec2.SecurityGroup.fromLookupById(this, 'Elastic-IP-Lambda-Security-Group', props.securityGroupId)
+            : new cdk.aws_ec2.SecurityGroup(this, 'Elastic-IP-Lambda-Security-Group', {
+                  vpc,
+                  allowAllOutbound: true,
+                  description:
+                      'This is a security group for a vpc attached lambda that uses elastic ip to have outbound communication without the need for a NAT solution',
+              });
+
+        const publicSubnet = !!props.subnetId
+            ? cdk.aws_ec2.Subnet.fromSubnetId(this, 'Elastic-IP-Lambda-Subnet', props.subnetId)
+            : vpc.publicSubnets[0];
 
         const publicFunction = new cdk.aws_lambda_nodejs.NodejsFunction(this, 'Lambda-With-Elastic-IP', {
             memorySize: 128,
@@ -55,7 +51,13 @@ export class LambdaElasticIpStack extends cdk.Stack {
 
         const elasticIP = new cdk.aws_ec2.CfnEIP(this, 'Lambda-Elastic-Ip', {});
 
-        this.associateLambdaToElasticIpCR({ elasticIP, vpc, publicSubnet, securityGroup, functionName: publicFunction.functionName });
+        this.associateLambdaToElasticIpCR({
+            elasticIP,
+            vpc,
+            publicSubnet,
+            securityGroup,
+            functionName: publicFunction.functionName,
+        });
     }
 
     private associateLambdaToElasticIpCR({ elasticIP, publicSubnet, securityGroup, vpc, functionName }: AssociateLambdaToElasticIpCRProps) {
@@ -78,7 +80,7 @@ export class LambdaElasticIpStack extends cdk.Stack {
         associateElasticIpFunctionCR.addToRolePolicy(
             new cdk.aws_iam.PolicyStatement({
                 effect: cdk.aws_iam.Effect.ALLOW,
-                actions: ['ec2:DescribeAddresses', 'ec2:AssociateAddress', 'ec2:DescribeNetworkInterfaces'],
+                actions: ['ec2:AssociateAddress', 'ec2:DescribeNetworkInterfaces'],
                 resources: ['*'],
             }),
         );
