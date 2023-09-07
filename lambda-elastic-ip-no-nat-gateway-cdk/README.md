@@ -67,6 +67,9 @@ app.synth();
    ```
 6. Note: The AWS CDK deployment process will output the DynamoDB table name, the API endpoint, and the IoT Core Topic name used for testing this project
 
+
+## Use Case
+You have a lambda function that requires internet access to make api calls to 3rd party vendors but you need a dedicated IP to be whitelisted by the 3rd party vendors. 
 ## How it works
 
 This pattern allows you to assign your lambda function a static public IP address that you can use to interact with APIs that require whitelisted IPs without the need to provision a NAT Gateway. Therefore, this pattern will save almost **$33/month** in NAT Gateway costs.
