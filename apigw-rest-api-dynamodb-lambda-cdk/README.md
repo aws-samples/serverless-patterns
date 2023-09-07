@@ -71,12 +71,11 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 	}
 	```
 	* Choose **Send** to submit the request and receive a "200 OK" response.
-	* Open the DynamoDB console and select the table which was created to confirm that the item has been added.
+	* Open the DynamoDB console and select the `AWSomeDynamoDB` table which was created to confirm that the item has been added.
 	* Change the values for `pk` or `data` in the POST body and repeat this process to add multiple items to the DynamoDB table.
 
 1. Invoke the DynamoDB **Query** action to query all items by artist in the DynamoDB table:
-	* Enter the Invoke URL in the address bar. Add **/prod/foo** to the URL path.
-	* Add **/foo** to the URL path. This defines the ID that you want to query.
+	* Enter the Invoke URL in the address bar. 
 	```
 	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/awsomedynamodb
 	```
@@ -84,33 +83,52 @@ Once the application is deployed, use [Postman](https://www.postman.com/) to tes
 	* Choose the **Body** tab. Choose **none**.
 	* Choose **Send** to submit the request and receive a "200 OK" response with a list of the matching results. Example: 
 	```
-		{
-			"Count": 1,
-			"Items": [
-				{
-					"AWSomeDynamoDBId": {
-						"S": "foo"
-					},
-					"name": {
-						"S": "blah blah blah"
-					},
-					"description": {
-						"S": "blah blah blah"
-					},
-					"Id": {
-						"S": "string"
-					}
-				}
-			],
-			"ScannedCount": 1
-		}
+{
+    "Count": 2,
+    "Items": [
+        {
+            "AWSomeDynamoDBId": {
+                "S": "c80cf550-f695-4759-b936-2730c1140668"
+            },
+            "Description": {
+                "S": "Do some thing"
+            },
+            "Id": {
+                "S": "14"
+            },
+            "Customer": {
+                "S": "Julian"
+            },
+            "Name": {
+                "S": "Do some thing"
+            }
+        },
+        {
+            "AWSomeDynamoDBId": {
+                "S": "5f00a663-fd47-41ad-a425-6cb470d8c869"
+            },
+            "Description": {
+                "S": "Do some thing"
+            },
+            "Id": {
+                "S": "14"
+            },
+            "Customer": {
+                "S": "John"
+            },
+            "Name": {
+                "S": "Do some thing"
+            }
+        }
+    ],
+    "ScannedCount": 2
+}
 	```
 	
 1. Invoke the DynamoDB **Query** action to query specific item by artist in the DynamoDB table:
-	* Enter the Invoke URL in the address bar. Add **/prod/foo** to the URL path.
-	* Add **/foo** to the URL path. This defines the ID that you want to query.
+	* Enter the Invoke URL in the address bar. Add **/{AWSomeDynamoDBId}** to the URL path. Replace with one of the `AWSomeDynamoDBId` values from the previous query. This defines the ID that you want to query.
 	```
-	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/awsomedynamodb/{id}
+	https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/awsomedynamodb/{AWSomeDynamoDBId}
 	```
 	* Select **GET** as the HTTP method from the drop-down list to the left of the address bar.
 	* Choose the **Body** tab. Choose **none**.
