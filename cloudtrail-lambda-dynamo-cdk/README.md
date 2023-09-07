@@ -28,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     npm install
     ```
-1. Open the lambda function cloudtrail-lambda-dynamo-cdk/src/lib/lambda/object_tag_checker/index.py, and on line 17 replace the example keys with your required keys:
+1. Open the lambda function cloudtrail-lambda-dynamo-cdk/src/lib/lambda/object_tag_checker/index.py, and on line 17 replace the example keys with your required S3 object keys:
     ```
     required_keys = {"Key1", "Key2", "Key3", "Key4"}
     ```
