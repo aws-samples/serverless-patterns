@@ -1,0 +1,19 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "removeComments": true,
+    "target": "ES2022",
+    "inlineSourceMap": true,
+    "esModuleInterop": true,
+    "noImplicitOverride": false,
+    "experimentalDecorators": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

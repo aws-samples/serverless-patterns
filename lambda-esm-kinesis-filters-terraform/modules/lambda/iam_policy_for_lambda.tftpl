@@ -1,0 +1,33 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Effect": "Allow",
+        "Resource":  ["*"]
+      },
+      {
+        "Action": [
+          "lambda:InvokeFunction",
+          "lambda:GetFunctionConfiguration"
+        ],
+        "Effect": "Allow",
+        "Resource":  ["${esm_filter_lambda_arn}"]
+      },
+      {
+        "Action": [
+           "kinesis:DescribeStream",
+           "kinesis:GetShardIterator",
+           "kinesis:GetRecords",
+           "kinesis:ListShards",
+           "kinesis:ListStreams"
+        ],
+        "Effect": "Allow",
+        "Resource":  ["${stream_arn}"]
+      }
+    ]
+  }

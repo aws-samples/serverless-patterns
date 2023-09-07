@@ -1,0 +1,53 @@
+{
+	"title": "Kinesis Firehose Data Transformation with Lambda",
+	"description": "Transform incoming source data and deliver the transformed data to destinations.",
+	"language": "",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"The purpose of this pattern is to deploy the infrastructure necessary to enable Kinesis Data Firehose data transformation.",
+			"Kinesis Data Firehose can invoke a Lambda function to transform incoming source data and deliver the transformed data to destinations. In this architecture, Kinesis Data Firehose then invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode. The transformed data is sent from Lambda to Kinesis Data Firehose. Kinesis Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/firehose-transformation-terraform",
+			"templateURL": "serverless-patterns/firehose-transformation-terraform",
+			"projectFolder": "firehose-transformation-terraform",
+			"templateFile": "firehose-transformation-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "Amazon Kinesis Data Firehose Data Transformation",
+				"link": "https://docs.aws.amazon.com/firehose/latest/dev/data-transformation.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform plan",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the README in the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+		"name": "Naresh Rajaram",
+		"image": "",
+		"bio": "Cloud Infrastructure Architect, AWS",
+		"linkedin": "https://www.linkedin.com/in/naresh-rajaram-25bb106/"
+	}]
+}

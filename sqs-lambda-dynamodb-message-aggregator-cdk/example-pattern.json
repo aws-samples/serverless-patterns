@@ -1,0 +1,55 @@
+{
+  "title": "Message Aggregator with SQS, Lambda and DynamoDB",
+  "description": "Creates a Lambda function that keep tracks of single messages using DynamoDB and forward a single aggregate message to a different SQS queue.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK project demonstrate how to create a Message Aggregator pattern using Amazon SQS, AWS Lambda and Amazon DynamoDB.",
+      "The solution creates a source and a destination SQS Queue and a Lambda function that keeps track of the messages by leveraging a DynamoDB Table.",
+      "This architecture is an implementation of the Integration pattern: Message Aggregator explained in the Integration Patterns book."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-dynamodb-message-aggregator-cdk",
+      "templateURL": "serverless-patterns/sqs-lambda-dynamodb-message-aggregator-cdk",
+      "projectFolder": "sqs-lambda-dynamodb-message-aggregator-cdk",
+      "templateFile": "sqs-lambda-dynamodb-message-aggregator-cdk/src/lib/src-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Message Aggregator Pattern",
+        "link": "https://www.enterpriseintegrationpatterns.com/patterns/messaging/Aggregator.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Raffaele Garofalo (Raf)",
+      "image": "https://avatars.githubusercontent.com/raffaeu",
+      "bio": "Raffaele Garofalo (Raf) is a Senior Solutions Architect at AWS and member of the AWS Serverless TFC (Technical Field Community).",
+      "linkedin": "raffaeu",
+      "twitter": "raffaeu"
+    }
+  ]
+}

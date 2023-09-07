@@ -31,13 +31,17 @@ The MSK cluster is set up to work with all three authentication mechanisms - TLS
 - Download Apache Kafka. 
 
     ```
-    wget https://downloads.apache.org/kafka/3.3.2/kafka_2.13-3.3.2.tgz
+    wget https://downloads.apache.org/kafka/3.4.1/kafka_2.13-3.4.1.tgz
     ```
+
+If this version (2.13-3.4.1) is not available anymore, please download latest Apache Kafka version that is MSK supports from https://downloads.apache.org/kafka/.
+
+Review this page to get a list of Apache Kafka versions supported by MSK - https://docs.aws.amazon.com/msk/latest/developerguide/supported-kafka-versions.html
 
 - Unzip the package you just downloaded
 
     ```
-    tar -xzf kafka_2.13-3.3.2.tgz
+    tar -xzf kafka_2.13-3.4.1.tgz
     ```
 
 
@@ -45,14 +49,14 @@ The MSK cluster is set up to work with all three authentication mechanisms - TLS
 
 ## IAM 
 
-- Go to the kafka_2.13-3.3.2/libs/ directory, then run the following command to download the Amazon MSK IAM JAR file. 
+- Go to the kafka_2.13-3.4.1/libs/ directory, then run the following command to download the Amazon MSK IAM JAR file. 
 
     ```
-    cd kafka_2.13-3.3.2/libs/ 
+    cd kafka_2.13-3.4.1/libs/ 
     wget https://github.com/aws/aws-msk-iam-auth/releases/download/v1.1.6/aws-msk-iam-auth-1.1.6-all.jar
     ```
 
-- Under kafka_2.13-3.3.2/bin directory create a new file with name `client.properties` and add following content in that file - 
+- Under kafka_2.13-3.4.1/bin directory create a new file with name `client.properties` and add following content in that file - 
 
 ```
 security.protocol=SASL_SSL
@@ -85,10 +89,10 @@ export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
 
 - Get the value of BootstrapBrokerStringSaslIam, and pick the first url from that, for example - b-3.<clustername>.<id>.c9.kafka.us-east-1.amazonaws.com:9098
 
-- Open terminal and cd to kafka_2.13-3.3.2/bin directory
+- Open terminal and cd to kafka_2.13-3.4.1/bin directory
 
     ```
-    cd ~/environment/kafka_2.13-3.3.2/bin
+    cd ~/environment/kafka_2.13-3.4.1/bin
     ```
 
 - Run this command to create a Kafka topic 
@@ -170,7 +174,7 @@ Here's the documentation based on which following instructions are created - htt
 
 - If you get a prompt like this - `Install reply anyway? [no]:`, enter yes, and press enter.
 
-- Open kafka_2.13-3.3.2/bin/client.properties, and comment out existing list by adding # in front of each line.
+- Open kafka_2.13-3.4.1/bin/client.properties, and comment out existing list by adding # in front of each line.
 
 - Add following lines after existing lines.
 
@@ -182,7 +186,7 @@ ssl.keystore.password=storepass
 ssl.key.password=storepass
 ```
 
-- Run following command to create a test topic from kafka_2.13-3.3.2/bin directory in terminal. Use the bootstrap server for TLS (BootstrapBrokerStringTls) from the list obtained in IAM section. -
+- Run following command to create a test topic from kafka_2.13-3.4.1/bin directory in terminal. Use the bootstrap server for TLS (BootstrapBrokerStringTls) from the list obtained in IAM section. -
 
     ```
     ./kafka-topics.sh --create --bootstrap-server b-1.mskstackcluster.97lslp.c9.kafka.us-east-1.amazonaws.com:9094 --command-config client.properties --replication-factor 3 --partitions 1 --topic MSKTutorialTopicTLS
@@ -239,7 +243,7 @@ ssl.truststore.location=<path-to-keystore-file>/kafka.client.truststore.jks
 - Run following command to create a topic. Replace `BootstrapBrokerStringSaslScram` with the value that you retrieved in the previous step.
 
     ```
-    cd ~/environment/kafka_2.13-3.3.2/
+    cd ~/environment/kafka_2.13-3.4.1/
     
     ./bin/kafka-topics.sh --create --bootstrap-server BootstrapBrokerStringSaslScram --replication-factor 3 --partitions 1 --topic DemoSASLTopic --command-config client_sasl.properties
     ```

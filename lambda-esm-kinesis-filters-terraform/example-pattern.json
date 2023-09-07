@@ -1,0 +1,53 @@
+{
+	"title": "AWS Event Source Mapping for Lambda from Amazon Kinesis Data Stream (Terraform)",
+	"description": "This pattern demonstrates the ability to filter Amazon Kinesis events so that only a subset of all events is sent to an AWS Lambda function for processing.",
+	"language": "",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"A new Amazon Kinesis Data Stream (kinesis_stream_lambda_esm) is created. Two AWS Lambda functions (esm_lambda_with_filter and esm_lambda_with_no_filter) that are subscribed to that stream with different filter settings.",
+			"This way we demonstrate how various filtering settings affect which Amazon Kinesis Data Stream events are sent to each AWS Lambda function for processing."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-esm-kinesis-filters-terraform",
+			"templateURL": "serverless-patterns/lambda-esm-kinesis-filters-terraform",
+			"projectFolder": "lambda-esm-kinesis-filters-terraform",
+			"templateFile": "lambda-esm-kinesis-filters-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "AWS Event Source Mapping for Lambda from Amazon Kinesis Data Stream (Terraform)",
+				"link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform plan",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the README in the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+		"name": "Naresh Rajaram",
+		"image": "",
+		"bio": "Cloud Infrastructure Architect, AWS",
+		"linkedin": "https://www.linkedin.com/in/naresh-rajaram-25bb106/"
+	}]
+}

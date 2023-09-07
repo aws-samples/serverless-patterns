@@ -1,5 +1,9 @@
 package com.unicorn.store.model;
 
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+
+@DynamoDbBean
 public class Unicorn {
 
     private String id;
@@ -8,6 +12,7 @@ public class Unicorn {
     private String size;
     private String type;
 
+    @DynamoDbPartitionKey
     public String getId() {
         return id;
     }
