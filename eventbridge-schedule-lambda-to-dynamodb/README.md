@@ -20,7 +20,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) installed
+* [.NET 7](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
 ## Deployment Instructions

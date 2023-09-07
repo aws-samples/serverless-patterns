@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: >
+  Eventbridge-sns-lambda
+
+  Sample SAM Template for 
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: SNS-Lambda-Topic
+      
+  SNSTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - Ref: SNSTopic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowEventBridgeToPublish
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sns:Publish
+            Resource: !Ref SNSTopic
+
+  LambdaFunction:
+    Type: AWS::Serverless::Function #https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
+    Properties:
+      FunctionName: LambdaFunction
+      Runtime: python3.8
+      Handler: app.lambda_handler
+      CodeUri: ./src
+      Events:
+        SNSTOpicEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref SNSTopic
+  # More details about EventBridge https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-eventbridgerule.html
+  EventBridgeRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: EventBridge Rule
+      EventPattern:
+        source:
+          - aws.ec2
+        detail-type:
+          - EC2 Instance State-change Notification
+      Targets:
+        - Arn: !Ref SNSTopic
+          Id: SNS-Topic

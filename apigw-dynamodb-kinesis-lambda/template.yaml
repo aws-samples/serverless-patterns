@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An Amazon API Gateway REST API that integrates with an Amazon DynamoDB table.
+Parameters:
+  AppName:
+    Type: String
+    Default: api-comments 
+    Description: Name of application.
+  StageName:
+    Type: String
+    Default: v1
+    Description: Name of API stage.
+Resources:
+  #Kinesis Data Stream
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 1
+  # Kinesis Consumer Lambda function
+  LambdaConsumer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: LambdaConsumer
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.10
+      CodeUri: src/
+      Policies: 
+      - KinesisStreamReadPolicy:
+          StreamName: !Ref KinesisStream      
+      Events:
+        Stream:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream.Arn
+            StartingPosition: LATEST
+            BatchSize: 10
+  DynamoDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: Comments
+      # A list of attributes that describe the key schema for the DynamoDB table and indexes.
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: userName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KinesisStreamSpecification:
+        StreamArn: !GetAtt KinesisStream.Arn
+      GlobalSecondaryIndexes:
+        - IndexName: Username-Index
+          KeySchema:
+            - AttributeName: userName
+              KeyType: HASH
+          Projection:
+            ProjectionType: INCLUDE
+            NonKeyAttributes:
+              - message
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+  APIGatewayRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: APIGatewayDynamoDBPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Query'
+                Resource: !Sub
+                  - '${varTableArn}*'
+                  - varTableArn: !GetAtt DynamoDBTable.Arn
+  Api:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: !Sub '${AppName}'
+      ApiKeySourceType: HEADER
+  CommentsResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: !Ref Api
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: 'comment'
+  CommentMethodPost:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      RestApiId: !Ref Api
+      ResourceId: !Ref CommentsResource
+      HttpMethod: POST
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS
+        Credentials: !GetAtt APIGatewayRole.Arn
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:dynamodb:action/PutItem'
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates:
+          application/json: "{\"TableName\":\"Comments\",\"Item\":{\"id\":{\"S\":\"$context.requestId\"},\"userName\":{\"S\":\"$input.path('$.username')\"},\"message\":{\"S\":\"$input.path('$.message')\"}}}"  
+        IntegrationResponses:
+            - StatusCode: '200'
+              ResponseTemplates:
+                application/json: "{}"
+      MethodResponses:
+        - StatusCode: '200'
+  
+  ApiDeployment:
+    Type: 'AWS::ApiGateway::Deployment'
+    DependsOn:
+        - CommentMethodPost
+    Properties:
+      RestApiId: !Ref Api
+      StageName: !Sub '${StageName}'
+
+Outputs:
+  ApiRootUrl:
+    Description: Root Url of the API
+    Value: !Sub 
+      - 'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/${StageName}'
+      - ApiId: !Ref Api
+  LambdaFunction:
+    Description: Lambda Function ARN
+    Value: !GetAtt LambdaConsumer.Arn
