@@ -2,7 +2,12 @@
 
 This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying a Lambda function with a public elastic IP without the need to provision a NAT gateway.
 
-![Architecture](assets/Lambda-Elastic-IP.svg)
+![Architecture](assets/Lambda-elastic-ip-no-nat-gateway.svg)
+
+![Production Architecture](assets/Lambda-elastic-ip-with-nat.svg)
+
+![Non-prod cost effective Architecture](assets/Lambda-elastic-ip-with-x-nat-gateway.svg)
+
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-elastic-ip-no-nat-gateway-cdk.
 
