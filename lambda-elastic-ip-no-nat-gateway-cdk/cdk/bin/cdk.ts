@@ -7,8 +7,8 @@ const app = new cdk.App();
 
 const patternStack = new LambdaElasticIpStack(app, 'LambdaElasticIpStack', {
   env: {
-    region: process.env.CDK_DEFAULT_REGION,
-    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: 'us-east-1' || process.env.CDK_DEFAULT_REGION,
+    account: '199150394284' || process.env.CDK_DEFAULT_ACCOUNT,
   },
 });
 
