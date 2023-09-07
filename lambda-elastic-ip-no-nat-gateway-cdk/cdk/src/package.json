@@ -1,0 +1,21 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "aws-lambda": "^1.0.7",
+    "@aws-sdk/client-ec2": "^3.405.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
+    "@types/node": "20.5.7",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

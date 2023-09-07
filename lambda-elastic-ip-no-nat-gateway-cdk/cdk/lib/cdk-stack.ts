@@ -4,6 +4,7 @@ import { Construct } from 'constructs';
 export interface LambdaElasticIpStackProps extends cdk.StackProps {
     availabilityZone?: string;
     cidrBlock?: string;
+    routeTableId?: string;
 }
 
 interface AssociateLambdaToElasticIpCRProps {
@@ -24,8 +25,8 @@ export class LambdaElasticIpStack extends cdk.Stack {
             cidrBlock: props.cidrBlock || '172.31.96.0/20',
             mapPublicIpOnLaunch: true,
         });
-        const routeTableId = vpc.publicSubnets[0].routeTable.routeTableId;
-        const routeTableAssociation = new cdk.aws_ec2.CfnSubnetRouteTableAssociation(this, 'rt-s-association', {
+        const routeTableId = props.routeTableId || vpc.publicSubnets[0].routeTable.routeTableId;
+        const routeTableAssociation = new cdk.aws_ec2.CfnSubnetRouteTableAssociation(this, 'rt-subnet-association', {
             subnetId: publicSubnet.subnetId,
             routeTableId,
         });
@@ -78,7 +79,7 @@ export class LambdaElasticIpStack extends cdk.Stack {
         associateElasticIpFunctionCR.addToRolePolicy(
             new cdk.aws_iam.PolicyStatement({
                 effect: cdk.aws_iam.Effect.ALLOW,
-                actions: ['ec2:DescribeAddresses', 'ec2:AssociateAddress', 'ec2:DescribeNetworkInterfaces'],
+                actions: ['ec2:AssociateAddress', 'ec2:DescribeNetworkInterfaces'],
                 resources: ['*'],
             }),
         );
