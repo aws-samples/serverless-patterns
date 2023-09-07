@@ -11,7 +11,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to Create a lambda function with public elastic IP without provisioning NAT Gateway"
+      "This sample project demonstrates how to Create a lambda function with public elastic IP without provisioning NAT Gateway and save $33/month in non-prod environment"
     ]
   },
   "gitHub": {
