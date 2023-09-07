@@ -74,12 +74,12 @@ The following resources will be provisioned:
 
 - A Lambda function to test the pattern
 - An Elastic IP to associate with the Lambda function
-- A public subnet in the default VPC with `us-east-1e` as an AZ
+- A public subnet in the default VPC
 - A custom resource with Lambda function to associate the Elastic IP with the test lambda's ENI
 
 Since AWS manages the provisioning of any Lambda ENI, we cannot access that ENI in CDK code. Therefore, to automate the process, we have to associate the Elastic IP with the ENI in a custom resource after the deployment occurs.
 
-**_Disclaimer:_** This pattern is best suited for non-production environments, since it is not multi-AZ nor highly scalable.
+**_Disclaimer:_** This pattern is best suited for non-production environments since it is not multi-AZ nor highly scalable.
 
 ## Testing
 
