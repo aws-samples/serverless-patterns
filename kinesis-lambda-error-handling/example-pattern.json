@@ -1,9 +1,9 @@
 {
 	"title": "Effective consumer strategies for handling Kinesis Data Stream anomalies",
 	"description": "To showcase on how to handle the consumer(AWS Lambda) failure when reading the records from the Amazon Kinesis data stream.",
-	"language": "",
+	"language": "Python",
 	"level": "200",
-	"framework": "AWS SAM",
+	"framework": "SAM",
 	"introBox": {
 		"headline": "How it works",
 		"text": [
@@ -41,7 +41,6 @@
 	},
 	"deploy": {
 		"text": [
-			"sam build",
 			"sam deploy --guided"
 		]
 	},
