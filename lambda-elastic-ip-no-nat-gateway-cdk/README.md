@@ -1,11 +1,12 @@
-# Lambda Elastic IP without NAT Gateway
+# AWS Lambda Elastic IP without NAT Gateway
 
 This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying a Lambda function with a public elastic IP that has internet access without the need to provision a NAT gateway.
 
+## Architecture 
 ![Architecture](assets/Lambda-elastic-ip-no-nat-gateway.svg)
-
+## Production Architecture 
 ![Production Architecture](assets/Lambda-elastic-ip-with-nat.svg)
-
+## Non-prod cost effective Architecture
 ![Non-prod cost effective Architecture](assets/Lambda-elastic-ip-with-x-nat-gateway.svg)
 
 
@@ -35,25 +36,8 @@ Important: This application uses various AWS services and there are costs associ
    npm install
    cd src
    npm install
+   cd ..
    ```
-
-```typescript
-#!/usr/bin/env node
-const app = new cdk.App();
-.
-.
-.
-
-const patternStack = new LambdaElasticIpStack(app, 'LambdaElasticIpStack', {
-  env: {
-    region: process.env.CDK_DEFAULT_REGION,
-    account: process.env.CDK_DEFAULT_ACCOUNT,
-  },
-});
-
-app.synth();
-
-```
 
 4. From the command line, configure AWS CDK:
    ```bash
@@ -65,15 +49,15 @@ app.synth();
    ```bash
    cdk deploy
    ```
-6. Note: The AWS CDK deployment process will output the DynamoDB table name, the API endpoint, and the IoT Core Topic name used for testing this project
-
 
 ## Use Case
-You have a lambda function that requires internet access to make api calls to 3rd party vendors but you need a dedicated IP to be whitelisted by the 3rd party vendors. 
+You have a Lambda function that requires internet access to make API calls to 3rd party service but you need a dedicated IP to be whitelisted by the 3rd party vendors. 
+
 ## How it works
 
-This pattern allows you to assign your lambda function a static public IP address that you can use to interact with APIs that require whitelisted IPs without the need to provision a NAT Gateway. Therefore, this pattern will save almost **$33/month** in NAT Gateway costs.
+This pattern allows you to assign your Lambda function a static public IP address that you can use to interact with APIs that require whitelisted IPs without the need to provision a NAT Gateway. Therefore, this pattern will save almost **$33/month** in NAT Gateway costs.
 
+##### **NOTE:** This pattern is best suited for non-production environments since it is not multi-AZ nor highly scalable.
 
 The following resources will be provisioned:
 
@@ -83,19 +67,16 @@ The following resources will be provisioned:
 
 Since AWS manages the provisioning of any Lambda ENI, we cannot access that ENI in CDK code. Therefore, to automate the process, we have to associate the Elastic IP with the ENI in a custom resource after the deployment occurs and the ENI is provisioned.
 
-##### **NOTE:** This pattern is best suited for non-production environments since it is not multi-AZ nor highly scalable.
-
 ## Testing
 
-To test this pattern, you must use both the AWS Console and the AWS CLI.
+To test this pattern, use the AWS Console or the AWS CLI.
 
 ### AWS Console Part
 
 1. Open the AWS Lambda Console
 2. Navigate to `vin-api-lambda`
 3. Test the lambda with any payload
-4. The lambda shouldn't time out and a random vin should be returned and logged.
-
+4. The Lambda function shouldn't time out and a random vin should be returned and logged.
 
 ## Cleanup
 

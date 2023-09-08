@@ -35,6 +35,7 @@ export class LambdaElasticIpStack extends cdk.Stack {
         const publicFunction = new cdk.aws_lambda_nodejs.NodejsFunction(this, 'Lambda-With-Elastic-IP', {
             memorySize: 128,
             handler: 'handler',
+            functionName: 'vin-api-lambda',
             timeout: cdk.Duration.seconds(10),
             bundling: {
                 minify: true,
