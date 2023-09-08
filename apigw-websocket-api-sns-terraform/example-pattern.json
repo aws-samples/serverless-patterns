@@ -1,0 +1,62 @@
+{
+  "title": "API WebSocket to SNS with request validation",
+  "description": "Create a WebSocket API to send notification via SNS topic with request validation",
+  "language": "",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use WebSocket API to integrate with Amazon Simple Notification service (SNS) to send notifications. This pattern also implements data validation in WebSocket API using model in API Gateway.",
+      "This pattern is utilizing native AWS Integration between WebSocket API Gateway and SNS. Request template is used in WebSocket integration to map the input to SNS payload.",
+      "This pattern is also a workaround to invoke AWS services in WebSocket API which requires Content-Type header to be application/x-www-form-urlencoded. By default, WebSocket APIs do not support overriding headers from AWS console by default",
+      "This pattern deploys one API Gateway and one SNS topic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-sns-terraform",
+      "templateURL": "serverless-patterns/apigw-websocket-api-sns-terraform",
+      "projectFolder": "apigw-websocket-api-sns-terraform",
+      "templateFile": "apigw-websocket-api-sns-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Request validation in WebSocket API",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/websocket-api-request-validation.html"
+      },
+      {
+        "text": "Mapping template in WebSocket API",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/websocket-api-data-transformations.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy -target aws_apigatewayv2_route.send_order",
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dushyant Pal",
+      "image": "https://drive.google.com/file/d/1nHLKNYGM4UaYa9sewd9lTQLEJpoZfDem/view",
+      "bio": "Cloud Engineer, Serverless team at AWS Sydney, Australia",
+      "linkedIn": "https://www.linkedin.com/in/dushyant-pal-b331996"
+    }
+  ]
+}

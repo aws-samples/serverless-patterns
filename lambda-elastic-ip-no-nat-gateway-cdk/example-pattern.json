@@ -1,6 +1,6 @@
 {
-  "title": "Lambda Elastic IP without NAT Gateway",
-  "description": "Create a lambda function with public elastic IP without provisioning NAT Gateway",
+  "title": "AWS Lambda Elastic IP without NAT Gateway",
+  "description": "Create a Lambda function with public Elastic IP without provisioning NAT Gateway",
   "language": "TypeScript",
   "level": "300",
   "framework": "CDK",
