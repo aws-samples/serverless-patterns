@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Signed Function'
+
+Parameters:
+  BucketName:
+    Type: String
+  S3Key:
+    Type: String
+  SigningProfileVersionArn:
+    Type: String
+
+Resources:
+
+  HelloWorldFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Ref BucketName
+        S3Key: !Ref S3Key
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Role: !GetAtt FunctionRole.Arn
+      Architectures:
+      - x86_64
+      CodeSigningConfigArn: !GetAtt CodeSigningConfig.CodeSigningConfigArn
+  
+  CodeSigningConfig:
+    Type: AWS::Lambda::CodeSigningConfig
+    Properties: 
+      AllowedPublishers: 
+        SigningProfileVersionArns: 
+          - !Ref SigningProfileVersionArn
+      CodeSigningPolicies:
+        UntrustedArtifactOnDeployment: Enforce
+
+  FunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - 
+         PolicyName: "root"
+         PolicyDocument:
+           Version: "2012-10-17"
+           Statement:
+              - 
+                Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+
+Outputs:
+  FunctionArn:
+    Description: Information about the value
+    Value: !Ref HelloWorldFunction

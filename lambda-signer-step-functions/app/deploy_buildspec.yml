@@ -1,0 +1,7 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - cd app
+      - aws cloudformation deploy --template-file template.yaml --stack-name ${STACK_NAME}-SignedFunctionStack --parameter-overrides BucketName=${BUCKET_NAME} S3Key=${SIGNED_OBJECT_KEY} SigningProfileVersionArn=${SIGNING_PROFILE_VERSION_ARN} --capabilities CAPABILITY_IAM

@@ -1,0 +1,462 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Automated code signing orchestrator
+
+Resources:
+
+  # Profile that will be used to sign images
+  CodeSigningProfile:
+    Type: AWS::Signer::SigningProfile
+    Properties:
+      PlatformId: AWSLambda-SHA384-ECDSA
+
+  # Topic for notifying the user
+  SNSTopic:
+    Type: AWS::SNS::Topic
+  
+  # Bucket for deploying artifacts
+  BuildBucket:
+    Type: AWS::S3::Bucket
+    Properties: 
+      AccessControl: Private
+      VersioningConfiguration: 
+        Status: Enabled
+      
+  # CodeCommit repository to deploy code
+  CodeCommitRepository:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryName: !Join ["-", [!Ref "AWS::StackName", ServerlessCodeSigningRepository]]
+  
+  # CodePipeline to initiate CI/CD
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location: !Ref BuildBucket
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: SourceAction
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeCommit
+                Version: 1
+              Configuration:
+                BranchName: main
+                RepositoryName: !GetAtt CodeCommitRepository.Name
+              OutputArtifacts:
+                - Name: SourceOutput
+        # Invokes the Step Function which will orchestrate the deployment
+        - Name: SignAndDeploy
+          Actions:
+            - Name: InvokeAction
+              ActionTypeId:
+                Owner: AWS
+                Category: Invoke
+                Version: 1
+                Provider: StepFunctions
+              Configuration:
+                StateMachineArn: !GetAtt SignAndDeployStateMachine.Arn
+  
+  # CodeBuild project to build the Lambda function zip file
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Location: !Ref BuildBucket
+        Name: build.zip
+        Type: S3
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:2.0
+        EnvironmentVariables:
+          - Name: BUCKET_NAME
+            Value: !Ref BuildBucket
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName: !Ref CodeBuildLogGroup
+          Status: ENABLED
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Source:
+        Location: !GetAtt CodeCommitRepository.CloneUrlHttp
+        Type: CODECOMMIT
+        BuildSpec: app/buildspec.yml
+  
+  # CodeBuild project to deploy the signed code to the Lambda function
+  DeployFunctionCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Location: !Ref BuildBucket
+        Name: build.zip
+        Type: S3
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:2.0
+        EnvironmentVariables:
+          - Name: BUCKET_NAME
+            Value: !Ref BuildBucket
+          - Name: SIGNED_OBJECT_VERSION
+            Value: ToBeReplaced
+          - Name: SIGNING_PROFILE_VERSION_ARN
+            Value: !GetAtt CodeSigningProfile.ProfileVersionArn
+          - Name: STACK_NAME
+            Value: !Ref AWS::StackName
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName: !Ref DeployFunctionCodeBuildLogGroup
+          Status: ENABLED
+      ServiceRole: !GetAtt DeployFunctionCodeBuildServiceRole.Arn
+      Source:
+        Location: !GetAtt CodeCommitRepository.CloneUrlHttp
+        Type: CODECOMMIT
+        BuildSpec: app/deploy_buildspec.yml
+  
+  # Log group for the first CodeBuild project
+  CodeBuildLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Properties:
+      RetentionInDays: 7
+  
+  # Log group for the second CodeBuild project
+  DeployFunctionCodeBuildLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Properties:
+      RetentionInDays: 7
+
+  # Service role for the CodePipeline pipeline
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "sts:AssumeRole"
+            Principal:
+              Service: codepipeline.amazonaws.com
+      Policies:
+        - 
+         PolicyName: CodePipelinePolicy
+         PolicyDocument:
+           Version: "2012-10-17"
+           Statement:
+              - 
+                Effect: "Allow"
+                Action:
+                  - "codecommit:CancelUploadArchive"
+                  - "codecommit:GetBranch"
+                  - "codecommit:GetCommit"
+                  - "codecommit:GetRepository"
+                  - "codecommit:GetUploadArchiveStatus"
+                  - "codecommit:UploadArchive"
+                Resource: !GetAtt CodeCommitRepository.Arn
+              - 
+                Effect: "Allow"
+                Action:
+                  - "states:DescribeExecution"
+                  - "states:DescribeStateMachine"
+                  - "states:StartExecution"
+                Resource: 
+                  - !GetAtt SignAndDeployStateMachine.Arn
+                  - !Sub 
+                    - "arn:${AWS::Partition}:states:${AWS::Region}:${accountId}:execution:${stateMachineName}:*"
+                    - { accountId: !Ref AWS::AccountId, stateMachineName: !GetAtt SignAndDeployStateMachine.Name }
+              - 
+                Effect: "Allow"
+                Action: 
+                  - "s3:ListBucket"
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                Resource: 
+                  - !GetAtt BuildBucket.Arn
+                  - !Join [ "/", [ !GetAtt BuildBucket.Arn, "*" ] ]
+  
+  # Service role for the first CodeBuild project
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "sts:AssumeRole"
+            Principal:
+              Service: codebuild.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyName: CodeBuildServiceRolePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                - "logs:CreateLogGroup"
+                - "logs:CreateLogStream"
+                - "logs:PutLogEvents"
+                - "codebuild:CreateReportGroup"
+                - "codebuild:CreateReport"
+                - "codebuild:UpdateReport"
+                - "codebuild:BatchPutTestCases"
+                - "codecommit:GitPull"
+                Resource: "*"
+              - Effect: Allow
+                Action: 
+                  - "s3:PutObject"
+                  - "s3:GetObject"
+                Resource: !Join [ "/", [ !GetAtt BuildBucket.Arn, "*" ] ]
+  
+  # Service role for the second CodeBuild project
+  DeployFunctionCodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "sts:AssumeRole"
+            Principal:
+              Service: codebuild.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyName: CodeBuildServiceRolePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                - "logs:CreateLogGroup"
+                - "logs:CreateLogStream"
+                - "logs:PutLogEvents"
+                - "codebuild:CreateReportGroup"
+                - "codebuild:CreateReport"
+                - "codebuild:UpdateReport"
+                - "codebuild:BatchPutTestCases"
+                - "codecommit:GitPull"
+                - "cloudformation:*"
+                - "lambda:*"
+                - "iam:*"
+                Resource: "*"
+              - Effect: Allow
+                Action: 
+                  - "s3:PutObject"
+                  - "s3:GetObject"
+                Resource: !Join [ "/", [ !GetAtt BuildBucket.Arn, "*" ] ]
+
+  # State machine to orchestrate the deployment of the signed code to the Lambda function
+  SignAndDeployStateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      RoleArn: !GetAtt StateMachineServiceRole.Arn
+      DefinitionString: 
+        !Sub
+          - |-
+            {
+              "Comment": "State Machine to sign and deploy lambda function code",
+              "StartAt": "CodeBuild StartBuild",
+              "States": {
+                "CodeBuild StartBuild": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::codebuild:startBuild.sync",
+                  "Parameters": {
+                    "ProjectName": "${projectName}"
+                  },
+                  "Next": "GetSignedZip"
+                },
+                "GetSignedZip": {
+                  "Type": "Task",
+                  "Next": "StartSigningJob",
+                  "Parameters": {
+                    "Bucket": "${bucketName}",
+                    "Key": "unsigned-code.zip"
+                  },
+                  "Resource": "arn:aws:states:::aws-sdk:s3:headObject"
+                },
+                "StartSigningJob": {
+                  "Type": "Task",
+                  "Parameters": {
+                    "ClientRequestToken": "MyData",
+                    "Destination": {
+                      "S3": {
+                        "BucketName": "${bucketName}",
+                        "Prefix": "signed-code.zip"
+                      }
+                    },
+                    "ProfileName": "${codeSigningProfileName}",
+                    "Source": {
+                      "S3": {
+                        "BucketName": "${bucketName}",
+                        "Key": "unsigned-code.zip",
+                        "Version.$": "$.VersionId"
+                      }
+                    }
+                  },
+                  "Resource": "arn:aws:states:::aws-sdk:signer:startSigningJob",
+                  "Next": "DescribeSigningJob"
+                },
+                "DescribeSigningJob": {
+                  "Type": "Task",
+                  "Next": "SigningJobSuccess?",
+                  "Parameters": {
+                    "JobId.$": "$.JobId"
+                  },
+                  "Resource": "arn:aws:states:::aws-sdk:signer:describeSigningJob"
+                },
+                "SigningJobSuccess?": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.Status",
+                      "StringMatches": "Succeeded",
+                      "Next": "DeployFunctionCodeBuild StartBuild"
+                    },
+                    {
+                      "Variable": "$.Status",
+                      "StringMatches": "Failed",
+                      "Next": "SNS Publish Failure"
+                    }
+                  ],
+                  "Default": "Wait"
+                },
+                "DeployFunctionCodeBuild StartBuild": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::codebuild:startBuild.sync",
+                  "Parameters": {
+                    "ProjectName": "${deployFunctionCodeBuildProjectName}",
+                    "EnvironmentVariablesOverride": [
+                      {
+                        "Name": "SIGNED_OBJECT_KEY",
+                        "Type": "PLAINTEXT",
+                        "Value.$": "$.SignedObject.S3.Key"
+                      }
+                    ]
+                  },
+                  "Catch": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "Next": "SNS Publish Failure"
+                    }
+                  ],
+                  "Next": "SNS Publish Success"
+                },
+                "SNS Publish Success": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::sns:publish",
+                  "Parameters": {
+                    "Message.$": "$",
+                    "TopicArn": "${topicArn}"
+                  },
+                  "End": true,
+                  "InputPath": "$.Build"
+                },
+                "SNS Publish Failure": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::sns:publish",
+                  "Parameters": {
+                    "Message.$": "$",
+                    "TopicArn": "${topicArn}"
+                  },
+                  "Next": "Fail"
+                },
+                "Fail": {
+                  "Type": "Fail"
+                },
+                "Wait": {
+                  "Type": "Wait",
+                  "Seconds": 5,
+                  "Next": "DescribeSigningJob"
+                }
+              }
+            }
+          - {projectName: !Ref CodeBuildProject, topicArn: !Ref SNSTopic, bucketName: !Ref BuildBucket, codeSigningProfileName: !GetAtt CodeSigningProfile.ProfileName, deployFunctionCodeBuildProjectName: !Ref DeployFunctionCodeBuildProject}
+
+  # Service role for the state machine
+  StateMachineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "sts:AssumeRole"
+            Principal:
+              Service: states.amazonaws.com
+      Policies:
+        - 
+         PolicyName: "StepFunctionDeployAndSignPolicy"
+         PolicyDocument:
+           Version: "2012-10-17"
+           Statement:
+              - 
+                Effect: "Allow"
+                Action: 
+                  - "codebuild:StartBuild"
+                  - "codebuild:StopBuild"
+                  - "codebuild:BatchGetBuilds"
+                  - "codebuild:BatchGetReports"
+                Resource: 
+                  - !GetAtt CodeBuildProject.Arn
+                  - !GetAtt DeployFunctionCodeBuildProject.Arn
+              - 
+                Effect: "Allow"
+                Action: 
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                  - "s3:ListBucket"
+                  - "s3:GetObjectVersion"
+                  - "s3-object-lambda:GetObject"
+                  - "s3-object-lambda:GetObjectVersion"
+                Resource:
+                  - !GetAtt BuildBucket.Arn
+                  - !Join [ "/", [ !GetAtt BuildBucket.Arn, "*" ] ]
+              -
+                Effect: "Allow"
+                Action: "sns:Publish"
+                Resource: !Ref SNSTopic
+              -
+                Effect: "Allow"
+                Action: "signer:StartSigningJob"
+                Resource: !Ref CodeSigningProfile
+              -
+                Effect: "Allow"
+                Action: "signer:DescribeSigningJob"
+                Resource: !Sub 
+                  - "arn:aws:signer:*:${accountId}:/signing-jobs/*"
+                  - { accountId: !Ref AWS::AccountId }
+              -
+                Effect: "Allow"
+                Action:
+                  - "events:PutTargets"
+                  - "events:PutRule"
+                  - "events:DescribeRule"
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventForCodeBuildStartBuildRule"
+
+Outputs:
+  BucketName:
+    Description: Name of the bucket
+    Value: !Ref BuildBucket
+
+  CodeCommitRepoName:
+    Description: Name of the CodeCommit repository name
+    Value: !GetAtt CodeCommitRepository.Name
+  
+  SNSTopicArn:
+    Description: Arn of the SNS topic
+    Value: !Ref SNSTopic
+  
+  StateMachineArn:
+    Description: Arn of the StepFunctions state machine
+    Value: !GetAtt SignAndDeployStateMachine.Arn

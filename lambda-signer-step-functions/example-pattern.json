@@ -1,0 +1,63 @@
+{
+  "title": "Automated Lambda Function Code Signing With AWS Signer and AWS Step Functions",
+  "description": "This pattern automates the process of signing function code using AWS Step Functions.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Signing AWS Lambda function code helps ensure function images are valid and unmodified.",
+      "However, this is an extra step in the deployment process that may dissuade developers from using it.",
+      "This pattern simplifies this process by providing an AWS Step Functions workflow that automates this process.",
+      "This pattern creates two stacks, an infrastructure stack providing a pipeline for function signing and deployment, and the function stack itself.",
+      "The infrastructure stack will create CI/CD resources using AWS CodeCommit, AWS CodeBuild, and AWS CodePipeline.",
+      "However, other CI/CD tools may be substituted in, provided they integrate with AWS Step Functions.",
+      "Developers can extend the deployment workflow by adding other actions to the AWS Step Functions state machine or AWS CodePipeline pipeline.",
+      "Additionally, as stated before, if different CI/CD tools are preferred, they can be substituted into the infrastructure template."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-signer-step-functions",
+      "templateURL": "serverless-patterns/lambda-signer-step-functions",
+      "projectFolder": "lambda-signer-step-functions",
+      "templateFile": "code-signer/template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Signer",
+        "link": "https://aws.amazon.com/blogs/aws/new-code-signing-a-trust-and-integrity-control-for-aws-lambda"
+      },
+      {
+        "text": "CodePipeline with AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/codepipeline/latest/userguide/tutorials-step-functions.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the README.md for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README.md for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the README.md for detailed cleanup instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Benson Wu",
+      "image": "https://github.com/bensontwu",
+      "bio": "Associate Cloud Application Architect @ AWS",
+      "linkedin": "https://linkedin.com/in/bensontwu"
+    }
+  ]
+}

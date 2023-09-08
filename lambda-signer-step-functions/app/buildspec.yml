@@ -1,0 +1,8 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - cd app
+      - zip unsigned-code.zip index.js
+      - aws s3 cp unsigned-code.zip s3://${BUCKET_NAME}/unsigned-code.zip
