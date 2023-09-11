@@ -125,75 +125,34 @@ sam local invoke --event=events/event.json
 
 You should see a response similar to the below
 
-`START RequestId: 5c10310a-abf9-416e-b017-697d2c3ba097 Version: $LATEST
-Received an event: {'eventSource': 'aws:kafka', 'eventSourceArn': 'arn:aws:kafka:us-west-2:123456789012:cluster/MSKWorkshopCluster/a93759a9-c9d0-4952-984c-492c6bfa2be8-13', 'bootstrapServers': 'b-1.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098,b-3.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098,b-2.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098', 'records': {'myTopic-0': [{'topic': 'myTopic', 'partition': 0, 'offset': 383, 'timestamp': 1678484822068, 'timestampType': 'CREATE_TIME', 'value': 'bTE=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 384, 'timestamp': 1678484823448, 'timestampType': 'CREATE_TIME', 'value': 'bTI=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 385, 'timestamp': 1678484824763, 'timestampType': 'CREATE_TIME', 'value': 'bTM=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 386, 'timestamp': 1678484825902, 'timestampType': 'CREATE_TIME', 'value': 'bTQ=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 387, 'timestamp': 1678484827810, 'timestampType': 'CREATE_TIME', 'value': 'bTU=', 'headers': []}]}}
-Event Source: aws:kafka
-Event Source ARN: arn:aws:kafka:us-west-2:123456789012:cluster/MSKWorkshopCluster/a93759a9-c9d0-4952-984c-492c6bfa2be8-13
-Bootstrap Servers: b-1.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098,b-3.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098,b-2.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098
-Records: {'myTopic-0': [{'topic': 'myTopic', 'partition': 0, 'offset': 383, 'timestamp': 1678484822068, 'timestampType': 'CREATE_TIME', 'value': 'bTE=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 384, 'timestamp': 1678484823448, 'timestampType': 'CREATE_TIME', 'value': 'bTI=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 385, 'timestamp': 1678484824763, 'timestampType': 'CREATE_TIME', 'value': 'bTM=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 386, 'timestamp': 1678484825902, 'timestampType': 'CREATE_TIME', 'value': 'bTQ=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 387, 'timestamp': 1678484827810, 'timestampType': 'CREATE_TIME', 'value': 'bTU=', 'headers': []}]}
-Current Record: [{'topic': 'myTopic', 'partition': 0, 'offset': 383, 'timestamp': 1678484822068, 'timestampType': 'CREATE_TIME', 'value': 'bTE=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 384, 'timestamp': 1678484823448, 'timestampType': 'CREATE_TIME', 'value': 'bTI=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 385, 'timestamp': 1678484824763, 'timestampType': 'CREATE_TIME', 'value': 'bTM=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 386, 'timestamp': 1678484825902, 'timestampType': 'CREATE_TIME', 'value': 'bTQ=', 'headers': []}, {'topic': 'myTopic', 'partition': 0, 'offset': 387, 'timestamp': 1678484827810, 'timestampType': 'CREATE_TIME', 'value': 'bTU=', 'headers': []}]`
-********************
-Now printing details of record number: 1
-Topic: myTopic
-Partition: 0
-Offset: 383
-Topic: myTopic
-Timestamp: 1678484822068
-TimestampType: CREATE_TIME
-Key = null
-Value = m1
-Now finished printing details of record number: 1
-********************
-********************
-Now printing details of record number: 2
-Topic: myTopic
-Partition: 0
-Offset: 384
-Topic: myTopic
-Timestamp: 1678484823448
-TimestampType: CREATE_TIME
-Key = null
-Value = m2
-Now finished printing details of record number: 2
-********************
-********************
-Now printing details of record number: 3
-Topic: myTopic
-Partition: 0
-Offset: 385
-Topic: myTopic
-Timestamp: 1678484824763
-TimestampType: CREATE_TIME
-Key = null
-Value = m3
-Now finished printing details of record number: 3
-********************
-********************
-Now printing details of record number: 4
-Topic: myTopic
-Partition: 0
-Offset: 386
-Topic: myTopic
-Timestamp: 1678484825902
-TimestampType: CREATE_TIME
-Key = null
-Value = m4
-Now finished printing details of record number: 4
-********************
-********************
-Now printing details of record number: 5
-Topic: myTopic
-Partition: 0
-Offset: 387
-Topic: myTopic
-Timestamp: 1678484827810
-TimestampType: CREATE_TIME
-Key = null
-Value = m5
-Now finished printing details of record number: 5
-********************
-END RequestId: 5c10310a-abf9-416e-b017-697d2c3ba097
-REPORT RequestId: 5c10310a-abf9-416e-b017-697d2c3ba097	Init Duration: 6.68 ms	Duration: 1502.83 ms	Billed Duration: 1503 ms	Memory Size: 128 MB	Max Memory Used: 128 MB
+START RequestId: ec2a36a6-5b5e-40c8-bff6-e6237babd613 Version: $LATEST
+EventSource =  aws:kafka
+EventSourceARN =  arn:aws:kafka:us-west-2:123456789012:cluster/MSKWorkshopCluster/a93759a9-c9d0-4952-984c-492c6bfa2be8-13
+This Key =  myTopic-0
+**********
+Start of message  1
+Topic =  myTopic
+Partition =  0
+Offset =  250
+Timestamp =  2023-03-06 03:08:30.111 +0000 UTC
+TimestampType =  CREATE_TIME
+Key =  null
+Value =  f
+End of message  1
+**********
+**********
+Start of message  2
+Topic =  myTopic
+Partition =  0
+Offset =  251
+Timestamp =  2023-03-06 03:08:31.086 +0000 UTC
+TimestampType =  CREATE_TIME
+Key =  null
+Value =  g
+End of message  2
+**********
+END RequestId: ec2a36a6-5b5e-40c8-bff6-e6237babd613
+REPORT RequestId: ec2a36a6-5b5e-40c8-bff6-e6237babd613	Init Duration: 1.38 ms	Duration: 651.86 ms	Billed Duration: 652 ms	Memory Size: 128 MB	Max Memory Used: 128 MB
 
 ## Cleanup
  
