@@ -13,8 +13,8 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns.git",
-      "templateURL": "serverless-patterns/cdk-apigw-connect-start_task",
-      "projectFolder": "cdk-apigw-connect-start_task",
+      "templateURL": "serverless-patterns/cdk-apigw-connect-start-task",
+      "projectFolder": "cdk-apigw-connect-start-task",
       "templateFile": "cdk_apigw_connect_start_task/cdk_apigw_connect_start_task_stack.py"
     }
   },
