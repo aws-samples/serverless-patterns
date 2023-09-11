@@ -1,6 +1,6 @@
 {
     "title": "Amazon API Gateway to Amazon DynamoDB which streams event to AWS Lambda",
-    "description": "Create a REST API Gateway which performs PutRecords API to save to DynamoDB and the stream is consumed by a Lambda function",
+    "description": "API Gateway to DynamoDB to Lambda function using streams.",
     "language": "Python",
     "level": "300",
     "framework": "CDK",
