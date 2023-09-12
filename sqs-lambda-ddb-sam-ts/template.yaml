@@ -40,7 +40,7 @@ Resources:
       Runtime: nodejs18.x
       CodeUri: ./src # Relative path to the handler function code - must have app.ts and package.json files
       Timeout: 10
-      MemorySize: 128
+      MemorySize: 1024 # Use https://github.com/alexcasalboni/aws-lambda-power-tuning/ to calculate optimal memory size for the actual payload
       Architectures:
         - arm64 # Configure Lambda to use ARM64 architecture
 

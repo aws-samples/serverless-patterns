@@ -68,6 +68,14 @@ Lambda function will stop writing messages into the DynamoDB table as soon as it
 
 Amazon DynamoDB table will have a minimal `ProvisionedThroughput` configuration for demo purposes, so that the users can observe message write retries when testing this stack. Real production throughput must be configured in accordance with the actual business requirements and message sizes.
 
+## AWS Lambda function implementation details
+
+This template uses AWS SAM CLI integration with the esbuild bundler and takes advantage of such feature as [ECMAScript Modules](https://tc39.es/ecma262/#sec-modules) compatible output. Producing ESM output allows esbuild bundler to perform [Tree Shaking](https://esbuild.github.io/api/#tree-shaking) optimization that automatically removes unreachable code from the output.
+
+Additionally, output [Minification](https://esbuild.github.io/api/#minify) is enabled for the Lambda function, which reduces the output size even further.
+
+See `Metadata` section of the `IngressProcessingFunction` resource for the Lambda function build configuration details.
+
 ## Testing
 
 You can execute a test script to simulate the activity of sending 5 identical batches of 10 messages each to the `IngressQueue`. Batch of messages is defined in [./messages.json](./messages.json) file and each message is configured to be ~4Kb in size for demo purposes.
