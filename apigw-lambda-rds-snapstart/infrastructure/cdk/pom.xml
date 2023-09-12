@@ -10,8 +10,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <cdk.version>2.62.2</cdk.version>
-        <junit.version>5.9.1</junit.version>
+        <cdk.version>2.94.0</cdk.version>
+        <junit.version>5.9.2</junit.version>
     </properties>
 
     <build>

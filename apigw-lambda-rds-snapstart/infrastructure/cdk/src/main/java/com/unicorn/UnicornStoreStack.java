@@ -8,11 +8,11 @@ import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.apigateway.LambdaRestApi;
 import software.amazon.awscdk.services.apigateway.RestApi;
 import software.amazon.awscdk.services.lambda.Alias;
-import software.amazon.awscdk.services.lambda.CfnFunction;
 import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.IFunction;
 import software.amazon.awscdk.services.lambda.Runtime;
+import software.amazon.awscdk.services.lambda.SnapStartConf;
 import software.constructs.Construct;
 
 import java.util.List;
@@ -61,7 +61,7 @@ public class UnicornStoreStack extends Stack {
 
     private Function createUnicornLambdaFunction() {
         Function function = Function.Builder.create(this, "UnicornStoreFunction")
-                .runtime(Runtime.JAVA_11)
+                .runtime(Runtime.JAVA_17)
                 .functionName("unicorn-store")
                 .memorySize(2048)
                 .timeout(Duration.seconds(29))
@@ -73,15 +73,10 @@ public class UnicornStoreStack extends Stack {
                         "DATASOURCES_DEFAULT_USERNAME", "postgres",
                         "DATASOURCES_DEFAULT_PASSWORD", infrastructureStack.getDatabaseSecretString(),
                         "DATASOURCES_DEFAULT_URL", infrastructureStack.getDatabaseJDBCConnectionString(),
-                        "AWS_SERVERLESS_JAVA_CONTAINER_INIT_GRACE_TIME", "500",
-                        "JAVA_TOOL_OPTIONS", "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+                        "AWS_SERVERLESS_JAVA_CONTAINER_INIT_GRACE_TIME", "500"
                 ))
+                .snapStart(SnapStartConf.ON_PUBLISHED_VERSIONS)
                 .build();
-
-        CfnFunction cfnFunction = (CfnFunction) function.getNode().getDefaultChild();
-        cfnFunction.setSnapStart(CfnFunction.SnapStartProperty.builder()
-                .applyOn("PublishedVersions")
-                .build());
 
         return function;
     }
