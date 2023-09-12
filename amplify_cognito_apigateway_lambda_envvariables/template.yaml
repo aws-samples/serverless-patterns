@@ -8,8 +8,6 @@ Description: >
 
 #################### PARAMETERS #############################
 
-Parameters:
-
   AmplifyFrontendRepository:
     Type: String
     Description: 'Amplify Frontend Repository in the format: https://<GitProviderDomain>/<user>/<repository>'
