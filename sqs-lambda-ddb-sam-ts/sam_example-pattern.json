@@ -7,7 +7,7 @@
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This code demonstrates how Amazon SQS queue can be used to buffer records for an Amazon DynamoDB table and mitigate the risk for a client of being throttled.",
+            "This code demonstrates how an Amazon SQS queue can be used to buffer records for an Amazon DynamoDB table and mitigate the risk for a client of being throttled.",
             "The SAM template deploys Ingress and Dead-Letter SQS queues, AWS Lambda function, and the destination DynamoDB table.",
             "AWS Lambda function will use partial batch response to return throttled records back to the queue.",
             "AWS Lambda function uses NodeJS 18 runtime running on ARM64 processors powered by AWS Graviton."
