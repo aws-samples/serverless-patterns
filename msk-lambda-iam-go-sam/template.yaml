@@ -13,10 +13,12 @@ Globals:
 Resources:
   HelloWorldGoKafkaFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Metadata:
+      BuildMethod: go1.x 
     Properties:
       CodeUri: HandlerKafka/
-      Handler: handler
-      Runtime: go1.x
+      Handler: bootstrap
+      Runtime: provided.al2
       Architectures:
         - x86_64
       Events:

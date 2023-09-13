@@ -4,16 +4,9 @@ This pattern is an example of a Lambda function that consumes messages from an A
 
 This project contains source code and supporting files for a serverless application that you can deploy with the AWS Serverless Application Model (AWS SAM) CLI. It includes the following files and folders.
 
-
-```bash
-.
-├── Makefile                    <-- Make to automate build
-├── README.md                   <-- This instructions file
-├── HandlerKafka                <-- Source code for a lambda function
-│   ├── main.go                 <-- Lambda function code
-│   └── main_test.go            <-- Unit tests
-└── template.yaml
-```
+- HandlerKafka - Code for the application's Lambda function.
+- events - Invocation events that you can use to invoke the function.
+- template.yaml - An AWS SAM template that defines the application's AWS resources.
 
 The application creates a Lambda function that listens to Kafka messages on a topic of an MSK Cluster. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
 
@@ -25,7 +18,6 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Docker installed](https://www.docker.com/community-edition)
 * [Golang](https://golang.org)
 * Create MSK cluster and topic that will be used for testing. It is important to create the topic before deploying the Lambda function, otherwise the event source mapping will stay disabled. 
 
@@ -41,38 +33,49 @@ To use the AWS SAM CLI, you need the following tools.
 In this example we use the built-in `sam build` to automatically download all the dependencies and package our build target.   
 Read more about [SAM Build here](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-build.html) 
 
-
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns.git
     ```
 1. Change directory to the pattern directory:
     ```
-    cd msk-lambda-iam-python-sam
+    cd msk-lambda-iam-go-sam
     ```
 
-1. The `sam build` command is wrapped inside of the `Makefile`. 
+This solution uses the AWS Lambda [custom runtime](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html) `provided.al2` which is the prefered way to run Go applications in Lambda. For more information, see [https://aws.amazon.com/blogs/compute/migrating-aws-lambda-functions-from-the-go1-x-runtime-to-the-custom-runtime-on-amazon-linux-2/](https://aws.amazon.com/blogs/compute/migrating-aws-lambda-functions-from-the-go1-x-runtime-to-the-custom-runtime-on-amazon-linux-2/).
 
-    ```shell
-    make
-    ```
+The AWS SAM template configures the `provided.al2` runtime and builds the Go function using the following syntax.
+
+```yaml
+...
+  HelloWorldGoKafkaFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x 
+    Properties:
+      CodeUri: HandlerKafka/
+      Handler: bootstrap
+      Runtime: provided.al2
+```
+You can also use the managed Go.1 runtime by amending the AWS SAM template:
 
 AWS Lambda Golang runtime requires a flat folder with the executable generated on build step. SAM will use `CodeUri` property to know where to look up for the application:
 
 ```yaml
 ...
-    FirstFunction:
-        Type: AWS::Serverless::Function
-        Properties:
-            CodeUri: hello_world/
-            ...
+  HelloWorldGoKafkaFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: HandlerKafka/
+      Handler: handler
+      Runtime: go1.x            
 ```
 
-1. To deploy your application for the first time, run the following in your shell:
-
-```bash
-sam deploy --guided
-```
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+    ```
+    sam build
+    sam deploy --guided
+    ```
 
 1. During the prompts:
 * **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
