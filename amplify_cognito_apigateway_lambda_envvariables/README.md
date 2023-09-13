@@ -1,4 +1,4 @@
-Hello Mike
+Hello Mike, how are you ?
 
 # Integration of Amplify Frontend, Cognito, API Gateway, Lambda
 
