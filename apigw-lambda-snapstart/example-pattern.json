@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-snapstart",
       "templateURL": "serverless-patterns/apigw-lambda-snapstart",
       "projectFolder": "apigw-lambda-snapstart",
-      "templateFile": "apigw-lambda-snapstart/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
