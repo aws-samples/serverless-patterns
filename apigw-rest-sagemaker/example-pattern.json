@@ -1,6 +1,7 @@
 {
   "title": "API Gateway REST API to SageMaker",
   "description": "Create a an Amazon API Gateway REST API to invoke a Sagemaker endpoint.",
+  "language": "",
   "level": "300",
   "framework": "SAM",
   "introBox": {
