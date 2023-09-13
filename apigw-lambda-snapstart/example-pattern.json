@@ -1,5 +1,5 @@
 {
-  "title": "Amazon API Gateway, AWS Lambda and Amazon DynamoDB with Lambda SnapStart for Java",
+  "title": "Synchronous REST API with Lambda SnapStart",
   "description": "This pattern demonstrates how to create a synchronous REST API using API Gateway, AWS Lambda and DynamoDB.",
   "language": "Java",
   "level": "400",
