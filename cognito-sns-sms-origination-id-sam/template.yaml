@@ -1,0 +1,181 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  capstone-app
+
+  Sample SAM Template for capstone-app
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+
+Parameters:
+  UserPoolName:
+    Type: String
+    Description: Name of the Amazon Cognito user pool
+    Default: youruserpoolname
+  SmsRoleName:
+    Type: String
+    Description: Name of the IAM role for sending SMS
+    Default: SmsRole2
+  SenderId:
+    Type: String
+    Description: Default origination number for SMS
+    Default: <default-phone-number-from-pinpoint>
+  CallbackUrl:
+    Type: String
+    Description: Allowed redirect URL after user login
+    Default: <application-url-after-user-login> #for example https://www.amazon.com/
+
+Resources:
+  KMSKey:
+    Type: 'AWS::KMS::Key'
+    Properties:
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Allow administration of the key
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - 'kms:*'
+            Resource: '*'
+
+  KMSKeyAlias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: alias/MyLambdaKMSKey
+      TargetKeyId: !Ref KMSKey
+
+  CognitoUserPool:
+    Type: 'AWS::Cognito::UserPool'
+    Properties:
+      UserPoolName: !Ref UserPoolName
+      AutoVerifiedAttributes:
+        - phone_number
+      MfaConfiguration: "ON"
+      MfaConfiguration: OPTIONAL
+      SmsConfiguration:
+        SnsCallerArn: !GetAtt SnsRole.Arn
+        ExternalId: !Ref SmsRoleName
+      LambdaConfig:
+        CustomSMSSender:
+          LambdaArn: !GetAtt CustomSmsSenderLambda.Arn
+          LambdaVersion: "V1_0"
+        KMSKeyID: !GetAtt KMSKey.Arn
+      UsernameAttributes:
+        - phone_number
+
+  CognitoUserPoolClient:
+    Type: 'AWS::Cognito::UserPoolClient'
+    Properties:
+      AllowedOAuthFlowsUserPoolClient: True
+      AllowedOAuthFlows:
+        - implicit
+      AllowedOAuthScopes:
+        - phone
+        - email
+        - openid
+        - profile
+        - aws.cognito.signin.user.admin
+      CallbackURLs:
+        - !Ref CallbackUrl
+      ClientName: CognitoAppClient
+      GenerateSecret: false
+      LogoutURLs:
+        - !Ref CallbackUrl
+      SupportedIdentityProviders:
+        - COGNITO
+      UserPoolId: !Ref CognitoUserPool
+
+  SnsRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Ref SmsRoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cognito-idp.amazonaws.com
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonSNSFullAccess'
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: CustomSmsSenderLambdaKMSPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:Encrypt
+                  - kms:Decrypt
+                  - kms:GenerateDataKey
+                Resource: '*'
+
+  DependencyLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: sns-cognito-dependencies
+      Description: Dependencies for capstone-app
+      ContentUri: dependencies/
+      RetentionPolicy: Retain
+
+  CustomSmsSenderLambda:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: sns-cognito/
+      Handler: app.handler
+      FunctionName: !Sub 'CustomSmsSender-${AWS::StackName}'
+      Layers:
+        - !Ref DependencyLayer
+      Runtime: nodejs14.x
+      Architectures:
+      - x86_64
+      Environment:
+        Variables:
+          SenderId: !Ref SenderId
+          KEY_ARN: !GetAtt KMSKey.Arn
+          KEY_ALIAS: !Ref KMSKeyAlias
+      Timeout: 10
+      Role: !GetAtt SnsRole.Arn
+
+  CognitoCustomSMSSenderLambdaInvocationPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - CustomSmsSenderLambda
+          - Arn
+      Principal: cognito-idp.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - CognitoUserPool
+          - Arn
+
+  CognitoUserPoolDomain:
+    Type: 'AWS::Cognito::UserPoolDomain'
+    Properties:
+      Domain: !Sub '${UserPoolName}-domain'
+      UserPoolId: !Ref CognitoUserPool
+
+Outputs:
+  CustomSmsSenderLambda:
+    Description: Custom SMS Sender Lambda ARN
+    Value: !GetAtt CustomSmsSenderLambda.Arn
+  UserPoolId:
+    Value: !Ref CognitoUserPool
+  LoginUI:
+    Value: !Sub https://${CognitoUserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/login?response_type=token&client_id=${CognitoUserPoolClient}&redirect_uri=${CallbackUrl}
