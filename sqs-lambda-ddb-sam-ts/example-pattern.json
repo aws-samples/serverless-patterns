@@ -1,7 +1,7 @@
 {
     "title": "Amazon SQS to AWS Lambda to Amazon DynamoDB",
     "description": "Preventing Amazon DynamoDB write throttling with an Amazon SQS queue-based buffer",
-    "language": "Node.js",
+    "language": "TypeScript",
     "level": "200",
     "framework": "SAM",
     "introBox": {
