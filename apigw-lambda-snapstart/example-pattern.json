@@ -1,0 +1,63 @@
+{
+  "title": "Synchronous REST API with Lambda SnapStart",
+  "description": "This pattern demonstrates how to create a synchronous REST API using API Gateway, AWS Lambda and DynamoDB.",
+  "language": "Java",
+  "level": "400",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern is built using [Spring Boot 3](https://spring.io/projects/spring-boot) and leverages the [AWS Serverless Java Container](https://github.com/awslabs/aws-serverless-java-container) for seamless integration with AWS Lambda.",
+      "This pattern also demonstrates the usage of [SnapStart](https://aws.amazon.com/blogs/compute/reducing-java-cold-starts-on-aws-lambda-functions-with-snapstart/) to improve startup performance."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-snapstart",
+      "templateURL": "serverless-patterns/apigw-lambda-snapstart",
+      "projectFolder": "apigw-lambda-snapstart",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Replatforming Guide",
+        "link": "https://serverlessland.com/content/service/lambda/paved-path/java-replatforming/introduction"
+      },
+      {
+        "text": "AWS Serverless Java Container",
+        "link": "https://github.com/awslabs/aws-serverless-java-container/"
+      },
+      {
+        "text": "Lambda SnapStart",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --stack-name unicorn-store --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mark Sailes",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/mark-sailes.jpg",
+      "bio": "Mark is a specialist solutions architect working at AWS. His primary focus is improving the developer experience of builders using Java on AWS Lambda.",
+      "linkedin": "mark-sailes",
+      "twitter": "MarkSailes3"
+    }
+  ]
+}

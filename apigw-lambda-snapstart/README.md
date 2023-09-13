@@ -8,6 +8,35 @@ to improve startup performance.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-snapstart.
 
+## Spring Web support in Lambda
+
+This pattern uses the Spring Web ```@Controller``` to support different REST endpoints in the same Lambda function. 
+There are two supported ways to achieve this with the AWS Serverless Java Container.
+
+### Delegating the handler to Spring
+
+The first is to specify a Spring class as the function handler and reference the SpringBootApplication class as an 
+environment variable.
+
+```yaml
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.amazonaws.serverless.proxy.spring.SpringDelegatingLambdaContainerHandler
+      ...
+      Environment:
+         Variables:
+            MAIN_CLASS: com.unicorn.store.StoreApplication
+```
+
+This is useful as you don't need to make any changes to your existing application to run it in Lambda.
+
+### Starting Spring in your own handler
+
+An alternative is to create your own handler and start Spring within it. The class ```StreamLambdaHandler``` is an 
+example of this.
+
+This is useful when you want control over the handler method, for example to add an annotation.
+
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
