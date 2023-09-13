@@ -18,7 +18,7 @@
             "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-ddb-sam-ts/",
             "templateURL": "serverless-patterns/sqs-lambda-ddb-sam-ts",
             "projectFolder": "sqs-lambda-ddb-sam-ts",
-            "templateFile": "sqs-lambda-ddb-sam-ts/template.yaml"
+            "templateFile": "template.yaml"
         }
     },
     "resources": {
