@@ -19,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
    ```
-   git clone https://github.com/aws-samples/serverless-patterns
+   git clone https://github.com/aws-samples/serverless-patterns && cd serverless-patterns
    ```
 2. Change directory to the pattern directory:
    ```
