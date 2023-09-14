@@ -1,11 +1,6 @@
 # AWS Service 1 to AWS Service 2
 
-This pattern shows an example how a phone number can be validated and how a SMS message can be send using Pinpoint APIs which via API Gateway and Lambda deployed using SAM.  
-
-As a pre-requisite, a Pinpoint Application has to be created and its SMS channel should be enabled. Subsequently, this stack can be deployed with pinpoint application id, destination phone number, message that has to be sent, origination number and message type. Please read more about the Pinpoint API calls utilised here:
-	https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-messages.html#apps-application-id-messagespost
-
-	https://docs.aws.amazon.com/pinpoint/latest/apireference/phone-number-validate.html
+This pattern << explain usage >>
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
