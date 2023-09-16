@@ -2,7 +2,7 @@
 
 This pattern creates a Kinesis Data Stream that is added as an event source to AWS Lambda function.
 
-Learn more about this pattern at Serverless Land Patterns: <url TBD>
+Learn more about this pattern at Serverless Land Patterns: <live url to be added>
 
 Important: This application uses various AWS services and there are costs associated with these services after the Free Tier usage. Please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -22,7 +22,7 @@ Important: This application uses various AWS services and there are costs associ
    ```
 2. Change directory to the pattern directory:
    ```
-   cd serverless-patterns/<TBD>
+   cd serverless-patterns/kinesis-lambda-py-cdk
    ```
 3. Create a virtual environment for Python:
    ```
@@ -51,6 +51,13 @@ Important: This application uses various AWS services and there are costs associ
 
 This pattern creates a Kinsesis Data stream and a Lambda function. The data stream is then added as an event source which can trigger the Lambda function.
 
+## Testing
+
+From the command line, run the following command to send a single data record to the Kinesis data stream. Note that you must edit the <stream_arn> with the Kinesis data stream ARN that is deployed which will be provided in the stack deployment outputs.
+
+```
+aws kinesis put-record --stream-arn <stream_arn> --partition-key 123 --data testdata
+```
 
 ## Cleanup
 
