@@ -19,19 +19,6 @@ export class SnsFirehoseOpensearchCdkTypescriptStack extends cdk.Stack {
     // user who can access the OpenSearch Dashboard
     const adminUserArn = `arn:aws:iam::${this.account}:user/admin`;
 
-    /* Resources need to create:
-    1. OpenSearch collection and dependencies
-      a. Encryption policy
-      b. Security Policy
-      c. User Access Policy
-      d. Firehose Access Policy
-    2. Firehose delivery stream and dependencies
-      a. S3 bucket used to backup
-      b. IAM role and policies
-    3. SNS topic
-    4. Firehose subscription and subscription role
-    */
-
     // OpenSearch collection
     const collection = new openSearch.CfnCollection(this, 'OpenSearchCollection', {
       name: `${collectionName}`,
