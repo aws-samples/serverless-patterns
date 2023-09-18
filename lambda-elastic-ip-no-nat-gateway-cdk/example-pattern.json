@@ -42,7 +42,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk destroy</code>."
+      "Delete the stack: <code> cdk destroy </code>."
     ]
   },
   "authors": [ 

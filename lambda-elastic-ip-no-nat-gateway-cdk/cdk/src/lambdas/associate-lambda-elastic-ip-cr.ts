@@ -40,10 +40,6 @@ export const handler: Handler = async (event: AssociateLambdaElasticIpEvent) => 
                     Name: 'status',
                     Values: ['in-use'],
                 },
-                {
-                    Name: 'description',
-                    Values: [`AWS Lambda VPC ENI-${event.functionName}*`],
-                },
             ],
             AllocationIds: [allocationId],
             MaxResults: 10,
@@ -58,7 +54,9 @@ export const handler: Handler = async (event: AssociateLambdaElasticIpEvent) => 
         console.log('DescribeNetworkInterfacesCommandResponse:', JSON.stringify(DescribeNetworkInterfacesCommandResponse, null, 2));
         const returnedNetworkInterfaces = DescribeNetworkInterfacesCommandResponse.NetworkInterfaces;
         if (!returnedNetworkInterfaces?.length) {
-            throw new Error(`No network interface is associated with this lambda function ${event.functionName}`);
+            throw new Error(
+                `No network interface is associated with this subnet + securityGroup combination (${event.subnetId}, ${event.securityGroupId})`,
+            );
         }
 
         console.log('Associating Lambda to Elastic IP...');
