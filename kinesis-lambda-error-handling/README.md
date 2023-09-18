@@ -49,7 +49,7 @@ Important: this application uses various AWS services and there are costs associ
    Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
-![Reference Architecture](/images/kinesis-lambda-error-handling.jpg)
+![Reference Architecture](./images/kinesis-lambda-error-handling.jpg)
 
 The pattern builds infrastructure with Amazon Kinesis data stream, a consumer Lambda function, SQS queue to load the failed records for further troubleshooting, and cloudwatch to validate the logs for the success, failure with retries.
 
@@ -66,9 +66,7 @@ To test the pattern, we are breaking the test cases into two scenarios.
 chmod +x kinesis-producer/*.sh;
 ./kinesis-producer/without-poison-pill-put-records.sh
 ```
-
-- Navigate to AWS Console, and then to Cloudwatch, Log groups, select the log group and the latest Log stream
-- In the logs, you should see all the 3 messages processed without any exception. 
+- In the Cloudwatch logs, you should see all the 3 messages processed without any exception. 
 
 ### Scenario 2: Put messages with the Poision pill
 - test-records-with-poison-pill.json --> Holds the base64 data with partition key
@@ -78,7 +76,7 @@ chmod +x kinesis-producer/*.sh;
 ./kinesis-producer/with-poison-pill-put-records.sh
 ```
 
-- Cloudwatch logs shows that there was one invalid or poison message, so here the bisectonfailure was applied which lead Lambda to split the batch in half and resume each half separately. Maximum retry attempts and maximum record age limit the number of retries on a failed batch. As the retry limit is 5, it will retry 5 times, before the message is put to AWS SQS.
+- In the Cloudwatch logs, you should see poison message and Lambda splitting the batch in half to resume each half separately. Finally placing the posion message to AWS SQS for further troubleshooting.
 
 ## Validation
 After the Scenario 2, the invalid/poison pill message is put in the SQS queue for the further research. 
@@ -96,7 +94,9 @@ chmod +x validation-scripts/read-sqs-queue.sh;
 We highly recommend to use [Amazon Kinesis Data Generator(KDG)](https://aws.amazon.com/blogs/big-data/test-your-streaming-data-solution-with-the-new-amazon-kinesis-data-generator/) for the high volume testing. The KDG makes it simple to send test data to your Amazon Kinesis stream or Amazon Kinesis Firehose delivery stream. 
 
 ## Cleanup
+```
 sam delete
+```
 
 ## Reference
 - [AWS SAM](https://aws.amazon.com/serverless/sam/)
