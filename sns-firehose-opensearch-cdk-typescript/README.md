@@ -1,4 +1,4 @@
-# AWS SNS to Kinesis Firehose to OpenSearch Dashboard
+# Amazon SNS to Kinesis Firehose to OpenSearch Dashboard
 
 <p align="center">
   <img src="./sns-firehose-opensearch.png">
