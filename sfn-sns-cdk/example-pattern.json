@@ -1,6 +1,6 @@
 {
   "title": "Step Functions to SNS",
-  "description": "Create a Step Functions workflow to send SNS message.",
+  "description": "Creates a Step Functions workflow to convert milliseconds to seconds and waits a period of time before sending an SNS message.",
   "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
