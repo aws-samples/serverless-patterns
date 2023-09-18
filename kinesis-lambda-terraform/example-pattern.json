@@ -22,7 +22,7 @@
     "resources": {
       "bullets": [
         {
-          "text": "Kinesis data streams with lambda consumer",
+          "text": "Kinesis Data Streams with Lambda consumers",
           "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
         },
         {
