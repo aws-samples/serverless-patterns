@@ -1,6 +1,11 @@
-# AWS Service 1 to AWS Service 2
+# Pinpoint SMS using API Gateway and Lambda
 
-This pattern << explain usage >>
+This pattern shows an example how a phone number can be validated and how a SMS message can be send using Pinpoint APIs which via API Gateway and Lambda deployed using SAM.  
+
+As a pre-requisite, a Pinpoint Application has to be created and its SMS channel should be enabled. Subsequently, this stack can be deployed with pinpoint application id, destination phone number, message that has to be sent, origination number and message type. Please read more about the Pinpoint API calls utilised here:
+https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-messages.html#apps-application-id-messagespost
+
+https://docs.aws.amazon.com/pinpoint/latest/apireference/phone-number-validate.html
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -21,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd serverless-patterns/apigw-lambda-pinpoint
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -38,11 +43,30 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+1. Depending on the country to which SMS messages has to be sent, an [origination number](https://docs.aws.amazon.com/pinpoint/latest/userguide/settings-sms-request-number.html) can be requested accordingly.
+
+2. Next, the SMS message can be sent using the API Gateway deployed via stack.
+
+3. The lambda function's code firstly verify the phone number by using the [phone number validate](https://docs.aws.amazon.com/pinpoint/latest/apireference/phone-number-validate.html) API call.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+1. You can make a request to API Gateway with the following payload:
+
+```
+{
+    "destination_number": "",
+    "message": "",
+    "pinpoint_app_id": "",
+    "origination_number": "",
+    "message_type": ""
+}
+```
+2. If the message is sent successfully, then you will receive the following response:
+
+```
+Message sent! Message ID: <random message id> 
+```
 
 ## Cleanup
  

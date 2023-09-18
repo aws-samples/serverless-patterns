@@ -1,32 +1,34 @@
 {
-  "title": "Pinpoint SMS via API Gateway and Lambda",
-  "description": "Validate phone number and send SMS from Pinpoint via API Gateway and Lambda",
+  "title": "Step Functions to Athena",
+  "description": "Create a Step Functions workflow to query Amazon Athena.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern shows an example how a phone number can be validated and how a SMS message can be send using Pinpoint APIs which via API Gateway and Lambda deployed using SAM."
+      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
+      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
+      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-pinpoint",
-      "templateURL": "serverless-patterns/apigw-lambda-pinpoint",
-      "projectFolder": "apigw-lambda-pinpoint",
-      "templateFile": "template.py"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
+      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
+      "projectFolder": "sfn-athena-cdk-python",
+      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Send Messages Pinpoint",
-        "link": "https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-messages.html#apps-application-id-messagespost"
+        "text": "Call Athena with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
       },
       {
-        "text": "Phone number validate",
-        "link": "https://docs.aws.amazon.com/pinpoint/latest/apireference/phone-number-validate.html"
+        "text": "Amazon Athena - Serverless Interactive Query Service",
+        "link": "https://aws.amazon.com/athena/"
       }
     ]
   },
@@ -42,15 +44,15 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+      "Delete the stack: <code>cdk delete</code>."
     ]
   },
   "authors": [
     {
-      "name": "Sahil Malhotra",
+      "name": "Your name",
       "image": "link-to-your-photo.jpg",
-      "bio": "Serverless enthusiast",
-      "linkedin": "https://www.linkedin.com/in/smalhotraa/",
+      "bio": "Your bio.",
+      "linkedin": "linked-in-ID",
       "twitter": "twitter-handle"
     }
   ]
