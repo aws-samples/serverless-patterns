@@ -2,7 +2,7 @@
 
 The Step Functions state machine can be started using the AWS CLI or from another service (e.g. API Gateway) to run the workflow and return the result.
 
-This CDK code deploys a Step Functions workflow that converts milliseconds to second, wait for the time passed to it and  then finally send message to Amazon SNS with a message containing the time it waited and returns the response. 
+This CDK code deploys a Step Functions workflow that converts milliseconds to second, wait for the time passed to it and then finally sends a message to Amazon SNS. 
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-sns-cdk
 
