@@ -31,7 +31,7 @@
         "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-create-topic.html"
       },
       {
-        "text": "Call Amazon SNS with Step Functions",
+        "text": "Call Amazon SNS with AWS Step Functions",
         "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-sns.html"
       }
     ]
