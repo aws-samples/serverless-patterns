@@ -16,7 +16,7 @@
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-lambda-terraform",
         "templateURL": "serverless-patterns/kinesis-lambda-terraform",
         "projectFolder": "kinesis-lambda-terraform",
-        "templateFile": "kinesis-lambda-terraform/main.tf"
+        "templateFile": "main.tf"
       }
     },
     "resources": {
