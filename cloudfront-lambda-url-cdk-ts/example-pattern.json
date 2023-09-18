@@ -1,7 +1,7 @@
 {
     "title": "Amazon Cloudfront to AWS Lambda URLs",
     "description": "Configure Cloudfront to point to a Lambda function via a Lambda URL",
-    "language": "Typescript",
+    "language": "TypeScript",
     "level": "200",
     "framework": "CDK",
     "introBox": {
@@ -16,7 +16,8 @@
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-lambda-url-cdk-ts",
         "templateURL": "serverless-patterns/cloudfront-lambda-url-cdk-ts",
-        "projectFolder": "cloudfront-lambda-url-cdk-ts"
+        "projectFolder": "cloudfront-lambda-url-cdk-ts",
+        "templateFile": "cdk/lib/cdk-stack.ts"
       }
     },
     "resources": {
