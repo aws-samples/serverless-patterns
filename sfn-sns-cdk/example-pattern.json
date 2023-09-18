@@ -10,7 +10,7 @@
       "Step Functions receive an execution using the `start-execution` api command with the the message {\"waitMilliseconds\" : <time-in-milliseconds>} in the input payload.",
       "The state machine will first call Lambda function to convert milliseconds to seconds.",
       "The state machine will enter \"Wait\" state and wait for the time passed to it during execution",
-      "After waiting, Step Functions will send a message by the time it waited to the SNS topic."    ]
+      "After waiting, Step Functions will send a message to SNS."    ]
   },
   "gitHub": {
     "template": {
