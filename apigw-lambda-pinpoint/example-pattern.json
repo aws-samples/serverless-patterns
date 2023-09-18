@@ -1,0 +1,57 @@
+{
+  "title": "Pinpoint SMS via API Gateway and Lambda",
+  "description": "Validate phone number and send SMS from Pinpoint via API Gateway and Lambda",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows an example how a phone number can be validated and how a SMS message can be send using Pinpoint APIs which via API Gateway and Lambda deployed using SAM."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-pinpoint",
+      "templateURL": "serverless-patterns/apigw-lambda-pinpoint",
+      "projectFolder": "apigw-lambda-pinpoint",
+      "templateFile": "template.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Send Messages Pinpoint",
+        "link": "https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-messages.html#apps-application-id-messagespost"
+      },
+      {
+        "text": "Phone number validate",
+        "link": "https://docs.aws.amazon.com/pinpoint/latest/apireference/phone-number-validate.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sahil Malhotra",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Serverless enthusiast",
+      "linkedin": "https://www.linkedin.com/in/smalhotraa/",
+      "twitter": "twitter-handle"
+    }
+  ]
+}
