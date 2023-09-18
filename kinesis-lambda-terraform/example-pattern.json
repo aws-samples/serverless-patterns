@@ -1,6 +1,6 @@
 {
     "title": "Kinesis Data Streams With Lambda Consumer",
-    "description": "When data is loaded into Kinesis data stream, the lambda consumer is invoked.",
+    "description": "When data is loaded into Kinesis data stream, the configured lambda function is invoked.",
     "language": "",
     "level": "200",
     "framework": "Terraform",
