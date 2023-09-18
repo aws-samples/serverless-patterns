@@ -7,7 +7,7 @@
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This pattern creates a Kinesis Data Stream and lambda consumer with event source mapping. ",
+        "This pattern creates a Kinesis Data Stream and lambda function (consumer) with event source mapping. ",
         "When the data is loaded into the stream, the lambda function is invoked. "
       ]
     },
