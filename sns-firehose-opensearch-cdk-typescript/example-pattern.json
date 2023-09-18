@@ -1,6 +1,6 @@
 {
   "title": "Amazon SNS to Kinesis Firehose to OpenSearch Dashboard",
-  "description": "This pattern deploys infrastructures that utilize Kinesis Firehose to deliver messages sent to an SNS topic to the Amazon OpenSearch serverless collection.",
+  "description": "This pattern deploys infrastructure that utilizes Kinesis Firehose to deliver messages sent to an SNS topic to Amazon OpenSearch.,
   "language": "Typescript",
   "level": "200",
   "framework": "CDK",
