@@ -7,9 +7,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This serverless pattern demonstrates how to send events from DynamoDB Stream to SQS using EventBridge Pipes. Whenever an item is inserted in DynamoDB table, the stream picks up the event & send it to EventBridge Pipes. ",
-      "The EventBridge Pipes Filter function in the Pipes filters the event and passes to the next states accordingly. For this example pattern, it checks for INSERT events & passes it to Enrichment Lambda function if found one. The Lambda function makes some logs regarding to event & event name & finally passes it to the Target SQS queue.",
-      "The intermediate Filter & Enrichment Lambda functions are optional & can be skipped as part of editing the implementation."
+      "This serverless pattern demonstrates how to send events from DynamoDB Stream to SQS using EventBridge Pipes. Whenever an item is inserted in DynamoDB table, the stream picks up the event & sends it to EventBridge Pipes. ",
+      "EventBridge Pipes filters the event and passes to the next states accordingly. For this example pattern, it checks for INSERT events & passes it to enrichment Lambda function. The Lambda function makes some logs regarding to event & event name & finally passes it to the target SQS queue.",
+      "The intermediate filter & enrichment Lambda functions are optional & can be skipped as part of editing the implementation."
     ]
   },
   "gitHub": {
@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
       "templateURL": "serverless-patterns/eventbridge-pipes-dynamodbstream-to-sqs-serverless",
       "projectFolder": "eventbridge-pipes-dynamodbstream-to-sqs-serverless",
-      "templateFile": "eventbridge-pipes-dynamodbstream-to-sqs-serverless/serverless.yml"
+      "templateFile": "serverless.yml"
     }
   },
   "resources": {
