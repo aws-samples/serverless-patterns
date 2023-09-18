@@ -9,8 +9,7 @@
 # Set the stack name
 STACK_NAME=sqs-lambda-ddb-sam-ts
 
-command -v aws >/dev/null 2>&1 || { echo >&2 "This script requires AWS CLI (https://aws.amazon.com/cli/) to be installed.  Aborting."; exit 1; }
-command -v jq >/dev/null 2>&1 || { echo >&2 "This script requires jq (https://stedolan.github.io/jq/) to be installed.  Aborting."; exit 1; }
+command -v sam >/dev/null 2>&1 || { echo >&2 "This script requires AWS SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) to be installed.  Aborting."; exit 1; }
 
 # Build SAM template
 sam build
