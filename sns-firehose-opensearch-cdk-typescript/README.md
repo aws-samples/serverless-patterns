@@ -68,6 +68,6 @@ Messages are sent to an SNS topic, and SNS fans out the messages to a Kinesis Da
     cdk destroy
     ```
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
