@@ -40,4 +40,4 @@ class AwsServerlessPatternCdkCrossaccountDeploymentStack(Stack):
         account_b_stage = add_stage(WebsiteStage(self, "DemoWebsite", 
             env=cdk.Environment(account="<aws-account-b-number>", region="<region>")))
 
-        # You can add as many stages as you want, for as many environments as you want, as long as they have been bootstrapped and trust the primary (pipeline) account.
+        # You can add as many stages as you want, with as many stacks as you want, for as many environments as you want, as long as they have been bootstrapped and trust the primary (pipeline) account.

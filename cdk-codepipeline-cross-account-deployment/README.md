@@ -1,6 +1,6 @@
 # CDK CodePipline Cross-Account Deployment
 
-This pattern deploys a CodePipline using CodeCommit and CodeBuild. From this pipeline it deploys a CloudFront distribution in front of an S3 Bucket to serve as a static website, across 2 accounts. This is an example of how you can use one pipline to deploy the same stack across multiple environments.
+This pattern deploys a CodePipleine using CodeCommit and CodeBuild. From this pipeline it deploys a CloudFront distribution in front of an S3 Bucket to serve as a static website, across 2 accounts. This is an example of how you can use one pipeline to deploy the same stack across multiple environments.
 
 Note that CloudFront and S3 are used in this pattern for demonstration purposes, you can use this pattern with any stack you wish to deploy.
 
@@ -10,7 +10,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Requirements
 
-* [Create AWS account(s)](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [Create AWS account(s)](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources. 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (AWS CDK >= 2.2.0) Installed
@@ -25,7 +25,9 @@ CDK
 
 ## How It Works
 
-After cloning this pattern, you will bootstrap 2 AWS environments with CDK. An environment is an Account-Region pair. This example uses 2 different accounts as a way to demonstrate deploying the same CDK stack(s) across accounts i.e. Development and Production. The pipeline will only deploy in the account you designate in the app.py file.
+After cloning this pattern, you will bootstrap 2 AWS environments with CDK. An environment is an Account-Region pair. This example uses 2 different accounts as a way to demonstrate deploying the same CDK stack(s) across accounts i.e. Development and Production. The CI/CD pipeline will only deploy in the account you designate in the app.py file. 
+
+It is a common practice to have CDK read external variables at build time, this is done by providing context in the cdk.json file in the projects root, then using this context from the ```cdk deploy``` command with the ```--context``` option for example. But in this example, we are going to utilize a CodePipeline to deploy our CDK into the different accounts after the inital bootstrap and deployment of said pipeline. Because of this, we are not going to be deploying from local after the initial set-up and this further context configuration wouldn't be necessary.
 
 While bootstrapping the, you include a ```--trust``` flag that creates a trust relationship from the primary (pipeline) account to the accounts you wish to deploy to.
 
@@ -37,9 +39,9 @@ While bootstrapping the, you include a ```--trust``` flag that creates a trust r
     ```
 2. Change directory to the pattern directory:
     ```bash
-    cd cdk-crossaccount-deployment
+    cd cdk-codepipeline-cross-account-deployment
     ```
-3. Use CDK to bootstrap environments (note that the trust flag will need to be included on all environments you wish to deploy to):
+3. Use CDK to bootstrap environments (Please note that the modern bootstrap template effectively grants the permissions implied by the --cloudformation-execution-policies to any AWS account in the --trust list. By default, this extends permissions to read and write to any resource in the bootstrapped account. Make sure to configure the bootstrapping stack with policies and trusted accounts that you are comfortable with.):
     ```bash
     cdk bootstrap aws://ACCOUNT-NUMBER-1/REGION-1
     ```
@@ -82,13 +84,13 @@ While bootstrapping the, you include a ```--trust``` flag that creates a trust r
     ```
 ## Testing
 
-1. After deploying, you can make changes in the repo, and push those changes to main. After these changes are pushed, navigate to the CodePipline dashboard and select the pipline to watch the CI/CD process.
+1. After the initial deployment, you can make changes in the CodeCommit repo, and push those changes to main. After these changes are pushed, navigate to the CodePipline dashboard and select the pipeline to watch the CI/CD process. At this point you can still make changes and deploy your CDK from local, but as a security best practice developers would not need to have account credentials at all after the initial pipeline deployment. Changes could all be deployed through the pipeline, therefore reducing the possibility of credentials leaking by not needing them in the first place. 
 
-2. After the pipline is complete, you can navigate to CloudFront in both accounts and see the distribution that has been created. The CloudFront dashboard will provide you with a URL you can use to navigate to the exmaple website that has been created.
+2. After the pipeline is complete, you can navigate to CloudFront in both accounts and see the distribution that has been created. The CloudFront dashboard will provide you with a URL you can use to navigate to the exmaple website that has been created.
 
 ## Cleanup
 
-1. Delete the stack in both accounts
+1. Delete the stack in both accounts, this will delete the distribution in both accounts, as well as the pipeline in the primary account.
 
     ```bash
     cdk destroy
