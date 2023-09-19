@@ -1,0 +1,52 @@
+{
+  "title": "SNS SQS fanout pattern using SAM",
+  "description": "This SAM application demonstrates how to create fan-out pattern using sns topic and sqs queues using subscription filters. The application uses one SNS Topic and three SQS queues subscribed to the SNS topic. The messages from the SNS topic will move to different topic depending on the message attribute set in the SNS topic message.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The three SQS queues are subscribed to the SNS Topic. The message routing logic is defined through the subscription filter policy.",
+      "The AllMetricsSqsQueue queue does not have any filter criteria and hence will receive all the messages, whereas, TemperatureSqsQueue and HumiditySqsQueue will receive messages having message attribute MetricType set to Temperature amd Humidity respectively."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-fanout",
+      "templateURL": "serverless-patterns/sns-sqs-fanout",
+      "projectFolder": "sns-sqs-fanout",
+      "templateFile": "sns-sqs-fanout/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "SNS SQS fanout pattern",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-common-scenarios.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+    }
+  ]
+}
