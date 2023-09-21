@@ -7,7 +7,7 @@
 	"introBox": {
 		"headline": "How it works",
 		"text": [
-			"This pattern demonstrates how to handle a Lambda consumer failure when reading from a Kinesis Data Stream with terraform.",
+			"This pattern demonstrates how to handle a Lambda consumer failure when reading from a Kinesis Data Stream with terraform."
 		]
 	},
 	"gitHub": {
@@ -49,15 +49,16 @@
 		]
 	},
 	"authors": [{
-		"name": "Mitesh Purohit",
-		"image": "",
-		"bio": "Sr Solution Architect, AWS",
-		"linkedin": "https://www.linkedin.com/in/mitup/"
-	},
+			"name": "Mitesh Purohit",
+			"image": "",
+			"bio": "Sr Solution Architect, AWS",
+			"linkedin": "https://www.linkedin.com/in/mitup/"
+		},
 		{
-		"name": "Naresh Rajaram",
-		"image": "",
-		"bio": "Cloud Infrastructure Architect, AWS",
-		"linkedin": "https://www.linkedin.com/in/naresh-rajaram-25bb106/"
-	}]
+			"name": "Naresh Rajaram",
+			"image": "",
+			"bio": "Cloud Infrastructure Architect, AWS",
+			"linkedin": "https://www.linkedin.com/in/naresh-rajaram-25bb106/"
+		}
+	]
 }
