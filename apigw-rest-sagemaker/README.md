@@ -1,4 +1,7 @@
 # AWS API Gateway REST Edge-Optimized API to Amazon SageMaker
+<p align="center">
+<img src="https://github.com/naba819/serverless-patterns/assets/76739433/0f4f29c4-9fa5-4b8e-98cc-f53d1009235b" width="700" height="275">
+</p>
 
 This pattern creates an Amazon API Gateway REST Edge-Optimized API with an Amazon SageMaker integration. It deploys a SageMaker Jumpstart model (Flan T5 XL) endpoint that is used for the integration.
 
