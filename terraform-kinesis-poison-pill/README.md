@@ -1,6 +1,6 @@
 # Kinesis Poison Pill Pattern
 
-This pattern demonstrates how to handle a Lambda consumer failure when reading from a Kinesis Data Stream with CDK
+This pattern demonstrates how to handle a Lambda consumer failure when reading from a Kinesis Data Stream with Terraform
 
 Without proper handling of failure when working with Kinesis Data Streams, an iterator will get stuck and the only way for the data to clear the stream is for it to **Age Out** beyond the trim horizon.
 
