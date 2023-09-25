@@ -1,37 +1,37 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type Event map[string]interface{}
+func handleRequest(evnt events.KinesisFirehoseEvent) (events.KinesisFirehoseResponse, error) {
 
-func HandleRequest(ctx context.Context, event events.KinesisEvent) error {
+	fmt.Printf("InvocationID: %s\n", evnt.InvocationID)
+	fmt.Printf("DeliveryStreamArn: %s\n", evnt.DeliveryStreamArn)
+	fmt.Printf("Region: %s\n", evnt.Region)
 
-	// loop through each record and transform
+	var response events.KinesisFirehoseResponse
 
-	for _, r := range event.Records {
-		event := &SampleEvent{}
-		err := json.Unmarshal(r.Kinesis.Data, event)
+	for _, record := range evnt.Records {
+		fmt.Printf("RecordID: %s\n", record.RecordID)
+		fmt.Printf("ApproximateArrivalTimestamp: %s\n", record.ApproximateArrivalTimestamp)
 
-		if err != nil {
-			// log stuff
+		// Transform data: ToUpper the data
+		var transformedRecord events.KinesisFirehoseResponseRecord
+		transformedRecord.RecordID = record.RecordID
+		transformedRecord.Result = events.KinesisFirehoseTransformedStateOk
+		transformedRecord.Data = []byte(strings.ToUpper(string(record.Data)))
 
-			return err
-
-		}
-
+		response.Records = append(response.Records, transformedRecord)
 	}
 
-	// return the transformed records
-	return fmt.Sprintf("Hello World"), nil
+	return response, nil
 }
 
 func main() {
-	lambda.Start(HandleRequest)
+	lambda.Start(handleRequest)
 }
