@@ -1,0 +1,58 @@
+{
+    "title": "Amazon Kinesis Data Firehose Data Transformation with AWS Lambda",
+    "description": "",
+    "language": "Go",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [""]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://serverlessland.com/patterns/",
+        "templateURL": "serverless-patterns/",
+        "projectFolder": "firehose-transformation-sam-go",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+            "text": "Amazon Kinesis Data Firehose",
+            "link": "https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html"  
+        },
+        {
+          "text": "Amazon Kinesis Data Firehose Data Transformation",
+          "link": "https://docs.aws.amazon.com/firehose/latest/dev/data-transformation.html"
+        },
+        {
+          "text": "Using AWS Lambda with Amazon Kinesis Data Firehose",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-kinesisfirehose.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": ["sam deploy --guided"]
+    },
+    "testing": {
+      "text": ["See the README in the Github repo for detailed testing instructions."]
+    },
+    "cleanup": {
+      "text": ["Delete the stack: <code>sam delete</code>."]
+    },
+    "authors": [
+      {
+        "name": "Micah Walter",
+        "image": "https://share.micawal.people.aws.dev/profile/micahwalter-profile.jpg",
+        "bio": "Sr. Solutions Architect @ AWS. Serverless enthusiast."
+      },
+      {
+        "name": "Manjunath Arakere",
+        "image": "https://d2908q01vomqb2.cloudfront.net/22d200f8670dbdb3e253a90eee5098477c95c23d/2023/07/06/marakere.jpg",
+        "bio": "Sr. Solutions Architect @ AWS. Serverless enthusiast."
+      }
+
+    ]
+  }
+  
