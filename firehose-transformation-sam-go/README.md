@@ -2,7 +2,7 @@
 
 ![Pipes diagram](./images/data-transformation.jpg)
 
-This pattern exemplifies 
+This pattern deploys a Kinesis Data Firehose that invokes a Lambda function to transform incoming source data and deliver the transformed data to destinations.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/
 
