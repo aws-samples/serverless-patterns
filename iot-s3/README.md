@@ -1,6 +1,6 @@
 # AWS IoT to S3
 
-This pattern explains how to put data to Amazon Simple Storage Service (S3) using AWS IoT Topic Rules.
+This pattern explains how to push event data to Amazon Simple Storage Service (S3) using AWS IoT Topic Rules.
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/iot-s3).
 
