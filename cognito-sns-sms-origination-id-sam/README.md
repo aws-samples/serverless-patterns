@@ -18,7 +18,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
 ## Getting Started
-The entire solution is built on SAM and the CustomSMSSender Lambda function in Node.js 18.x. The instructions below shows the prerequisities, deployment instructions and testing steps.
+The entire solution is built on AWS SAM and the CustomSMSSender Lambda function in Node.js 18.x. The instructions below shows the prerequisities, deployment instructions and testing steps.
 
 ### Prerequisites
 * Amazon SNS SMS account is moved out of [SMS Sandbox](https://aws.amazon.com/blogs/compute/introducing-the-sms-sandbox-for-amazon-sns/)
@@ -40,16 +40,8 @@ The entire solution is built on SAM and the CustomSMSSender Lambda function in N
    cd dependencies/nodejs
    npm init -y
    
-4. Modify `package.json` to add following dependencies and run npm install:
+4. Install dependencies:
 
-   ```
-   {
-   "dependencies": {
-   "@aws-crypto/client-node": "^3.2.0",
-   "base64-js": "^1.5.1"
-   }
-   }
-   ```
    ```
    npm install
    ```
@@ -85,25 +77,18 @@ The entire solution is built on SAM and the CustomSMSSender Lambda function in N
    ```aidl
    sam build
    ```
-
-7. Run below command to package the sam project:
-   ```
-   sam package --template-file template.yaml --s3-bucket sns-cognito --output-template-file out.yaml
-   ```
-
-   **Note:** Ensure that the default values for all the `Parameters` in the CloudFormation template `template.yaml` are filled out with correct values.
-
    
 8. Run below command to deploy the AWS resources for the pattern as specified in the template.yaml file:
+   **Note:** Ensure that the default values for all the `Parameters` in the CloudFormation template `template.yaml` are filled out with correct values.
     ```
-    sam deploy --template-file ./out.yaml --stack-name <your-stack-name> --capabilities CAPABILITY_NAMED_IAM
+    sam deploy -g --capabilities CAPABILITY_NAMED_IAM
     ```
    
 ## How it works
 
 You can create a Lambda function and then activate that function during Cognito user pool operations such as user sign-up, confirmation, and sign-in (authentication) with a Lambda trigger. You can add authentication challenges, migrate users, and customize verification messages. 
 
-This solution uses the [custom SMS sender lambda trigger](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-sms-sender.html) to dynamically identify the country code from the user's phone number and fetch the corresponding Origination ID from Amazon Pinpoint to send SMS message.
+This solution uses the [custom SMS sender Lambda trigger](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-sms-sender.html) to dynamically identify the country code from the user's phone number and fetch the corresponding Origination ID from Amazon Pinpoint to send SMS message.
 
 ## Testing
 
@@ -140,13 +125,9 @@ This solution uses the [custom SMS sender lambda trigger](https://docs.aws.amazo
 
 ## Cleanup
  
-1. Delete the stack
+1. Delete the SAM template
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
