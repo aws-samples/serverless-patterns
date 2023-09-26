@@ -1,0 +1,6 @@
+# SAM default build folder
+.aws-sam/
+
+# macOS
+*.DS_Store
+

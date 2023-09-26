@@ -1,0 +1,206 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - IoT event processing through AWS serverless services 
+
+Resources:
+  # Define the SNS topic
+  MetricsSnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: MetricsSnsTopic
+      TopicName: MetricsSnsTopic    
+
+  # Define the SQS queue
+  MetricsSqsQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: MetricsSqsQueue
+      RedrivePolicy: 
+        deadLetterTargetArn: !GetAtt MetricsSqsDLQueue.Arn
+        maxReceiveCount: 5
+  TemperatureSqsQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: TemperatureSqsQueue
+      RedrivePolicy: 
+        deadLetterTargetArn: !GetAtt TemperatureSqsDLQueue.Arn
+        maxReceiveCount: 5      
+  HumiditySqsQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: HumiditySqsQueue
+      RedrivePolicy: 
+        deadLetterTargetArn: !GetAtt HumiditySqsDLQueue.Arn
+        maxReceiveCount: 5
+  MetricsSqsDLQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: MetricsSqsDLQueue
+  TemperatureSqsDLQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: TemperatureSqsDLQueue
+  HumiditySqsDLQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: HumiditySqsDLQueue
+
+  # Policy allows SNS to publish to this SQS queue
+  SnsToSqsPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal: 
+              Service: "sns.amazonaws.com"
+            Resource: "*"
+            Action: 
+              - sqs:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref MetricsSnsTopic
+      Queues:
+        - !Ref MetricsSqsQueue
+        - !Ref TemperatureSqsQueue
+        - !Ref HumiditySqsQueue        
+
+  # SNS Subscriptions and Filter Policies
+  MetricsQueueSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt MetricsSqsQueue.Arn
+      Protocol: sqs
+      RawMessageDelivery: True
+      TopicArn: !Ref MetricsSnsTopic
+  TemperatureSqsQueueSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt TemperatureSqsQueue.Arn
+      Protocol: sqs
+      FilterPolicy:
+        MetricType:
+          - Temperature
+      RawMessageDelivery: True
+      TopicArn: !Ref MetricsSnsTopic
+  HumiditySqsQueueSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt HumiditySqsQueue.Arn
+      Protocol: sqs
+      FilterPolicy:
+        MetricType:
+          - Humidity
+      RawMessageDelivery: True
+      TopicArn: !Ref MetricsSnsTopic
+
+  # Define the publisher Lambda function with permissions
+  IoTMetricsEventProcessorFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: eventprocessor.handler
+      Runtime: nodejs16.x
+      Timeout: 3
+      MemorySize: 128
+      Environment:
+        Variables:
+          SNStopic: !Ref MetricsSnsTopic
+      Policies:
+        ## Read more about SAM Policy templates at:
+        ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt MetricsSnsTopic.TopicName
+      Events:
+        IotSensorThing:
+          Type: IoTRule
+          Properties:
+            Sql:  SELECT * FROM "device/iotsensors"
+
+  # Define the IoT thing
+  IotSensorThing:
+    Type: AWS::IoT::Thing
+    Properties:
+      ThingName: IotSensorThing
+      AttributePayload:
+        Attributes:
+          myAttributeA: AttributeAValue
+
+  # Define the consumer Lambda function with permissions
+  AllFilteredEventConsumerFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: allfilteredeventconsumer.handler
+      Runtime: nodejs16.x
+      Timeout: 3
+      MemorySize: 128
+      Environment:
+        Variables:
+          DatabaseTable: !Ref DynamoTable
+      Policies:
+        ## Read more about SAM Policy templates at:
+        ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+        - DynamoDBWritePolicy:
+            TableName: !Ref DynamoTable            
+      Events:
+        MetricsSqsQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MetricsSqsQueue.Arn
+            BatchSize: 10
+
+  # Define the DynamoDB table to store the events
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: ID
+        AttributeType: S
+      KeySchema:
+      - AttributeName: ID
+        KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+Outputs:
+  IoTMetricsEventProcessorFunction:
+    Description: IoTMetricsEventProcessorFunction function name
+    Value: !Ref IoTMetricsEventProcessorFunction
+  
+  IoTMetricsEventProcessorFunctionArn:
+    Description: IoTMetricsEventProcessorFunction function name
+    Value: !GetAtt IoTMetricsEventProcessorFunction.Arn
+
+  AllFilteredEventConsumerFunction:
+    Description: AllFilteredEventConsumerFunction function name
+    Value: !Ref AllFilteredEventConsumerFunction
+  
+  AllFilteredEventConsumerFunctionArn:
+    Description: AllFilteredEventConsumerFunction function name
+    Value: !GetAtt AllFilteredEventConsumerFunction.Arn
+
+  SNStopicName:
+    Description: SNS topic name
+    Value: !GetAtt MetricsSnsTopic.TopicName
+
+  SNStopicARN:
+    Description: SNS topic ARN
+    Value: !Ref MetricsSnsTopic
+
+  MetricsSqsQueueName:
+    Description: SQS queue name
+    Value: !GetAtt MetricsSqsQueue.QueueName
+
+  MetricsSqsQueueArn:
+    Description: SQS queue ARN
+    Value: !GetAtt MetricsSqsQueue.Arn
+
+  MetricsSqsQueueURL:
+    Description: SQS queue URL
+    Value: !Ref MetricsSqsQueue
+
+  DynamoDbTable:
+    Description: DynamoDb Table  
+    Value: !Ref DynamoTable
