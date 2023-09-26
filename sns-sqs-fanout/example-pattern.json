@@ -22,7 +22,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "SNS SQS fanout pattern",
+        "text": "Common Amazon SNS scenarios",
         "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-common-scenarios.html"
       }
     ]
