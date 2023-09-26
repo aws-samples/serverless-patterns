@@ -36,7 +36,9 @@ Important: this application uses various AWS services and there are costs associ
     ```
 4. Generate the Mkdocs Build Static Content
     ```
-    cd mycontent && mkdocs build && cd ..
+    cd mycontent
+    mkdocs build
+    cd ..
     ```
 5. Deploy the stack to your default AWS account and region.
     ```

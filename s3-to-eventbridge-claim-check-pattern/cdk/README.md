@@ -36,7 +36,10 @@ Other reasons you might want to use this pattern is if the message size is too b
 ## Deploying and testing this pattern
 Clone the project an run:
 
-`npm run build && cdk deploy`
+   ```bash
+   npm run build
+   cdk deploy
+   ```
 
 Once deployed then upload a file into your new S3 Bucket.
 

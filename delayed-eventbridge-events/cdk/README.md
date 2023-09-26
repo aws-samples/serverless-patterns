@@ -36,7 +36,6 @@ Remember if you are raising events into EventBridge try and make sure your event
 ## Deploying and testing this pattern
 Clone the project an run:
 
-`npm run build && cdk deploy`
 
 Once deployed trigger a `UserCreated` event.
 

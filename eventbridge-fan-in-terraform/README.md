@@ -1,8 +1,8 @@
-# Amazon Eventbridge Eventbus fan-in to Central Eventbus to different region
+# Amazon Eventbridge Eventbus fan-in to Central Eventbus to different Region
 
-This pattern demonstrates how to aggregate all your events from multiple Eventbus (in the same region) to a central Eventbus in a different region. This allows you to centrally accumulate events coming in from different event sources for downstream consumption.
+This pattern demonstrates how to aggregate all your events from multiple Eventbus (in the same Region) to a central Eventbus in a different Region. This allows you to centrally accumulate events coming in from different event sources for downstream consumption.
 
-This pattern is deployed using Terraform to create a central EventBridge bus, Eventbridge rules on fan-in buses and all IAM resources required. The Eventbuses to aggregate can be defined in terraform.tfvars file (Sample ARNs is provided, replace with Eventbus ARNs as needed). The provider.tf file also lists the AWS regions of the fan-in Eventbus and central Eventbus (replace these based on where your Eventbuses exist and where you want your central bus to be created).
+This pattern is deployed using Terraform to create a central EventBridge bus, Eventbridge rules on fan-in buses and all IAM resources required. The Eventbuses to aggregate can be defined in the `terraform.tfvars` file (sample ARNs is provided, replace with Eventbus ARNs as needed). The provider.tf file also lists the AWS Regions of the fan-in Eventbus and central Eventbus (replace these based on where your Eventbuses exist and where you want your central bus to be created).
 
 Note: The pattern assumes you already have a minimum of 2 eventbuses that you want to aggregate onto a central Eventbus (the central bus will be created as part of this deployment). The fan-in Eventbuses can be created manually or using any of the Infrastructure-as-code platforms.
 
@@ -27,9 +27,9 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd eventbridge-fan-in-terraform
     ```
-3. In the provider.tf file, add the regions where the Eventbuses exist in the provider block with alias "others". Also add the region where you want the central Eventbus to be created in the provider block with alias "central"
+3. In the provider.tf file, add the Regions where the Eventbuses exist in the provider block with alias "others". Also add the Region where you want the central Eventbus to be created in the provider block with alias "central"
 
-4. In the terraform.tfvars file, add the ARNs of the existing Eventbuses you want to aggregate. Note that all of these fan-in Eventbuses should exist in the same region. 
+4. In the terraform.tfvars file, add the ARNs of the existing Eventbuses you want to aggregate. Note that all of these fan-in Eventbuses should exist in the same Region. 
 
 5. From the command line, initialize Terraform:
     ```
@@ -46,9 +46,9 @@ This application picks the configurations from terraform.tfvars files to create 
 
 ## Testing
 
-Note: To test this pattern, you will need a minimum of 2 existing event buses in the fan-in region. 
+Note: To test this pattern, you will need a minimum of 2 existing event buses in the fan-in Region. 
 
-Login to the AWS account where the terraform is deployed. Publish an event on any of the fan-in Eventbuses. Switch to the region where the central Eventbus is created and navigate to Cloudwatch logs. You should see the event you published in the log group of the Central Eventbus.
+Login to the AWS account where the terraform is deployed. Publish an event on any of the fan-in Eventbuses. Switch to the Region where the central Eventbus is created and navigate to Cloudwatch logs. You should see the event you published in the log group of the Central Eventbus.
 
 
 ## Cleanup

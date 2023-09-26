@@ -88,7 +88,8 @@ In case you want to try out testing with Kafka producer client provided as part 
 
 - Redeploy the SAM template 
     ```
-    sam build && sam deploy --guided --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM
+    sam build
+    sam deploy --guided --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM
     ```
 
     This will deploy a Cloud9 instance and an EC2 instance in a private subnet with Kakfa and IAM Auth library downloaded and configured.

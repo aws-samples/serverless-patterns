@@ -24,7 +24,8 @@ Learn more about this pattern at Serverless Land Patterns: [https://serverlessla
 2. Start by packaging the Lambda function in a zip file
     ```
     cd apigw-lambda-dynamodb-cdk-go/function
-    GOOS=linux go build -o my-func main.go && zip function.zip my-func
+    GOOS=linux go build -o my-func main.go
+    zip function.zip my-func
     ```
 
 4. Deploy the stack to your default AWS account and region

@@ -38,9 +38,10 @@ First clone the repo and then setup your construct `lib/notify-consumers-of-sche
 You will need to run `cdk deploy` with your `SLACK_API_KEY` and `SLACK_CHANNEL_ID`
 
 
-```
-npm run build && cdk deploy
-```
+   ```bash
+   npm run build
+   cdk deploy
+   ```
 
 The SchemaNotifier is a construct that will create eventbridge rules for you on your `default` bus, listening to any schema changes you specify.
 

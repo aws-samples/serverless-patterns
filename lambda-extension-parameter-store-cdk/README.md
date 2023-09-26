@@ -26,7 +26,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Run below command to install required dependancies:
     ```
-    npm install && cd ./lambda && npm install && cd ./..
+    npm install
+    cd ./lambda
+    npm install
+    cd ./..
     ```
 3. Before proceed:
     * Next command, you need to provide the correct Parameter Store Lambda extension layer ARN sepcific to the region you are deploying the stack. Refer here to obtain the ARN for your region: https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html#ps-integration-lambda-extensions-add

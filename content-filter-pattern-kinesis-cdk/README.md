@@ -35,7 +35,8 @@ Important: this application uses various AWS services and there are costs associ
    ```
 1. From the command line, use AWS CDK to deploy the AWS resources for the pattern.
     ```
-    npm run build && cdk deploy 
+    npm run build
+    cdk deploy 
     ```
 1. During the prompts:
     * Enter the desired AWS Region

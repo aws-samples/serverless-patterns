@@ -19,7 +19,10 @@
     },
     "deploy": {
       "text": [
-        "cd cdk && npm run build && npm install && cdk deploy"
+        "cd cdk
+        npm run build
+        npm install
+        cdk deploy"
       ]
     },
     "gitHub": {

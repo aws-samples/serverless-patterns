@@ -42,7 +42,12 @@ Rather than inserting and sending messages one after another, we can use streams
 ## Deploying and testing this pattern
 Clone the project an run:
 
-`npm run build && cdk deploy`
+   ```bash
+   npm run build
+   cdk deploy
+   ```
+
+
 
 Once deployed then trigger the `write-to-ddb` function. This will add a new user to the table.
 
