@@ -1,0 +1,53 @@
+{
+  "title": "SNS to SQS fanout pattern",
+  "description": "This example demonstrates a fan-out pattern using SNS topic and SQS queues. Subscription filters are used to route SNS topics to the the correct SQS queue.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Three SQS queues subscribe to the SNS topic. The topic routing logic is defined through the subscription filter policy.",
+      "The AllMetricsSqsQueue queue receives all the messages. Messages will route to the TemperatureSqsQueue when the MetricType is set to 'Temperature'. Messages will route to HumiditySqsQueue when MetricType is set to 'Humidity'.
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-fanout",
+      "templateURL": "serverless-patterns/sns-sqs-fanout",
+      "projectFolder": "sns-sqs-fanout",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Common Amazon SNS scenarios",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-common-scenarios.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "bio": "Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}
