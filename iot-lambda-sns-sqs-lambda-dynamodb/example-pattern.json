@@ -32,6 +32,10 @@
       {
         "text": "CloudFormation - AWS::IoT::TopicRule",
         "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iot-topicrule.html"
+      },
+      {
+        "text": "Servelessland - SNS-SQS Fanout Pattern",
+        "link": "https://serverlessland.com/patterns/iot-s3"
       }
     ]
   },
