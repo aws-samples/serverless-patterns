@@ -1,8 +1,8 @@
 # IoT Even Processing through AWS Serverless Services
 
-The SAM template deploys an IoT Think, an event processor Lambda function, an SNS topic, three SQS fanout queues, a consumer Lambda function, a DynamoDB table and the IAM permissions required to run the application. When an IoT event is sent to an IoT topic, the event processor Lambda function is invoked. The event processor Lambda function to poll this event, filters out the events that are not required and publishes the required events to a SNS topic. There is an SNS-SQS fan out pattern using subscription filter policy. The events from SNS topics moves to the respective SQS queues depnding on the filter policy. The consumer Lambda function reads from the SQS queue and stored the event in a DynamoDB table. 
+The SAM template deploys an IoT Thing, an event processor Lambda function, an SNS topic, three SQS fanout queues, a consumer Lambda function, a DynamoDB table and the IAM permissions required to run the application. When an IoT event is sent to an IoT topic, the event processor Lambda function is invoked. The event processor Lambda function to poll this event, filters out the events that are not required and publishes the required events to a SNS topic. There is an SNS-SQS fan out pattern using subscription filter policy. The events from SNS topics moves to the respective SQS queues depnding on the filter policy. The consumer Lambda function reads from the SQS queue and stored the event in a DynamoDB table. 
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/tbd/.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-lambda-sns-sqs-lambda-dynamodb/.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd tbd
+    cd iot-lambda-sns-sqs-lambda-dynamodb
     ```
 1. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -84,10 +84,10 @@ The easiest way to test is using the MQTT test client.
 4. Click in **Publish** to send the event. After the event has been sent, the created the IoT event processor Lambda will be triggered and the event will flow through the data pipeline.
 
 
-5. Go to the [AWS SQS Console](https://us-west-2.console.aws.amazon.com/sqs/v2/home) page and search for the queue with name `HumiditySqsQueue` and `TemperatureSqsQueue` and validate the number of messages based on number of the times events where published on AWS IoT console. Please note `MetricType` attribute in the IoT even payload determines the filter and routing logic.
+5. Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/v2/home) page and search for the queue with name `HumiditySqsQueue` and `TemperatureSqsQueue` and validate the number of messages based on number of the times events where published on AWS IoT console. Please note `MetricType` attribute in the IoT even payload determines the filter and routing logic.
 ![AWS SQS Console](images/sqs-queue-messages.png)
 
-6. Go to the [AWS DynamoDB Console](https://us-west-2.console.aws.amazon.com/dynamodbv2/home) page and search for the DynamoDB table with name `iot-lambda-sns-sqs-lambda-dynamodb-DynamoTable-*`. Investigate the items in the DynamoDB table. It should contain both the temperature and humidity event data. 
+6. Go to the [AWS DynamoDB Console](https://console.aws.amazon.com/dynamodbv2/home) page and search for the DynamoDB table with name `iot-lambda-sns-sqs-lambda-dynamodb-DynamoTable-*`. Investigate the items in the DynamoDB table. It should contain both the temperature and humidity event data. 
 ![AWS DynamoDB Console](images/dynamodb-content.png)
 
 

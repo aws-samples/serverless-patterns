@@ -1,0 +1,62 @@
+{
+  "title": "IoT Even Processing through AWS Serverless Services",
+  "description": "The SAM template deploys an IoT Thing, an event processor Lambda function, an SNS topic, three SQS fanout queues, a consumer Lambda function, a DynamoDB table and the IAM permissions required to run the application. When an IoT event is sent to an IoT topic, the event processor Lambda function is invoked. The event processor Lambda function to poll this event, filters out the events that are not required and publishes the required events to a SNS topic. There is an SNS-SQS fan out pattern using subscription filter policy. The events from SNS topics moves to the respective SQS queues depnding on the filter policy. The consumer Lambda function reads from the SQS queue and stored the event in a DynamoDB table.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When message events are sent to a IoT topic, this event will trigger a Lambda function and the event flows through rest of the chain of AWS serverless services.",
+      "Please refer to the architecture diagram for the event flow."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-lambda-sns-sqs-lambda-dynamodb",
+      "templateURL": "serverless-patterns/iot-lambda-sns-sqs-lambda-dynamodb",
+      "projectFolder": "iot-lambda-sns-sqs-lambda-dynamodb",
+      "templateFile": "iot-lambda-sns-sqs-lambda-dynamodb/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS IoT SQL Reference",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-sql-reference.html?icmpid=docs_iot_console"
+      },
+      {
+        "text": "AWS IoT Rule Actions",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-rule-actions.html"
+      },
+      {
+        "text": "CloudFormation - AWS::IoT::TopicRule",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iot-topicrule.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+    }
+  ]
+}
