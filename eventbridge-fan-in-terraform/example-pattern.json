@@ -1,0 +1,47 @@
+{
+  "title": "Amazon EventBridge fan-in",
+  "description": "Aggregate events from multiple EventBridge event busses to a central bus",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to aggregate all your events from multiple event busses (in the same region) to a central event bus in a different region.",
+      "This pattern is deployed using Terraform to create a central EventBridge bus, EventBridge rules on fan-in buses and all IAM resources required.",
+      "The event busses to aggregate can be defined in `terraform.tfvars` file (Sample ARNs are provided, replace with event bus ARNs as needed).",
+      "The `provider.tf` file also lists the AWS Regions of the fan-in event bus and central event bus (replace these based on where your event busses exist and where you want your central bus to be created)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-fan-in-terraform",
+      "templateURL": "serverless-patterns/eventbridge-fan-in-terraform",
+      "projectFolder": "eventbridge-fan-in-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>terraform destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Aniket Bulbule",
+      "image": "https://drive.google.com/file/d/1g5X8juFALsl44ZACvcZSKGmCVUS4IKqi/view?usp=sharing",
+      "bio": "Partner Solutions Architect @AWS, Serverless Enthusiast",
+      "linkedin": "www.linkedin.com/in/aniket-bulbule"
+    }
+  ]
+}
