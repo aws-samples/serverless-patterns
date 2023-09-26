@@ -1,6 +1,6 @@
-# Fan-out queue pattern using SAM
+# Fan-out queue pattern using AWS Serverless Application Model (SAM)
 
-This SAM application demonstrates how to create fan-out pattern using sns topic and sqs queues using subscription filters. The application uses one SNS Topic and three SQS queues subscribed to the SNS topic. The messages from the SNS topic will move to different topic depending on the message attribute set in the SNS topic message.
+This SAM application demonstrates how to create fan-out pattern using SNS topic and sqs queues using subscription filters. The application uses one SNS topic and three SQS queues subscribed to the SNS topic. The messages from the SNS topic will move to different topic depending on the message attribute set in the SNS topic message.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sns-sqs-fanout
 
