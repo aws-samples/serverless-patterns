@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The three SQS queues are subscribed to the SNS Topic. The message routing logic is defined through the subscription filter policy.",
+      "Three SQS queues subscribe to the SNS topic. The topic routing logic is defined through the subscription filter policy.",
       "The AllMetricsSqsQueue queue does not have any filter criteria and hence will receive all the messages, whereas, TemperatureSqsQueue and HumiditySqsQueue will receive messages having message attribute MetricType set to Temperature amd Humidity respectively."
     ]
   },
