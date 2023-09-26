@@ -1,5 +1,5 @@
 {
-  "title": "SNS SQS fanout pattern using SAM",
+  "title": "SNS to SQS fanout pattern",
   "description": "This SAM application demonstrates how to create fan-out pattern using sns topic and sqs queues using subscription filters. The application uses one SNS Topic and three SQS queues subscribed to the SNS topic. The messages from the SNS topic will move to different topic depending on the message attribute set in the SNS topic message.",
   "language": "YAML",
   "level": "200",
