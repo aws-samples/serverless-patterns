@@ -1,55 +1,55 @@
 {
-  "title": "Amazon Cognito - Amazon Pinpoint - Amazon SNS",
-  "description": "Integrate Amazon Pinpoint and Amazon SNS with your Cognito-based application using Lambda functions.",
-  "language": "JavaScript",
-  "level": "200",
-  "framework": "SAM",
-  "introBox": {
-    "headline": "How it works",
-    "text": [
-      "This pattern explains how to integrate Lambda functions with Amazon Cognito and dynamically select Sender ID based on country regulations and send SMS message using Amazon SNS SMS."
-    ]
-  },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-sns-sms-origination-id-sam",
-      "templateURL": "serverless-patterns/cognito-sns-sms-origination-id-sam",
-      "projectFolder": "cognito-sns-sms-origination-id-sam",
-      "templateFile": "template.yaml"
-    }
-  },
-  "resources": {
-    "bullets": [
+    "title": "Amazon Cognito - Amazon Pinpoint - Amazon SNS",
+    "description": "Integrate Amazon Pinpoint and Amazon SNS with your Cognito-based application.",
+    "language": "JavaScript",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern explains how to integrate Lambda functions with Amazon Cognito and dynamically select Sender ID based on country regulations and send SMS message using Amazon SNS SMS."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-sns-sms-origination-id-sam",
+        "templateURL": "serverless-patterns/cognito-sns-sms-origination-id-sam",
+        "projectFolder": "cognito-sns-sms-origination-id-sam",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon SNS SMS account is moved out of SMS Sandbox",
+          "link": "https://aws.amazon.com/blogs/compute/introducing-the-sms-sandbox-for-amazon-sns/"
+        },
+        {
+          "text": "Amazon Cognito user pools",
+          "link": "https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/Welcome.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
       {
-        "text": "Amazon SNS SMS account is moved out of SMS Sandbox",
-        "link": "https://aws.amazon.com/blogs/compute/introducing-the-sms-sandbox-for-amazon-sns/"
-      },
-      {
-        "text": "Amazon Cognito User Pools",
-        "link": "https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/Welcome.html"
+        "name": "Rimpy Tewani",
+        "bio": "Cloud Application Architect at Amazon Web Services",
+        "linkedin": "https://www.linkedin.com/in/rimpy-tewani/"
       }
     ]
-  },
-  "deploy": {
-    "text": [
-      "sam deploy"
-    ]
-  },
-  "testing": {
-    "text": [
-      "See the GitHub repo for detailed testing instructions."
-    ]
-  },
-  "cleanup": {
-    "text": [
-      "Delete the stack: <code>sam delete</code>."
-    ]
-  },
-  "authors": [
-    {
-      "name": "Rimpy Tewani",
-      "bio": "Cloud Application Architect at Amazon Web Services",
-      "linkedin": "https://www.linkedin.com/in/rimpy-tewani/"
-    }
-  ]
-}
+  }

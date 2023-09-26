@@ -1,10 +1,11 @@
 # Amazon Cognito - Amazon Pinpoint - Amazon SNS
+# Integrate Amazon Pinpoint and Amazon SNS with your Cognito-based application
 
 Multi-factor authentication (MFA) increases security for your app. You can choose SMS text messages or time-based one-time passwords (TOTP) as second factors to sign in your users.
 
 By default, Amazon Cognito uses a single Sender ID/Origination Identity to send SMS to all the users for MFA. However, in some countries, there might be regulations on the use of a certain type of Sender ID's, and the users from such countries are not able to receive SMS from Amazon Cognito due to this.
 
-This pattern explains how to integrate Lambda functions with Amazon Cognito and dynamically select Sender ID based on country regulations and send SMS message using Amazon SNS SMS.
+This pattern explains how to integrate Lambda functions with Amazon Cognito and dynamically select the Sender ID based on country regulations and send SMS message using Amazon SNS SMS.
 
 When you assign a custom SMS sender trigger to your user pool, Amazon Cognito invokes a Lambda function instead of its default behavior when a user event requires that it send an SMS message. With a custom sender trigger, your AWS Lambda function can send SMS notifications to your users through a method and provider that you choose. The custom code of your function must process and deliver all SMS messages from your user pool.
 
@@ -88,7 +89,7 @@ The entire solution is built on AWS SAM and the CustomSMSSender Lambda function 
 
 You can create a Lambda function and then activate that function during Cognito user pool operations such as user sign-up, confirmation, and sign-in (authentication) with a Lambda trigger. You can add authentication challenges, migrate users, and customize verification messages. 
 
-This solution uses the [custom SMS sender Lambda trigger](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-sms-sender.html) to dynamically identify the country code from the user's phone number and fetch the corresponding Origination ID from Amazon Pinpoint to send SMS message.
+This solution uses the [custom SMS sender Lambda trigger](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-sms-sender.html) to dynamically identify the country code from the user's phone number and fetch the corresponding Origination ID from Amazon Pinpoint to send SMS messages.
 
 ## Testing
 
