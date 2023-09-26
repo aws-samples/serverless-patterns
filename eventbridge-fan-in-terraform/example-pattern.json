@@ -1,16 +1,16 @@
 {
-  "title": "Eventbridge fan-in",
-  "description": "Aggregate your Eventbridge eventbuses to a central bus",
+  "title": "Amazon EventBridge fan-in",
+  "description": "Aggregate events from multiple EventBridge event busses to a central bus",
   "language": "Python",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to aggregate all your events from multiple Eventbus (in the same region) to a central Eventbus in a different region.",
-      "This pattern is deployed using Terraform to create a central EventBridge bus, Eventbridge rules on fan-in buses and all IAM resources required.",
-      "The Eventbuses to aggregate can be defined in terraform.tfvars file (Sample ARNs is provided, replace with Eventbus ARNs as needed).",
-      "The provider.tf file also lists the AWS regions of the fan-in Eventbus and central Eventbus (replace these based on where your Eventbuses exist and where you want your central bus to be created)."
+      "This pattern demonstrates how to aggregate all your events from multiple event busses (in the same region) to a central event bus in a different region.",
+      "This pattern is deployed using Terraform to create a central EventBridge bus, EventBridge rules on fan-in buses and all IAM resources required.",
+      "The event busses to aggregate can be defined in `terraform.tfvars` file (Sample ARNs are provided, replace with event bus ARNs as needed).",
+      "The `provider.tf` file also lists the AWS Regions of the fan-in event bus and central event bus (replace these based on where your event busses exist and where you want your central bus to be created)."
     ]
   },
   "gitHub": {
@@ -18,7 +18,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-fan-in-terraform",
       "templateURL": "serverless-patterns/eventbridge-fan-in-terraform",
       "projectFolder": "eventbridge-fan-in-terraform",
-      "templateFile": "eventbridge-fan-in-terraform/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "deploy": {
@@ -33,7 +33,7 @@
   },
   "cleanup": {
     "text": [
-      "terraform destroy"
+      "<code>terraform destroy</code>"
     ]
   },
   "authors": [
