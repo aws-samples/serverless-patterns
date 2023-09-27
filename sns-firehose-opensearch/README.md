@@ -45,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 
 This SAM template creates an SNS Topic, Kinesis Firehose Delivery Stream, S3 bucket, and subscripted the Kinesis Firehose Delivery Stream to the SNS Topic. As messages are published to the topic, they are streamed to the Firehose Delivery Stream, and then delivered the the Firehose Delivery Stream's destinations, which in this case is an S3 bucket. 
 
-==============================================
+
 
 ## Testing
 

@@ -61,6 +61,8 @@ Resources:
                 - 'aoss:ListCollections'
                 - 'aoss:DeleteAccessPolicy'
                 - 'aoss:CreateCollection'
+                - 'aoss:APIAccessAll'
+                - 'aoss:DashboardsAccessAll'
                 Resource: '*'
 
   # IAMUser:
