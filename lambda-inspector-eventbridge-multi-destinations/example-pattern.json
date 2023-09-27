@@ -1,0 +1,48 @@
+{
+    "title": "Optimized Vulnerability Management: Streamling Amazon Inspector findings with Amazon EventBridge, AWS Lambda, Amazon DynamoDB and SNS",
+    "description": "This pattern listens to Amazon Inspector events and triggers downstream services for only interested events",
+    "language": "",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": ["Listening to Amazon Inspector Events, multiple Amazon EventBridge rules are setup to look up only for the specific events, every time they occur despite of the Status, downstream services are invoked based on the targets."]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://serverlessland.com/patterns/lambda-inspector-eventbridge-multi-destinations",
+        "templateURL": "serverless-patterns/lambda-inspector-eventbridge-multi-destinations",
+        "projectFolder": "lambda-inspector-eventbridge-multi-destinations",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Inspector Now Scans AWS Lambda Functions for Vulnerabilities",
+          "link": "https://aws.amazon.com/blogs/aws/amazon-inspector-now-scans-aws-lambda-functions-for-vulnerabilities/"
+        },
+        {
+          "text": "Perform continuous vulnerability scanning of AWS Lambda functions with Amazon Inspector",
+          "link": "https://aws.amazon.com/blogs/security/perform-continuous-vulnerability-scanning-of-aws-lambda-functions-with-amazon-inspector/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": ["sam deploy --guided"]
+    },
+    "testing": {
+      "text": ["See the README in the Github repo for detailed testing instructions."]
+    },
+    "cleanup": {
+      "text": ["Delete the stack: <code>sam delete</code>."]
+    },
+    "authors": [
+      {
+        "name": "Manjunath Arakere",
+        "image": "https://d2908q01vomqb2.cloudfront.net/22d200f8670dbdb3e253a90eee5098477c95c23d/2023/07/06/marakere.jpg",
+        "bio": "Senior Solutions Architect @ AWS. Serverless enthusiast."
+      }
+    ]
+  }
+  
