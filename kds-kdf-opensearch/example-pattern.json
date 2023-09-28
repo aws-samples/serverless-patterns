@@ -1,5 +1,5 @@
 {
-  "title": "Amazon Kinesis Data Streams to Amazon API Gateway via Amazon Kinesis Data Firehose",
+  "title": "Amazon Kinesis Data Streams to Amazon OpenSeach via Amazon Kinesis Data Firehose",
   "description": "This sample project demonstrates how to send data received by Kinesis Data Streams to Amazon OpenSearch via Kinesis Data Firehose.",
   "language": "YAML",
   "level": "200",
