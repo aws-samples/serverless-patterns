@@ -1,0 +1,192 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: SAM application to implement a data pipeline using Kinesis Data Streams to Kinesis Data Firehose to OpenSearch
+
+Parameters:
+  AdminUserArn:
+    Type: String
+    Description: Enter ARN for any User with admin rights
+
+Resources:
+  MyKDS:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 2
+
+  MyKDFRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonOpenSearchServiceFullAccess'
+        - 'arn:aws:iam::aws:policy/AmazonOpenSearchIngestionFullAccess'
+        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'            
+      Policies:
+        - PolicyName: MyKDFPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "firehose:CreateDeliveryStream"
+                  - "firehose:DeleteDeliveryStream"
+                  - "firehose:DescribeDeliveryStream"
+                  - "firehose:PutRecord"
+                  - "firehose:PutRecords"
+                  - "firehose:PutRecordBatch"
+                  - "firehose:UpdateDestination"
+                Resource:
+                  - !GetAtt MyKDS.Arn
+              - Effect: Allow
+                Action:
+                  - "kinesis:GetRecords"
+                  - "kinesis:GetShardIterator"
+                  - "kinesis:DescribeStream"
+                  - "kinesis:DescribeStreamSummary"
+                  - "kinesis:DescribeStreamConsumer"
+                  - "kinesis:SubscribeToShard"
+                  - "kinesis:RegisterStreamConsumer"
+                  - "aoss:GetAccessPolicy"
+                  - "aoss:CreateAccessPolicy"
+                  - "aoss:UpdateSecurityConfig"
+                  - "aoss:UpdateVpcEndpoint"
+                  - "aoss:UpdateSecurityPolicy"
+                  - "aoss:ListAccessPolicies"
+                  - "aoss:ListSecurityPolicies"
+                  - "aoss:UpdateAccessPolicy"
+                  - "aoss:DeleteSecurityPolicy"
+                  - "aoss:UntagResource"
+                  - "aoss:GetSecurityPolicy"
+                  - "aoss:ListTagsForResource"
+                  - "aoss:BatchGetCollection"
+                  - "aoss:ListSecurityConfigs"
+                  - "aoss:CreateSecurityConfig"
+                  - "aoss:CreateSecurityPolicy"
+                  - "aoss:TagResource"
+                  - "aoss:DeleteVpcEndpoint"
+                  - "aoss:BatchGetVpcEndpoint"
+                  - "aoss:GetPoliciesStats"
+                  - "aoss:ListVpcEndpoints"
+                  - "aoss:UpdateAccountSettings"
+                  - "aoss:GetAccountSettings"
+                  - "aoss:GetSecurityConfig"
+                  - "aoss:CreateVpcEndpoint"
+                  - "aoss:DeleteSecurityConfig"
+                  - "aoss:ListCollections"
+                  - "aoss:DeleteAccessPolicy"
+                  - "aoss:CreateCollection"
+                  - "aoss:APIAccessAll"
+                  - "aoss:DashboardsAccessAll"                  
+                Resource:
+                  - "*"
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:ListBucket"
+                  - "s3:GetObjectVersion"
+                  - "s3:PutObject"
+                  - "s3:PutObjectAcl"
+                Resource:
+                  - !Sub arn:aws:s3:::${MyKDFS3Bucket}/*
+
+  MyKDFS3Bucket:
+    Type: AWS::S3::Bucket
+
+  MyKDF:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: "MyDeliveryStream"
+      DeliveryStreamType: "KinesisStreamAsSource"
+      KinesisStreamSourceConfiguration:
+        KinesisStreamARN: !GetAtt MyKDS.Arn
+        RoleARN: !GetAtt MyKDFRole.Arn
+      AmazonOpenSearchServerlessDestinationConfiguration:
+        CollectionEndpoint: !GetAtt MyOpenSearchCollection.CollectionEndpoint
+        IndexName: my-index
+        RoleARN: !GetAtt MyKDFRole.Arn
+        S3Configuration: 
+            BucketARN: !GetAtt MyKDFS3Bucket.Arn
+            Prefix: "kdf/"
+            RoleARN: !GetAtt MyKDFRole.Arn
+            BufferingHints:
+              IntervalInSeconds: 60
+              SizeInMBs: 1
+            ErrorOutputPrefix: "error/"
+            CompressionFormat: "UNCOMPRESSED"
+
+  MyOpenSearchCollection:
+    Type: 'AWS::OpenSearchServerless::Collection'
+    Properties:
+      Name: my-collection
+      Type: SEARCH
+      Description: Search collection
+    DependsOn: 
+      - EncryptionPolicy
+      - SecurityPolicy
+
+  EncryptionPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: my-encryption-policy
+      Type: encryption
+      Description: Encryption policy for my-collection
+      Policy: >-
+        {"Rules":[{"ResourceType":"collection","Resource":["collection/my-collection"]}],"AWSOwnedKey":true}
+
+  SecurityPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: network-policy
+      Type: network
+      Description: Network policy for my-collection
+      Policy: >-
+        [{"Rules":[{"ResourceType":"collection","Resource":["collection/my-collection"]}, {"ResourceType":"dashboard","Resource":["collection/my-collection"]}],"AllowFromPublic":true}]
+
+  OpenSearchAccessPolicyForAdmin:
+    Type: 'AWS::OpenSearchServerless::AccessPolicy'
+    Properties:
+      Name: os-access-policy-admin
+      Type: data
+      Description: Access policy for my-collection
+      Policy: !Sub >-
+        [{"Description":"Access for Admin","Rules":[{"ResourceType":"index","Resource":["index/my-collection/my-index"],"Permission":["aoss:*"]},
+        {"ResourceType":"collection","Resource":["collection/my-collection"],"Permission":["aoss:*"]}],
+        "Principal":["${AdminUserArn}"]}]
+
+  OpenSearchAccessPolicyForKDF:
+    Type: 'AWS::OpenSearchServerless::AccessPolicy'
+    Properties:
+      Name: os-access-policy-kinesis
+      Type: data
+      Description: Access policy for my-collection
+      Policy: !Sub >-
+        [{"Description":"Access for Kinesis","Rules":[{"ResourceType":"index","Resource":["index/my-collection/my-index"],"Permission":["aoss:*"]},
+        {"ResourceType":"collection","Resource":["collection/my-collection"],"Permission":["aoss:*"]}],
+        "Principal":["${MyKDFRole.Arn}"]}]
+        
+Outputs:
+  MyKDF:
+    Description: Kinesis Data Stream name
+    Value: !Ref MyKDF
+
+  MyKDFArn:
+    Value: !GetAtt MyKDF.Arn
+    Description: Kinesis firehose
+
+  OpenSearchCollection:
+    Value: !GetAtt MyOpenSearchCollection.CollectionEndpoint
+    Description: Opensearch Collection
+
+  OpenSearchCollectionDashboard:
+    Value: !GetAtt MyOpenSearchCollection.DashboardEndpoint
+    Description: Opensearch Dashboard
+
+  MyKDSName:
+    Description: Kinesis Data Stream name
+    Value: !Ref MyKDS    
