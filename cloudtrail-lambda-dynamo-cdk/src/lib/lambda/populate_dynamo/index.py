@@ -24,6 +24,10 @@ def lambda_handler(event, context):
                 continue
 
             object_key = record["s3"]["object"]["key"]
+
+            if object_key.split("/")[2] != "CloudTrail":
+                continue
+
             response = s3_client.get_object(Bucket=cloudtrail_bucket, Key=object_key)
             log_data = gzip.decompress(response["Body"].read()).decode("utf-8")
             cloudtrail_logs = json.loads(log_data)["Records"]

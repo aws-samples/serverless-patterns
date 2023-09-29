@@ -22,16 +22,13 @@ export class TagComplianceStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY 
     });
 
-    // random generated number appended to bucket name, to create unique name
-    const generatedNum = Math.ceil(Math.random() * 100);
-
-    const cloudtrail_bucket = new s3.Bucket(this, 'objectCreationLogs', {
-      bucketName: `object-creation-logs-${generatedNum}`, // name may be changed, need to make sure bucket name doesn't already exist
+    const cloudtrail_bucket = new s3.Bucket(this, 'objectCreationLogs', {// name may be changed, need to make sure bucket name doesn't already exist
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.S3_MANAGED,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true
     });
+    new cdk.CfnOutput(this, 'BucketName', {value: cloudtrail_bucket.bucketName});
 
     const cloudtrailPrincipal = new iam.ServicePrincipal("cloudtrail.amazonaws.com");
 
