@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  bedrockAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      ApiKeySourceType: HEADER
+      BinaryMediaTypes:
+        - '*/*'
+      EndpointConfiguration:
+        Type: REGIONAL
+        Name: !Ref ApiName
+  
+  ApiFunction: # Adds a GET api endpoint at "/" to the ApiGatewayApi via an Api event
+    Type: AWS::Serverless::Function
+    Properties:
+      Events:
+        imagePath:
+          Type: Api 
+          Properties:
+            Path: /image
+            Method: post
+            RestApiId: !Ref bedrockAPI
+        textPathai21Grande:
+          Type: Api 
+          Properties:
+            Path: /text/model_ai21_j2grande
+            Method: post   
+            RestApiId: !Ref bedrockAPI
+        textPathai21Jumbo:
+          Type: Api 
+          Properties:
+            Path: /text/model_ai21_j2jumbo
+            Method: post   
+            RestApiId: !Ref bedrockAPI
+        textPathAnthropicClaudeInstant:
+          Type: Api 
+          Properties:
+            Path: /text/model_anthropic_claudeinstant
+            Method: post    
+            RestApiId: !Ref bedrockAPI
+        textPathAnthropicClaudeV2:
+          Type: Api 
+          Properties:
+            Path: /text/model_anthropic_claudev2
+            Method: post    
+            RestApiId: !Ref bedrockAPI
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      CodeUri: ./
+      Timeout: 90
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17' 
+          Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:*
+              Resource: '*'

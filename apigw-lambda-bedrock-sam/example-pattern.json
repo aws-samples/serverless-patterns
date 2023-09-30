@@ -1,0 +1,61 @@
+{
+  "title": "API Gateway with Lambda proxy integration to invoke Amazon Bedrock",
+  "description": "Make API calls to generate image and text responses using Amazon Bedrock with serverless",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A REST API is created that has /image and /text resources associated with the available models in Amazon Bedrock for image and text generation respectively. All resources integrate with a Lambda function over proxy integration."
+          "* Place a request to /image over HTTP POST method with the required prompt as the request body to generate an image using StabilityAI stable diffusion XL model."
+          "* Place a request to /text/model* over HTTP POST method with the required prompt as the request body to generate a text output using various models offered by Anthropic, AI21 labs."
+
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-sam",
+      "templateURL": "serverless-patterns/apigw-lambda-bedrock-sam",
+      "projectFolder": "apigw-lambda-bedrock-sam",
+      "templateFile": "apigw-lambda-bedrock-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/blogs/aws/amazon-bedrock-is-now-generally-available-build-and-scale-generative-ai-applications-with-foundation-models/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abha Tripathi",
+      "image": "https://avatars.githubusercontent.com/u/36122588?s=400&u=209552eb3fa55e5c4176e54a24a7737ce899083b&v=4",
+      "bio": "Cloud Engineer @ AWS",
+      "linkedin": "www.linkedin.com/in/abha-tripathi-344a0a146"
+    },
+    {
+      "name": "Sushir V R",
+      "image": "https://avatars.githubusercontent.com/u/42473846?s=400&u=4c7b19858e4ec3d9ae24e379c35848219ee57a86&v=4",
+      "bio": "Cloud Engineer @ AWS",
+      "linkedin": "www.linkedin.com/in/sushirvr"
+    }
+  ]
+}
