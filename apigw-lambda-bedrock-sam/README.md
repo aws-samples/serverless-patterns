@@ -1,6 +1,7 @@
 # API Gateway with Lambda proxy integration to invoke Amazon Bedrock
 
-This pattern creates an API Gateway REST API with Lambda proxy integration which places invoke calls to Amazon Bedrock for text and image generation.
+This pattern creates an API Gateway REST API with Lambda proxy integration which places invoke calls to Amazon Bedrock for text and image generation. Bedrock allows the use of various LLMs by providers like AI21 labs, Anthropic etc which can be used to generate texts and images in repsonse to prompts provided by users.
+The API generated in this pattern exposes multiple text and image generation models currently available in Bedrock to allow users to send requests to any of the available models.
 
 Learn more about this pattern at Serverless Land Patterns: <TBD>
 
