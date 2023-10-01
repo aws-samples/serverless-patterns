@@ -1,6 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# Text generation via ApiGateway -> Lambda -> Bedrock
 
-This pattern << explain usage >>
+![architecture](architecture/architecture.png)
+
+This pattern demonstrates how to expose an endpoint to invoke models in Amazon Bedrock.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -21,39 +23,36 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd apigw-lambda-bedrock-cdk-python
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS CDK to deploy the AWS resources.
     ```
-    sam deploy --guided
+    cdk deploy
     ```
-1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
-
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-Explain how the service interaction works.
+CDK will create an Api Gateway, along with a resource and a POST method. There's a AWS Lambda function that will be taking the prompt and invoking an Amazon Bedrock model (anthropic.claude-v2). If you wish to try other models, make sure to modify the policy attached to the Lambda function and invoke the right model.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+After deployment, take note of the API Gateway URL (Check the Outputs section) and make a POST request to the *text_gen* endpoint with a desired prompt. For example:
+
+    ```
+    curl -X POST \
+    https://ygah153dth.execute-api.us-east-1.amazonaws.com/prod/text_gen \
+    -H "Content-Type: application/json" \
+    -d '{"prompt": "Write an email to my department announcing I will lead a gen-ai workshop with Amazon Bedrock"}'
+    ```
+
 
 ## Cleanup
  
-1. Delete the stack
+1. Run below script in the `apigw-lambda-bedrock-cdk-python` directory to delete AWS resources created by this sample stack.
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    cdk destroy
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
+
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
