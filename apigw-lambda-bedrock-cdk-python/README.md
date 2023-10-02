@@ -4,7 +4,7 @@
 
 This pattern demonstrates how to expose an endpoint to invoke models in Amazon Bedrock.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Note: this pattern includes a layer with a custom version of boto3. Using an outdated boto3 version will result in an ["unknown service error"](https://repost.aws/knowledge-center/lambda-python-runtime-errors)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -52,6 +52,9 @@ After deployment, take note of the API Gateway URL (Check the Outputs section) a
     ```bash
     cdk destroy
     ```
+
+## Extra Resources
+* [Bedrock Api Reference](https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html)
 
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
