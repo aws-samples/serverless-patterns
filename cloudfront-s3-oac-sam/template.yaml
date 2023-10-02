@@ -22,7 +22,7 @@ Resources:
         SigningBehavior: always
         SigningProtocol: sigv4
 
-  # Creates a new cache policy using default TTL values, no viewer request cookies, no Brotli or Gzip encoding, no header inclusion, and no URL query strings.
+  # Creates a new cache policy using default TTL values, no viewer request cookies, Brotli and Gzip encoding, no header inclusion, and no URL query strings.
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-cachepolicy-parametersincachekeyandforwardedtoorigin.html#cfn-cloudfront-cachepolicy-parametersincachekeyandforwardedtoorigin-querystringsconfig
   CloudFrontCachePolicy:
     Type: AWS::CloudFront::CachePolicy
@@ -30,13 +30,13 @@ Resources:
       CachePolicyConfig:
         DefaultTTL: 86400
         MaxTTL: 31536000
-        MinTTL: 86400
+        MinTTL: 1
         Name: !Ref DeploymentName
         ParametersInCacheKeyAndForwardedToOrigin:
           CookiesConfig:
             CookieBehavior: none
-          EnableAcceptEncodingBrotli: false
-          EnableAcceptEncodingGzip: false
+          EnableAcceptEncodingBrotli: true
+          EnableAcceptEncodingGzip: true
           HeadersConfig:
             HeaderBehavior: none
           QueryStringsConfig:
