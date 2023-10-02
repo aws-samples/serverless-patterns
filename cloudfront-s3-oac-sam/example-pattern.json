@@ -49,7 +49,7 @@
   "authors": [
     {
       "name": "Nathan J. Lichtenstein",
-      "image": "img/njl-photo.png",
+      "image": "https://drs3mcpy435v4.cloudfront.net/photo.png",
       "bio": "Never satisfied with the status quo, Nathan joined AWS as a Senior Solutions Architect in 2022. Based in NYC he loves all things cloud and networking.",
       "linkedin": "nathanjlichtenstein"
     }
