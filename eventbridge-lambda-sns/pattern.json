@@ -1,0 +1,62 @@
+{
+  "title": "EventBridge to Lambda with SNS ",
+  "description": "Create a Lambda function that monitors if subnets in your VPC run out of available IP addresses.",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an AWS Lambda function that scans the subnet(s) for AWS VPC subnet(s) that are running low on IP addresses and send alert via SNS topic. Amazon CloudWatch Events rule triggers the Lambda function at a desired interval"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-sns",
+      "templateURL": "serverless-patterns/eventbridge-lambda-sns",
+      "projectFolder": "eventbridge-lambda-sns",
+      "templateFile": "eventbridge-lambda-sns/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using AWS Lambda with Amazon EventBridge (CloudWatch Events)",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents.html"
+      },
+      {
+        "text": "IP addressing for your VPCs and subnets",
+        "link": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-ip-addressing.htmll"
+      },
+      {
+        "text": "How can I publish a message to an Amazon SNS topic using a Lambda function?",
+        "link": "https://repost.aws/knowledge-center/sns-topic-lambda"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: sam delete."
+    ]
+  },
+  "authors": [
+    {
+      "headline": "Presented by Xolile Speelman",
+      "name": "Xolile Speelman",
+      "image": "https://ibb.co/Zx1vbdq",
+      "bio": "Xolile Speelam is a Cloud Support Engineer @AWS",
+      "linkedin": "https://www.linkedin.com/in/xspeelman"
+    }
+  ]
+}
+
