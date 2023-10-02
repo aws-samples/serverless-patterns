@@ -81,6 +81,10 @@ Resources:
     Properties:
       GroupDescription: EC2 Security Group for instances launched in the VPC by Batch
       VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - Description: Allow all outbound traffic
+          IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0      
   Subnet:
     Type: 'AWS::EC2::Subnet'
     Properties:
