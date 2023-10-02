@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Amazon CloudFront to Amazon S3 with OAC
 
 This pattern creates a CloudFront distribution with an S3 origin secured with origin access control (OAC).
 
