@@ -1,0 +1,57 @@
+{
+  "title": "CloudFront to S3 secured with OAC",
+  "description": "Create a CloudFront distribution with an S3 origin secured with origin access control (OAC).",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to deploy a CloudFront distribution with an S3 origin that is secured with origin access control (OAC). Compared to the older origin access identity (OAI) method OAC offers enhanced security practices, comprehensive HTTP methods support, and supports objects encrypted with SSE-KMS.",
+      "This pattern deploys one CloudFront distribution and one S3 Bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-s3-oac-sam",
+      "templateURL": "serverless-patterns/cloudfront-s3-oac-sam",
+      "projectFolder": "cloudfront-s3-oac-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon CloudFront introduces Origin Access Control (OAC)",
+        "link": "https://aws.amazon.com/blogs/networking-and-content-delivery/amazon-cloudfront-introduces-origin-access-control-oac/"
+      },
+      {
+        "text": "Amazon CloudFront - Developer Guide - Restricting access to an Amazon S3 origin",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nathan J. Lichtenstein",
+      "image": "img/njl-photo.png",
+      "bio": "Never satisfied with the status quo, Nathan joined AWS as a Senior Solutions Architect in 2022. Based in NYC he loves all things cloud and networking.",
+      "linkedin": "nathanjlichtenstein"
+    }
+  ]
+}
