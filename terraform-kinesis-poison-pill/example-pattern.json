@@ -24,7 +24,7 @@
 				"link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
 			},
 			{
-				"text": "AWS Lambda Failure-Handling Features",
+				"text": "AWS Lambda Failure Handling Features",
 				"link": "https://www.amazonaws.cn/en/new/2019/aws-lambda-supports-failure-handling-features-for-kinesis-and-dynamodb-event-sources/"
 			}
 
