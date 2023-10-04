@@ -6,7 +6,7 @@ A function URL is a dedicated endpoint for your Lambda function. When you create
 
 By configuring CloudFront in front of the Lambda Function URL endpoint you can use custom domain names, Cognito authentication via Lambda@Edge, AWS Web Application Firewall (WAF) and AWS Shield Advanced to protect your endpoint from attacks.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cloudfront-lambda-urls-cdk.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
