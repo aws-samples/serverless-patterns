@@ -1,0 +1,121 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Description: >
+  This pattern shows 
+  1. Integration of Amazon Kinesis Data Firehose and AWS Lambda for the Data transformation
+  2. Lambda function to transform the data 
+  3. Amazon Kinesis to deliver the transformed data to S3 bucket
+
+Resources:
+# Create the lambda function to consume the message from Kinesis firehouse for data transformation
+  MyLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: cmd/functions/data-transformation/
+      Handler: bootstrap
+      Runtime: provided.al2
+      MemorySize: 128
+      Timeout: 10
+      Tracing: Active
+      Tags:
+        AppName: serverless-pattern
+# Create the bucket for the Kinesis Firehose to write the transformed data
+  MyS3Bucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      Tags:
+        - Key: AppName 
+          Value: serverless-pattern
+# Create the Amazon Cloudwatch group for the logging and monitoring 
+  MyCloudWatchLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: MyLambdaFunctionLogs
+      Tags:
+        - Key: AppName 
+          Value: serverless-pattern
+
+  MyLogStreamGroup:
+    Type: AWS::Logs::LogStream
+    Properties:
+      LogGroupName: !Ref MyCloudWatchLogGroup
+# Create the Amazon Kinesis Firehose Delivery Stream, default test data will be used to mimic the producer 
+  DeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamType: 'DirectPut'
+      ExtendedS3DestinationConfiguration:
+        BucketARN: !GetAtt 'MyS3Bucket.Arn'
+        Prefix: ''
+        BufferingHints:
+          SizeInMBs: 1
+          IntervalInSeconds: 60
+        CloudWatchLoggingOptions:
+          Enabled: true
+          LogGroupName: !Ref MyCloudWatchLogGroup
+          LogStreamName: !Ref MyLogStreamGroup
+        EncryptionConfiguration:
+          NoEncryptionConfig: 'NoEncryption'
+        RoleARN: !GetAtt 'DeliveryStreamRole.Arn'
+        ProcessingConfiguration:
+          Enabled: true
+          Processors:
+            - Type: 'Lambda'
+              Parameters:
+                - ParameterName: 'LambdaArn'
+                  ParameterValue: !GetAtt 'MyLambdaFunction.Arn'
+
+  DeliveryStreamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: 'Allow'
+            Principal:
+              Service: 'firehose.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'access-s3-destination'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 's3:PutObject'
+                  - 's3:GetObject'
+                  - 's3:ListBucket'
+                Resource:
+                  - !Sub 'arn:aws:s3:::${MyS3Bucket}'
+                  - !Sub 'arn:aws:s3:::${MyS3Bucket}/*'
+        - PolicyName: 'access-lambda-function'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'lambda:InvokeFunction'
+                  - 'lambda:GetFunctionConfiguration'
+                Resource: !GetAtt 'MyLambdaFunction.Arn'
+        - PolicyName: 'access-cloudwatch-logs'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'logs:PutLogEvents'
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${MyCloudWatchLogGroup}:log-stream:${MyLogStreamGroup}'
+
+Outputs:
+  # Output for Lambda function name
+  WriteToDynamoDBFunctionName:
+    Description: "Data Transformation Lambda function"
+    Value: !Ref MyLambdaFunction
