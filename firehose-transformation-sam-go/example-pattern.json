@@ -11,7 +11,7 @@
     "gitHub": {
       "template": {
         "repoURL": "https://serverlessland.com/patterns/",
-        "templateURL": "serverless-patterns/",
+        "templateURL": "serverless-patterns/firehose-transformation-sam-go",
         "projectFolder": "firehose-transformation-sam-go",
         "templateFile": "template.yaml"
       }
