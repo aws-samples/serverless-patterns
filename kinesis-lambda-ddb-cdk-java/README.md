@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon [Kinesis Data Stream](https://docs.aws.amazon.com/streams/latest/dev/introduction.html) and an AWS [Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) which then sends the records to DynamoDB, using the AWS Cloud Development Kit (AWS CDK) in Java.
 
-Learn more about this pattern at Serverless Land Patterns: <TBD>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/kinesis-lambda-ddb-cdk-java
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
