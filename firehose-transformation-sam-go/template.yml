@@ -8,7 +8,7 @@ Description: >
   3. Amazon Kinesis to deliver the transformed data to S3 bucket
 
 Resources:
-# Create the lambda function to consume the message from Kinesis firehouse for data transformation
+# Create the Lambda function to consume the message from Kinesis firehouse for data transformation
   MyLambdaFunction:
     Type: 'AWS::Serverless::Function'
     Metadata:
