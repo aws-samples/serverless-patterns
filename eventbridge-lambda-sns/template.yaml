@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create a EventBridge triggered Lambda function that pushishes to an SNS Topic the VPC subnets which are falling below threshold of avaialble IPs in a VPC subnet
+
+Resources:
+  # Define the SNS topic
+  MySnsTopic:
+    Type: AWS::SNS::Topic
+
+  # Define the IP Availability Lambda function with permissions
+  IpAvailabilityFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.11
+      Timeout: 30
+      MemorySize: 2048
+      Environment:
+        Variables:
+          SNStopic: !Ref MySnsTopic
+          IP_limit: 4000
+      Policies:
+        ## Read more about SAM Policy templates at:
+        ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+      - SNSPublishMessagePolicy:
+          TopicName: !GetAtt MySnsTopic.TopicName
+      - Statement:
+        - Sid: MyVpcReadAccess
+          Effect: Allow
+          Action:
+          - ec2:DescribeRegions
+          - ec2:DescribeSubnets
+          Resource: '*'
+      # Define the EventBridge trigger
+      Events:
+        ScheduledFunction:
+          Type: Schedule
+          Properties:
+            Schedule: rate(7 days)
+
+Outputs:
+  IpAvailabilityFunction:
+    Description: IpAvailabilityFunction function name
+    Value: !Ref IpAvailabilityFunction
+  
+  SNStopicName:
+    Description: SNS topic name
+    Value: !GetAtt MySnsTopic.TopicName
+
+  SNStopicARN:
+    Description: SNS topic ARN
+    Value: !Ref MySnsTopic
+
