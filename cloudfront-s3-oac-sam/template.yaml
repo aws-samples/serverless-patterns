@@ -66,7 +66,6 @@ Resources:
   Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${AWS::AccountId}-${DeploymentName}"
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - BucketKeyEnabled: true
