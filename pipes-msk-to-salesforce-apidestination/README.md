@@ -2,7 +2,7 @@
 
 This pattern shows how to use EventBridge Pipes to send MSK data to Salesforce using API Destinations. The pattern uses an MSK cluster as a source to EventBridge Pipe, a Lambda function to base64 decode the payload and transform data to adhere to Salesforce schema, and an API Destination as a target to send the payload to Salesforce. The use case shown here is to create "Leads" in Salesforce using the payload from MSK. 
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/pipes-msk-to-salesforce-apidestination
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-msk-to-salesforce.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
