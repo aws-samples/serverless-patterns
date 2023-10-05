@@ -5,7 +5,7 @@ Description: Serverless patterns - CloudFront distribution with an S3 origin sec
 
 Parameters:
     DeploymentName:
-      Description: Unique name used to create OAC, cache policy, and bucket.
+      Description: Unique name used to create OAC and cache policy.
       Type: String
       AllowedPattern: (?!(^((2(5[0-5]|[0-4][0-9])|[01]?[0-9]{1,2})\.){3}(2(5[0-5]|[0-4][0-9])|[01]?[0-9]{1,2})$|^xn--|.+-s3alias$))^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$
 
