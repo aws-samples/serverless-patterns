@@ -1,5 +1,5 @@
 {
-    "title": "Check S3 Object Tag Compliance Using CloudTrail, Lambda and Dynamo",
+    "title": "Check Amazon S3 object tag compliance using AWS CloudTrail",
     "description": "Creates a CloudTrail trail to track S3 object creation events, and checks for the required tags on those objects to determine compliance",
     "language": "TypeScript",
     "level": "200",
@@ -7,8 +7,8 @@
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This pattern demonstrates how to use CloudTrail events to check the tags of S3 objects that have been created. The S3 objects are stored in a DynamoDB table",
-        "which then gets sent to Lambda to check if the required tags are present. Compliance is updated on the DynamoDB table in the attribute is_compliant (true/false).",
+        "This pattern demonstrates how to use AWS CloudTrail events to check the tags of S3 objects that have been created. The S3 objects are stored in an Amazon DynamoDB table",
+        "which then gets sent to AWS Lambda to check if the required tags are present. Compliance is updated on the DynamoDB table in the attribute is_compliant (true/false).",
         "Further actions can be taken based on the results of the compliance check at the user's discretion."
       ]
     },
@@ -17,7 +17,7 @@
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudtrail-lambda-dynamo-cdk",
         "templateURL": "serverless-patterns/cloudtrail-lambda-dynamo-cdk",
         "projectFolder": "cloudtrail-lambda-dynamo-cdk/src",
-        "templateFile": "cloudtrail-lambda-dynamo-cdk/src/lib/tag-compliance-stack.ts"
+        "templateFile": "/lib/tag-compliance-stack.ts"
       }
     },
     "resources": {

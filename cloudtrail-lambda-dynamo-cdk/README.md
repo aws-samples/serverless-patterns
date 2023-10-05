@@ -28,24 +28,27 @@ Important: this application uses various AWS services and there are costs associ
     ```
     npm install
     ```
-1. Open the lambda function cloudtrail-lambda-dynamo-cdk/src/lib/lambda/object_tag_checker/index.py, and on line 17 replace the example keys with your required S3 object keys:
-    ```
+1. The pattern checks for the existence of required S3 object keys:
+     ```
     required_keys = {"Key1", "Key2", "Key3", "Key4"}
     ```
-1. Use the following command to generate the AWS CloudFormation template for your CDK application:
+   If you wish to amend your required your required S3 object keys, open the Lambda function cloudtrail-lambda-dynamo-cdk/src/lib/lambda/object_tag_checker/index.py, and on line 17 replace the example keys with your required S3 object keys.
+4. Use the following command to generate the AWS CloudFormation template for your CDK application:
     ```
     cdk synth
     ```
-1. Use the following command to deploy the AWS resources for this pattern into your AWS account:
+5. Use the following command to deploy the AWS resources for this pattern into your AWS account:
     ```
     cdk deploy
     ```
 ## Testing
 
 Once the CDK stack has deployed successfully, you can take the following steps to ensure the pattern is working appropriately:
-1. Using the AWS CLI, upload the test_file.txt found in the src folder to the S3 bucket of your choosing using the following command:
+
+1.  Navigate to the CLoudFormation stack `TagComplianceStack` and retrieve the `AWS::S3::Bucket` resource name.
+1. Using the AWS CLI, upload the `test_file.txt` found in the src folder to the S3 bucket name using the following command:
     ```
-    aws s3 cp test/test_file.txt s3://<bucket-name>/est/test_file1.txt
+    aws s3 cp test/test_file.txt s3://<bucket-name>/test_file1.txt
     ```
     If the file upload was successful, you should receive the following response:
     ```
@@ -53,7 +56,7 @@ Once the CDK stack has deployed successfully, you can take the following steps t
     ```
     You can also open the AWS Management Console, navigate to S3, and confirm the uploaded file is found in the S3 bucket you specified.
 
-1. Using the AWS CLI, upload and tag the test_file.txt found in the src folder to the S3 bucket of your choosing using the following command:
+1. Using the AWS CLI, upload and tag the `test_file.txt` found in the src folder to the S3 bucket using the following command:
    ```
    aws s3 cp test/test_file.txt s3://<bucket-name>/test_file2.txt
    aws s3api put-object-tagging \
@@ -63,11 +66,11 @@ Once the CDK stack has deployed successfully, you can take the following steps t
 
    ```
 
-1. In DynamoDB console, Navigate to DynamoDB, "s3-objects-table" table created for this pattern
+1. In the DynamoDB console, navigate to DynamoDB, `s3-objects-table` table created for this pattern.
 
-1. Click 'Explore table items'
+1. Select 'Explore table items'
 
-1. Within a couple of minutes, you should see two new items populated into the DynamoDB table specifying the ARN of the uploaded objects. The ‘is_compliant’ column should be set to ‘false’ for test_file1.txt since the object was uploaded with no tags and set to ‘true’ for test_file2.txt.
+1. Within a couple of minutes, you should see two new items populated into the DynamoDB table specifying the ARN of the uploaded objects. The `is_compliant` column should be set to `false` for `test_file1.txt` since the object was uploaded with no tags and set to `true` for `test_file2.txt`.
 
 ## Cleanup
  
