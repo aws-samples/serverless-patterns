@@ -1,0 +1,151 @@
+openapi: 3.0.3
+info:
+  title: Customer API - OpenAPI 3.0
+  description: |-
+    Customer API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+paths:
+  /customers:
+    post:
+      tags:
+        - customer
+      description: |-
+        Create a new customer.
+      operationId: addCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '200':
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '405':
+          description: Invalid input
+      x-amazon-apigateway-integration:
+        uri: ${openapi_demo_lambda_uri}
+        httpMethod: POST
+        type: AWS_PROXY
+  /customers/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: Customer ID used to update customer details
+    get:
+      tags:
+        - customer
+      description: |-
+        Retrieve customer details
+      operationId: getCustomer
+      responses:
+        '200':
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '404':
+          description: No customers found
+      x-amazon-apigateway-integration:
+        uri: ${openapi_demo_lambda_uri}
+        httpMethod: POST
+        type: AWS_PROXY
+    put:
+      tags:
+        - customer
+      description: |-
+        Update customer details.
+      operationId: updateCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '200':
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '405':
+          description: Invalid input
+      x-amazon-apigateway-integration:
+        uri: ${openapi_demo_lambda_uri}
+        httpMethod: POST
+        type: AWS_PROXY
+    delete:
+      tags:
+        - customer
+      description: |-
+        Remove customer.
+      operationId: removeCustomer
+      responses:
+        '200':
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '404':
+          description: No customer found to be removed
+      x-amazon-apigateway-integration:
+        uri: ${openapi_demo_lambda_uri}
+        httpMethod: POST
+        type: AWS_PROXY
+components:
+  schemas:
+    Data:
+      type: object
+      properties:
+        message:
+          type: string
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    CustomerRequest:
+      type: object
+      properties:
+        firstname:
+          type: string
+        lastname:
+          type: string
+        zipcode:
+          type: string
+    CustomerResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        zipcode:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+      required: [id]
+    GenericResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Data'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
