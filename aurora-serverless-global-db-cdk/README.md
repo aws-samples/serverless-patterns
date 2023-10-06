@@ -71,7 +71,7 @@ Note down the primary-test-app.FargateServiceURL and secondary-test-app.FargateS
 
 2. Write a task into the Primary Cluster 
     ```
-    curl primary-test-app.FargateServiceURL/tasks -H 'Content-Type: application/json' -d '{"name":"Task1","status":"created"}'
+    curl -X POST primary-test-app.FargateServiceURL/tasks -H 'Content-Type: application/json' -d '{"name":"Task1","status":"created"}'
     ```
     Expected Response : Task added with ID: 1
 3. Read the tasks from the Secondary cluster 
@@ -83,7 +83,7 @@ Note down the primary-test-app.FargateServiceURL and secondary-test-app.FargateS
 
 4. Attempt to write a task into the Secondary cluster 
     ```
-    curl secondary-test-app.FargateServiceURL/tasks -H 'Content-Type: application/json' -d '{"name":"Task1","status":"created"}'
+    curl -X POST secondary-test-app.FargateServiceURL/tasks -H 'Content-Type: application/json' -d '{"name":"Task1","status":"created"}'
     ```
     Expected Response : error : cannot execute INSERT in a read-only transaction
     
