@@ -2,6 +2,8 @@
 
 This pattern shows an example how a phone number can be validated and how a SMS message can be send using Pinpoint APIs which via API Gateway and Lambda deployed using SAM.  
 
+Please note, for demonstration purpose, no authorization mechanism is deployed for the API. The best practice is to use authorization like IAM, Lambda Authorizer etc. depending on your use case to secure your API. 
+
 As a pre-requisite, a Pinpoint Application has to be created and its SMS channel should be enabled. Subsequently, this stack can be deployed with pinpoint application id, destination phone number, message that has to be sent, origination number and message type. Please read more about the Pinpoint API calls utilised here:
 https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-messages.html#apps-application-id-messagespost
 
@@ -55,18 +57,16 @@ Important: this application uses various AWS services and there are costs associ
 
 ```
 {
-    "destination_number": "",
-    "message": "",
-    "pinpoint_app_id": "",
-    "origination_number": "",
-    "message_type": ""
+    "destination_number": ""
 }
 ```
-2. If the message is sent successfully, then you will receive the following response:
+2. If the sample message is sent successfully, then you will receive the following response:
 
 ```
 Message sent! Message ID: <random message id> 
 ```
+
+3. You can modify the setup to input the message that has to be sent via Pinpoint.
 
 ## Cleanup
  
