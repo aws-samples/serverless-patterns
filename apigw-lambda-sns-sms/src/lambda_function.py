@@ -14,9 +14,7 @@ def lambda_handler(event, context):
     destination_number = event_body["destination_number"]
     print(destination_number)
     
-    message = event_body["message"]
-    print(message)
-
+    message = "Your OTP is 1234"
 
     response = dict()
     try:
@@ -30,7 +28,6 @@ def lambda_handler(event, context):
                 PhoneNumber=destination_number,
                 Message=message
             )
-            
             
             message_id = response_send_message['MessageId']
             
