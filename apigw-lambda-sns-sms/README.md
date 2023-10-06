@@ -2,6 +2,7 @@
 
 This pattern shows an example how a phone number can be validated and how a SMS message can be send using SMS Publish APIs via API Gateway and Lambda deployed using SAM.  
 
+Please note, for demonstration purpose, no authorization mechanism is deployed for the API. The best practice is to use authorization like IAM, Lambda Authorizer etc. depending on your use case to secure your API. 
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -41,7 +42,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. The SMS message can be sent using the API Gateway deployed via stack.
 
-2. The lambda function's code firstly verify the phone number by using the [phone number validate](https://docs.aws.amazon.com/pinpoint/latest/apireference/phone-number-validate.html) API call and if the number is valid it sends the SMS.
+2. The lambda function's code firstly verify the phone number by using the [phone number validate](https://docs.aws.amazon.com/pinpoint/latest/apireference/phone-number-validate.html) API call and if the number is valid it sends a sample SMS message.
 
 ## Testing
 
@@ -49,15 +50,16 @@ Important: this application uses various AWS services and there are costs associ
 
 ```
 {
-    "destination_number": "",
-    "message": ""
+    "destination_number": ""
 }
 ```
-2. If the message is sent successfully, then you will receive the following response:
+2. If the sample message is sent successfully, then you will receive the following response:
 
 ```
 Message sent! Message ID: <random message id> 
 ```
+
+3. You can modify the setup to input the message that has to be sent via SNS.
 
 ## Cleanup
  

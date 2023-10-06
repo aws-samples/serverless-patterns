@@ -54,4 +54,8 @@ Resources:
               Action:
                 - "sns:Publish"
               Resource: "*"
+            - Effect: Deny
+              Action:
+                - "sns:Publish"
+              Resource: "arn:aws:sns:*:*"
 
