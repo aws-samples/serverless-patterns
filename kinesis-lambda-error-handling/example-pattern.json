@@ -1,0 +1,62 @@
+{
+	"title": "Effective consumer strategies for handling Kinesis Data Stream anomalies",
+	"description": "To showcase on how to handle the consumer(AWS Lambda) failure when reading the records from the Amazon Kinesis data stream.",
+	"language": "Python",
+	"level": "200",
+	"framework": "SAM",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"The purpose of this pattern is to deploy the infrastructure to showcase on how handle the consumer(AWS Lambda) failure when reading the records from the Amazon Kinesis data stream.",
+			"If the error handling measures fail, Lambda discards the records and continues processing batches from the stream. With the default settings, this means that a bad record can block processing on the affected shard for up to one week. To avoid this, in this project we are going to configure function's event source mapping with a reasonable number of retries and a maximum record age.",
+            "To retain a record of discarded batches, we are going to configure a failed-event destination. Lambda sends the record to the destination - AWS SQS."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-lambda-error-handling",
+			"templateURL": "serverless-patterns/kinesis-lambda-error-handling",
+			"projectFolder": "kinesis-lambda-error-handling",
+			"templateFile": "kinesis-lambda-error-handling/template.yaml"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "AWS SAM",
+				"link": "https://aws.amazon.com/serverless/sam/"
+			},
+            {
+				"text": "AWS Lambda with Amazon Kinesis",
+				"link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+            },
+            {
+				"text": "Lambda event source mappings",
+				"link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
+            },
+            {
+				"text": "Amazon Kinesis Data Generator",
+				"link": "https://aws.amazon.com/blogs/big-data/test-your-streaming-data-solution-with-the-new-amazon-kinesis-data-generator/"
+            }
+		]
+	},
+	"deploy": {
+		"text": [
+			"sam deploy --guided"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the README in the GitHub repo for detailed testing instructions."
+		]
+	},
+    "cleanup": {
+        "text": ["Delete the stack: <code>sam delete</code>."]
+      },
+      "authors": [
+        {
+          "name": "Manjunath Arakere",
+          "image": "https://d2908q01vomqb2.cloudfront.net/22d200f8670dbdb3e253a90eee5098477c95c23d/2023/07/06/marakere.jpg",
+          "bio": "Senior Solutions Architect @ AWS. Serverless enthusiast."
+        }
+      ]
+}
