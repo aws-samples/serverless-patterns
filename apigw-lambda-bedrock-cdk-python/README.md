@@ -25,6 +25,26 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd serverless-patterns/apigw-lambda-bedrock-cdk-python
     ```
+1. Create virtual environment for Python
+    ```
+    python3 -m venv .venv
+    ```
+    For a Windows platform, activate the virtualenv like this:
+    ```
+    .venv\Scripts\activate.bat
+    ```
+1. Install the Python required dependencies:
+    ```
+    pip install -r requirements.txt
+    ```
+1. Run the command below to bootstrap your account. CDK needs it to deploy
+    ```
+    cdk bootstrap
+    ```
+1. Review the CloudFormation template the cdk generates for you stack using the following AWS CDK CLI command:
+    ```
+    cdk synth
+    ```
 1. From the command line, use AWS CDK to deploy the AWS resources.
     ```
     cdk deploy
