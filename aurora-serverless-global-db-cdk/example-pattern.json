@@ -1,7 +1,7 @@
 {
   "title": "Amazon Aurora Serverless Primary to Secondary Global Database",
   "description": "Create an Aurora Serverless Global database to replicate across regions",
-  "language": "Typescript",
+  "language": "TypeScript",
   "level": "300",
   "framework": "CDK",
   "introBox": {
