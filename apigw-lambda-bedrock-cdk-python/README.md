@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigw-lambda-bedrock-cdk-python
+    cd serverless-patterns/apigw-lambda-bedrock-cdk-python
     ```
 1. From the command line, use AWS CDK to deploy the AWS resources.
     ```
