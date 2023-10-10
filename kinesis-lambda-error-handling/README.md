@@ -8,7 +8,7 @@ If the error handling measures fail, Lambda discards the records and continues p
 
 To retain a record of discarded batches, we are going to configure a failed-event destination. Lambda sends the failed record to the destination - AWS SQS. 
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/kinesisds-lambda-error-handling).
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/kinesis-lambda-error-handling).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
