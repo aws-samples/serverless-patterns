@@ -144,23 +144,15 @@ Resources:
             Action: "sts:AssumeRole"
       Path: "/"
       Policies:
-       - PolicyName: SNSAccess
+       - PolicyName: Access
           PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Resource:
-                  - !Ref MySnsTopic
-                Action:
-                  - sns:Publish
-        - PolicyName: LambdaExecute
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
+             Version: "2012-10-17"
+             Statement:
               - Effect: Allow
                 Action:
-                  - "lambda:InvokeFunction"
-                Resource: 
-                  - !GetAtt LambdaFunction.Arn
+                   - "lambda:InvokeFunction"
+                   - "sns:Publish"
+                Resource: "*"     
 
 
 Outputs:
