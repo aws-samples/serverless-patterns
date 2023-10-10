@@ -12,21 +12,21 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/sonihemish/serverless-patterns/tree/sonihemish-feature-s3-object-lambda-textract/s3-object-lambda-textract",
+      "templateURL": "serverless-patterns/s3-object-lambda-textract",
+      "projectFolder": "s3-object-lambda-textract",
+      "templateFile": "s3-object-lambda-textract/template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "text": "Transforming S3 Objects with S3 Object Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-s3-object-lambda.html"
       },
       {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Analyzing Document Text with Amazon Textract",
+        "link": "https://docs.aws.amazon.com/textract/latest/dg/analyzing-document-text.html"
       }
     ]
   },
@@ -42,16 +42,16 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
     {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "name": "Hemish Soni",
+      "image": "https://badgephotos.corp.amazon.com/?uid=hnsoni",
+      "bio": "Sr Partner Solution Architect, Serverless Enthusiast",
+      "linkedin": "https://www.linkedin.com/in/sonihemish/",
+      "twitter": "@sonihemish"
     }
   ]
 }
