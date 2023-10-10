@@ -145,14 +145,14 @@ Resources:
       Path: "/"
       Policies:
        - PolicyName: Access
-          PolicyDocument:
-             Version: "2012-10-17"
-             Statement:
-              - Effect: Allow
-                Action:
-                   - "lambda:InvokeFunction"
-                   - "sns:Publish"
-                Resource: "*"     
+         PolicyDocument:
+           Version: "2012-10-17"
+           Statement:
+             - Effect: Allow
+               Action:
+                 - "lambda:InvokeFunction"
+                 - "sns:Publish"
+               Resource: "*"     
 
 
 Outputs:
