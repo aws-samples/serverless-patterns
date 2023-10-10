@@ -1,5 +1,2 @@
-aws_cdk.aws_sns
-aws_cdk.aws_sqs
-aws_cdk.aws_sqs_sns_subscriptions
-aws_cdk.aws_iam
--e .
+aws-cdk-lib==2.13.0
+constructs>=10.0.0,<11.0.0

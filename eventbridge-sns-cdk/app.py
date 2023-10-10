@@ -1,23 +1,18 @@
 #!/usr/bin/env python3
-import os
 
-from aws_cdk import core as cdk
 from aws_cdk import (
+    App,
+    Stack,
+    CfnOutput,
     aws_sns as sns,
-    aws_sns_subscriptions as subs,
     aws_events as events,
-    aws_events_targets as targets,
-    core
+    aws_events_targets as targets
 )
-# For consistency with TypeScript code, `cdk` is the preferred import name for
-# the CDK's core module.  The following line also imports it as `core` for use
-# with examples from the CDK Developer's Guide, which are in the process of
-# being updated to use `cdk`.  You may delete this import if you don't need it.
-from aws_cdk import core
+from constructs import Construct
 
-class EventbridgeSnsCdkStack(cdk.Stack):
+class EventbridgeSnsCdkStack(Stack):
 
-    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         #SNS Topic
@@ -47,10 +42,10 @@ class EventbridgeSnsCdkStack(cdk.Stack):
         rule.add_target(targets.SnsTopic(MySnsTopic))
 
         # CDK Outputs
-        cdk.CfnOutput(self, "SNS topic name", description="SNS topic name", value=MySnsTopic.topic_name)
-        cdk.CfnOutput(self, "SNS topic ARN", description="SNS topic ARN", value=MySnsTopic.topic_arn)
+        CfnOutput(self, "SNS topic name", description="SNS topic name", value=MySnsTopic.topic_name)
+        CfnOutput(self, "SNS topic ARN", description="SNS topic ARN", value=MySnsTopic.topic_arn)
 
 
-app = core.App()
+app = App()
 EventbridgeSnsCdkStack(app,"EventbridgeSnsCdkExample")
 app.synth()

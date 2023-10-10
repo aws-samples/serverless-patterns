@@ -1,0 +1,61 @@
+{
+  "title": "AWS Step Functions to SNS",
+  "description": "Creates a Step Functions workflow to convert milliseconds to seconds and waits a period of time before sending an SNS message.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Step Functions receive an execution using the `start-execution` api command with the the message {\"waitMilliseconds\" : <time-in-milliseconds>} in the input payload.",
+      "The state machine will first call Lambda function to convert milliseconds to seconds.",
+      "The state machine will enter \"Wait\" state and wait for the time passed to it during execution",
+      "After waiting, Step Functions will send a message to SNS."    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-sns-cdk",
+      "templateURL": "serverless-patterns/sfn-sns-cdk",
+      "projectFolder": "sfn-sns-cdk",
+      "templateFile": "src/lib/sfn-sns-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting started with the AWS CDK",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
+      },
+      {
+        "text": "Setup SNS topic",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-create-topic.html"
+      },
+      {
+        "text": "Call Amazon SNS with AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-sns.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abdullah Bashatah",
+      "bio": "Cloud Support Engineer @ AWS.",
+      "linkedin": "abdullah-bashatah-92429aba"
+    }
+  ]
+}

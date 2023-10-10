@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SQS to Lambda
+
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 30
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#   SQS                                                                  #
+##########################################################################
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  QueueConsumerFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ./build/handler
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MySqsQueue.Arn
+            BatchSize: 10
+
+Outputs:
+  QueueConsumerFunction:
+    Description: QueueConsumerFunction function name
+    Value: !Ref QueueConsumerFunction
+  
+  SQSqueueName:
+    Description: SNS queue name
+    Value: !GetAtt MySqsQueue.QueueName
+
+  SQSqueueARN:
+    Description: SQS queue ARN
+    Value: !GetAtt MySqsQueue.Arn
+
+  SQSqueueURL:
+    Description: SQS queue URL
+    Value: !Ref MySqsQueue

@@ -1,0 +1,149 @@
+openapi: "3.0.1"
+info:
+  title: "DynamoDB Crud API with Canary releases"
+  version: "1.0.0"
+paths:
+  /{id}:
+    get:
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content: {}
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [CrudRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub":"arn:aws:apigateway:${AWS::Region}:dynamodb:action/GetItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$')) {\n  \"id\":\
+                \ \"$inputRoot.Item.id.S\",\n  \"message\": \"$inputRoot.Item.message.S\"\
+                \n}\n"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{\n  \"TableName\": \"${CrudDDB}\",\n\
+            \  \"Key\":{\n    \"id\": {\"S\": \"$input.params().path.id\"}\n  }\n\
+            }\n"}
+        passthroughBehavior: "when_no_templates"
+    put:
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content: {}
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [CrudRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub":"arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$'))\n{\n    \"id\"\
+                : \"$inputRoot.Attributes.id.S\",\n    \"message\": \"$inputRoot.Attributes.message.S\"\
+                \n}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{\n    \"TableName\": \"${CrudDDB}\"\
+            ,\n    \"Key\": {\"id\": {\"S\": \"$input.params().path.id\"}},\n    \"\
+            ExpressionAttributeNames\":{\"#m\":\"message\"},\n    \"ExpressionAttributeValues\"\
+            : {\":m\":{\"S\": $input.json('$.message')}},\n    \"UpdateExpression\"\
+            : \"SET #m = :m\",\n    \"ReturnValues\": \"ALL_NEW\"\n}"}
+        passthroughBehavior: "when_no_templates"
+    delete:
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content: {}
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [CrudRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub":"arn:aws:apigateway:${AWS::Region}:dynamodb:action/DeleteItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "{\"message\":\"item deleted\"}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{\n    \"TableName\":\"${CrudDDB}\",\n\
+            \    \"Key\":{\"id\":{\"S\": \"$input.params().path.id\"}}\n}"}
+        passthroughBehavior: "when_no_templates"
+  /:
+    get:
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Cache-Control:
+              schema:
+                type: "string"
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+          content: {}
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [CrudRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub":"arn:aws:apigateway:${AWS::Region}:dynamodb:action/Scan"}
+        responses:
+          "200":
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Cache-Control: "'no-cache, no-store'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$'))\n$inputRoot.Items"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{\n  \"TableName\": \"${CrudDDB}\"\n\
+            }\n"}
+        passthroughBehavior: "when_no_templates"
+    post:
+      responses:
+        "200":
+          description: "200 response"
+          content: {}
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [CrudRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub":"arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$'))\n{\n    \"id\"\
+                : \"$inputRoot.Attributes.id.S\",\n    \"message\": \"$inputRoot.Attributes.message.S\"\
+                \n}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{\n    \"TableName\": \"${CrudDDB}\"\
+            ,\n    \"Key\": {\"id\": {\"S\": \"$context.requestId\"}},\n    \"ExpressionAttributeNames\"\
+            :{\"#m\":\"message\"},\n    \"ExpressionAttributeValues\": {\":m\":{\"\
+            S\": $input.json('$.message')}},\n    \"UpdateExpression\": \"SET #m =\
+            \ :m\",\n    \"ReturnValues\": \"ALL_NEW\"\n}"}
+        passthroughBehavior: "when_no_templates"
+components: {}

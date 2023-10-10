@@ -1,0 +1,84 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+##########################################################################
+#   DynamoDB                                                             #
+##########################################################################
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+###########################################################
+# BUS                                                      #
+###########################################################
+  MyBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub ${AWS::StackName}-bus
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: MyFunction
+      MemorySize: 512
+      Architectures: ["arm64"]
+      Handler: bootstrap
+      Runtime: provided.al2
+      Timeout: 6
+      CodeUri: ./build/handler
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref MyBus
+      Events:
+        DynamoStream:
+          Type: DynamoDB
+          Properties:
+            BatchSize: 100
+            ParallelizationFactor: 10
+            StartingPosition: LATEST
+            MaximumRetryAttempts: 2
+            BisectBatchOnFunctionError: true
+            MaximumRecordAgeInSeconds: 120
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"eventName": ["INSERT"]}'
+            Stream: !GetAtt MyTable.StreamArn
+      Environment:
+        Variables:
+          BUS_NAME: !Ref MyBus
+          RUST_BACKTRACE: 1
+          RUST_LOG: info
+
+  MyFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub /aws/lambda/${MyFunction}
+
+##########################################################################
+#   OUTPUTS                                                              #
+##########################################################################
+Outputs:
+  MyTableStream:
+    Value: !GetAtt MyTable.StreamArn
+    Export: 
+      Name: !Sub ${AWS::StackName}-MyTableStream
+
+  MyFunctionArn:
+    Value: !GetAtt MyFunction.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-MyFunctionArn

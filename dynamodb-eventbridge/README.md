@@ -35,8 +35,7 @@ Important: this application uses various AWS services and there are costs associ
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
-
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    * Choose Save Arguments to Configuration File if you desire reuse all information as defaults. So you can use `sam deploy` without --guided argument in future.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
@@ -46,7 +45,7 @@ When new items are added to the DynamoDB table, a payload with item-level change
 
 ## Testing
 
-* After deployment is complete, add an item to the DynamoDB table and check status of lambda processing function through Exports and streams tab on table details console.
+* After deployment is complete, add an item to the DynamoDB table and check status of lambda processing function through `Exports and streams` tab on table details console.
 ![DynamoDB Console](images/DynamoDB.png)
 
 * For logs of Lambda processing function, check on CloudWatch Logs with pattern "EventProcessingFunction".
@@ -65,7 +64,7 @@ When new items are added to the DynamoDB table, a payload with item-level change
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete --stack-name STACK_NAME
     ```
 1. Confirm the stack has been deleted
     ```bash

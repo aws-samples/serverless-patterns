@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SQS to EventBridge
+
+Resources:
+  Source:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-queue
+
+  # Event Bus (Target)
+  Target:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub ${AWS::StackName}-bus
+
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatch
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:PutLogEvents'
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:DescribeLogStreams'
+                  - 'logs:DescribeLogGroups'
+                  - 'cloudwatch:PutMetricData'
+                Resource: '*'
+        - PolicyName: SourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource: !GetAtt Source.Arn
+        - PolicyName: !Sub ${AWS::StackName}-target-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:PutEvents'
+                Resource: !GetAtt Target.Arn
+
+  Pipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: !Sub ${AWS::StackName}-sqs-eb
+      Description: 'Pipe from SQS to EventBridge'
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt Source.Arn
+      SourceParameters:
+        FilterCriteria:
+          Filters:
+            - Pattern: '{"body":{"type":["NEW"]}}'
+        SqsQueueParameters:
+          BatchSize: 2
+          MaximumBatchingWindowInSeconds: 30
+      Target: !GetAtt Target.Arn
+      TargetParameters:
+        EventBridgeEventBusParameters:
+          DetailType: "OrderCreated"
+          Source: "myapp.orders"
+        InputTemplate: |
+              {
+                "orderId": "<$.body.orderId>",
+                "customerId": "<$.body.customerId>"
+              }
+
+Outputs: 
+  SourceSQSURL: 
+    Description: "URL of new Amazon SQS Queue"
+    Value: 
+      Ref: Source

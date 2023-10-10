@@ -1,9 +1,10 @@
-import { Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
-import { AuroraCapacityUnit, Credentials, DatabaseClusterEngine, ServerlessCluster } from '@aws-cdk/aws-rds';
-import { Vpc } from '@aws-cdk/aws-ec2';
-import { Secret } from '@aws-cdk/aws-secretsmanager';
-import { Cluster, ContainerImage } from '@aws-cdk/aws-ecs';
-import { ApplicationLoadBalancedFargateService } from '@aws-cdk/aws-ecs-patterns';
+import { Duration, Stack, StackProps} from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { AuroraCapacityUnit, Credentials, DatabaseClusterEngine, ServerlessCluster } from 'aws-cdk-lib/aws-rds';
+import { Vpc } from 'aws-cdk-lib/aws-ec2';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
+import { Cluster, ContainerImage } from 'aws-cdk-lib/aws-ecs';
+import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
 import path = require('path');
 
 export class CdkStack extends Stack {

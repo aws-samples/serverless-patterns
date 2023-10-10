@@ -1,0 +1,10 @@
+[
+   {
+      "timestamp":1672776200000,
+      "message":"THIS IS A SUCCESS"
+   },
+   {
+      "timestamp":1672776300000,
+      "message":"THIS IS AN ERROR"
+   }
+]

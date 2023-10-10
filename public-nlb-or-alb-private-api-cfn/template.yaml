@@ -1,0 +1,419 @@
+# Cloudformation
+# Author - Shivam Rajawat
+# Cloudformation template to deploy NLB VPCE setup in a account
+# Aim - To invoke same/cross account private API via via NLB and also attach custom domain to an API
+
+Transform: AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: 2010-09-09
+Description: This cloudformation template is to deploy resources for invoking same/cross account private API via NLB and also attach custom domain to an API
+Parameters:
+  Prefix:
+    Description: Prefix to be added to all the resources name for tracking purpose
+    Type: String
+    MinLength: 2
+    MaxLength: 20
+  ELBName:
+    Description: Public ELB name
+    Type: String
+    MinLength: 2
+    MaxLength: 40
+    Default: public-elb-for-private-api
+  TargetGroup:
+    Description: Target Group Name for ELB
+    Type: String
+    MinLength: 2
+    MaxLength: 40
+    Default: target-group-for-public-elb
+  VPC:
+    Description: VPC IDs
+    Type: AWS::EC2::VPC::Id
+  PublicSubnetIDs: 
+    Description: Public Subnet IDs for ELB
+    Type: "List<AWS::EC2::Subnet::Id>"
+  PrivateSubnetIDs: 
+    Description: Private Subnet IDs for VPCE
+    Type: "List<AWS::EC2::Subnet::Id>"
+  SecurityGroupID: 
+    Description: Security group IDs for VPCE. Note - please make sure that the security group allows 443 traffic. Select only one security group
+    Type: "List<AWS::EC2::SecurityGroup::Id>"
+  DomainName:
+    Description: Full Domain Name that you want
+    Type: String
+    MinLength: 15
+    MaxLength: 90
+  HostedZoneId:
+    Description: Hosted Zone Id
+    Type: String
+    MinLength: 15
+    MaxLength: 90
+  NlbOrAlb:
+    Description: NLB or ALB
+    AllowedValues:
+      - NLB
+      - ALB
+    Type: String
+    Default: NLB
+  SameAccount:
+    Description: Deploy private API and backend resources in same account. Y for Yes and N for No
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+      - 'yes'
+      - 'no'
+    Type: String
+    Default: 'Yes'
+
+Conditions: 
+  NlbCheck: !Equals [!Ref NlbOrAlb, NLB]
+  AlbCheck: !Equals [!Ref NlbOrAlb, ALB]
+  SameAccCheck: !Or [!Equals [!Ref SameAccount, 'Yes'], !Equals [!Ref SameAccount, 'yes']]
+
+Resources:
+  CertificateARN:
+    Type: AWS::CertificateManager::Certificate
+    Properties: 
+      DomainName: !Ref DomainName
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !Ref HostedZoneId
+
+  VPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      PrivateDnsEnabled: true
+      SecurityGroupIds: 
+        - !Select [ 0, !Ref SecurityGroupID ]
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.execute-api
+      SubnetIds: 
+        - !Select [ 0, !Ref PrivateSubnetIDs ]
+        - !Select [ 1, !Ref PrivateSubnetIDs ]
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+  
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Condition: SameAccCheck
+    DependsOn: BackendLambdaFunction
+    Properties:
+      ApiKeySourceType: HEADER
+      Description: An API Gateway with a Lambda Integration
+      EndpointConfiguration:
+        Types:
+          - PRIVATE
+      Name: PrivateApiViaCFN
+      Policy: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal: "*"
+            Action:
+              - "execute-api:Invoke"
+            Resource: "execute-api:/*"
+          - Effect: "Deny"
+            Principal: "*"
+            Action:
+              - "execute-api:Invoke"
+            Resource: "execute-api:/*"
+            Condition:
+              StringNotEquals:
+                aws:sourceVpce: !Ref VPCEndpoint
+
+  ApiGatewayResource:
+    Condition: SameAccCheck
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: 'lambda'
+      RestApiId: !Ref ApiGatewayRestApi
+
+  ApiGatewayMethod:
+    Condition: SameAccCheck
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        ConnectionType: INTERNET
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${BackendLambdaFunction.Arn}/invocations'
+      OperationName: 'lambda'
+      ResourceId: !Ref ApiGatewayResource
+      RestApiId: !Ref ApiGatewayRestApi
+
+  ApiGatewayStage:
+    Condition: SameAccCheck
+    Type: AWS::ApiGateway::Stage
+    DependsOn: ApiGatewayDeployment
+    Properties:
+      DeploymentId: !Ref ApiGatewayDeployment
+      Description: Lambda API Stage v0
+      RestApiId: !Ref ApiGatewayRestApi
+      StageName: 'v0'
+
+  ApiGatewayDeployment:
+    Condition: SameAccCheck
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ApiGatewayMethod
+    Properties:
+      Description: New Stage being added here, Latest Lambda API Deployment
+      RestApiId: !Ref ApiGatewayRestApi
+
+  APIGatewayLambdaInvokePermission:
+    Condition: SameAccCheck
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref BackendLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/*'
+
+  BackendLambdaFunction:
+    Condition: SameAccCheck
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+              'statusCode': 200,
+              'body': json.dumps("Hello from Private API in same account")
+            }    
+      Description: AWS Lambda function
+      FunctionName: !Sub ${Prefix}-PrivateApiLambdaFncViaCFN
+      Handler: index.lambda_handler
+      MemorySize: 256
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: python3.9
+      Timeout: 60
+  
+  LambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Select [0, [!Join ['-', [!Ref Prefix, 'custom-lambda-function-role']]]]
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: !Sub
+            - '${Prefix}-NetworkInterfacePolicy'
+            - Prefix: !Ref Prefix
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                - "ec2:DescribeNetworkInterfaces"
+                Resource: '*'
+        - PolicyName: BasicExecutionRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action: logs:CreateLogGroup
+              Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+            - Effect: Allow
+              Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              Resource: !Sub 
+                - 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${functionName}:*'
+                - functionName: !Select [0, [!Join ['-', [!Ref Prefix, Custom-lambda-function]]]]
+  CustomLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json, boto3, time
+          import urllib3
+
+          http = urllib3.PoolManager()
+
+          client = boto3.client('ec2')
+          def lambda_handler(event, context):
+            # TODO implement
+            print(event)
+            IP = []
+            for networkInterface in event['ResourceProperties']['key1']:
+                resp = client.describe_network_interfaces(NetworkInterfaceIds=[
+                networkInterface,
+            ])
+                print(resp)
+                privateIp=resp['NetworkInterfaces'][0]['PrivateIpAddress']
+                IP.append(privateIp)
+
+            data = {"PrivateIp1":IP[0],"PrivateIp2":IP[1],"VPCE":"false"}
+            responseBody =  {
+                'Status': "SUCCESS",
+                "PhysicalResourceId":"customresource",
+                "StackId":event['StackId'],
+                "RequestId":event['RequestId'],
+                "LogicalResourceId":event['LogicalResourceId'],
+                "Data":data
+            }
+            
+            json_responseBody = json.dumps(responseBody)
+
+            print("Response body:")
+            print(json_responseBody)
+
+            headers = {
+                'content-type' : '',
+                'content-length' : str(len(json_responseBody))
+            }
+
+            try:
+                response = http.request('PUT', event['ResponseURL'], headers=headers, body=json_responseBody)
+                print("Status code:", response.status)
+
+
+            except Exception as e:
+                print("send(..) failed executing http.request(..):", e)
+      Description: AWS Lambda function
+      FunctionName: !Select [0, [!Join ['-', [!Ref Prefix, Custom-lambda-function]]]]
+      Handler: index.lambda_handler
+      MemorySize: 256
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: python3.9
+      Timeout: 60
+
+  ENIsIP:
+    Type: 'Custom::LambdaResource'
+    Version: '1.0'
+    Properties:
+      ServiceToken: !GetAtt CustomLambdaFunction.Arn
+      key1: !GetAtt VPCEndpoint.NetworkInterfaceIds
+
+  NetworkLoadBalancerTargetGroup:
+      DependsOn:  ENIsIP
+      Type: AWS::ElasticLoadBalancingV2::TargetGroup
+      Condition: NlbCheck
+      Properties:
+        Port: 443
+        Name: !Sub ${Prefix}-${TargetGroup}
+        HealthCheckEnabled: true
+        Protocol: TLS
+        VpcId: !Ref VPC
+        Targets:
+          - Id: !GetAtt ENIsIP.PrivateIp1
+            Port: 443
+          - Id: !GetAtt ENIsIP.PrivateIp2
+            Port: 443
+        TargetType: ip
+  NetworkLoadBalancer:
+      DependsOn:  NetworkLoadBalancerTargetGroup
+      Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+      Condition: NlbCheck
+      Properties: 
+        Name: !Sub ${Prefix}-${ELBName}
+        Scheme: internet-facing
+        Subnets:
+          - !Select [ 0, !Ref PublicSubnetIDs ]
+          - !Select [ 1, !Ref PublicSubnetIDs ]
+        Type: network
+
+  NetworkLoadBalancerListener:
+      DependsOn: NetworkLoadBalancer
+      Type: AWS::ElasticLoadBalancingV2::Listener
+      Condition: NlbCheck
+      Properties:
+        DefaultActions:
+          - Type: forward
+            TargetGroupArn: !Ref NetworkLoadBalancerTargetGroup
+        LoadBalancerArn: !Ref NetworkLoadBalancer
+        Port: '443'
+        Protocol: TLS
+        Certificates:
+          - CertificateArn: !Ref CertificateARN
+  
+  ApplicationLoadBalancerTargetGroup:
+    DependsOn:  ENIsIP
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Condition: AlbCheck
+    Properties:
+      Port: 443
+      Name: !Sub ${Prefix}-${TargetGroup}
+      HealthCheckEnabled: true
+      Protocol: HTTPS
+      VpcId: !Ref VPC
+      Targets:
+        - Id: !GetAtt ENIsIP.PrivateIp1
+          Port: 443
+        - Id: !GetAtt ENIsIP.PrivateIp2
+          Port: 443
+      TargetType: ip
+      HealthCheckEnabled : True
+      Matcher:
+        HttpCode: '200,403'
+  ApplicationLoadBalancer:
+      DependsOn:  ApplicationLoadBalancerTargetGroup
+      Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+      Condition: AlbCheck
+      Properties: 
+        Name: !Sub ${Prefix}-${ELBName}
+        Scheme: internet-facing
+        Subnets:
+          - !Select [ 0, !Ref PublicSubnetIDs ]
+          - !Select [ 1, !Ref PublicSubnetIDs ]
+        Type: application
+        SecurityGroups:
+          - !Select [ 0, !Ref SecurityGroupID ]
+
+  ApplicationLoadBalancerListener:
+      DependsOn: ApplicationLoadBalancer
+      Type: AWS::ElasticLoadBalancingV2::Listener
+      Condition: AlbCheck
+      Properties:
+        DefaultActions:
+          - Type: forward
+            TargetGroupArn: !Ref ApplicationLoadBalancerTargetGroup
+        LoadBalancerArn: !Ref ApplicationLoadBalancer
+        Port: '443'
+        Protocol: HTTPS
+        Certificates:
+          - CertificateArn: !Ref CertificateARN
+
+  HostedZoneRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: CNAME
+      ResourceRecords: 
+      - !If [ NlbCheck, !GetAtt NetworkLoadBalancer.DNSName, !GetAtt ApplicationLoadBalancer.DNSName]
+      TTL: '300'
+
+Outputs:
+  NetworkLoadBalancerDNS:
+    Condition: NlbCheck
+    Value: !GetAtt NetworkLoadBalancer.DNSName
+  ApplicationLoadBalancerDNS:
+    Condition: AlbCheck
+    Value: !GetAtt ApplicationLoadBalancer.DNSName
+  CustomDomainName:
+    Value: !Ref HostedZoneRecordSet
+  VPCEndpoint:
+    Value: !Ref VPCEndpoint
+  APIGatewayURL:
+    Condition: SameAccCheck
+    Value: !Sub 
+      - 'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/v0/lambda'
+      - ApiId: !Ref ApiGatewayRestApi
+  CURLCommand:  
+    Condition: SameAccCheck
+    Value: !Sub 
+      - "curl https://${CustomDomain}/${ApiGatewayStage}/lambda -H 'Host:${ApiId}.execute-api.${AWS::Region}.amazonaws.com'"
+      - CustomDomain: !Ref HostedZoneRecordSet
+        ApiGatewayStage: !Ref ApiGatewayStage
+        ApiId: !Ref ApiGatewayRestApi

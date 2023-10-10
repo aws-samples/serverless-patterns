@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 import os
-
+from constructs import Construct
 from aws_cdk import (
-    core as cdk,
-    aws_apigatewayv2 as apigatewayv2,
-    aws_apigatewayv2_integrations as integrations,
-    aws_lambda as lambda_,
+    App,
+    Stack,
+    CfnOutput,
+    Duration,
+    aws_lambda as lambda_
 )
+import aws_cdk.aws_apigatewayv2_alpha as _apigw
+import aws_cdk.aws_apigatewayv2_integrations_alpha as _integrations
+
 
 DIRNAME = os.path.dirname(__file__)
 
-class ApigwHttpApiLambdaStack(cdk.Stack):
+class ApigwHttpApiLambdaStack(Stack):
 
-    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # Create the Lambda function to receive the request
@@ -29,25 +33,25 @@ class ApigwHttpApiLambdaStack(cdk.Stack):
         )
 
         # Create the HTTP API with CORS
-        http_api = apigatewayv2.HttpApi(
+        http_api = _apigw.HttpApi(
             self, "MyHttpApi",
-            cors_preflight=apigatewayv2.CorsPreflightOptions(
-                allow_methods=[apigatewayv2.CorsHttpMethod.GET],
+            cors_preflight=_apigw.CorsPreflightOptions(
+                allow_methods=[_apigw.CorsHttpMethod.GET],
                 allow_origins=["*"],
-                max_age=cdk.Duration.days(10),
+                max_age=Duration.days(10),
             )
         )
 
         # Add a route to GET /
         http_api.add_routes(
             path="/",
-            methods=[apigatewayv2.HttpMethod.GET],
-            integration=integrations.LambdaProxyIntegration(handler=lambda_fn),
+            methods=[_apigw.HttpMethod.GET],
+            integration=_integrations.HttpLambdaIntegration("LambdaProxyIntegration", handler=lambda_fn),
         )
 
         # Outputs
-        cdk.CfnOutput(self, "API Endpoint", description="API Endpoint", value=http_api.api_endpoint)
+        CfnOutput(self, "API Endpoint", description="API Endpoint", value=http_api.api_endpoint)
 
-app = cdk.App()
+app = App()
 ApigwHttpApiLambdaStack(app, "ApigwHttpApiLambdaStack")
 app.synth()

@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Cognito User Pool
+
+Parameters:
+  Email:
+    Type: String
+  CallbackUrl:
+    Type: String
+
+Resources:
+  
+  CognitoAuthorizerUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties: 
+      UserPoolName: cognito-user-pool-userpool
+
+  CognitoAuthorizerUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties: 
+      AllowedOAuthFlows: 
+        - implicit
+      AllowedOAuthFlowsUserPoolClient: True
+      AllowedOAuthScopes: 
+        - email
+        - openid
+        - profile
+      CallbackURLs: 
+        - !Ref CallbackUrl
+      ClientName: cognito-user-pool-client
+      SupportedIdentityProviders: 
+        - COGNITO
+      UserPoolId: !Ref CognitoAuthorizerUserPool
+
+  CognitoAuthorizerUserPoolUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties: 
+      UserAttributes: 
+        - Name: email
+          Value: !Ref Email
+      Username: !Ref Email
+      UserPoolId: !Ref CognitoAuthorizerUserPool
+
+  CognitoAuthorizerUserPoolResourceServer:
+    Type: AWS::Cognito::UserPoolResourceServer
+    Properties: 
+      Identifier: com.apigw
+      Name: com.apigw
+      Scopes: 
+        - ScopeDescription: scope_description
+          ScopeName: scope_name
+      UserPoolId: !Ref CognitoAuthorizerUserPool
+      
+  CognitoAuthorizerUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties: 
+      Domain: !Sub user-pool-domain-${AWS::AccountId}
+      UserPoolId: !Ref CognitoAuthorizerUserPool
+
+Outputs:
+
+  HostedUi:
+    Description: Hosted UI
+    Value: !Sub "https://${CognitoAuthorizerUserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/login?client_id=${CognitoAuthorizerUserPoolClient}&response_type=token&scope=email+openid+profile&redirect_uri=${CallbackUrl}"

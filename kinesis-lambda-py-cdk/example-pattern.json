@@ -1,0 +1,54 @@
+{
+  "title": "Kinesis to Lambda with error handling",
+  "description": "Create a Python Lambda function with Event Source as Kinesis Data source",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon Kinesis Data Stream that integrates with AWS Lambda using AWS CDK in Python.
+"In this example, the Kinesis Data Stream is used as an event source for the Lambda function which can be then be coded to process the data from the stream as per requirement."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-lambda-py-cdk",
+      "templateURL": "serverless-patterns/kinesis-lambda-py-cdk",
+      "projectFolder": "svlsland",
+      "templateFile": "kinesis-lambda-py-cdk/svlsland/svlsland_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS CDK Construct for Kinesis and Lambda",
+        "link": "https://docs.aws.amazon.com/solutions/latest/constructs/aws-kinesisstreams-lambda.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sushir V R",
+      "image": "https://avatars.githubusercontent.com/u/42473846?v=4",
+      "bio": "Cloud Engineer @ AWS",
+      "linkedin": "www.linkedin.com/in/sushirvr",
+      "twitter": ""
+    }
+  ]
+}

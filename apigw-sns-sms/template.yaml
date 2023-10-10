@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: API to send SMS using SNS
+
+Resources:
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      DefinitionBody: # an OpenApi definition
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './api.yaml'
+      OpenApiVersion: 3.0.3
+      EndpointConfiguration:
+          Type: REGIONAL
+
+  RootRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: API-SNSSMS
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: SNS_SMS
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: [ "sns:Publish"]
+                Resource: "*"
+              - Effect: Deny
+                Action: ["sns:Publish"]
+                Resource: "arn:aws:sns:*:*"
+              
+Outputs:
+  API:
+    Description: API to send SMS using SNS
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/dev"

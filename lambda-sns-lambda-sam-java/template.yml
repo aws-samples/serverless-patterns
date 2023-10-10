@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: aws-publisher-subscriber-pattern
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 3072
+    Timeout: 30
+
+Resources:
+#Lambda Publisher
+  PaymentPublisher:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PaymentPublisher
+      Handler: com.example.publisher.PaymentPublisher::handleRequest
+      CodeUri: target/sourceCode.zip
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt PaymentsSNS.TopicName
+      Environment:
+        Variables:
+          TOPIC_ARN: !Ref PaymentsSNS
+
+  #Lambda Subscriber
+  PaymentSubscriber:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PaymentSubscriber
+      Handler: com.example.subscriber.PaymentSubscriber::handleRequest
+      CodeUri: target/sourceCode.zip
+
+  #SNS Topic
+  PaymentsSNS:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: PaymentsTopic
+      Subscription:
+        - Protocol: lambda
+          Endpoint: !GetAtt PaymentSubscriber.Arn
+
+  #Permissions
+  SNSInvokePaymentSubscriber:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref PaymentSubscriber
+      Principal: sns.amazonaws.com

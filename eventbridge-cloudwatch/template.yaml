@@ -21,36 +21,47 @@ Resources:
   LogGroupForEvents:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: /aws/events/resource-policy-test
+      LogGroupName: /aws/vendedlogs/events/resource-policy-test
   LogGroupForEventsPolicy:
     Type: AWS::Logs::ResourcePolicy
     Properties:
       PolicyName: EventBridgeToCWLogsPolicy
-      PolicyDocument: !Sub 
-      - >
+      PolicyDocument: !Sub >
         {
           "Version": "2012-10-17",
           "Statement": [
             {
-              "Sid": "EventBridgetoCWLogsPolicy",
+              "Sid": "EventBridgetoCWLogsCreateLogStreamPolicy",
               "Effect": "Allow",
               "Principal": {
                 "Service": [
-                  "delivery.logs.amazonaws.com",
                   "events.amazonaws.com"
                 ]
               },
               "Action": [
-                "logs:CreateLogStream",
+                "logs:CreateLogStream"
+              ],
+              "Resource": [
+                "${LogGroupForEvents.Arn}"
+              ]
+            },
+            {
+              "Sid": "EventBridgetoCWLogsPutLogEventsPolicy",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              },
+              "Action": [
                 "logs:PutLogEvents"
               ],
               "Resource": [
-                "${logArn}"
+                "${LogGroupForEvents.Arn}"
               ],
               "Condition": {
-                "ArnEquals": {"aws:SourceArn": "${ruleArn}"}
+                "ArnEquals": {"AWS:SourceArn": "${LogsRule.Arn}"}
               }
             }
           ]
         }
-      - { logArn: !GetAtt LogGroupForEvents.Arn, ruleArn:  !GetAtt LogsRule.Arn}

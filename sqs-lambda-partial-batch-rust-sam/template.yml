@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SQS to Lambda with ReportBatchItemFailures
+
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 30
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#   SQS                                                                  #
+##########################################################################
+  MyDeadSqsQueue:
+    Type: AWS::SQS::Queue
+
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt MyDeadSqsQueue.Arn
+        maxReceiveCount: 1
+          
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  MyFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ./build/handler
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MySqsQueue.Arn
+            BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+Outputs:
+  MySqsQueueName:
+    Description: SQS queue name
+    Value: !GetAtt MySqsQueue.QueueName
+  MySqsQueueArn:
+    Description: SQS queue ARN
+    Value: !GetAtt MySqsQueue.Arn
+  MySqsQueueURL:
+    Description: SQS queue URL
+    Value: !Ref MySqsQueue
+

@@ -1,7 +1,8 @@
-import { App, Stack, StackProps } from "@aws-cdk/core";
-import * as codecommit from "@aws-cdk/aws-codecommit";
-import * as codepipeline from "@aws-cdk/aws-codepipeline";
-import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions"
+import { Stack, StackProps, App } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import * as codecommit from "aws-cdk-lib/aws-codecommit";
+import * as codepipeline from "aws-cdk-lib/aws-codepipeline";
+import * as codepipeline_actions from "aws-cdk-lib/aws-codepipeline-actions"
 
 import { PipelineRole, E2ECodeBuildRole } from "./constructs/roles";
 import { getEndToEndTestsActions } from "./constructs/end-to-end-tests";

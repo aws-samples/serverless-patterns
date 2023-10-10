@@ -1,32 +1,23 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
+Description: |
   A Step Functions Standard Workflow doing PUT and GET operations directly on DynamoDB
-
 Parameters:
   DdbTableName:
     Type: String
-    Default: "my-table"
+    Default: my-table
 Resources:
-
-##########################################################################
-#   DynamoDB                                                                  #
-##########################################################################
   MyDdbTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: "id"
-          AttributeType: "S"
-      BillingMode: "PAY_PER_REQUEST"
+        - AttributeName: id
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
       KeySchema:
-        - AttributeName: "id"
-          KeyType: "HASH"
+        - AttributeName: id
+          KeyType: HASH
       TableName: !Ref DdbTableName
-##########################################################################
-#   STEP FUNCTION                                                        #
-##########################################################################
-
   StateMachinetoDDB:
     Type: AWS::Serverless::StateMachine
     Properties:
@@ -35,57 +26,47 @@ Resources:
         States:
           SendToDDB:
             Type: Task
-            Resource: "arn:aws:states:::dynamodb:putItem"
-            ResultPath: "$.output_from_ddb_put"
+            Resource: arn:aws:states:::dynamodb:putItem
+            ResultPath: $.output_from_ddb_put
             Parameters:
               TableName: !Ref DdbTableName
               Item:
-                "id.$": "$.id"
-                "description.$" : States.Format('Hello, my id is {}.', $.id)
+                id.$: $.id
+                description.$: States.Format('Hello, my id is {}.', $.id)
             Next: ReadFromDDB
           ReadFromDDB:
             Type: Task
-            Resource: "arn:aws:states:::dynamodb:getItem"
+            Resource: arn:aws:states:::dynamodb:getItem
             Parameters:
               TableName: !Ref DdbTableName
               Key:
-                "id.$": "$.id"
-            ResultPath: "$.output_from_ddb_get"
-            OutputPath: "$.output_from_ddb_get.Item"
-            End: True
-      Role: !GetAtt [ MyStateMachineExecutionRole, Arn ]
-
-##########################################################################
-#   Roles                                                               #
-##########################################################################
-
+                id.$: $.id
+            ResultPath: $.output_from_ddb_get
+            OutputPath: $.output_from_ddb_get.Item
+            End: true
+      Role: !GetAtt MyStateMachineExecutionRole.Arn
   MyStateMachineExecutionRole:
-    Type: "AWS::IAM::Role"
+    Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
-          - Effect: "Allow"
+          - Effect: Allow
             Principal:
               Service:
                 - !Sub states.${AWS::Region}.amazonaws.com
-            Action: "sts:AssumeRole"
-      Path: "/"
+            Action: sts:AssumeRole
+      Path: /
       Policies:
         - PolicyName: DDBPolicy
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
-                  - 'dynamodb:PutItem'
-                  - 'dynamodb:GetItem'
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
                 Resource: !GetAtt MyDdbTable.Arn
-
-
-##########################################################################
-#   Outputs                                                              #
-##########################################################################
 Outputs:
   StateMachinetoDDBArn:
     Value: !Ref StateMachinetoDDB

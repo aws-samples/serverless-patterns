@@ -1,0 +1,8 @@
+[
+  {
+    "EventBusName": "test-bus",
+    "Source": "my-application",
+    "DetailType": "message",
+    "Detail": "{\"message\":\"Hello world!\"}"
+  }
+]

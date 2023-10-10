@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda Function URL
+Resources:
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  FURLFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs14.x
+      Timeout: 3
+      FunctionUrlConfig:
+        AuthType: AWS_IAM
+        Cors:
+            AllowOrigins: ["*"]
+  
+Outputs:
+  FunctionURLEndpoint:
+    Description: FURLFunction function name
+    Value: !GetAtt FURLFunctionUrl.FunctionUrl

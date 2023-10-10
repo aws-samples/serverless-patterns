@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  PinpointAppId:
+    Type: String
+    Description: Pinpoint application id through which you wish to send SMS
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${AWS::StackName}
+        - ResourceName: PinpointSMSApigw
+      StageName: Prod
+      DefinitionBody:
+        openapi: '3.0'
+        info: {}
+        paths:
+          /send_message:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PinpointFunction.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+  PinpointFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: PinpointFunction
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          PINPOINT_APP_ID: 
+            Ref: PinpointAppId
+      Events:
+        ApiPOSTsendmessage:
+          Type: Api
+          Properties:
+            Path: /send_message
+            Method: POST
+            RestApiId: !Ref Api
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - "mobiletargeting:PhoneNumberValidate"
+              Resource: !Join
+                - ""
+                - - "arn:aws:mobiletargeting:*:"
+                  - !Ref AWS::AccountId
+                  - ":phone/number/validate"
+            - Effect: Allow
+              Action:
+                - "mobiletargeting:SendMessages"
+              Resource: !Join
+                - ""
+                - - "arn:aws:mobiletargeting:*:"
+                  - !Ref AWS::AccountId
+                  - ":apps/*/messages"
+

@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: API Gateway data validation
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+
+  # REST API Configuration. Creates models available for validation at each endpoint.
+  MainApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Models:
+        Vehicle: # Data model for vehicles to be validated against
+          type: object
+          required:
+            - make
+            - model
+            - year
+          properties:
+            make:
+              type: string
+            model:
+              type: string
+            year:
+              type: integer
+              minimum: 2010
+            color:
+              type: string
+              enum:
+                - green
+                - red
+                - blue
+
+  ProcessFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - arm64
+      Events:
+        Process:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MainApi
+            Path: /{id}
+            Method: post
+            RequestParameters:
+              - method.request.querystring.order:
+                  Required: true
+                  Caching: true
+              # - method.request.path.id:
+              #     Required: true
+              - method.request.header.custom-agent:
+                  Required: true
+            RequestModel:
+              Model: Vehicle # Links available model
+              Required: true # requires validation
+              ValidateBody: true #Validates the request body.
+              ValidateParameters: true #Validates the request header
+
+            
+Outputs:
+  ProcessApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${MainApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

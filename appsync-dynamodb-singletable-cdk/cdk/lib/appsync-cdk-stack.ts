@@ -1,107 +1,103 @@
-import * as cdk from '@aws-cdk/core';
-import { join } from 'path';
-import { GraphqlApi, MappingTemplate, Schema } from '@aws-cdk/aws-appsync'
-import { Table, BillingMode, AttributeType } from '@aws-cdk/aws-dynamodb'
+import { Stack, StackProps } from 'aws-cdk-lib'
+import { Construct } from 'constructs'
+import { Table, BillingMode, AttributeType } from 'aws-cdk-lib/aws-dynamodb'
+import {
+	AppsyncFunction,
+	Code,
+	FunctionRuntime,
+	GraphqlApi,
+	InlineCode,
+	Resolver,
+	SchemaFile,
+} from 'aws-cdk-lib/aws-appsync'
+import { join } from 'path'
 
-export class AppsyncCdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
+export class AppsyncCdkStack extends Stack {
+	constructor(scope: Construct, id: string, props?: StackProps) {
+		super(scope, id, props)
 
-    // DynamoDB Table
-    const DDBTable = new Table(this, 'MDDBTable', {
-      partitionKey: {name:'PK', type: AttributeType.STRING},
-      sortKey: {name: "SK", type: AttributeType.STRING},
-      billingMode: BillingMode.PAY_PER_REQUEST
-    });
+		// DynamoDB Table
+		const DDBTable = new Table(this, 'MDDBTable', {
+			partitionKey: { name: 'PK', type: AttributeType.STRING },
+			sortKey: { name: 'SK', type: AttributeType.STRING },
+			billingMode: BillingMode.PAY_PER_REQUEST,
+		})
 
-    // AppSync GraphQL API
-    const AppSyncApi = new GraphqlApi(this, 'AppSyncApi', {
-      name: 'SingleTableApiCDK',
-      schema: Schema.fromAsset(join(__dirname, 'schema.graphql'))
-    })
+		// AppSync GraphQL API
+		const AppSyncApi = new GraphqlApi(this, 'AppSyncApi', {
+			name: 'SingleTableApiCDK',
+			schema: SchemaFile.fromAsset(join(__dirname, 'schema.graphql')),
+		})
 
-    // AppSync Data Source -> DynamoDB table
-    const DDBDataSource = AppSyncApi.addDynamoDbDataSource("DDBDataSource", DDBTable)
+		// AppSync Data Source -> DynamoDB table
+		const DDBDataSource = AppSyncApi.addDynamoDbDataSource(
+			'DDBDataSource',
+			DDBTable
+		)
 
-    // Custom resolver
-    DDBDataSource.createResolver({
-      typeName: 'Query',
-      fieldName: 'getParentWithChildren',
-      requestMappingTemplate: MappingTemplate.fromString(`
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-            "expression": "PK = :pk",
-            "expressionValues" : {
-                ":pk" : $util.dynamodb.toDynamoDBJson($ctx.args.PK)
-            }
-          }
+		const getParentWithChildrenFunc = new AppsyncFunction(
+			this,
+			'getParentWithChildrenFunction',
+			{
+				name: 'getParentWithChildrenFunction',
+				api: AppSyncApi,
+				dataSource: DDBDataSource,
+				code: Code.fromAsset(
+					join(__dirname, '/mappings/Query.getParentWithChildren.js')
+				),
+				runtime: FunctionRuntime.JS_1_0_0,
+			}
+		)
+
+		const createItemFunction = new AppsyncFunction(this, 'createItemFunction', {
+			name: 'createItemFunction',
+			api: AppSyncApi,
+			dataSource: DDBDataSource,
+			code: Code.fromAsset(join(__dirname, '/mappings/Mutation.createItem.js')),
+			runtime: FunctionRuntime.JS_1_0_0,
+		})
+
+		const passthrough = InlineCode.fromInline(`
+        // The before step
+        export function request(...args) {
+          console.log(args);
+          return {}
         }
-      `),
-      responseMappingTemplate: MappingTemplate.fromString(`
-        #set($children = [])
-        #foreach($item in $ctx.result.items)
-          #if($item['type'] == "parent")
-            #set($PK = $item['PK'])
-            #set($SK = $item['SK'])
-            #set($data = $item['data'])
-            #set($type = $item['type'])
-          #end
-          #if($item['type'] == "child")
-            $util.qr($children.add($item))
-          #end
-        #end
-        {
-          "PK": "\${PK}",
-            "SK": "\${SK}",
-            "children": $utils.toJson($children),
-            "data": "\${data}",
-            "type": "\${type}"
-        }
-      `)
-    })
 
-    // Mutation resolver
-    DDBDataSource.createResolver({
-      typeName: "Mutation",
-      fieldName: "createParentItem",
-      requestMappingTemplate: MappingTemplate.fromString(`
-        {
-          "version": "2018-05-29",
-          "operation": "PutItem",
-          "key": {
-            "PK": $util.dynamodb.toDynamoDBJson($ctx.args.PK),
-            "SK": $util.dynamodb.toDynamoDBJson($ctx.args.SK)
-          },
-          "attributeValues": {
-            "data": $util.dynamodb.toDynamoDBJson($ctx.args.data),
-            "type": $util.dynamodb.toDynamoDBJson($ctx.args.type)
-          }
+        // The after step
+        export function response(ctx) {
+          return ctx.prev.result
         }
-      `),
-      responseMappingTemplate: MappingTemplate.fromString("$util.toJson($ctx.result)")
-    })
+    `)
 
-    // Mutation resolver
-    DDBDataSource.createResolver({
-      typeName: "Mutation",
-      fieldName: "createChildItem",
-      requestMappingTemplate: MappingTemplate.fromString(`
-        {
-          "version": "2018-05-29",
-          "operation": "PutItem",
-          "key": {
-            "PK": $util.dynamodb.toDynamoDBJson($ctx.args.PK),
-            "SK": $util.dynamodb.toDynamoDBJson($ctx.args.SK)
-          },
-          "attributeValues": {
-            "data": $util.dynamodb.toDynamoDBJson($ctx.args.data),
-            "type": $util.dynamodb.toDynamoDBJson($ctx.args.type)
-          }
-        }
-      `),
-      responseMappingTemplate: MappingTemplate.fromString("$util.toJson($ctx.result)")
-    })
-  }
+		const parentWithChildrenResolver = new Resolver(
+			this,
+			'parentWithChildrenResolver',
+			{
+				api: AppSyncApi,
+				typeName: 'Query',
+				fieldName: 'getParentWithChildren',
+				runtime: FunctionRuntime.JS_1_0_0,
+				pipelineConfig: [getParentWithChildrenFunc],
+				code: passthrough,
+			}
+		)
+		const createParentResolver = new Resolver(this, 'createParentResolver', {
+			api: AppSyncApi,
+			typeName: 'Mutation',
+			fieldName: 'createParentItem',
+			runtime: FunctionRuntime.JS_1_0_0,
+			pipelineConfig: [createItemFunction],
+			code: passthrough,
+		})
+
+		const createChildResolver = new Resolver(this, 'createChildResolver', {
+			api: AppSyncApi,
+			typeName: 'Mutation',
+			fieldName: 'createChildItem',
+			runtime: FunctionRuntime.JS_1_0_0,
+			pipelineConfig: [createItemFunction],
+			code: passthrough,
+		})
+	}
 }

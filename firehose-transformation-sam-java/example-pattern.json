@@ -1,0 +1,57 @@
+{
+  title: "AWS Kinesis Firehose Transformation with Lambda using SAM for Java",
+  description: "Create a serverless app using Amazon Kinesis Data Firehose and AWS Lambda.",
+  language: "Java",
+  level: "200",
+  framework: "SAM",
+  introBox: {
+    headline: "How it works",
+    text: [
+      "This pattern deploys a Kinesis Firehose Delivery Stream, a transformation Lambda function (Java), a destination S3 bucket, and all of the additional infrastructure required for the pattern.",
+      "In this example, Kinesis Data Firehose then invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode. The transformed data is sent from Lambda to Kinesis Data Firehose. Kinesis Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
+    ]
+  },
+  gitHub: {
+    template: {
+      repoURL: "https://github.com/aws-samples/serverless-patterns/tree/main/firehose-transformation-sam-java",
+      templateURL: "patterns/firehose-transformation-sam-java",
+      projectFolder: "firehose-transformation-sam-java",
+      templateFile: "firehose-transformation-sam-java/template.yaml"
+    }
+  },
+  resources: {
+    bullets: [
+      {
+        text: "Using AWS Lambda with Amazon Kinesis",
+        link: "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+      },
+      {
+        text: "Working with AWS SAM",
+        link: "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started.html"
+      }
+    ]
+  },
+  deploy: {
+    text: [
+      "sam deploy --guided"
+    ]
+  },
+  testing: {
+    text: [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  cleanup: {
+    text: [
+      "Delete objects in S3: <code>aws s3 rm s3://<BUCKET_NAME> --recursive</code>",
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  authors: [
+    {
+      name: "Praveen Nerellapalli",
+      bio: "Solutions Architect @ AWS",
+      linkedin: "https://www.linkedin.com/in/pnerellapalli/"
+    }
+  ]
+}

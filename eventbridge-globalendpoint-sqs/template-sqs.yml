@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SQS
+
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  StageName:
+    Type: String
+    Default: dev
+
+Resources:
+##########################################################################
+#   SQS                                                                  #
+##########################################################################
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      Tags:
+        - Key: mame
+          Value: !Ref AWS::StackName
+
+Outputs:
+  MySqsQueueName:
+    Description: SQS queue name
+    Value: !GetAtt MySqsQueue.QueueName
+    Export:
+      Name: !Sub MySqsQueueName-${StageName}
+  MySqsQueueArn:
+    Description: SQS queue ARN
+    Value: !GetAtt MySqsQueue.Arn
+    Export:
+      Name: !Sub MySqsQueueArn-${StageName}
+  MySqsQueueURL:
+    Description: SQS queue URL
+    Value: !Ref MySqsQueue
+    Export:
+      Name: !Sub MySqsQueueURL-${StageName}

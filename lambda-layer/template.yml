@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Deploys a lambda function that has the PyMySQL layer and imports PyMySQL. This Lambda works.
+  Deploys another lambda function that does not have the PyMySQL layer and imports PyMySQL. This Lambda produces an error.
+
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  PyMySQLLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: pymysql-layer
+      ContentUri: dependencies/
+      CompatibleRuntimes:
+        - python3.7
+        - python3.8
+
+  PyMySQLLayerLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      MemorySize: 128
+      Timeout: 3
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: src/
+      Description: Lambda Function that imports PyMySQL and has the PyMySQL layer
+      Layers:
+        - !Ref PyMySQLLayer
+
+  PyMySQLNoLayerLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      MemorySize: 128
+      Timeout: 3
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: src/
+      Description: Lambda Function that imports PyMySQL but does not have the PyMySQL layer
+
+Outputs:
+  PyMySQLLayerLambdaFunctionName:
+    Description: The name of the Lambda Function that has the PyMySQL Layer
+    Value: !Ref PyMySQLLayerLambdaFunction
+  PyMySQLLayerLambdaFunctionARN:
+    Description: The ARN of the Lambda Function that has the PyMySQL Layer
+    Value: !GetAtt PyMySQLLayerLambdaFunction.Arn
+  PyMySQLNoLayerLambdaFunctionName:
+    Description: The name of the Lambda Function that has the PyMySQL Layer
+    Value: !Ref PyMySQLNoLayerLambdaFunction
+  PyMySQLNoLayerLambdaFunctionARN:
+    Description: The ARN of the Lambda Function that has the PyMySQL Layer
+    Value: !GetAtt PyMySQLNoLayerLambdaFunction.Arn

@@ -1,0 +1,150 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: SAM application to POST data to API Gateway from Kinesis Data Streams via Kinesis Firehose
+
+Parameters:
+  SecretName:
+    Type: String
+    Default: KinesisFirehoseHttpEndpointAccessKey
+
+Resources:
+
+  MySecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: "KinesisFirehoseHttpEndpointAccessKey"
+      Description: "Secret with dynamically generated secret password."
+      GenerateSecretString:
+        PasswordLength: 30
+        ExcludeCharacters: '"@/\'
+
+  MyApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: dev
+      Auth:
+        DefaultAuthorizer: MyLambdaAuthorizer
+        Authorizers:
+          MyLambdaAuthorizer:
+            FunctionArn: !GetAtt LambdaAuthorizerFunction.Arn
+            Identity:
+              Header: "X-Amz-Firehose-Access-Key"
+
+  LambdaAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: lambda_authorizer.lambda_handler
+      Runtime: python3.10
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref MySecret
+      Environment:
+        Variables:
+          SECRET_NAME: !Ref SecretName
+
+  TestLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.10
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+            RestApiId: !Ref MyApiGateway
+
+  MyKinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 2
+
+  MyKinesisFirehoseRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: KinesisFirehosePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "firehose:CreateDeliveryStream"
+                  - "firehose:DeleteDeliveryStream"
+                  - "firehose:DescribeDeliveryStream"
+                  - "firehose:PutRecord"
+                  - "firehose:PutRecords"
+                  - "firehose:PutRecordBatch"
+                  - "firehose:UpdateDestination"
+                Resource:
+                  - !GetAtt MyKinesisStream.Arn
+              - Effect: Allow
+                Action:
+                  - "kinesis:GetRecords"
+                  - "kinesis:GetShardIterator"
+                  - "kinesis:DescribeStream"
+                  - "kinesis:DescribeStreamSummary"
+                  - "kinesis:DescribeStreamConsumer"
+                  - "kinesis:SubscribeToShard"
+                  - "kinesis:RegisterStreamConsumer"
+                Resource:
+                  - "*"
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:ListBucket"
+                  - "s3:GetObjectVersion"
+                  - "s3:PutObject"
+                  - "s3:PutObjectAcl"
+                Resource:
+                  - !Sub arn:aws:s3:::${MyS3Bucket}/*
+
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+
+  KinesisFirehoseDeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: "MyDeliveryStream"
+      DeliveryStreamType: "KinesisStreamAsSource"
+      KinesisStreamSourceConfiguration:
+        KinesisStreamARN: !GetAtt MyKinesisStream.Arn
+        RoleARN: !GetAtt MyKinesisFirehoseRole.Arn
+      HttpEndpointDestinationConfiguration:
+        EndpointConfiguration:
+          Url: !Sub "https://${MyApiGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+          AccessKey: '{{resolve:secretsmanager:KinesisFirehoseHttpEndpointAccessKey:SecretString}}'
+        RoleARN: !GetAtt MyKinesisFirehoseRole.Arn
+        BufferingHints:
+            IntervalInSeconds: 60
+            SizeInMBs: 1
+        S3Configuration:
+          RoleARN: !GetAtt MyKinesisFirehoseRole.Arn
+          BucketARN: !GetAtt MyS3Bucket.Arn
+          BufferingHints:
+            IntervalInSeconds: 60
+            SizeInMBs: 1
+          ErrorOutputPrefix: "error/"
+          CompressionFormat: "UNCOMPRESSED"
+          Prefix: "raw/"
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value:
+      Fn::Sub: "https://${MyApiGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+  MyKinesisStream:
+    Description: Kinesis Data Stream name
+    Value: !Ref MyKinesisStream     
+  

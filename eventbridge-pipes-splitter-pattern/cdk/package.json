@@ -1,0 +1,30 @@
+{
+  "name": "cdk",
+  "version": "0.1.0",
+  "bin": {
+    "cdk": "bin/cdk.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.284.0",
+    "@aws-sdk/util-dynamodb": "^3.279.0",
+    "@types/aws-lambda": "^8.10.111",
+    "@types/jest": "^29.4.0",
+    "@types/node": "18.11.18",
+    "aws-cdk": "2.80.0",
+    "esbuild": "0.17",
+    "jest": "^29.4.1",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "~4.9.5"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.80.0",
+    "constructs": "^10.0.0",
+    "source-map-support": "^0.5.21"
+  }
+}

@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: Deploys the infrastructure necessary to enable Kinesis Data Firehose data transformation via a Lambda function
+
+
+Parameters:
+  DestinationBucketName:
+    Type: String
+    
+Resources:
+
+  ########## FUNCTION ###########
+  TransformationLambdaFunction:
+    Type: AWS::Serverless::Function
+    Description: 'Lambda function invoked by Kinesis Firehose, transforms streaming data, puts data back in firehose.'
+    Properties:
+      FunctionName: TransformationFunction
+      Handler: index.handler
+      Runtime: nodejs14.x
+      CodeUri: src/
+      Timeout: 90
+  
+  ########## DESTINATION S3 BUCKET ###########
+  DestinationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DestinationBucketName
+
+  ########## KINESIS DATA FIREHOSE ###########
+  DeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    DependsOn:
+      - DeliveryStreamPolicy
+    Properties:
+      DeliveryStreamType: "DirectPut"
+      ExtendedS3DestinationConfiguration:
+        BucketARN: !GetAtt DestinationBucket.Arn
+        BufferingHints:
+          SizeInMBs: 1
+          IntervalInSeconds: 60
+        CloudWatchLoggingOptions:
+          Enabled: true
+          LogGroupName: "/aws/kinesisfirehose/ibcd"
+          LogStreamName: "S3Delivery"
+        EncryptionConfiguration:
+          NoEncryptionConfig: "NoEncryption"
+        Prefix: ""
+        RoleARN: !GetAtt DeliveryStreamRole.Arn
+        ProcessingConfiguration:
+          Enabled: true
+          Processors:
+            - Type: Lambda
+              Parameters:
+                - ParameterName: LambdaArn
+                  ParameterValue: !GetAtt TransformationLambdaFunction.Arn
+
+  ########## POLICIES ##########
+  LambdaFirehoseAccessPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles:
+        - !Ref LambdaRole
+      PolicyName: Lambda_Firehose_access_policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - firehose:DescribeDeliveryStream
+              - firehose:ListDeliveryStreams
+              - firehose:ListTagsForDeliveryStream
+              - firehose:PutRecord
+              - firehose:PutRecordBatch
+            Resource:
+              - !GetAtt DeliveryStream.Arn
+
+  DeliveryStreamPolicy:
+    Type: AWS::IAM::Policy
+    Properties: 
+      Roles:
+        - !Ref DeliveryStreamRole
+      PolicyName: firehose_delivery_policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:GetBucketLocation
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:ListBucketMultipartUploads
+              - s3:PutObject
+            Resource:
+              - !Sub 'arn:aws:s3:::${DestinationBucket}'
+              - !Sub 'arn:aws:s3:::${DestinationBucket}/*'
+          - Effect: Allow
+            Action:
+              - 'lambda:InvokeFunction'
+              - 'lambda:GetFunctionConfiguration'
+            Resource:
+              - !GetAtt TransformationLambdaFunction.Arn
+
+  ########## ROLES ###########
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+
+  DeliveryStreamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+            Action: sts:AssumeRole

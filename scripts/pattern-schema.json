@@ -1,0 +1,57 @@
+{
+  "id": "serverless-pattern-schema",
+  "type": "object",
+  "properties": {
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "language": {
+      "type": "string",
+      "enum": ["TypeScript", "Node.js", "Python", "Java", "Go", "Rust", ".NET", "OpenAPI", "YAML", ""]
+    },
+    "framework": {
+      "type": "string",
+      "enum": ["CDK", "SAM", "Terraform", "Serverless Framework", "Terraform (with modules)", "Pulumi"]
+    },
+    "introBox": {
+      "type": "object",
+      "properties": {
+        "headline": { "type": "string" },
+        "text": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["headline", "text"]
+    },
+    "gitHub": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "object",
+          "properties": {
+            "repoURL": { "type": "string" },
+            "templateURL": { "type": "string" },
+            "projectFolder": { "type": "string" },
+            "templateFile": { "type": "string" }
+          },
+          "required": ["repoURL", "templateURL", "projectFolder", "templateFile"]
+        }
+      },
+      "required": ["template"]
+    },
+    "authors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "bio": { "type": "string" }
+        },
+        "required": ["name", "bio"]
+      }
+    }
+  },
+  "required": ["title", "language", "framework", "introBox", "gitHub", "authors"]
+}

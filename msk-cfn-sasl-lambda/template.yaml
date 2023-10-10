@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  msk-lambda-consumer
+
+  Sample SAM Template for msk-lambda-consumer
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+
+Parameters:
+  MSkClusterId:
+    Description: Copy your MSK cluster arn and paste.
+    Type: String
+  SecretArn:
+    Description: Copy your secrets arn and paste.
+    Type: String
+  TopicName:
+    Description: Pass the topic name where lambda needs to listen in.
+    Default: DemoSASLTopic
+    Type: String
+  SubnetIds:
+    Type: CommaDelimitedList
+    Description: Provide comma separated security ids
+  SecurityGroups:
+    Type: CommaDelimitedList
+    Description: Provide comma separated security group ids
+    
+Resources:
+  TopicConsumerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Ref 'MSkClusterId'
+            Topics:
+              - !Ref 'TopicName'
+            SourceAccessConfigurations:
+              - Type: 'SASL_SCRAM_512_AUTH'
+                URI: !Ref 'SecretArn'
+      VpcConfig:
+        SubnetIds: !Ref SubnetIds
+        SecurityGroupIds: !Ref SecurityGroups
+      Policies:
+        - SecretsManagerReadWrite
+        - AWSLambdaBasicExecutionRole
+        - AWSKeyManagementServicePowerUser
+        - AWSLambdaMSKExecutionRole
+        - Version: '2012-10-17' 
+          Statement:
+            - Effect: Allow
+              Action:
+                - kafka-cluster:Connect
+                - kafka-cluster:AlterCluster
+                - kafka-cluster:DescribeCluster
+                - kafka-cluster:*Topic*
+                - kafka-cluster:WriteData
+                - kafka-cluster:ReadData
+                - kafka-cluster:AlterGroup
+                - kafka-cluster:DescribeGroup
+                - kafka:ListScramSecrets
+              Resource: !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:*'
+
+Outputs:
+  TopicConsumerFunction:
+    Description: "Topic Consumer Lambda Function ARN"
+    Value: !GetAtt TopicConsumerFunction.Arn
+  TopicConsumerFunctionIamRole:
+    Description: "Implicit IAM Role created for Topic Consumer function"
+    Value: !GetAtt TopicConsumerFunctionRole.Arn

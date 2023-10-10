@@ -1,6 +1,6 @@
 # AWS Amazon S3 to AWS Lambda - Create a Lambda function that resizes images uploaded to S3
 
-The SAM template deploys a Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image and creates a thumbail version of the image in the same bucket.
+The SAM template deploys a Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image and creates a thumbnail version of the image in the same bucket.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-lambda](https://serverlessland.com/patterns/s3-lambda)
 

@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: stepfunctions-eventbridge-lambda
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+#Lambda Functions
+Resources:
+  OrderState:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: OrderState
+      Handler: com.example.OrderState::handleRequest
+      CodeUri: target/sourceCode.zip
+
+  ProcessOrder:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ProcessOrder
+      Handler: com.example.ProcessOrder::handleRequest
+      CodeUri: target/sourceCode.zip
+
+  #EventBridge custom Event Bus
+  OrdersEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: OrdersEventBus
+
+  #EventBridge Event Rule
+  ProcessOrderEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: ProcessOrderEventRule
+      EventBusName: !GetAtt OrdersEventBus.Arn
+      Targets:
+        - Arn: !GetAtt ProcessOrder.Arn
+          Id: "ProcessOrder"
+      EventPattern:
+        source:
+          - "com.example.orders"
+
+  ## Step Function
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: sfn-definition.asl.yml
+      DefinitionSubstitutions:
+        OrderState: !GetAtt OrderState.Arn
+      Name: ProcessOrders
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "cloudwatch:*"
+                - "logs:*"
+                - "lambda:InvokeFunction"
+                - "events:PutEvents"
+              Resource: "*"
+
+  ProcessOrderEventBridgeRuleInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ProcessOrder
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt ProcessOrderEventRule.Arn

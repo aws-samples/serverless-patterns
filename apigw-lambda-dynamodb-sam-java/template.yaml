@@ -5,7 +5,7 @@ Description: AWS-SAM-APIGW-Lambda-DDB
 Globals:
   Function:
     Runtime: java11
-    MemorySize: 512
+    MemorySize: 3008
     Timeout: 25
 
   Api:
@@ -46,3 +46,9 @@ Resources:
       PrimaryKey:
         Name: ticketId
         Type: String
+
+Outputs:
+  PaymentsEndpoint:
+    Description: API Gateway Payments Endpoint
+    Value:
+      Fn::Sub: https://${ticketAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/ticket

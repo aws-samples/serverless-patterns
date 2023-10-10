@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Deploys the resources necessary to enable Kinesis Data Firehose data transformation via a Lambda function
+Parameters:
+  DestinationS3BucketName:
+    Type: String
+    Description: 'Optional name of the S3 bucket where the streaming data should be delivered'
+    Default: ''
+
+Globals:
+  Function:
+    Tracing: Active
+Conditions:
+  HasBucketName: !Not [!Equals [!Ref DestinationS3BucketName, '']]
+
+Resources:
+
+########## Data TRANSFORMATION LAMBDA FUNCTION ###########
+  TransformationLambdaFunction:
+    Type: AWS::Serverless::Function
+    Description: 'Lambda function invoked by Kinesis Data Firehose, transforms streaming data, returns data to Firehose'
+    Properties:
+      FunctionName: 'KDFTransformationFunction'
+      Handler: 'app.handler'
+      Runtime: 'python3.11'
+      CodeUri: 'src/'
+      Timeout: 60
+
+  ########## DESTINATION S3 BUCKET ###########
+  DestinationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !If [HasBucketName, !Ref DestinationS3BucketName, !Ref 'AWS::NoValue']
+      
+  ########## KINESIS DATA FIREHOSE ###########
+  DeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamType: 'DirectPut'
+      ExtendedS3DestinationConfiguration:
+        BucketARN: !GetAtt 'DestinationBucket.Arn'
+        Prefix: ''
+        BufferingHints:
+          SizeInMBs: 1
+          IntervalInSeconds: 60
+        CloudWatchLoggingOptions:
+          Enabled: true
+          LogGroupName: !Ref DeliveryStreamLogGroup
+          LogStreamName: !Ref DeliveryStreamLogStream
+        EncryptionConfiguration:
+          NoEncryptionConfig: 'NoEncryption'
+        RoleARN: !GetAtt 'DeliveryStreamRole.Arn'
+        ProcessingConfiguration:
+          Enabled: true
+          Processors:
+            - Type: 'Lambda'
+              Parameters:
+                - ParameterName: 'LambdaArn'
+                  ParameterValue: !GetAtt 'TransformationLambdaFunction.Arn'
+  
+  ########## CLOUDWATCH LOGGING FOR KINESIS DATA FIREHOSE ###########
+  DeliveryStreamLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: '/aws/kinesisfirehose/kdf-serverless-pattern'
+      RetentionInDays: 90
+
+  DeliveryStreamLogStream:
+    Type: AWS::Logs::LogStream
+    Properties:
+      LogGroupName: !Ref DeliveryStreamLogGroup
+      LogStreamName: 'S3Delivery'
+
+  ########## IAM ROLE FOR KINESIS DATA FIREHOSE ###########
+  DeliveryStreamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: 'Allow'
+            Principal:
+              Service: 'firehose.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'firehose-to-s3-destination'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 's3:AbortMultipartUpload'
+                  - 's3:GetBucketLocation'
+                  - 's3:GetObject'
+                  - 's3:ListBucket'
+                  - 's3:ListBucketMultipartUploads'
+                  - 's3:PutObject'
+                Resource:
+                  - !Sub 'arn:aws:s3:::${DestinationBucket}'
+                  - !Sub 'arn:aws:s3:::${DestinationBucket}/*'
+        - PolicyName: 'invoke-lambda-transformation-function'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'lambda:InvokeFunction'
+                  - 'lambda:GetFunctionConfiguration'
+                Resource: !GetAtt 'TransformationLambdaFunction.Arn'
+        - PolicyName: 'write-to-cloudwatch-logs'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'logs:PutLogEvents'
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${DeliveryStreamLogGroup}:log-stream:${DeliveryStreamLogStream}'
+Outputs:
+  S3Bucket:
+    Description: 'Name of the destination S3 bucket'
+    Value: !Ref DestinationBucket
+

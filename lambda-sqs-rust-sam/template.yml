@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Lambda to SQS
+  
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 30
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#   SQS                                                                  #
+##########################################################################
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  QueuePublisherFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ./build/handler
+      Environment:
+        Variables:
+          SQS_QUEUE_NAME: !Ref MySqsQueue
+      Policies:
+        ## Read more about SAM Policy templates at:
+        ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt MySqsQueue.QueueName
+
+Outputs:
+  QueuePublisherFunction:
+    Description: QueuePublisherFunction function name
+    Value: !Ref QueuePublisherFunction
+  
+  SQSqueueName:
+    Description: SNS queue name
+    Value: !GetAtt MySqsQueue.QueueName
+
+  SQSqueueARN:
+    Description: SQS queue ARN
+    Value: !GetAtt MySqsQueue.Arn
+
+  SQSqueueURL:
+    Description: SQS queue URL
+    Value: !Ref MySqsQueue

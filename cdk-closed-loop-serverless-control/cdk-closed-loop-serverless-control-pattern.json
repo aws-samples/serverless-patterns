@@ -1,0 +1,63 @@
+{
+  "title": "Amazon EventBridge to AWS Lambda with feedback control by Amazon Cloudwatch Alarms",
+  "description": "Create a closed-Loop (feedback) control mechanism for throttle-handling of 3rd party calls on AWS Lambda with Amazon Cloudwatch Alarms and Amazon EventBridge",
+  "language": "TypeScript",
+  "level": "400",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates an ON/OFF control implementation on AWS Lambda with a closed-loop (feedback) control mechanism. This is useful when your application is dependent on third-party calls and you need to handle any throttling or a performance issue on the third-party service.",
+      "Using the feedback control mechanism, AWS Lambda performs the third-party call and uses Amazon Cloudwatch custom metrics feature to store call metrics like response time and status code. This pattern deploys two AWS Lambda functions, one Amazon EventBridge rule, two Amazon CloudWatch alarms and one Amazon Cloudwatch composite alarm.",
+      "A set of Cloudwatch Alarms monitors these custom metrics produced after the third-party call and decides if the third-party service call is healty. If not, the event planner Lambda function stops feeding messages to EventBridge to drop third-party calls temporarly to avoid additional load on the third-party service. It also brings cost benefits and concurrency savings on AWS Lambda by avoiding the lambda invocations for the unhealthy 3rd party service."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-closed-loop-serverless-control",
+      "templateURL": "serverless-patterns/cdk-closed-loop-serverless-control",
+      "projectFolder": "cdk-closed-loop-serverless-control/cdk",
+      "templateFile": "lib/cdk-serverless-control-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Amazon CloudWatch alarms",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html"
+      },
+      {
+        "text": "Amazon CloudWatch - Publishing custom metrics",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html"
+      },
+      {
+        "text": "Amazon EventBridge features",
+        "link": "https://aws.amazon.com/eventbridge/features/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See README.md file in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Emir Ayar",
+      "image": "https://eercan.com/emir-ercan-ayar-2022-profile-mid.png",
+      "bio": "Emir Ayar is a Tech Lead Solutions Architect on the AWS Prototyping Team to help customers build IoT, Edge AI, and Industry 4.0 solutions and implement architectural best practices.",
+      "linkedin": "https://www.linkedin.com/in/eercanayar/",
+      "twitter": "https://twitter.com/eercanayar"
+    }
+  ]
+}

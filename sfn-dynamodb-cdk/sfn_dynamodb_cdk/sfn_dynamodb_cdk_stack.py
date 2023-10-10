@@ -1,24 +1,20 @@
-from aws_cdk import core as cdk
-
-# For consistency with other languages, `cdk` is the preferred import name for
-# the CDK's core module.  The following line also imports it as `core` for use
-# with examples from the CDK Developer's Guide, which are in the process of
-# being updated to use `cdk`.  You may delete this import if you don't need it.
-from aws_cdk import core
 from aws_cdk import (
+    Stack,
+    CfnOutput,
+    Duration,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as sfn_tasks,
     aws_dynamodb as ddb,
-    core
 )
 from aws_cdk.aws_dynamodb import Attribute
+from constructs import Construct
 
 table_name = "MyDDBTableName"
 
 
-class SfnDynamodbCdkStack(cdk.Stack):
+class SfnDynamodbCdkStack(Stack):
 
-    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # The code that defines your stack goes here
@@ -52,11 +48,11 @@ class SfnDynamodbCdkStack(cdk.Stack):
         state_machine = sfn.StateMachine(
             self, "SfnToDDBWorkflowStateMachine",
             definition=definition,
-            timeout=core.Duration.minutes(5)
+            timeout=Duration.minutes(5)
         )
 
-        core.CfnOutput(scope=self, id='StateMachineArn',
+        CfnOutput(scope=self, id='StateMachineArn',
                        value=state_machine.state_machine_arn)
 
-        core.CfnOutput(scope=self, id='TableName',
+        CfnOutput(scope=self, id='TableName',
                        value=ddb_table.table_name)

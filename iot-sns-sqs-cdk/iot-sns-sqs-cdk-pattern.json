@@ -1,0 +1,57 @@
+{
+  "title": "IoT Core to SNS to SQS",
+  "description": "Create a IoT Rule with a SNS action that delivers messages to a SQS queue.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern contains a sample AWS CDK stack to create an IoT Rule with a SNS action, a SNS Topic and a SQS standard Queue subscribed to the SNS topic.",
+      "When a message is published to the IoT topic defined in the IoT Rule, this message will be published to the SNS topic and then the message will be delivered to the SQS queue subscribed to the SNS topic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-sns-sqs-cdk",
+      "templateURL": "serverless-patterns/iot-sns-sqs-cdk",
+      "projectFolder": "iot-sns-sqs-cdk",
+      "templateFile": "iot-sns-sqs-cdk/iot_sns_sqs_cdk/iot_sns_sqs_cdk_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "IoT Rule SNS action",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/sns-rule-action.html"
+      },
+      {
+        "text": "Subscribing a SQS queue to a SNS topic",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-subscribe-queue-sns-topic.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Patrick Malatesta",
+      "image": "https://media-exp1.licdn.com/dms/image/C5603AQF5JwByyAUH8g/profile-displayphoto-shrink_200_200/0/1569421621135?e=1660780800&v=beta&t=7tR-t6sQkFbWSFhWmthf-2wGMFNGbmcfpQhvxXupm6g",
+      "bio": "Cloud Infrastructure Architect at AWS Professional Services",
+      "linkedin": "https://www.linkedin.com/in/patricktomasinimalatesta/"
+    }
+  ]
+}

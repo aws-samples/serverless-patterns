@@ -20,7 +20,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 3
       MemorySize: 128
       Environment:
@@ -28,7 +28,7 @@ Resources:
           SES_SENDER_IDENTITY: !Ref SenderEmailAddress
       Policies:
         - SESCrudPolicy: 
-          IdentityName: '*' #Specify ARN(s) for identity. If in sandbox, specify both SENDER and RECEIVER ARNs
+            IdentityName: '*' #Specify ARN(s) for identity. If in sandbox, specify both SENDER and RECEIVER ARNs
 
 ##########################################################################
 #   OUTPUTS                                                              #

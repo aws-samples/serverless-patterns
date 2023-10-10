@@ -13,21 +13,16 @@
   "devDependencies": {
     "@types/jest": "^26.0.10",
     "@types/node": "10.17.27",
-    "aws-cdk": "^2.1.0",
+    "aws-cdk": "2.80.0",
     "jest": "^26.4.2",
     "ts-jest": "^26.2.0",
     "ts-node": "^9.0.0",
     "typescript": "~3.9.7"
   },
   "dependencies": {
-    "@aws-cdk/aws-ec2": "^1.136.0",
-    "@aws-cdk/aws-lambda-event-sources": "^1.136.0",
-    "@aws-cdk/aws-lambda-nodejs": "^1.136.0",
-    "@aws-cdk/aws-msk": "^1.136.0",
-    "@aws-cdk/aws-sqs": "^1.136.0",
-    "@aws-cdk/core": "^1.136.0",
-    "aws-cdk-lib": "2.1.0",
-    "constructs": "^10.0.12",
+    "@aws-cdk/aws-msk-alpha": "^2.16.0-alpha.0",
+    "aws-cdk-lib": "2.80.0",
+    "constructs": "^10.0.0",
     "package.json": "^2.0.1"
   }
 }

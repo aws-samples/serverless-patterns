@@ -1,0 +1,33 @@
+input EventInput {
+  # The unique identifier for the Event.
+  id: String!
+  customMessage: String
+}
+
+type EventResponse @aws_api_key {
+  # The event accepted within integration layer.
+  status: String!
+}
+
+type Query {
+  getEvents(
+    limit: Int
+    nextToken: String
+  ): EventList! @aws_api_key
+}
+
+type EventList {  
+  id: String
+}
+
+type Mutation {  
+  # Put Event.
+  putEvent(
+    event: EventInput!
+  ): EventResponse @aws_api_key
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

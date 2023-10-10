@@ -1,0 +1,60 @@
+{
+  "title": "AWS WAF ACL attached to Amazon AppSync graphql API",
+  "description": "Create an AppSync graphql API protected with WAF rules. This WebACL limits the requests to certain countries and protects against common graphql attacks.",
+  "language": "typescript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to protect an AppSync Graphql API against attacks using WAF (Web Application Firewall) rules.",
+      "This pattern deploys a graphql API with DynamoDB resolvers, and a WAF web ACL with rules for protecting GraphQL APIs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/waf-appsync-cdk",
+      "templateURL": "serverless-patterns/waf-appsync-cdk",
+      "projectFolder": "waf-appsync-cdk",
+      "templateFile": "cdk.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using AWS WAF to protect your APIs",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/WAF-Integration.html"
+      },
+      {
+        "text": "AWS WAF",
+        "link": "https://aws.amazon.com/waf/"
+      },
+      {
+        "text": "Building WAF rules",
+        "link": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rules.html"
+      },
+      {
+        "text": "AWS AppSync",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy --all"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "Harun Hasdal",
+      "image": "https://avatars.githubusercontent.com/u/4698942",
+      "bio": "AWS Solution Architect. Serverless advocate.",
+      "linkedin": "harunhasdal",
+      "twitter": "@harunhasdal"
+    }
+  ]
+}

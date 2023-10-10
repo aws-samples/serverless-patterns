@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: s3-lambda-s3
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+Resources:
+  TextTransformer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: TextTransformer
+      Handler: com.example.TextTransformer::handleRequest
+      CodeUri: target/sourceCode.zip
+      Policies:
+        - S3ReadPolicy:
+            BucketName: sourceconfigbckt
+        - S3CrudPolicy:
+            BucketName: destinationconfigbckt
+      Environment:
+        Variables:
+          SOURCE_BUCKET: sourceconfigbckt
+      Events:
+        FileUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref sourceconfigbckt
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: '.txt'
+
+  sourceconfigbckt:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: sourceconfigbckt
+
+  destinationconfigbckt:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: destinationconfigbckt

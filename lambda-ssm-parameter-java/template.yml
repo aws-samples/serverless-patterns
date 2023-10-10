@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Lambda function and an AWS Systems Manager Parameter Store parameter.
+
+Parameters:
+  SSMParameterName:
+    Description: Parameter name.
+    Type: String
+    Default: ExampleParameterName
+    MinLength: 1
+    MaxLength: 950
+    AllowedPattern: ^[a-zA-Z0-9_.-/]*$
+Resources:
+  SSMParameter:
+    Type: 'AWS::SSM::Parameter'
+    Properties:
+      Name: !Ref SSMParameterName
+      Type: String
+      Value: "{\"key1\":\"value1\"}"
+
+  LambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    DependsOn:
+      - SSMParameter
+    Properties:
+      CodeUri: LambdaFunction
+      Handler: com.example.App::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          SSMParameterName: !Ref SSMParameterName
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - 'ssm:GetParameter'
+              - 'ssm:PutParameter'
+            Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SSMParameterName}'
+
+Outputs:
+  LambdaFunctionName:
+    Description: Lambda function name.
+    Value: !Ref LambdaFunction

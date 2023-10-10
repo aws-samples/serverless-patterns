@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template to connect DynamoDB Stream to EventBridge
+
+Resources:
+
+  # DynamoDB Table
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AWS::StackName}-orders
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        ## Listen for KEYS_ONLY, NEW_IMAGE, OLD_IMAGE, or NEW_AND_OLD_IMAGES (https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_StreamSpecification.html)
+        StreamViewType: NEW_AND_OLD_IMAGES    
+
+  # Event Bus (Target)
+  ApplicationEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub ${AWS::StackName}-bus
+
+  # DLQ for Stream (Source)
+  PipeDLQueue: 
+    Type: AWS::SQS::Queue   
+    Properties: 
+      QueueName: !Sub ${AWS::StackName}-pipe-dlq
+
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-source-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:DescribeStream"
+                  - "dynamodb:GetRecords"
+                  - "dynamodb:GetShardIterator"
+                  - "dynamodb:ListStreams"
+                Resource: !GetAtt OrdersTable.StreamArn
+        - PolicyName: !Sub ${AWS::StackName}-target-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:PutEvents'
+                Resource: !GetAtt ApplicationEventBus.Arn
+        - PolicyName: !Sub ${AWS::StackName}-dlq-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "SQS:SendMessage"
+                Resource: !GetAtt PipeDLQueue.Arn
+
+  # EventBridge Pipe to listen to all created items in DDB table             
+  OrderCreatedPipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: !Sub ${AWS::StackName}-order-created
+      Description: "Pipes to connect to DDB stream listening only for insert changes"
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt OrdersTable.StreamArn
+      SourceParameters:
+        FilterCriteria:
+          Filters:
+            - Pattern: '{ "eventName": ["INSERT"] }'
+        DynamoDBStreamParameters:
+          StartingPosition: LATEST
+          BatchSize: 1
+          DeadLetterConfig:
+            Arn: !GetAtt PipeDLQueue.Arn
+      Target: !GetAtt ApplicationEventBus.Arn
+      TargetParameters:
+        EventBridgeEventBusParameters:
+          DetailType: "OrderCreated"
+          Source: "myapp.orders"
+
+  # EventBridge Pipe to listen to all updated items in DDB table
+  OrderUpdatedPipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: !Sub ${AWS::StackName}-order-updated
+      Description: "Pipes to connect to DDB stream listening only for modify changes"
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt OrdersTable.StreamArn
+      SourceParameters:
+        FilterCriteria:
+          Filters:
+            - Pattern: '{ "eventName": ["MODIFY"] }'
+        DynamoDBStreamParameters:
+          StartingPosition: LATEST
+          BatchSize: 1
+          DeadLetterConfig:
+            Arn: !GetAtt PipeDLQueue.Arn
+      Target: !GetAtt ApplicationEventBus.Arn
+      TargetParameters:
+        EventBridgeEventBusParameters:
+          DetailType: "OrderUpdated"
+          Source: "myapp.orders"
+

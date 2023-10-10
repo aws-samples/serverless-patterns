@@ -1,0 +1,507 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  EnvType:
+    Description: MSK Cluster Type.
+    Default: Serverless
+    Type: String
+    AllowedValues:
+      - Serverless
+      - Provisioned
+    ConstraintDescription: Must specify Serverless or Provisioned.
+Conditions:
+  CreateProvisionedCluster: !Equals 
+    - !Ref EnvType
+    - Provisioned
+  CreateServerlessCluster: !Equals 
+    - !Ref EnvType
+    - Serverless    
+Mappings:
+  SubnetConfig:
+      VPC:
+        CIDR: '10.0.0.0/16'
+      PublicOne:
+        CIDR: '10.0.0.0/24'
+      PrivateSubnetMSKOne:
+        CIDR: '10.0.1.0/24'
+      PrivateSubnetMSKTwo:
+        CIDR: '10.0.2.0/24'
+      PrivateSubnetMSKThree:
+        CIDR: '10.0.3.0/24'
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+      Tags:
+        - Key: 'Name'
+          Value: 'MSKVPC'
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicOne', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: 'Name'
+          Value: 'PublicSubnet'
+  PrivateSubnetMSKOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetMSKOne', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetMSKOne'
+  PrivateSubnetMSKTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 1
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetMSKTwo', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetMSKTwo'
+  PrivateSubnetMSKThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 2
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetMSKThree', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetMSKThree'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+
+  NATEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachement
+    Properties: 
+      Domain: vpc
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NATEIP.AllocationId
+      SubnetId: !Ref 'PublicSubnetOne'
+      Tags: 
+        - Key: 'Name'
+          Value: 'ConfluentKafkaNATGateway'
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachement
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetOne
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway'
+
+  PrivateSubnetMSKOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetMSKOne
+  PrivateSubnetMSKTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetMSKTwo
+  PrivateSubnetMSKThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetMSKThree
+  
+  Cloud9EC2Bastion:
+    Type: AWS::Cloud9::EnvironmentEC2
+    Properties: 
+      AutomaticStopTimeMinutes: 30
+      Description: "Cloud9 EC2 environment"
+      InstanceType: t3.large
+      Name: !Sub "${AWS::StackName}-Cloud9EC2Bastion"
+      SubnetId: !Ref PublicSubnetOne
+      Tags: 
+        - Key: 'Purpose'
+          Value: 'Cloud9EC2BastionHostInstance'
+  
+  KafkaClientInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
+      GroupName: !Sub "${AWS::StackName} Security group attached to the kakfa client producer"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 10.0.0.0/24
+
+  MSKSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Security Group for the MSK cluster
+      GroupName: !Sub "${AWS::StackName} Security group for the MSK cluster"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 9092
+          ToPort: 9092
+          CidrIp: 10.0.0.0/24
+        - IpProtocol: tcp
+          FromPort: 9094
+          ToPort: 9094
+          CidrIp: 10.0.0.0/24
+        - IpProtocol: tcp
+          FromPort: 2181
+          ToPort: 2181
+          CidrIp: 10.0.0.0/24
+        - IpProtocol: tcp
+          FromPort: 9098
+          ToPort: 9098
+          CidrIp: 10.0.0.0/24
+        - IpProtocol: tcp
+          FromPort: 9096
+          ToPort: 9096
+          CidrIp: 10.0.0.0/24
+        - IpProtocol: tcp
+          FromPort: 8083
+          ToPort: 8083
+          CidrIp: 10.0.0.0/24
+        - IpProtocol: tcp
+          FromPort: 8081
+          ToPort: 8081
+          CidrIp: 10.0.0.0/24
+      VpcId: !Ref 'VPC'
+
+
+  SKSecurityGroup9092:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: MSKSecurityGroup
+    Properties:
+      GroupId: !GetAtt MSKSecurityGroup.GroupId
+      Description: Enable Self referencing Bootstrap servers Plaintext
+      IpProtocol: tcp
+      FromPort: 9092
+      ToPort: 9092
+      SourceSecurityGroupId: !GetAtt MSKSecurityGroup.GroupId
+
+  MSKSecurityGroup9096:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: MSKSecurityGroup
+    Properties:
+      GroupId: !GetAtt MSKSecurityGroup.GroupId
+      Description: Enable Self referencing SASL
+      IpProtocol: tcp
+      FromPort: 9096
+      ToPort: 9096
+      SourceSecurityGroupId: !GetAtt MSKSecurityGroup.GroupId
+
+  MSKSecurityGroup9098:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: MSKSecurityGroup
+    Properties:
+      GroupId: !GetAtt MSKSecurityGroup.GroupId
+      Description: Enable Self referencing IAM
+      IpProtocol: tcp
+      FromPort: 9098
+      ToPort: 9098
+      SourceSecurityGroupId: !GetAtt MSKSecurityGroup.GroupId
+
+  MSKCertAuthority:
+    Type: AWS::ACMPCA::CertificateAuthority
+    Condition: CreateProvisionedCluster
+    Properties: 
+      KeyAlgorithm: "RSA_4096"
+      SigningAlgorithm: "SHA256WITHRSA"
+      Subject: 
+        Country: "US"
+      Type: "ROOT"
+
+  MSKCert:
+    Type: AWS::ACMPCA::Certificate
+    Condition: CreateProvisionedCluster
+    Properties: 
+      CertificateAuthorityArn: !Ref MSKCertAuthority
+      CertificateSigningRequest: !GetAtt
+        - MSKCertAuthority
+        - CertificateSigningRequest
+      SigningAlgorithm: "SHA256WITHRSA"
+      TemplateArn: arn:aws:acm-pca:::template/RootCACertificate/V1
+      Validity: 
+        Type: YEARS
+        Value: 10
+
+  RootCAActivation:
+    Type: AWS::ACMPCA::CertificateAuthorityActivation
+    Condition: CreateProvisionedCluster
+    Properties:
+      CertificateAuthorityArn:
+        Ref: MSKCertAuthority
+      Certificate:
+        Fn::GetAtt:
+        - MSKCert
+        - Certificate
+      Status: ACTIVE
+
+  RootCAPermission:
+    Type: AWS::ACMPCA::Permission
+    Condition: CreateProvisionedCluster
+    Properties:
+      Actions:
+        - IssueCertificate
+        - GetCertificate
+        - ListPermissions
+      CertificateAuthorityArn: !Ref MSKCertAuthority
+      Principal: acm.amazonaws.com
+
+  CredentialsKMSKey:
+    Type: AWS::KMS::Key
+    Condition: CreateProvisionedCluster
+    Properties: 
+      Description: "KMS key to use with credentials secret with KMS"
+      EnableKeyRotation: True
+      KeyPolicy: 
+        Version: "2012-10-17"
+        Id: key-default-1
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Join 
+                - ''
+                - - 'arn:aws:iam::'
+                  - !Ref 'AWS::AccountId'
+                  - ':root'
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: Enable Secret Manager Permissions
+            Effect: Allow
+            Principal:
+              AWS: "*"
+            Action: 
+              - "kms:Decrypt"
+              - "kms:ReEncrypt*"
+              - "kms:GenerateDataKey*"
+              - "kms:CreateGrant"
+              - "kms:DescribeKey"
+            Resource: '*'
+            Condition:
+              StringEquals:
+                kms:CallerAccount: !Ref 'AWS::AccountId'
+                kms:ViaService: !Join 
+                  - ''
+                  - - 'secretsmanager.'
+                    - !Ref 'AWS::Region'
+                    - '.amazonaws.com'
+      PendingWindowInDays: 7
+  
+  CredentialsKMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Condition: CreateProvisionedCluster
+    Properties: 
+      AliasName: alias/mskstack_secret_manager_key
+      TargetKeyId: !Ref 'CredentialsKMSKey'
+
+  CredentialsSecret:
+    Type: AWS::SecretsManager::Secret
+    Condition: CreateProvisionedCluster
+    Properties: 
+      Description: "Secret to use for SCRAM Auth"
+      Name: "AmazonMSK_Credentials"
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "test-user"}'
+        GenerateStringKey: "password"
+        PasswordLength: 30
+        ExcludeCharacters: '"@/\'
+      KmsKeyId: !Ref 'CredentialsKMSKey'
+
+  MSKConfiguration:
+    Type: AWS::MSK::Configuration
+    Condition: CreateProvisionedCluster
+    Properties: 
+      Description: "MSKConfiguration"
+      Name: "MSKConfiguration"
+      ServerProperties: |
+        auto.create.topics.enable=true
+        default.replication.factor=3
+        min.insync.replicas=2
+        num.io.threads=8
+        num.network.threads=5
+        num.partitions=1
+        num.replica.fetchers=2
+        replica.lag.time.max.ms=30000
+        socket.receive.buffer.bytes=102400
+        socket.request.max.bytes=104857600
+        socket.send.buffer.bytes=102400
+        unclean.leader.election.enable=true
+        zookeeper.session.timeout.ms=18000
+        delete.topic.enable=true
+        log.retention.hours=8
+
+  MSKCluster:
+    Type: AWS::MSK::Cluster
+    Condition: CreateProvisionedCluster
+    Properties: 
+      BrokerNodeGroupInfo: 
+        ClientSubnets:
+          - !Ref PrivateSubnetMSKOne
+          - !Ref PrivateSubnetMSKTwo
+          - !Ref PrivateSubnetMSKThree
+        SecurityGroups:
+          - !GetAtt MSKSecurityGroup.GroupId
+        InstanceType: "kafka.m5.large"
+        StorageInfo:
+          EBSStorageInfo:
+            VolumeSize: 100
+      ClientAuthentication: 
+        Unauthenticated: 
+          Enabled: False
+        Sasl:
+          Iam:
+            Enabled: True
+          Scram:
+            Enabled: True
+        Tls:
+          CertificateAuthorityArnList: 
+            - !Ref MSKCertAuthority
+          Enabled: True
+      ClusterName: !Sub "${AWS::StackName}-cluster"
+      ConfigurationInfo: 
+        Arn: !Ref MSKConfiguration
+        Revision: 1
+      EncryptionInfo: 
+        EncryptionInTransit: 
+          ClientBroker: TLS
+          InCluster: True
+      KafkaVersion: "3.3.1"
+      NumberOfBrokerNodes: 3
+
+  SecretMSKAssociation:
+    Type: AWS::MSK::BatchScramSecret
+    Condition: CreateProvisionedCluster
+    Properties: 
+      ClusterArn: !Ref MSKCluster
+      SecretArnList: 
+        - !Ref CredentialsSecret
+
+  ServerlessMSKCluster:
+    Type: AWS::MSK::ServerlessCluster
+    Condition: CreateServerlessCluster
+    Properties: 
+      ClientAuthentication: 
+        Sasl:
+          Iam:
+            Enabled: True
+      ClusterName: !Sub "${AWS::StackName}-serverless-cluster"
+      VpcConfigs: 
+        - SubnetIds: 
+            - !Ref PrivateSubnetMSKOne
+            - !Ref PrivateSubnetMSKTwo
+            - !Ref PrivateSubnetMSKThree
+          SecurityGroups:
+              - !GetAtt MSKSecurityGroup.GroupId
+
+Outputs:
+  VPCId: 
+    Description: The ID of the VPC created
+    Value: !Ref 'VPC'
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCID"
+  PublicSubnetOne: 
+    Description: The name of the public subnet created
+    Value: !Ref 'PublicSubnetOne'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnetOne"
+  PrivateSubnetMSKOne: 
+    Description: The ID of private subnet one created
+    Value: !Ref 'PrivateSubnetMSKOne'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetMSKOne"
+  PrivateSubnetMSKTwo: 
+    Description: The ID of private subnet two created
+    Value: !Ref 'PrivateSubnetMSKTwo'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetMSKTwo"
+  PrivateSubnetMSKThree: 
+    Description: The ID of private subnet three created
+    Value: !Ref 'PrivateSubnetMSKThree'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetMSKThree"
+  VPCStackName: 
+    Description: The name of the VPC Stack
+    Value: !Ref 'AWS::StackName'
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCStackName"
+  ProvisionedMSKArn:
+    Description: Provisioned MSK Cluster ARN. 
+    Value: !Ref MSKCluster
+    Export:
+      Name: !Sub "${AWS::StackName}-ProvisionedMSKArn"
+    Condition: "CreateProvisionedCluster"
+  CredentialsSecretArn:
+    Description: ARN for secret manager secret with credentials. 
+    Value: !Ref CredentialsSecret
+    Export:
+      Name: !Sub "${AWS::StackName}-CredentialsSecret"
+    Condition: "CreateProvisionedCluster"
+  ServerlessMSKArn:
+    Description: Serverless MSK Cluster ARN. 
+    Value: !Ref ServerlessMSKCluster
+    Export:
+      Name: !Sub "${AWS::StackName}-Serverless"
+    Condition: "CreateServerlessCluster"
+  SecurityGroupId:
+    Description: ID of scurity group for MSK clients. 
+    Value: !GetAtt MSKSecurityGroup.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}-SecurityGroupId"
+    
+
+

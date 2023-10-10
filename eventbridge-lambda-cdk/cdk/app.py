@@ -1,14 +1,18 @@
 from aws_cdk import (
+    App,
+    Stack,
+    RemovalPolicy,
+    Duration,
     aws_events as events,
     aws_lambda as lambda_,
     aws_events_targets as targets,
-    aws_logs as logs,
-    core as cdk,
+    aws_logs as logs
 )
+from constructs import Construct
 
 
-class EventBridgeLambdaStack(cdk.Stack):
-    def __init__(self, app: cdk.App, id: str) -> None:
+class EventBridgeLambdaStack(Stack):
+    def __init__(self, app: App, id: str) -> None:
         super().__init__(app, id)
 
         # Lambda Function
@@ -19,7 +23,7 @@ class EventBridgeLambdaStack(cdk.Stack):
             self, "Singleton",
             code=lambda_.InlineCode(handler_code),
             handler="index.main",
-            timeout=cdk.Duration.seconds(10),
+            timeout=Duration.seconds(10),
             runtime=lambda_.Runtime.PYTHON_3_9,
         )
 
@@ -28,7 +32,7 @@ class EventBridgeLambdaStack(cdk.Stack):
             self,
             'logs',
             log_group_name = f"/aws/lambda/{lambdaFn.function_name}",
-            removal_policy = cdk.RemovalPolicy.DESTROY,
+            removal_policy = RemovalPolicy.DESTROY,
             retention = logs.RetentionDays.ONE_DAY
         )
 
@@ -43,6 +47,6 @@ class EventBridgeLambdaStack(cdk.Stack):
         rule.add_target(targets.LambdaFunction(lambdaFn))
 
 
-app = cdk.App()
+app = App()
 EventBridgeLambdaStack(app, "EventBridgeLambdaExample")
 app.synth()

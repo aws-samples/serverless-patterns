@@ -11,14 +11,13 @@
   },
   "devDependencies": {
     "@types/node": "10.17.27",
-    "aws-cdk": "1.125.0",
+    "aws-cdk": "2.80.0",
     "ts-node": "^9.0.0",
     "typescript": "~3.9.7"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.125.0",
-    "@aws-cdk/aws-dynamodb": "1.125.0",
-    "@aws-cdk/core": "1.125.0",
+    "aws-cdk-lib": "2.80.0",
+    "constructs": "^10.0.0",
     "source-map-support": "^0.5.16"
   }
 }

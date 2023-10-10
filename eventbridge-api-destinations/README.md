@@ -16,10 +16,14 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * To run example #1, an account with [Webhook.site](https://webhook.site/)
 * To run example #2, an account with [Slack](http://slack.com). Follow the instructions at [Create a bot for your workspace](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) and note the bot's token (this code begins with xoxb) and the channel ID. You need both of these values to deploy the solution.
-* To run example #3, an account with [sumologic](https://sumologic.com). Follow the instructions at [Create an HTTP Source ](https://help.sumologic.com/03Send-Data/Sources/02Sources-for-Hosted-Collectors/HTTP-Source) and note the unique URL for your HTTP Source you need this value to deploy the solution.
-* To run example #4, an account with [mongodb](https://www.mongodb.com/). Follow the instructions at [Create an HTTPS Endpoint](https://docs.mongodb.com/realm/endpoints/) and note the unique URL for your API destination endpoint to deploy the solution.
+* To run example #3, an account with [Sumologic](https://sumologic.com). Follow the instructions at [Create an HTTP Source ](https://help.sumologic.com/03Send-Data/Sources/02Sources-for-Hosted-Collectors/HTTP-Source) and note the unique URL for your HTTP Source you need this value to deploy the solution.
+* To run example #4, an account with [Mongodb](https://www.mongodb.com/). Follow the instructions at [Create an HTTPS Endpoint](https://docs.mongodb.com/realm/endpoints/) and note the unique URL for your API destination endpoint to deploy the solution.
 * To run example #5, an account with [Zendesk](https://www.zendesk.com). Follow the instructions to  [Enable Password an API key access](https://support.zendesk.com/hc/en-us/articles/4408836402074-Using-the-API-dashboard#enabling_password_or_token_access_).
-
+* To run example #6, an account with [Freshdesk](https://support.freshdesk.com/support/login). Follow the instructions at [Getting Started](https://developers.freshdesk.com/api/#getting-started) and note the unique URL for your API destination endpoint to deploy the solution.
+* To run example #7, an account with [DataDog](hhttps://www.datadoghq.com). Follow the instructions to [Add an API key or client token](https://docs.datadoghq.com/account_management/api-app-keys/#add-an-api-key-or-client-token) and note the api key.
+* To run example #9, an account with [Shopify](https://www.shopify.com/). Follow the instructions to [Create an app and configure Admin API Access scopes](https://shopify.dev/apps/auth/admin-app-access-tokens#step-1-create-and-install-the-app). Make sure to note the Admin Key.
+* To run example #10, an account with [Stripe](https://dashboard.stripe.com/login). Follow the instructions to [Set up your development environment](https://stripe.com/docs/development/quickstart) and note the api key.
+* To run example #11, an account with [Salesforce](https://login.salesforce.com/). Follow the Prerequisites to [Create an app and configure security token](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-tutorial-salesforce.html). Make sure to note the Authorization endpoint, Client ID, Client Secret and OAuth Http Parameters Key.
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -36,7 +40,11 @@ Important: this application uses various AWS services and there are costs associ
 - To run the sumologic HTTP Source collector example, cd to `3-sumologic`.
 - To run the mongoDB API destination example, cd to `4-mongodb`.
 - To run the Zendesk API Destination example, cd to `5-zendesk`.
+- To run the freshdesk API destination example, cd to `6-freshdesk`.
 - To run the Datadog API Destination example, cd to `7-datadog`.
+- To run the Shopify API Destination example, cd to `9-shopify`.
+- To run the Stripe API Destination example, cd to `10-stripe`.
+- To run the API Destination with OAuth credentials example, cd to `11-oauth-api`.
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
@@ -61,6 +69,11 @@ aws events put-events --entries file://testEvent.json
 4. For the sumo logic example use the testEvent.json within the 3-sumologic directory
 5. For the mongoDB example use the testEvent.json within the 4-mongodb directory
 6. For the zendesk example use the testEvent.json within the 5-zendesk directory
+7. For the freshdesk example use the testEvent.json within the 6-freshdesk directory
+8. For the datadog example use the testEvent.json within the 7-datadog directory
+9. For the shopify example use the testEvent.json within the 9-shopify directory
+10. For the stripe example use the testEvent.json within the 10-stripe directory
+11. For the OAuth example use the testEvent.json within the 11-oauth-api directory
 ```
 aws events put-events --entries file://3-sumologic/testEvent.json
 ```
@@ -76,6 +89,6 @@ aws events put-events --entries file://3-sumologic/testEvent.json
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

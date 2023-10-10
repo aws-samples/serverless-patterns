@@ -1,0 +1,30 @@
+Comment: A description of my state machine
+StartAt: Lambda Invoke
+States:
+  Lambda Invoke:
+    Type: Task
+    Resource: arn:aws:states:::lambda:invoke
+    OutputPath: $.Payload
+    Parameters:
+      Payload.$: $
+      FunctionName: ${OrderState}
+    Retry:
+      - ErrorEquals:
+          - Lambda.ServiceException
+          - Lambda.AWSLambdaException
+          - Lambda.SdkClientException
+        IntervalSeconds: 2
+        MaxAttempts: 6
+        BackoffRate: 2
+    Next: EventBridge PutEvents
+  EventBridge PutEvents:
+    Type: Task
+    Resource: arn:aws:states:::aws-sdk:eventbridge:putEvents
+    Parameters:
+      Entries:
+        - Detail:
+            data.$: $.data
+          DetailType: OrderCreated
+          EventBusName: OrdersEventBus
+          Source: com.example.orders
+    End: true

@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Persist an item to a DynamoDB table from Lambda
+
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 30
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  LambdaPutDynamoDB:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./build/handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DynamoTable
+      Policies:
+        ## Read more about SAM Policy templates at:
+        ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+        - DynamoDBWritePolicy:
+            TableName: !Ref DynamoTable
+
+##########################################################################
+#   DynamoDB                                                            #
+##########################################################################
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: ID
+        AttributeType: S
+      KeySchema:
+      - AttributeName: ID
+        KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+##########################################################################
+#   OUTPUTS                                                              #
+##########################################################################
+  
+Outputs:
+  LambdFunction:
+    Value: !Ref LambdaPutDynamoDB
+    Description: LambdaPutDynamoDB function  Arn
+
+  DynamoDbTable:
+    Value: !Ref DynamoTable
+    Description: DynamoDb Table 

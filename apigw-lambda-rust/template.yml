@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An Amazon API Gateway HTTP API and an AWS Lambda function.
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Parameters:
+  StageName:
+    Description: The name of the stage is the first path segment in the Uniform Resource Identifier (URI) of a call to API Gateway
+    Type: String
+    Default: dev
+
+Resources:
+##########################################################################
+#  API Gateway REST API                                                  #
+##########################################################################
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref StageName
+      Name: !Ref AWS::StackName
+      Description: An Amazon private REST API Gateway and an AWS Lambda function.
+      Auth:
+        ResourcePolicy:
+          CustomStatements: [{
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "execute-api:/*/*/*"
+          }]
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  LambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ./build/handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /do
+            Method: POST
+            RestApiId: !Ref MyApi
+
+Outputs:
+  HttpApiEndpoint:
+    Description: The default endpoint for the REST API.
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"

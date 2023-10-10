@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import { App } from '@aws-cdk/core';
+import { App } from 'aws-cdk-lib';
 
 import { vpcStack } from './src/stacks/vpc_stack';
 import { lambdaStack } from './src/stacks/lambda_stack';

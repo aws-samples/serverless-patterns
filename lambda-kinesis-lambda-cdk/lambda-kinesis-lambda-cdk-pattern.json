@@ -1,0 +1,57 @@
+{
+    "title": "Lambda to Kinesis Data Stream to Kinesis",
+    "description": "Create a Lambda function to push record to a Kinesis Data Stream and create another function to process those events from the stream.",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to use serverless producer and consumer for a Kinesis Data Stream",
+        "A producer Lambda function puts data into the Kinesis Data Stream while consumer Lambda function gets trigger when there is data in the stream",
+        "This pattern deploys two Lambda Functions and one Kinesis Data Stream."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-kinesis-lambda-cdk",
+        "templateURL": "serverless-patterns/lambda-kinesis-lambda-cdk",
+        "projectFolder": "lambda-kinesis-lambda-cdk"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Tutorial: Using AWS Lambda with Amazon Kinesis",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis-example.html"
+        },
+        {
+          "text": "Boto3 client for Kinesis",
+          "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kinesis.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Saborni Bhattacharya",
+        "image": "https://drive.google.com/file/d/1AZFquOkafEQRUlrT4hKOtIbt4Cq66SHd/view?usp=sharing",
+        "bio": "I work at AWS and I love making technical contents.",
+        "linkedin": "https://www.linkedin.com/in/saborni-bhattacharya-5b523812a/"
+      }
+    ]
+  }

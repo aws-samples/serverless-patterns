@@ -1,0 +1,80 @@
+service: dynamodbstream-ebpipes-sqs-serverless
+frameworkVersion: '^3.28.1'
+useDotenv: true
+
+custom:
+# specify the region using --region flag while deploying the stack, else the default region ap-south-1 will be chosen
+  region: ${opt:region, "ap-south-1"}
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  memorySize: 256
+  timeout: 30
+  # override the default stage (dev) to be `prod`, or you can use the `--stage` CLI option
+  stage: ${opt:stage, "prod"}
+  region: ${self:custom.region}
+
+
+plugins:
+# creates eventbridge-pipes using the below serverless framework plugin.
+  - serverless-pipes
+
+functions:
+  pipes-enrichment:
+    handler: index.handler
+
+
+# Serverless Framework plugin called as "pipes", used to create EventBridge Pipes 
+# by providing the required event sources, targets and other parameters as needed.
+# Refer `https://github.com/distinction-dev/serverless-pipes` for its usage.
+pipes:
+  testPatternPipes:
+    enabled: true
+    source:
+      dynamodb:
+        arn:
+          Fn::GetAtt: [DynamoDBSourceTable, StreamArn]
+        startingPosition: TRIM_HORIZON
+    target:
+      sqs:
+        arn:
+          Fn::GetAtt: [TargetSQSQueue, Arn]
+    enrichment: 
+      name: pipes-enrichment
+    filter:
+      - Pattern: "{ \"eventName\": [ \"INSERT\" ]}"
+    iamRolePipes:
+      type: "individual"
+    
+
+# creates the source DynamoDB-Stream, target SQS resources & outputs their ARN
+resources:
+  Resources:
+    DynamoDBSourceTable: 
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: 'Album'
+            AttributeType: 'S'
+        KeySchema: 
+          - AttributeName: 'Album'
+            KeyType: 'HASH'
+        ProvisionedThroughput: 
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        StreamSpecification:
+          StreamViewType: 'NEW_AND_OLD_IMAGES'
+        TableName: 'DynamoDBSourceTable'
+    TargetSQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: 'TargetSQSQueue'
+  Outputs:
+      DynamoDBSourceTableName:
+        Value:
+          Ref: DynamoDBSourceTable
+      TargetSQSQueueArn:
+        Value: 
+          Fn::GetAtt: [TargetSQSQueue, Arn]
+

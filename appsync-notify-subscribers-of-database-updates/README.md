@@ -54,7 +54,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 8. During the prompts:
     * Enter a stack name
-    * Select the same AWS Region which was choosen in step 4
+    * Select the same AWS Region which was chosen in step 4
     * Enter a AppSyncEndpoint from step 5
     * Enter an AppSyncApiKey from step 5
     * Allow SAM to create roles with the required permissions.
@@ -86,7 +86,7 @@ For this test you will use the **AppSyncEndpoint**, **AppSyncApiKey**.
 
 ![plot](./imgs/1-http/cognitoSignUp.png)
 
-1.3 Open AppSync, login using Cognito User Pool and created user, launch subscribtion.
+1.3 Open AppSync, login using Cognito User Pool and created user, launch subscription.
 
 ![plot](./imgs/1-http/before-http-update.png)
 

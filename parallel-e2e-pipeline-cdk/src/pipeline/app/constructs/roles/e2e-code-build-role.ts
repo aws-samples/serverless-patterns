@@ -1,9 +1,9 @@
-import { Construct } from "@aws-cdk/core";
+import { Construct } from 'constructs';
 import { 
   Role,
   ServicePrincipal, 
   ManagedPolicy
-} from "@aws-cdk/aws-iam";
+} from "aws-cdk-lib/aws-iam";
 
 
 export class E2ECodeBuildRole extends Construct {

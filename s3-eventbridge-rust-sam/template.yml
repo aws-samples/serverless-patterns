@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: S3 bucket to EventBridge to Lambda - @jbesw
+
+Globals:
+  Function:
+    MemorySize: 128
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 30
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#   S3                                                                  #
+##########################################################################
+  SourceBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: True        
+
+  # Enforce HTTPS only access to S3 bucket #
+  BucketForImagePolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SourceBucket
+      PolicyDocument:
+        Statement:
+        - Action: s3:*
+          Effect: Deny
+          Principal: "*"
+          Resource:
+          - !Sub "arn:aws:s3:::${SourceBucket}/*"
+          - !Sub "arn:aws:s3:::${SourceBucket}"
+          Condition:
+            Bool:
+              aws:SecureTransport: false
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./build/handler
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref SourceBucket
+      Events:
+        Trigger:
+          Type: EventBridgeRule
+          Properties:
+            InputPath: $.detail
+            Pattern:
+              source:
+                - "aws.s3"
+
+Outputs:
+  SourceBucketName:
+    Value: !Ref SourceBucket
+    Description: S3 Bucket for object storage
+  FunctionArn:
+    Value: !Ref MyFunction
+    Description: MyFunction ARN

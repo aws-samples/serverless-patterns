@@ -1,0 +1,7 @@
+[
+  {
+    "DetailType": "transaction",
+    "Source": "demo.sqs",
+    "Detail": "{\"msg\":\"test\"}"
+  }
+]

@@ -1,0 +1,76 @@
+{
+    "title": "CloudFront to S3 with Lambda@Edge",
+    "description": "Create a CloudFront Distribution to upload files to an S3 bucket. Uses Lambda@Edge for authentication.",
+    "language": "Typescript",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern creates an Amazon CloudFront distribution that can be used to upload files to an Amazon S3 bucket.",
+        "It uses a Lambda@Edge function to verify a JSON Web Token (JWT) issued by Amazon Cognito.",
+        "This allows authorized uploads of large objects to S3 via CloudFront without providing public access to the S3 bucket."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-lambda-edge-s3-cdk",
+        "templateURL": "serverless-patterns/cloudfront-lambda-edge-s3-cdk",
+        "projectFolder": "cloudfront-lambda-edge-s3-cdk/cdk",
+        "templateFile": "cloudfront-lambda-edge-s3-cdk/cdk/lib/amazon-s3-upload-api-patterns-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+            "text": "Patterns for building an API to upload files to Amazon S3 - blog post",
+            "link": "<coming soon!>"
+        },
+        {
+            "text": "AWS CDK",
+            "link": "https://aws.amazon.com/cdk/"
+        },
+        {
+            "text": "Lambda@Edge - Docs",
+            "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-edge.html"
+        },
+        {
+            "text": "Amazon CloudFront - Docs",
+            "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"
+        },
+        {
+            "text": "Amazon Cognito - Docs",
+            "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Thomas Moore",
+        "image": "https://media.licdn.com/dms/image/C4E03AQE-RZl0cWis7w/profile-displayphoto-shrink_800_800/0/1603702578898?e=1684368000&v=beta&t=qYZp45l0aJGwGLr5w_L3iaEy-GslYtsgZ__31T_V1kw",
+        "bio": "Senior Solutions Architect @ Amazon Web Services",
+        "linkedin": "tmmruk"
+      },
+      {
+        "name": "Josh Hart",
+        "image": "https://media.licdn.com/dms/image/C4D03AQGRwNOzXNqY3g/profile-displayphoto-shrink_800_800/0/1623056962115?e=1684368000&v=beta&t=49QN439QTtRHw96h94xihNqsAP7soOjMqHXrRpfuLWs",
+        "bio": "Senior Solutions Architect @ Amazon Web Services",
+        "linkedin": "hartjosh"
+      }
+    ]
+  }

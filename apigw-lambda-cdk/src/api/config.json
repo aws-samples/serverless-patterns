@@ -9,7 +9,11 @@
       "X-Clacks-Overhead": "GNU Terry Pratchett"
     },
     "tags": [
-      {"key": "Key", "value": "Value"},
-      {"key": "Project", "value": "ServerlessLand"}
+      {
+        "key": "Key", "value": "Value"
+      },
+      {
+        "key": "Project", "value": "ServerlessLand"
+      }
     ]
 }

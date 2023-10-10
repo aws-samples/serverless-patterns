@@ -1,0 +1,65 @@
+{
+  "title": "IoT Core to S3 to Lambda",
+  "description": "Create a IoT Rule with a S3 action that puts messages in a S3 bucket and triggers a Lambda function to extract the S3 object key.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern contains a sample AWS CDK stack to create an IoT Rule with a S3 action and an AWS Lambda function.",
+      "When a message is published to the IoT topic defined in the IoT Rule, this message will be saved as an object in the S3 bucket. The object is added to the prefix `iot/` and is identified by the timestamp in unix format. The Lambda function is configured with an event source mapping and it will be triggered when a new object is added to the `iot/` prefix. In this sample the Lambda function extracts and logs the S3 object key."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-s3-lambda-cdk",
+      "templateURL": "serverless-patterns/iot-s3-lambda-cdk",
+      "projectFolder": "iot-s3-lambda-cdk",
+      "templateFile": "iot_s3_lambda_cdk/iot_s3_lambda_cdk_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS IoT Core",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/what-is-aws-iot.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "Amazon Simple Storage Service",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+      },
+      {
+        "text": "IoT Rule S3 action",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/s3-rule-action.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Patrick Malatesta",
+      "image": "https://media-exp1.licdn.com/dms/image/C5603AQF5JwByyAUH8g/profile-displayphoto-shrink_200_200/0/1569421621135?e=1660780800&v=beta&t=7tR-t6sQkFbWSFhWmthf-2wGMFNGbmcfpQhvxXupm6g",
+      "bio": "Cloud Infrastructure Architect at AWS Professional Services",
+      "linkedin": "https://www.linkedin.com/in/patricktomasinimalatesta/"
+    }
+  ]
+}

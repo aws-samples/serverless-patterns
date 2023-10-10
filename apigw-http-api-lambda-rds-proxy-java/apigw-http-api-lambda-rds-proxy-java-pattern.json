@@ -1,0 +1,63 @@
+{
+  "title": "Amazon API Gateway HTTP API to AWS Lambda to RDS Proxy",
+  "description": "Create an HTTP API endpoint that calls a Lambda function to RDS Proxy.",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern sets up API Gateway HTTP API using AWS Lambda function as an integration which talks to RDS Aurora(Postgres) via RDS Proxy with IAM Authentication enabled.",
+      "The Lambda function uses short-lived credentials to authenticate through RDS proxy via IAM authentication using the popular JavaScript ORM sequelize."]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda-rds-proxy-java",
+      "templateURL": "patterns/apigw-http-api-lambda-rds-proxy-java",
+      "projectFolder": "apigw-http-api-lambda-rds-proxy-java",
+      "templateFile": "apigw-http-api-lambda-rds-proxy-java/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Connecting to a database through RDS Proxy documentation",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-proxy-setup.html#rds-proxy-iam-setup"
+      },
+      {
+        "text": "Using RDS Proxy",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-proxy.html"
+      },
+      {
+        "text": "Using Amazon RDS Proxy with AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-rds-proxy-with-aws-lambda/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>  mvn package",
+      "sam build",
+      "sam deploy --guided </code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy CanaryDeploymentStack",
+      "cdk destroy MyServerlessApplicationStack</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Muhammed Soyer",
+      "image": "https://drive.google.com/file/d/1p0yj8HYZ7n7dCz9bq4XR_nP5rEwh2k6L/view?usp=sharing",
+      "bio": "I am a Technical Account Manager at AWS with a background of software development.",
+      "linkedin": "https://www.linkedin.com/in/msoyer/"
+    }
+  ]
+}

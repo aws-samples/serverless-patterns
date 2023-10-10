@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Streams DynamoDB table changes to EventBridge
+Resources:
+  #DynamoDB Streams specification
+  MyDynamoStream:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: name
+          AttributeType: S
+      KeySchema:
+        - AttributeName: name
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+
+  # Define the publisher Lambda function with permissions
+  EventProcessingFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: PublishFunction
+      Handler: com.example.App::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      Timeout: 30
+      MemorySize: 512
+      Events:
+        TableRecordChange:
+          Type: DynamoDB
+          Properties:
+            StartingPosition: LATEST
+            Stream: !GetAtt MyDynamoStream.StreamArn
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Resource: '*'
+            Action:
+              - events:PutEvents
+  
+  #Define the Lambda subscribers for INSERT and REMOVE events from table
+  SubscribeInsertFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Processes events for inserts.
+      CodeUri: SubscribeFunction/
+      Handler: com.example.App::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Timeout: 30
+
+  SubscribeRemoveFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Processes events for deletes.
+      CodeUri: SubscribeFunction/
+      Handler: com.example.App::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Timeout: 30
+
+  #EventBridge specification
+  MyEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: MyEventBus
+  
+  #EventBridge rules and permissions
+  EventRuleInsert: 
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Insert transactions"
+      EventBusName: !GetAtt MyEventBus.Arn
+      EventPattern: 
+        source: 
+          - "MyDynamoStream"
+        detail-type:
+          - transaction   
+        detail: 
+          eventName: 
+            - "INSERT"
+      State: "ENABLED"
+      Targets: 
+        - 
+          Arn: !GetAtt SubscribeInsertFunction.Arn
+          Id: "eventRuleInsert"
+  PermissionForInsertEventsToInvokeLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: !Ref SubscribeInsertFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt EventRuleInsert.Arn
+
+  EventRuleRemove: 
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Remove transactions"
+      EventBusName: !GetAtt MyEventBus.Arn
+      EventPattern: 
+        source: 
+          - "MyDynamoStream"
+        detail-type:
+          - transaction   
+        detail: 
+          eventName: 
+            - "REMOVE"
+      State: "ENABLED"
+      Targets: 
+        - 
+          Arn: !GetAtt SubscribeRemoveFunction.Arn
+          Id: "eventRuleRemove"
+  PermissionForRemoveEventsToInvokeLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: !Ref SubscribeRemoveFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt EventRuleRemove.Arn
+  

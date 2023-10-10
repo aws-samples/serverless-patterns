@@ -1,0 +1,64 @@
+{
+  "title": "Amazon API Gateway Canary Deployment",
+  "description": "Create a serverless app using API Gateway and Lambda.",
+  "language": "Java",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to create an API Gateway canary deployment with a Lambda function behind an API Gateway REST API.",
+      "Once the canary deployment is live, requests will be routed to the new and old version of the Lambda function at a rate of 50/50 using the Lambda alias from the APIGW stage variables to route traffic to the correct version."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-canary-deployment-cdk-java",
+      "templateURL": "patterns/apigw-canary-deployment-cdk-java",
+      "projectFolder": "apigw-canary-deployment-cdk-java",
+      "templateFile": "apigw-canary-deployment-cdk-java/src/main/java/com.myorg/MyServerlessApplicationStack.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Build an API Gateway REST API with Lambda integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-with-lambda-integration.html"
+      },
+      {
+        "text": "Working with the AWS CDK in Java",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-java.html"
+      },
+      {
+        "text": "AWS CLI start-execution",
+        "link": "https://docs.aws.amazon.com/cli/latest/reference/stepfunctions/start-execution.html#start-execution"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code> cdk deploy MyServerlessApplicationStack",
+      "cdk deploy MyServerlessApplicationStack -c env=dev ",
+      "cdk deploy CanaryDeploymentStack </code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy CanaryDeploymentStack",
+      "cdk destroy MyServerlessApplicationStack</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Muhammed Soyer",
+      "image": "https://drive.google.com/file/d/1p0yj8HYZ7n7dCz9bq4XR_nP5rEwh2k6L/view?usp=sharing",
+      "bio": "I am a Technical Account Manager at AWS with a background of software development.",
+      "linkedin": "https://www.linkedin.com/in/msoyer/"
+    }
+  ]
+}

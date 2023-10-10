@@ -1,0 +1,61 @@
+{
+    "title": "EventBridge schedule to trigger Step Function with CDK Python",
+    "description": "Simple pattern that triggers Step Function execution every 5 minutes using EventBridge Scheduler with CDK/Python. ",
+    "language": "Python",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "EventBridge Scheduler triggers a new Step Function execution every 5 minutes."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-step-function-cdk-python",
+            "templateURL": "serverless-patterns/eventbridge-schedule-to-step-function-cdk-python",
+            "projectFolder": "eventbridge-schedule-to-step-function-cdk-python",
+            "templateFile": "eventbridge-schedule-to-step-function-cdk-python/eventbridge_schedule_to_step_function_cdk_python_stack.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+              "text": "Introducing Amazon EventBridge Scheduler",
+              "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+            },
+            {
+              "text": "Amazon EventBridge Scheduler Docs",
+              "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+            },
+            {
+              "text": "Scheduler Documentation for CDK v2 Python",
+              "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_scheduler/CfnSchedule.html"
+            }
+          ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the README in the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Pubudu Jayawardana",
+            "image": "https://avatars.githubusercontent.com/u/1263087",
+            "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusiast.",
+            "linkedin": "pubudusj",
+            "twitter": "@pubudusj"
+        }
+    ]
+}

@@ -1,8 +1,9 @@
-import { Stack, StackProps, Aspects, Tag, Construct } from '@aws-cdk/core';
+import { Stack, StackProps, Aspects, Tag } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import {
     InterfaceVpcEndpointAwsService,
     ISecurityGroup, ISubnet, SecurityGroup, SubnetType, Vpc, Peer, Port, IVpc
-} from '@aws-cdk/aws-ec2';
+} from 'aws-cdk-lib/aws-ec2';
 
 
 export class vpcStack extends Stack {
@@ -52,9 +53,6 @@ export class vpcStack extends Stack {
             },
             securityGroups: [vSecurityGroup]
         });
-
-        vSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(80), 'allow HTTP traffic');
-        vSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(443), 'allow HTTPS traffic');
 
         this.iVpc = vpc;
         this.publicSubNet = vpc.publicSubnets;

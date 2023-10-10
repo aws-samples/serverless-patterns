@@ -8,7 +8,7 @@
         "@aws-cdk/aws-lambda": "^1.89.0",
         "@aws-cdk/core": "^1.89.0",
         "@aws-cdk/aws-wafv2": "1.126.0",
-        "aws-cdk": "^1.89.0"
+        "aws-cdk": "2.80.0"
     },
     "devDependencies": {
         "@types/aws-lambda": "^8.10.72",

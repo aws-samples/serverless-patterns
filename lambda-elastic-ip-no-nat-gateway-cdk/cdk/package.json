@@ -1,0 +1,35 @@
+{
+  "name": "cdk",
+  "version": "0.1.0",
+  "bin": {
+    "cdk": "bin/cdk.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "esbuild": "rm -rf dist && esbuild ./src/lambdas/* --bundle --entry-names=[dir]/[name]/index --sourcemap --platform=node --target=node18.14 --outdir=dist",
+    "package": "cd dist && for f in * ; do ([ -d \"$f\" ] && cd $f && zip ../$f.zip *) ; done",
+    "bundle": "npm run esbuild && npm run package",
+    "local-synth": "npm run build && cdk synth --no-staging > template.yaml",
+    "deploy": "cdk deploy",
+    "local-synth-and-deploy": "npm run local-synth && npm run deploy",
+    "destroy": "cdk destroy"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.4",
+    "@types/node": "20.5.7",
+    "@types/source-map-support": "^0.5.7",
+    "jest": "^29.6.4",
+    "ts-jest": "^29.1.1",
+    "aws-cdk": "2.94.0",
+    "esbuild": "^0.15.14",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.94.0",
+    "constructs": "^10.0.0",
+    "source-map-support": "^0.5.21"
+  }
+}

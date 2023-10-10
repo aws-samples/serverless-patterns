@@ -1,0 +1,64 @@
+{
+  "title": "AWS Step Functions Express Workflow to Amazon Comprehend for Sentiment Analysis",
+  "description": "The SAM template deploys a Step Functions Express workflow that invokes Amazon Comprehend and returns the sentiment analysis done by Comprehend in the response. The SAM template contains the required resouces with IAM permission to run the application with logging enabled.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Start the Express Workflow using the start-sync-execution api command with a message string in English for sentiment analysis in the input payload.",
+      "The Express Workflow invokes Amazon Comprehend.",
+      "Comprehend returns the sentiment of the input text.",
+      "If the integration works fine, the sentiment analysis outcome is returned in Step Function execution results within a output object.",
+      "If the integration fails, the Step Functions workflow will retry up to 5 times before exiting with a status:FAILED response."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-comprehend-sam",
+      "templateURL": "serverless-patterns/sfn-comprehend-sam",
+      "projectFolder": "sfn-comprehend-sam",
+      "templateFile": "sfn-comprehend-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Step Function - AWS SDK service integrations",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      },
+      {
+        "text": "AWS Step Function - CloudWatch Logs",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/cw-logs.html"
+      },
+      {
+        "text": "ComprehendBasicAccessPolicy",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-template-list.html#comprehend-basic-access-policy"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+    }
+  ]
+}

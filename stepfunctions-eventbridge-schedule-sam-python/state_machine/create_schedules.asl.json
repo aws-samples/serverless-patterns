@@ -1,0 +1,28 @@
+{
+  "Comment": "CreateScheduleStateMachine",
+  "StartAt": "CreateSchedule",
+  "States": {
+    "CreateSchedule": {
+      "Type": "Task",
+      "Parameters": {
+        "FlexibleTimeWindow": {
+          "Mode": "OFF"
+        },
+        "Name.$": "States.Format('schedule_{}', $$.Execution.Name)",
+        "GroupName": "${ScheduleGroup}",
+        "ScheduleExpression.$": "States.Format('at({}T{})', $.scheduleDate, $.scheduleTime)",
+        "Target": {
+          "Arn": "${TargetArn}",
+          "RoleArn": "${RoleArn}",
+          "Input": {
+            "executionId.$": "$$.Execution.Name",
+            "scheduleDate.$": "$.scheduleDate",
+            "scheduleTime.$": "$.scheduleTime"
+          }
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:scheduler:createSchedule",
+      "End": true
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "title": "Amazon Kinesis Data Streams to AWS Lambda",
+  "description": "A serverless example to connect Amazon Kinesis Data Streams to AWS Lambda.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon Kinesis Data Stream that integrates with AWS Lambda using AWS CDK in TypeScript.",
+      "In this example, the Kinesis Data Stream is used as an event source for the lambda function which",
+      "processes the data from the stream and catches any failures."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-lambda-cdk-typescript",
+      "templateURL": "serverless-patterns/kinesis-lambda-cdk-typescript",
+      "projectFolder": "kinesis-lambda-cdk-typescript",
+      "templateFile": "kinesis-lambda-cdk-typescript/src/bin/app.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using AWS Lambda with Amazon Kinesis",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+      },
+      {
+        "text": "Working with the AWS CDK in TypeScript",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jayesh Shinde",
+      "image": "https://media.licdn.com/dms/image/D5603AQHVz5yI3aST-Q/profile-displayphoto-shrink_800_800/0/1681449439639?e=1699488000&v=beta&t=3kF_wIbfR5gSK5ZaLS_gmBJ3D4tqt_wUdUWEr3jK-Rg",
+      "bio": "Sr. Application Architect @ AWS",
+      "linkedin": "jayeshshinde",
+      "twitter": "@jayeshashinde"
+    }
+  ]
+}

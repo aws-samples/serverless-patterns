@@ -1,0 +1,56 @@
+{
+  "title": "S3 to SNS",
+  "description": "Sends notifications from S3 to SNS when an object is created.",
+  "language": "",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This creates an S3 bucket and SNS topic. S3 sends a notification to the SNS topic when a new object is uploaded to the bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-sns-terraform",
+      "templateURL": "serverless-patterns/s3-sns-terraform",
+      "projectFolder": "s3-sns-terraform",
+      "templateFile": "s3-sns-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon S3 Event Notifications",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/NotificationHowTo.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. Change directory: `s3-sns-terraform`.",
+      "2. Delete all files from the S3 bucket.",
+      "3. Delete the stack: `terraform destroy`.",
+      "4. Confirm the stack has been deleted: `terraform show`."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Joahna Abelgas",
+      "image": "https://avatars.githubusercontent.com/u/86153724?v=4",
+      "bio": "Cloud Engineer",
+      "linkedin": "https://linkedin.com/in/joahna/",
+      "twitter": "https://twitter.com/heyjoahna"
+    }
+  ]
+}

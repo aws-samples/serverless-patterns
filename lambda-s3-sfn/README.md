@@ -58,7 +58,8 @@ aws lambda invoke --function-name {SavePayloadAndStartStateMachineFunction}  --p
  
 1. Empty/delete S3 bucket and delete the stack:
     ```bash
-   aws s3 rm s3://lambda-s3-sfn-uploads --recursive && aws cloudformation delete-stack --stack-name STACK_NAME 
+   aws s3 rm s3://lambda-s3-sfn-uploads --recursive
+   aws cloudformation delete-stack --stack-name STACK_NAME 
     ```
 1. Confirm the stack has been deleted:
     ```bash

@@ -1,0 +1,65 @@
+{
+    "title": "AWS AppConfig Feature Flag setup with AWS SAM",
+    "description": "Create a AWS AppConfig Feature Flag with AWS SAM.",
+    "language": "Typescript",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how create feature flags in AWS AppConfig and retrieve their value using AWS Lambda and exposing them through an HTTP API endpoint."            
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appconfig-feature-flag-sam",
+            "templateURL": "serverless-patterns/appconfig-feature-flag-sam",
+            "projectFolder": "appconfig-feature-flag-sam",
+            "templateFile": "appconfig-feature-flag-sam/template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS AppConfig",
+                "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html"
+            },
+            {
+                "text": "AWS AppConfig Feature Flags",
+                "link": "https://aws.amazon.com/it/blogs/mt/using-aws-appconfig-feature-flags"
+            },
+            {
+                "text": "AWS AppConfig integration with Lambda extensions",
+                "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions.html"
+            },
+            {
+                "text": "Learn to Use AWS AppConfig Feature Flags",
+                "link": "https://catalog.us-east-1.prod.workshops.aws/workshops/2ee2fc71-0618-479c-86dd-1d5fb168eb20/en-US/getting-started"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Alberto Meneghini",
+            "image": "https://avatars.githubusercontent.com/u/10563281",
+            "bio": "Software Developer",
+            "linkedin": "https://www.linkedin.com/in/alberto-meneghini-78a48a41/",
+            "twitter": "@menalb84"
+        }
+    ]
+}

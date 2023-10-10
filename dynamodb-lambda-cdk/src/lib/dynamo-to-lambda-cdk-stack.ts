@@ -1,12 +1,13 @@
-import * as cdk from '@aws-cdk/core';
-import { Table, BillingMode, AttributeType, StreamViewType } from '@aws-cdk/aws-dynamodb';
-import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import * as lambda from '@aws-cdk/aws-lambda';
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { Table, BillingMode, AttributeType, StreamViewType } from 'aws-cdk-lib/aws-dynamodb';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { aws_lambda as lambda }from 'aws-cdk-lib';
 import * as path from 'path';
-import { DynamoEventSource } from '@aws-cdk/aws-lambda-event-sources';
+import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 
-export class DynamoToLambdaCdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class DynamoToLambdaCdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
     // DynamoDB table
     const dynamoTable = new Table(this, 'DynamoTable', {
@@ -31,7 +32,7 @@ export class DynamoToLambdaCdkStack extends cdk.Stack {
     }))
 
     // Outputs
-    new cdk.CfnOutput(this, 'DynamoDbTableName', { value: dynamoTable.tableName });
-    new cdk.CfnOutput(this, 'LambdaFunctionArn', { value: lambdaReadStream.functionArn });
+    new CfnOutput(this, 'DynamoDbTableName', { value: dynamoTable.tableName });
+    new CfnOutput(this, 'LambdaFunctionArn', { value: lambdaReadStream.functionArn });
   }
 }

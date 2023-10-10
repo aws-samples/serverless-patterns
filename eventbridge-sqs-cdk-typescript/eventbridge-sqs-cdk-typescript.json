@@ -1,0 +1,58 @@
+{
+  "title": "Amzon Eventbridge to Amazon SQS",
+  "description": "Create an EventBridge rule that invokes a SQS queue.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains sample AWS CDK code to create an EventBridge rule, as well as a SQS queue.",
+      "The EventBridge rule publishes matched events to the SQS queue. In this example, the rule filters for specific attributes in the event before sending the event to the queue."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sqs-cdk-typescript",
+      "templateURL": "serverless-patterns/eventbridge-sqs-cdk-typescript",
+      "projectFolder": "eventbridge-sqs-cdk-typescript",
+      "templateFile": "eventbridge-sqs-cdk-typescript/lib/eventbridge-sqs-cdk-stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ryan See",
+      "image": "https://media.licdn.com/dms/image/C5603AQHs8qKE6cec5w/profile-displayphoto-shrink_800_800/0/1610320704421?e=2147483647&v=beta&t=BXxxOIEVE3xKmnghCLoLmUZ6MJ7Ptk1h4cOihVNj8aE",
+      "bio": "Ryan is a Solutions Architect at AWS. ",
+      "linkedin": "ryanseee",
+      "twitter": "twitter-handle"
+    }
+  ]
+}

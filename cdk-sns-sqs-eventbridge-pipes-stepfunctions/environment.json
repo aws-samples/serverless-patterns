@@ -1,0 +1,6 @@
+{
+    "Parameters": {
+        "LOG_LEVEL": "debug",
+        "IS_LOCAL": "true"
+    }
+}

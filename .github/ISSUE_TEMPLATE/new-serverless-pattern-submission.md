@@ -21,6 +21,6 @@ Note the following information for the model:
 - Framework: currently, we support SAM or CDK.
 - Author bio may include a LinkedIn and/or Twitter reference and a 1-sentence bio.
 
-You must ensure that the sections of the model README.me are completed in full.
+You must ensure that the sections of the model README.md are completed in full.
 
 ## GitHub PR for template:

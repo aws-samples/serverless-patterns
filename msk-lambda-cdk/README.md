@@ -98,9 +98,12 @@ EOF
 REGION=ca-central-1
 TOPIC=transactions
 
-kafka_arn=$(aws kafka list-clusters --region $REGION --output text --query 'ClusterInfoList[0].ClusterArn') && echo "$kafka_arn" 
-zookeeperConnectString=`aws kafka describe-cluster --region $REGION --cluster-arn "$kafka_arn" --output text --query 'ClusterInfo.ZookeeperConnectString'` && echo $zookeeperConnectString 
-bootstrapBroker=`aws kafka get-bootstrap-brokers --region $REGION --output text --cluster-arn $kafka_arn` && echo $bootstrapBroker
+kafka_arn=$(aws kafka list-clusters --region $REGION --output text --query 'ClusterInfoList[0].ClusterArn')
+echo "$kafka_arn" 
+zookeeperConnectString=`aws kafka describe-cluster --region $REGION --cluster-arn "$kafka_arn" --output text --query 'ClusterInfo.ZookeeperConnectString'`
+echo $zookeeperConnectString 
+bootstrapBroker=`aws kafka get-bootstrap-brokers --region $REGION --output text --cluster-arn $kafka_arn`
+echo $bootstrapBroker
 
 ./kafka-topics.sh --create --zookeeper $zookeeperConnectString --replication-factor 2 --partitions 1 --topic $TOPIC
 ```

@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: aws-decouple-messaging-pattern
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 3072
+    Timeout: 30
+
+Resources:
+#Lambda Producer
+  PaymentProducer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PaymentProducer
+      Handler: com.example.producer.PaymentProducer::handleRequest
+      CodeUri: target/sourceCode.zip
+      Policies:
+        - AmazonSQSFullAccess
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref PaymentsSqsQueue
+
+  #Lambda Consumer
+  PaymentConsumer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PaymentConsumer
+      Handler: com.example.consumer.PaymentConsumer::handleRequest
+      CodeUri: target/sourceCode.zip
+      Events:
+        SalesSQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt PaymentsSqsQueue.Arn
+
+# SQS Queue
+  PaymentsSqsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: Payments

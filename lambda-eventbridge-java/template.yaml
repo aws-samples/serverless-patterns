@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Lambda to EventBridge
+
+Parameters:
+  EventBusName:
+    Type: String
+    Description: Event bus name
+    Default: 'default'
+    
+Resources:
+  # Define the publisher Lambda function 
+  PublisherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PublisherFunction
+      CodeUri: PublisherFunction
+      Handler: com.example.App::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref EventBusName
+
+Outputs:
+  PublisherFunction:
+    Description: PublisherFunction function name
+    Value: !Ref PublisherFunction

@@ -1,0 +1,37 @@
+openapi: "3.0.1"
+info:
+  title: "SNS SMS"
+  version: "2022-07-29T06:56:31Z"
+paths:
+  /:
+    post:
+      parameters:
+      - name: "Content-Type"
+        in: "header"
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        credentials: arn:aws:iam::${AWS::AccountId}:role/API-SNSSMS
+        httpMethod: "POST"
+        uri: arn:aws:apigateway:${AWS::Region}:sns:path//
+        responses:
+          default:
+            statusCode: "200"
+        requestParameters:
+          integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+        requestTemplates:
+          application/json: "#set($inputRoot = $input.path('$'))\nAction=Publish&PhoneNumber=$util.urlEncode($util.parseJson($input.json('$.PhoneNumber')))&Message=$util.parseJson($input.json('$.Message'))&AWS.SNS.SMS.SMSType={'DataType:'String','StringValue': 'Transactional'}"
+        passthroughBehavior: "when_no_templates"
+        type: "aws"
+components:
+  schemas:
+    Empty:
+      title: "Empty Schema"
+      type: "object"

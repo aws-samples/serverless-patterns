@@ -1,0 +1,63 @@
+{
+  "title": "EventBridge Scheduler to publish messages to Amazon SNS",
+  "description": "Simple pattern that publishes a message to a SNS topic every 5 minutes. Email address subscribed to the SNS topic will receive notifcication every 5 minutes.",
+  "language": "Java",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample pattern demonstrates how to use EventBridge Scheduler to publish message to a Amazon SNS topic every 5 minutes and deployed using the AWS CDK for Java."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-sns-publish-cdk-java",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-sns-publish-cdk-java",
+      "projectFolder": "eventbridge-schedule-to-sns-publish-cdk-java",
+      "templateFile": "eventbridge-schedule-to-sns-publish-cdk-java/src/main/java/com/myorg/EventbridgeScheduleToSnsCdkJavaStack.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with the AWS CDK in Java",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-java.html"
+      },
+      {
+        "text": "AWS CLI start-execution",
+        "link": "https://docs.aws.amazon.com/cli/latest/reference/stepfunctions/start-execution.html#start-execution"
+      },
+      {
+        "text": "Getting Started with EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "Getting started with Amazon SNS",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-getting-started.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cdk deploy -c email=sample@example.com</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Hoi Wing Chan",
+      "bio": "Hoi Wing is a Technical Account Manager at Amazon Web Services with a background of software development and architecture.",
+      "linkedin": "https://www.linkedin.com/in/wing-chan-0943a344"
+    }
+  ]
+}

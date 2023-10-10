@@ -1,6 +1,7 @@
 package com.example.utils;
 
 import com.example.model.Ticket;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
@@ -11,15 +12,15 @@ import java.util.UUID;
 
 public class DDBUtils {
 
-    public static String persistTicket(Ticket ticket){
+    private final DynamoDbClient ddb = DynamoDbClient.builder()
+            .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+            .region(Region.EU_CENTRAL_1)
+            .build();
+    private final DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder()
+            .dynamoDbClient(ddb)
+            .build();
 
-        DynamoDbClient ddb = DynamoDbClient.builder()
-                .region(Region.EU_CENTRAL_1)
-                .build();
-
-        DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder()
-                .dynamoDbClient(ddb)
-                .build();
+    public String persistTicket(Ticket ticket){
 
         DynamoDbTable<Ticket> mappedTable = enhancedClient
                 .table("tickets", TableSchema.fromBean(Ticket.class));

@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway REST API with VPC Link integration
+
+Parameters:
+  NlbInternalDns:
+    Type: String
+  NlbInternalArn:
+    Type: String
+
+Resources:
+  
+  # REST API
+  AppApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: apigw-rest-api-vpclink
+      Description: VPC Link integraton REST API demo
+
+  RootMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref AppApi
+      ResourceId: !GetAtt AppApi.RootResourceId
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: HTTP_PROXY
+        ConnectionType: VPC_LINK
+        IntegrationHttpMethod: GET
+        ConnectionId: !Ref VPCLinkRestNlbInternal
+        Uri: !Sub http://${NlbInternalDns}
+
+  Deployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+    - RootMethodGet
+    Properties:
+      RestApiId: !Ref AppApi
+  
+  Stage:  
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: Prod
+      RestApiId: !Ref AppApi
+      DeploymentId: !Ref Deployment
+
+  VPCLinkRestNlbInternal:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: VPCLinkRestNlbInternal
+      TargetArns:
+        - !Ref NlbInternalArn
+
+Outputs:
+
+  # API Gateway endpoint to be used during tests
+  AppApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"

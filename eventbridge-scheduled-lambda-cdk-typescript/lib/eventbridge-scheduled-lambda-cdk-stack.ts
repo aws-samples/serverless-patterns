@@ -1,11 +1,12 @@
-import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
-import { Rule, Schedule } from "@aws-cdk/aws-events";
-import {LambdaFunction} from "@aws-cdk/aws-events-targets";
+import { Stack, StackProps, Duration } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import {aws_lambda as lambda } from 'aws-cdk-lib';
+import { Rule, Schedule } from "aws-cdk-lib/aws-events";
+import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
 import * as path from 'path';
 
-export class EventbridgeScheduledLambdaCdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class EventbridgeScheduledLambdaCdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     // get interval in minutes from context (cdk deploy --context interval_in_minutes=<value>)
@@ -13,7 +14,7 @@ export class EventbridgeScheduledLambdaCdkStack extends cdk.Stack {
 
     // check if user enter --context value, if not application will terminate
     if (typeof interval_in_minutes === 'undefined') {
-      console.log('example: cdk deploy --context internal_in_minutes=5')
+      console.log('example: cdk deploy --context interval_in_minutes=5')
       process.exit(1)
     }
     
@@ -26,7 +27,7 @@ export class EventbridgeScheduledLambdaCdkStack extends cdk.Stack {
     const myFunction = new lambda.Function(this, 'function-name', {
       runtime: lambda.Runtime.NODEJS_14_X,
       memorySize: 128,
-      timeout: cdk.Duration.seconds(30),
+      timeout: Duration.seconds(30),
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '/../src')),
       // create environment variable with the interval assigned with --context

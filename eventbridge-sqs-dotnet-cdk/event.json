@@ -1,0 +1,8 @@
+[
+    {
+      "DetailType": "message",
+      "Source": "cdk.myapp",
+      "EventBusName": "MySQSEventBus",
+      "Detail": "{\"message\":\"Hello from EventBridge to SQS Queue!\"}"
+    }
+  ]

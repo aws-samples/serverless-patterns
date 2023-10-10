@@ -1,12 +1,13 @@
 from aws_cdk import (
-    core,
+    Stack,
+    Duration,
     aws_iam as _iam,
     aws_lambda as _lambda,
     aws_sqs as _sqs
 )
 from constructs import Construct
 
-class LambdaSqsCdkStack(core.Stack):
+class LambdaSqsCdkStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -14,7 +15,7 @@ class LambdaSqsCdkStack(core.Stack):
         # Create SQS Queue
         queue = _sqs.Queue(
             self, "LambdaToSqsQueue",
-            visibility_timeout=core.Duration.seconds(300),
+            visibility_timeout=Duration.seconds(300),
             queue_name='LambdaToSqsQueue')
 
         # Create Lambda function

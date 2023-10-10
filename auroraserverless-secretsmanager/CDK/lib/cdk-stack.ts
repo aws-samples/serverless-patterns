@@ -1,7 +1,9 @@
-import { CfnOutput, Construct, Stack, StackProps} from '@aws-cdk/core';
-import * as sm from "@aws-cdk/aws-secretsmanager";
-import { CfnDBCluster, CfnDBSubnetGroup } from '@aws-cdk/aws-rds';
-import { SubnetType, Vpc } from '@aws-cdk/aws-ec2';
+
+import { Stack, StackProps, CfnOutput  } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_secretsmanager as sm } from "aws-cdk-lib";
+import { CfnDBCluster, CfnDBSubnetGroup } from 'aws-cdk-lib/aws-rds';
+import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
 
 export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {

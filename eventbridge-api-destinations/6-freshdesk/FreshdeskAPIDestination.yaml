@@ -10,6 +10,10 @@ Parameters:
     NoEcho: true
     Type: String
     Default: '<<Enter your APIKeyValue>>'
+  Password:
+    NoEcho: true
+    Type: String
+    Default: '<<Enter your Password>>'
 
 Resources:
   MyEventBus:
@@ -25,7 +29,7 @@ Resources:
       AuthParameters:
         BasicAuthParameters :
           Username : !Ref MyAPIKeyValue
-          Password : 'X'
+          Password : !Ref Password
 
   MyApiDestination:
     Type: AWS::Events::ApiDestination

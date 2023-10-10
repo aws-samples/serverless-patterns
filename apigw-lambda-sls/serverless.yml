@@ -1,0 +1,36 @@
+service: apigw-lambda-sls
+frameworkVersion: '^3' # require serverless v3 or later
+
+plugins:
+  - serverless-plugin-typescript # enable TypeScript support for Lambda functions
+
+provider:
+  name: aws
+
+  # common configuration for all Lambda functions in this stack
+  runtime: nodejs16.x
+  architecture: arm64 # use Graviton for running all Lambda functions
+
+  # override the default stage (dev)
+  stage: prod
+
+  # optional, Lambda function's memory size in MB, default is 1024
+  memorySize: 256
+
+  apiGateway:
+    description: API Gateway for this stack
+
+# Lambda function triggered with events from the default EventBridge topic
+functions:
+  logEvent:
+    handler: src/handler.echoEvent
+    events:
+      # use shortcut path definition
+      - http: GET /{proxy+}
+      - http: GET /
+
+resources:
+  # Override the default description
+  Description: API Gateway REST API invoking a Lambda function (Serverless Framework).
+
+    

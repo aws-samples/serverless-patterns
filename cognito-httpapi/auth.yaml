@@ -18,7 +18,7 @@ Conditions:
     - "true"
 
 Resources:
-  # Create a Cognito User pool foruser management
+  # Create a Cognito User pool for user management
   UserPool:
     Type: AWS::Cognito::UserPool 
     Properties:

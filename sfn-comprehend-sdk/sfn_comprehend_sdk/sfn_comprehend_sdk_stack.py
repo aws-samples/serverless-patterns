@@ -1,14 +1,16 @@
 from aws_cdk import (
-    core as cdk,
+    Stack,
+    CfnOutput,
+    Duration,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as sfn_tasks,
     aws_iam as iam
 )
+from constructs import Construct
 
+class SfnComprehendSdkStack(Stack):
 
-class SfnComprehendSdkStack(cdk.Stack):
-
-    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         detect_sentiment_task = sfn_tasks.CallAwsService(self, "DetectSentiment", service="comprehend",
@@ -19,8 +21,8 @@ class SfnComprehendSdkStack(cdk.Stack):
         state_machine = sfn.StateMachine(
             self, "DetectSentimentStateMachine",
             definition=definition,
-            timeout=cdk.Duration.minutes(5)
+            timeout=Duration.minutes(5)
         )
 
-        cdk.CfnOutput(scope=self, id='StateMachineArn',
+        CfnOutput(scope=self, id='StateMachineArn',
                       value=state_machine.state_machine_arn)

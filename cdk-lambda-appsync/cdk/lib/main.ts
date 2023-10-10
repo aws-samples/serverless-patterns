@@ -1,59 +1,87 @@
-import * as cdk from '@aws-cdk/core'
-import { GraphqlApi, Schema, MappingTemplate, AuthorizationType } from '@aws-cdk/aws-appsync'
-import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs'
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib'
+import { Construct } from 'constructs'
+import {
+	GraphqlApi,
+	SchemaFile,
+	AuthorizationType,
+	AppsyncFunction,
+	Code,
+	FunctionRuntime,
+	Resolver,
+} from 'aws-cdk-lib/aws-appsync'
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { join } from 'path'
+import { Runtime } from 'aws-cdk-lib/aws-lambda'
 
-const requestTemplate = `
-$util.qr($ctx.args.put("id", $util.defaultIfNull($ctx.args.id, $util.autoId())))
-#set( $createdAt = $util.time.nowISO8601() )
-$util.qr($context.args.put("createdAt", $createdAt))
-$util.qr($context.args.put("updatedAt", $createdAt))
-{
-  "version": "2017-02-28",
-  "payload": $util.toJson($ctx.args)
-}`
+export class MainStack extends Stack {
+	constructor(scope: Construct, id: string, props?: StackProps) {
+		super(scope, id, props)
 
-const responseTemplate = `$util.toJson($context.result)`
+		const api = new GraphqlApi(this, 'Api', {
+			name: 'TriggeredByLambda',
+			schema: SchemaFile.fromAsset(
+				join(__dirname, '../graphql/schema.graphql')
+			),
+			authorizationConfig: {
+				defaultAuthorization: {
+					authorizationType: AuthorizationType.IAM,
+				},
+			},
+		})
 
-export class MainStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props)
+		const createTodoFunc = new AppsyncFunction(this, 'createTodoFunction', {
+			name: 'createTodoFunction',
+			api,
+			dataSource: api.addNoneDataSource('none'),
+			code: Code.fromAsset(
+				join(__dirname, '../graphql/Mutation.createTodo.js')
+			),
+			runtime: FunctionRuntime.JS_1_0_0,
+		})
 
-    const api = new GraphqlApi(this, 'Api', {
-      name: 'TriggeredByLambda',
-      schema: Schema.fromAsset(join(__dirname, 'schema.graphql')),
-      authorizationConfig: {
-        defaultAuthorization: {
-          authorizationType: AuthorizationType.IAM,
-        },
-      },
-    })
-    const noneDS = api.addNoneDataSource('NONE')
-    noneDS.createResolver({
-      typeName: 'Mutation',
-      fieldName: 'createTodo',
-      requestMappingTemplate: MappingTemplate.fromString(requestTemplate),
-      responseMappingTemplate: MappingTemplate.fromString(responseTemplate),
-    })
+		new Resolver(this, 'PipelineResolver', {
+			api,
+			typeName: 'Mutation',
+			fieldName: 'createTodo',
+			code: Code.fromInline(`
+        // The before step
+        export function request(...args) {
+          console.log(args);
+          return {}
+        }
+    
+        // The after step
+        export function response(ctx) {
+          return ctx.prev.result
+        }
+      `),
+			runtime: FunctionRuntime.JS_1_0_0,
+			pipelineConfig: [createTodoFunc],
+		})
 
-    const lambda = new NodejsFunction(this, 'trigger', {
-      bundling: {
-        target: 'es2020',
-        commandHooks: {
-          beforeInstall: (inputDir: string, outputDir: string) => [],
-          beforeBundling: (inputDir: string, outputDir: string) => [`cd lib`, `amplify codegen`],
-          afterBundling: (inputDir: string, outputDir: string) => [],
-        },
-      },
-      environment: {
-        GRAPHQL_URL: api.graphqlUrl,
-      },
-    })
-    api.grantMutation(lambda)
+		const lambda = new NodejsFunction(this, 'trigger', {
+			runtime: Runtime.NODEJS_16_X,
+			bundling: {
+				target: 'es2020',
 
-    new cdk.CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
-    new cdk.CfnOutput(this, 'apiId', { value: api.apiId })
-    new cdk.CfnOutput(this, 'functionArn', { value: lambda.functionArn })
-    new cdk.CfnOutput(this, 'functionName', { value: lambda.functionName })
-  }
+				commandHooks: {
+					beforeInstall: (inputDir: string, outputDir: string) => [],
+					beforeBundling: (inputDir: string, outputDir: string) => [
+						`cd graphql`,
+						`amplify codegen`,
+					],
+					afterBundling: (inputDir: string, outputDir: string) => [],
+				},
+			},
+			environment: {
+				GRAPHQL_URL: api.graphqlUrl,
+			},
+		})
+		api.grantMutation(lambda)
+
+		new CfnOutput(this, 'graphqlUrl', { value: api.graphqlUrl })
+		new CfnOutput(this, 'apiId', { value: api.apiId })
+		new CfnOutput(this, 'functionArn', { value: lambda.functionArn })
+		new CfnOutput(this, 'functionName', { value: lambda.functionName })
+	}
 }

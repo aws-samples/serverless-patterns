@@ -1,0 +1,98 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: AWS-SAM-kinesis
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 3072
+    Timeout: 25
+
+Resources:
+
+########### S3 BUCKET ###########
+  DeliveryBucket:
+    Type: AWS::S3::Bucket
+
+########### KINESIS DATA STREAM ###########
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: "kds-data"
+      RetentionPeriodHours: 24
+      ShardCount: 1
+
+########## KINESIS DATA FIREHOSE ###########
+  DeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    DependsOn:
+      - DeliveryStreamPolicy
+    Properties:
+      DeliveryStreamName: "kdf-firehose"
+      DeliveryStreamType: "KinesisStreamAsSource"
+      KinesisStreamSourceConfiguration:
+        KinesisStreamARN: !GetAtt KinesisStream.Arn
+        RoleARN: !GetAtt DeliveryStreamRole.Arn
+      ExtendedS3DestinationConfiguration:
+        BucketARN: !GetAtt DeliveryBucket.Arn
+        BufferingHints:
+          SizeInMBs: 1
+          IntervalInSeconds: 60
+        CloudWatchLoggingOptions:
+          Enabled: true
+          LogGroupName: "/aws/kinesisfirehose/ibcd"
+          LogStreamName: "S3Delivery"
+        CompressionFormat: "GZIP"
+        EncryptionConfiguration:
+          NoEncryptionConfig: "NoEncryption"
+        Prefix: ""
+        RoleARN: !GetAtt DeliveryStreamRole.Arn
+
+########## Policies ###########
+  DeliveryStreamPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles:
+        - !Ref DeliveryStreamRole
+      PolicyName: firehose_delivery_policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:AbortMultipartUpload'
+              - 's3:GetBucketLocation'
+              - 's3:GetObject'
+              - 's3:ListBucket'
+              - 's3:ListBucketMultipartUploads'
+              - 's3:PutObject'
+            Resource:
+              - !GetAtt DeliveryBucket.Arn
+              - !Join
+                - ''
+                - - 'arn:aws:s3:::'
+                  - !Ref DeliveryBucket
+                  - '*'
+          - Effect: Allow
+            Action:
+              - 'kinesis:DescribeStream'
+              - 'kinesis:GetShardIterator'
+              - 'kinesis:GetRecords'
+              - 'kinesis:ListShards'
+            Resource:
+              - !GetAtt KinesisStream.Arn
+
+  DeliveryStreamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+            Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': !Ref 'AWS::AccountId'

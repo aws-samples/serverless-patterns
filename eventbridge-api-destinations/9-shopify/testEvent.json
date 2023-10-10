@@ -1,0 +1,5 @@
+{
+    "EventBusName": "MyShopifyEventBus",
+    "Source": "MyShopifyApp",
+    "Detail": "{\"product\": {\"title\": \"Teddy Bear\",\"body_html\": \"<strong>Fluffy Bear!</strong>\",\"vendor\": \"Vendor\",\"product_type\": \"Stuffed Animal\",\"tags\": [\"Fluffy\",\"Bear\",\"MediumSize\"]}}"
+}

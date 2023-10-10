@@ -1,0 +1,71 @@
+service: lambda-sfn-sls
+frameworkVersion: '^3' # require serverless v3 or later
+
+plugins:
+  - serverless-plugin-typescript # enable TypeScript support for Lambda functions
+  - serverless-step-functions # enable Step Functions support for Serverless Framework
+
+provider:
+  name: aws
+
+  # common configuration for all Lambda functions in this stack
+  runtime: nodejs14.x
+  architecture: arm64 # use Graviton for running all Lambda functions
+
+  # use --region option value or the default - us-east-1
+  region: ${opt:region, "us-east-1"}
+
+  # override the default stage (dev)
+  stage: ${opt:stage, "prod"}
+
+  # optional, Lambda function's memory size in MB, default is 1024
+  memorySize: 256
+
+  # Lambda's default IAM role
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "states:StartExecution"
+          Resource:
+            Fn::GetAtt: [HelloWorldStateMachine, Arn]
+
+# Step Functions
+stepFunctions:
+  validate: true # pre-deployment state machine validation
+  stateMachines:
+    helloWorld:
+      name: HelloWorldStateMachine
+      type: EXPRESS
+      loggingConfig:
+        level: ALL
+        includeExecutionData: false
+        destinations:
+          - Fn::GetAtt: [ StateMachineLogGroup, Arn ]
+      # definition can be embedded into this template or managed in a separate file
+      definition: ${file(./statemachine/stateMachine.asl.yml)}
+
+# Lambda functions
+functions:
+  invokeSFN:
+    handler: src/handler.invokeSFN
+    environment:
+      STATE_MACHINE_ARN:
+        Fn::GetAtt: [HelloWorldStateMachine, Arn]      
+
+resources:
+  # Override the default description
+  Description: Lambda function invoking a Step Function (Serverless Framework).
+
+  Resources:
+    StateMachineLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Join [ "/", [ "stepfunctions", HelloWorldStateMachine]]
+
+  Outputs:
+    LambdaName:
+      Description: "Lambda function name"
+      Value: "${self:service}-${sls:stage}-invokeSFN"
+

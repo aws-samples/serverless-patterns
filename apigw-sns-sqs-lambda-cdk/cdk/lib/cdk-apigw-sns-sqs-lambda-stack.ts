@@ -2,18 +2,20 @@
   *  SPDX-License-Identifier: MIT-0
  */
 
-import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import * as lambda from '@aws-cdk/aws-lambda';
-import { SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
-import * as sns from '@aws-cdk/aws-sns';
-import * as sqs from '@aws-cdk/aws-sqs';
-import * as subscriptions from '@aws-cdk/aws-sns-subscriptions';
-import * as apigateway from '@aws-cdk/aws-apigateway';
+import { Stack, StackProps, Aws } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_iam as iam } from 'aws-cdk-lib';
+import { aws_lambda as lambda } from 'aws-cdk-lib';
+import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import { aws_sqs as sqs } from 'aws-cdk-lib';
+import { aws_sns as sns } from 'aws-cdk-lib';
+import { aws_sns_subscriptions as subscriptions } from 'aws-cdk-lib';
+import { aws_apigateway as apigateway } from 'aws-cdk-lib';
+
 import * as path from 'path';
 
-export class CdkApigwSnsSqsLambdaStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class CdkApigwSnsSqsLambdaStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     const topic = new sns.Topic(this, 'topic')
@@ -53,7 +55,7 @@ export class CdkApigwSnsSqsLambdaStack extends cdk.Stack {
       new apigateway.AwsIntegration({
         service: 'sns',
         integrationHttpMethod: 'POST',
-        path: `${cdk.Aws.ACCOUNT_ID}/${topic.topicName}`,
+        path: `${Aws.ACCOUNT_ID}/${topic.topicName}`,
         options: {
           credentialsRole: gatewayExecutionRole, 
           passthroughBehavior: apigateway.PassthroughBehavior.NEVER,

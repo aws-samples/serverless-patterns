@@ -1,0 +1,45 @@
+{
+  "title": "Kinesis Data Streams integration with Lambda which sends records to DynamoDB using the AWS CDK in Java",
+  "description": "This pattern creates an Amazon Kinesis Data Stream and an AWS Lambda function which then sends the records to DynamoDB, using the AWS Cloud Development Kit (AWS CDK) in Java.",
+  "language": "Java",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When data is sent to the Kinesis data stream, the Lambda function will be triggered which will then fetch the records from the event and send it to DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/kinesis-lambda-ddb-cdk-java",
+      "templateURL": "serverless-patterns/kinesis-lambda-ddb-cdk-java",
+      "projectFolder": "kinesis-lambda-ddb-cdk-java",
+      "templateFile": "kinesis-lambda-ddb-cdk-java/src/main/java/com/myorg/KinesisLambdaDdbCdkJavaStack.java" 
+    }
+  },
+  
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abha Tripathi",
+      "image": "https://avatars.githubusercontent.com/u/36122588?s=400&u=209552eb3fa55e5c4176e54a24a7737ce899083b&v=4",
+      "bio": "Cloud Engineer @AWS",
+      "linkedin": "www.linkedin.com/in/abha-tripathi-344a0a146"
+    }
+  ]
+}

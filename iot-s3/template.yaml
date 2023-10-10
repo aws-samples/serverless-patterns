@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Transform: 'AWS::Serverless-2016-10-31'
+
+Description: To put IoT events to S3 Bucket using AWS IoT Topic rules.
+
+Resources:
+
+  # Define the S3 bucket to save the data
+  MyS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced    
+
+  # Define IAM Role to allow AWS IoT to put events to S3 Bucket
+  S3AccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: iot.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: IoTS3PutAccessPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Action:
+                - s3:Get*
+                - s3:List*
+                - s3:PutObject
+              Effect: Allow
+              Resource: '*'
+
+  # Define AWS IoT Topic Rule to put event to S3 using 'S3' Action.
+  IoTToS3Rule:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      TopicRulePayload:
+        Actions:
+        - S3:
+            Key: ${topic(2)}/${timestamp()}
+            BucketName: !Ref MyS3Bucket
+            RoleArn: !GetAtt S3AccessRole.Arn
+        RuleDisabled: false
+        Sql: SELECT * FROM 'topics/+/ThingsS3'

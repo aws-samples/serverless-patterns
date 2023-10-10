@@ -1,0 +1,62 @@
+{
+    "title": "Lambda Layers",
+    "description": "Create a Lambda Function that has a layer added to it",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to deploy a Lambda Function that has a layer added to it.",
+        "The SAM template provided deploys two Lambda functions. Both Lambda functions attempt to import the `PyMySQL` package.",
+        "However, only one of the Lambda functions has the `PyMySQL` layer which allows it to import the package successfully.",
+        "This pattern tests both Lambda functions to illustrate the difference when there is a layer added to a Lambda function.",
+        "One use case for Lambda layers is to have packages like `PyMySQL` shared across various Lambda functions that require connections to RDS MySQL.",
+        "Using layers reduces the size of uploaded deployment archives and makes it faster to deploy your code."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-layer",
+        "templateURL": "serverless-patterns/lambda-layer",
+        "projectFolder": "lambda-layer",
+        "templateFile": "lambda-layer/template.yml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AWS Lambda Developer Guide - Creating and sharing Lambda layers",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html"
+        },
+        {
+          "text": "AWS Compute Blog - Working with AWS Lambda and Lambda Layers in AWS SAM",
+          "link": "https://aws.amazon.com/blogs/compute/working-with-aws-lambda-and-lambda-layers-in-aws-sam/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Glenn Chia Jin Wee",
+        "image": "https://avatars.githubusercontent.com/u/31919569?v=4",
+        "bio": "Glenn is an Associate Cloud Architect at AWS based in Singapore",
+        "linkedin": "https://www.linkedin.com/in/glenn-chia-291344142",
+        "twitter": "glenncjw"
+      }
+    ]
+  }

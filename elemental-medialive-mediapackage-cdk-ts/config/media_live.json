@@ -1,0 +1,15 @@
+{
+  "streamName": "live",
+  "channelClass" : "STANDARD", 
+  "inputType" : "URL_PULL",
+  "sourceEndBehavior" : "LOOP",
+  "codec": "AVC",
+  "encodingProfile" : "HD-720p",
+  "priLink": "",
+  "secLink" : "",
+  "inputCidr": "0.0.0.0/0" ,
+  "priUrl": "https://d15an60oaeed9r.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8",
+  "secUrl" : "https://d15an60oaeed9r.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8",
+  "priFlow" : "",
+  "secFlow" : "" 
+}

@@ -10,7 +10,6 @@ Resources:
   AutomationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${AWS::AccountId}-ServerlessLandAuotomationExecutionRole"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -29,7 +28,6 @@ Resources:
               - Effect: Allow
                 Action: lambda:InvokeFunction
                 Resource: !GetAtt LambdaFunction.Arn
-    DependsOn: LambdaFunction
 
 ##########################################################################
 #  DynamoDB table that is going to be used in this pattern for testing                                                      #
@@ -37,10 +35,14 @@ Resources:
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub "${AWS::AccountId}-ServerlessLandTestTable"
+      BillingMode: "PROVISIONED"
       ProvisionedThroughput:
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5"
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: True
+      SSESpecification:
+        SSEEnabled: True
       AttributeDefinitions:
         -
           AttributeName: "Album"
@@ -70,6 +72,7 @@ Resources:
       CodeUri: ./src
       Runtime: python3.7
       Timeout: 60
+      ReservedConcurrentExecutions: 5
       Policies:
         - Statement:
           - Effect: Allow
@@ -84,9 +87,7 @@ Resources:
 ###################################################################################################################
   SsmAutomationDocument:
     Type: AWS::SSM::Document
-    DependsOn: LambdaFunction
     Properties:
-      Name: !Sub "${AWS::AccountId}_serverlessland_automation"
       DocumentType: Automation
       Content:
         schemaVersion: "0.3"

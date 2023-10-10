@@ -1,0 +1,58 @@
+{
+  "title": "Amazon API Gateway HTTP API to SQS to Lambda",
+  "description": "This pattern creates an HTTP API endpoint that send message to SQS and trigger a Lambda function to process the message",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway HTTP API with a <code>send</code> route that send message to a SQS queue.",
+      "The  Amazon API Gateway HTTP API has basic CORS configured. ",
+      "Upon receiving message, SQS will trigger a Lambda function to process the message.", 
+      "The function will only <code>print</code> the message only. The function written in Python."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-sqs-lambda",
+      "templateURL": "serverless-patterns/apigw-http-api-sqs-lambda",
+      "projectFolder": "apigw-http-api-sqs-lambda",
+      "templateFile": "infrastructure/apigw_http_api_sqs_lambda_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Lambda with Amazon SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+      },
+      {
+        "text": "Amazon API Gateway HTTP Integration subtype reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-aws-services-reference.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Paul Lu",
+      "bio":"I am an AWS Solution Architect from Taipei, Taiwan.",
+      "linkedin": "https://www.linkedin.com/in/paul-lu-7336b433/"
+    }
+  ]
+}

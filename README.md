@@ -1,6 +1,6 @@
 # AWS serverless patterns
 
-This repo contains serverless patterns showing how to integrate services services using infrastructure-as-code (IaC). You can use these patterns to help develop your own projects quickly.
+This repo contains serverless patterns showing how to integrate services using infrastructure-as-code (IaC). You can use these patterns to help develop your own projects quickly.
 
 - Learn more about these patterns at https://serverlessland.com/patterns.
 - To learn more about submitting a pattern, read the [publishing guidelines page](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md).
@@ -10,7 +10,6 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * AWS CLI already configured with Administrator permission
-* [NodeJS 14.x installed](https://nodejs.org/en/download/)
 
 ## Deployment Instructions
 
@@ -20,13 +19,13 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a new directory and navigate to that directory in a terminal.
 
-1. Clone this repo:
+1. Clone this repo
 
 ```
 git clone https://github.com/aws-samples/serverless-patterns
 ```
 
-Each subdirectory contains additional installation and usage instructions. 
+Each subdirectory contains additional installation and usage instructions.
 
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.

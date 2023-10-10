@@ -1,0 +1,215 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  appsync-lambda-stepfunctions-sam
+
+  SAM Template for invoking a step functions from a lambda resolver using appsync
+
+
+Resources:
+  AppSyncServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "appsync.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+  InvokeLambdaResolverPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: "DirectAppSyncLambda"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: "lambda:invokeFunction"
+            Resource:
+              - !GetAtt SamStepFunctionFunction.Arn
+          - Effect: "Allow"
+            Action: "states:StartExecution"
+            Resource:
+              - !GetAtt SamStepFunctionStateMachine.Arn
+      Roles:
+        - !Ref AppSyncServiceRole
+        - !Ref lambdaStepFunctionRole
+  LambdaLoggingPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: LambdaXRayPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action: [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+              ]
+            Resource: "*"
+      Roles:
+        - !Ref lambdaStepFunctionRole
+
+  DynamoDBReadPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: DynamoDBReadPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action: [
+              "dynamodb:GetItem",
+              "dynamodb:Query",
+
+              ]
+            Resource:
+              - !GetAtt SamStepFunctionsTable.Arn
+      Roles:
+        - !Ref lambdaStepFunctionRole
+
+  DynamoDBWritePolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: DynamoDBWritePolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action: [
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:ConditionCheckItem",
+              "dynamodb:DeleteItem",
+            ]
+            Resource:
+              - !GetAtt SamStepFunctionsTable.Arn
+
+      Roles:
+        - !Ref lambdaStepFunctionRole
+
+
+
+  lambdaStepFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+            - "sts:AssumeRole"
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+
+  RoleAppSyncCloudWatch:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+
+
+  SamStepFunctionStateMachine:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: statemachine/booking_step_function.asl.json
+      DefinitionSubstitutions:
+        DDBUpdateItem: !Sub arn:${AWS::Partition}:states:::dynamodb:updateItem
+        DDBGetItem: !Sub arn:${AWS::Partition}:states:::dynamodb:getItem
+        DDBTable: !Ref SamStepFunctionsTable
+
+      Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+        - DynamoDBWritePolicy:
+            TableName: !Ref SamStepFunctionsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref SamStepFunctionsTable
+
+
+
+  SamStepFunctionsApi:
+    Type: "AWS::AppSync::GraphQLApi"
+    Properties:
+      Name: SamStepFunctionsApi
+      AuthenticationType: "API_KEY"
+      XrayEnabled: true
+      LogConfig:
+        CloudWatchLogsRoleArn: !GetAtt RoleAppSyncCloudWatch.Arn
+        ExcludeVerboseContent: FALSE
+        FieldLogLevel: ALL
+
+  SamStepFunctionsApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt SamStepFunctionsApi.ApiId
+
+  SamStepFunctionsApiSchema:
+    Type: "AWS::AppSync::GraphQLSchema"
+    Properties:
+      ApiId: !GetAtt SamStepFunctionsApi.ApiId
+      DefinitionS3Location: 'graphql/schema.graphql'
+  ###################
+  # Lambda Direct Data Source and Resolver
+  ##################
+  SamStepFunctionDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt SamStepFunctionsApi.ApiId
+      Name: "SamStepFunctionsLambdaDirectResolver"
+      Type: "AWS_LAMBDA"
+      ServiceRoleArn: !GetAtt AppSyncServiceRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !GetAtt SamStepFunctionFunction.Arn
+  SamStepFunctionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambda/
+      Handler: app.lambda_handler
+      Role: !GetAtt lambdaStepFunctionRole.Arn
+      Runtime: python3.8
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !Ref SamStepFunctionStateMachine
+      Architectures:
+        - x86_64
+
+  CreateAddStepFunctionsResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt SamStepFunctionsApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "addStepFunctionExecution"
+      DataSourceName: !GetAtt SamStepFunctionDataSource.Name
+  SamStepFunctionsTable:
+    Type: AWS::Serverless::SimpleTable # More info about SimpleTable Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-simpletable.html
+    Properties:
+      PrimaryKey:
+        Name: Id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+Outputs:
+  SamStepFunctionStateMachineArn:
+    Description: "Sam Step Functions State machine ARN"
+    Value: !Ref SamStepFunctionStateMachine
+

@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create an API Destination in EventBridge with OAuth Credentials
+
+Parameters:
+  ExternalAPIURL:
+    Type: String
+    Description: Enter External API URL
+    Default: '<>'
+  ExternalAuthEndpoint:
+    Type: String
+    Description: Enter Authorization Endpoint
+    Default: '<>'
+  ExternalAPIClientID:
+    Type: String
+    Description: Enter OAuth Client ID
+    Default: '<>'
+  ExternalAPIClientSecret:
+    Type: String
+    NoEcho: True
+    Description: Enter OAuth Client Secret
+    Default: '<>'
+  ExternalAPIUserName:
+    Type: String
+    Description: Enter OAuth Username
+    Default: '<>'
+  ExternalAPIPassword:
+    Type: String
+    NoEcho: True
+    Description: Enter OAuth Password  
+    Default: '<>'
+
+Resources:
+  MyEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "ExternalOAuthEventBus"
+      
+  ConnectionSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: "ExternalOAuthCredentials"
+      Description: "OAuth connection credential secret"   
+      SecretString: !Sub >-
+        {"ClientID": "${ExternalAPIClientID}", "ClientSecret": "${ExternalAPIClientSecret}", "Username": "${ExternalAPIUserName}", "Password": "${ExternalAPIPassword}"}      
+
+  MyConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: 'OAUTH_CLIENT_CREDENTIALS'
+      Description: 'My connection with an OAuth2 credentials'
+      AuthParameters:
+        OAuthParameters: 
+          AuthorizationEndpoint: !Ref ExternalAuthEndpoint
+          ClientParameters: 
+            ClientID: '{{resolve:secretsmanager:ExternalOAuthCredentials:SecretString:ClientID}}'
+            ClientSecret: '{{resolve:secretsmanager:ExternalOAuthCredentials:SecretString:ClientSecret}}'
+          HttpMethod: 'POST'
+          OAuthHttpParameters: 
+            HeaderParameters:
+              - Key: 'Content_Type'
+                Value: 'application/x-www-form-urlencoded'
+                IsValueSecret: false
+            BodyParameters:
+              - Key: 'grant_type'
+                Value: 'password'
+                IsValueSecret: true
+              - Key: 'username'
+                Value: '{{resolve:secretsmanager:ExternalOAuthCredentials:SecretString:Username}}'
+                IsValueSecret: true
+              - Key: 'password'
+                Value: '{{resolve:secretsmanager:ExternalOAuthCredentials:SecretString:Password}}'
+                IsValueSecret: true          
+    DependsOn: ConnectionSecret
+              
+
+  MyApiDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'ExternalApiDestination'
+      ConnectionArn: !GetAtt MyConnection.Arn
+      InvocationEndpoint: !Ref ExternalAPIURL
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+      
+  EventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt MyApiDestination.Arn
+              - Effect: Allow
+                Action:
+                  - secretsmanager:CreateSecret
+                  - secretsmanager:UpdateSecret
+                  - secretsmanager:DescribeSecret
+                  - secretsmanager:DeleteSecret
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:PutSecretValue
+                Resource:
+                  - arn:aws:secretsmanager:*:*:secret:events!connection/*               
+                
+  MyDLQueue: 
+    Type: AWS::SQS::Queue
+
+  EventRule: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      State: "ENABLED"
+      EventBusName: !Ref MyEventBus
+      EventPattern: 
+        source:
+          - "MyTestApp"
+        detail-type:
+          - "MyTestMessage"
+      Targets: 
+        - Arn: !GetAtt MyApiDestination.Arn
+          RoleArn: !GetAtt EventBridgeTargetRole.Arn
+          Id: "MyAPIdestination"
+          InputPath: "$.detail.responsePayload"
+          DeadLetterConfig:
+            Arn: !GetAtt MyDLQueue.Arn
+
+Outputs:
+  MyEventBusName:
+    Description: Application EventBus Name
+    Value: !Ref MyEventBus
+
+  MyEventBusArn:
+    Description: Application EventBus ARN
+    Value: !GetAtt MyEventBus.Arn
+
+  MyConnectionName:
+    Value: !Ref MyConnection
+  MyConnectionArn:
+    Value: !GetAtt MyConnection.Arn        
+
+  MyApiDestinationName:
+    Value: !Ref MyApiDestination
+  MyApiDestinationArn:
+    Value: !GetAtt MyApiDestination.Arn
+
+  EventBridgeTargetRoleArn:
+    Value: !GetAtt EventBridgeTargetRole.Arn
+
+  MyDLQueue:
+    Value: !GetAtt MyDLQueue.Arn

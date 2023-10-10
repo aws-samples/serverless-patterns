@@ -1,0 +1,10 @@
+[
+    {
+        "Data": "ewogICAiQXRvbWljTnVtYmVyIjogNCwKICAgIkVsZW1lbnQiOiAiQmVyeWxsaXVtIiwKICAgIlN5bWJvbCI6ICJCZSIsCiAgICJBdG9taWNNYXNzIjogOS4wMTIKfQ==",
+        "PartitionKey": "key"
+    },
+    {
+        "Data": "ewogICAiQXRvbWljTnVtYmVyIjogNSwKICAgIkVsZW1lbnQiOiAiQm9yb24iLAogICAiU3ltYm9sIjogIkIiLAogICAiQXRvbWljTWFzcyI6ICIxMC44MTEiIAp9",
+        "PartitionKey": "key"
+    }
+]

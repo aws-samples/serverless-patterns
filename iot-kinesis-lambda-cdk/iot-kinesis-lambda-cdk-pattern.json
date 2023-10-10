@@ -1,0 +1,65 @@
+{
+  "title": "IoT Core to Kinesis to Lambda",
+  "description": "Create a IoT Rule with a Kinesis Data Stream action that publishes messages to a Kinesis Data Stream and triggers a Lambda function to process the data.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern contains a sample AWS CDK stack to create an IoT Rule with a Kinesis Data Streams action and an AWS Lambda function.",
+      "When a message is published to the IoT topic defined in the IoT Rule, this message will be delivered to the Kinesis Data Stream. The Lambda function is configured with an event source mapping and it will be triggered to process the streaming data. In this sample the Lambda function decodes the message polled from the Kinesis Data Stream and logs its content."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-kinesis-lambda-cdk",
+      "templateURL": "serverless-patterns/iot-kinesis-lambda-cdk",
+      "projectFolder": "iot-kinesis-lambda-cdk",
+      "templateFile": "iot_kinesis_lambda_cdk/iot_kinesis_lambda_cdk_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS IoT Core",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/what-is-aws-iot.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://aws.amazon.com/s3/"
+      },
+      {
+        "text": "Amazon Kinesis Data Streams",
+        "link": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html"
+      },
+      {
+        "text": "IoT Rule Kinesis Data Streams action",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/kinesis-rule-action.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Patrick Malatesta",
+      "image": "https://media-exp1.licdn.com/dms/image/C5603AQF5JwByyAUH8g/profile-displayphoto-shrink_200_200/0/1569421621135?e=1660780800&v=beta&t=7tR-t6sQkFbWSFhWmthf-2wGMFNGbmcfpQhvxXupm6g",
+      "bio": "Cloud Infrastructure Architect at AWS Professional Services",
+      "linkedin": "https://www.linkedin.com/in/patricktomasinimalatesta/"
+    }
+  ]
+}

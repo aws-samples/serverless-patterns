@@ -1,0 +1,3 @@
+name: alb-lambda-pulumi-cs
+runtime: dotnet
+description: A minimal AWS Pulumi YAML program

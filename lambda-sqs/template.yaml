@@ -31,7 +31,7 @@ Outputs:
     Value: !Ref QueuePublisherFunction
   
   SQSqueueName:
-    Description: SNS queue name
+    Description: SQS queue name
     Value: !GetAtt MySqsQueue.QueueName
 
   SQSqueueARN:

@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  LambdaFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: LambdaFunction/
+      Handler: com.example.App::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 
+      FunctionUrlConfig:
+        AuthType: NONE
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        PriceClass: PriceClass_All
+        HttpVersion: http2
+        IPV6Enabled: true
+        Comment: Distribution with Lambda Function URL
+        Origins:
+        - DomainName: !Select [2, !Split ["/", !GetAtt LambdaFunctionUrl.FunctionUrl]] # Remove https:// from URL. 
+          Id: LambdaOrigin
+          CustomOriginConfig:
+            HTTPSPort: 443
+            OriginProtocolPolicy: https-only
+        Enabled: 'true'
+        DefaultCacheBehavior:
+          TargetOriginId: LambdaOrigin
+          CachePolicyId: '658327ea-f89d-4fab-a63d-7e88639e58f6'
+          ViewerProtocolPolicy: redirect-to-https
+          SmoothStreaming: 'false'
+          Compress: 'true'
+
+
+Outputs:
+  LambdaFunction:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt LambdaFunction.Arn
+  LambdaFunctionURL:
+    Description: "Lambda function URL"
+    Value: !GetAtt LambdaFunctionUrl.FunctionUrl
+  CloudFrontDomain:
+    Description: CloudFront domain name 
+    Value: !Sub https://${CloudFrontDistribution.DomainName}/
+

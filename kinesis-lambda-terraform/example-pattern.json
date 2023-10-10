@@ -1,0 +1,58 @@
+{
+    "title": "Kinesis Data Streams With Lambda Consumer",
+    "description": "When data is loaded into Kinesis data stream, the configured lambda function is invoked.",
+    "language": "",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern creates a Kinesis Data Stream and lambda function (consumer) with event source mapping. ",
+        "When the data is loaded into the stream, the lambda function is invoked. "
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-lambda-terraform",
+        "templateURL": "serverless-patterns/kinesis-lambda-terraform",
+        "projectFolder": "kinesis-lambda-terraform",
+        "templateFile": "main.tf"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Kinesis Data Streams with Lambda consumers",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+        },
+        {
+          "text": "Lambda event source mapping",
+          "link": "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_event_source_mapping.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "terraform apply"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>terraform destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Rahul Sringeri",
+        "image": "",
+        "bio": "Technical Account Manager at AWS for strategic accounts.",
+        "linkedin": "",
+        "twitter": ""
+      }
+    ]
+  }
