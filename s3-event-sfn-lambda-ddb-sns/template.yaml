@@ -144,12 +144,23 @@ Resources:
             Action: "sts:AssumeRole"
       Path: "/"
       Policies:
-       - AmazonSNSFullAccess
-       - CloudWatchLogsFullAccess
-       - AWSLambda_FullAccess
-       - AmazonEventBridgeFullAccess
-       - AmazonS3FullAccess
-          
+       - PolicyName: SNSAccess
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Resource:
+                  - !Ref MySnsTopic
+                Action:
+                  - sns:Publish
+        - PolicyName: LambdaExecute
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "lambda:InvokeFunction"
+                Resource: 
+                  - !GetAtt LambdaFunction.Arn
 
 
 Outputs:
