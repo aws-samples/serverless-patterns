@@ -144,19 +144,11 @@ Resources:
             Action: "sts:AssumeRole"
       Path: "/"
       Policies:
-        -  PolicyName: LogPermissions
-           PolicyDocument:
-             Version: "2012-10-17"
-             Statement:
-              - Effect: Allow
-                Action:
-                  - "cloudwatch:*"
-                  - "logs:*"
-                  - "lambda:*"
-                  - "sns:*"
-                  - "s3:*"
-                  - "events:*"
-                Resource: "*"
+       - AmazonSNSFullAccess
+       - CloudWatchLogsFullAccess
+       - AWSLambda_FullAccess
+       - AmazonEventBridgeFullAccess
+       - AmazonS3FullAccess
           
 
 
