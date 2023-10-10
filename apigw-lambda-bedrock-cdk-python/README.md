@@ -20,23 +20,23 @@ You must request access to a model before you can use it. If you try to use the 
 
 1. In the AWS console, select the region from which you want to access Amazon Bedrock. At the time of writing, Amazon Bedrock is available in us-east-1 (N. Virginia) and us-west-2 (Oregon) regions.
 
-![Region Selection](bedrock_setup/region-selection.png)
+    ![Region Selection](bedrock_setup/region-selection.png)
 
-2. Find **Amazon Bedrock** by searching in the AWS console.
+1. Find **Amazon Bedrock** by searching in the AWS console.
 
-![Bedrock Search](bedrock_setup/bedrock-search.png)
+    ![Bedrock Search](bedrock_setup/bedrock-search.png)
 
-3. Expand the side menu.
+1. Expand the side menu.
 
-![Bedrock Expand Menu](bedrock_setup/bedrock-menu-expand.png)
+    ![Bedrock Expand Menu](bedrock_setup/bedrock-menu-expand.png)
 
-4. From the side menu, select **Model access**.
+1. From the side menu, select **Model access**.
 
-![Model Access](bedrock_setup/model-access-link.png)
+    ![Model Access](bedrock_setup/model-access-link.png)
 
-5. Select the **Edit** button.
+1. Select the **Edit** button.
 
-![Model Access View](bedrock_setup/model-access-view.png)
+    ![Model Access View](bedrock_setup/model-access-view.png)
 
 6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Save changes** to activate the models in your account. For this pattern we only need Anthropic/Claude but feel free to experiment with others.
 
