@@ -1,7 +1,7 @@
 # Amazon Aurora Serverless V2 Primary to Secondary Global Database
 The pattern creates a serverless global database cluster enabling data replication from the primary to secondary cluster. The regional primary cluster contains a serverless db instance supporting both writes and reads. The regional secondary cluster contains a serverless db instance supporting only reads. In the unlikely event of a regional degradation or outage, the secondary region can be promoted to read and write capabilities in less than 1 minute. Also the pattern adopts the multiple stack capability of CDK to provision the resources across the primary and secondary regions. You can deploy each stack indvidually or deploy all the stacks using --all option.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/aurora-serverless-global-db-cdk](https://serverlessland.com/patterns/aurora-serverless-global-db-cdk)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
