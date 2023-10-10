@@ -1,0 +1,57 @@
+{
+  "title": "AWS Secrets Manager to CloudWatch Events to Lambda to SNS",
+  "description": "An terraform template that detects and notifies on Amazon Secrets Manager secret key creation, Updation and deletion using Amazon CloudWatch event and Amazon SNS",
+  "language": "",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Once the template deployed successfully, first thing to do is to confirm the Email subscription. You will receive an email to confirm it.  Then, head to AWS Secrets Manager console and Create a Secret Key by following these steps - https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html . That's it. You will soon receive a notification about the key you created. Now any event (Like Update or Delete) happens related to that Secret Key, you will receive the notification.",
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-sns-sqs-terraform",
+      "templateURL": "serverless-patterns/sm-cw-lambda-sns-terraform",
+      "projectFolder": "sm-cw-lambda-sns-terraform",
+      "templateFile": "sm-cw-lambda-sns-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Create an AWS Secrets Manager secret",
+        "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html"
+      },
+      {
+        "text": "Monitor AWS Secrets Manager secrets",
+        "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/monitoring.html"
+      }
+    ]
+  },
+	"deploy": {
+		"text": [
+		          "terraform init",
+		          "terraform apply"
+		        ]
+	},
+	"testing": {
+		"text": ["See the Github repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": [
+		          "terraform destroy",
+		          "terraform show"
+		        ]
+	},
+	"authors": [
+		{
+			"name": "Makendran G",
+			"image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
+			"bio": "Cloud Support Engineer @ AWS",
+			"linkedin": "https://www.linkedin.com/in/makendran",
+			"twitter": "@MakendranG"
+		}
+	]
+} 
