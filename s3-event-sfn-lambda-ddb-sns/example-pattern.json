@@ -7,12 +7,12 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern sets up the following resources:"
+      "This pattern sets up the following resources:",
 
- "An Amazon S3 bucket that is configured to send any events regarding its content, such as an `Object created` event that is emitted when an object is uploaded to the bucket, to Amazon EventBridge."
- "An Amazon EventBridge rule that triggers a Step Functions workflow if a new `Object created` event is emitted by the S3 bucket. The workflow receives an [EventBridge event message](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ev-events.html) as its input which contains information such as the name of the S3 bucket and the key of the uploaded csv."
-  "A sample AWS Step Functions workflow that calls the [Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) to identify objects uploaded to the S3 bucket. The workflow posesses an IAM role that authorizes it to read from the S3 bucket and to call Lambda and SNS."
-  "A Dynamodb table and an SNS topic"
+ "An Amazon S3 bucket that is configured to send any events regarding its content, such as an `Object created` event that is emitted when an object is uploaded to the bucket, to Amazon EventBridge.",
+ "An Amazon EventBridge rule that triggers a Step Functions workflow if a new `Object created` event is emitted by the S3 bucket. The workflow receives an [EventBridge event message](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ev-events.html) as its input which contains information such as the name of the S3 bucket and the key of the uploaded csv.",
+  "A sample AWS Step Functions workflow that calls the [Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) to identify objects uploaded to the S3 bucket. The workflow posesses an IAM role that authorizes it to read from the S3 bucket and to call Lambda and SNS.",
+  "A Dynamodb table and an SNS topic",
   "Step function using [wait for callback pattern](https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token)"
 
 
