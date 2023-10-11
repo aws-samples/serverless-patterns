@@ -1,6 +1,6 @@
-# Amazon API Gateway REST API to Lambda to Bedrock
+# Amazon API Gateway REST API to SQS to Lambda to Bedrock
 
-This pattern creates an Amazon API Gateway REST API, an AWS Lambda function resource that makes a call to a model in AWS Bedrock.
+This pattern creates an Amazon API Gateway REST API, an AWS Lambda function that makes a call to a model in Amazon Bedrock.
 
 Learn more about this pattern at Serverless Land Patterns: http://serverlessland.com/patterns/apigw-rest-api-lambda-bedrock-cdk.
 
@@ -27,7 +27,7 @@ The following diagram illustrates the solutions architecture
     cd apigw-rest-api-lambda-bedrock-cdk.
     ```
 
-1. Deploy the stack to your default AWS account and region. The output of this command should give you the HTTP API URL.
+1. Deploy the stack to your default AWS account and region. The output of this command should give you the REST API URL.
     ```
 	cd cdk
     cdk deploy
