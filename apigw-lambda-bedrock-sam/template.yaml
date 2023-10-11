@@ -51,38 +51,38 @@ Resources:
       CodeUri: ./
       Timeout: 90
       Policies:
-        - AWSLambdaBasicExecutionRole
-        - PolicyName: Access Bedrock
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "bedrock:ListFoundationModels"
-                  - "bedrock:GetFoundationModel"
-                  - "bedrock:InvokeModel"
-                  - "bedrock:InvokeModelWithResponseStream"
-                  - "bedrock:CreateModelCustomizationJob"
-                  - "bedrock:GetModelCustomizationJob"
-                  - "bedrock:GetFoundationModelAgreementAvailability"
-                  - "bedrock:ListModelCustomizationJobs"
-                  - "bedrock:StopModelCustomizationJob"
-                  - "bedrock:GetCustomModel"
-                  - "bedrock:ListCustomModels"
-                  - "bedrock:DeleteCustomModel"
-                  - "bedrock:CreateProvisionedModelThroughput"
-                  - "bedrock:UpdateProvisionedModelThroughput"
-                  - "bedrock:GetProvisionedModelThroughput"
-                  - "bedrock:DeleteProvisionedModelThroughput"
-                  - "bedrock:ListProvisionedModelThroughputs"
-                  - "bedrock:ListTagsForResource"
-                  - "bedrock:UntagResource"
-                  - "bedrock:TagResource"
-                  - "bedrock:AcceptAcknowledgement"
-                  - "bedrock:GetModelPermission"
-                  - "bedrock:GetModelInvocationLogging"
-                  - "bedrock:PutModelInvocationLogging"
-                  - "bedrock:CreateFoundationModelAgreement"
-                  - "bedrock:DeleteFoundationModelAgreement"
-                  - "bedrock:ListFoundationModelAgreementOffers"
-                Resource: "*"     
+       - AWSLambdaBasicExecutionRole
+       - Statement:
+         - Sid: SSMDescribeParametersPolicy
+           Effect: Allow
+           Action:
+              - "bedrock:ListFoundationModels"
+              - "bedrock:GetFoundationModel"
+              - "bedrock:InvokeModel"
+              - "bedrock:InvokeModelWithResponseStream"
+              - "bedrock:CreateModelCustomizationJob"
+              - "bedrock:GetModelCustomizationJob"
+              - "bedrock:GetFoundationModelAgreementAvailability"
+              - "bedrock:ListModelCustomizationJobs"
+              - "bedrock:StopModelCustomizationJob"
+              - "bedrock:GetCustomModel"
+              - "bedrock:ListCustomModels"
+              - "bedrock:DeleteCustomModel"
+              - "bedrock:CreateProvisionedModelThroughput"
+              - "bedrock:UpdateProvisionedModelThroughput"
+              - "bedrock:GetProvisionedModelThroughput"
+              - "bedrock:DeleteProvisionedModelThroughput"
+              - "bedrock:ListProvisionedModelThroughputs"
+              - "bedrock:ListTagsForResource"
+              - "bedrock:UntagResource"
+              - "bedrock:TagResource"
+              - "bedrock:AcceptAcknowledgement"
+              - "bedrock:GetModelPermission"
+              - "bedrock:GetModelInvocationLogging"
+              - "bedrock:PutModelInvocationLogging"
+              - "bedrock:CreateFoundationModelAgreement"
+              - "bedrock:DeleteFoundationModelAgreement"
+              - "bedrock:ListFoundationModelAgreementOffers"
+           Resource: "*"     
+
+      
