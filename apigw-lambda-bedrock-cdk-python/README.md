@@ -81,7 +81,9 @@ You must request access to a model before you can use it. If you try to use the 
 
 ## How it works
 
-CDK will create an Api Gateway, along with a resource and a POST method. There's a AWS Lambda function that will be taking the prompt and invoking an Amazon Bedrock model (anthropic.claude-v2). If you wish to try other models, make sure to modify the policy attached to the Lambda function and invoke the right model.
+CDK will create an Api Gateway, along with a resource and a POST method. There's a AWS Lambda function that will be taking the prompt and invoking an Amazon Bedrock model (anthropic.claude-v2) synchronously. If you wish to try other models, make sure to modify the policy attached to the Lambda function and invoke the right model. 
+
+This pattern is a synchronous pattern. For an asynchronous approach, please check [this](../apigw-rest-api-sqs-lambda-bedrock-cdk) pattern that involves the usage of Amazon SQS.
 
 ## Testing
 
