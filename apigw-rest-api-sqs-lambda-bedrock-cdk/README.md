@@ -37,7 +37,7 @@ The following diagram illustrates the solutions architecture
 
 This pattern creates an Amazon API Gateway REST API, an Amazon SQS queue and an AWS Lambda function. AWS Lambda function consumes messages from SQS using [AWS lambda event source mapping](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html). The lambda function then calls Bedrock using the request from SQS. The Lambda function is set with the max concurrency of 10 (configurable through [cdk.context.json](./cdk/cdk.context.json)). This setting is enabled to make sure the requests does not overwhelm Amazon Bedrock.
 
-To achieve full functionality with this pattern, you must send the response from Lambda function to client using techniques such as websocket or GraphQL subscriptions. This pattern is an asynchronous pattern. For a simple pattern that synchronously call Bedrock, explore this [synchronous pattern](../apigw-rest-api-lambda-bedrock-cdk). 
+To achieve full functionality with this pattern, you must send the response from Lambda function to client using techniques such as websocket or GraphQL subscriptions. This pattern is an asynchronous pattern. For a simple pattern that synchronously call Bedrock, explore this [synchronous pattern](../apigw-lambda-bedrock-cdk-python). 
 
 ## Testing
 
@@ -65,6 +65,7 @@ curl -X POST https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/inv
 - [Amazon Bedrock documentation](https://aws.amazon.com/bedrock)
 - [API Gateway websocket](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html)
 - [Publishing message to IoT Topic](https://serverlessland.com/patterns/apigw-lambda-iot-cdk)
+
 
 
 
