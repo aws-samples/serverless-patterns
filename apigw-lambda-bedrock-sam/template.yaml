@@ -10,7 +10,7 @@ Resources:
         - '*/*'
       EndpointConfiguration:
         Type: REGIONAL
-        Name: !Ref ApiName
+        Name: !Ref bedrockAPI
   
   ApiFunction: # Adds a GET api endpoint at "/" to the ApiGatewayApi via an Api event
     Type: AWS::Serverless::Function
