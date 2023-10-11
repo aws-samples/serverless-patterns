@@ -1,0 +1,166 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - CQRS pattern using DynamoDB, Lambda and Elasticahe for Redis
+
+Globals:
+  Function:
+    Runtime: java11
+    MemorySize: 512
+    Timeout: 25
+
+Resources:
+  cqrsVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 30.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref "AWS::StackName","vpc" ] ]
+
+  privateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref cqrsVPC
+      AvailabilityZone: "us-east-1b"
+      CidrBlock: 30.0.1.0/23
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref "AWS::StackName","privatesubnet-a" ] ]
+
+  privateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref cqrsVPC
+      AvailabilityZone: "us-east-1a"
+      CidrBlock: 30.0.2.0/23
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref "AWS::StackName","privatesubnet-b" ] ]
+
+  cqrsSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: CQRS Subnet-group
+      SubnetIds:
+        - !Ref privateSubnetA
+        - !Ref privateSubnetB
+
+  redisClusterSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Redis cluster access
+      VpcId: !Ref cqrsVPC
+
+  cqrsOrderSubscriberSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: lambda access
+      VpcId: !Ref cqrsVPC
+
+  cqrsOrderSubscriberEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      CidrIp: 0.0.0.0/0
+      GroupId:
+        Fn::GetAtt:
+          - cqrsOrderSubscriberSG
+          - GroupId
+      IpProtocol: -1
+
+  redisSGIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId:
+        Fn::GetAtt:
+          - redisClusterSG
+          - GroupId
+      IpProtocol: tcp
+      ToPort: 6379
+      FromPort: 6379
+      SourceSecurityGroupId: !Ref cqrsOrderSubscriberSG
+
+  redisSGEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: Allow all outbound traffic
+      CidrIp: 0.0.0.0/0
+      GroupId:
+        Fn::GetAtt:
+          - redisClusterSG
+          - GroupId
+      IpProtocol: -1
+
+  redisCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      CacheNodeType: "cache.t2.micro"
+      Engine: "redis"
+      NumCacheNodes: 1
+      VpcSecurityGroupIds:
+        - !Ref redisClusterSG
+      CacheSubnetGroupName: !Ref cqrsSubnetGroup
+
+  #OrderPublisher Lambda Function
+  OrderPublisher:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CQRSOrderPublisher
+      Handler: com.aws.cqrs.infrastructure.lambda.CreateOrderHandler::handleRequest
+      CodeUri: target/dynamodb-lambda-elasticache-1.0-SNAPSHOT.jar
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersDDBTable
+
+  #OrderSubscriber Lambda Function
+  OrderSubscriber:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CQRSOrderSubscriber
+      Handler: com.aws.cqrs.infrastructure.lambda.OrderEventHandler::handleRequest
+      CodeUri: target/dynamodb-lambda-elasticache-1.0-SNAPSHOT.jar
+      VpcConfig:
+        SecurityGroupIds:
+          - !GetAtt cqrsOrderSubscriberSG.GroupId
+        SubnetIds:
+          - !GetAtt privateSubnetA.SubnetId
+          - !GetAtt privateSubnetB.SubnetId
+      Events:
+        OrdersDDBTable:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt OrdersDDBTable.StreamArn
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 100
+
+  OrderQueryService:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CQRSOrderQueryService
+      Handler: com.aws.cqrs.infrastructure.lambda.OrderQueryHandler::handleRequest
+      CodeUri: target/dynamodb-lambda-elasticache-1.0-SNAPSHOT.jar
+      VpcConfig:
+        SecurityGroupIds:
+          - !GetAtt cqrsOrderSubscriberSG.GroupId
+        SubnetIds:
+          - !GetAtt privateSubnetA.SubnetId
+          - !GetAtt privateSubnetB.SubnetId
+
+  #Orders DynamoDB table and DynamoDB Streams
+  OrdersDDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: CQRSOrders
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE

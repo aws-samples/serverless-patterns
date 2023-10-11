@@ -1,0 +1,34 @@
+{
+  "Records": [
+    {
+      "eventID": "7de3041dd709b024af6f29e4fa13d34c",
+      "eventName": "INSERT",
+      "eventVersion": "1.1",
+      "eventSource": "aws:dynamodb",
+      "awsRegion": "region",
+      "dynamodb": {
+        "ApproximateCreationDateTime": 1479499740,
+        "Keys": {
+          "orderId": {
+            "S": " 9fa50324-b1ea-4b41-a494-4761f861843d"
+          }
+        },
+        "NewImage": {
+          "orderId": {
+            "S": "9fa50324-b1ea-4b41-a494-4761f861843d"
+          },
+          "clientId": {
+            "S": "123456780"
+          },
+          "productId": {
+            "S": "abc-def-ghi"
+          }
+        },
+        "SequenceNumber": "13021600000000001596893679",
+        "SizeBytes": 112,
+        "StreamViewType": "NEW_IMAGE"
+      },
+      "eventSourceARN": "arn:aws:dynamodb:region:account ID:table/CQRSOrders /stream/2023-07-16T20:42:48.104"
+    }
+  ]
+}

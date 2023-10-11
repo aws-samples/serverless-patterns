@@ -1,0 +1,58 @@
+{
+  "title": "CQRS pattern using DynamoDB, Lambda and Elasticache",
+  "description": "Implement CQRS design pattern using DynamoDB streams, Lambda and Elasticache",
+  "language": "Java",
+  "level": "400",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to implement Command and Query Responsibility Segregation (CQRS) pattern using AWS Serverless services. This pattern is leveraging the native integration between these services. In this pattern, Amazon DynamoDB is used as a write-data store and takes advantage of the out-of-box feature, DynamoDB Streams, to propagate the data changes to a read database, i.e., Amazon Elasticache for Redis using AWS Lambda",
+      "This pattern deploys one VPC with two Subnets and two Security Groups, one DynamoDB table, three Lambda functions and one Elaticache for Redis cluster."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-lambda-elasticache",
+      "templateURL": "serverless-patterns/dynamodb-lambda-elasticache",
+      "projectFolder": "dynamodb-lambda-elasticache",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon DynamoDB streams",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html"
+      },
+      {
+        "text": "Amazon Elasticache for Redis",
+        "link": "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/WhatIs.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mansi Doshi",
+      "image": "",
+      "bio": "Mansi is a Cloud Consultant at Amazon Web Services based in India.",
+      "linkedin": "linked-in-ID",
+      "twitter": "https://www.linkedin.com/in/mansi-doshi-2a448177"
+    }
+  ]
+}
