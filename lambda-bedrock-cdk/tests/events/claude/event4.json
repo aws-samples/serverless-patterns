@@ -1,0 +1,14 @@
+{
+    "request_body": {
+      "prompt": "\n\nHuman: Define 'function' in this context:the math teacher wrote a function on the blackboard\n\nAssistant:",
+      "max_tokens_to_sample": 300,
+      "temperature": 0.5,
+      "top_k": 250,
+      "top_p": 1,
+      "stop_sequences": [
+        "\\n\\nHuman:"
+      ],
+      "anthropic_version": "bedrock-2023-05-31"
+    },
+    "model_id": "anthropic.claude-v2"
+  }

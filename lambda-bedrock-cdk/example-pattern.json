@@ -1,0 +1,60 @@
+{
+  "title": "Lambda to Bedrock",
+  "description": "Create a Lambda function to infere foundation models in Bedrock.",
+  "language": "Python, Typescript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an AWS Lambda function to infere foundational models in Bedrock. The function is invoked with a JSON payload to infere the desired foundation model and it will return Bedrock response with an execution time to evaluate different models performances."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-bedrock-ckd",
+      "templateURL": "serverless-patterns/lambda-bedrock-cdk",
+      "projectFolder": "lambda-bedrock-cdk",
+      "templateFile": "lambda-bedrock-cdk/lambda-layer/bin/lambda-layer.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-service.html"
+      },
+      {
+        "text": "Boto3 Bedrock",
+        "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock.html#"
+      },
+      {
+        "text": "Boto3 BedrockRuntime",
+        "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock-runtime.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Max Berta",
+      "image": "https://avatars.githubusercontent.com/u/138134439?v=4",
+      "bio": "Startup Solution Architect at AWS",
+      "linkedin": "massimoberta"
+    }
+  ]
+}

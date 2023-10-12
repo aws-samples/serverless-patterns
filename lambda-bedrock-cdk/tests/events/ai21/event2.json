@@ -1,0 +1,19 @@
+{
+    "request_body": {
+      "prompt": "Define 'function' in this context:the promotion required more responsibilities in his job function",
+      "temperature": 0.5,
+      "topP": 0.5,
+      "maxTokens": 200,
+      "stopSequences": [],
+      "countPenalty": {
+        "scale": 0
+      },
+      "presencePenalty": {
+        "scale": 0
+      },
+      "frequencyPenalty": {
+        "scale": 0
+      }
+    },
+    "model_id": "ai21.j2-mid-v1"
+  }
