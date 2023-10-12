@@ -30,16 +30,12 @@ Important: this application uses various AWS services and there are costs associ
     cd lambda-layer
     ```
 
-3. Run below command to install required dependancies:
-    ```
-    npm install
-    ```
-4. If you never used CDK in this account run:
+3. If you never used CDK in this account run:
     ```
     cdk bootstrap
     ```
 
-5. From the command line, run:
+4. From the command line, run:
     ```
     cdk deploy
     ```
