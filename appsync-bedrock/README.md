@@ -2,6 +2,8 @@
 
 This pattern shows how to invoke Amazon Bedrock models from AppSync through HTTP resolvers.
 
+Why? This pattern can be used as a starting point to leverage pipeline resolvers and Amazon Bedrock. In your pipeline resolver, you could for example first fetch some information from another datasource (external API, database, ...) and use the information returned by this datasource to include it in your prompts when invoking Amazon Bedrock models. With pipeline resolvers, you do not need to call (and therefore pay for) compute resources (such as lambda functions) to perform this logic.
+
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appsync-bedrock
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
