@@ -1,0 +1,189 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - REST API Gateway to Amazon SES
+Parameters:
+  StageName:
+    Type: String
+    Default: dev
+    Description: Name of API stage.
+  ApiKeyName:
+    Type: String
+    Default: email-apikey
+    Description: Name of API key.
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Api:
+    TracingEnabled: True
+    MethodSettings:
+      - LoggingLevel: ERROR
+
+Resources:
+  # API Gateway role with permissions to send email
+  ApiGatewaySESRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: !Join ["", ["/", !Ref "AWS::StackName", "/"]]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowApiGatewayServiceToAssumeRole
+            Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: SESSendEmail
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ses:SendEmail'
+                Resource: ["*"]
+  # REST API Gateway
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Name: !Sub ${AWS::StackName}-api
+  # API Gateway Method
+  ApiGatewayRootMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ApiKeyRequired: true
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+      RequestParameters: 
+        method.request.header.Content-Type: false
+      RequestValidatorId: !Ref ApiRequestValidator
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS
+        Credentials: !GetAtt ApiGatewaySESRole.Arn 
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:email:action/SendEmail
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestParameters: 
+          integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+        RequestTemplates: 
+          application/json: !Sub 
+            - |-         
+              #set($inputRoot = $input.path('$'))
+              Action=SendEmail
+              &Source=$inputRoot.from
+              #foreach($to in $inputRoot.to)
+              &Destination.ToAddresses.member.$foreach.count=$to
+              #end
+              #foreach($bcc in $inputRoot.bcc)
+              &Destination.BccAddresses.member.$foreach.count=$bcc
+              #end
+              #foreach($cc in $inputRoot.cc)
+              &Destination.CcAddresses.member.$foreach.count=$cc
+              #end
+              &Message.Subject.Data=$inputRoot.subject
+              &Message.Body.Text.Data=$inputRoot.text
+              &Message.Body.Html.Data=$inputRoot.html
+            - {}
+        IntegrationResponses:
+          - StatusCode: 200
+          - StatusCode: 400
+          - StatusCode: 403
+          - StatusCode: 404
+          - StatusCode: 500
+          - StatusCode: 503
+      ResourceId: !GetAtt ApiGateway.RootResourceId
+      RestApiId: !Ref ApiGateway
+  # API Key    
+  ApiKey:
+    Type: 'AWS::ApiGateway::ApiKey'
+    DependsOn:
+      - ApiGatewayDeployment
+    Properties:
+      Enabled: true
+      Name: !Sub '${ApiKeyName}' 
+      StageKeys:
+        - RestApiId: !Ref ApiGateway
+          StageName: !Sub '${StageName}'
+  ApiUsagePlan:
+    Type: 'AWS::ApiGateway::UsagePlan'
+    DependsOn:
+      - ApiGatewayDeployment
+    Properties:
+      ApiStages:
+        - ApiId: !Ref ApiGateway
+          Stage: !Sub '${StageName}'
+      Throttle:
+        RateLimit: 500
+        BurstLimit: 1000
+      UsagePlanName: !Sub 'usage-plan'
+      Quota:
+        Limit: 10000
+        Period: MONTH
+  ApiUsagePlanKey:
+    Type: 'AWS::ApiGateway::UsagePlanKey'
+    Properties:
+      KeyType: API_KEY
+      KeyId: !Ref ApiKey
+      UsagePlanId: !Ref ApiUsagePlan
+  # API Request validator 
+  ApiRequestValidator:
+    Type: AWS::ApiGateway::RequestValidator
+    Properties:
+      Name: RequestBodyValidator
+      RestApiId: !Ref ApiGateway
+      ValidateRequestBody: True
+      ValidateRequestParameters: True
+  RequestModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref ApiGateway
+      Schema: {"$schema": "http://json-schema.org/draft-04/schema#",
+      "title": "Stats",
+      "type": "object",
+      "properties": {
+          "to": {
+              "type": "array"
+          },
+          "from": {
+              "type": "string"
+          },
+          "cc" : {
+               "type": "array"           
+          },
+          "bcc" : {
+               "type": "array"           
+          },
+          "subject": {
+              "type": "string"
+          },
+          "text": {
+              "type": "string"
+          },
+          "html": {
+              "type": "string"
+          }
+      },
+      "required": ["to", "from", "html", "text"] }
+  # API Gateway deployment 
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ApiGatewayRootMethod
+    Properties:
+      RestApiId: !Ref ApiGateway
+      StageName: !Sub '${StageName}'
+
+# List all common outputs for usage
+Outputs:
+  ApiEndpoint: 
+    Description: "API Gateway endpoint URL for Email API"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
