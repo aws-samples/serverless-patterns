@@ -1,4 +1,4 @@
-# Dynamic Bedrock model selection with API Gateway and Lambda
+# Dynamic Amazon Bedrock model selection with API Gateway and Lambda
 
 This pattern creates an API Gateway REST API with Lambda proxy integration which places invoke calls to Amazon Bedrock models for text and image generation.
 
