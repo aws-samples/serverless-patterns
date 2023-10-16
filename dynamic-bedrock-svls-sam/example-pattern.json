@@ -18,7 +18,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamic-bedrock-svls-sam",
       "templateURL": "serverless-patterns/dynamic-bedrock-svls-sam",
       "projectFolder": "dynamic-bedrock-svls-sam",
-      "templateFile": "dynamic-bedrock-svls-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
