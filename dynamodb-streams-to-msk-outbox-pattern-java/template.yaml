@@ -1,0 +1,273 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template for outboxpattern
+
+Parameters:
+  OrderApiLambdaFunctionName:
+    Type: String
+    Description: function name
+    Default: order-api
+  OrderOutboxEventProcessingHandlerName:
+    Type: String
+    Description: function name
+    Default: order-event-outbox-service
+  NotificationHandlerName:
+    Type: String
+    Description: function name
+    Default: notification-service
+
+Resources:
+  OrderTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: Order
+      AttributeDefinitions: 
+        - AttributeName: customerId
+          AttributeType: S
+        - AttributeName: orderId
+          AttributeType: S  
+      KeySchema: 
+        - AttributeName: customerId
+          KeyType: HASH
+        - AttributeName: orderId
+          KeyType: RANGE  
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+        
+  OrderItemTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: OrderItem
+      AttributeDefinitions: 
+        - AttributeName: orderId
+          AttributeType: S
+        - AttributeName: orderItemId
+          AttributeType: S  
+      KeySchema: 
+        - AttributeName: orderId
+          KeyType: HASH
+        - AttributeName: orderItemId
+          KeyType: RANGE   
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  OrderNotificationOutboxTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: OrderNotificationOutbox
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+  NotificationTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Notification
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5      
+
+  OrderApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: order-service
+      Handler: com.aws.microservices.order.infrastructure.lambda.OrderRequestHandler::handleRequest
+      FunctionName: !Ref OrderApiLambdaFunctionName
+      Architectures:
+        - arm64
+      Runtime: java17
+      MemorySize: 512
+      Timeout: 300
+      Tracing: Active
+      Tags:
+        Application: outboxpattern
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-id
+        SubnetIds:
+          - subnet-id
+          - subnet-id
+      Environment:
+        Variables:
+          ORDER_TABLE: !Ref OrderTable
+          ORDER_ITEM_TABLE: !Ref OrderItemTable
+          ORDER_PAYMENT_OUTBOX_TABLE: OrderPaymentOutboxTable
+      Policies:
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:*
+            Resource:
+              - !Sub
+                - 'arn:aws:dynamodb:*:*:table/${Table}'
+                - { Table: !Ref OrderTable }
+              - !Sub
+                - 'arn:aws:dynamodb:*:*:table/${Table}'
+                - { Table: !Ref OrderItemTable }
+              - !Sub
+                - 'arn:aws:dynamodb:*:*:table/${Table}'
+                - { Table: OrderNotificationOutbox }
+          - Effect: Allow
+            Action:
+              - logs:*
+            Resource:
+              - "*"
+
+      Events:
+        HealthCheck:
+          Type: Api
+          Properties:
+            Path: /v1/health
+            Method: get
+        GetMusic:
+          Type: Api
+          Properties:
+            Path: /v1/order
+            Method: get
+        PostMusic:
+          Type: Api
+          Properties:
+            Path: /v1/order
+            Method: post
+
+  ProcessDynamoDBStream:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: order-event-outbox-service
+      Handler: com.aws.microservices.order.messaging.infrastructure.lambda.OrderOutboxEventHandler::handleRequest
+      FunctionName: !Ref OrderOutboxEventProcessingHandlerName
+      Architectures:
+        - arm64
+      Runtime: java17
+      MemorySize: 512
+      Timeout: 300
+      Tracing: Active
+      Environment:
+        Variables:
+          bootstrap_server: boot-xxxxxxxx.c3.kafka-serverless.ap-south-1.amazonaws.com:9098
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-id
+        SubnetIds:
+          - subnet-id
+          - subnet-id
+      Policies:
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:*
+            Resource:
+              - !Sub
+                - 'arn:aws:dynamodb:*:*:table/${Table}'
+                - { Table: !Ref OrderNotificationOutboxTable }
+          - Effect: Allow
+            Action:
+              - kafka-cluster:Connect
+              - kafka-cluster:AlterCluster
+              - kafka-cluster:DescribeCluster
+            Resource:
+              - arn:aws:kafka:ap-south-1:aws_account:cluster/lambda-msk-test/*
+          - Effect: Allow
+            Action:
+              - kafka-cluster:*Topic*
+              - kafka-cluster:WriteData
+              - kafka-cluster:ReadData
+            Resource:
+              - arn:aws:kafka:ap-south-1:aws_account:topic/lambda-msk-test/*
+          - Effect: Allow
+            Action:
+              - kafka-cluster:AlterGroup
+              - kafka-cluster:DescribeGroup
+            Resource:
+              - arn:aws:kafka:ap-south-1:aws_account:group/lambda-msk-test/*
+          - Effect: Allow
+            Action:
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DeleteNetworkInterface
+            Resource: "*"
+      Events:
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt OrderNotificationOutboxTable.StreamArn
+            BatchSize: 100
+            StartingPosition: TRIM_HORIZON
+  
+  MSKNotificationHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: notification-service
+      Handler: com.aws.microservices.notification.infrastructure.lambda.MSKNotificationHandler::handleRequest
+      FunctionName: !Ref NotificationHandlerName
+      Architectures:
+        - arm64
+      Runtime: java17
+      MemorySize: 512
+      Timeout: 300
+      Tracing: Active
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-id
+        SubnetIds:
+          - subnet-id
+          - subnet-id
+      Policies:
+        Statement:
+          - Effect: Allow
+            Action:
+              - kafka-cluster:Connect
+              - kafka-cluster:AlterCluster
+              - kafka-cluster:DescribeCluster
+            Resource:
+              - arn:aws:kafka:ap-south-1:aws_account:cluster/lambda-msk-test/*
+          - Effect: Allow
+            Action:
+              - kafka-cluster:*Topic*
+              - kafka-cluster:WriteData
+              - kafka-cluster:ReadData
+            Resource:
+              - arn:aws:kafka:ap-south-1:aws_account:topic/lambda-msk-test/*
+          - Effect: Allow
+            Action:
+              - kafka-cluster:AlterGroup
+              - kafka-cluster:DescribeGroup
+            Resource:
+              - arn:aws:kafka:ap-south-1:aws_account:group/lambda-msk-test/*
+          - Effect: Allow
+            Action:
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DeleteNetworkInterface
+            Resource: "*"
+
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: arn:aws:kafka:ap-south-1:aws_account:cluster/lambda-msk-test/08b0e39b-5038-4c8e-88aa-276c416ab7ec-s3
+            Topics:
+              - order-notification-event-topic                   
+        
+Outputs:
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL for Dev stage for Order Get function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/v1/order"
+    
