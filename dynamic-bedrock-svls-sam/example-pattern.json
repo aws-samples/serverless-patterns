@@ -9,7 +9,7 @@
     "text": [
       "A REST API is created that has /image and /text resources associated with the available models in Amazon Bedrock. All resources integrate with a Lambda function over proxy integration.",
           "The /image POST endpoint generates an image using StabilityAI stable diffusion XL model.",
-          "* Place a request to /text/model* over HTTP POST method with the required prompt as the request body to generate a text output using various models offered by Anthropic, AI21 labs."
+          "The /text/model POST method with the required prompt generates a text output using various Bedrock models offered by Anthropic, AI21 labs."
 
     ]
   },
