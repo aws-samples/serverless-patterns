@@ -1,5 +1,5 @@
 {
-  "title": "Dynamic Bedrock model selection with API Gateway and Lambda",
+  "title": "Dynamic Amazon Bedrock model selection with API Gateway and Lambda",
   "description": "Make API calls to generate image and text responses using Amazon Bedrock models with serverless services",
   "language": "Python",
   "level": "200",
