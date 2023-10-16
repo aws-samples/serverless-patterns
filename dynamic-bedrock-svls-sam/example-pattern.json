@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "A REST API is created that has /image and /text resources associated with the available models in Amazon Bedrock for image and text generation respectively. All resources integrate with a Lambda function over proxy integration.",
+      "A REST API is created that has /image and /text resources associated with the available models in Amazon Bedrock. All resources integrate with a Lambda function over proxy integration.",
           "* Place a request to /image over HTTP POST method with the required prompt as the request body to generate an image using StabilityAI stable diffusion XL model.",
           "* Place a request to /text/model* over HTTP POST method with the required prompt as the request body to generate a text output using various models offered by Anthropic, AI21 labs."
 
