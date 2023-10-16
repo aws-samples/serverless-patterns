@@ -10,7 +10,7 @@
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://serverlessland.com/patterns/lambda-inspector-eventbridge-multi-destinations",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/inspector-eventbridge-multi-destinations",
         "templateURL": "serverless-patterns/lambda-inspector-eventbridge-multi-destinations",
         "projectFolder": "lambda-inspector-eventbridge-multi-destinations",
         "templateFile": "template.yaml"
