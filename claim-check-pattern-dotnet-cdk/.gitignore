@@ -1,0 +1,6 @@
+bin
+obj
+local
+*.zip
+*.dll
+cdk.out
