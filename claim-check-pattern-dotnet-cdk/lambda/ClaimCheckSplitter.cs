@@ -22,7 +22,6 @@ public class ClaimCheckSplitter
         var customMessage=Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(bodyStr);
         context.Logger.LogInformation($"customMessage:{customMessage}");
         if(customMessage==null) throw new Exception("customMessage was null!");
-        if(String.IsNullOrEmpty(customMessage.id)) throw new Exception("customMessage.id was null!");
         var id=Convert.ToString(customMessage.id);
         context.Logger.LogInformation($"customMessage.id:{id}");
 

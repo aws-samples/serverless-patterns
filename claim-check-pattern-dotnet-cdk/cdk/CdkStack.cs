@@ -48,26 +48,29 @@ namespace Cdk
         private void createRules(EventBus claimCheckApplicationBus, Queue sampleProcessorInputQueue)
         {
             var target=new LogGroup(this, "ClaimTargetLog", new LogGroupProps {
-                LogGroupName= "/aws/events/claimTargetLog",
+                LogGroupName= "/aws/events/claimCheckTargetLog",
                 RemovalPolicy= RemovalPolicy.DESTROY,
             });
             var targets= new List<Amazon.CDK.AWS.Events.Targets.CloudWatchLogGroup> { new Amazon.CDK.AWS.Events.Targets.CloudWatchLogGroup(target) };
-            // Send all events on claimCheckApplicationBusRule to CloudWatch Logs to demonstrate only id"s are passed on bus        
+            // Send all events on claimCheckApplicationBusRule to CloudWatch Logs to demonstrate only ids are passed on bus        
             var claimCheckApplicationBusRule = new Rule(this, "ClaimCheckApplicationBusRule", new RuleProps {
-                RuleName= "claimCheckApplicationBusRule",
+                RuleName= "ClaimCheckApplicationBusRule",
                 EventBus= claimCheckApplicationBus,
                 EventPattern=new EventPattern {
-                    Source= Match.Prefix("")
+                    Source=Match.AnythingBut("Blocked"),
+                    //Source= Match.Prefix("")
                 },
                 Targets=targets.ToArray()
             });
 
             var sampleProcessorInputQueueRule = new Rule(this, "SampleProcessorInputQueueRule", new RuleProps {
+                RuleName= "SampleProcessorInputQueueRule",
                 EventBus=claimCheckApplicationBus,
-                EventPattern=new EventPattern{
-                    Source=Match.Prefix(""),
+                EventPattern=new EventPattern {
+                    Source=Match.AnythingBut("Blocked"),
+                    //Source= Match.Prefix("")
                 },
-                Targets=new List<Amazon.CDK.AWS.Events.Targets.SqsQueue>{new Amazon.CDK.AWS.Events.Targets.SqsQueue(sampleProcessorInputQueue)}.ToArray(),
+                Targets=new List<Amazon.CDK.AWS.Events.Targets.SqsQueue>{new Amazon.CDK.AWS.Events.Targets.SqsQueue(sampleProcessorInputQueue)}.ToArray()
             });
         }
 
@@ -81,29 +84,33 @@ namespace Cdk
                 AssumedBy= new ServicePrincipal("pipes.amazonaws.com"),
             });
 
-            var claimCheckEnrichmentPipe = new CfnPipe(this, "ClaimCheckEnrichmentPipe", new CfnPipeProps {
-                RoleArn= retrievalPipeRole.RoleArn,
-                Source= sampleProcessorInputQueue.QueueArn,
-                Target= targetWorkflow.StateMachineArn,
-                Enrichment= claimCheckRetrievalLambda.FunctionArn,
+            var name="ClaimCheckEnrichmentPipe";
+            var claimCheckEnrichmentPipe = new CfnPipe(this, name, new CfnPipeProps {
+                RoleArn=retrievalPipeRole.RoleArn,
+                Source=sampleProcessorInputQueue.QueueArn,
+                Target=targetWorkflow.StateMachineArn,
+                Enrichment=claimCheckRetrievalLambda.FunctionArn,
                 SourceParameters=new CfnPipe.PipeSourceParametersProperty()
                 {
                     SqsQueueParameters=new CfnPipe.PipeSourceSqsQueueParametersProperty { BatchSize = 1 }
                 },
                 TargetParameters=new CfnPipe.PipeTargetParametersProperty {
                     StepFunctionStateMachineParameters=new CfnPipe.PipeTargetStateMachineParametersProperty { InvocationType= "FIRE_AND_FORGET" }
-                }
+                },
+                Name=name
             });
 
+            name="ClaimCheckSplitPipe";
             var claimCheckSplitPipe = new CfnPipe(this, "ClaimCheckSplitPipe", new CfnPipeProps {
-                RoleArn= splitPipeRole.RoleArn,
-                Source= sampleDataWriteQueue.QueueArn,
-                Target= claimCheckApplicationBus.EventBusArn,
-                Enrichment= claimCheckSplitLambda.FunctionArn,
+                RoleArn=splitPipeRole.RoleArn,
+                Source=sampleDataWriteQueue.QueueArn,
+                Target=claimCheckApplicationBus.EventBusArn,
+                Enrichment=claimCheckSplitLambda.FunctionArn,
                 SourceParameters=new CfnPipe.PipeSourceParametersProperty()
                 {
                     SqsQueueParameters=new CfnPipe.PipeSourceSqsQueueParametersProperty { BatchSize = 1 }
                 },
+                Name=name
             });
             
             sampleDataWriteQueue.GrantConsumeMessages(splitPipeRole);
@@ -116,25 +123,29 @@ namespace Cdk
 
         private dynamic createQueues()
         {
-            var deadLetterQueue1 = new Queue(this, "ClaimCheckDeadLetterQueue1", new QueueProps { EnforceSSL= true });
-            var deadLetterQueue2 = new Queue(this, "ClaimCheckDeadLetterQueue2", new QueueProps { EnforceSSL= true });
+            var deadLetterQueue1 = new Queue(this, "ClaimCheckDeadLetterQueue1", new QueueProps { EnforceSSL= true, QueueName="SampleDataWriteQueueDLQ" });
+            var deadLetterQueue2 = new Queue(this, "ClaimCheckDeadLetterQueue2", new QueueProps { EnforceSSL= true, QueueName="SampleProcessorInputQueueDLQ" });
 
             // Step 1: Create sample data of a "large" payload and put it in an SQS queue
             // Implementation= an AWS Lambda function ("claimCheckSampleDataCreatorLambda") creates this sample data and puts it in the SQS queue ("sampleDataWriteQueue")
-            var sampleDataWriteQueue = new Queue(this, "SampleDataWriteQueue", new QueueProps { 
-                EnforceSSL= true, 
-                DeadLetterQueue = new DeadLetterQueue {
-                    MaxReceiveCount= 1,
-                    Queue= deadLetterQueue1,
-            }
+            var name="SampleDataWriteQueue";
+            var sampleDataWriteQueue=new Queue(this, "SampleDataWriteQueue", new QueueProps { 
+                EnforceSSL=true, 
+                DeadLetterQueue=new DeadLetterQueue {
+                    MaxReceiveCount=1,
+                    Queue=deadLetterQueue1
+                },
+                QueueName=name
             });
 
+            name="SampleProcessorInputQueue";
             var sampleProcessorInputQueue = new Queue(this, "SampleProcessorInputQueue", new QueueProps {
                 EnforceSSL= true,
                 DeadLetterQueue = new DeadLetterQueue {
                     MaxReceiveCount= 1,
                     Queue= deadLetterQueue2,
-            }
+                },
+                QueueName=name
             });
 
             return new {

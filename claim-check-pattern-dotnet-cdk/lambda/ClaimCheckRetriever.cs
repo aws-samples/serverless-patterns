@@ -16,17 +16,18 @@ public class ClaimCheckRetriever
         var customMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(sqsMessages[0].Body);
         context.Logger.LogInformation($"customMessage:{customMessage}");
         if(customMessage==null) throw new Exception("customMessage was null!");
-        if(String.IsNullOrEmpty(customMessage.id)) throw new Exception("customMessage.id was null!");
         var id=Convert.ToString(customMessage.id);
         context.Logger.LogInformation($"id:{id}");
     
-        var response=await dynamoDbClient.GetItemAsync(
+        var item=await dynamoDbClient.GetItemAsync(
             Environment.GetEnvironmentVariable("CLAIM_CHECK_TABLE"),
             new Dictionary<string, AttributeValue>()
             {
                 {"id", new AttributeValue(id)},
             }
         );
-        return response;
+        var customJsonMessage=item.Item["custom_message_json"];
+        context.Logger.LogInformation($"customJsonMessage from DynamoDB:{customJsonMessage}]");
+        return item;
     }
 }
