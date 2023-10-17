@@ -26,8 +26,9 @@ public class ClaimCheckRetriever
                 {"id", new AttributeValue(id)},
             }
         );
-        var customJsonMessage=item.Item["custom_message_json"];
-        context.Logger.LogInformation($"customJsonMessage from DynamoDB:{customJsonMessage}]");
+        //var customJsonMessage=item.Item["custom_message_json"];
+        //context.Logger.LogInformation($"customJsonMessage from DynamoDB:{customJsonMessage}]");
+        context.Logger.LogInformation($"item from DynamoDB:{JsonSerializer.Serialize(item)}]");
         return item;
     }
 }

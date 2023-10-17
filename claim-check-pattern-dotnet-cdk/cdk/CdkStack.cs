@@ -34,13 +34,15 @@ namespace Cdk
 
         private StateMachine createWorkflow()
         {
-            var targetWorkflow = new StateMachine(this, "ClaimCheckTargetWorkflow", new StateMachineProps {
+            var name="ClaimCheckTargetWorkflow";
+            var targetWorkflow = new StateMachine(this, name, new StateMachineProps {
                 Definition=Chain.Start(new Pass(this, "Process Message")),
                 TracingEnabled= true,
                 Logs = new LogOptions {
                     Destination= new LogGroup(this, "ClaimCheckTargetWorkflowLogGroup", new LogGroupProps {RemovalPolicy= RemovalPolicy.DESTROY,}),
                     Level=LogLevel.ALL,
                 },
+                StateMachineName=name
             });
             return targetWorkflow;
         }
