@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
@@ -13,19 +14,25 @@ namespace ServerlessPatterns.ClaimCheck;
 public class ClaimCheckSplitter
 {
     private static readonly AmazonDynamoDBClient dynamoDbClient = new AmazonDynamoDBClient();    
-    public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
-    {
-        context.Logger.LogInformation("Version 0.0.3");
-        await dynamoDbClient.PutItemAsync(Environment.GetEnvironmentVariable("TABLE_NAME"),
-        new Dictionary<string, AttributeValue>()
-        {
-            {"PK", new AttributeValue("1")},
-            {"SK", new AttributeValue(DateTime.Now.ToString("yyyyMMddHHmmss"))}
-        });
+    public async Task<object> FunctionHandler(dynamic eventInput, ILambdaContext context)
+    {        
+        context.Logger.LogInformation($"Received event: {JsonSerializer.Serialize(eventInput)}"); // JSON.stringify(event, null, 2)
+        context.Logger.LogInformation($"Records[0]: {eventInput[0]}");
+        var body = JsonSerializer.Deserialize(eventInput[0].body);
+        context.Logger.LogInformation($"body:{body}");
 
-        return new APIGatewayProxyResponse()
-        {
-            StatusCode = 201
+        await dynamoDbClient.PutItemAsync(
+            Environment.GetEnvironmentVariable("CLAIM_CHECK_TABLE"),
+            new Dictionary<string, AttributeValue>()
+            {
+                {"id", new AttributeValue(body.id)},
+                {"message", new AttributeValue(JsonSerializer.Serialize(body))}
+            }
+        );
+
+        return new {
+            eventType= "Some_Event_Type",
+            id=body.id,
         };
     }
 }

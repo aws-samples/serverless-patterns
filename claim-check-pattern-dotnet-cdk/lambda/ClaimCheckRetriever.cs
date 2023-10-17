@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
@@ -11,19 +12,21 @@ namespace ServerlessPatterns.ClaimCheck;
 public class ClaimCheckRetriever
 {
     private static readonly AmazonDynamoDBClient dynamoDbClient = new AmazonDynamoDBClient();    
-    public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+    public async Task<GetItemResponse> FunctionHandler(dynamic eventInput, ILambdaContext context)
     {
-        context.Logger.LogInformation("Version 0.0.3");
-        await dynamoDbClient.PutItemAsync(Environment.GetEnvironmentVariable("TABLE_NAME"),
-        new Dictionary<string, AttributeValue>()
-        {
-            {"PK", new AttributeValue("1")},
-            {"SK", new AttributeValue(DateTime.Now.ToString("yyyyMMddHHmmss"))}
-        });
-
-        return new APIGatewayProxyResponse()
-        {
-            StatusCode = 201
-        };
+        context.Logger.LogInformation($"Received event: {JsonSerializer.Serialize(eventInput)}"); // JSON.stringify(event, null, 2)
+        context.Logger.LogInformation($"Records[0]: {eventInput[0].body}");
+        var body = JsonSerializer.Deserialize(eventInput[0].body);
+        context.Logger.LogInformation($"body:{body}");
+        context.Logger.LogInformation($"id:{body.id}");
+    
+        var response=await dynamoDbClient.GetItemAsync(
+            Environment.GetEnvironmentVariable("CLAIM_CHECK_TABLE"),
+            new Dictionary<string, AttributeValue>()
+            {
+                {"id", new AttributeValue(body.id)},
+            }
+        );
+        return response;
     }
 }

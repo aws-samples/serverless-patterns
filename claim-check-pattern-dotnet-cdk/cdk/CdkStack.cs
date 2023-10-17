@@ -18,7 +18,6 @@ namespace Cdk
 {
     public class CdkStack : Stack
     {
-        private Role lambdaFunctionRoleA;
         private const string tableName = "ClaimCheckTable";
 
         internal CdkStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
@@ -27,7 +26,7 @@ namespace Cdk
             var queues=createQueues();
             var functions=createFunctions(queues.SampleDataWriteQueue, claimCheckTable);                        
             var targetWorkflow=createWorkflow();
-            var claimCheckApplicationBus=createEventBus(queues.SampleDataWriteQueue, queues.SampleProcessorInputQueue, functions.ClaimCheckSplitLambda, functions.ClaimCheckRetrievalLambda, targetWorkflow);
+            var claimCheckApplicationBus=createEventBus();
             createRules(claimCheckApplicationBus, queues.SampleProcessorInputQueue);
             createPipes(queues.SampleProcessorInputQueue, queues.SampleDataWriteQueue, claimCheckApplicationBus, targetWorkflow, functions.ClaimCheckRetrievalLambda, functions.ClaimCheckSplitLambda);
             //createAPIs(lambdaFunction);
@@ -144,7 +143,7 @@ namespace Cdk
             };
         }
 
-        private EventBus createEventBus(Queue sampleDataWriteQueue, Queue sampleProcessorInputQueue, Function claimCheckSplitLambda, Function claimCheckRetrievalLambda, StateMachine targetWorkflow)
+        private EventBus createEventBus()
         {
             // Step 2= We want to put this event on our application bus. However, we don"t want to put the entire payload on the bus, only the claim check.
             // Implementation= we use an EventBridge Pipe to split the payload.
@@ -174,57 +173,40 @@ namespace Cdk
             };*/
             var lambdaRuntime=Runtime.DOTNET_6;
             var lambdaBinPath="../lambda/bin/debug/net6.0";
-            lambdaFunctionRoleA = new Role(this, "DynamoDbHandlerRole", new RoleProps()
-            {
-                RoleName = "DynamoDbHandlerRole",
-                Description = "Role assumed by the DynamoDbLambdaFunction",
-                AssumedBy = new ServicePrincipal("lambda.amazonaws.com"),
-            });   
 
-            var lambdaFunction = new Function(this, "DynamoDbHandler", new FunctionProps() // REMOVE
-            {
-                Runtime = lambdaRuntime,
-                Timeout = Duration.Seconds(30),
-                Environment = new Dictionary<string, string>(1)
-                {
-                    {"TABLE_NAME", tableName}
-                },
-                Code = Code.FromAsset(lambdaBinPath, new AssetOptions()
-                {
-                    //Bundling = buildOption
-                }),
-                Handler="ClaimCheckFunctions::ServerlessPatterns.ClaimCheck.DynamoDBPersister::FunctionHandler",
-                Role = lambdaFunctionRoleA,
-                FunctionName="DynamoDBPersister"                
-            }); 
-                       
-            var claimCheckSampleDataCreatorLambda = new Function(this, "ClaimCheckSampleDataCreatorLambda", new FunctionProps {
+            var functionName="ClaimCheckSampleDataCreatorLambda";
+            var claimCheckSampleDataCreatorLambda = new Function(this, functionName, new FunctionProps {
                 Runtime= lambdaRuntime,
                 Code=Code.FromAsset(lambdaBinPath),
                 Handler="ClaimCheckFunctions::ServerlessPatterns.ClaimCheck.ClaimCheckDataCreator::FunctionHandler",
                 Environment=new Dictionary<string, string>(1) {
                     {"QUEUE_URL", sampleDataWriteQueue.QueueUrl},
-                }
+                },         
+                FunctionName=functionName
             });
             sampleDataWriteQueue.GrantSendMessages(claimCheckSampleDataCreatorLambda);
 
-            var claimCheckRetrievalLambda = new Function(this, "ClaimCheckRetrievalLambda", new FunctionProps {
+            functionName="ClaimCheckRetrievalLambda";
+            var claimCheckRetrievalLambda = new Function(this, functionName, new FunctionProps {
                 Runtime= lambdaRuntime,
                 Code=Code.FromAsset(lambdaBinPath),
                 Handler="ClaimCheckFunctions::ServerlessPatterns.ClaimCheck.ClaimCheckRetriever::FunctionHandler",
                 Environment=new Dictionary<string, string>(1) {
                     {"CLAIM_CHECK_TABLE",claimCheckTable.TableName}
-                }
+                },
+                FunctionName=functionName
             });
             claimCheckTable.GrantReadData(claimCheckRetrievalLambda);
 
-            var claimCheckSplitLambda = new Function(this, "ClaimCheckSplitLambda", new FunctionProps {
+            functionName="ClaimCheckSplitLambda";
+            var claimCheckSplitLambda = new Function(this, functionName, new FunctionProps {
                 Runtime= lambdaRuntime,
                 Code=Code.FromAsset(lambdaBinPath),
                 Handler="ClaimCheckFunctions::ServerlessPatterns.ClaimCheck.ClaimCheckSplitter::FunctionHandler",
                 Environment=new Dictionary<string, string>(1) {
                     {"CLAIM_CHECK_TABLE", claimCheckTable.TableName},
-                }
+                },
+                FunctionName=functionName
             });
             claimCheckTable.GrantWriteData(claimCheckSplitLambda);
 
@@ -237,7 +219,7 @@ namespace Cdk
 
         private Table createTable()
         {            
-            var dynamoDbTable = new Table(this, "tableA", new TableProps()
+            /*var dynamoDbTable = new Table(this, "tableA", new TableProps()
             {
                 BillingMode = BillingMode.PAY_PER_REQUEST,
                 TableName = "tableA",
@@ -252,9 +234,11 @@ namespace Cdk
                     Type = AttributeType.STRING
                 }
             });
-            dynamoDbTable.GrantReadWriteData(lambdaFunctionRoleA);
+            dynamoDbTable.GrantReadWriteData(lambdaFunctionRoleA);*/
             
             var claimCheckTable = new Table(this, tableName, new TableProps {
+                BillingMode = BillingMode.PAY_PER_REQUEST,
+                TableName = tableName,
                 PartitionKey=new Attribute { Name= "id", Type= AttributeType.STRING },
                 PointInTimeRecovery= true,
                 RemovalPolicy= RemovalPolicy.DESTROY
