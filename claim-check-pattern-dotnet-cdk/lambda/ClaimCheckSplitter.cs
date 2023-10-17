@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
+using System.Dynamic;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
-using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.SQS.Model;
 
@@ -21,21 +19,25 @@ public class ClaimCheckSplitter
         context.Logger.LogInformation($"Records[0]: {sqsMessages[0]}");
         var firstSqsMessage = sqsMessages[0];
         var bodyStr=firstSqsMessage.Body;
-        var customMessage=JsonSerializer.Deserialize<dynamic>(bodyStr);
+        var customMessage=Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(bodyStr);
         context.Logger.LogInformation($"customMessage:{customMessage}");
+        if(customMessage==null) throw new Exception("customMessage was null!");
+        if(String.IsNullOrEmpty(customMessage.id)) throw new Exception("customMessage.id was null!");
+        var id=Convert.ToString(customMessage.id);
+        context.Logger.LogInformation($"customMessage.id:{id}");
 
         await dynamoDbClient.PutItemAsync(
             Environment.GetEnvironmentVariable("CLAIM_CHECK_TABLE"),
             new Dictionary<string, AttributeValue>()
             {
-                {"id", new AttributeValue(customMessage.id)},
-                {"message", new AttributeValue(JsonSerializer.Serialize(customMessage))}
+                {"id", new AttributeValue(id)},
+                {"custom_message_json", new AttributeValue(bodyStr)}
             }
         );
 
         return new {
             eventType= "Some_Event_Type",
-            id=customMessage.id,
+            id=id,
         };
     }
 }
