@@ -36,13 +36,13 @@ namespace Cdk
         {
             var name="ClaimCheckTargetWorkflow";
             var targetWorkflow = new StateMachine(this, name, new StateMachineProps {
-                Definition=Chain.Start(new Pass(this, "Process Message")),
                 TracingEnabled= true,
                 Logs = new LogOptions {
                     Destination= new LogGroup(this, "ClaimCheckTargetWorkflowLogGroup", new LogGroupProps {RemovalPolicy= RemovalPolicy.DESTROY, LogGroupName="/aws/stepFunctions/ClaimCheckWorkflow"}),
                     Level=LogLevel.ALL
                 },
-                StateMachineName=name
+                StateMachineName=name,
+                DefinitionBody=new ChainDefinitionBody(new Pass(this, "Process Message"))
             });
             return targetWorkflow;
         }
