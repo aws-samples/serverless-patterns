@@ -16,7 +16,7 @@ public class ClaimCheckRetriever
         var customMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(sqsMessages[0].Body);
         context.Logger.LogInformation($"customMessage:{customMessage}");
         if(customMessage==null) throw new Exception("customMessage was null!");
-        var id=Convert.ToString(customMessage.id);
+        var id=Convert.ToString(customMessage.detail.id); // ID from the inner message, NOT the event!
         context.Logger.LogInformation($"id:{id}");
     
         var item=await dynamoDbClient.GetItemAsync(

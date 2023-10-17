@@ -39,8 +39,8 @@ namespace Cdk
                 Definition=Chain.Start(new Pass(this, "Process Message")),
                 TracingEnabled= true,
                 Logs = new LogOptions {
-                    Destination= new LogGroup(this, "ClaimCheckTargetWorkflowLogGroup", new LogGroupProps {RemovalPolicy= RemovalPolicy.DESTROY,}),
-                    Level=LogLevel.ALL,
+                    Destination= new LogGroup(this, "ClaimCheckTargetWorkflowLogGroup", new LogGroupProps {RemovalPolicy= RemovalPolicy.DESTROY, LogGroupName="/aws/stepFunctions/ClaimCheckWorkflow"}),
+                    Level=LogLevel.ALL
                 },
                 StateMachineName=name
             });
@@ -50,7 +50,7 @@ namespace Cdk
         private void createRules(EventBus claimCheckApplicationBus, Queue sampleProcessorInputQueue)
         {
             var target=new LogGroup(this, "ClaimTargetLog", new LogGroupProps {
-                LogGroupName= "/aws/events/claimCheckTargetLog",
+                LogGroupName= "/aws/eventBus/rules/targets/claimCheckTargetLog",
                 RemovalPolicy= RemovalPolicy.DESTROY,
             });
             var targets= new List<Amazon.CDK.AWS.Events.Targets.CloudWatchLogGroup> { new Amazon.CDK.AWS.Events.Targets.CloudWatchLogGroup(target) };
