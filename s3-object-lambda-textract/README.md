@@ -1,13 +1,5 @@
 # AWS S3 Object Lambda to Amazon textract
 
-```
-  _________________   ________ ___.        __               __    .____                  ___.        .___          __           ___________              __                        __   
- /   _____/\_____  \  \_____  \\_ |__     |__| ____   _____/  |_  |    |   _____    _____\_ |__    __| _/____    _/  |_  ____   \__    ___/___ ___  ____/  |_____________    _____/  |_ 
- \_____  \   _(__  <   /   |   \| __ \    |  |/ __ \_/ ___\   __\ |    |   \__  \  /     \| __ \  / __ |\__  \   \   __\/  _ \    |    |_/ __ \\  \/  /\   __\_  __ \__  \ _/ ___\   __\
- /        \ /       \ /    |    \ \_\ \   |  \  ___/\  \___|  |   |    |___ / __ \|  Y Y  \ \_\ \/ /_/ | / __ \_  |  | (  <_> )   |    |\  ___/ >    <  |  |  |  | \// __ \\  \___|  |  
-/_______  //______  / \_______  /___  /\__|  |\___  >\___  >__|   |_______ (____  /__|_|  /___  /\____ |(____  /  |__|  \____/    |____| \___  >__/\_ \ |__|  |__|  (____  /\___  >__|  
-        \/        \/          \/    \/\______|    \/     \/               \/    \/      \/    \/      \/     \/                              \/      \/                  \/     \/      
-```
 This pattern allows you to upload a document documents such as PDFs, images, tables, and forms into an S3 bucket the text (key value paid) from the document can be extract using S3 Object Lambda using AWS Textract
 
 This pattern provides a simple On-demand mechanism of extracting key value pair from document for Intelligent document processing. 
@@ -52,64 +44,13 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The architecture for the pattern is as follows: 
-The pattern create an access point for the S3 bucket allowing the Lambda to access 
+The architecture for the pattern is as follows: The pattern create an access point for the S3 bucket allowing the Lambda to access 
 The pattern allows an object in the S3 bucket to be access via an Access point to invoke a Lambda (S3 object Lambda). 
 The lambda invokes Amazon Textact to analysie the document for key value pair using OCR. This allows extraction
-of the text from the the object (such as pdf and image file). The S3 Object Lambda Access point can be used to download 
+of the text from the object (such as pdf and image file). The S3 Object Lambda Access point can be used to download 
 the extracted output of the original document.
 
-```
-                  +---------------+-------------------------------------------------------------------------------------+
-                  |               |                                                                                     |
-                  | AWS Cloud     |                                                                                     |
-                  |               |                                                                                     |
-                  +---------------+                                                                                     |
-                  |                                                                                                     |
-                  |                                                                                                     |
-                  |                                                                        +------------------+         |
-+----------+      |                                                                        |                  |         |
-|          |      |                                                                        |                  |         |
-| Original <------+------------------------------------------------------------------------>     S3 Bucket    |         |
-|   Object |      |                                                                        |                  |         |
-+----------+      |                                                                        |                  |         |
-  Input           |                                                                        +--------+---------+         |
-                  |                                                                                 |                   |
-                  |                                                                                 |                   |
-                  |                                                                                 |                   |
-                  |                                                                                 |                   |
-                  |                                                                                 |                   |
-                  |                                                                        +--------v---------+         |
-                  |                                                                        |                  |         |
-                  |                                                                        |                  |         |
-                  |                                                                        |  Supporting S3   |         |
-                  |                                                                        |    Access Point  |         |
-                  |                                                                        |                  |         |
-                  |                                                                        +--------+---------+         |
-                  |                                                                                 |                   |
-                  |                                                                                 |                   |
-                  |         +-------------------+          +----------------------+                 |                   |
-   Output         |         |                   |          |                      |                 |                   |
-+-----------+     |         | S3 Object Lambda  |          |       Extracting     |                 |                   |
-|           |     |         |    access point   |          |    Lambda Function   |                 |                   |
-| Extract   |<----+--------->                   <---------->                      <-----------------+                   |
-|           |     |         |                   |          |                      |                                     |
-+-----------+     |         +-------------------+          +----------^-----------+                                     |
-                  |                                                   |                                                 |
-                  |                                                   |                                                 |
-                  |                                                   |  Execute                                        |
-                  |                                                   |                                                 |
-                  |                                                   |                                                 |
-                  |                                        +----------v-----------+                                     |
-                  |                                        |                      |                                     |
-                  |                                        |                      |                                     |
-                  |                                        |    Amazon Textract   |                                     |
-                  |                                        |                      |                                     |
-                  |                                        |                      |                                     |
-                  |                                        +----------------------+                                     |
-                  |                                                                                                     |
-                  +-----------------------------------------------------------------------------------------------------+
-```
+![pattern](images/pattern.jpg)
 
 ## Testing
 

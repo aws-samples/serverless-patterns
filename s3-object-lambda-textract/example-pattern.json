@@ -1,6 +1,6 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "title": "S3 Object Lambda using textract",
+  "description": "This pattern provides a simple On-demand mechanism of extracting key value pair from document for Intelligent document processing.Example Use case : If an enterprise has a large volume of PDF document and does not want to run a batch job due to the cost of processing of extracting / processing all the document, S3 Ojbect lambda provdies a good mechanism to extract only the OCR document on need basis without major changes to the architecture and in a serverless fashion, optimising cost.",
   "language": "Python",
   "level": "200",
   "framework": "CDK",

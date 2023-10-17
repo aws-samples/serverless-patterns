@@ -74,12 +74,7 @@ Resources:
       # The function needs permission to call back to the S3 Object Lambda Access Point with the WriteGetObjectResponse.
       Policies:
         - TextractPolicy: {}
-        - S3CrudPolicy:
-            BucketName: !Ref S3Bucket
-        - Statement:
-          - Effect: Allow
-            Action: 's3-object-lambda:WriteGetObjectResponse'
-            Resource: '*'
+        - AmazonS3ObjectLambdaExecutionRolePolicy: {}
 
 Outputs:
   S3BucketName:
