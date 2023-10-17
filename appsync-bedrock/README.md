@@ -2,7 +2,7 @@
 
 This pattern shows how to invoke Amazon Bedrock models from AppSync through HTTP resolvers.
 
-Why? This pattern can be used as a starting point to leverage AWS AppSync pipeline resolvers and Amazon Bedrock. In your pipeline resolver, you could for example first fetch some information from another datasource (external API, database, ...) and use the information returned by this datasource to include it in your prompts when invoking Amazon Bedrock models. With pipeline resolvers, you do not need to call (and therefore pay for) compute resources (such as lambda functions) to perform this logic.
+Why? This pattern can be used as a starting point to leverage AWS AppSync pipeline resolvers and Amazon Bedrock. In your pipeline resolver, you could for example first fetch some information from another datasource (external API, database, ...) and use the information returned by this datasource to include it in your prompts when invoking Amazon Bedrock models. With pipeline resolvers, you do not need to call (and therefore pay for) compute resources (such as Lambda functions) to perform this logic.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appsync-bedrock
 
@@ -14,6 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* Make sure to enable the **Anthropic - Claude Instant** model on the [Bedrock console](https://console.aws.amazon.com/bedrock/home#/modelaccess).
 
 ## Deployment Instructions
 
@@ -45,6 +46,7 @@ In this pattern the end user is able to provide a query and a role. Based on the
 1. Visit the [AppSync on the AWS Console](https://console.aws.amazon.com/appsync/home#/apis) in the region you deployed this sample in.
 2. Select the AppSync API called AppSyncToBedrockApi
 3. From the left pane, click on **Queries**
+   ![queries](images/1.png)
 4. Fill in the following query and run it:
    ```graphql
     mutation MyMutation {
@@ -53,7 +55,8 @@ In this pattern the end user is able to provide a query and a role. Based on the
         }
     }
    ```
-   In this query we are providing the schoolteacher role. The expected output should take this role into consideration.
+   In this query we are providing the **schoolteacher** role. The expected output should take this role into consideration.
+   ![mutation-1](images/2.png)
 
 5. Now let's run the same query with a **philosopher** role.
     ```graphql
@@ -64,6 +67,7 @@ In this pattern the end user is able to provide a query and a role. Based on the
     }
    ```
    The result is noticably different and matches the response a philosopher might give to the given question.
+   ![mutation-2](images/3.png)
 
 ## Cleanup
  
