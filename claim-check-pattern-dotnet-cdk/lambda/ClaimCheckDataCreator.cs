@@ -33,6 +33,7 @@ public class ClaimCheckDataCreator
             }
         };
 
+        context.Logger.LogInformation("Putting message on queue...");
         await sqsClient.SendMessageAsync(queueUrl, JsonSerializer.Serialize(messageWithManyDetails));
         context.Logger.LogInformation("Message put on queue.");
     }

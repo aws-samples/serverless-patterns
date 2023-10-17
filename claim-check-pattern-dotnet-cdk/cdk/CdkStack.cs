@@ -182,7 +182,8 @@ namespace Cdk
                 Environment=new Dictionary<string, string>(1) {
                     {"QUEUE_URL", sampleDataWriteQueue.QueueUrl},
                 },         
-                FunctionName=functionName
+                Timeout=Duration.Seconds(15),
+                FunctionName=functionName            
             });
             sampleDataWriteQueue.GrantSendMessages(claimCheckSampleDataCreatorLambda);
 
@@ -194,6 +195,7 @@ namespace Cdk
                 Environment=new Dictionary<string, string>(1) {
                     {"CLAIM_CHECK_TABLE",claimCheckTable.TableName}
                 },
+                Timeout=Duration.Seconds(15),
                 FunctionName=functionName
             });
             claimCheckTable.GrantReadData(claimCheckRetrievalLambda);
@@ -206,6 +208,7 @@ namespace Cdk
                 Environment=new Dictionary<string, string>(1) {
                     {"CLAIM_CHECK_TABLE", claimCheckTable.TableName},
                 },
+                Timeout=Duration.Seconds(15),
                 FunctionName=functionName
             });
             claimCheckTable.GrantWriteData(claimCheckSplitLambda);
