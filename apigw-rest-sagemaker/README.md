@@ -54,7 +54,7 @@ Once the application is deployed, retrieve the API URL provided as output and ap
 Postman Example
 1. URL:
     ```
-    https://aabbccddee.execute-api.eu-west-1.amazonaws.com/text
+    https://aabbccddee.execute-api.eu-west-1.amazonaws.com/v1/text
     ```
 
 2. Method:
