@@ -1,0 +1,58 @@
+{
+  "title": "Priority Queue Pattern using Amazon SQS",
+  "description": "This sample project creates a Priority SQS Queue Pattern using AWS Serverless services. There are three priorities in this sample app - High, Medium and Low. However, the same architecture can be extended to any number of priorities.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project showcases Priority Queue Pattern using AWS Serverless services. There are three priorities - High, Medium and Low.",
+      "The project demonstrates the behavior using both standard and FIFO SQS Queues. Lambda is used as consumer of the messages from SQS queues. The objective is to first process the messages from High priority queue and only if there is no messages in High priority queue, process from Medium and subsequently from Low priority queue if no more messages left on High and Medium priority queues.",
+      "As it is observed in the results, FIFO queue performs much better in maintaining the priority however Standard queue might not be able to maintain the priority in some instances as the ordering of the messages is on best effort basis."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/priority-queue-sam",
+      "templateURL": "serverless-patterns/priority-queue-sam",
+      "projectFolder": "priority-queue-sam",
+      "templateFile": "priority-queue-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "SQS Priority Queue",
+        "link": "https://github.com/aws-samples/sqs-priority-queues/blob/main/template/sqs_priority_queues.yaml"
+      },
+      {
+        "text": "Invoking Lambda at sub minute frequency",
+        "link": "https://aws.amazon.com/blogs/architecture/a-serverless-solution-for-invoking-aws-lambda-at-a-sub-minute-frequency"
+      }      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+    }
+  ]
+}

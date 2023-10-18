@@ -1,0 +1,41 @@
+{
+    "Comment": "Invoke Lambda every 10 seconds",
+    "StartAt": "ConfigureCount",
+    "States": {
+        "ConfigureCount": {
+            "Type": "Pass",
+            "Result": {
+                "index": 0,
+                "count": 6
+            },
+            "ResultPath": "$.iterator",
+            "Next": "Iterator"
+        },
+        "Iterator": {
+            "Type": "Task",
+            "Resource": "${IteratorArn}",
+            "ResultPath": "$.iterator",
+            "Next": "IsCountReached"
+        },
+        "IsCountReached": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.iterator.continue",
+                    "BooleanEquals": true,
+                    "Next": "Wait"
+                }
+            ],
+            "Default": "Done"
+        },
+        "Wait": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "Iterator"
+        },
+        "Done": {
+            "Type": "Pass",
+            "End": true
+        }
+    }
+}

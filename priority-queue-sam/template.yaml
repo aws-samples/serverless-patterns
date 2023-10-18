@@ -1,0 +1,285 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create a Priority SQS Queue Pattern using AWS Serverless services. There are three priorities in this sample app - High, Medium and Low.
+
+Resources:
+  # Define the Standard SQS queue
+  HighPrioritySqsQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: HighPrioritySqsQueue
+      RedrivePolicy: 
+        deadLetterTargetArn: !GetAtt HighPrioritySqsDLQueue.Arn
+        maxReceiveCount: 5
+  MediumPrioritySqsQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: MediumPrioritySqsQueue
+      RedrivePolicy: 
+        deadLetterTargetArn: !GetAtt MediumPrioritySqsDLQueue.Arn
+        maxReceiveCount: 5      
+  LowPrioritySqsQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: LowPrioritySqsQueue
+      RedrivePolicy: 
+        deadLetterTargetArn: !GetAtt LowPrioritySqsDLQueue.Arn
+        maxReceiveCount: 5
+  HighPrioritySqsDLQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: HighPrioritySqsDLQueue
+  MediumPrioritySqsDLQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: MediumPrioritySqsDLQueue
+  LowPrioritySqsDLQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: LowPrioritySqsDLQueue
+
+  # Define the FIFO SQS queue
+  HighPrioritySqsFIFOQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: HighPrioritySqsQueue.fifo
+      FifoQueue: True
+      ContentBasedDeduplication: True
+      VisibilityTimeout: 300
+      RedrivePolicy: # Define the dead-letter queue (DLQ) configuration
+        deadLetterTargetArn: !GetAtt HighPrioritySqsFIFODLQueue.Arn
+        maxReceiveCount: 5
+  MediumPrioritySqsFIFOQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: MediumPrioritySqsQueue.fifo
+      FifoQueue: True
+      ContentBasedDeduplication: True
+      VisibilityTimeout: 300
+      RedrivePolicy: # Define the dead-letter queue (DLQ) configuration
+        deadLetterTargetArn: !GetAtt MediumPrioritySqsFIFODLQueue.Arn
+        maxReceiveCount: 5
+  LowPrioritySqsFIFOQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: LowPrioritySqsQueue.fifo
+      FifoQueue: True
+      ContentBasedDeduplication: True
+      VisibilityTimeout: 300
+      RedrivePolicy: # Define the dead-letter queue (DLQ) configuration
+        deadLetterTargetArn: !GetAtt LowPrioritySqsFIFODLQueue.Arn
+        maxReceiveCount: 5
+  HighPrioritySqsFIFODLQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: HighPrioritySqsFIFODLQueue.fifo
+      FifoQueue: True # Set to true to create a FIFO queue, ensuring strict message ordering
+      ContentBasedDeduplication: True
+      VisibilityTimeout: 300
+  MediumPrioritySqsFIFODLQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: MediumPrioritySqsFIFODLQueue.fifo
+      FifoQueue: True # Set to true to create a FIFO queue, ensuring strict message ordering
+      ContentBasedDeduplication: True
+      VisibilityTimeout: 300
+  LowPrioritySqsFIFODLQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: LowPrioritySqsFIFODLQueue.fifo
+      FifoQueue: True # Set to true to create a FIFO queue, ensuring strict message ordering
+      ContentBasedDeduplication: True
+      VisibilityTimeout: 300
+  # Define Function that polls the Standard SQS queues
+  StandardSQSQueuePollerFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: processMessages.lambda_handler
+      Runtime: python3.9
+      Timeout: 60
+      MemorySize: 128
+      Environment:
+        Variables:
+          HighPriorityQueue: !Ref HighPrioritySqsQueue
+          MediumPriorityQueue: !Ref MediumPrioritySqsQueue
+          LowPriorityQueue: !Ref LowPrioritySqsQueue
+      Policies:
+        - SQSPollerPolicy:
+            QueueName:
+              !GetAtt HighPrioritySqsQueue.QueueName
+        - SQSPollerPolicy:
+            QueueName:
+              !GetAtt MediumPrioritySqsQueue.QueueName
+        - SQSPollerPolicy:
+            QueueName:
+              !GetAtt LowPrioritySqsQueue.QueueName                                                    
+  # Define Function that reads messages from the FIFO SQS queues
+  FIFOSQSQueuePollerFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: processMessages.lambda_handler
+      Runtime: python3.9
+      Timeout: 60
+      MemorySize: 128
+      Environment:
+        Variables:
+          HighPriorityQueue: !Ref HighPrioritySqsFIFOQueue
+          MediumPriorityQueue: !Ref MediumPrioritySqsFIFOQueue
+          LowPriorityQueue: !Ref LowPrioritySqsFIFOQueue
+      Policies:
+        - SQSPollerPolicy:
+            QueueName:
+              !GetAtt HighPrioritySqsFIFOQueue.QueueName
+        - SQSPollerPolicy:
+            QueueName:
+              !GetAtt MediumPrioritySqsFIFOQueue.QueueName
+        - SQSPollerPolicy:
+            QueueName:
+              !GetAtt LowPrioritySqsFIFOQueue.QueueName                                              
+  # Define Function that invokes the FIFOSQSQueuePollerFunction
+  IteratorFIFO:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: iterator.lambda_handler
+      Runtime: python3.9
+      Timeout: 60
+      MemorySize: 128
+      Environment:
+        Variables:
+          FunctionToInvoke: !Ref FIFOSQSQueuePollerFunction
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName:
+              !Ref FIFOSQSQueuePollerFunction       
+  # Define the Step Function that invokes the FIFO Iterator Function
+  StateMachineInvokeLambdaFIFOQ:
+    Type: AWS::Serverless::StateMachine
+    DependsOn:
+        - StatesExecutionRole
+        - StateMachineFIFOLogGroup
+    Properties:
+      DefinitionUri: statemachine/lambdainvoker.asl.json
+      DefinitionSubstitutions:
+        IteratorArn: !GetAtt IteratorFIFO.Arn
+      Role:
+        Fn::GetAtt: [ StatesExecutionRole, Arn ]
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineFIFOLogGroup.Arn
+        IncludeExecutionData: true
+        Level: 'ALL'
+      Events:
+        ScheduledStepFunction:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)     
+  StateMachineFIFOLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", StateMachineInvokeLambdaFIFOQ]]
+  # Define Function that invokes the Standard SQSQueuePollerFunction
+  IteratorStandard:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: iterator.lambda_handler
+      Runtime: python3.9
+      Timeout: 60
+      MemorySize: 128
+      Environment:
+        Variables:
+          FunctionToInvoke: !Ref StandardSQSQueuePollerFunction
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName:
+              !Ref StandardSQSQueuePollerFunction
+  # Define the Step Function that invokes the Standard Iterator Function              
+  StateMachineInvokeLambdaStandardQ:
+    Type: AWS::Serverless::StateMachine
+    DependsOn:
+        - StatesExecutionRole
+        - StateMachineStandardLogGroup
+    Properties:
+      DefinitionUri: statemachine/lambdainvoker.asl.json
+      DefinitionSubstitutions:
+        IteratorArn: !GetAtt IteratorStandard.Arn
+      Role:
+        Fn::GetAtt: [ StatesExecutionRole, Arn ]
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineStandardLogGroup.Arn
+        IncludeExecutionData: true
+        Level: 'ALL'
+      Events:
+        ScheduledStepFunction:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)     
+  StateMachineStandardLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", StateMachineInvokeLambdaStandardQ]]      
+  StatesExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: LambdaExecute
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "lambda:InvokeFunction"
+                Resource: 
+                  - !GetAtt IteratorFIFO.Arn
+                  - !GetAtt IteratorStandard.Arn
+        -  PolicyName: LogPermissions
+           PolicyDocument:
+             Version: "2012-10-17"
+             Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogDelivery"
+                  - "logs:GetLogDelivery"
+                  - "logs:UpdateLogDelivery"
+                  - "logs:DeleteLogDelivery"
+                  - "logs:ListLogDeliveries"
+                  - "logs:PutLogEvents"
+                  - "logs:PutResourcePolicy"
+                  - "logs:DescribeResourcePolicies"
+                  - "logs:DescribeLogGroups"
+                Resource: "*"         
+Outputs:
+  StandardHighPrioritySqsQueueURL:
+    Description: High Priority SQS queue URL
+    Value: !Ref HighPrioritySqsQueue
+  StandardMediumPrioritySqsDLQueueURL:
+    Description: Medium Priority SQS queue URL
+    Value: !Ref MediumPrioritySqsDLQueue
+  StandardLowPrioritySqsQueueURL:
+    Description: Low Priority SQS queue URL
+    Value: !Ref LowPrioritySqsQueue      
+
+  FIFOHighPrioritySqsQueueURL:
+    Description: FIFO High Priority SQS queue URL
+    Value: !Ref HighPrioritySqsFIFOQueue
+  FIFOMediumPrioritySqsQueueURL:
+    Description: FIFO Medium Priority SQS queue URL
+    Value: !Ref MediumPrioritySqsFIFOQueue
+  FIFOLowPrioritySqsLQueueURL:
+    Description: FIFO Low Priority SQS queue URL
+    Value: !Ref LowPrioritySqsFIFOQueue      
