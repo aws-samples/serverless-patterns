@@ -1,7 +1,7 @@
 {
   "title": "AppSync to Bedrock",
   "description": "Create a AppSync API to interact with Bedrock models.",
-  "language": "Typescript",
+  "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
