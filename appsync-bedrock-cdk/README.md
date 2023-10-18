@@ -19,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
+    ```
     git clone https://github.com/aws-samples/serverless-patterns
     ```
 2. Change directory to the pattern directory:
@@ -39,14 +39,14 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-In this pattern the end user is able to provide a prompt that will be used to invoke an Amazon Bedrock model from within the JS resolver.
-It is possible to augment the integration by adding functions in the pipeline resolver.
+In this pattern the end user is able to provide a prompt that will be used to invoke an Amazon Bedrock model from the JS resolver.
+It is possible to augment the integration by adding functions in the pipeline resolver and change the invoked model by inserting the relative inference parameters in the JS resolver.
 
 ## Testing
 
 Provide steps to trigger the integration and show what should be observed if successful.
 
-1. Generate code for invoking the API (only if you changed the definition):
+1. Generate code for invoking the API (if you changed the schema):
     ```
     npx @aws-amplify/cli codegen add --apiId <GraphQLApiID> --region <Region>
     ```
