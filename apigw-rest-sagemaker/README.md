@@ -52,9 +52,28 @@ Important: this application uses various AWS services and there are costs associ
 Once the application is deployed, retrieve the API URL provided as output and append the resource name "/text". Then make the request from Postman or from a terminal. The URL should look like this : https://[api-id].execute-api.[api-region].amazonaws.com/v1/text
 
 Postman Example
-    ```bash
+1. URL:
+    ```
     https://aabbccddee.execute-api.eu-west-1.amazonaws.com/text
     ```
+
+2. Method:
+```
+POST
+```
+
+3. Request Header and value: 
+```
+x-api-key: Q425Bv0mFe7s6C4jRrCAlazVkSlXXXXXXXXXXXXX
+```
+
+4. Body: Choose "raw" radio button and "JSON" from dropdownlist.
+```
+{
+     "text_inputs": "A step by step recipe to make chicken noodles:",
+     "max_length": 5000
+}
+```
 
 OR open a terminal and execute the curl command
 
