@@ -29,6 +29,7 @@ Resources:
           LambdaInvoke:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke.waitForTaskToken
+            TimeoutSeconds: 3600
             Parameters:
               FunctionName: MyLambdaFunction
               Payload:
@@ -43,6 +44,15 @@ Resources:
                 IntervalSeconds: 1
                 MaxAttempts: 3
                 BackoffRate: 2
+            Catch: 
+              - ErrorEquals:
+                  - Lambda.ServiceException
+                  - Lambda.UnknownError
+                  - Lambda.AWSLambdaException
+                  - Lambda.SdkClientException
+                  - Lambda.TooManyRequestsException
+                Next: PrepareSNSMessage
+                ResultPath: "$.error"
             Next: PrepareSNSMessage
           PrepareSNSMessage:
             Type: Pass
