@@ -1,0 +1,10 @@
+{
+  "deviceId": "Test1",
+  "filtering": "Distance",
+  "accuracy": 0,
+  "location": {
+    "longitude":-115.16039044280883,
+    "latitude": 36.092019726675666
+  },
+  "timestamp": "2023-10-18T09:50:00"
+}

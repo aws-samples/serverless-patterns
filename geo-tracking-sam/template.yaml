@@ -1,0 +1,111 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  welcome-app
+
+  Sample SAM Template for welcome-app
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 128
+
+Resources:
+  DistanceFilteringTracker:
+    Type: AWS::Location::Tracker
+    Properties: 
+      Description: Distance Based Tracker
+      PositionFiltering: DistanceBased
+      TrackerName: DistanceFilteringTracker
+  AccuracyFilteringTracker:
+    Type: AWS::Location::Tracker
+    Properties: 
+      Description: Accuracy Based Tracker
+      PositionFiltering: AccuracyBased
+      TrackerName: AccuracyFilteringTracker
+  TimeFilteringTracker:
+    Type: AWS::Location::Tracker
+    Properties: 
+      Description: Time Based Tracker
+      PositionFiltering: TimeBased
+      TrackerName: TimeFilteringTracker      
+  MyDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: geo-tracking-data
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: deviceId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+        - AttributeName: deviceId
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  TrackerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: tracker/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Description: A function that is used to test trackers
+      Architectures:
+        - x86_64
+      Policies:
+        - Statement:
+          - Sid: TrackerTesting
+            Effect: Allow
+            Action:
+            - geo:BatchUpdateDevicePosition
+            Resource: 
+            - !GetAtt DistanceFilteringTracker.Arn
+            - !GetAtt AccuracyFilteringTracker.Arn
+            - !GetAtt TimeFilteringTracker.Arn            
+  GeoTrackingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: geotracking/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Description: A function that tracks geo location based on a tracker update event and writes to a dynamodb
+      Architectures:
+        - x86_64
+      Policies:
+        - Statement:
+          - Sid: GeoLocationTracking
+            Effect: Allow
+            Action:
+            - geo:*
+            Resource: '*'
+        - DynamoDBCrudPolicy:
+           TableName: !Ref MyDynamoDBTable        
+      Environment:
+        Variables:
+          TableName: !Ref MyDynamoDBTable        
+      Events:
+        GeoTracking:
+          Type: EventBridgeRule 
+          Properties:
+            Pattern:
+              source:
+                - aws.geo
+              detail-type:
+                - AWS API Call via CloudTrail                
+              detail:
+                eventSource:
+                  - geo.amazonaws.com
+                eventName:
+                  - BatchUpdateDevicePosition
+
+Outputs:
+  GeoTrackingFunction:
+    Description: "Geo Tracking Lambda Function ARN"
+    Value: !GetAtt GeoTrackingFunction.Arn
+  GeoTrackingFunctionIamRole:
+    Description: "Implicit IAM Role created for Geo Tracking function"
+    Value: !GetAtt GeoTrackingFunctionRole.Arn
