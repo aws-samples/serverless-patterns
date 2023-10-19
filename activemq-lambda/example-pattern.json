@@ -1,0 +1,58 @@
+{
+  "title": "ActiveMQ to Lambda",
+  "description": "Create ActiveMQ Broker and Lambda with ActiveMQ as Event Source",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template deploy new ActiveMQ Broker and use it as event source for AWS Lambda.",
+      "Lambda uses Openwire protocol to connect with ActiveMQ"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/activemq-lambda",
+      "templateURL": "serverless-patterns/activemq-lambda",
+      "projectFolder": "activemq-lambda",
+      "templateFile": "activemq-lambda/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Amazon MQ as an event source for AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-mq-as-an-event-source-for-aws-lambda/"
+      },
+      {
+        "text": "Using Lambda with Amazon MQ",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-mq.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Thanit Youruchatangern",
+      "image": "https://raw.githubusercontent.com/final000/myphoto/main/myphoto.jpeg",
+      "bio": "I am a Technical Account Manager at AWS based in Thailand. I help customer solving complex problems with simple solutions.",
+      "linkedin": "www.linkedin.com/in/thanit-youruchatangern-a90060216",
+      "twitter": "twitter-handle"
+    }
+  ]
+}
