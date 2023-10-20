@@ -1,0 +1,56 @@
+{
+    "title": "AWS Appsync to Amazon API Gateway (AWS_IAM Auth) to DynamoDB",
+    "description": "Using Appsync GraphQL API to access Amazon API Gateway REST API protected with AWS_IAM auth and integrated with Amazon DynamoDB",
+    "language": "YAML",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern deploys an AWS Appsync GraphQL API which acts as a front door to Amazon API Gateway REST API protected with AWS_IAM authentication. The REST API Gateway is directly integrated with Amazon DynamoDB table and has capability to read/create/update/delete restaurant data in the table"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-apigateway-dynamodb-sam",
+        "templateURL": "serverless-patterns/appsync-apigateway-dynamodb-sam",
+        "projectFolder": "appsync-apigateway-dynamodb-sam",
+        "templateFile": "appsync-apigateway-dynamodb-sam/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AWS AppSync HTTP Resolvers",
+          "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers-js.html"
+        },
+        {
+          "text": "Using Amazon API Gateway as a proxy for DynamoDB",
+          "link": "https://aws.amazon.com/blogs/compute/using-amazon-api-gateway-as-a-proxy-for-dynamodb/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Damini Nixcy Mol Antony",
+        "image": "https://avatars.githubusercontent.com/u/39347789?v=4",
+        "bio": "Senior Cloud Support Engineer (Serverless) @AWS",
+        "linkedin": "damini-nixcy-mol"
+      }
+    ]
+  }
