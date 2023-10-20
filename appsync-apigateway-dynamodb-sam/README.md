@@ -46,9 +46,7 @@ The easiest way to test the AppSync API is with the AppSync console at https://c
 
 1) Click on the API you created and visit the Queries tab.
 2) To add a new restaurant entry, paste the following command in the query editor tab. Likewise you can update, delete restaurant using updateRestaurant and deleteRestaurant mutations.
-
-    :::code{showCopyAction=true showLineNumbers=false language=json}
-
+    ```graphql
         mutation MyMutation {
             addRestaurant(input: {cuisine: Multi, name: "ABC", restaurantId: "100", state: "NY", zip: "10001"}) {
                 data {
@@ -61,14 +59,13 @@ The easiest way to test the AppSync API is with the AppSync console at https://c
                 message
             }
         }
-    :::
+    ```
 
-    ![AddRestaurant Mutation](/images/Mutation.png)
+    ![AddRestaurant Mutation](./images/Mutation.png)
 
 3) To get the list of restaurants, paste the following command in the query editor tab.
 
-    :::code{showCopyAction=true showLineNumbers=false language=json}
-
+    ```graphql
         query MyQuery {
             listRestaurants {
                 cuisine
@@ -78,14 +75,13 @@ The easiest way to test the AppSync API is with the AppSync console at https://c
                 zip
             }
         }
-    :::
+    ```
 
-    ![listRestaurants Query](/images/Query-listRestaurants.png)
+    ![listRestaurants Query](./images/Query-listRestaurants.png)
 
 4) To get restaurant based on restaurant ID, paste the following command in the query editor tab.
 
-    :::code{showCopyAction=true showLineNumbers=false language=json}
-
+    ```graphql
         query MyQuery {
             getRestaurant(restaurantId: "100") {
                 cuisine
@@ -95,9 +91,9 @@ The easiest way to test the AppSync API is with the AppSync console at https://c
                 zip
             }
         }
-    :::
+    ```
 
-    ![getRestaurant Query](/images/Query-getRestaurant.png)
+    ![getRestaurant Query](./images/Query-getRestaurant.png)
 
 ## Cleanup
  
