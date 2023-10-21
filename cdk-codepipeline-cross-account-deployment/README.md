@@ -70,14 +70,17 @@ While bootstrapping the, you include a ```--trust``` flag that creates a trust r
     ```bash
     python3 -m pip install -r requirements.txt
     ```
+7. In the /app.py file, on line 25, update the environment information with the account number and region you want to deploy the pipeline itself to.
 
-7. From the command line, use CDK to synthesize the CloudFormation template and check for errors:
+8. In the aws_serverless_pattern_cdk_crossaccount_deployment/aws_serverless_pattern_cdk_crossaccount_deployment_stack.py file, update line 39 with the information of first environment you want to deploy the sample website to and line 43 with the information of second environment you want to deploy the sample website to. Please note that these need to match the environment information you used while bootstrapping in step 3 above.
+
+9. From the command line, use CDK to synthesize the CloudFormation template and check for errors:
 
     ```bash
     cdk synth
     ```
 
-8. From the command line, use CDK to deploy the stack:
+10. From the command line, use CDK to deploy the stack:
 
     ```bash
     cdk deploy
