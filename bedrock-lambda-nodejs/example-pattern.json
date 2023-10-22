@@ -1,0 +1,58 @@
+{
+  "title": "Bedrock in a NodeJS Lambda",
+  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "language": "NodeJS",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to make use of Bedrock within a Lambda function on NodeJS runtime.",
+      "The business logic is in <code>./src/index.js</code>. You can use sample payloads stored in <code>./events</code> to test the function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-lambda-nodejs",
+      "templateURL": "serverless-patterns/bedrock-lambda-nodejs",
+      "projectFolder": "bedrock-lambda-nodejs",
+      "templateFile": "bedrock-lambda-nodejs/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Learn more about Amazon Bedrock",
+        "link": "https://aws.amazon.com/bedrock/"
+      },
+      {
+        "text": "Build Serverless Applications with Bedrock on FooBar",
+        "link": "https://www.youtube.com/watch?v=P9Lnf4GMUsI&t=492s&ab_channel=FooBarServerless"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build && sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Giuseppe Battista",
+      "image": "https://media.licdn.com/dms/image/D4E03AQGOz6p4p-rSfg/profile-displayphoto-shrink_800_800/0/1686238097666?e=1703721600&v=beta&t=bhKqpehfON17sLUNDn-yFUKJhohuWljVKNCarDnsdYA",
+      "bio": "Giuseppe Battista is a Senior Solutions Architect at Amazon Web Services. He leads soultions architecture for Early Stage Startups in UK and Ireland. He hosts the Twitch Show \"Let's Build a Startup\" on twitch.tv/aws and he's head of Unicorn's Den accelerator.",
+      "linkedin": "https://www.linkedin.com/in/giusedroid/",
+      "twitter": "giusedroid"
+    }
+  ]
+}
