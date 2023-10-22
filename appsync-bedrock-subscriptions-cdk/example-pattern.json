@@ -39,7 +39,7 @@
         },
         {
             "text": "Bedrock's Response Stream API",
-            "link": " https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModelWithResponseStream.html"
+            "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModelWithResponseStream.html"
         }
       ]
     },
