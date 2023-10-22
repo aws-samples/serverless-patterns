@@ -13,7 +13,7 @@ Resources:
       Policies:
         - Statement:
             - Effect: Allow
-              Action: 'bedrock:*'
+              Action: 'bedrock:InvokeModel'
               Resource: '*'
 
 Outputs:
