@@ -16,7 +16,7 @@
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-bedrock-subscriptions-cdk",
         "templateURL": "serverless-patterns/appsync-bedrock-subscriptions-cdk",
         "projectFolder": "appsync-bedrock-subscriptions-cdk",
-        "templateFile": "appsync-bedrock-subscriptions-cdk/lib/backend-stack.ts"
+        "templateFile": "lib/backend-stack.ts"
       }
     },
     "resources": {
