@@ -7,12 +7,12 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Sellers can use either a Cloudformation template or CDK deploy to deploy AWS API Gateway in their Sellers account."
-      "This will create REST API called marketplace-metering-records with AWS service integration to DynamoDB table AWSMarketplaceMeteringRecords." 
-      "The following 3 API resources will be created:"
-      "1) /insertMeteringRecord/{customerIdentifier}: When seller wants to insert metering records for a partincular buyer."
-      "2) /insertMeteringRecords: When seller wants to upload metering records in bulk."
-      "3) /listMeteringRecords/{customerIdentifier}: When seller wants to list the status of a specific buyers metering record."
+      "Sellers can use either a Cloudformation template or CDK deploy to deploy AWS API Gateway in their Sellers account.",
+      "This will create REST API called marketplace-metering-records with AWS service integration to DynamoDB table AWSMarketplaceMeteringRecords.", 
+      "The following 3 API resources will be created:",
+      "1) /insertMeteringRecord/{customerIdentifier}: When seller wants to insert metering records for a partincular buyer.",
+      "2) /insertMeteringRecords: When seller wants to upload metering records in bulk.",
+      "3) /listMeteringRecords/{customerIdentifier}: When seller wants to list the status of a specific buyers metering record.",
     ]
   },
   "gitHub": {
