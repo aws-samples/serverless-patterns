@@ -18,9 +18,9 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns.git",
-      "templateURL": "serverless-patterns/cdk-apigw-markerplace-metering-records",
-      "projectFolder": "cdk-apigw-markerplace-metering-records",
-      "templateFile": "cdk-apigw-markerplace-metering-records/cdk-apigw-markerplace-metering-records.py"
+      "templateURL": "serverless-patterns/cdk-apigw-marketplace-metering-records",
+      "projectFolder": "cdk-apigw-marketplace-metering-records",
+      "templateFile": "cdk-apigw-marketplace-metering-records/cdk-apigw-marketplace-metering-records.py"
     }
   },
   "resources": {

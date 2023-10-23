@@ -9,11 +9,11 @@ from aws_cdk import core as cdk
 # being updated to use `cdk`.  You may delete this import if you don't need it.
 from aws_cdk import core
 
-from cdk_apigw_markerplace_metering_records.cdk_apigw_markerplace_metering_records_stack import CdkApigwMarkerplaceMeteringRecordsStack
+from cdk_apigw_marketplace_metering_records.cdk_apigw_marketplace_metering_records_stack import CdkApigwMarketplaceMeteringRecordsStack
 
 
 app = core.App()
-CdkApigwMarkerplaceMeteringRecordsStack(app, "CdkApigwMarkerplaceMeteringRecordsStack",
+CdkApigwMarketplaceMeteringRecordsStack(app, "CdkApigwMarketplaceMeteringRecordsStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.

@@ -29,11 +29,11 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
 ```
-git clone https://github.com/aws-samples/serverless-patterns/cdk-apigw-markerplace-metering-records.git
+git clone https://github.com/aws-samples/serverless-patterns/cdk-apigw-marketplace-metering-records.git
 ```
 2. Change directory
 ```
-cd cdk-apigw-markerplace-metering-records
+cd cdk-apigw-marketplace-metering-records
 ```
 3. To manually create a virtualenv on MacOS and Linux:
 ```
@@ -122,7 +122,7 @@ Note: The payload that will be posted to the API’s will only need customer ide
 ```
 
 
-### Test the api invocation using curl: for single metering record Entry
+### Test the api invocation using curl for single metering record Entry
 ```
 curl -X POST "https://<apigateway-id>.execute-api.<aws-region>.amazonaws.com/prod/insertMeteringRecord/<CustomerIdentifier>"  -H "Content-Type: application/json" --data '{
     "metered_dimensions": [
@@ -140,7 +140,7 @@ curl -X POST "https://<apigw-id>.execute-api.us-east-1.amazonaws.com/prod/insert
 ```
 If the execution is successful, you will get an empty response and you can chekc data in DynamoDB table
 
-Test the api invocation using curl: for Multiple metering records Entry
+### Test the api invocation using curl for Multiple metering records Entry
 ```
 https://4e7cwh04z0.execute-api.us-east-1.amazonaws.com/prod/insertMeteringRecords
 curl -X POST "https://<apigateway-id>.execute-api.<aws-region>.amazonaws.com/prod/insertMeteringRecords"  -H "Content-Type: application/json" --data '{
