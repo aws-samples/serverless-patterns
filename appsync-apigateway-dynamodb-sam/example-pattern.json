@@ -1,5 +1,5 @@
 {
-    "title": "AWS AppSync to Amazon API Gateway (AWS_IAM Auth) to DynamoDB",
+    "title": "AWS AppSync to Amazon API Gateway to DynamoDB",
     "description": "Using AppSync GraphQL API to access Amazon API Gateway REST API protected with AWS_IAM auth and integrated with Amazon DynamoDB",
     "language": "YAML",
     "level": "200",
