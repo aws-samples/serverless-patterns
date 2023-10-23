@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern demonstrates how to use the Lambda extension telemetry API to persist Lambda logs to an S3 bucket",
-      "The SAM template deploy Sample Lambda Application, Lambda Extension as Lambda Layer and S3 bucket to store Sample Lambda function's logs. The Lambda Extension use TelemetryAPI together with Extension API to capture Lambda Log and send to S3."
+      "The SAM template deploys a sample Lambda application, Lambda extension as Lambda layer and an S3 bucket to store the Lambda function logs. The Lambda extension uses the  telemetry API together with the extensions API to capture Lambda Log and persist to S3."
     ]
   },
   "gitHub": {
