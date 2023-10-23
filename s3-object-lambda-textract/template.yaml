@@ -21,26 +21,6 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
-  S3BucketPolicy:
-    Type: 'AWS::S3::BucketPolicy'
-    Properties:
-      Bucket: !Ref S3Bucket
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action: '*'
-            Effect: Allow
-            Resource:
-              - !GetAtt S3Bucket.Arn
-              - !Sub
-                  - '${varS3BucketArn}/*'
-                  - varS3BucketArn: !GetAtt S3Bucket.Arn
-            Principal:
-              AWS: '*'
-            Condition:
-              StringEquals:
-                's3:DataAccessPointAccount': !Sub ${AWS::AccountId}
-
   # S3 Access Point (Network origin: Internet)
   S3AccessPoint:
     Type: 'AWS::S3::AccessPoint'
