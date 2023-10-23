@@ -138,7 +138,7 @@ class CdkApigwMarketplaceMeteringRecordsStack(cdk.Stack):
         
 
 # Create new apigateway rest api.      
-        apigw = apigateway.RestApi(self, 'marketplace-metering-records-demo',
+        apigw = apigateway.RestApi(self, 'marketplace-metering-records',
                 description ='This api will insert metering records into dynamodb table : AWSMarketplaceMeteringRecords',
                 endpoint_types =[apigateway.EndpointType.REGIONAL]
         )

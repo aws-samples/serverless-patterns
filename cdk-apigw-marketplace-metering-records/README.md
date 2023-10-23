@@ -37,11 +37,11 @@ cd cdk-apigw-marketplace-metering-records
 ```
 3. To manually create a virtualenv on MacOS and Linux:
 ```
-$ python3 -m venv .venv
+python3 -m venv .venv
 ```
 4. After the init process completes and the virtualenv is created, you can use the following to activate virtualenv.
 ```
-$ source .venv/bin/activate
+source .venv/bin/activate
 ``` 
 6. After activating your virtual environment for the first time, install the app's standard dependencies:
 ```
@@ -49,11 +49,11 @@ python -m pip install -r requirements.txt
 ```
 7. Install APIGateway Module
 ```
-python -m pip install aws-cdk.aws-apigateway
+pip install aws-cdk.aws-apigateway
 ```
 8. Install DynamoDB module
 ```
-python -m pip install aws-cdk.aws_dynamodb
+pip install aws-cdk.aws-dynamodb
 ```
 9. Update 'cdk-apigw-markerplace-metering-records/cdk.context.json' file with your application specific parameters
 ```
