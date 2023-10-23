@@ -15,7 +15,7 @@
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-apigateway-dynamodb-sam",
         "templateURL": "serverless-patterns/appsync-apigateway-dynamodb-sam",
         "projectFolder": "appsync-apigateway-dynamodb-sam",
-        "templateFile": "appsync-apigateway-dynamodb-sam/template.yaml"
+        "templateFile": "template.yaml"
       }
     },
     "resources": {
