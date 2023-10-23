@@ -1,4 +1,4 @@
-# CDK Python project for deploying Rest API that can inseet and list Marketplace Metering records.
+# CDK Python project for deploying Rest API that can insert and list Marketplace Metering records.
 
 Marketplace consumption based pricing (a.k.a usage-based dimentions consumption-based dimensions, or metered dimensions) should be reported to AWS Marketplace and must be stored in a DynamoDB table called
 AWSMarketplaceMeteringRecords. This table gets created in the Seller’s AWS account as part of AWS Markerplace SaaS quickstart integration. 
@@ -78,8 +78,9 @@ At the end of the deployment the CDK output will list stack outputs, and an API 
 ## Testing
 Note: The payload that will be posted to the API’s will only need customer identifier and metered dimension data. Below is some sample data for reference.
 
-# /insertMeteringRecord/{customerIdentifier} - Endpoint to use for metering dimension entry for single Customer.
-## TEST DATA THAT SELLER WILL SEND FOR SINGLE CUSTOMER/BUYER 
+### /insertMeteringRecord/{customerIdentifier} - Endpoint to use for metering dimension entry for single Customer.
+#### TEST DATA THAT SELLER WILL SEND FOR SINGLE CUSTOMER/BUYER 
+```
 "customerIdentifier": "<Customer identifier Value>",
 {
     "metered_dimensions": [
@@ -87,7 +88,9 @@ Note: The payload that will be posted to the API’s will only need customer ide
         {"dimension_name":"<Metered dimension 2>", "dimension_value":<Metered dimension unit value>}
     ]
 }
-## Example json data.
+```
+#### Example json data.
+```
 "customerIdentifier": "ExWoL3vTir2",
 {
     "metered_dimensions": [
@@ -95,8 +98,10 @@ Note: The payload that will be posted to the API’s will only need customer ide
         {"dimension_name":"metered_3_id", "dimension_value":20}
     ]
 }
-# /insertMeteringRecords - Endpoint to use for bulk entry of metering records for multiple customers.
-## TEST DATA THAT SELLER WILL SEND FOR BATCH PROCESSING
+```
+### /insertMeteringRecords - Endpoint to use for bulk entry of metering records for multiple customers.
+#### TEST DATA THAT SELLER WILL SEND FOR BATCH PROCESSING
+```
 {
     "buyers" : [
         {"customerIdentifier": "ExWoL3vTir2",
@@ -114,10 +119,10 @@ Note: The payload that will be posted to the API’s will only need customer ide
     ]
     
 }
+```
 
 
-
-Test the api invocation using curl: for single metering record Entry
+### Test the api invocation using curl: for single metering record Entry
 ```
 curl -X POST "https://<apigateway-id>.execute-api.<aws-region>.amazonaws.com/prod/insertMeteringRecord/<CustomerIdentifier>"  -H "Content-Type: application/json" --data '{
     "metered_dimensions": [
