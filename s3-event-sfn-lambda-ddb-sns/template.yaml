@@ -1,0 +1,185 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Object upload to S3 triggers a state machine which uses Lambda function to put records to DynamoDB post which a notification would be sent to user via SNS.
+
+Resources:
+#=====
+# Creates an Amazon S3 bucket to which images will be uploaded to trigger our workflow.
+#=====
+  IngestionBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      # Amazon EventBridge receives notifications for all events in the bucket.
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+
+#=====
+# Creates a Step Functions workflow.
+#=====
+  UpdateTableStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+     
+      # state machine definition
+      Definition:
+        StartAt: LambdaInvoke
+        States:
+          LambdaInvoke:
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke.waitForTaskToken
+            TimeoutSeconds: 3600
+            Parameters:
+              FunctionName: MyLambdaFunction
+              Payload:
+                data.$: "$"
+                token.$: "$$.Task.Token"
+            Retry:
+              - ErrorEquals:
+                  - Lambda.ServiceException
+                  - Lambda.AWSLambdaException
+                  - Lambda.SdkClientException
+                  - Lambda.TooManyRequestsException
+                IntervalSeconds: 1
+                MaxAttempts: 3
+                BackoffRate: 2
+            Catch: 
+              - ErrorEquals:
+                  - Lambda.ServiceException
+                  - Lambda.UnknownError
+                  - Lambda.AWSLambdaException
+                  - Lambda.SdkClientException
+                  - Lambda.TooManyRequestsException
+                Next: PrepareSNSMessage
+                ResultPath: "$.error"
+            Next: PrepareSNSMessage
+          PrepareSNSMessage:
+            Type: Pass
+            Result:
+              TopicArn:
+                Fn::Sub: "arn:aws:sns:${AWS::Region}:${AWS::AccountId}:my-sns-topic"
+              Message.$: "$"
+            ResultPath: "$.snsInput"
+            Next: SNSPublish
+          SNSPublish:
+            Type: Task
+            Resource: arn:aws:states:::sns:publish
+            Parameters:
+              Message: "Successfully completed the workflow!"
+              TopicArn.$: "$.snsInput.TopicArn"
+            End: true
+      
+      Role: !GetAtt StateMachineExecutionRole.Arn
+      
+      # The Step Functions workflow is triggered each time an object is created in our S3 bucket.
+      Events:
+        StateChange:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: default
+            Pattern:
+              source:
+                - aws.s3
+              detail-type:
+                - Object Created
+              detail:
+                bucket:
+                  name:
+                    - !Ref IngestionBucket
+  
+                    
+#===== 
+# DynamoDB Table                                                      
+#=====
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: transaction_id
+          AttributeType: "S" 
+      KeySchema:
+        - AttributeName: transaction_id
+          KeyType: HASH
+      
+      
+#=====
+# Lambda Function                                                      
+#=====
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Runtime: python3.11
+      Environment:
+        Variables:
+          TableName: !Ref DynamoDBTable
+      FunctionName: MyLambdaFunction
+      Handler: lambda-dynamoDb.lambda_handler
+      MemorySize: 128
+      Policies:
+        - CloudWatchLogsFullAccess
+        - AWSStepFunctionsFullAccess
+        - AmazonS3FullAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
+      Timeout: 30
+    
+    
+    
+  #=====
+  # SNS Topic
+  #=====
+  MySnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+     TopicName: my-sns-topic
+    
+    
+    
+  #=====
+  # IAM Roles                                                               
+  #=====
+  StateMachineExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+       - PolicyName: Access
+         PolicyDocument:
+           Version: "2012-10-17"
+           Statement:
+             - Effect: Allow
+               Action:
+                 - "lambda:InvokeFunction"
+                 - "sns:Publish"
+               Resource: "*"     
+
+
+Outputs:
+  IngestionBucket:
+    Description: "S3 bucket name"
+    Value: !Ref IngestionBucket
+  UpdateTableStateMachine:
+    Description: "Example state machine"
+    Value: !Ref UpdateTableStateMachine
+  LambdaFuncton:
+    Value: !Ref LambdaFunction
+    Description: Lambda Function ARN
+  TableName:
+    Value: !Ref DynamoDBTable
+    Description: DynamoDb Table Name
+  MySnsTopicName:
+    Description: SNS topic name
+    Value: !GetAtt MySnsTopic.TopicName
+    Export:
+      Name: MySNSTopicName
