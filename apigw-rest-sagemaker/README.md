@@ -5,7 +5,7 @@
 
 This pattern creates an Amazon API Gateway REST Edge-Optimized API with an Amazon SageMaker integration. It deploys a SageMaker Jumpstart model (Flan T5 XL) endpoint that is used for the integration.
 
-Learn more about this pattern at Serverless Land Patterns: <add-serverlessland-url-after-publication>
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-rest-sagemaker](https://serverlessland.com/patterns/apigw-rest-sagemaker)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
