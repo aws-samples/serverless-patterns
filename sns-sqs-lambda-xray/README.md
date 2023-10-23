@@ -1,6 +1,6 @@
-# X-ray trace for SNS to SQS to Lambda with AWS Powertools
+# X-Ray trace for Amazon SNS to Amazon SQS to AWS Lambda with AWS Powertools
 
-This pattern demonstrate how to use SAM template and AWS Powertools to capture X-ray trace. 
+This pattern demonstrate how to use an AWS SAM template and Powertools for AWS Lambda to capture and propagate Amazon X-Ray trace. 
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -38,19 +38,19 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The template deploy two Lambda functions, Producer and Consumer, SNS, SQS. The calling sequence is Lambda Producer -> SNS -> SQS -> Lambda Consumer. 
-The whole process flow is captured by X-ray and displayed on Cloudwatch X-ray traces
+The template deploys two Lambda functions, Producer and Consumer, SNS, SQS. The calling sequence is Lambda Producer -> SNS -> SQS -> Lambda Consumer. 
+The whole process flow is captured by X-Ray and displayed with Amazon CloudWatch X-ray traces
 
 ## Testing
 
-Invoke Lambda ProducerFunction and Observe the trace in Cloudwatch > X-Ray traces > Service Map. The service map shows end-to-end of the flow. 
-Click on each node to check how Subseqment, Annotation and Metadata display on X-Ray traces console
+Invoke the Lambda Producer Function and observe the trace in Amazon CloudWatch > X-Ray traces > Service Map. The service map shows the end-to-end flow. 
+Click on each node to check how subsegment, annotation and metadata display in X-Ray traces console/
 
 ## Cleanup
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete
     ```
 1. Confirm the stack has been deleted
     ```bash
