@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an use a API Gateway REST API to invoke a SageMaker endpoint. This pattern is leveraging the native AWS service integration between these 2 services.",
+      "This pattern shows how to use an use a API Gateway REST API to invoke a SageMaker endpoint using using a native AWS service integration.",
       "The pattern deploys a SageMaker endpoint for the Flan-T5 foundation model in Amazon SageMaker JumpStart. To deploy the pattern with a different model, replace the ModelData and ImageURI parameters in the template.yaml file. The template also deploys a REST API with AWS service integration to invoke the SageMaker endpoint directly. "
     ]
   },
