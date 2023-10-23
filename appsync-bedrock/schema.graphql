@@ -1,0 +1,14 @@
+type ModelInvocation {
+	output: String
+}
+
+type Mutation {
+  invokeModel (
+    role: String!
+    query: String!
+  ): ModelInvocation
+}
+
+# Any Query you need for your application
+type QueryOutput { output: String! }
+type Query { myQuery(input: String!): QueryOutput }

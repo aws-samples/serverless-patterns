@@ -1,0 +1,62 @@
+{
+  "title": "AWS AppSync to Amazon Bedrock",
+  "description": "Invoke Amazon Bedrock models from AWS AppSync HTTP resolver",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to invoke Amazon Bedrock models from AppSync through HTTP resolvers.",
+      "In this pattern the end user is able to provide a query and a role. Based on the role provided (philosopher, schoolteacher or politician), a specific context will be added to the prompt used to invoke an Amazon Bedrock model from within the JS resolver."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-bedrock",
+      "templateURL": "serverless-patterns/appsync-bedrock",
+      "projectFolder": "appsync-bedrock",
+      "templateFile": "appsync-bedrock/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS AppSync",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "AWS AppSync HTTP Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers-js.html"
+      },
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-service.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alexis Philippart de Foy",
+      "image": "https://media.licdn.com/dms/image/C4D03AQFyN5GLrFk-0g/profile-displayphoto-shrink_800_800/0/1586853008031?e=1702512000&v=beta&t=yYu7ilmNVS5_1u6cQ5-CjT6noQRtO8WnUFAtMfB2s3s",
+      "bio": " I am a Startup Solutions Architect, Serverless enthusiast and former Startup Founder.",
+      "linkedin": "apdf",
+      "twitter": "@aphilippartd"
+    }
+  ]
+}
