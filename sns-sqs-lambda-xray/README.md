@@ -1,4 +1,4 @@
-# X-Ray trace for Amazon SNS to Amazon SQS to AWS Lambda with AWS Powertools
+# #AWS X-Ray trace for Amazon SNS to Amazon SQS to AWS Lambda with AWS Powertools
 
 This pattern demonstrate how to use an AWS SAM template and Powertools for AWS Lambda to capture and propagate Amazon X-Ray trace. 
 
