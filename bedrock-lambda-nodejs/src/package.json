@@ -1,0 +1,22 @@
+{
+  "name": "sam-bedrock-lambda-node",
+  "version": "1.0.0",
+  "description": "a lambda function making use of bedrock written in nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bedrock",
+    "aws",
+    "lambda",
+    "sam",
+    "node",
+    "nodejs"
+  ],
+  "author": "gbatt@amazon.com",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.429.0"
+  }
+}
