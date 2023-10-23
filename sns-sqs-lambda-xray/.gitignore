@@ -1,6 +1,0 @@
-#AWS SAM
-samconfig.toml
-/.aws-sam
-
-#Other file
-out.json
