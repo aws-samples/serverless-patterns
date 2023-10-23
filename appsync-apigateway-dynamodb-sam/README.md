@@ -99,11 +99,7 @@ The easiest way to test the AppSync API is with the AppSync console at https://c
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
