@@ -1,0 +1,61 @@
+{
+  "title": "API Gateway REST API for inserting and lising Marketplace Metering records.",
+  "description": "Create an API Gateway REST API that will enable Marketplace Sellers to enter Metering records using API endpoionts",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Sellers can use either a Cloudformation template or CDK deploy to deploy AWS API Gateway in their Sellers account."
+      "This will create REST API called marketplace-metering-records with AWS service integration to DynamoDB table AWSMarketplaceMeteringRecords." 
+      "The following 3 API resources will be created:"
+      "1) /insertMeteringRecord/{customerIdentifier}: When seller wants to insert metering records for a partincular buyer."
+      "2) /insertMeteringRecords: When seller wants to upload metering records in bulk."
+      "3) /listMeteringRecords/{customerIdentifier}: When seller wants to list the status of a specific buyers metering record."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns.git",
+      "templateURL": "serverless-patterns/cdk-apigw-markerplace-metering-records",
+      "projectFolder": "cdk-apigw-markerplace-metering-records",
+      "templateFile": "cdk-apigw-markerplace-metering-records/cdk-apigw-markerplace-metering-records.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Solutions Construct for aws-apigateway-dynamodb",
+        "link": "https://docs.aws.amazon.com/solutions/latest/constructs/aws-apigateway-dynamodb.html"
+      },
+      {
+        "text": "AWS Marketplace metering usage",
+        "link": "https://docs.aws.amazon.com/marketplace/latest/userguide/metering-for-usage.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "CDK deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sai Kotagiri",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Sai Kotagiri is a Partner Solutions Architect at Amazon Web Services based in New York metropolitan area. Sai has over 20 years of experience focusing on digital transformation and IT strategy",
+      "linkedin": "https://www.linkedin.com/in/sai-diwakar-kotagiri-1251928/"
+    }
+  ]
+}

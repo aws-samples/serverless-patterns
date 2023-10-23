@@ -1,0 +1,6 @@
+{
+    "params":{
+        "aws_region_name":"<aws_region_name>",
+        "metering_table_name":"AWSMarketplaceMeteringRecords"       
+    }
+}
