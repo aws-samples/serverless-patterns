@@ -1,14 +1,14 @@
 {
-  "title": "X-ray trace for SNS to SQS to Lambda with AWS Powertools",
-  "description": "This pattern demonstrate how to use SAM template and AWS Powertools to capture X-ray trace.",
+  "title": "AWS X-Ray trace for Amazon SNS to Amazon SQS to AWS Lambda with AWS Powertools",
+  "description": "This pattern demonstrate how to use an AWS SAM template and Powertools for AWS Lambda to capture and propagate Amazon X-Ray trace.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The template deploy two Lambda functions, Producer and Consumer, SNS, SQS. The calling sequence is Lambda Producer -> SNS -> SQS -> Lambda Consumer.",
-      "The whole process flow is captured by X-ray and displayed on Cloudwatch X-ray traces"
+      "The template deploys two Lambda functions, Producer and Consumer, SNS, SQS. The calling sequence is Lambda Producer -> SNS -> SQS -> Lambda Consumer.",
+      "The whole process flow is captured by X-Ray and displayed with Amazon CloudWatch X-ray traces"
     ]
   },
   "gitHub": {
@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-lambda-xray",
       "templateURL": "serverless-patterns/sns-sqs-lambda-xray",
       "projectFolder": "sns-sqs-lambda-xray",
-      "templateFile": "sns-sqs-lambda-xray/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -26,7 +26,7 @@
         "link": "https://docs.powertools.aws.dev/lambda/python/latest/core/tracer/"
       },
       {
-        "text": "Monitor Amazon SNS-based applications end-to-end with AWS X-Ray active tracing",
+        "text": "Monitor Amazon SNS based applications end-to-end with AWS X-Ray active tracing",
         "link": "https://aws.amazon.com/blogs/compute/monitor-amazon-sns-based-applications-end-to-end-with-aws-x-ray-active-tracing/"
       }
     ]
