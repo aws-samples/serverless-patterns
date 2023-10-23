@@ -20,7 +20,7 @@ class CdkApigwMarketplaceMeteringRecordsStack(cdk.Stack):
 
 
         apigw_request_template_customeridentifier = '''{
-            "TableName": "''' + metering_table_name.value_as_string +'''",
+            "TableName": "''' + metering_table_name +'''",
             "Item": {
                 "create_timestamp": {
                     "N": "$context.requestTimeEpoch"
@@ -45,7 +45,7 @@ class CdkApigwMarketplaceMeteringRecordsStack(cdk.Stack):
         }'''
 
         apigw_request_template_batchinserts = '''{
-            "RequestItems": {"''' + metering_table_name.value_as_string + '''": [
+            "RequestItems": {"''' + metering_table_name + '''": [
                     #foreach($buyer in $input.path('$.buyers')){
                         "PutRequest" : {
                             "Item" : {
@@ -77,7 +77,7 @@ class CdkApigwMarketplaceMeteringRecordsStack(cdk.Stack):
         }'''
 
         apigw_request_template_query = '''{
-            "TableName": "''' + metering_table_name.value_as_string +'''",
+            "TableName": "''' + metering_table_name +'''",
             "KeyConditionExpression": "customerIdentifier = :v1",
             "ExpressionAttributeValues": {
                 ":v1": {
@@ -90,7 +90,7 @@ class CdkApigwMarketplaceMeteringRecordsStack(cdk.Stack):
         apigw_policy_dyanmodb = iam.Policy(self, "apigw-policy-for-dyanmodb",
             statements=[iam.PolicyStatement(
                 actions=["dynamodb:PutItem", "dynamodb:List*","dynamodb:BatchWriteItem","dynamodb:Query"],
-                resources=["arn:aws:dynamodb:*:*:table/"+metering_table_name.value_as_string]
+                resources=["arn:aws:dynamodb:*:*:table/"+metering_table_name]
             )]
         )
 # Create an IAM  apigateway execution role.
@@ -147,7 +147,7 @@ class CdkApigwMarketplaceMeteringRecordsStack(cdk.Stack):
 
         apigw.root.add_resource('insertMeteringRecord').add_resource('{customerIdentifier}').add_method('POST',
             apigateway.AwsIntegration(
-                region = aws_region_name.value_as_string,
+                region = aws_region_name,
                 service = 'dynamodb',
                 integration_http_method = 'POST',
                 action = 'PutItem', 
@@ -159,7 +159,7 @@ class CdkApigwMarketplaceMeteringRecordsStack(cdk.Stack):
 # create a resource for batch entry of metered records
         apigw.root.add_resource('insertMeteringRecords').add_method('POST',
             apigateway.AwsIntegration(
-                region = aws_region_name.value_as_string,
+                region = aws_region_name,
                 service = 'dynamodb',
                 integration_http_method = 'POST',
                 action = 'BatchWriteItem', 
@@ -171,7 +171,7 @@ class CdkApigwMarketplaceMeteringRecordsStack(cdk.Stack):
 # create a resource for querying metered records
         apigw.root.add_resource('listMeteringRecords').add_resource('{customerIdentifier}').add_method('GET',
             apigateway.AwsIntegration(
-                region = aws_region_name.value_as_string,
+                region = aws_region_name,
                 service = 'dynamodb',
                 integration_http_method = 'POST',
                 action = 'Query', 

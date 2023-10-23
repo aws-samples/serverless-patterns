@@ -51,6 +51,10 @@ python -m pip install -r requirements.txt
 ```
 python -m pip install aws-cdk.aws-apigateway
 ```
+8. Install DynamoDB module
+```
+python -m pip install aws-cdk.aws_dynamodb
+```
 9. Update 'cdk-apigw-markerplace-metering-records/cdk.context.json' file with your application specific parameters
 ```
 {
