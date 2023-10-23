@@ -1,9 +1,8 @@
-# Amazon Bedrock integration in Lambda (NodeJS Runtime)
+# Amazon Bedrock integration in AWS Lambda (NodeJS Runtime)
 
 This pattern shows how to make use of Amazon Bedrock in a Lambda function with NodeJS runtime.
 
-Learn more about this pattern at Serverless Land Patterns: [https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-lambda-nodejs](https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-lambda-nodejs)
-
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/bedrock-lambda-nodejs](https://serverlessland.com/patterns/bedrock-lambda-nodejs)
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
