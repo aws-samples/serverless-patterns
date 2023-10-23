@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to use Lambda extension Telemetry API to get Lambda log and forward to S3 bucket",
+      "This pattern demonstrates how to use the Lambda extension telemetry API to persist Lambda logs to an S3 bucket",
       "The SAM template deploy Sample Lambda Application, Lambda Extension as Lambda Layer and S3 bucket to store Sample Lambda function's logs. The Lambda Extension use TelemetryAPI together with Extension API to capture Lambda Log and send to S3."
     ]
   },
