@@ -1,6 +1,6 @@
 {
   "title": "Lambda Extension Telemetry API to S3",
-  "description": "Create a Lambda Extension to send Lambda logs to S3",
+  "description": "Create a Lambda extension to send Lambda logs to S3",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
