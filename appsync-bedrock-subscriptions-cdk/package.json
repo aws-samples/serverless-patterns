@@ -29,7 +29,7 @@
     "@smithy/protocol-http": "^3.0.8",
     "@smithy/signature-v4": "^2.0.12",
     "@smithy/util-utf8": "^2.0.0",
-    "aws-cdk-lib": "2.70.0",
+    "aws-cdk-lib": "2.80.0",
     "babel-jest": "^29.7.0",
     "constructs": "^10.0.0",
     "langchain": "^0.0.169"
