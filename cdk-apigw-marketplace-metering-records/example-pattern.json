@@ -12,7 +12,7 @@
       "The following 3 API resources will be created:",
       "1) /insertMeteringRecord/{customerIdentifier}: When seller wants to insert metering records for a partincular buyer.",
       "2) /insertMeteringRecords: When seller wants to upload metering records in bulk.",
-      "3) /listMeteringRecords/{customerIdentifier}: When seller wants to list the status of a specific buyers metering record.",
+      "3) /listMeteringRecords/{customerIdentifier}: When seller wants to list the status of a specific buyers metering record."
     ]
   },
   "gitHub": {
@@ -29,6 +29,11 @@
         "text": "AWS Solutions Construct for aws-apigateway-dynamodb",
         "link": "https://docs.aws.amazon.com/solutions/latest/constructs/aws-apigateway-dynamodb.html"
       },
+      {
+        "text": "AWS Marketplace Seller workshop - QuickStart integration",
+        "link": "https://catalog.workshops.aws/mpseller/en-US/saas/integration-with-quickstart"
+      },
+      
       {
         "text": "AWS Marketplace metering usage",
         "link": "https://docs.aws.amazon.com/marketplace/latest/userguide/metering-for-usage.html"
