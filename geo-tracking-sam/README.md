@@ -1,8 +1,8 @@
 # geo-tracking-sam
 
-# App Location Tracking using AWS Event Bridge, Lambda and DynamoDB
+# App Location Tracking using AWS Location Services, Event Bridge, Lambda and DynamoDB
 
-This pattern shows an example how AWS Location Trackers API can be invoked to trigger an event to send the trackers coordinates to a dynamoDB database deployed using SAM.  
+This pattern shows an example how AWS Location Trackers API for tracker movement can be invoked to trigger an event to send the trackers coordinates to a dynamoDB database deployed using SAM.  
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

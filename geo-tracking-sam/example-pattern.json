@@ -1,0 +1,57 @@
+{
+  "title": "Location Tracking using AWS Location Services, Event Bridge, Lambda and DynamoDB",
+  "description": "Invoking AWS Location Trackers API for tracker movement to trigger an event that send the trackers information including coordinates to a dynamoDB database",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an AWS Location Services Tracker API for position updates from your device that send the trackers coordinates to a dynamoDB database. Trackers offer three position filtering options to help manage costs and reduce jitter in your location updates (Accuracy-based, Distance-based, Time-based). The test event triggers a Lambda function that receives a payload from your location services APP and sends location tracker update via the BatchUpdateDevicePosition API. An Event Bridge rule then listens for the Amazon Location Services API (BatchUpdateDevicePosition) being called via cloudtrail and invokes a another lambda function which calls another Amazon Location API (GetDevicePosition) with the tracker information to get the most recent position and updated the DynamoDB table with the location information."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/geo-tracking-sam",
+      "templateURL": "serverless-patterns/geo-tracking-sam",
+      "projectFolder": "geo-tracking-sam",
+      "templateFile": "geo-tracking-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Start tracking",
+        "link": "https://docs.aws.amazon.com/location/latest/developerguide/start-tracking.html"
+      },
+      {
+        "text": "Reacting to Amazon Location Service events with Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/location/latest/developerguide/location-events.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: aws cloudformation delete-stack --stack-name STACK_NAME."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shyam Sundar",
+      "image": "https://github.com/aws-samples/serverless-patterns/geo-tracking-sam/pic/authorPic.jpeg",
+      "bio": "Sr. Solutions Architect @ AWS",
+      "linkedin": "shyam--sundar",
+      "twitter": ""
+    }
+  ]
+}
