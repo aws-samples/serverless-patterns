@@ -1,13 +1,13 @@
 {
-    "title": "AWS Appsync to Amazon API Gateway (AWS_IAM Auth) to DynamoDB",
-    "description": "Using Appsync GraphQL API to access Amazon API Gateway REST API protected with AWS_IAM auth and integrated with Amazon DynamoDB",
+    "title": "AWS AppSync to Amazon API Gateway (AWS_IAM Auth) to DynamoDB",
+    "description": "Using AppSync GraphQL API to access Amazon API Gateway REST API protected with AWS_IAM auth and integrated with Amazon DynamoDB",
     "language": "YAML",
     "level": "200",
     "framework": "SAM",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This pattern deploys an AWS Appsync GraphQL API which acts as a front door to Amazon API Gateway REST API protected with AWS_IAM authentication. The REST API Gateway is directly integrated with Amazon DynamoDB table and has capability to read/create/update/delete restaurant data in the table"
+        "This pattern deploys an AWS AppSync GraphQL API which acts as a front door to Amazon API Gateway REST API protected with AWS_IAM authentication. The REST API Gateway is directly integrated with Amazon DynamoDB table and has capability to read/create/update/delete restaurant data in the table"
       ]
     },
     "gitHub": {
