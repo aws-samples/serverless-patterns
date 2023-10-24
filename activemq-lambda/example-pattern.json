@@ -1,6 +1,6 @@
 {
   "title": "ActiveMQ to Lambda",
-  "description": "Create ActiveMQ Broker and Lambda with ActiveMQ as Event Source",
+  "description": "Establish an ActiveMQ Broker and configure a Lambda function with ActiveMQ as its event source",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
