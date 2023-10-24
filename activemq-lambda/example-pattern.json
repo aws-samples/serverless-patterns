@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This template deploy new ActiveMQ Broker and use it as event source for AWS Lambda.",
+      "This template deploys a new ActiveMQ Broker and uses it as an event source for AWS Lambda. The Lambda function employs the OpenWire protocol to establish a connection with ActiveMQ.",
       "Lambda uses Openwire protocol to connect with ActiveMQ"
     ]
   },
