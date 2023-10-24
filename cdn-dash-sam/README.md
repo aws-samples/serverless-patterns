@@ -2,7 +2,7 @@
 
 This pattern deploys Amazon Eventbridge rule and a AWS Lambda function that creates custom metrics in Amazon CloudWatch for the API mappings of the custom domain names that are present in the region.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-custom-metrics
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
