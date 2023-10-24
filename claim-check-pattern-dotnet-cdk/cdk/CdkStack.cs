@@ -1,11 +1,8 @@
 using System.Collections.Generic;
 using Amazon.CDK;
-using Amazon.CDK.AWS.APIGateway;
-using Amazon.CDK.AWS.Apigatewayv2;
 using Amazon.CDK.AWS.DynamoDB;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.Lambda;
-using AssetOptions = Amazon.CDK.AWS.S3.Assets.AssetOptions;
 using Constructs;
 using Amazon.CDK.AWS.Events;
 using Amazon.CDK.AWS.SQS;
@@ -29,7 +26,6 @@ namespace Cdk
             var claimCheckApplicationBus=createEventBus();
             createRules(claimCheckApplicationBus, queues.SampleProcessorInputQueue);
             createPipes(queues.SampleProcessorInputQueue, queues.SampleDataWriteQueue, claimCheckApplicationBus, targetWorkflow, functions.ClaimCheckRetrievalLambda, functions.ClaimCheckSplitLambda);
-            //createAPIs(lambdaFunction);
         }
 
         private StateMachine createWorkflow()
@@ -235,51 +231,13 @@ namespace Cdk
 
         private Table createTable()
         {            
-            /*var dynamoDbTable = new Table(this, "tableA", new TableProps()
-            {
-                BillingMode = BillingMode.PAY_PER_REQUEST,
-                TableName = "tableA",
-                PartitionKey = new Attribute()
-                {
-                    Name = "PK",
-                    Type = AttributeType.STRING
-                },
-                SortKey = new Attribute()
-                {
-                    Name = "SK",
-                    Type = AttributeType.STRING
-                }
-            });
-            dynamoDbTable.GrantReadWriteData(lambdaFunctionRoleA);*/
-            
             var claimCheckTable = new Table(this, tableName, new TableProps {
                 BillingMode = BillingMode.PAY_PER_REQUEST,
                 TableName = tableName,
                 PartitionKey=new Attribute { Name= "id", Type= AttributeType.STRING },
-                PointInTimeRecovery= true,
                 RemovalPolicy= RemovalPolicy.DESTROY
             });
             return claimCheckTable;
         }
-
-        private void createAPIs(Function lambdaFunction)
-        {
-            var apiGateway = new RestApi(this, "CdkApi", new RestApiProps()
-            {
-                RestApiName = "CdkApi"
-            });
-
-            var apiGatewayIntegrationRole = new Role(this, "ApiGatewayIntegrationRole", new RoleProps() {
-                AssumedBy = new ServicePrincipal("apigateway.amazonaws.com"),
-            });
-
-            apiGateway.Root.AddMethod("ANY");
-            
-            var postResource = apiGateway.Root.AddResource("create");
-            postResource.AddMethod("POST", new LambdaIntegration(lambdaFunction));
-
-            lambdaFunction.GrantInvoke(apiGatewayIntegrationRole);
-        }
-
     }
 }
