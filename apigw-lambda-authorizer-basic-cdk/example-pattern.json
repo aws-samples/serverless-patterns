@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-authorizer-basic-cdk",
       "templateURL": "serverless-patterns/apigw-lambda-authorizer-basic-cdk",
       "projectFolder": "apigw-lambda-authorizer-basic-cdk",
-      "templateFile": "apigw-lambda-authorizer-basic-cdk/lib/basic-authorizer-construct.js"
+      "templateFile": "lib/basic-authorizer-construct.js"
     }
   },
   "resources": {
