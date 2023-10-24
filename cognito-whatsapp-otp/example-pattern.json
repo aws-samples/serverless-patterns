@@ -1,0 +1,68 @@
+{
+  "title": "How to use WhatsApp to send Amazon Cognito notification messages",
+  "description": "This pattern provides guidance on how to use an Amazon Cognito Userpool's custom SMS sender Lambda trigger to send OTP messages on WhatsApp",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "By default, Amazon Cognito uses Amazon Simple Notification Service (Amazon SNS) for delivery of SMS text messages.",
+      "This can be changed with the help of custom SMS sender Lambda trigger. When you assign a custom SMS sender trigger to your user pool, Amazon Cognito invokes a Lambda function instead of its default behavior when a user event requires that it send an SMS message. ",
+      "The AWS Lambda function can then send SMS notifications to your users through a method and provider that you choose. This pattern will provide guidance on how to use custom sender lambda triggers to send OTP messages on WhatsApp."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-whatsapp-otp",
+      "templateURL": "serverless-patterns/cognito-whatsapp-otp",
+      "projectFolder": "cognito-whatsapp-otp",
+      "templateFile": "cognito-whatsapp-otp/lib/whatsapp_otp-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Cognito User Pools",
+        "link": "https://aws.amazon.com/cognito/"
+      },
+      {
+        "text": "Custom SMS sender AWS Lambda trigger",
+        "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-sms-sender.html"
+      },
+      {
+        "text": "AWS Secrets Manager",
+        "link": "https://aws.amazon.com/secrets-manager/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nideesh KT",
+      "image": "https://drive.google.com/file/d/1leKzwJxa7Voandp1MhO_mzKdr-73GK4t/view",
+      "bio": "Nideesh is a Senior Cloud Support Engineer at AWS.",
+      "linkedin": "https://www.linkedin.com/in/nideesh-k-t-ab4250124/"
+    },
+    {
+      "name": "Reethi Joseph",
+      "image": "lhttps://drive.google.com/file/d/1fthW0WuTMx8dKt3EPoh6NHFdj-jBrtvf/view",
+      "bio": "Reethi is a Senior Cloud Support Engineer at AWS.",
+      "linkedin": "https://www.linkedin.com/in/reethi-joseph/"
+    }
+  ]
+}
