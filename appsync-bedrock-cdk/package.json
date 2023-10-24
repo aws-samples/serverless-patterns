@@ -5,6 +5,7 @@
     "backend": "bin/backend.js"
   },
   "scripts": {
+    "deploy": "cdk deploy --outputs-file ./cdk-outputs.json",
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",

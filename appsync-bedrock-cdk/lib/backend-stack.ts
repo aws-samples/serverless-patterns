@@ -9,7 +9,7 @@ export class BackendStack extends cdk.Stack {
 
     const api = new GraphqlApi(this, 'Api', {
       name: 'AppsyncBedrockApi',
-      schema: SchemaFile.fromAsset("src/api/schema.gql"),
+      schema: SchemaFile.fromAsset("src/schema.gql"),
       authorizationConfig: {
         defaultAuthorization: {
           authorizationType: AuthorizationType.API_KEY
@@ -30,8 +30,8 @@ export class BackendStack extends cdk.Stack {
     })
 
     bedrockDataSource.grantPrincipal.addToPrincipalPolicy(new PolicyStatement({
-      actions: ["bedrock:*"],
-      resources: ["*"]
+      resources: [`arn:aws:bedrock:${this.region}::foundation-model/anthropic.claude-v2`],
+      actions: ["bedrock:*"]
     }))
 
     const invokeModelFunction = new AppsyncFunction(this, 'InvokeModelFunction', {
@@ -39,10 +39,11 @@ export class BackendStack extends cdk.Stack {
       dataSource: bedrockDataSource,
       name: 'invokeModelFunction',
       runtime: FunctionRuntime.JS_1_0_0,
-      code: Code.fromAsset("src/api/mappings/Mutation.invokeModel.js")
+      code: Code.fromAsset("src/Mutation.invoke.js")
     })
 
 
+    // Optional: Extend resolver with new functions
     const invokeResolver = new Resolver(this, "InvokeResolver", {
       api: api,
       typeName: 'Mutation',

@@ -1,24 +1,42 @@
-import { Amplify, API, graphqlOperation } from 'aws-amplify';
-import { GraphQLQuery } from '@aws-amplify/api';
-import { InvokeMutation } from '../src/API';
-import * as mutations from '../src/graphql/mutations';
+import { AppSyncRequestApiKey, GraphQLResult } from "../src/appsyncRequest"
+import { readFileSync } from "fs"
+let APPSYNC_URL = ""
+let APPSYNC_API_KEY = ""
+let REGION = ""
 
-Amplify.configure({
-    aws_appsync_graphqlEndpoint:
-    '<GraphQLApiURL>',
-    aws_appsync_region: '<Region>',
-    aws_appsync_authenticationType: 'API_KEY',
-    aws_appsync_apiKey: '<GraphQLApiKey>'
-})
+beforeAll(() => {
+    const file = readFileSync("cdk-outputs.json");
+    const data = JSON.parse(file.toString())
+    APPSYNC_URL = data.BackendStack.GraphQLApiURL
+    APPSYNC_API_KEY = data.BackendStack.GraphQLApiKey
+    REGION = data.BackendStack.Region
+  });
 
-// After the deployment of the stack, you should be able to retrieve the output from Bedrock invocations
-test('Bedrock Model invoked', async () => {
+describe('Bedrock Model invoked', () => {
+    test("The user is able to perform the ask mutation with the API_KEY", async() => {
+        const mutationPromise = await AppSyncRequestApiKey({
+            config: {
+                url: APPSYNC_URL,
+                region: REGION,
+                key: APPSYNC_API_KEY
+            },
+            operation: {
+                operationName: "MyMutation",
+                query: `mutation MyMutation($prompt: String!) {
+                    invoke(prompt: $prompt)
+                }`,
+                variables: {
+                    prompt: 'What is the capital of France?'
+                }
+            }
+        }) as GraphQLResult<{invoke: {completion: string}}>
+    
+        console.log(mutationPromise)
+        if (mutationPromise?.data) {
+            expect(mutationPromise.data.invoke).toBeTruthy()
+        } else {
+            throw new Error("No data returned")
+        }
+    });
 
-    const mutation = await API.graphql<GraphQLQuery<InvokeMutation>>({
-        query: mutations.invoke,
-        variables: { prompt: 'What is the capital of France?' }
-    }
-    )
-
-    expect(mutation.data?.invoke).toBeDefined()
 })
