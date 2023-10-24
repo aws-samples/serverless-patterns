@@ -33,7 +33,7 @@
   },
   "deploy": {
     "text": [
-      "cdk deploy"
+      "npm run deploy"
     ]
   },
   "testing": {
