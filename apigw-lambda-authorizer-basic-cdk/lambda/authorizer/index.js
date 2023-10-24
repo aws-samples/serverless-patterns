@@ -12,7 +12,7 @@ exports.handler = async (event) => {
         const isUserAuthorizer = (retrievedPassword && retrievedPassword === credentials.password) ? 'Allow': 'Deny';
         const iamPolicy = generatePolicy(credentials.username, isUserAuthorizer, event.methodArn);
 
-        console.log(JSON.stringify(iamPolicy, null, 2));
+        
 
         return iamPolicy;
     } catch (error) {
