@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Using a Lambda Authorizer the credentials provided in the Authorization header are decoded using Base64 and verified in a mock database."
+      "The Lambda authorizer decodes the credentials provided in the Authorization header. If matched in the mock database a policy is returned giving permissions to invoke the downstream Lambda function. If the user is not found a policy is returned denying access to the downstream Lambda function."
     ]
   },
   "gitHub": {
