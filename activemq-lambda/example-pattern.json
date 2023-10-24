@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/activemq-lambda",
       "templateURL": "serverless-patterns/activemq-lambda",
       "projectFolder": "activemq-lambda",
-      "templateFile": "activemq-lambda/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
