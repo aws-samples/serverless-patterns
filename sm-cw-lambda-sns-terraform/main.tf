@@ -73,6 +73,12 @@ resource "aws_sns_topic_subscription" "sns_topic_subscription" {
   endpoint  = var.SNSEndpoint
 }
 
+resource "aws_cloudwatch_event_target" "sns_target" {
+  rule      = aws_cloudwatch_event_rule.event_rule.name
+  target_id = "sns_target"
+  arn       = aws_sns_topic.sns_topic.arn
+}
+
 output "MySnsTopicName" {
   description = "SNS topic name"
   value       = aws_sns_topic.sns_topic.name
