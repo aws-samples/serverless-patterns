@@ -1,16 +1,206 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Service to Service description
+Description: Cognito to API Gateway to Lambda to IOT
 
-# Comment on each global 
-Globals:
+Parameters:
+  IOTEndpoint:
+    Type: String
+  IOTTopic:
+    Type: String
 
-
-# Comment each resource section to explain usage
 Resources:
+  ##########################################################################
+  #   API Gateway                                                    #
+  ##########################################################################
 
+  AppApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: apigw-rest-api-http-integration
+      Description: REST API Integration with SQS, Lamda, IOT
 
-# List all common outputs for usage
+  # POST Method with HTTP integration
+  RootMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref AppApi
+      ResourceId: !GetAtt AppApi.RootResourceId
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Credentials: !GetAtt APISQSGatewayRole.Arn
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - StatusCode: "200"
+        PassthroughBehavior: NEVER
+        RequestParameters:
+          integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+        RequestTemplates:
+          application/json: Action=SendMessage&MessageBody=$input.body
+        Type: AWS
+        Uri: !Join
+          - ""
+          - - "arn:aws:apigateway:"
+            - !Ref "AWS::Region"
+            - :sqs:path/
+            - !Ref "AWS::AccountId"
+            - /
+            - !Sub ${MySqsQueue.QueueName}
+      MethodResponses:
+        - ResponseModels:
+            application/json: Empty
+          StatusCode: "200"
+  Deployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - RootMethodGet
+    Properties:
+      RestApiId: !Ref AppApi
+
+  Stage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: Prod
+      RestApiId: !Ref AppApi
+      DeploymentId: !Ref Deployment
+
+  ##########################################################################
+  #   SQS Queue                                                    #
+  ##########################################################################
+
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+
+  OrderServiceQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref MySqsQueue
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: order-api-send-msg-sqs
+            Effect: Allow
+            Principal:
+              Service: "apigateway.amazonaws.com"
+            Action:
+              - SQS:SendMessage
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:DescribeLogGroups
+              - logs:DescribeLogStreams
+              - logs:PutLogEvents
+              - logs:GetLogEvents
+              - logs:FilterLogEvents
+            Resource: !GetAtt MySqsQueue.Arn
+
+  ##########################################################################
+  #   Lambda publish                                                    #
+  ##########################################################################
+  iotpublish:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      FunctionName: iotpush
+      Description: Lambda to push message to IOT topic
+      Runtime: python3.9
+      Timeout: 10
+      MemorySize: 128
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          IOT_DATA_ENDPOINT: !Ref IOTEndpoint
+          IOT_TOPIC: !Ref IOTTopic
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MySqsQueue.Arn
+            BatchSize: 10
+
+  ##########################################################################
+  #   Roles                                                                #
+  ##########################################################################
+
+  LambdaExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: CustomPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "iot:*"
+                  - "iotjobsdata:*"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "sqs:*"
+                Resource: "*"
+
+  APISQSGatewayRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: ApiGatewayLogsPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                  - logs:GetLogEvents
+                  - logs:FilterLogEvents
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "iot:*"
+                  - "iotjobsdata:*"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "sqs:*"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "kms:Decrypt"
+                  - "kms:GenerateDataKey"
+                  - "kms:Encrypt"
+                Resource: "*"
+
 Outputs:
-
-
+  # API Gateway endpoint to be used during tests
+  AppApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
