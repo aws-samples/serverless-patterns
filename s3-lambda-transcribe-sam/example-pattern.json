@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern contains a sample AWS Serverless Application Model (SAM) template that deploys a Lambda Function with an S3 object created trigger to start an Amazon Transcribe job and place the transcription results in another S3 bucket.",
+      "This pattern contains a Lambda Function with an S3 object trigger to start an Amazon Transcribe job and place the transcription results into a seperate S3 bucket.",
       "This pattern deploys one Lambda Function and two S3 Buckets."
     ]
   },
