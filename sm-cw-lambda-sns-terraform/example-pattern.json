@@ -1,5 +1,5 @@
 {
-  "title": "AWS Secrets Manager to CloudWatch Events to Lambda to SNS",
+  "title": "AWS Secrets Manager to CloudWatch Events to SNS",
   "description": "An terraform template that detects and notifies on Amazon Secrets Manager secret key creation, Updation and deletion using Amazon CloudWatch event and Amazon SNS",
   "language": "YAML",
   "level": "200",
