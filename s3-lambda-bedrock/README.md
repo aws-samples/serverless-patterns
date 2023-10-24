@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# S3 to Lambda to Bedrock Embeddings
 
 This pattern explains how to deploy a SAM application with Amazon S3, AWS Lambda and Amazon Bedrock.
 
