@@ -4,7 +4,7 @@ This pattern contains a sample AWS Serverless Application Model (SAM) template t
 
 This pattern deploys one Lambda Function and two S3 buckets.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-lambda-transcribe-sam](https://serverlessland.com/patterns/s3-lambda-transcribe-sam)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
