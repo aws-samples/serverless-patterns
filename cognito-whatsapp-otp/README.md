@@ -84,18 +84,17 @@ cdk deploy
 
 ## How it works
 
-This pattern creates an AWS Lambda function
+This pattern creates an AWS Lambda function which is the custom sms sender Lambda that gets triggered when notification messages are to be sent from Amazon Cognito. The AWS Lambda makes the API call to send the message through WhatsApp. 
 
-Steps involved in this pattern:
+These are the steps involved in this pattern:
 
 1. User signs up in Amazon Cognito Userpool
 2. Amazon Cognito invokes custom SMS sender AWS Lambda function. Amazon Cognito sends user attributes, including the phone number, and the one-time code(encrypted secrets) to your Lambda function 
-3. The AWS Lambda obtains the WhatsApp access token from the AWS Secrets Manager.  AWS Lambda also parses phone number, user attributes and encrypted secrets. 
-4. AWS Lambda decrypts the secret and performs a POST API call to the WhatsApp API.
-5. The WhatsApp message gets delivered to the customer.
+3. The AWS Lambda decrypts the on time code by making the Decrypt API call to the AWS KMS Key
+4. AWS Lambda obtains the WhatsApp access token from the AWS Secrets Manager.  AWS Lambda also parses phone number, user attributes and encrypted secrets. 
+5. AWS Lambda sends a POST API call to the WhatsApp API and the WhatsApp message gets delivered to the customer.
 
-
-[Image: image.png]
+<img src="./images/architecture-diagram.jpg" width="100%"/>
 
 
 ## **Testing** 
