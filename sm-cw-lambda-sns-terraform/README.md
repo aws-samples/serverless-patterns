@@ -1,4 +1,4 @@
-# AWS Secrets Manager to CloudWatch Events to Lambda to SNS
+# AWS Secrets Manager to CloudWatch Events to SNS
 
 This pattern contains a terraform template to detect and notify on Amazon Secrets Manager Secret Key Creation, Updation and Deletion using Amazon CloudWatch event and Amazon SNS.
 
@@ -66,6 +66,8 @@ Log into the AWS Console, browse to AWS IoT Core:
     ```bash
     terraform show
     ```
+
 ----
 Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved. 
+
 SPDX-License-Identifier: MIT-0
