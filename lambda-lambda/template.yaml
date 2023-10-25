@@ -9,7 +9,7 @@ Resources:
     Properties:
       CodeUri: ProducerFunction/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 3
       EventInvokeConfig:
         DestinationConfig:
@@ -25,7 +25,7 @@ Resources:
     Properties:
       CodeUri: OnFailureFunction/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 3
   OnSuccessFunction:
     Type: AWS::Serverless::Function
@@ -33,7 +33,7 @@ Resources:
     Properties:
       CodeUri: OnSuccessFunction/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 3
 Outputs:
   ProducerFunctionName:

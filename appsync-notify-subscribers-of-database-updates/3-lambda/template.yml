@@ -5,7 +5,7 @@ Description: Notify subscribers of database updates
 Globals:
   Function:
     CodeUri: src/
-    Runtime: nodejs12.x
+    Runtime: nodejs16.x
     Timeout: 10
     MemorySize: 128
     Layers:
@@ -39,7 +39,7 @@ Resources:
       # delete old version of layer
       RetentionPolicy: Delete
     Metadata:
-      BuildMethod: nodejs12.x
+      BuildMethod: nodejs16.x
 
   AppSyncLambdaUseIAM:
     Type: 'AWS::Serverless::Function'

@@ -19,7 +19,7 @@ module "lambda_function" {
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
   handler       = "app.handler"
-  runtime       = "nodejs12.x"
+  runtime       = "nodejs16.x"
   publish       = true
 
   architectures = ["arm64"] # Set to "arm64" if you are running this from ARM, else use "x86_64"
