@@ -1,40 +1,36 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "title": "API Gateway REST API to SQS",
+  "description": "API Gateway REST API Integration to SQS",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
+      "An API Gateway REST API is created with integration to Amazon SQS. ",
+      "A HTTP Request to API Gateway POST method will create a message with the request body to SQS"
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sqs-rest",
+      "templateURL": "serverless-patterns/apigw-sqs-rest",
+      "projectFolder": "apigw-sqs-rest",
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
-      },
-      {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Amazon API Gateway - Rest API to AWS Services",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam build",
+      "sam deploy --guided"
     ]
   },
   "testing": {
@@ -49,11 +45,11 @@
   },
   "authors": [
     {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
+      "name": "Abdul Waheed",
+      "image": "https://avatars.githubusercontent.com/u/15647692?v=4",
+      "bio": "Solutions Architect @ AWS",
       "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "twitter": "waheed2"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # AWS Service 1 to AWS Service 2
 
-This pattern << explain usage >>
+This pattern creates an Amazon API Gateway REST API with a send route that send message to a SQS queue. 
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -21,10 +21,11 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd apigw-sqs-rest
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
+    sam build
     sam deploy --guided
     ```
 1. During the prompts:
@@ -38,22 +39,26 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+The API Gateway handles the incoming API requests and send the $request.body.MessageBody as a message to SQS queue. 
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+1. Copy the API Endpoint from SAM Deploy output
+ex: https://********.<region>.amazonaws.com/Prod 
+
+2. Send a post request to the API Endpoint with sample JSON body
+ex:
+{
+  "type": "API Request",
+  "message": "sample message from API Gateway"
+}
+
+3. Copy the SQS Queue name from the deploy output and check the message received in the SQS queue
 
 ## Cleanup
  
 1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
+    sam delete
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
