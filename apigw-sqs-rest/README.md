@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# AWS API Gateway (REST API) to SQS
 
 This pattern creates an Amazon API Gateway REST API with a send route that send message to a SQS queue. 
 
