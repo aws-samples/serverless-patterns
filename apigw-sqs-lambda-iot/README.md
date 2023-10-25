@@ -1,10 +1,17 @@
-# AWS Service 1 to AWS Service 2
+# Amazon API Gateway (REST API) to Amazon SQS to AWS Lambda to AWS IOT 
 
-This pattern << explain usage >>
+This pattern explains how to deploy a SAM application with  Amazon API Gateway (REST API), Amazon SQS, AWS Lambda and AWS IOT
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+This pattern is useful to accept and respond to requests quickly but offloading the processing as asynchronous process. Once the request is placed in SQS, API gateway responds back to the caller immediately without waiting for those messages to be processed.
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+When an HTTP POST request is made to the Amazon API Gateway endpoint, request payload is sent to Amazon Simple Queue Service. AWS Lambda function consumes event from the Queue and post the event/payload as MQTT message to AWS IoT Topic. 
+
+Key Benefits:
+
+Operations: AWS services used in this pattern can scale easily and quickly based on incoming traffic.
+Security: The APIs created with Amazon API Gateway expose HTTPS endpoints only.
+Cost: Pay only for what you use. No minimum fee.
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
@@ -21,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd apigw-sqs-lambda-iot
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -37,23 +44,33 @@ Important: this application uses various AWS services and there are costs associ
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
-
-Explain how the service interaction works.
+The API Gateway handles the incoming API requests and send the $request.body.MessageBody as a message to SQS queue. The Lambda fucntion consumes the message from the SQS queue and extracts the topic from the request. Post the message in request body to the IOT topic on the topic name in request.
+ 
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+1. Go to AWS IOT Core Console -> Create MQTT Test Client -> Subscribe to a topic "MyTopic"
+
+2. Copy the API gateway endpoint to send request from deploy output
+    ex: https://********..amazonaws.com/Prod
+
+5. Create a JSON Request 
+    ex: {
+            "topic": "devicenewitem",
+            "message": "sample message from input"
+        }
+
+6. Make a HTTP post request to the endpoint captured using a REST client like postman
+
+7. You should get a 200 Success SendMessageResponse. You can check the MQTT Test client showing the request you passed to a dynamic client
 
 ## Cleanup
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
+
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
