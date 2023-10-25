@@ -1,10 +1,10 @@
-# Amazon API Gateway REST API to Lambda to Bedrock
+# Amazon API Gateway REST API to SQS to Lambda to Bedrock
 
 This pattern creates an Amazon API Gateway REST API, Amazon SQS queue and an AWS Lambda function that makes a call to a model in Amazon Bedrock.
 
 Learn more about this pattern at Serverless Land Patterns: http://serverlessland.com/patterns/apigw-rest-api-sqs-lambda-bedrock-cdk.
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example. 
+Important: This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example. 
 
 ## Requirements
 

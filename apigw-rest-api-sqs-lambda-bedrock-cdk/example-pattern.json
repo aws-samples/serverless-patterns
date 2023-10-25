@@ -1,13 +1,13 @@
 {
   "title": "API Gateway REST API to SQS to Lambda to Bedrock",
-  "description": "Queries a model in Bedrock through API Gateway and Lambda by asynchrnously sending messages through SQS",
+  "description": "This pattern invokes a model in Amazon Bedrock through API Gateway and Lambda by asynchrnously sending messages through SQS",
   "language": "Python",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon SQS queue. AWS Lambda function consumes the messages from the SQS, calls a model in Amazon Bedrock"
+      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon SQS queue. AWS Lambda function consumes the messages from the SQS, calls a model in Amazon Bedrock."
     ]
   },
   "gitHub": {
