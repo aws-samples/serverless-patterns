@@ -7,7 +7,7 @@
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This pattern creates an Amazon API Gateway REST API and Amazon Eventbridge with CDK in Python."
+        "This pattern creates an Amazon API gateway REST API endpoint. The endpoint uses service integrations to directly connect to Amazon EventBridge."
       ]
     },
     "gitHub": {
