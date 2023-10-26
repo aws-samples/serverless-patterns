@@ -1,0 +1,62 @@
+{
+    "title": "API Gateway REST API to Amazon EventBridge",
+    "description": "This pattern creates an Amazon API Gateway REST API and Amazon Eventbridge with CDK in Python.",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern creates an Amazon API Gateway REST API and Amazon Eventbridge with CDK in Python."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-eventbridge-cdk",
+        "templateURL": "serverless-patterns/apigw-rest-api-sqs-lambda-bedrock-cd",
+        "projectFolder": "apigw-rest-api-eventbridge-cdk",
+        "templateFile": "apigw-rest-api-eventbridge-cdk/cdk/app.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Build an API Gateway REST API with AWS integration",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html"
+        },
+        {
+          "text": "Amazon EventBridge",
+          "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+        },
+        {
+          "text": "Amazon EventBridge PutEvents",
+          "link": "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html"
+        }
+  
+      ]
+    },
+  
+    "deploy": {
+      "text": [
+        "cd cdk",
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Patrick Meiler",
+        "bio": "Solutions Architect, AWS",
+        "linkedin": "https://www.linkedin.com/in/patrickmeiler"
+      }
+    ]
+  }
