@@ -41,7 +41,6 @@ Important: this application uses various AWS services and there are costs associ
 1. In the terraform output, you can see `alb_url`. When you access the url, you should see the response "Default Response from ALB" from Lambda.
 2. To access the path based route from the ALB, Access `alb_url`/api/service1, you should see "Hello from Service1!!!!" and `alb_url`/api/service1, you should see ""Hello from Service2!!!!"
 
-** Please note: Application Load Balancer's default settings for health check are 5 consecutive health check successes with 35 seconds interval. So, it will take couple of minutes for the target to be healthy.
 
 ## Cleanup
  
