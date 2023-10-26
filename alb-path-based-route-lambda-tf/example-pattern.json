@@ -1,0 +1,60 @@
+{
+  "title": "ALB(path-based-route) to Lambda",
+  "description": "Create an Application Load Balancer with path-based routing with target as AWS Lambda",
+  "language": "HCL",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to create an Application Load Balancer with path-based routing along with associated Listener and Target as AWS Lambda. Implemented in Terraform."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-path-based-route-lambda-tf",
+      "templateURL": "serverless-patterns/alb-path-based-route-lambda-tf",
+      "projectFolder": "alb-path-based-route-lambda-tf",
+      "templateFile": "alb-path-based-route-lambda-tf/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/lambda-functions.html"
+      },
+      {
+        "text": "ALB path-based routing",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform apply --auto-approve"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the resource: terraform destroy --auto-approve."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pushparaju Thangavel",
+      "image": "./Pushparaju.jpeg",
+      "bio": "Pushparaju is a Cloud Infrastructure Architect with Amazon Web Services",
+      "linkedin": "https://www.linkedin.com/in/pushparaju-thangavel/"
+    }
+  ]
+}
