@@ -45,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Cleanup
  
-1. To delete the stack, run:
+1. To delete the resources, run:
     ```bash
     terraform destroy --auto-approve
     ```
