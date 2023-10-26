@@ -1,20 +1,3 @@
-# Required providers configuration
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~>4.52.0"
-    }
-  }
-
-  required_version = "~> 1.0"
-}
-
-# AWS provider configuration
-provider "aws" {
-  profile = "default"
-  region = "us-east-1"
-}
 
 # Create AWS VPC 
 resource "aws_vpc" "vpc" {
@@ -71,6 +54,9 @@ resource "aws_route_table_association" "public_rt_table_b" {
 # Create an Internet Gateway
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.vpc.id
+  tags = {
+    "Name" = "example-igw"
+  }
 }
 
 # Create IAM Role for Lambda Function
@@ -150,36 +136,94 @@ resource "aws_lb" "load_balancer" {
   }
 }
 
-# Create the ALB listener with the target group.
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_lb.load_balancer.arn
-  port              = 80
-  protocol          = "HTTP"
-  default_action {
-    type             = "forward"
-    target_group_arn = "${aws_lb_target_group.target_group.arn}"
-  }
-}
-
-# Create the ALB target group for Lambda
-resource "aws_lb_target_group" "target_group" {
-  name     = "myLoadBalancerTargets"
+# Create target groups for different services
+resource "aws_lb_target_group" "service1" {
+  name        = "service1-target-group"
   target_type = "lambda"
   vpc_id   = aws_vpc.vpc.id
 }
 
-# Attach the ALB target group to the Lambda Function
-resource "aws_lb_target_group_attachment" "target_group_attachment" {
-  target_group_arn = aws_lb_target_group.target_group.arn
-  target_id        = aws_lambda_function.lambda_function.arn
+resource "aws_lb_target_group" "service2" {
+  name        = "service2-target-group"
+  target_type = "lambda"
+  vpc_id   = aws_vpc.vpc.id
+}
+
+resource "aws_alb_target_group_attachment" "service1_attachment" {
+  depends_on       = [aws_lb.load_balancer]
+  target_group_arn = aws_lb_target_group.service1.arn
+  target_id        = aws_lambda_function.lambda_function1.arn
+}
+
+resource "aws_alb_target_group_attachment" "service2_attachment" {
+  depends_on       = [aws_lb.load_balancer]
+  target_group_arn = aws_lb_target_group.service2.arn
+  target_id        = aws_lambda_function.lambda_function2.arn
+}
+
+# Define ALB listeners and path-based routing
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.load_balancer.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "200"
+      message_body = "Default Response from ALB"
+    }
+  }
+}
+# Define path-based routing rules
+resource "aws_lb_listener_rule" "example_rule1" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 100
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.service1.arn
+  }
+  condition {
+    path_pattern {
+      values = ["/api/service1*"]
+    }
+  }
+
+}
+resource "aws_lb_listener_rule" "example_rule2" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 101
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.service2.arn
+  }
+  condition {
+    path_pattern {
+      values = ["/api/service2*"]
+    }
+  }
 }
 
 # Create the Lambda Function
-resource "aws_lambda_function" "lambda_function" {
-  function_name = "lambdaFunction"
+resource "aws_lambda_function" "lambda_function1" {
+  function_name = "lambdaFunction-service1"
   runtime       = "nodejs14.x"
   handler       = "index.handler"
-  filename      = "lambda.zip"
+  filename      = "Lambda1.zip"
+  role          = aws_iam_role.lambda_role.arn
+  depends_on    = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+  tags = {
+    Name = "lambdaFunction"
+  }
+}
+
+# Create the Lambda Function
+resource "aws_lambda_function" "lambda_function2" {
+  function_name = "lambdaFunction-service2"
+  runtime       = "nodejs14.x"
+  handler       = "index.handler"
+  filename      = "Lambda2.zip"
   role          = aws_iam_role.lambda_role.arn
   depends_on    = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
   tags = {
@@ -188,10 +232,19 @@ resource "aws_lambda_function" "lambda_function" {
 }
 
 # Allow the application load balancer to access Lambda Function
-resource "aws_lambda_permission" "with_lb" {
+resource "aws_lambda_permission" "with_lb_function1" {
   statement_id  = "AllowExecutionFromlb"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_function.arn
+  function_name = aws_lambda_function.lambda_function1.arn
   principal     = "elasticloadbalancing.amazonaws.com"
-  source_arn    = aws_lb_target_group.target_group.arn
+  source_arn    = aws_lb_target_group.service1.arn
+}
+
+# Allow the application load balancer to access Lambda Function
+resource "aws_lambda_permission" "with_lb_function2" {
+  statement_id  = "AllowExecutionFromlb"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_function2.arn
+  principal     = "elasticloadbalancing.amazonaws.com"
+  source_arn    = aws_lb_target_group.service2.arn
 }

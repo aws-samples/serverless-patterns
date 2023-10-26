@@ -1,8 +1,8 @@
-# Application Load balancer with AWS Lambda as target with Terraform
+# Application Load balancer with path-based routing and target as AWS Lambda in Terraform
 
-This pattern demonstrates how to create an Application Load Balancer with AWS Lambda as target. Implemented in Terraform.
+This pattern demonstrates how to create an Application Load Balancer with path-based routing along with associated Listener and Target as AWS Lambda. Implemented in Terraform.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/alb-lambda-terraform
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/alb-path-based-route-lambda-tf
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd alb-lambda-terraform
+    cd alb-path-based-route-lambda-tf
     ```
 3. From the command line, run:
     ```
@@ -38,7 +38,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-1. In the stack output, you can see `alb_url`. When you access the url, you should see the response "Hello World" from Lambda.
+1. In the terraform output, you can see `alb_url`. When you access the url, you should see the response "Default Response from ALB" from Lambda.
+2. To access the path based route from the ALB, Access `alb_url`/api/service1, you should see "Hello from Service1!!!!" and `alb_url`/api/service1, you should see ""Hello from Service2!!!!"
 
 ** Please note: Application Load Balancer's default settings for health check are 5 consecutive health check successes with 35 seconds interval. So, it will take couple of minutes for the target to be healthy.
 
