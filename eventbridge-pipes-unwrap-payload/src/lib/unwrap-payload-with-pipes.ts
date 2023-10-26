@@ -101,25 +101,16 @@ export class UnwrapStack extends Stack {
           },
           resultPath: '$.unwrappedAlreadyStringifiedContent',
         }))
-        .next(new Pass(this, 'MergePayload', {
-          parameters: {
-            body: JsonPath.jsonMerge(
-              JsonPath.objectAt("$.body"),
-              JsonPath.objectAt("$.unwrappedPayload"),
-            ),
-          },
-          resultPath: '$.mergedPayload',
-        }))
         .next(new Pass(this, 'MergeAlreadyStringifiedContent', {
           parameters: {
             payload: JsonPath.jsonMerge(
-              JsonPath.objectAt("$.mergedPayload.body.payload"),
+              JsonPath.objectAt("$.unwrappedPayload.payload"),
               JsonPath.objectAt("$.unwrappedAlreadyStringifiedContent")
             ),
           },
           resultPath: '$.mergedAlreadyStringifiedContent',
-        }))
-        .next(new Pass(this, 'MergeBack', {
+        }))    
+        .next(new Pass(this, 'MergePayload', {
           parameters: {
             Message: JsonPath.jsonMerge(
               JsonPath.objectAt("$.body"),

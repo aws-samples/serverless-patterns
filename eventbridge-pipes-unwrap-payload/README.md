@@ -1,6 +1,7 @@
 # Using EventBridge Pipes to unwrap stringified payload
 
 This pattern showcases two ways  to parse JSON-strings within an EventBridge Pipe. While an EventBridge Pipe target transformer can parse JSON-strings automatically, if the payload contains nested strings, an additional enricher is needed. This example shows 1) how the unwrapping can be achieved through code, using a Lambda function. 2) how the unwrapping can be achieved withough code, using AWS Step functions intrinsic functions.
+Based on your use-case, you may prefer either way to unwrap events.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/unwrap-payload-with-pipes
 
@@ -50,8 +51,10 @@ To demo the processing, a Lambda function puts three sample events on SNS. Two S
 Step-by-step instructions to understand the implementation for the pattern:
 
 1. Deploy the Stack
-1. Trigger the UnwrapSampleDataCreatorLambda-function to generate three sample events on the sourceStream.
-1. The unwrapped events will be logged in UnwrapLogGroup.
+1. (optional) Look at the structure of events created by the "UnwrapSampleDataCreatorLambda-function" (inside unwrapSampleDataCreator.js). Some nested attributes are JSON-strings, rather than JSON-objects.
+1. Trigger the UnwrapSampleDataCreatorLambda-function to generate three sample events on each source queue. You can do so in the console or using the CLI: aws lambda invoke --function-name (enter function name here) output.txt 
+1. The events are automatically proccessed by two EventBridge Pipes. One uses a Lambda Enrichment, one a Step Function enrichment.
+1. Look at the unwrapped events logged in "/aws/events/unwrapTargetLog": both Pipes achieve the same result, an unwrapped JSON-object.
 
 ## Cleanup
  
