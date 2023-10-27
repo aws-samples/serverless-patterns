@@ -1,6 +1,6 @@
-# Application Load balancer with path-based routing and target as AWS Lambda in Terraform
+# Application Load balancer with path-based routing and AWS Lambda target in Terraform
 
-This pattern demonstrates how to create an Application Load Balancer with path-based routing along with associated Listener and Target as AWS Lambda. Implemented in Terraform.
+This pattern demonstrates how to create an Application Load Balancer with path-based routing along with associated listener and target as AWS Lambda. Implemented in Terraform.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/alb-path-based-route-lambda-tf
 
@@ -39,7 +39,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Testing
 
 1. In the terraform output, you can see `alb_url`. When you access the url, you should see the response "Default Response from ALB" from Lambda.
-2. To access the path based route from the ALB, Access `alb_url`/api/service1, you should see "Hello from Service1!!!!" and `alb_url`/api/service1, you should see ""Hello from Service2!!!!"
+2. To access the path based route from the ALB, Access `alb_url`/api/service1, you should see "Hello from Service1!!!!" and `alb_url`/api/service2, you should see ""Hello from Service2!!!!"
 
 
 ## Cleanup
