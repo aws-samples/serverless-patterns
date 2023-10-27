@@ -53,8 +53,9 @@ Resources:
       MemorySize: 1024
       # The function needs permission to call back to the S3 Object Lambda Access Point with the WriteGetObjectResponse.
       Policies:
-        - TextractPolicy: {}
-        - AmazonS3ObjectLambdaExecutionRolePolicy: {}
+        - AmazonS3ObjectLambdaExecutionRolePolicy
+        - AmazonTextractFullAccess
+
 
 Outputs:
   S3BucketName:
