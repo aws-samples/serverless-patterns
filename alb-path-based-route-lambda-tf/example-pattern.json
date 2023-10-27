@@ -1,5 +1,5 @@
 {
-  "title": "ALB(path-based-route) to Lambda",
+  "title": "Application Load Balancer (path-based-route) to AWS Lambda",
   "description": "Create an Application Load Balancer with path-based routing with target as AWS Lambda",
   "language": "Python",
   "level": "200",
@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to create an Application Load Balancer with path-based routing along with associated Listener and Target as AWS Lambda. Implemented in Terraform."
+      "This pattern shows how to create an Application Load Balancer with path-based routing along with associated listener and target as AWS Lambda. Implemented in Terraform."
     ]
   },
   "gitHub": {
