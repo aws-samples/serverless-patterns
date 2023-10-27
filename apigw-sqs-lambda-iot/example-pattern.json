@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "An API Gateway REST API is created with integration to Amazon SQS. Lambda picks up the message from SQS and post it to IOT Data API endpoinbt ",
+      " ",
       "A HTTP Request to API Gateway POST method will create a message with the request body to SQS. Lambda picks up the message uses the topic in the request body to send message to the IOT Data API endpoint on the topic captured in the request"
     ]
   },
