@@ -1,7 +1,7 @@
 {
   "title": "ALB(path-based-route) to Lambda",
   "description": "Create an Application Load Balancer with path-based routing with target as AWS Lambda",
-  "language": "HCL",
+  "language": "Python",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
