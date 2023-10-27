@@ -1,6 +1,6 @@
 # Amazon API Gateway (REST API) to Amazon SQS to AWS Lambda to AWS IOT 
 
-This pattern explains how to deploy a SAM application with  Amazon API Gateway (REST API), Amazon SQS, AWS Lambda and AWS IOT
+This pattern explains how to deploy a serverless application using SAM. The pattern connects Amazon API Gateway (REST API), Amazon SQS, AWS Lambda, and AWS IOT
 
 This pattern is useful to accept and respond to requests quickly but offloading the processing as asynchronous process. Once the request is placed in SQS, API gateway responds back to the caller immediately without waiting for those messages to be processed.
 
