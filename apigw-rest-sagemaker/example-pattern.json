@@ -1,0 +1,57 @@
+{
+  "title": "API Gateway REST API to SageMaker",
+  "description": "Create a an Amazon API Gateway REST API to invoke a Sagemaker endpoint.",
+  "language": "",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to use an use a API Gateway REST API to invoke a SageMaker endpoint using using a native AWS service integration.",
+      "The pattern deploys a SageMaker endpoint for the Flan-T5 foundation model in Amazon SageMaker JumpStart. To deploy the pattern with a different model, replace the ModelData and ImageURI parameters in the template.yaml file. The template also deploys a REST API with AWS service integration to invoke the SageMaker endpoint directly. "
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-sagemaker",
+      "templateURL": "serverless-patterns/apigw-rest-sagemaker",
+      "projectFolder": "apigw-rest-sagemaker",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "How do I use API Gateway as a proxy for another AWS service?",
+        "link": "https://repost.aws/knowledge-center/api-gateway-proxy-integrate-service"
+      },
+      {
+        "text": "Zero-shot prompting for the Flan-T5 foundation model in Amazon SageMaker JumpStart",
+        "link": "https://aws.amazon.com/blogs/machine-learning/zero-shot-prompting-for-the-flan-t5-foundation-model-in-amazon-sagemaker-jumpstart/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: aws cloudformation delete-stack --stack-name STACK_NAME"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nabanita Paul",
+      "image": "nabanita-paul.jpeg",
+      "bio": "Cloud Support Engineer II @AWS",
+      "linkedin": "nabanita-paul"
+    }
+  ]
+}

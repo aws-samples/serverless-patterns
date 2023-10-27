@@ -1,0 +1,59 @@
+{
+  "title": "Amazon API Gateway REST API to Amazon SES",
+  "description": "Create an Amazon API Gateway REST API that integrates with Amazon SES",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon SES.",
+      "The API includes an API key and usage plan. The API integrates directly with the SES API and supports SendEmail API action."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-ses-transformation",
+      "templateURL": "serverless-patterns/apigw-ses-transformation",
+      "projectFolder": "apigw-ses-transformation",
+      "templateFile": "apigw-ses-transformation/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Tutorial: Build an API Gateway REST API with AWS integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html"
+      },
+      {
+        "text": "Setting up data transformations for REST APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/rest-api-data-transformations.html"
+      },
+      {
+        "text": "Amazon API Gateway API request and response data mapping reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sathesh Navaretnam",
+      "bio": "I am a Technical Account Manager in AWS. I specialize in operational best practices, developing Serverless and event-driven solutions.",
+      "linkedin": "satheshh"
+    }
+  ]
+}

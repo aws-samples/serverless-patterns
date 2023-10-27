@@ -1,0 +1,58 @@
+{
+  "title": "Create Cloudwatch custom metrics for API Gateway custom domain names using SAM",
+  "description": "This pattern deploys Amazon Eventbridge rule and a AWS Lambda function that creates custom metrics in Amazon CloudWatch for the API mappings present in all custom domain names that are present in the region where this is deployed.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a Lambda function that scans the custom domain name and its API mappings in the region and creates custom metrics namespace in CloudWatch metrics for 200. 4xx and 5xx errors. The metric data points get populated for the requests that comes in to the APIs/CDN post creation of the custom namespace."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdn-dash-sam",
+      "templateURL": "serverless-patterns/cdn-dash-sam",
+      "projectFolder": "cdn-dash-sam",
+      "templateFile": "cdn-dash-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Publish Custom Metrics",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abha Tripathi",
+      "image": "https://avatars.githubusercontent.com/u/36122588?s=400&u=209552eb3fa55e5c4176e54a24a7737ce899083b&v=4",
+      "bio": "Cloud Engineer @ AWS",
+      "linkedin": "abha-tripathi-344a0a146"
+    },
+    {
+      "name": "Sushir V R",
+      "image": "https://avatars.githubusercontent.com/u/42473846?s=400&u=4c7b19858e4ec3d9ae24e379c35848219ee57a86&v=4",
+      "bio": "Cloud Engineer @ AWS",
+      "linkedin": "sushirvr"
+    }
+  ]
+}

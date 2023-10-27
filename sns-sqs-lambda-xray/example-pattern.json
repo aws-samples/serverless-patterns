@@ -1,0 +1,58 @@
+{
+  "title": "AWS X-Ray trace for Amazon SNS to Amazon SQS to AWS Lambda with AWS Powertools",
+  "description": "This pattern demonstrate how to use an AWS SAM template and Powertools for AWS Lambda to capture and propagate Amazon X-Ray trace.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The template deploys two Lambda functions, Producer and Consumer, SNS, SQS. The calling sequence is Lambda Producer -> SNS -> SQS -> Lambda Consumer.",
+      "The whole process flow is captured by X-Ray and displayed with Amazon CloudWatch X-ray traces"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-lambda-xray",
+      "templateURL": "serverless-patterns/sns-sqs-lambda-xray",
+      "projectFolder": "sns-sqs-lambda-xray",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Powertools for AWS Lambda (Python) - Tracer",
+        "link": "https://docs.powertools.aws.dev/lambda/python/latest/core/tracer/"
+      },
+      {
+        "text": "Monitor Amazon SNS based applications end-to-end with AWS X-Ray active tracing",
+        "link": "https://aws.amazon.com/blogs/compute/monitor-amazon-sns-based-applications-end-to-end-with-aws-x-ray-active-tracing/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Thanit Youruchatangern",
+      "image": "https://raw.githubusercontent.com/final000/myphoto/main/myphoto.jpeg",
+      "bio": "I am a Technical Account Manager at AWS based in Thailand. I help customer solving complex problems with simple solutions.",
+      "linkedin": "www.linkedin.com/in/thanit-youruchatangern-a90060216",
+      "twitter": "twitter-handle"
+    }
+  ]
+}

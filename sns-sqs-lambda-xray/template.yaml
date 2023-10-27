@@ -1,0 +1,110 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    X-ray trace for SNS-SQS-Lambda with Powertool
+
+Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy-globals.html
+    Function:
+        Timeout: 5
+        MemorySize: 128
+        Runtime: python3.10
+        Tracing: Active
+
+Resources:
+    ProducerFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: app.lambda_handler
+            CodeUri: producer_app
+            Description: Producer function
+            Architectures:
+                - x86_64
+            Tracing: Active    
+            Environment:
+                Variables:
+                    # QUEUE_URL: !Ref SourceSqsQueue # Gets SQS Queue URL   
+                    SNS_TOPIC: !Ref SourceSnsTopic        
+            Policies:
+                # - SQSSendMessagePolicy:
+                #     QueueName: !GetAtt SourceSqsQueue.QueueName    
+                - SNSPublishMessagePolicy:
+                    TopicName: !GetAtt SourceSnsTopic.TopicName                    
+            Layers:  
+                - !Ref SharedLibLayer
+    ConsumerFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
+        Properties:
+            Handler: app.lambda_handler
+            CodeUri: consumer_app
+            Description: Consumer function
+            Architectures:
+                - x86_64
+            Tracing: Active
+            Environment:
+                Variables:
+                    POWERTOOLS_SERVICE_NAME: ConsumerTracer
+            Events:
+                SQSEvent:
+                    Type: SQS
+                    Properties: 
+                        Queue: !GetAtt SourceSqsQueue.Arn
+                        BatchSize: 10
+            Layers:  
+                - !Ref SharedLibLayer
+    SharedLibLayer:
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+            Description: Layer containing extension(s)
+            ContentUri: share_layer/
+            CompatibleRuntimes:
+                - python3.10
+            RetentionPolicy: Delete  
+        Metadata:
+            BuildMethod: python3.10
+    SourceSqsQueue:
+        Type: AWS::SQS::Queue
+
+    SourceSnsTopic:
+        Type: AWS::SNS::Topic
+        Properties:
+            TracingConfig: Active        
+            Subscription: 
+                - Protocol: sqs
+                  Endpoint: !GetAtt SourceSqsQueue.Arn 
+    SnsToSqsPolicy:
+        Type: AWS::SQS::QueuePolicy
+        Properties:
+            PolicyDocument:
+                 Version: "2012-10-17"
+                 Statement:
+                    - Sid: "Allow SNS publish to SQS"
+                      Effect: Allow
+                      Principal:
+                        Service: "sns.amazonaws.com"
+                      Resource: !GetAtt SourceSqsQueue.Arn
+                      Action: SQS:SendMessage
+                      Condition:
+                        ArnEquals:
+                            aws:SourceArn: !Ref SourceSnsTopic
+            Queues:
+                - !Ref SourceSqsQueue            
+Outputs:
+  
+    ConsumerFunction:
+      Description: "Hello World Lambda Function ARN"
+      Value: !GetAtt ConsumerFunction.Arn
+    ProducerFunction:
+      Description: "Producer Lambda Function ARN"
+      Value: !GetAtt ProducerFunction.Arn      
+    SharedLibLayer:
+      Description: "Share Library Layer ARN"
+      Value: !Ref SharedLibLayer   
+    SourceSqsQueue:
+        Description: "Source SQS ARN"
+        Value: !GetAtt SourceSqsQueue.Arn
+    SourceSqsURL:
+        Description: "Source SQS URL"        
+        Value: !Ref SourceSqsQueue
+    SourceSnsTopic:
+        Description: "Source SNS ARN"
+        Value: !Ref SourceSnsTopic       

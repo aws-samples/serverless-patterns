@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  aws-extension-telemetryapi-s3-app
+
+  Sample SAM Template for aws-extension-telemetryapi-s3-app
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  SampleFunction1:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: sampleappsrc/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Architectures:
+        - arm64
+      Layers: 
+        - !Ref TelemetryS3ExtensionsLayer    
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref LogExtensionsBucket
+      Environment:
+        Variables:
+          S3_BUCKET_NAME:
+            Ref: LogExtensionsBucket                        
+  TelemetryS3ExtensionsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      Description: Layer containing extension(s)
+      ContentUri: extensionsrc/
+      CompatibleRuntimes:
+        - python3.10
+      RetentionPolicy: Delete  
+    Metadata:
+      BuildMethod: makefile     
+  LogExtensionsBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteAfterSevenDays
+            Status: "Enabled"
+            ExpirationInDays: 7
+
+Outputs:
+  SampleFunction1:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt SampleFunction1.Arn
+  SampleFunction1IamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt SampleFunction1Role.Arn
+  TelemetryS3ExtensionsLayer:
+    Description: "TelemetryS3ExtensionsLayer ARN"
+    Value: !Ref TelemetryS3ExtensionsLayer    
+  LogExtensionsBucket:
+    Description: "LogExtensionsBucket ARN"
+    Value: !Ref LogExtensionsBucket    
