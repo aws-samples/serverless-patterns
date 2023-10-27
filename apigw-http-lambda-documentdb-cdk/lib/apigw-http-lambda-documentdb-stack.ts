@@ -57,9 +57,12 @@ export class ApiGwHttpLambdaDocumentDbStack extends cdk.Stack {
 
     // allow Document DB access from the VPC
     docDbcluster.connections.allowFrom(ec2.Peer.ipv4(vpc.vpcCidrBlock), ec2.Port.tcp(27017));
+    
+    //AWS Secrets Manager secret for the DocumentDb 
+    const dbSecret = docDbcluster.secret!;
 
     // Lambda function which is conncted to the DocumentDb
-    const lambdaPutDynamoDB = new NodejsFunction(this, 'LambdaToDocumentDB', {
+    const LambdaToDocumentDB = new NodejsFunction(this, 'LambdaToDocumentDB', {
       runtime: Runtime.NODEJS_18_X,
       handler: 'handler',
       timeout: cdk.Duration.seconds(3),
@@ -69,15 +72,15 @@ export class ApiGwHttpLambdaDocumentDbStack extends cdk.Stack {
       },
     });
 
-   //output the url of the api gateway
-   new cdk.CfnOutput(this, 'ApiGatewayUrl', {
-    value: httpApi.apiEndpoint,
-    description: 'The URL of the ApiGateway ',
-    exportName: 'ApiGatewayUrl',
-  });
+    // Grant Lambda function access to AWS Secrets Manager secret
+    LambdaToDocumentDB.addToRolePolicy(new cdk.aws_iam.PolicyStatement({
+      actions: ['secretsmanager:GetSecretValue'],
+      resources: [dbSecret.secretFullArn!],
+      effect: cdk.aws_iam.Effect.ALLOW
+    }));
 
     // Create an integration between the API Gateway and the Lambda function
-    const lambdaIntegration = new HttpLambdaIntegration('MetaDataLinks', lambdaPutDynamoDB);
+    const lambdaIntegration = new HttpLambdaIntegration('MetaDataLinks', LambdaToDocumentDB);
 
     //create a default route to the LambdaFunction
     httpApi.addRoutes({
@@ -85,6 +88,13 @@ export class ApiGwHttpLambdaDocumentDbStack extends cdk.Stack {
       methods: [apigw.HttpMethod.ANY],
       integration: lambdaIntegration,
     });
+
+   //output the url of the api gateway
+   new cdk.CfnOutput(this, 'ApiGatewayUrl', {
+    value: httpApi.apiEndpoint,
+    description: 'The URL of the ApiGateway ',
+    exportName: 'ApiGatewayUrl',
+  });
 
   }
 }
