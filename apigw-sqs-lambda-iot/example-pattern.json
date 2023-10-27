@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       " ",
-      "A HTTP Request to API Gateway POST method will create a message with the request body to SQS. Lambda picks up the message uses the topic in the request body to send message to the IOT Data API endpoint on the topic captured in the request"
+      "A HTTP Request to API Gateway POST method will create a message with the request body to SQS. Lambda picks up the message uses the topic in the request body to send message to the IOT Data API endpoint"
     ]
   },
   "gitHub": {
