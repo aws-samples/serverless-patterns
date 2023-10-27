@@ -1,5 +1,5 @@
 {
-  "title": "API Gateway REST API to SQS to Lambda to IOT",
+  "title": "Asynchronous message processing with Lambda and IoT Core",
   "description": "API Gateway REST API Integration to SQS to Lambda to IOT",
   "language": "Python",
   "level": "200",
