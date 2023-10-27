@@ -4,7 +4,7 @@ This pattern explains how to deploy a serverless application using SAM. The patt
 
 This pattern accepts and respond to requests quickly by offloading the processing as asynchronous process. Once the request is placed in the SQS queue, API Gateway responds back to the caller immediately without waiting for those messages to be processed.
 
-When an HTTP POST request is made to the Amazon API Gateway endpoint, request payload is sent to Amazon Simple Queue Service. AWS Lambda function consumes event from the Queue and post the event/payload as MQTT message to AWS IoT Topic. 
+When an HTTP POST request is made to the Amazon API Gateway endpoint, request payload is sent to SQS queue. AWS Lambda function consumes event from the Queue and post the event/payload as MQTT message to AWS IoT Topic. 
 
 Key Benefits:
 
