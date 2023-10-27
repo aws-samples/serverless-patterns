@@ -2,7 +2,7 @@
 
 This pattern explains how to deploy a serverless application using SAM. The pattern connects Amazon API Gateway (REST API), Amazon SQS, AWS Lambda, and AWS IOT
 
-This pattern is useful to accept and respond to requests quickly but offloading the processing as asynchronous process. Once the request is placed in SQS, API gateway responds back to the caller immediately without waiting for those messages to be processed.
+This pattern accepts and respond to requests quickly by offloading the processing as asynchronous process. Once the request is placed in the SQS queue, API Gateway responds back to the caller immediately without waiting for those messages to be processed.
 
 When an HTTP POST request is made to the Amazon API Gateway endpoint, request payload is sent to Amazon Simple Queue Service. AWS Lambda function consumes event from the Queue and post the event/payload as MQTT message to AWS IoT Topic. 
 
