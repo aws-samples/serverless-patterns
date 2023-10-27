@@ -126,3 +126,6 @@ cdk destroy
 
 1. Delete the secret WhatsAppAccessToken that was created on AWS Secrets Manager
 
+----
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+SPDX-License-Identifier: MIT-0
