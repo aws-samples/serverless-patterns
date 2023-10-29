@@ -1,40 +1,37 @@
-using System;
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.Model;
-using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.SQS;
+using ClaimCheckPattern.Models;
 
-namespace ServerlessPatterns.ClaimCheck;
+namespace ClaimCheckPattern;
 
 public class ClaimCheckDataCreator
 {
-    private static readonly AmazonSQSClient sqsClient = new AmazonSQSClient();    
-    public async Task FunctionHandler(object inputEvent, ILambdaContext context)
+    private static readonly AmazonSQSClient SqsClient = new();
+
+    public async Task FunctionHandler(object _, ILambdaContext context)
     {
-        context.Logger.LogInformation("ClaimCheckDataCreator called.");
-        var queueUrl=Environment.GetEnvironmentVariable("QUEUE_URL");
-        var messageWithManyDetails = new {
-            id=Guid.NewGuid().ToString(),
-            source= "systemA",
-            customer=new {
-                first_name="John",
-                middle_names="Michael Frankie",
-                last_name="Doe"
-            },
-            data=new {
-                someDummyData1="someDummyData1",
-                someDummyData2="someDummyData2",
-                someDummyData3="someDummyData3"
+        context.Logger.LogInformation($"{nameof(ClaimCheckDataCreator)} called.");
+
+        // Create message
+        var fullMessage = new FullMessage
+        {
+            Id = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "John Doe",
+            Data = new Dictionary<string, string>
+            {
+                {"demoKey1", "demoValue1"},
+                {"demoKey2", "demoValue2"},
+                {"demoKey3", "demoValue3"}
             }
         };
 
-        context.Logger.LogInformation("Putting message on queue...");
-        await sqsClient.SendMessageAsync(queueUrl, JsonSerializer.Serialize(messageWithManyDetails));
-        context.Logger.LogInformation("Message put on queue.");
+        // Put message on queue
+        context.Logger.LogInformation($"Putting full message with id: '{fullMessage.Id}' on queue...");
+        var queueUrl = Environment.GetEnvironmentVariable("QUEUE_URL");
+        var messageBody = JsonSerializer.Serialize(fullMessage);
+        await SqsClient.SendMessageAsync(queueUrl, messageBody);
+        context.Logger.LogInformation("Full message was put on queue successfully.");
     }
 }

@@ -1,42 +1,43 @@
-using System.Dynamic;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.Lambda.Core;
-using Amazon.SQS.Model;
+using Amazon.Lambda.SQSEvents;
+using ClaimCheckPattern.Models;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
-namespace ServerlessPatterns.ClaimCheck;
+namespace ClaimCheckPattern;
 
 public class ClaimCheckSplitter
 {
-    private static readonly AmazonDynamoDBClient dynamoDbClient = new AmazonDynamoDBClient();    
-    public async Task<object> FunctionHandler(Message[] sqsMessages, ILambdaContext context)
-    {        
-        context.Logger.LogInformation($"Received event: {JsonSerializer.Serialize(sqsMessages)}");
-        context.Logger.LogInformation($"Records[0]: {sqsMessages[0]}");
-        var firstSqsMessage = sqsMessages[0];
-        var bodyStr=firstSqsMessage.Body;
-        var customMessage=Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(bodyStr);
-        context.Logger.LogInformation($"customMessage:{customMessage}");
-        if(customMessage==null) throw new Exception("customMessage was null!");
-        var id=Convert.ToString(customMessage.id);
-        context.Logger.LogInformation($"customMessage.id:{id}");
+    private static readonly AmazonDynamoDBClient DynamoDbClient = new();
 
-        await dynamoDbClient.PutItemAsync(
+    public async Task<object> FunctionHandler(SQSEvent.SQSMessage[] sqsMessages, ILambdaContext context)
+    {
+        // Read full message
+        context.Logger.LogInformation($"Received event: {JsonSerializer.Serialize(sqsMessages)}");
+        var fullMessageJson = sqsMessages[0].Body;
+        var fullMessage = JsonSerializer.Deserialize<FullMessage>(fullMessageJson);
+        if (fullMessage == null)
+        {
+            throw new Exception("Full message was null.");
+        }
+
+        // Create and store claim check mapping
+        context.Logger.LogInformation($"Storing full message with id: '{fullMessage.Id}' in DynamoDB.");
+        await DynamoDbClient.PutItemAsync(
             Environment.GetEnvironmentVariable("CLAIM_CHECK_TABLE"),
-            new Dictionary<string, AttributeValue>()
+            new Dictionary<string, AttributeValue>
             {
-                {"id", new AttributeValue(id)},
-                {"custom_message_json", new AttributeValue(bodyStr)}
+                {"id", new AttributeValue($"{fullMessage.Id}")},
+                {"custom_message_json", new AttributeValue(fullMessageJson)}
             }
         );
-
-        return new {
-            eventType= "Some_Event_Type",
-            id=id,
+        context.Logger.LogInformation("Full message was stored successfully.");
+        return new ClaimCheck
+        {
+            Id = fullMessage.Id
         };
     }
 }
