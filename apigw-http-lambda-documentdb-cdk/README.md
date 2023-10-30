@@ -39,6 +39,24 @@ cdk deploy
 
 Explain how the service interaction works.
 
+1. **GET**:
+```bash
+curl -X GET "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json"
+```
+2. **POST**:
+```bash
+curl -X POST "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"key": "value"}'
+```
+3. **PUT**:
+```bash
+curl -X PUT "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"_id": "id", "key": "newvalue"}'
+```
+4. **DELETE**:
+```bash
+curl -X DELETE "YOUR_API_ENDPOINT"?id=id
+```
+
+
 ## Testing
 
 Provide steps to trigger the integration and show what should be observed if successful.

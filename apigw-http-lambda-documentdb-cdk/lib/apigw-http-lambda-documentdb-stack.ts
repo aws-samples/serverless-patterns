@@ -65,11 +65,15 @@ export class ApiGwHttpLambdaDocumentDbStack extends cdk.Stack {
     const LambdaToDocumentDB = new NodejsFunction(this, 'LambdaToDocumentDB', {
       runtime: Runtime.NODEJS_18_X,
       handler: 'handler',
-      timeout: cdk.Duration.seconds(3),
+      timeout: cdk.Duration.seconds(300),
       entry: path.join(__dirname, '../lambda/app.ts'),
       environment: {
         DOCUMENTDB_SECRET_NAME: documentDbSecretName,
       },
+      vpc: vpc, //Lambda needs to be in the VPC which has a route to the DocumentDB database
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+      }      
     });
 
     // Grant Lambda function access to AWS Secrets Manager secret
