@@ -1,5 +1,5 @@
 import { Handler } from 'aws-lambda';
-import { Collection, MongoClient } from 'mongodb';
+import { Collection, MongoClient, ObjectId } from 'mongodb';
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager"; // ES Modules import
 
 export const handler: Handler = async (event, context) => {
@@ -79,11 +79,15 @@ async function handlePostRequest(event: any, collection: Collection) {
 
 async function handlePutRequest(event: any, collection: Collection) {
   const updatedPayload = event.body ? JSON.parse(event.body) : {};
+
   console.log('Updated payload:', updatedPayload);
-  const filter = { _id: updatedPayload._id };
-  console.log('filter:' + updatedPayload._id );
+  const filter = { _id: new ObjectId(updatedPayload._id) };
+
+  delete updatedPayload._id; //the _id can not be updated
+  
   const result = await collection.updateOne(filter, { $set: updatedPayload });
   console.log('Updated data:', result);
+
   return {
     statusCode: 200,
     body: JSON.stringify(result.modifiedCount),
@@ -92,9 +96,11 @@ async function handlePutRequest(event: any, collection: Collection) {
 
 async function handleDeleteRequest(event: any, collection: Collection) {
   const idToDelete = event.queryStringParameters.id;
+
   console.log('ID to delete:', idToDelete);
-  const filter = { _id: idToDelete };
-  console.log('filter:' + idToDelete);
+
+  const filter = { _id: new ObjectId(idToDelete) };
+
   const result = await collection.deleteOne(filter);
   console.log('Deleted data:', result);
   return {
