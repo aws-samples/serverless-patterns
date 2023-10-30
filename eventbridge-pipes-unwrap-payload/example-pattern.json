@@ -1,0 +1,52 @@
+{
+  "title": "Using EventBridge Pipes to unwrap stringified payload",
+  "description": "This pattern showcases two ways  to parse JSON-strings within a pipe. While an EventBridge Pipes target transformer can parse JSON-strings automatically, if the payload contains nested strings, an additional enricher is needed. This example shows 1) how the unwrapping can be achieved through code, using a Lambda function. 2) how the unwrapping can be achieved withough code, using AWS Step functions intrinsic functions.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "To demo the processing, a Lambda function puts three sample events on SNS. Two SQS queues are subscribed to the SNS topic, both receiving the three events. Each queue is conntected to an EventBridge bus, which logs all received events in CloudWatch. One pipe leverages Lambda enrichment to unwrap the stringified payload, the other pipe uses AWS Step Functions to unwrap the stringified payload."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/unwrap-payload-with-pipes",
+      "templateURL": "serverless-patterns/unwrap-payload-with-pipes",
+      "projectFolder": "unwrap-payload-with-pipes",
+      "templateFile": "src/lib/unwrap-payload-with-pipes.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "More Enterprise Integration Patterns on AWS Samples",
+        "link": "https://github.com/aws-samples/amazon-eventbridge-pipes-architectural-patterns"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dominik Richter",
+      "image": "https://avatars.githubusercontent.com/u/29404931",
+      "bio": "Solutions Architect at AWS, passionate about event-driven architectures and Serverless.",
+      "linkedin": "do-richter"
+    }
+  ]
+}
