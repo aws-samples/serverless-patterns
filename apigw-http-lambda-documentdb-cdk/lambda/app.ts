@@ -18,7 +18,6 @@ export const handler: Handler = async (event, context) => {
       body: 'Internal server error - Failed to retrieve MongoDB URI from secret store',
     };
   }
-  console.log('MongoDB URI:', mongoDbUri);
 
   const method = event.requestContext.http.method;
   console.log('HTTP Method:', method);
@@ -31,6 +30,7 @@ export const handler: Handler = async (event, context) => {
   );
 
   try {
+    
     await client.connect();
 
     const db = client.db('mydb');
@@ -81,6 +81,7 @@ async function handlePutRequest(event: any, collection: Collection) {
   const updatedPayload = event.body ? JSON.parse(event.body) : {};
   console.log('Updated payload:', updatedPayload);
   const filter = { _id: updatedPayload._id };
+  console.log('filter:' + updatedPayload._id );
   const result = await collection.updateOne(filter, { $set: updatedPayload });
   console.log('Updated data:', result);
   return {
@@ -93,6 +94,7 @@ async function handleDeleteRequest(event: any, collection: Collection) {
   const idToDelete = event.queryStringParameters.id;
   console.log('ID to delete:', idToDelete);
   const filter = { _id: idToDelete };
+  console.log('filter:' + idToDelete);
   const result = await collection.deleteOne(filter);
   console.log('Deleted data:', result);
   return {

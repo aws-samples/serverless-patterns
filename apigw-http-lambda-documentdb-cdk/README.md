@@ -1,6 +1,6 @@
-# AWS Service 1 to AWS Service 2
+# Amazon API Gateway to AWS Lambda to Amazon DocumentDB 
 
-This pattern << explain usage >>
+This AWS CDK stack deploys an API Gateway HTTP API that integrates with a Lambda function and a DocumentDB cluster. The Lambda function is connected to the DocumentDB cluster through a VPC.  The Lambda implements CRUD operations function for this REST API
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -37,24 +37,41 @@ cdk deploy
 ```
 ## How it works
 
-Explain how the service interaction works.
+This will create an API Gateway HTTP API, a Lambda function, and a DocumentDB cluster. The output of the command will include the URL of the API Gateway HTTP API.
 
-1. **GET**:
+### Usage
+To use the API Gateway HTTP API, send a GET request to the root path (/). The Lambda function will be invoked and will return the contents of the DocumentDB cluster.
+
+### Example
+1. **GET** - Retrieve data from the MongoDB collection.:
 ```bash
 curl -X GET "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json"
 ```
-2. **POST**:
+2. **POST**  - Insert data into the MongoDB collection.:
 ```bash
 curl -X POST "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"key": "value"}'
 ```
-3. **PUT**:
+3. **PUT** - Update data in the MongoDB collection.:
 ```bash
 curl -X PUT "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"_id": "id", "key": "newvalue"}'
 ```
-4. **DELETE**:
+4. **DELETE** - Delete data from the MongoDB collection.:
 ```bash
 curl -X DELETE "YOUR_API_ENDPOINT"?id=id
 ```
+
+### Security
+The Lambda function is granted access to the DocumentDB cluster through a VPC security group. The security group only allows traffic from the Lambda function to the DocumentDB cluster.
+
+The Lambda function is also granted access to the AWS Secrets Manager secret for the DocumentDB cluster. The secret contains the credentials for accessing the DocumentDB cluster.
+
+### Troubleshooting
+If you are having trouble deploying or using the stack, please refer to the following resources:
+
+AWS CDK documentation: https://docs.aws.amazon.com/cdk/latest/guide/
+DocumentDB documentation: https://docs.aws.amazon.com/documentdb/latest/developerguide/
+Lambda documentation: https://docs.aws.amazon.com/lambda/latest/dg/welcome.html
+License
 
 
 ## Testing
@@ -65,7 +82,7 @@ Provide steps to trigger the integration and show what should be observed if suc
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    cdk destroy
     ```
 1. Confirm the stack has been deleted
     ```bash
