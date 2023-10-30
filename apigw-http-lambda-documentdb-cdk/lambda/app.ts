@@ -40,13 +40,13 @@ export const handler: Handler = async (event, context) => {
 
     switch (method) {
       case 'GET':
-        return handleGetRequest(collection);
+        return await handleGetRequest(collection);
       case 'POST':
-        return handlePostRequest(event, collection);
+        return await handlePostRequest(event, collection);
       case 'PUT':
-        return handlePutRequest(event, collection);
+        return await handlePutRequest(event, collection);
       case 'DELETE':
-        return handleDeleteRequest(event, collection);
+        return await handleDeleteRequest(event, collection);
       default:
         return handleUnsupportedMethod();
     }

@@ -73,7 +73,16 @@ export class ApiGwHttpLambdaDocumentDbStack extends cdk.Stack {
       vpc: vpc, //Lambda needs to be in the VPC which has a route to the DocumentDB database
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-      }      
+      },      
+      bundling: {
+        commandHooks: {
+          afterBundling: (inputDir: string, outputDir: string): string[] => [
+            `cp ${inputDir}/lambda/global-bundle.pem ${outputDir}`,
+          ],
+          beforeBundling: (inputDir: string, outputDir: string): string[] => [],
+          beforeInstall: (inputDir: string, outputDir: string): string[] => [],
+        },
+      },      
     });
 
     // Grant Lambda function access to AWS Secrets Manager secret
