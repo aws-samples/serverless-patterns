@@ -26,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change the working directory to this pattern's directory:
     ```
-    cd apigw-http-api-eventbridge-dotnet-cdk
+    cd alb-path-based-route-lambda-cdk
     ```
 1. Build the .NET CDK project:
     ```
