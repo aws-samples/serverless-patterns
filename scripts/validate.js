@@ -9,7 +9,7 @@ const schema = require('./pattern-schema.json');
 const { ValidationError } = require('jsonschema');
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
-const githubAutomation = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION === 'true' : false;
+const githubAutomation = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION === 'true' : true;
 
 const octokit = new Octokit({
   auth: process.env.TOKEN,
@@ -110,6 +110,9 @@ const main = async () => {
     const resultsWithCustomValidation = await customValidate(parsedJSON);
 
     const mergedErrors = [...result.errors, ...resultsWithCustomValidation];
+
+    console.log('Result errors', result.errors)
+    console.log('Custom errors', resultsWithCustomValidation)
 
     if (mergedErrors.length > 0) {
       const errors = buildErrors(mergedErrors);
