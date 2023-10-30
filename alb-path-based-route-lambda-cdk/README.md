@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Application Load balancer with path-based routing and AWS Lambda target using AWS CDK .NET
 
 This pattern shows how to create an Application Load Balancer with path-based routing along with associated listener and target as AWS Lambda. Implemented in AWS CDK .NET.
 
