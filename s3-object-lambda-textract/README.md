@@ -1,12 +1,12 @@
 # AWS S3 Object Lambda to Amazon textract
 
-This pattern allows you to upload a document documents such as PDFs, images, tables, and forms into an S3 bucket the text (key value paid) from the document can be extract using S3 Object Lambda using AWS Textract
+This pattern allows you to upload a document documents such as PDFs, images, tables, and forms into an S3 bucket the text (key value paid) from the document can be extract using S3 Object Lambda using Amazon Textract
 
-This pattern provides a simple On-demand mechanism of extracting key value pair from document for Intelligent document processing. 
+This pattern provides a simple on-demand mechanism of extracting key value pair from document for intelligent document processing. 
 
-Example Use case : If an enterprise has a large volume of PDF document and does not want to run a batch job due to the cost of processing of extracting / processing all the document, S3 Ojbect lambda provdies a good mechanism to extract only the OCR document on need basis without major changes to the architecture and in a serverless fashion, optimising cost.
+Example Use case : If an enterprise has a large volume of PDF document and does not want to run a batch job due to the cost of processing of extracting / processing all the document, S3 Object Lambda provides a good mechanism to extract only the OCR document on need basis without major changes to the architecture and in a serverless fashion, optimising cost.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-object-lambda-textract
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
