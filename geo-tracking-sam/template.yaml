@@ -80,8 +80,11 @@ Resources:
           - Sid: GeoLocationTracking
             Effect: Allow
             Action:
-            - geo:*
-            Resource: '*'
+            - geo:GetDevicePosition
+            Resource: 
+            - !GetAtt DistanceFilteringTracker.Arn
+            - !GetAtt AccuracyFilteringTracker.Arn
+            - !GetAtt TimeFilteringTracker.Arn
         - DynamoDBCrudPolicy:
            TableName: !Ref MyDynamoDBTable        
       Environment:
@@ -101,8 +104,10 @@ Resources:
                   - geo.amazonaws.com
                 eventName:
                   - BatchUpdateDevicePosition
-
 Outputs:
+  TrackerFunction:
+    Description: "Tracking Testing Lambda Function ARN"
+    Value: !GetAtt TrackerFunction.Arn
   GeoTrackingFunction:
     Description: "Geo Tracking Lambda Function ARN"
     Value: !GetAtt GeoTrackingFunction.Arn
