@@ -28,14 +28,14 @@ const customValidate = async (patternFile) => {
   }
 
   // Check to make sure there is a validate path to this file.
-  if(repoURL && templateFile){
-    const URL = path.join(repoURL, templateFile);
-    console.log('Fetching info from', URL)
-    const response = await fetch(URL);
-    if(response.status !== 200){
-      errors.push(new ValidationError('Failed to find the file template file to load on Serverless Land. Please make sure your GitHub configurtion is correct.', null, null, 'gitHub.template'))
-    }
-  }
+  // if(repoURL && templateFile){
+  //   const URL = path.join(repoURL, templateFile);
+  //   console.log('Fetching info from', URL)
+  //   const response = await fetch(URL);
+  //   if(response.status !== 200){
+  //     errors.push(new ValidationError('Failed to find the file template file to load on Serverless Land. Please make sure your GitHub configurtion is correct.', null, null, 'gitHub.template'))
+  //   }
+  // }
 
   return errors;
 };
