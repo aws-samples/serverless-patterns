@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-lambda-documentdb-cdk",
       "templateURL": "serverless-patterns/apigw-http-lambda-documentdb-cdk",
       "projectFolder": "apigw-http-lambda-documentdb-cdk",
-      "templateFile": "apigw-http-lambda-documentdb-cdk/apigw-http-lambda-documentdb-stack.ts"
+      "templateFile": "apigw-http-lambda-documentdb-stack.ts"
     }
   },
   "resources": {
@@ -49,9 +49,9 @@
   "authors": [
     {
       "name": "Joachim Aumann",
-      "image": "https://www.amazon.de/photos/share/fyyJddtldnCEkOihHWn4LY0zTI1Fw5AhIjnIljdDp7n/gallery/SGFjN9ptTde6YrXgwXsEjw",
+      "image": "./joaumann.jpg",
       "bio": "I am a Sr. Solutions Architect working at AWS",
-      "linkedin": "https://www.linkedin.com/in/joachim-aumann/"
+      "linkedin": "joachim-aumann"
     }
   ]
 }
