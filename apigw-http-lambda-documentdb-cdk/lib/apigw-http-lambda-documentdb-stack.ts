@@ -50,6 +50,7 @@ export class ApiGwHttpLambdaDocumentDbStack extends cdk.Stack {
     // allow Document DB access from the VPC
     docDbcluster.connections.allowFrom(ec2.Peer.ipv4(vpc.vpcCidrBlock), ec2.Port.tcp(27017));
     
+    
     // destroy Document DB cluster when stack is destroye - remove for production use
     docDbcluster.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
 

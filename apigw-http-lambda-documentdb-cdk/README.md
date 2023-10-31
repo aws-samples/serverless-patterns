@@ -4,7 +4,6 @@ This AWS CDK stack deploys an API Gateway HTTP API that integrates with a Lambda
 
 You should use this pattern if you want to migrate your application to DocumentDB using a serverless REST API application layer
 
-
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -31,38 +30,17 @@ cd apigw-http-lambda-documentdb-cdk
 ```bash
 npm install
 ```    
-1. From the command line, configure AWS CDK with
+1. From the command line, configure AWS CDK with:
 ```bash
 cdk bootstrap
 ```  
-6. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `lib/cdk-stack.ts` file:
+6. From the command line, use AWS CDK to deploy the AWS resources for the pattern:
 ```bash
 cdk deploy
 ```
 ## How it works
 
 This will create an API Gateway HTTP API, a Lambda function, and a DocumentDB cluster. The output of the command will include the URL of the API Gateway HTTP API.
-
-### Usage
-To use the API Gateway HTTP API, send a GET request to the root path (/). The Lambda function will be invoked and will return the contents of the DocumentDB cluster.
-
-### Example
-1. **GET** - Retrieve data from the MongoDB collection.:
-```bash
-curl -X GET "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json"
-```
-2. **POST**  - Insert data into the MongoDB collection.:
-```bash
-curl -X POST "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"key": "value"}'
-```
-3. **PUT** - Update data in the MongoDB collection.:
-```bash
-curl -X PUT "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"_id": "id", "key": "newvalue"}'
-```
-4. **DELETE** - Delete data from the MongoDB collection.:
-```bash
-curl -X DELETE "YOUR_API_ENDPOINT"?id=id
-```
 
 ### Security
 The Lambda function is granted access to the DocumentDB cluster through a VPC security group. The security group only allows traffic from the Lambda function to the DocumentDB cluster.
@@ -75,20 +53,37 @@ If you are having trouble deploying or using the stack, please refer to the foll
 AWS CDK documentation: https://docs.aws.amazon.com/cdk/latest/guide/
 DocumentDB documentation: https://docs.aws.amazon.com/documentdb/latest/developerguide/
 Lambda documentation: https://docs.aws.amazon.com/lambda/latest/dg/welcome.html
+Amazon API Gateway HTTP documentation: https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+To use the API Gateway HTTP API, send a GET request to the root path (/). The Lambda function will be invoked and will return the contents of the DocumentDB cluster.
+
+In the stack output, you can see `ApiGatewayUrl`. This URL can be used with the curl commands below to interact with the DocumentDB.
+
+### Example
+1. **GET** - Retrieve data from the DocumentDB collection.:
+```bash
+curl -X GET "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json"
+```
+2. **POST**  - Insert data into the DocumentDB collection.:
+```bash
+curl -X POST "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"key": "value"}'
+```
+3. **PUT** - Update data in the DocumentDB collection.:
+```bash
+curl -X PUT "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"_id": "A_VALID_ID_FROM_THE_DATABASE", "key": "newvalue"}'
+```
+4. **DELETE** - Delete data from the DocumentDB collection.:
+```bash
+curl -X DELETE "YOUR_API_ENDPOINT"?id=A_VALID_ID_FROM_THE_DATABASE
+```
 
 ## Cleanup
  
 1. Delete the stack
     ```bash
     cdk destroy
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
