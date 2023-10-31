@@ -75,8 +75,6 @@ If you are having trouble deploying or using the stack, please refer to the foll
 AWS CDK documentation: https://docs.aws.amazon.com/cdk/latest/guide/
 DocumentDB documentation: https://docs.aws.amazon.com/documentdb/latest/developerguide/
 Lambda documentation: https://docs.aws.amazon.com/lambda/latest/dg/welcome.html
-License
-
 
 ## Testing
 
