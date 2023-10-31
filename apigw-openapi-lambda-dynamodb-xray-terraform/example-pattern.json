@@ -1,7 +1,7 @@
 {
-  "title": "Deploying API Gateway REST API using OpenAPI specification with Lambda Powertools for logging and tracing",
+  "title": "Deploying API Gateway REST API using OpenAPI spec with Lambda Powertools",
   "description": "Create a Lambda backed REST API using OpenAPI specification, integrated with lambda powertools for enhanced logging and traceability",
-  "language": "Typescript",
+  "language": "TypeScript",
   "level": "200",
   "framework": "Terraform",
   "services": {
@@ -19,7 +19,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-openapi-lambda-dynamodb-xray-terraform",
       "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/apigw-openapi-lambda-dynamodb-xray-terraform/infra/main.tf",
       "projectFolder": "apigw-openapi-lambda-dynamodb-xray-terraform",
-      "templateFile": "apigw-openapi-lambda-dynamodb-xray-terraform/infra/main.tf",
+      "templateFile": "infra/main.tf",
       "readmeURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/apigw-openapi-lambda-dynamodb-xray-terraform/README.md"
     }
   },
@@ -63,7 +63,7 @@
       "name": "Damodar Shenvi Wagle",
       "image": "https://drive.google.com/file/d/1o-NvTy-Ock12bKOLoMiwyolqizNNMhv8/view?usp=sharing",
       "bio": "Damodar Shenvi Wagle is a Senior Cloud Application Architect at AWS Professional Services.",
-      "linkedin": "https://www.linkedin.com/in/damodar-shenvi-wagle-72375548/"
+      "linkedin": "www.linkedin.com/in/damodar-shenvi-wagle-72375548"
     }
   ]
 }
