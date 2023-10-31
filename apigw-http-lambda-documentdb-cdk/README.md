@@ -22,19 +22,19 @@ Important: this application uses various AWS services and there are costs associ
 ```bash
 git clone https://github.com/aws-samples/serverless-patterns
 ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
 ```bash
 cd apigw-http-lambda-documentdb-cdk
 ```
-1. run npm install to install npm packages:
+3. run npm install to install npm packages:
 ```bash
 npm install
 ```    
-1. From the command line, configure AWS CDK with:
+4. From the command line, configure AWS CDK with:
 ```bash
 cdk bootstrap
 ```  
-6. From the command line, use AWS CDK to deploy the AWS resources for the pattern:
+5. From the command line, use AWS CDK to deploy the AWS resources for the pattern:
 ```bash
 cdk deploy
 ```
@@ -51,8 +51,11 @@ The Lambda function is also granted access to the AWS Secrets Manager secret for
 If you are having trouble deploying or using the stack, please refer to the following resources:
 
 AWS CDK documentation: https://docs.aws.amazon.com/cdk/latest/guide/
+
 DocumentDB documentation: https://docs.aws.amazon.com/documentdb/latest/developerguide/
+
 Lambda documentation: https://docs.aws.amazon.com/lambda/latest/dg/welcome.html
+
 Amazon API Gateway HTTP documentation: https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html
 
 ## Testing
@@ -76,15 +79,16 @@ curl -X PUT "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"_id": 
 ```
 4. **DELETE** - Delete data from the DocumentDB collection.:
 ```bash
-curl -X DELETE "YOUR_API_ENDPOINT"?id=A_VALID_ID_FROM_THE_DATABASE
+curl -X DELETE "YOUR_API_ENDPOINT?id=A_VALID_ID_FROM_THE_DATABASE"
 ```
 
 ## Cleanup
  
-1. Delete the stack
-    ```bash
-    cdk destroy
-    ```
+Delete the stack
+
+```bash
+cdk destroy
+```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
