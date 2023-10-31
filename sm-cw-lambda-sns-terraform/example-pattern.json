@@ -1,6 +1,6 @@
 {
   "title": "AWS Secrets Manager to CloudWatch Events to SNS",
-  "description": "An terraform template that detects and notifies on Amazon Secrets Manager secret key creation, Updation and deletion using Amazon CloudWatch event and Amazon SNS",
+  "description": "A terraform template that detects AWS Secrets Manager changes via CloudWatch and notify with SNS.",
   "language": "YAML",
   "level": "200",
   "framework": "Terraform",
@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sm-cw-lambda-sns-terraform",
       "templateURL": "serverless-patterns/sm-cw-lambda-sns-terraform",
       "projectFolder": "sm-cw-lambda-sns-terraform",
-      "templateFile": "sm-cw-lambda-sns-terraform/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {
