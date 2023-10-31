@@ -8,6 +8,7 @@
     "headline": "How it works",
     "text": [
       "This AWS CDK stack deploys an API Gateway HTTP API that integrates with a Lambda function and a DocumentDB cluster. The Lambda function is connected to the DocumentDB cluster through a VPC. The Lambda implements CRUD operations function for this REST API"
+      ,"You should use this pattern if you want to migrate your application to DocumentDB using a serverless REST API application layer"
     ]
   },
   "gitHub": {
@@ -48,7 +49,7 @@
   "authors": [
     {
       "name": "Joachim Aumann",
-      "image": "link-to-your-photo.jpg",
+      "image": "https://www.amazon.de/photos/share/fyyJddtldnCEkOihHWn4LY0zTI1Fw5AhIjnIljdDp7n/gallery/SGFjN9ptTde6YrXgwXsEjw",
       "bio": "I am a Sr. Solutions Architect working at AWS",
       "linkedin": "https://www.linkedin.com/in/joachim-aumann/"
     }

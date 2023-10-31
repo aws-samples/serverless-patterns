@@ -1,6 +1,9 @@
 # Amazon API Gateway to AWS Lambda to Amazon DocumentDB 
 
-This AWS CDK stack deploys an API Gateway HTTP API that integrates with a Lambda function and a DocumentDB cluster. The Lambda function is connected to the DocumentDB cluster through a VPC.  The Lambda implements CRUD operations function for this REST API
+This AWS CDK stack deploys an API Gateway HTTP API that integrates with a Lambda function and a DocumentDB cluster. The Lambda function is connected to the DocumentDB cluster through a VPC. The Lambda implements the CRUD operations function for this REST API.
+
+You should use this pattern if you want to migrate your application to DocumentDB using a serverless REST API application layer
+
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -11,7 +14,8 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
+* [Node and NPM](https://nodejs.org/en/download/) installed
 
 ## Deployment Instructions
 

@@ -16,21 +16,13 @@ export class ApiGwHttpLambdaDocumentDbStack extends cdk.Stack {
 
     const documentDbSecretName = 'documentDbSecretName';
 
-    // Create VPC with a public and a private subnet
+    // Create VPC with public and private subnets
     const vpc = new ec2.Vpc(this, 'VPC-serverless-pattern', {
       ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'),
       maxAzs: 2,
       subnetConfiguration: [
-        {
-          cidrMask: 24,
-          name: 'PublicSubnet1',
-          subnetType: ec2.SubnetType.PUBLIC,
-        },
-        {
-          cidrMask: 24,
-          name: 'PrivateSubnet1',
-          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-        },
+        { cidrMask: 24, name: 'PublicSubnet', subnetType: ec2.SubnetType.PUBLIC },
+        { cidrMask: 24, name: 'PrivateSubnet', subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       ],
       natGateways: 1
     });
@@ -58,6 +50,9 @@ export class ApiGwHttpLambdaDocumentDbStack extends cdk.Stack {
     // allow Document DB access from the VPC
     docDbcluster.connections.allowFrom(ec2.Peer.ipv4(vpc.vpcCidrBlock), ec2.Port.tcp(27017));
     
+    // destroy Document DB cluster when stack is destroye - remove for production use
+    docDbcluster.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
+
     //AWS Secrets Manager secret for the DocumentDb 
     const dbSecret = docDbcluster.secret!;
 

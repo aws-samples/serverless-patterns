@@ -1,3 +1,5 @@
+//To further optimize the code, you can move the connection to Amazon DocumentDB  and retrieve the secret outside the handler or through a AWS Lambda layer. However, for simplicity, I have kept it in one file.
+
 import { Handler } from 'aws-lambda';
 import { Collection, MongoClient, ObjectId } from 'mongodb';
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager"; // ES Modules import
@@ -97,16 +99,23 @@ async function handlePutRequest(event: any, collection: Collection) {
 async function handleDeleteRequest(event: any, collection: Collection) {
   const idToDelete = event.queryStringParameters.id;
 
-  console.log('ID to delete:', idToDelete);
+  try {
+    const filter = { _id: new ObjectId(idToDelete) };
 
-  const filter = { _id: new ObjectId(idToDelete) };
+    const result = await collection.deleteOne(filter);
+    console.log('Deleted data:', result);
 
-  const result = await collection.deleteOne(filter);
-  console.log('Deleted data:', result);
-  return {
-    statusCode: 200,
-    body: JSON.stringify(result.deletedCount),
-  };
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result.deletedCount),
+    };
+  } catch (error) {
+    console.error('Error deleting document:', error);
+    return {
+      statusCode: 500,
+      body: 'Internal server error - Failed to delete document',
+    };
+  }
 }
 
 function handleUnsupportedMethod() {
@@ -116,39 +125,33 @@ function handleUnsupportedMethod() {
     body: 'Unsupported HTTP method',
   };
 }
-
+//Get MongoDB URI from AWS Secret Manager
 async function getMongoDbUri() {
 
-  const secret_name = process.env.DOCUMENTDB_SECRET_NAME;
-
-  const client = new SecretsManagerClient();
-  let response;
-  const uri = '';
-
   try {
-    response = await client.send(
+    const secret_name = process.env.DOCUMENTDB_SECRET_NAME;
+    const client = new SecretsManagerClient();
+    const response = await client.send(
       new GetSecretValueCommand({
         SecretId: secret_name,
-        VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
+        VersionStage: "AWSCURRENT",
       })
     );
+
+    if (typeof response.SecretString !== "undefined") {
+      const { host, password, username, port } = JSON.parse(response.SecretString);
+      const DOCDB_ENDPOINT = host || 'DOCDBURL';
+      const DOCDB_PASSWORD = encodeURIComponent(password) || 'DOCPASSWORD';
+      const DOCDB_USERNAME = username || 'myuser';
+      const DOCDB_PORT = port || 'myuser';
+
+      const uri = `mongodb://${DOCDB_USERNAME}:${DOCDB_PASSWORD}@${DOCDB_ENDPOINT}:${DOCDB_PORT}/mydb?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
+
+      return uri;
+    }
   } catch (error) {
-    // For a list of exceptions thrown, see
-    // https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-    throw error;
+    console.error('Error retrieving MongoDB URI:', error);
   }
 
-  if (typeof response.SecretString != "undefined") {
-    const { host, password, username, port } = JSON.parse(response.SecretString);
-    const DOCDB_ENDPOINT = host || 'DOCDBURL';
-    const DOCDB_PASSWORD = encodeURIComponent(password) || 'DOCPASSWORD';
-    const DOCDB_USERNAME = username || 'myuser';
-    const DOCDB_PORT = port || 'myuser';
-
-    const uri = `mongodb://${DOCDB_USERNAME}:${DOCDB_PASSWORD}@${DOCDB_ENDPOINT}:${DOCDB_PORT}/mydb?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
-
-    return uri;
-  }
-
-  return uri;
+  return null;
 }
