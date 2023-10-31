@@ -1,0 +1,53 @@
+{
+  "title": "Streaming Response With Bedrock and Lambda Function URL",
+  "description": "Create a LLM Streaming Response API with Lambda Function URL Streaming write",
+  "language": "nodejs",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an Lambda Function URL streaming ability and Bedrock runtime `InvokeModelWithResponseStreamCommand` to build a LLM response streaming API",
+      "This pattern deploys One Lambda Function. Since Bedrock access is limited to certain regions, user need to set BEDROCK_AWS_ACCESS_KEY_ID and BEDROCK_AWS_SECRET_ACCESS_KEY environment variables to Lambda Function to allow request across regions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-streaming-ttfb-write-sam-with-bedrock-streaming",
+      "templateURL": "serverless-patterns/lambda-streaming-ttfb-write-sam-with-bedrock-streaming",
+      "projectFolder": "lambda-streaming-ttfb-write-sam-with-bedrock-streaming",
+      "templateFile": "lambda-streaming-ttfb-write-sam-with-bedrock-streaming/src/index.js"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Configure Lambda Function Response Streaming",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ian Chenyang Zhao",
+      "image": "https://media.licdn.com/media/AAYQAQSOAAgAAQAAAAAAAB-zrMZEDXI2T62PSuT6kpB6qg.png",
+      "bio": "https://github.com/randomradio",
+      "linkedin": "https://www.linkedin.com/in/ianchenyangzhao/"
+    }
+  ]
+}
