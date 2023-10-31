@@ -36,9 +36,16 @@
       }
     ]
   },
+  "build": {
+    "text": [
+      "npm install",
+      "npm run build"
+    ]
+  },
   "deploy": {
     "text": [
-      "./deploy.sh"
+      "terraform -chdir=infra init",
+      "terraform -chdir=infra apply"
     ]
   },
   "testing": {

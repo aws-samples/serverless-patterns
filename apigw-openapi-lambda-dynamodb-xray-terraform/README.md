@@ -17,19 +17,25 @@ Important: this application uses various AWS services and there are costs associ
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
+    ```bash 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
 2. Change directory to the pattern directory:
-    ```
+    ```bash
     cd apigw-openapi-lambda-dynamodb-xray-terraform
     ```
-3. Script `deploy.sh` compiles typescript code and builds the package. From the command line, run script deploy.sh:
+3. Compile typescript code and build the package:
+    ```bash
+    chmod 700 build.sh
+    npm install
+    npm run build
     ```
-    chmod 700 deploy.sh
-    ./deploy.sh
+4. Deploy with terraform:
+    ```bash
+    terraform -chdir=infra init
+    terraform -chdir=infra apply
     ```
-4. After successful deployment, note the output `restapi_url`. You will use this URL for testing.
+5. After successful deployment, note the output `restapi_url`. You will use this URL for testing.
 
 ## How it works
 
