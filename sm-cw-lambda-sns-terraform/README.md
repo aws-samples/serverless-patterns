@@ -46,8 +46,6 @@ This template is used to monitor AWS Secrets Manager secret keys. This helps in 
 ## Testing
 
 Once the template deployed successfully, first thing to do is to confirm the Email subscription. You will receive an email to confirm it.  Then, head to AWS Secrets Manager console and Create a Secret Key by following these steps - https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html . That's it. You will soon receive a notification about the key you created. Now any event (Like Update or Delete) happens related to that Secret Key, you will receive the notification.
-Log into the AWS Console, browse to AWS IoT Core:
-
 
 ## Cleanup
 
