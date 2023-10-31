@@ -1,0 +1,56 @@
+{
+    "title": "EventBridge to Step Functions and failure events to SQS - with CDK Java",
+    "description": "Create a Step Functions workflow to Send Failure event to SQS for operational needs.",
+    "language": "Java",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern creates an Amazon EventBridge event bus, a AWS Step Functions workflow, and subscribes the AWS Step Functions workflow to be executed when a `customEvent` event is published to the event bus. The AWS Step Functions workflow executes Lambda function for business worflow. AWS Lambda can occasionally experience transient service errors. In this case, invoking Lambda results in a 500 error, such as ServiceException, AWSLambdaException, or SdkClientException. As a best practice, proactively handle these exceptions in your state machine to Retry invoking your Lambda function, or to Catch the error and move to Failed Queue for operational needs.", 
+        "Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example."    ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-eventbridge-stepfunction-sqs-java",
+        "templateURL": "serverless-patterns/cdk-eventbridge-stepfunction-sqs-java",
+        "projectFolder": "cdk-eventbridge-stepfunction-sqs-java",
+        "templateFile": "infrastructure/src/main/java/com/myorg/CdkInfraStack.java"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Getting started with the AWS CDK",
+          "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
+        },
+        {
+          "text": "Call Amazon SQS with Step Functions",
+          "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-sqs.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Dinesh Balaaji Prabakaran",
+        "image": "https://avatars.githubusercontent.com/u/43818089?s=400&u=8a1e4fabab318016c485049108a2012b760e9ff7&v=4",
+        "bio": "I am a Senior Technical Account Manager with AWS, I specialize in architecting and developing serverless, event-driven solutions on AWS. AWS Storage Technical Field Community member.",
+        "linkedin": "https://www.linkedin.com/in/pdineshbalaaji"
+      }
+    ]
+  }
