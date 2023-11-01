@@ -1,5 +1,5 @@
 {
-  "title": "Serverless Retrieval Augmented Generation (RAG) with Bedrock, Lambda, S3, and LanceDB",
+  "title": "Serverless Retrieval Augmented Generation (RAG) with Bedrock, Lambda, S3",
   "description": "With this pattern we want to showcase how to implement a serverless RAG architecture.",
   "language": "Python",
   "level": "400",
