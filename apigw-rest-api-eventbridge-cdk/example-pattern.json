@@ -13,7 +13,7 @@
     "gitHub": {
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-eventbridge-cdk",
-        "templateURL": "apigw-rest-api-eventbridge-cdk",
+        "templateURL": "serverless-patterns/apigw-rest-api-eventbridge-cdk",
         "projectFolder": "apigw-rest-api-eventbridge-cdk",
         "templateFile": "apigw-rest-api-eventbridge-cdk/cdk/app.py"
       }
