@@ -1,8 +1,8 @@
-# Implementing the claim check pattern using EventBridge Pipes
+# Implementing the claim check pattern using EventBridge Pipes and .NET
 
 To reduce the size of the events in your event-driven application, you can temporarily remove attributes. This approach is known as the [claim check pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/StoreInLibrary.html).
 
-This pattern demonstrates the claim check pattern using EventBridge Pipes. Attributes that are removed from an event are stored in DynamoDB and retrieved from there when needed. This is done inside Pipes, using enrichment via AWS Lambda.
+This pattern demonstrates the claim check pattern using EventBridge Pipes with Lambda functions and CDK infrastructure written in .NET. Attributes that are removed from an event are stored in DynamoDB and retrieved from there when needed. This is done inside Pipes, using enrichment via AWS Lambda.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/claim-check-pattern-dotnet-cdk
 
@@ -51,12 +51,12 @@ This template demonstrates how EventBridge Pipes can remove unneded attributes t
 
 Step-by-step instructions to understand the implementation for the pattern:
 
-1. Deploy the ClaimCheckStack
-2. Check the "ClaimCheckTable" in Amazon DynamoDB to see it is empty.
-2. Trigger the ClaimCheckSampleDataCreatorLambda to generate a sample event.
-3. Check the "ClaimCheckTable" again to see the event has been persistet in the database
-4. Check the Amazon CloudWatch Log group '/aws/eventBus/rules/targets/claimCheckTargetLog' to see that only the claim check is passed to EventBridge
-5. Check the ClaimCheckTargetWorkflow execution to see the enriched object in the target workflow.
+1. Deploy the `ClaimCheckPatternDotnet` CDK stack.
+2. Check the `ClaimCheckTable` in Amazon DynamoDB to see it is empty.
+2. Trigger the `ClaimCheckSampleDataCreatorLambda` to generate a sample event.
+3. Check the `ClaimCheckTable` again to see the event has been persistet in the database.
+4. Check the Amazon CloudWatch Log group `/aws/eventBus/rules/targets/ClaimCheckTargetLog` to see that only the claim check is passed to EventBridge.
+5. Check the `ClaimCheckTargetWorkflow` execution to see the enriched object in the target workflow.
 
 ## Cleanup
  

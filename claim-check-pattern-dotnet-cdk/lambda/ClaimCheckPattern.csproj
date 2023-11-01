@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <AWSProjectType>Lambda</AWSProjectType>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <PublishReadyToRun>true</PublishReadyToRun>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.Core" Version="2.2.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.4.0" />
+    <PackageReference Include="Amazon.Lambda.CloudWatchEvents" Version="4.4.0" />
+    <PackageReference Include="Amazon.Lambda.SQSEvents" Version="2.2.0" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.203.11" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.200.64" />
+  </ItemGroup>
+</Project>
