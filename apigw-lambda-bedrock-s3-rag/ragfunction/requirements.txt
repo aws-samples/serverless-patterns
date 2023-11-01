@@ -1,0 +1,4 @@
+lancedb==0.3.2
+langchain==0.0.325
+boto3==1.28.73
+pandas==2.1.2

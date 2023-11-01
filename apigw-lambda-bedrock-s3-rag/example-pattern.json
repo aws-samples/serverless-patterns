@@ -1,0 +1,73 @@
+{
+  "title": "Serverless Retrieval Augmented Generation (RAG) with Bedrock, Lambda, S3, and LanceDB",
+  "description": "With this pattern we want to showcase how to implement a serverless RAG architecture.",
+  "language": "Python",
+  "level": "400",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "With this pattern we want to showcase how to implement a serverless RAG architecture.",
+      "Customers asked for a way to quickly test RAG capabilities on a small number of documents without managing infrastructure for contextual knowledge and non-parametric memory.",
+      "In this pattern, we run a RAG workflow in a single Lambda function, so that customers only pay for the infrastructure they use, when they use it. We use LanceDB with S3 as backend for embedding storage.",
+      "This pattern deploys one Lambda function behind an API Gateway and an S3 Bucket where to store your embeddings.",
+      "This pattern makes use of Bedrock to calculate embeddings with Amazon Titan Embedding and Claude as prediction LLM",
+      "We also provide a local pipeline to ingest your PDFs and upload them to S3."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-s3-rag",
+      "templateURL": "serverless-patterns/apigw-lambda-bedrock-s3-rag",
+      "projectFolder": "apigw-lambda-bedrock-s3-rag",
+      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+      },
+      {
+        "text": "Retrieval Augmented Generation (RAG) - original research paper",
+        "link": "https://arxiv.org/abs/2005.11401"
+      },
+      {
+        "text": "Amazon Titan Embedding",
+        "link": "https://aws.amazon.com/bedrock/titan/#Titan_Embeddings_.28generally_available.29"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy -g"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kevin Shaffer-Morrison",
+      "image": "https://kevin.shaffer-morrison.com/images/sideProfileHeadshot.jpg",
+      "bio": "Kevin Shaffer-Morrison is a Senior Solutions Architect at Amazon Web Services. He's helped hundreds of startups get off the ground quickly and up into the cloud. Kevin focuses on helping the earliest stage of founders with code samples and  twitch live streams  on twitch.tv/aws.",
+      "linkedin": "kshaffermorrison"
+    },
+    {
+      "name": "Giuseppe Battista",
+      "image": "https://media.licdn.com/dms/image/D4E03AQGOz6p4p-rSfg/profile-displayphoto-shrink_800_800/0/1686238097666?e=1703721600&v=beta&t=bhKqpehfON17sLUNDn-yFUKJhohuWljVKNCarDnsdYA",
+      "bio": "Giuseppe Battista is a Senior Solutions Architect at Amazon Web Services. He leads soultions architecture for Early Stage Startups in UK and Ireland. He hosts the Twitch Show \"Let's Build a Startup\" on twitch.tv/aws and he's head of Unicorn's Den accelerator.",
+      "linkedin": "giusedroid",
+      "twitter": "giusedroid"
+    }
+  ]
+}
