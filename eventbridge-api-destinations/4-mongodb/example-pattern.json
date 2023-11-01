@@ -1,0 +1,64 @@
+{
+    "title": "EventBridge API Destinations configuration for MongoDB",
+    "description": "Create an EventBridge rule and API destination to route events to MongoDB",
+    "language": "YAML",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an API Destination for the MongoDB API. Once deployed, the pattern allows user to send events easily through Event Bridge to MongoDB to write data into database. The pattern creates the following resources: Event Bridge Bus, Event Bridge Connection, Event Bridge API Destination, Event Bridge Rule, IAM Role, and SQS Queue.",
+            "The EventBridge rule uses the API Destination and Connection as a target, SQS Queue as a DLQ, and the IAM role as its role. To send events go to the bus and send sample events. To create a ticket enter “MyTestMessage” for the detail type, “MyTestApp” for the source, the bus created by the pattern for the Event Bus Name, and any call that follows the format for the MongoDB API as detail (https://docs.mongodb.com/realm/endpoints/).",
+            "The following information is needed to use the pattern: MongoDB Api-Key and Password: To create the AUTH for the Event Bridge Connection.",
+            "The IAM Role created by the pattern only has the permission to allow InvokeApiDestination access to the EventBridge Rule.",
+            "To work the user must have Password Access enabled in MongoDB (https://docs.mongodb.com/realm/authentication/api-key/)"
+        ]
+    },
+    "testing": {
+        "headline": "Testing",
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+            "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cd ./4-mongodb",
+            "sam deploy --guided"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "projectFolder": "eventbridge-api-destinations",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations",
+            "templateURL": "serverless-patterns/eventbridge-api-destinations",
+            "templateFile": "4-mongodb/mongoDB.yaml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "Using API destinations with Amazon EventBridge",
+                "link": "https://aws.amazon.com/blogs/compute/using-api-destinations-with-amazon-eventbridge/"
+            },
+            {
+                "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+                "link": "https://serverlessland.com/learn/eventbridge"
+            },
+            {
+                "text": "MongoDB APIs documentation",
+                "link": "https://docs.atlas.mongodb.com/api/"
+            },
+            {
+                "text": "MongoDB HTTPS endpoints",
+                "link": "https://docs.mongodb.com/realm/endpoints/"
+            }
+        ]
+    }
+}

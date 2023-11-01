@@ -1,0 +1,70 @@
+{
+    "title": "EventBridge API Destinations to Freshdesk",
+    "description": "Create an EventBridge rule and API destination to route events to Freshdesk",
+    "language": "YAML",
+    "level": "100",
+    "framework": "SAM",
+    "services": {
+        "from": "eventbridge",
+        "to": "eventbridge"
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an API Destination for the Freshdesk send ticket API. Once deployed, the pattern allows a user to send events easily through Event Bridge to Freshdesk tickets. The pattern creates the following resources: EventBridge bus, EventBridge connection, EventBridge API Destination, EventBridge rule, IAM role, and SQS queue.",
+            "The EventBridge rule uses the API Destination and Connection as a target, SQS queue as a DLQ, and the IAM role as its role. To send events go to the bus and send sample events. To send a ticket enter “freshdesktest” for the source, the bus created by the pattern for the Event Bus Name, and any call that follows the format for the create tickets as the detail (https://developers.freshdesk.com/api/#create_ticket).",
+            "The following information is needed to use the pattern:",
+            "- Freshdesk APIKey: To create the AUTH for the Event Bridge Connection",
+            "- Freshdesk Workspace: To construct the API Destination to the user's workspace",
+            "The IAM Role created by the pattern only has the permission to allow InvokeApiDestination access to the EventBridge Rule."
+        ]
+    },
+    "testing": {
+        "headline": "Testing",
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+            "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cd ./6-freshdesk",
+            "sam deploy --guided"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "projectFolder": "eventbridge-api-destinations",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations",
+            "templateURL": "serverless-patterns/eventbridge-api-destinations",
+            "templateFile": "6-freshdesk/FreshdeskAPIDestination.yaml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "Freshdesk login",
+                "link": "https://support.freshdesk.com/support/login"
+            },
+            {
+                "text": "Freshdesk: Getting started for developers",
+                "link": "https://developers.freshdesk.com/api/#getting-started"
+            },
+            {
+                "text": "Freshdesk: Create a ticket",
+                "link": "https://developers.freshdesk.com/api/#create_ticket"
+            },
+            {
+                "text": "Using API destinations with Amazon EventBridge",
+                "link": "https://aws.amazon.com/blogs/compute/using-api-destinations-with-amazon-eventbridge/"
+            }
+        ]
+    }
+}
