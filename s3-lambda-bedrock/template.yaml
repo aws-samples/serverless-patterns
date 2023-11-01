@@ -61,7 +61,12 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - s3:*
+                  - s3:GetObjectAcl
+                  - s3:GetObject
+                  - s3:ListAllMyBuckets
+                  - s3:ListBucketVersions
+                  - s3:GetObjectAttributes
+                  - s3:ListBucket
                 Resource:
                   - !Sub "arn:aws:s3:::${ContentBucketName}/*"
                   - !Sub "arn:aws:s3:::${ContentBucketName}"
