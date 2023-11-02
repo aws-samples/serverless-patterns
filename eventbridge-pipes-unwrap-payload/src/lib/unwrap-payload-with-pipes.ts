@@ -7,6 +7,8 @@ import { PolicyDocument, PolicyStatement, ServicePrincipal, Role } from 'aws-cdk
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { CloudWatchLogGroup } from 'aws-cdk-lib/aws-events-targets';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { Topic } from 'aws-cdk-lib/aws-sns';
+import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { StateMachineType, StateMachine, Pass, Result, LogLevel, Map, JsonPath } from 'aws-cdk-lib/aws-stepfunctions';
 
 
@@ -29,27 +31,10 @@ export class UnwrapStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-        // create SQS queue for option 1: using Lambda Enrichment
-        const lamdaEnrichmentSourceQueue = new Queue(this, 'UnwrapSourceQueue1', {
-          enforceSSL: true,
-          deadLetterQueue: {
-            maxReceiveCount: 1,
-            queue: new Queue(this, 'UnwrapSourceDeadLetterQueue1', {
-              enforceSSL: true,
-            }),
-          }
-        });
-    
-        // create SQS queue for option 2: using Step Functions Enrichment
-        const stepFunctionsEnrichmentSourceQueue = new Queue(this, 'UnwrapSourceQueue2', {
-          enforceSSL: true,
-          deadLetterQueue: {
-            maxReceiveCount: 1,
-            queue: new Queue(this, 'UnwrapSourceDeadLetterQueue2', {
-              enforceSSL: true,
-            }),
-          }
-        });
+    // create SNS topic
+    const sourceTopic = new Topic(this, 'UnwrapSourceTopic', {
+      fifo: false,
+    });
 
     // Create AWS Lambda function that writes three sample messages to the topic to easily test the pipe
     const sampleDataCreatorLambda = new Function(this, 'UnwrapSampleDataCreatorLambda', {
@@ -58,13 +43,36 @@ export class UnwrapStack extends Stack {
       code: Code.fromAsset('lib/lambda'),
       handler: 'unwrapSampleDataCreator.handler',
       environment: {
-        LAMBDA_ENRICHMENT_SOURCE_QUEUE_URL: lamdaEnrichmentSourceQueue.queueUrl,
-        STEP_FUNCTIONS_ENRICHMENT_SOURCE_QUEUE_URL: stepFunctionsEnrichmentSourceQueue.queueUrl,
+        SNS_TOPIC_ARN: sourceTopic.topicArn,
       }
     });
-    
-    lamdaEnrichmentSourceQueue.grantSendMessages(sampleDataCreatorLambda);
-    stepFunctionsEnrichmentSourceQueue.grantSendMessages(sampleDataCreatorLambda);
+    sourceTopic.grantPublish(sampleDataCreatorLambda);
+
+    // create SQS queue for option 1: using Lambda Enrichment
+    const lamdaEnrichmentSourceQueue = new Queue(this, 'UnwrapSourceQueue1', {
+      enforceSSL: true,
+      deadLetterQueue: {
+        maxReceiveCount: 1,
+        queue: new Queue(this, 'UnwrapSourceDeadLetterQueue1', {
+          enforceSSL: true,
+        }),
+      }
+    });
+
+    // create SQS queue for option 2: using Step Functions Enrichment
+    const stepFunctionsEnrichmentSourceQueue = new Queue(this, 'UnwrapSourceQueue2', {
+      enforceSSL: true,
+      deadLetterQueue: {
+        maxReceiveCount: 1,
+        queue: new Queue(this, 'UnwrapSourceDeadLetterQueue2', {
+          enforceSSL: true,
+        }),
+      }
+    });
+
+    // subscribe SQS queue to SNS topic
+    sourceTopic.addSubscription(new SqsSubscription(lamdaEnrichmentSourceQueue));
+    sourceTopic.addSubscription(new SqsSubscription(stepFunctionsEnrichmentSourceQueue));
 
 
     // create AWS Lambda function that unwraps the event payload
@@ -89,36 +97,41 @@ export class UnwrapStack extends Stack {
         level: LogLevel.ALL
       },
       definition: new Map(this, 'Map')
-        .iterator(new Pass(this, 'UnwrapPayload', {
+        .iterator(new Pass(this, 'UnwrapBody', {
           parameters: {
-            payload: JsonPath.stringToJson(JsonPath.stringAt("$.body.payload")),
+            Message: JsonPath.stringToJson(JsonPath.stringAt("$.body.Message")),
           },
-          resultPath: '$.unwrappedPayload',
+          resultPath: '$.body',
         })
-        .next(new Pass(this, 'UnwrapAlreadyStringifiedContent', {
+        
+      /*  
+        .next(new Pass(this, 'MergePayload', {
           parameters: {
-            alreadyStringifiedContent: JsonPath.stringToJson(JsonPath.stringAt("$.unwrappedPayload.payload.alreadyStringifiedContent")),
+            Message: JsonPath.jsonMerge(
+              JsonPath.objectAt("$.body.Message"),
+              JsonPath.objectAt("$.unwrappedPayload"),
+            ),
           },
-          resultPath: '$.unwrappedAlreadyStringifiedContent',
+          resultPath: '$.mergedPayload',
         }))
         .next(new Pass(this, 'MergeAlreadyStringifiedContent', {
           parameters: {
             payload: JsonPath.jsonMerge(
-              JsonPath.objectAt("$.unwrappedPayload.payload"),
+              JsonPath.objectAt("$.mergedPayload.Message.payload"),
               JsonPath.objectAt("$.unwrappedAlreadyStringifiedContent")
             ),
           },
           resultPath: '$.mergedAlreadyStringifiedContent',
-        }))    
-        .next(new Pass(this, 'MergePayload', {
+        }))
+        .next(new Pass(this, 'MergeBack', {
           parameters: {
             Message: JsonPath.jsonMerge(
-              JsonPath.objectAt("$.body"),
+              JsonPath.objectAt("$.body.Message"),
               JsonPath.objectAt("$.mergedAlreadyStringifiedContent")
             ),
           },
           outputPath: '$.Message',
-        }))
+        }))*/
         ),
     });
        
@@ -209,10 +222,6 @@ export class UnwrapStack extends Stack {
     new CfnOutput(this, "UnwrapSampleDataCreatorLambdaArn", {
       value: sampleDataCreatorLambda.functionArn,
       exportName: "UnwrapSampleDataCreatorLambdaArn",
-    });
-    new CfnOutput(this, "UnwrapSampleDataCreatorLambdaName", {
-      value: sampleDataCreatorLambda.functionName,
-      exportName: "UnwrapSampleDataCreatorLambdaName",
     });
   }
 }
