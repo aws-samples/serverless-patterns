@@ -56,7 +56,7 @@ Once your stack has been deployed, you can ingest PDF documents by following the
 ## Testing
 
 ```bash
-./run.sh <your-stack-name> # find it in ./samconfig.toml
+./test.sh <your-stack-name> # find it in ./samconfig.toml
 ```
 
 ### Sample Output
@@ -70,6 +70,10 @@ Prediction ended at 2023-11-01 16:20:59.934
 
 {"message": " Based on the provided context, the relevant information about Amazon Bedrock pricing is:\n\nWith Amazon Bedrock, you pay to run inference on any of the third-party foundation models. Pricing is based on the volume of input tokens and output tokens, and on whether you have purchased provisioned throughput for the model. For more inform tion, see the Model providers page in the Amazon Bedrock console. For each model, pricing is listed following the model version. For more information about purchasing provisioned throughput, see Provisioned throughput (p. 55).\n\nFor more information, see Amazon Bedrock Pricing.\n\nSo in summary, the Amazon Bedrock pricing model is based on the number of tokens processed during inference and whether provisioned throughput is purchased. The pricing details for each model are listed in the console."}
 ```
+
+## Known Limitations
+This implementation is subject to the hard limit on the timeout of APIGateway set to 29 seconds. We have measured the probability of failure because of `endpoint timeout` errors to be around 5% (n=700 observations). 
+
 ## Cleanup
  
 1. Delete the stack
