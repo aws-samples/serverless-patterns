@@ -21,7 +21,8 @@
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-bedrock-s3-streaming-rag",
         "templateURL": "serverless-patterns/lambda-bedrock-s3-streaming-rag",
-        "templateFile": "lambda-bedrock-s3-streaming-rag/template.yml"
+        "projectFolder": "lambda-bedrock-s3-streaming-rag",
+        "templateFile": "template.yml"
       }
     },
     "resources": {
