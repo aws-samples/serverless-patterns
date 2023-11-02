@@ -8,9 +8,7 @@ from langchain.document_loaders import PyPDFDirectoryLoader
 import lancedb as ldb
 import pyarrow as pa
 
-embeddings = BedrockEmbeddings(
-    region_name="us-east-1"
-)
+embeddings = BedrockEmbeddings()
 
 # we split the data into chunks of 1,000 characters, with an overlap
 # of 200 characters between the chunks, which helps to give better results
@@ -25,7 +23,7 @@ schema = pa.schema(
       pa.field("text", pa.string()), # langchain requires it
       pa.field("id", pa.string()) # langchain requires it
   ])
-  
+
 tbl = db.create_table("doc_table", schema=schema)
 
 # load the document as before
