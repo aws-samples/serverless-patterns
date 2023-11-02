@@ -1,26 +1,26 @@
 {
-    "title": "Streaming Serverless Retrieval Augmented Generation (RAG) with Bedrock, Lambda, S3",
-    "description": "With this pattern we want to showcase how to implement a streaming serverless RAG architecture.",
+    "title": "Streaming Serverless RAG with Bedrock, Lambda, S3",
+    "description": "With this pattern I want to showcase how to implement a streaming serverless RAG architecture.",
     "language": "Node.js",
     "level": "400",
     "framework": "SAM",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "With this pattern we want to showcase how to implement a streaming serverless RAG architecture.",
+        "With this pattern I want to showcase how to implement a streaming serverless RAG architecture.",
         "Customers asked for a way to quickly test RAG capabilities on a small number of documents without managing infrastructure for contextual knowledge and non-parametric memory.",
-        "In this pattern, we run a RAG workflow in a single Lambda function, so that customers only pay for the infrastructure they use, when they use it. We use LanceDB with S3 as backend for embedding storage.",
+        "In this pattern, I run a RAG workflow in a single Lambda function, so that customers only pay for the infrastructure they use, when they use it. We use LanceDB with S3 as backend for embedding storage.",
         "This pattern deploys one Lambda function with a function URL and an S3 Bucket where to store your embeddings.",
         "This pattern makes use of Bedrock to calculate embeddings with Amazon Titan Embedding and any AMazon Bedrock chat model as prediction LLM",
         "The responses are streamed using Lambda URL function streaming for a quicker time to first byte and a better user experience",
-        "We also provide a local pipeline to ingest your PDFs and upload them to S3."
+        "I also provide a local pipeline to ingest your PDFs and upload them to S3.",
+        "There is also an example of how to consume streamed responses using a very basic React application."
       ]
     },
     "gitHub": {
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-bedrock-s3-streaming-rag",
         "templateURL": "serverless-patterns/lambda-bedrock-s3-streaming-rag",
-        "projectFolder": "lambda-bedrock-s3-streaming-rag",
         "templateFile": "lambda-bedrock-s3-streaming-rag/template.yml"
       }
     },
