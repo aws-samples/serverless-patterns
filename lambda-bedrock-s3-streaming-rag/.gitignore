@@ -1,7 +1,4 @@
 *.toml
-.DS_Store
 node_modules
 embeddings/
 .aws-sam
-*.mov
-*.mp4
