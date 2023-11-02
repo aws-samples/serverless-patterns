@@ -1,0 +1,4 @@
+boto3==1.28.73
+lancedb==0.3.2
+langchain==0.0.325
+pypdf==3.17.0

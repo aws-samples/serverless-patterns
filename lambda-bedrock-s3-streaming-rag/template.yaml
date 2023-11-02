@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  node18.x
+
+  Sample SAM Template for streaming-rag-on-lambda
+
+Parameters: 
+  FunctionURLAuthType:
+    Default: AWS_IAM
+    Description: What type of auth the Lambda should use for the FunctionURL
+    Type: String
+    AllowedValues: [ AWS_IAM, NONE ]
+
+Resources:
+
+  DocumentBucket:
+    Type: 'AWS::S3::Bucket'
+
+  StreamingRAGFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs18.x
+      CodeUri: function/.
+      Timeout: 300
+      MemorySize: 256
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          s3BucketName: !Ref DocumentBucket
+          region: !Ref AWS::Region
+          lanceDbTable: doc_table
+      FunctionUrlConfig:
+        AuthType: !Ref FunctionURLAuthType
+        Cors:
+          AllowCredentials: true
+          AllowHeaders:
+            - x-amz-security-token
+            - x-amz-date
+            - x-amz-content-sha256
+            - referer
+            - content-type
+            - accept
+            - authorization
+          AllowMethods:
+          - '*'
+          AllowOrigins:
+          - '*'
+          MaxAge: 0
+        InvokeMode: RESPONSE_STREAM
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: 
+                - 'bedrock:InvokeModel'
+                - 'bedrock:InvokeModelWithResponseStream'
+              Resource: '*'
+            - Effect: Allow
+              Action: s3:GetObject
+              Resource: !Sub arn:aws:s3:::${DocumentBucket}/*
+            - Effect: Allow
+              Action: s3:ListBucket
+              Resource: !Sub arn:aws:s3:::${DocumentBucket}
+
+Outputs:
+  StreamingRAGFunction:
+    Description: "Streaming Lambda Function ARN"
+    Value: !GetAtt StreamingRAGFunction.Arn
+  StreamingRAGFunctionURL:
+    Description: "Function URL for Streaming"
+    Value: !GetAtt StreamingRAGFunctionUrl.FunctionUrl
+  StreamingRAGFunctionIamRole:
+    Description: "Implicit IAM Role created for Streaming function"
+    Value: !GetAtt StreamingRAGFunctionRole.Arn
+  DocumentBucketName:
+    Description: "S3 bucket where LanceDB sources embeddings. Check this repository README for instructions on how to import your documents"
+    Value: !Ref DocumentBucket

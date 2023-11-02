@@ -1,0 +1,4 @@
+{
+    "query": "What is Amazon Bedrock for?",
+    "model": "anthropic.claude-instant-v1"
+}
