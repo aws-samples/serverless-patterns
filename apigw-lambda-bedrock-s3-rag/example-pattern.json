@@ -20,7 +20,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-s3-rag",
       "templateURL": "serverless-patterns/apigw-lambda-bedrock-s3-rag",
       "projectFolder": "apigw-lambda-bedrock-s3-rag",
-      "templateFile": "apigw-lambda-bedrock-s3-rag/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
