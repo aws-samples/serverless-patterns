@@ -38,8 +38,7 @@ python3 ingest.py
 
 
 STACK_NAME=$1
-# BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query 'Stacks[0].Outputs[?OutputKey==`DocumentBucketName`].OutputValue' --output text)
-BUCKET_NAME=streaming-rag-lambda-v1-document-bucket
+BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query 'Stacks[0].Outputs[?OutputKey==`DocumentBucketName`].OutputValue' --output text)
 
 
 cp -r /tmp/embeddings ./

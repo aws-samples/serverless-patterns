@@ -55,13 +55,6 @@ We also provide a local pipeline to ingest your PDFs and upload them to S3.
 ## Ingest Documents
 Once your stack has been deployed, you can ingest PDF documents by following the instructions in [`./data-pipeline/README.md`](./data-pipeline/README.md)
 
-```bash
-cd data-pipeline
-chmod u+x run.sh # ensure you can execute the file
-./run.sh <your-stack-name> # find it in ./samconfig.toml
-```
-
-
 ## Testing
 Once your stack has been deployed and you have loaded in your documents, follow the testing instructions in [`./testing/README.md`](./testing/README.md)
 

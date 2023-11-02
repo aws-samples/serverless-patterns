@@ -56,7 +56,7 @@ You will need to ensure you have your AWS credentials as environment variables i
 # AWS_SECRET_ACCESS_KEY
 # AWS_SESSION_TOKEN
 # AWS_REGION
-STACK_NAME=<your-stack-name>  # find it in ./samconfig.toml
+export STACK_NAME=<your-stack-name>  # find it in ./samconfig.toml
 LAMBDA_ENDPOINT_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query 'Stacks[0].Outputs[?OutputKey==`StreamingRAGFunctionURL`].OutputValue' --output text)
 
 cd react

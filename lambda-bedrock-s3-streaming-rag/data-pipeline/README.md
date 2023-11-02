@@ -19,6 +19,8 @@ all have `.pdf` extensions. In this example, we'll only ingest PDF documents.
 
 
 ```bash
+cd data-pipeline
+pip install -r requirements.txt
 chmod u+x run.sh # ensure you can execute the file
 ./run.sh <your-stack-name>
 ```
