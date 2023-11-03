@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Creates an EventBridge Pipes with MSK cluster source and Lambda function for encrichment and Salesforce endpoint as Target. 
+  The MSK cluster is deployed into private subnet.
+
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the kafka client instance
+    Type: String
+    Default: default-key
+  MSKKafkaVersion:
+    Type: String
+    Default: 2.8.1
+    AllowedValues:
+    - 2.8.1
+    - 2.8.0
+    - 2.7.1
+    - 2.7.0
+    - 2.6.2
+    - 2.6.1
+    - 2.6.0
+    - 2.5.1
+    - 2.4.1.1
+    - 2.3.1
+    - 2.2.1
+  InstanceType:
+    Type: String
+    Default: kafka.t3.small
+    AllowedValues:
+    - kafka.t3.small
+    - kafka.m5.large
+    - kafka.m5.xlarge
+    - kafka.m5.2xlarge
+    - kafka.m5.4xlarge
+    - kafka.m5.8xlarge
+    - kafka.m5.12xlarge
+    - kafka.m5.16xlarge
+    - kafka.m5.24xlarge
+  MSKTopic:
+    Type: String
+    Default: msk-pipe-enrich-sf-demo-topic
+  SalesforceOauthUrl:
+    Type: String
+    Description: 'Salesforce Url for OAuth authentication.'
+    Default: https://velocity-enterprise-676.my.salesforce.com/services/oauth2/token
+  SFEndpointUrl:
+    Type: String
+    Description: 'Salesforce Endpoint Url'
+    Default: https://velocity-enterprise-676.my.salesforce.com/services/data/v58.0/sobjects/Cloud_New__e
+  SalesforceOauthClientId:
+    Type: String
+    Description: 'Salesforce Integration Application Client ID'
+    MinLength: 1
+    MaxLength: 256
+    Default: 3MVG9Rr0EZ2YOVMZ01EUNfA.XERigZ7YR5nZHeVyathjalq3mA1iGPFv6JvSmSW7L161w5.jyZE0wE_feesr4
+  SalesforceOauthClientSecret:
+    Type: String
+    Description: 'Salesforce Integration Application Client Secret'
+    MinLength: 1
+    MaxLength: 256
+    Default: 47C98BD15C48248F79DAAEDB82C297280287A120986E413AA40983F6746BE421
+
+Resources:
+  VPCStack:
+      Type: AWS::CloudFormation::Stack
+      Properties:
+        TemplateURL: "./vpc-stack.yaml"
+
+  MSKCluster:
+      Type: AWS::CloudFormation::Stack
+      DependsOn: VPCStack
+      Properties:
+        TemplateURL: "./msk-cluster-stack.yaml"
+        Parameters:
+          MskClusterVPCId: !GetAtt VPCStack.Outputs.VPCId
+          MskClusterPublicSubnet: !GetAtt VPCStack.Outputs.PublicSubnet
+          MskClusterPrivateSubnet1: !GetAtt VPCStack.Outputs.PrivateSubnet1
+          MskClusterPrivateSubnet2: !GetAtt VPCStack.Outputs.PrivateSubnet2
+          InstanceType: !Ref InstanceType
+          MSKKafkaVersion: !Ref MSKKafkaVersion
+
+  PipesStack:
+      Type: AWS::CloudFormation::Stack
+      DependsOn: MSKCluster
+      Properties:
+        TemplateURL: "./pipes-stack.yaml"
+        Parameters:
+          MskClusterPrivateSubnet1: !GetAtt VPCStack.Outputs.PrivateSubnet1
+          MskClusterPrivateSubnet2: !GetAtt VPCStack.Outputs.PrivateSubnet2
+          MSKTopic: !Ref MSKTopic
+          MSKCluster: !GetAtt MSKCluster.Outputs.MSKCluster
+          ClusterName: !GetAtt MSKCluster.Outputs.ClusterName
+          ClusterId: !GetAtt MSKCluster.Outputs.ClusterId
+          SalesforceOauthUrl: !Ref SalesforceOauthUrl
+          SFEndpointUrl: !Ref SFEndpointUrl
+          SalesforceOauthClientId: !Ref SalesforceOauthClientId
+          SalesforceOauthClientSecret: !Ref SalesforceOauthClientSecret
+
+  KafkaProducerStack:
+      Type: AWS::CloudFormation::Stack
+      DependsOn: MSKCluster
+      Properties:
+        TemplateURL: "./producer-stack.yaml"
+        Parameters:
+          PublicSubnet: !GetAtt VPCStack.Outputs.PublicSubnet
+          PrivateSubnet: !GetAtt VPCStack.Outputs.PrivateSubnet1
+          MSKProducerSGID: !GetAtt MSKCluster.Outputs.MSKProducerSGID
+          KeyName: !Ref KeyName
+          MSKKafkaVersion: !Ref MSKKafkaVersion
+          MSKCluster: !GetAtt MSKCluster.Outputs.MSKCluster
+

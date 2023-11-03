@@ -1,0 +1,64 @@
+{
+    "title": "Leveraging Fargate for Scheduled Jobs",
+    "description": "Create a scheduled AWS Fargate Task running on AWS ECS Cluster and EventBridge Rule using Serverless Framework",
+    "language": "Node.js",
+    "architectureURL": "",
+    "videoId": "",
+    "level": "100",
+    "framework": "Serverless Framework",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern deploys an AWS Fargate Task on AWS ECS Cluster which runs on EventBridge Rule.",
+            "",
+            "The docker image for the task based on Node.js is built first, then the image is pushed to AWS ECR. AWS ECS pulls the image from ECR and runs the image on Fargate. A serverless plugin called 'serverless-fargate' is used to create the template. The job is scheduled to run on every 10th minute of the hour.",
+            "",
+            "A simple JSON file containing message string and timestamp, is pushed to S3 bucket. All the necessary resources and permissions are configured using serverless framework."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/fargate-eventbridge-serverless",
+            "templateURL": "serverless-patterns/fargate-eventbridge-serverless",
+            "projectFolder": "fargate-eventbridge-serverless",
+            "templateFile": "serverless.yml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "Creating Amazon ECS resources with AWS CloudFormation",
+                "link": "https://docs.aws.amazon.com/AmazonECS/latest/userguide/creating-resources-with-cloudformation.html"
+            },
+            {
+                "text": "Serverless Fargate Plugin",
+                "link": "https://www.serverless.com/plugins/serverless-fargate"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "<code>serverless deploy --verbose</code>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the Github repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>serverless remove --verbose</code>."
+        ]
+    },
+    "authors": [
+        {
+            "headline": "Presented by Tejas Dhamecha, Software Engineer at Distinction-Dev, India.",
+            "name": "Tejas Dhamecha",
+            "bio": "Tejas Dhamecha is a Software Engineer working at Distinction-Dev, India who has a passion for building serverless solutions.",
+            "linkedin":"https://www.linkedin.com/in/tejas-dhamecha/",
+            "imageURL": "https://0.gravatar.com/avatar/98a4c425988ef7ee758a28ba98b947b7860c3182e898340b7b3c12bc441effb7?size=256"
+        }
+    ]
+  }

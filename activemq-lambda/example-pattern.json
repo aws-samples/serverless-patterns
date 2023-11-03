@@ -1,0 +1,60 @@
+{
+  "title": "Application Load Balancer (path-based-route) to AWS Lambda",
+  "description": "Create an Application Load Balancer with path-based routing with target as AWS Lambda",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to create an Application Load Balancer with path-based routing along with associated listener and target as AWS Lambda. Implemented in AWS CDK .NET."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-path-based-route-lambda-cdk",
+      "templateURL": "serverless-patterns/alb-path-based-route-lambda-cdk",
+      "projectFolder": "alb-path-based-route-lambda-cdk",
+      "templateFile": "alb-path-based-route-lambda-cdk/src/AlbPathBasedRouteLambdaCdkStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/lambda-functions.html"
+      },
+      {
+        "text": "ALB path-based routing",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pushparaju Thangavel",
+      "image": "./Pushparaju.jpeg",
+      "bio": "Pushparaju is a Cloud Infrastructure Architect with Amazon Web Services",
+      "linkedin": "https://www.linkedin.com/in/pushparaju-thangavel/"
+    }
+  ]
+}

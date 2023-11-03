@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```
-   sam deploy --guided
+   sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
    ```
 1. You can also use AWS CloudFormation console and paste the template.yml file in the designer and deploy it by passing the below required parameters.
 

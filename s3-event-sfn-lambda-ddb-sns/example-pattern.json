@@ -1,0 +1,58 @@
+{
+  "title": "Amazon S3 to AWS Step Functions via Amazon EventBridge and get notification back via SNS",
+  "description": "The SAM template deploys an Amazon S3 bucket that publishes events to Amazon EventBridge, and sets up an AWS Step Functions workflow to show how to consume these events via an EventBridge rule. It deploys the the IAM resources required to run the application. It also deploys a Lambda function, SNS topic and DynamoDB table. EventBridge consumes events directly from S3 buckets when the NoticationConfiguration is enabled, as shown in the template.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern sets up the following resources:",
+
+ "An Amazon S3 bucket that is configured to send any events regarding its content, such as an `Object created` event that is emitted when an object is uploaded to the bucket, to Amazon EventBridge.",
+ "An Amazon EventBridge rule that triggers a Step Functions workflow if a new `Object created` event is emitted by the S3 bucket. The workflow receives an [EventBridge event message](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ev-events.html) as its input which contains information such as the name of the S3 bucket and the key of the uploaded csv.",
+  "A sample AWS Step Functions workflow that calls the [Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) to identify objects uploaded to the S3 bucket. The workflow posesses an IAM role that authorizes it to read from the S3 bucket and to call Lambda and SNS.",
+  "A DynamoDB table and an SNS topic",
+  "Step function using [wait for callback pattern](https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token)"
+
+
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-event-sfn-lambda-ddb-sns",
+      "templateURL": "serverless-patterns/s3-event-sfn-lambda-ddb-sns",
+      "projectFolder": "s3-event-sfn-lambda-ddb-sns",
+      "templateFile": "template.yaml"
+    }
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abha Tripathi",
+      "image": "https://avatars.githubusercontent.com/u/36122588?s=400&u=209552eb3fa55e5c4176e54a24a7737ce899083b&v=4",
+      "bio": "Cloud Engineer @ AWS",
+      "linkedin": "www.linkedin.com/in/abha-tripathi-344a0a146"
+    },
+    {
+      "name": "Sushir V R",
+      "image": "https://avatars.githubusercontent.com/u/42473846?s=400&u=4c7b19858e4ec3d9ae24e379c35848219ee57a86&v=4",
+      "bio": "Cloud Engineer @ AWS",
+      "linkedin": "www.linkedin.com/in/sushirvr"
+    }
+  ]
+}

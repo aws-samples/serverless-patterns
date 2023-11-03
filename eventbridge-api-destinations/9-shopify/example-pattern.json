@@ -1,0 +1,70 @@
+{
+    "title": "EventBridge API Destinations to Shopify",
+    "description": "Create an EventBridge rule and API destination to route events to Shopify",
+    "language": "YAML",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an API Destination for the Shopify Create Product API. Once deployed, the pattern allows a user to send events easily through EventBridge to create products in a Shopify store. The pattern creates the following resources: EventBridge Bus, EventBridge Connection, EventBridge API Destination, EventBridge Rule, IAM Role, and SQS Queue.",
+            "The EventBridge rule uses the API Destination and Connection as a target, SQS Queue as a DLQ, and the IAM role as its role. To send events go to the bus and send sample events.",
+            "To create a product, enter “MyShopifyApp” for the source, the bus created by the pattern for the Event Bus Name, and any call that follows the format for posting products as the detail (https://shopify.dev/api/admin-rest/2021-10/resources/product#post-products).",
+            "Before using the pattern a Shopify app and Admin Key with the appropriate permissions should be created. (https://shopify.dev/apps/auth/admin-app-access-tokens#step-1-create-and-install-the-app).",
+            "The following information is needed to run the template:",
+            "- Shopify Admin Key: To create the AUTH for the EventBridge Connection",
+            "- Shopify Store Name: To construct the call for the API destination",
+            "The IAM role created by the pattern only has the permission to allow InvokeApiDestination access to the EventBridge Rule."
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+            "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cd ./9-shopify",
+            "sam deploy --guided"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "projectFolder": "eventbridge-api-destinations",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations",
+            "templateURL": "serverless-patterns/eventbridge-api-destinations",
+            "templateFile": "9-shopify/ShopifyAPIDestination.yaml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "Shopify: Create an app",
+                "link": "https://shopify.dev/apps/getting-started/create"
+            },
+            {
+                "text": "Shopify: Amazon EventBridge webhook delivery",
+                "link": "https://shopify.dev/apps/webhooks/configuration/eventbridge"
+            },
+            {
+                "text": "Shopify: Access tokens for custom apps in the Shopify admin",
+                "link": "https://shopify.dev/apps/auth/admin-app-access-tokens"
+            },
+            {
+                "text": "Shopfy: Product resource",
+                "link": "https://shopify.dev/api/admin-rest/2021-10/resources/product#top"
+            },
+            {
+                "text": "Using API destinations with Amazon EventBridge",
+                "link": "https://aws.amazon.com/blogs/compute/using-api-destinations-with-amazon-eventbridge/"
+            }
+        ]
+    }
+}

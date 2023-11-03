@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: > 
+  AWS SAM Template for Serverless pattern 
+  Kinesis DataStream triggers Lambda with error handling and invalid record is put into SQS for further analysis
+  AWS Services used: AWS Lambda, SQS, Kineis, CloudWatch, IAM 
+  Cloud9 is recommended as it comes with all the neceassry packages and cli to run this Serverless pattern
+ 
+Resources:
+  # Create the Kinesis Data Stream
+  DataActivityKinesisStream:
+    Type: 'AWS::Kinesis::Stream'
+    Properties:
+      Name: DataActivityKinesisStream
+      RetentionPeriodHours: 25
+      ShardCount: 1
+      Tags:
+        - Key: AppName 
+          Value: serverless-pattern
+
+  # Create the lambda function to consume the message from Kinesis Data Stream, process and then decide if it's. valid or not.
+  KinesisDataStreamProcessor:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: KinesisDataStreamProcessor
+      CodeUri: kinesis-consumer/
+      Handler: kinesis-consumer-fn.lambda_handler
+      Runtime: python3.9
+      MemorySize: 128
+      Timeout: 10
+      Tracing: Active
+      Tags:
+        AppName: serverless-pattern
+      Environment:
+        Variables:
+          KINESIS_STREAM_NAME: !Ref DataActivityKinesisStream
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt AnomalyDataQueue.QueueName
+      Events:
+        DataActivityKinesisEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt DataActivityKinesisStream.Arn
+            BatchSize: 5
+            DestinationConfig: 
+              OnFailure:
+                Type: SQS
+                Destination: !GetAtt AnomalyDataQueue.Arn
+            MaximumRetryAttempts: 5
+            StartingPosition: TRIM_HORIZON
+            MaximumRecordAgeInSeconds: 3600
+            BisectBatchOnFunctionError: true
+            # Refer to below link for other values for starting position
+            # https://docs.aws.amazon.com/kinesis/latest/APIReference/API_StartingPosition.html
+      
+  # Create an SQS queue to put the failed messages
+  AnomalyDataQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: AnomalyDataQueue
+      Tags:
+        - Key: AppName 
+          Value: serverless-pattern
+
+# Create the cloudwatch log group to validate and verify the application run status
+  EventMonitor:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: KinesisDataStreamProcessorLogs
+      Tags:
+        - Key: AppName 
+          Value: serverless-pattern
+
+Outputs:
+  KinesisStreamName:
+    Description: Kinesis Stream Name
+    Value: !Ref DataActivityKinesisStream
+
+  LambdaFunctionName:
+    Description: Lambda Function Name
+    Value: !Ref KinesisDataStreamProcessor
+
+  SQSQueueName:
+    Description: SQS Queue Name
+    Value: !GetAtt AnomalyDataQueue.QueueName
+  
+  CloudWatchLogGroupName: 
+    Description: CloudWatch Group Name
+    Value: !Ref EventMonitor

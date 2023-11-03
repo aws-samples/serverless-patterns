@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sentiment-analysis
+
+  Sample SAM template for sentiment analysis with AWS Lambda and Amazon Comprehend
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 5
+    MemorySize: 256
+
+Resources:
+  DetectSentimentApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+
+  DetectSentimentLambdaFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - arm64
+      Policies:
+        - ComprehendBasicAccessPolicy: {}
+      Events:
+        SentimentAnalysis:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /detect_sentiment
+            Method: post
+            RestApiId:
+              Ref: DetectSentimentApi
+
+Outputs:
+  SentimentAnalysisAPI:
+    Description: "API Gateway endpoint URL for the dev stage of the Detect Sentiment API"
+    Value: !Sub "https://${DetectSentimentApi}.execute-api.${AWS::Region}.amazonaws.com/dev/detect_sentiment/"

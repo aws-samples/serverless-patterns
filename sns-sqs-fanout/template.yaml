@@ -1,0 +1,153 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SNS to SQS Fanout pattern using SAM
+
+
+Resources:
+  # The SNS topic where all metrics data will be published
+  MetricsSnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: MetricsSnsTopic
+      TopicName: MetricsSnsTopic    
+
+  # Define the SQS queues
+  # AllMetricsSqsQueue will receive all the messages from SNS Topic
+  AllMetricsSqsQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: AllMetricsSqsQueue
+      RedrivePolicy: 
+        deadLetterTargetArn: !GetAtt MetricsSqsDLQueue.Arn
+        maxReceiveCount: 5
+  # TemperatureSqsQueue will receive only the temperature metrics data from SNS Topic        
+  TemperatureSqsQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: TemperatureSqsQueue
+      RedrivePolicy: 
+        deadLetterTargetArn: !GetAtt TemperatureSqsDLQueue.Arn
+        maxReceiveCount: 5
+  # HumiditySqsQueue will receive only the humidity metrics data from SNS Topic         
+  HumiditySqsQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: HumiditySqsQueue
+      RedrivePolicy: 
+        deadLetterTargetArn: !GetAtt HumiditySqsDLQueue.Arn
+        maxReceiveCount: 5
+  # Define the deal letter queues for each of the above three topics
+  MetricsSqsDLQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: MetricsSqsDLQueue
+  TemperatureSqsDLQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: TemperatureSqsDLQueue
+  HumiditySqsDLQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: HumiditySqsDLQueue
+
+  # Define the policy that allows SNS to publish to this SQS queue
+  SnsToSqsPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow SNS publish to SQS"
+            Effect: Allow
+            Principal: 
+              Service: "sns.amazonaws.com"
+            Resource: "*"
+            Action: 
+              - sqs:SendMessage
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref MetricsSnsTopic
+      Queues:
+        - !Ref AllMetricsSqsQueue
+        - !Ref TemperatureSqsQueue
+        - !Ref HumiditySqsQueue        
+
+  # Define the SNS Subscriptions and Filter Policies
+  # AllMetricsSqsQueue will receive all messages from the SNS Topic
+  MetricsQueueSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt AllMetricsSqsQueue.Arn
+      Protocol: sqs
+      RawMessageDelivery: True
+      TopicArn: !Ref MetricsSnsTopic
+  # TemperatureSqsQueue will receive only the messages which has message attribute MetricType = temperature from SNS Topic    
+  TemperatureSqsQueueSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt TemperatureSqsQueue.Arn
+      Protocol: sqs
+      FilterPolicy:
+        MetricType:
+          - Temperature
+      RawMessageDelivery: True
+      TopicArn: !Ref MetricsSnsTopic
+  # HumiditySqsQueue will receive only the messages which has message attribute MetricType = humidity from SNS Topic  
+  HumiditySqsQueueSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt HumiditySqsQueue.Arn
+      Protocol: sqs
+      FilterPolicy:
+        MetricType:
+          - Humidity
+      RawMessageDelivery: True
+      TopicArn: !Ref MetricsSnsTopic
+
+# List all common outputs for usage
+Outputs:
+  SNStopicName:
+    Description: SNS topic name
+    Value: !GetAtt MetricsSnsTopic.TopicName
+
+  SNStopicARN:
+    Description: SNS topic ARN
+    Value: !Ref MetricsSnsTopic
+
+  AllMetricsSqsQueueName:
+    Description: SQS queue name
+    Value: !GetAtt AllMetricsSqsQueue.QueueName
+
+  AllMetricsSqsQueueArn:
+    Description: SQS queue ARN
+    Value: !GetAtt AllMetricsSqsQueue.Arn
+
+  AllMetricsSqsQueueURL:
+    Description: SQS queue URL
+    Value: !Ref AllMetricsSqsQueue
+
+  TemperatureSqsQueueName:
+    Description: SQS queue name
+    Value: !GetAtt TemperatureSqsQueue.QueueName
+
+  TemperatureSqsQueueArn:
+    Description: SQS queue ARN
+    Value: !GetAtt TemperatureSqsQueue.Arn
+
+  TemperatureSqsQueueURL:
+    Description: SQS queue URL
+    Value: !Ref TemperatureSqsQueue
+
+  HumiditySqsQueueName:
+    Description: SQS queue name
+    Value: !GetAtt HumiditySqsQueue.QueueName
+
+  HumiditySqsQueueArn:
+    Description: SQS queue ARN
+    Value: !GetAtt HumiditySqsQueue.Arn
+
+  HumiditySqsQueueURL:
+    Description: SQS queue URL
+    Value: !Ref HumiditySqsQueue
+
+

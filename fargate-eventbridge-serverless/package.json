@@ -1,0 +1,12 @@
+{
+  "name": "fargate-eventbridge-serverless",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless-fargate": "^0.0.12"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.395.0"
+  }
+}

@@ -66,6 +66,14 @@ Resources:
                 Action:
                   - 'events:PutEvents'
                 Resource: !GetAtt ApplicationEventBus.Arn
+        - PolicyName: !Sub ${AWS::StackName}-dlq-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "SQS:SendMessage"
+                Resource: !GetAtt PipeDLQueue.Arn
 
   # EventBridge Pipe to listen to all created items in DDB table             
   OrderCreatedPipe:

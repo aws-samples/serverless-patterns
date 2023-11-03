@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: This templates creates a Lambda function running with an ECR Image. The ECR image needs to be entered in the parameters
+
+Parameters:
+  EcrUri:
+    Type: String 
+    Description : The Image Uri of the container image, for instance "112233445566.dkr.ecr.eu-west-1.amazonaws.com/hello-world:latest"
+
+Resources:
+  LambdaEcr:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: !Ref EcrUri
+      MemorySize: 256
+      Timeout: 30

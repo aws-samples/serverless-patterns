@@ -1,0 +1,118 @@
+service: fargate-eventbridge-serverless
+frameworkVersion: '3'
+provider:
+  name: aws
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'ap-south-1'}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+       - s3:CreateBucket
+      Resource: arn:aws:s3:::${self:custom.destinationBucket}/*
+  ecr:
+    images:
+      hello-task:
+        path: ./
+        file: Dockerfile
+
+custom:
+  destinationBucket: ${self:service}-${self:provider.stage}-destination-bucket
+
+fargate:
+  clusterName: fargate-eventbridge-serverless
+  containerInsights: true
+  memory: '0.5GB'
+  cpu: 256
+  architecture: X86_64
+  vpc:
+    assignPublicIp: true
+    securityGroupIds:
+      - {Ref: SecurityGroup}
+    subnetIds:
+      - {Ref: Subnet}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+       - s3:PutObject
+      Resource: arn:aws:s3:::${self:custom.destinationBucket}/*
+
+  tasks:
+    hello-task:
+      name: hello-task
+      image: hello-task
+      vpc:
+        assignPublicIp: true
+        securityGroupIds:
+          - {Ref: SecurityGroup}
+        subnetIds:
+          - {Ref: Subnet}
+      memory: '0.5GB'
+      cpu: 256
+      schedule: cron(0/10 * * * ? *)
+      environment:
+        DESTINATION_BUCKET: ${self:custom.destinationBucket}
+
+resources:
+  Resources:
+    DestinationBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.destinationBucket}
+    # creates a VPC with a public subnets within the VPC
+    VPC:
+      Type: AWS::EC2::VPC
+      Properties:
+        CidrBlock: 12.2.1.0/24
+        EnableDnsHostnames: true
+        EnableDnsSupport: true
+    Subnet:
+      Type: AWS::EC2::Subnet
+      Properties:
+        VpcId: { Ref: VPC }
+        CidrBlock: 12.2.1.0/25
+        MapPublicIpOnLaunch: true
+        AvailabilityZone: !Select 
+          - 0
+          - Fn::GetAZs: {Ref: 'AWS::Region'}
+    SecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: SG created via serverless framework
+        VpcId: { Ref: VPC }
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 443
+            ToPort: 443
+            CidrIp: 0.0.0.0/0
+    # internet gateway that connects the vpc to the internet
+    InternetGateway:
+      Type: AWS::EC2::InternetGateway
+    AttachGateway:
+      Type: AWS::EC2::VPCGatewayAttachment
+      Properties:
+        VpcId: { Ref: VPC }
+        InternetGatewayId: { Ref: InternetGateway }
+    PublicSubnetRouteTable:
+      Type: AWS::EC2::RouteTable
+      Properties:
+        VpcId: { Ref: VPC }
+    # creates public routes for the subnet
+    PublicSubnetRoute:
+      Type: AWS::EC2::Route
+      DependsOn: AttachGateway
+      Properties:
+        RouteTableId: { Ref: PublicSubnetRouteTable }
+        DestinationCidrBlock: 0.0.0.0/0
+        GatewayId: { Ref: InternetGateway }
+    PublicSubnetRouteTableAssociationOne:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: { Ref: PublicSubnetRouteTable }
+        SubnetId: { Ref: Subnet }
+
+plugins:
+  - serverless-fargate

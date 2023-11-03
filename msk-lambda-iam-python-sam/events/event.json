@@ -1,0 +1,54 @@
+{
+  "eventSource": "aws:kafka",
+  "eventSourceArn": "arn:aws:kafka:us-west-2:123456789012:cluster/MSKWorkshopCluster/a93759a9-c9d0-4952-984c-492c6bfa2be8-13",
+  "bootstrapServers": "b-1.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098,b-3.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098,b-2.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098",
+  "records": {
+    "myTopic-0": [
+      {
+        "topic": "myTopic",
+        "partition": 0,
+        "offset": 383,
+        "timestamp": 1678484822068,
+        "timestampType": "CREATE_TIME",
+        "value": "bTE=",
+        "headers": []
+      },
+      {
+        "topic": "myTopic",
+        "partition": 0,
+        "offset": 384,
+        "timestamp": 1678484823448,
+        "timestampType": "CREATE_TIME",
+        "value": "bTI=",
+        "headers": []
+      },
+      {
+        "topic": "myTopic",
+        "partition": 0,
+        "offset": 385,
+        "timestamp": 1678484824763,
+        "timestampType": "CREATE_TIME",
+        "value": "bTM=",
+        "headers": []
+      },
+      {
+        "topic": "myTopic",
+        "partition": 0,
+        "offset": 386,
+        "timestamp": 1678484825902,
+        "timestampType": "CREATE_TIME",
+        "value": "bTQ=",
+        "headers": []
+      },
+      {
+        "topic": "myTopic",
+        "partition": 0,
+        "offset": 387,
+        "timestamp": 1678484827810,
+        "timestampType": "CREATE_TIME",
+        "value": "bTU=",
+        "headers": []
+      }
+    ]
+  }
+}

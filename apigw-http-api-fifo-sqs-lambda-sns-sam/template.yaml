@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: ApigwSnsSqsLambda SAM Template
+
+# Define the parameters section
+Parameters:
+   # Lambda Function Name parameter
+  FunctionName: 
+    Type: String
+    Default: ServerlessLand_Function
+    Description: Name of the function that will process messages from sqs queue
+    
+  # API Stage Name parameter
+  StageName:
+    Type: String
+    Default: prod
+    Description: Name of API stage
+  
+  # Main SQS Name parameter
+  SQSQueueName:
+    Type: String
+    Default: ServerlessLandSQS.fifo
+    Description: Name of fifo sqs that will receive messages from Http API (add .fifo suffix)
+  
+  # DLQ SQS Name parameter
+  SQSDLQName:
+    Type: String
+    Default: ServerlessLandSQSDlq.fifo
+    Description: Name of the dead letter fifo queue that will be attached to the main queue <mySQS> (add .fifo suffix)
+    
+  # SNS Topic Name parameter
+  SNSTopicName:
+    Type: String
+    Default: ServerlessLandSNSTopic
+    Description: Name of sns standard topic that will receive messages from lambda function code (add .fifo suffix)
+
+# Define the resource section
+Resources:
+  # Define the dead-letter queue for the main Queue (i.e. !Ref SQSQueueName)
+  MyDeadLetterQueueForSQS:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref SQSDLQName
+      FifoQueue: True # Set to true to create a FIFO queue, ensuring strict message ordering
+      ContentBasedDeduplication: True
+      VisibilityTimeout: 300
+
+  # Define the Amazon SNS topic resource
+  MySNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Ref SNSTopicName
+  
+  # Define the AWS Lambda function resource.
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Ref FunctionName
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Environment:
+        Variables:
+          TOPIC_ARN: !Ref MySNSTopic
+      Policies:
+        - SQSPollerPolicy:
+            QueueName:
+              !GetAtt MySQSQueue.QueueName
+        - SNSPublishMessagePolicy:
+            TopicName:
+              !GetAtt MySNSTopic.TopicName
+              
+      Events: # Adding SQS event to the Lambda function
+        MySQSTrigger:
+          Type: SQS 
+          Properties:
+            Queue: !GetAtt MySQSQueue.Arn
+
+
+  # Define the main Amazon SQS queue resource
+  MySQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref SQSQueueName
+      FifoQueue: True
+      ContentBasedDeduplication: True
+      VisibilityTimeout: 300
+      RedrivePolicy: # Define the dead-letter queue (DLQ) configuration
+        deadLetterTargetArn: !GetAtt MyDeadLetterQueueForSQS.Arn
+        maxReceiveCount: 5
+      
+  # Define the IAM Role resource for the API Gateway
+  MyAPiRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: # Define the permissions policy for the IAM Role to allow API Gateway to assume the role
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies: # Define the IAM Policy attached to the role to allow sending messages to the SQS queue
+        - PolicyName: SendMessagePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt MySQSQueue.Arn # Specify the ARN of the SQS queue
+                
+  # Define the AWS HTTP API resource
+  MyAPI:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref StageName # Specify the stage name for the API
+      DefinitionBody: # Define the API configuration using AWS::Include transformation
+        'Fn::Transform':
+          Name: "AWS::Include"
+          Parameters:
+            Location: 'api.yaml' # Specify the location of the API configuration in 'api.yaml'
+
+
+# Define the outputs section
+Outputs:
+  # Output the API Gateway endpoint URL for the MyAPI in the Prod stage
+  MyAPI:
+    Description: "API Gateway endpoint URL for Prod stage for myfunction"
+    Value: !Sub "https://${MyAPI}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${StageName}/"
+  MySNSTopic:
+    Description: "SNS topic arn. Use this topic to subscribe an email endpoint"
+    Value: !Ref MySNSTopic
