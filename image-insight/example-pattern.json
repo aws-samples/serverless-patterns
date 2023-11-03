@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/image-insight",
       "templateURL": "serverless-patterns/image-insight",
       "projectFolder": "image-insight",
-      "templateFile": "image-insight/template.yml"
+      "templateFile": "template.yml"
     }
   },
   "resources": {
