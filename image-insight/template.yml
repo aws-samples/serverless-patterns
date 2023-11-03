@@ -15,7 +15,7 @@ Resources:
           title: "RESTAPI-PUT-GET"
           version: "2023-07-13T05:41:53Z"
         servers:
-        - url: "https://pipphoz417.execute-api.us-east-1.amazonaws.com/{basePath}"
+        - url: "https://123343.execute-api.us-east-1.amazonaws.com/{basePath}"
           variables:
             basePath:
               default: "dev"

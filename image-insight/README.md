@@ -1,4 +1,4 @@
-# ImageVision
+# ImageInsight
 
 ![Workflow](/ImageInsightsWorkflow.png)
 
