@@ -26,7 +26,7 @@ cd image-vision-project
 2. Deploy the serverless application using AWS SAM.
 ```bash
 sam build
-sam deploy --guided --stack-name image-description-stack
+sam deploy --guided --stack-name image-description-stack --capabilities CAPABILITY_NAMED_IAM
 ```
 3. Your application is now deployed, and the API Gateway endpoint is available.
 
