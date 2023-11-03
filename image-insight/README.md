@@ -1,6 +1,6 @@
 # ImageVision
 
-![Workflow](./ImageinsightsWorkflow.png)
+![Workflow](./ImageInsightsWorkflow.png)
 
 ## Overview
 This project is a serverless application that uses AWS services to provide image description based on AWS Rekognition and Bedrock services. It's designed to help you analyze and describe the content of images.
