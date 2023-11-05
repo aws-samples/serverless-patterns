@@ -1,6 +1,6 @@
 # Amazon API Gateway to AWS Lambda to Amazon Bedrock using AWS SDK for JS and SAM
 
-This sample project deploys an Amazon API Gateway REST API with an AWS Lambda integration. The Lambda function is written in Python, calls the Amazon Bedrock API for Anthropic Claude-v2 model and returns a response containing the generated content.
+This sample project deploys an Amazon API Gateway REST API with an AWS Lambda integration. The Lambda function is written in TypeScript, calls the Amazon Bedrock API for Anthropic Claude-v2 model and returns a response containing the generated content.
 
 Learn more about this pattern at Serverless Land Patterns: serverlessland.com/patterns/apigw-lambda-bedrock
 
