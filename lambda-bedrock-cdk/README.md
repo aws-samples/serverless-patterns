@@ -1,6 +1,6 @@
-# Bedrock foundational model inference with AWS Lambda with CDK
+# Amazon Bedrock foundational model inference with AWS Lambda with CDK
 
-This pattern demonstrates how to infere a foundational model in Bedrock via a Lambda function.
+This pattern shows how to infer a foundational model in Amazon Bedrock via an AWS Lambda function.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-cdk
 
@@ -45,6 +45,8 @@ Important: this application uses various AWS services and there are costs associ
 
 Verify deployment in the AWS Console and copy function name.
 
+To use Bedrock, you must request access to Bedrock's FMs via the [Bedrock Management Console](https://console.aws.amazon.com/bedrock). To do so, you will need to have the correct IAM Permissions. 
+
 `cd tests`
 
 Grant execution permissions to the `test.sh` script:
@@ -79,7 +81,7 @@ A successful response will return:
 {"statusCode": 200, "model_id": "ai21.j2-mid-v1", "execution_time": [execution time in ms], "body": "[model repsonse]"
 ```
 
-If an error occures it will return:
+If an error occurs it will return:
 
 ```
 {"statusCode": 500, "request_body": "[request_body event payload]", "models": "[list of foundational models enabled in Bedrock]"
