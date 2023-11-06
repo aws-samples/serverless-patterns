@@ -6,7 +6,7 @@ Without proper handling of failure when working with Kinesis Data Streams, an it
 
 This will ultimately create wasteful invocations of a Lambda, wasted CPU cycles in a container and worst of all the downstream consumers will not get the data they need.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/terraform-kinesis-poison-pill
 
 **Important**: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -40,7 +40,7 @@ Learn more about this pattern at Serverless Land Patterns: << Add the live URL h
 5. Change directory to the pattern directory:
     ```
     cd ../..
-
+    ```
 6. Deploy the stack to your default AWS account and region using terraform
     ```
     terraform init
