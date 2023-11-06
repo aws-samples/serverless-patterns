@@ -1,0 +1,12 @@
+{
+  "version": "1.89.0",
+  "description": "Python client for jsii runtime",
+  "license": "Apache-2.0",
+  "author": "Amazon Web Services",
+  "jsii-runtime": {
+    "version": "1.89.0"
+  },
+  "bugs": "https://github.com/aws/jsii",
+  "homepage": "https://github.com/aws/jsii",
+  "repository": "https://github.com/aws/jsii.git"
+}

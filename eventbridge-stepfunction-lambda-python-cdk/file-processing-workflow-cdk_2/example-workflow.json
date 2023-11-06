@@ -1,0 +1,72 @@
+{
+    "title": "File processing Workflow",
+    "description": "This sample project shows handling of file processing workloads following the eventdriven microservice pattern. Deploying this sample project will create 2 S3 buckets, Eventbridge rules, one stepfunction 3 lambdas and a couple of roles for working successfully",
+    "language": "Python",
+    "simplicity": "2 - Patterns",
+    "usecase": "",
+    "type": "Standard",
+    "diagram": "/file_processing_workflow_cdk/resources/statemachine.png",
+    "videoId": "",
+    "level": "100",
+    "framework": "CDK",
+    "services": [
+      "lambda",
+      "EventBridge",
+      "StepFunctions",
+      "S3",
+      "IAM"
+    ],
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "In this project, User is supposed to upload a JSON/XML file into source S3 bucket, based on a pre-defined schema. The Source bucket emits notification and the event is captured in Eventbridge rule. The rule triggers stepfunction which checks if the file uploaded is  JSON or a XML file. Based on the file type the Stepfunction forwards the request to the next step where either the XML Handler or the JSon Handler processors pick up and  transform the file and eventually upload it back to destination S3-bucket. Sample JSON/XML files are attached as part of the  code under sample_source_data directory. The JSON handler looks for the employee data and if the jobTitleName happens to be  Developer it transforms that to the new standard of the company as Engineer and uploads in the destination directory. In the XML handler it looks for departmentid and if it is of value 5346 it changes it to Management else keeps it as Finance "
+      ]
+    },
+    "testing": {
+      "headline": "Testing",
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "headline": "Cleanup",
+      "text": [
+        "1. Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "deploy": {
+      "text": [
+        "1. Bootstrap CDK, if needed: <code>cdk bootstrap aws://{your-aws-account-number}/{your-aws-region}</code>",
+        "2. Deploy the stack: <code>cdk deploy</code>"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/step-functions-workflows-collection/tree/main/batch-lambda-cdk/",
+        "templateDir": "batch-lambda-cdk/batch_lambda_cdk",
+        "templateFile": "app.py",
+        "ASL": "file-processing-workflow-cdk/file_processing_workflow_cdk/statemachine/statemachine.asl.json"
+      },
+      "payloads": [
+        {
+          "headline": "",
+          "payloadURL": ""
+        }
+      ]
+    },
+    "resources": {
+      "headline": "Additional resources",
+      "bullets": [
+        {
+          "text": "The AWS Step Functions Workshop",
+          "link": "https://catalog.workshops.aws/stepfunctions/en-US"
+        }
+      ]
+    },
+    "authors": [
+      {
+        "name": "Soumik Roy",
+        "bio": "Soumik is Cloud Application Architect at AWS who is passionate about serverless and event-driven architectures.",
+      }
+    ]
+  }
