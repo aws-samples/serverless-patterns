@@ -1,21 +1,21 @@
 {
-  "title": "Lambda to Bedrock",
-  "description": "Create a Lambda function to infere foundation models in Bedrock.",
+  "title": "AWS Lambda to Amazon Bedrock",
+  "description": "Create an AWS Lambda function to infer foundation models in Amazon Bedrock.",
   "language": "Python",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Lambda function to infere foundational models in Bedrock. The function is invoked with a JSON payload to infere the desired foundation model and it will return Bedrock response with an execution time to evaluate different models performances."
+      "This sample project demonstrates how to use an AWS Lambda function to infer foundational models in Bedrock. The function is invoked with a JSON payload to infere the desired foundation model and it will return Bedrock response with an execution time to evaluate different models performances."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-bedrock-ckd",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-bedrock-cdk",
       "templateURL": "serverless-patterns/lambda-bedrock-cdk",
       "projectFolder": "lambda-bedrock-cdk",
-      "templateFile": "lambda-bedrock-cdk/lambda-layer/bin/lambda-layer.ts"
+      "templateFile": "lambda-layer/bin/lambda-layer.ts"
     }
   },
   "resources": {
