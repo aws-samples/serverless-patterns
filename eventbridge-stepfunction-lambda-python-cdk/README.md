@@ -7,12 +7,14 @@ This reference architecture is for a file processor workflow. This architecture 
 Use Case/ Business Requirement(Hypothetical):
 
 Its assumed that there has been a merger between 2 companies A and B.
-A is now the parent company of B and would like to make a few things uniform in company B as per the regulations in comapny A.
+A is now the parent company of B and would like to make a few things uniform in company B as per the regulations in company A.
 One such example is all Developers in Company B would now be designated as Engineers as per the policy of company A. Hence all employee data stored in S3 is now getting updated
-Another such example is based on activities performed by employees of particular department-id in comapny B, the parent company treats those employees as employees under Finance department else under Management Department and adds these modifications to the files stored in source S3 bucket.
+Another such example is based on activities performed by employees of particular department, in company B, the parent company treats those employees as employees under Finance department else under Management Department and adds these modifications to the files stored in source S3 bucket.
 
 
-As part of the pattern, upon deployment, it will go ahead and create a source S3 bucket. The source S3 bucket is configured such that it triggers cloudwatch events. Event rules are created in the default event bus to monitor on the source s3 bucket. Once any event is recieved upon object creation in S3, as per the rule, eventbridge forwards the event to AWS Step Functions. Step Functions use lambdas to determine the file type and then based on the file type Step Function forwards the event details to subsequent steps(lambdas) to handle(modify and upload) the file. The destination S3 bucket is also configured as part of the deployment and the bucket name is provided to the lambdas as environment variable
+As part of the pattern, upon deployment, it will go ahead and create a source S3 bucket. The source S3 bucket is configured such that it triggers cloudwatch events. Event rules are created in the default event bus to monitor on the source s3 bucket. Once any event is recieved upon object creation in S3, as per the rule, eventbridge forwards the event to AWS Step Functions. Step Functions use lambdas to determine the file type and then based on the file type Step Function forwards the event details to subsequent steps(lambdas) to handle(modify and upload) the file. The destination S3 bucket is also configured as part of the deployment and the bucket name is provided to the lambdas as environment variable .
+
+Loading files in S3 is out of scope of this project. For test purposes we have provided some sample source files to be uploaded in source S3 bucket. These files are under the path  (file-processing-workflow-cdk/sample_source_data)
 
 Important: In case this architecture is to be used for customer reference and for heavy use if we need to understand pricing please look into [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
