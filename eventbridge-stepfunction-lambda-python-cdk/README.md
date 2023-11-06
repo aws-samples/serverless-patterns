@@ -14,7 +14,7 @@ Another such example is based on activities performed by employees of particular
 
 As part of the pattern, upon deployment, it will go ahead and create a source S3 bucket. The source S3 bucket is configured such that it triggers cloudwatch events. Event rules are created in the default event bus to monitor on the source s3 bucket. Once any event is recieved upon object creation in S3, as per the rule, eventbridge forwards the event to AWS Step Functions. Step Functions use lambdas to determine the file type and then based on the file type Step Function forwards the event details to subsequent steps(lambdas) to handle(modify and upload) the file. The destination S3 bucket is also configured as part of the deployment and the bucket name is provided to the lambdas as environment variable .
 
-Loading files in S3 is out of scope of this project. For test purposes we have provided some sample source files to be uploaded in source S3 bucket. These files are under the path  (file-processing-workflow-cdk/sample_source_data)
+Loading files in S3 is out of scope of this project. For test purposes we have provided some sample source files to be uploaded in source S3 bucket. These files are under the path  (file-processing-workflow-cdk_2/sample_source_data)
 
 Important: In case this architecture is to be used for customer reference and for heavy use if we need to understand pricing please look into [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -43,9 +43,9 @@ Important: In case this architecture is to be used for customer reference and fo
     ```
 5. Change directory to the pattern directory:
     ```
-    cd eventbridge-stepfunction-lambda-python-cdk/file-processing-workflow-cdk
+    cd eventbridge-stepfunction-lambda-python-cdk/file-processing-workflow-cdk_2
     ```
-6. Inside the `file-processing-workflow-cdk` directory run ` python -m venv venv` to create a virtual environment with required dependencies for this project
+6. Inside the `file-processing-workflow-cdk_2` directory run ` python -m venv venv` to create a virtual environment with required dependencies for this project
 7. Run `source venv/bin/activate`
 8. Run `python3 -m pip install -r requirements.txt`
 9. Run `cdk bootstrap`
@@ -110,7 +110,7 @@ Do you wish to deploy these changes (y/n)? y
 ## How it works
 
 * As explained before this is a simple file processer workflow based on Claim Check Pattern and implemented using Event driven Architecture.
-Once the project is fully deployed please upload one of the simple JSON or XML files from the sample_source_data directory under file-processing-workflow-cdk directory.
+Once the project is fully deployed please upload one of the simple JSON or XML files from the sample_source_data directory under file-processing-workflow-cdk_2 directory.
 If a JSON file is uploaded in the source S3 bucket the Eventbridge triggers the StepFunction. The FileGateway step in Stepfunction determine the file type and forwards it to the JSONHandler(FileHandlerJSON lambda) which modiifies the "jobTitleName" tag value in the JSON from Developer to "Engineer" and uploaded to the the destination S3 bucket. 
 If an XML file was uploaded then the XMLHandler(FIleHandlerXML lambda) step would handle the file and if the DEPARTMENT_ID tag was of 5346 then a new tag is introduced DEPARTMENT_NAME with value as Management else the new tags value would be Finance and eventually pushed to destination S3.
 
