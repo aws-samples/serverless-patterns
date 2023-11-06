@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigw-rest-eventbridge-cdk
+    cd apigw-rest-api-eventbridge-cdk
     ```
 1. Install Python dependencies.
     ```
@@ -46,18 +46,16 @@ Upon deployment, you will see the API endpoint URL in the output. It will take t
 
 `https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/`
 
-1. [Enable the model](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html#manage-model-access) in Bedrock if you have not done before. The model used by the sample is "anthropic.claude-v2"
-
-2. Post the request to the api
+1. Post the request to the api
 ```bash
- curl -v --location --request POST 'https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/' \
+ curl --location --request POST 'https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "HelloWorld":"Hello World"
 }'
 ```
 
-3. If the execution is successful, you will get response similar to
+2. If the execution is successful, you will get response similar to
 ```json
  {"Entries":
     [{ "EventId": "fb87cdf5-e00a-46f3-6dbb-6b2b3e7f4e25" }],
