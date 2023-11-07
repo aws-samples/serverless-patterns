@@ -1,0 +1,11 @@
+    setuptools
+    boto3>=1.26
+    Click>=8.0
+    deepmerge
+    PyYAML
+    requests
+    tzlocal>=4.0
+    six>=1.15
+    questionary>=1.10
+    ruamel.yaml>=0.17.32
+    fonttools==4.38.0

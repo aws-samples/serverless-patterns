@@ -1,0 +1,25 @@
+Accounts:
+  - id: 1234567890123
+    tags:
+      - Key: accountName
+        Value: test-account
+      - Key: company
+        Value: Acme
+      - Key: department
+        Value: IT Operations
+  - id: 1234567890123
+    tags:
+      - Key: accountName
+        Value: dev-account
+      - Key: company
+        Value: Acme
+      - Key: department
+        Value: Sales
+  - id: 116295186851
+    tags:
+      - Key: accountName
+        Value: prod-account
+      - Key: company
+        Value: Acme
+      - Key: department
+        Value: Marketing
