@@ -1,0 +1,74 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "BasicDescribePolicy",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:PutMetricAlarm",
+        "ecr:GetAuthorizationToken",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AccessToEncryptAndDeccryptKMSKeys",
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus",
+        "kms:ListGrants",
+        "kms:ListKeys",
+        "kms:ListAliases",
+        "kms:ListKeyPolicies",
+        "kms:ListResourceTags",
+        "kms:ListRetirableGrants",
+        "kms:ReEncryptTo"
+      ],
+      "Resource": [
+        "${kms_key_arn}"
+      ]
+    },
+    {
+      "Sid": "ECRGrantsToConnectAndDownload",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+      ],
+      "Resource": "arn:aws:ecr:*:*:repository/${standard_resource_name}"
+    },
+    {
+      "Sid": "ECSGrants",
+      "Effect": "Allow",
+      "Action": [
+        "ecs:CreateCluster",
+        "ecs:DeregisterContainerInstance",
+        "ecs:DescribeServices",
+        "ecs:DiscoverPollEndpoint",
+        "ecs:Poll",
+        "ecs:RegisterContainerInstance",
+        "ecs:RegisterContainerInstance",
+        "ecs:StartTelemetrySession",
+        "ecs:Submit*",
+        "ecs:UpdateContainerInstancesState",
+        "ecs:UpdateService"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "ForAllValues:StringEquals": {
+          "aws:ResourceTag/common_identifier": "${standard_resource_name}"
+        }
+      }
+    }
+  ]
+}
