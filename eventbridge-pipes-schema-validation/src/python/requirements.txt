@@ -1,0 +1,4 @@
+confluent-kafka==2.2.0
+fastavro==1.8.2
+requests==2.31.0
+urllib3<2 # Pinning <2 necessary due to: https://github.com/psf/requests/issues/6443

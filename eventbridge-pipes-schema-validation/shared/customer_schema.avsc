@@ -1,0 +1,15 @@
+{
+    "namespace": "example.avro",
+    "type": "record",
+    "name": "Customer",
+    "fields": [
+    {"name": "customer_account_no","type": "int", "doc": "customer account number"},
+    {"name": "first_name","type": "string"},
+    {"name": "middle_name","type": ["null","string"], "default": null},
+    {"name": "last_name","type": "string"},
+    {"name": "email_addresses","type": ["null", {"type":"array", "items":"string" }]},
+    {"name": "customer_address","type": "string","doc": "customer address"},
+    {"name": "mode_of_payment","type": {"type": "enum","name": "ModeOfPayment","symbols": ["CARD","CASH"]}, "default": "CARD"},
+    {"name": "customer_rating", "type": ["null", "int"], "default": null}
+    ]
+}

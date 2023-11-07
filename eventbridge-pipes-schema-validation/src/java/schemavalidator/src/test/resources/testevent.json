@@ -1,0 +1,10 @@
+[{"partition":0,
+  "offset":20192,
+  "timestamp":1699282778691,
+  "timestampType":"CREATE_TIME",
+  "value":"AwCTpTSK4StOq6M+06m3n5Q2GBRsZkNtUVZCallOABRibG5GTG9TRHVZAgIUWVhlWmVWZVFjdgAUQ0FITHBlb3h3RgAA",
+  "eventSourceArn":"arn:aws:kafka:eu-central-1:12345:cluster/demo-cluster/123455",
+  "bootstrapServers":"boot-1234.c3.kafka-serverless.eu-central-1.amazonaws.com:9098",
+  "eventSource":"aws:kafka",
+  "eventSourceKey":"messages2-0"
+}]
