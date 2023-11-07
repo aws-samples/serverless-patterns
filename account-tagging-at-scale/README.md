@@ -1,5 +1,5 @@
 # Account Tagging at Scale
-This pattern helps to tag accounts at scale. This splution is complete serverless in nature and is built on `python`. This solution takes user input (yaml) and asks what are the tag key/value pairs. The solution builds an AWS Lambda funtion that takes the tag input data and uses AWS Organization API's to tag each and every account mentioned in the YAML file. See `Architecture` section for the architecture flow for more information.
+This pattern helps to tag accounts at scale. This solution is complete serverless in nature and is built on `python` and `Terraform`. This solution takes user input (yaml) and asks what are the tag key/value pairs. The solution builds an AWS Lambda funtion that takes the tag input data (key/value pair) and uses AWS Organization API's to tag each and every account mentioned in the YAML file. See `Architecture` section for the architecture flow and `Deployment Instructions` for detailed information.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -35,7 +35,16 @@ AWS Lambda funtion uses an IAM role called `AFTCrossAccountRole` to tag the acco
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-2. **In the Control Tower/ AWS Organization Account setup the `AFTCrossAccountRole` role.**
+
+2. Change directory to below directory and update tag key/value pair in `tag-data.yaml`
+
+    ```
+    cd account-tagging-at-scale/layers
+
+    ```
+
+
+3. **Setup IAM Role `AFTCrossAccountRole` role in the Control Tower/ AWS Organization Account**
 
     Change directory to below directory:
 
@@ -43,13 +52,18 @@ AWS Lambda funtion uses an IAM role called `AFTCrossAccountRole` to tag the acco
     cd account-tagging-at-scale/terraform/AFTCrossAccountRole
 
     ```
-3. From the command line, use Terraform CLI to deploy the IAM role:
+4. From the command line, use Terraform CLI to deploy the IAM role:
     ```
     terraform init
     terraform plan
     terraform deploy
     ```
-4. Once the IAM role is setup in Control Tower/ AWS Organization Account, setup core tagging solution **in a Seperate Account (like a management account).**
+ 
+    **Note:** Make sure Control Tower/ AWS Organization Account credentials are exported in your terminal.
+
+4. Once the IAM role is setup in Control Tower/ AWS Organization Account in above step, we will now setup core tagging solution **in a Seperate Account (like a management account).**
+
+    **Note:** Make sure Control Tower/ AWS Organization Account credentials are exported in your terminal.
 
     Change directory to the pattern directory:
 
