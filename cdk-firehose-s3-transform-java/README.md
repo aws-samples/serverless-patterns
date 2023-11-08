@@ -1,4 +1,4 @@
-# Kinesis Data Streams with Lambda Integration
+# KinesisFirehose Transformation with Lambda Integration
 
 ![architecture diagram](architecture.png)
 
@@ -21,7 +21,7 @@
 2. Change directory to the pattern directory:
 
     ```
-    cd serverless-patterns/cdk-kinesis-lambda-java
+    cd serverless-patterns/cdk-firehose-s3-transform-java
     ```
 3. From the command line, use AWS CDK to deploy the AWS resources for the serverless application
 
@@ -45,31 +45,21 @@
 
 ## How it works
 
-This Kinesis-Lambda integration pattern makes use of the aws-kinesisstreams-lambda [Solution construct](https://docs.aws.amazon.com/solutions/latest/constructs/aws-kinesisstreams-lambda.html) to create the infrastructure.
+This KinesisFirehose-Lambda integration for transformation processing pattern makes use of the L2 contructs aws-kinesisfirehose-alpha [Solution construct](https://constructs.dev/packages/@aws-cdk/aws-kinesisfirehose-alpha/v/2.101.1-alpha.0?lang=java) to create the infrastructure.
 
-Lambda get triggered based on the events from the Kinesis Data Stream. For any error in invocation of the lambda function events are persisted in the configured dead-letter SQS queue.
+Lambda get triggered based on the events from the Kinesis Firehose. For any error in invocation of the lambda function or transformation outcome of the events, they are persisted in the configured S3 buckets.
 
-In the example the Kinesis Event Source is configured with `maxretryattempt` as 1, bisectBatchOnError set to true, and `reportBatchItemFailures` set to true with batch size of 3.
+In the example the KinesisDatafirehose transformation lambda function is configured with max 5 retries, buffering interval of 5 minutes and max buffer size of 3 MB.
 
-Lambda code has been updated to handle exception on any error due to event processing as per the best practice to return the sequence number. Using this configuration and approach duplicate message reprocessing can be avoided. 
+Lambda code for transformation is a sample code which concantenates the sample data posted via Firehose to add additional element summary in the json written to S3 bucket.
 
-For more details on handling Success and Failure conditions in Kinesis data streams consumption, refer the [documentation](https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html#services-kinesis-errors).
+For more details on handling Success and Failure conditions in KinesisDatafirehose, refer the [documentation](https://docs.aws.amazon.com/firehose/latest/dev/data-transformation.html).
+
 ## Testing
-Update the producer.sh file with Kinesis stream name which got created. Update the number of messages to get published in to the stream by updating the number in loop as shown in the below statement
-
-while [ $a -lt 24 ]
-
-From the command line
-
-   ```bash
-   cd ../software
-   cd KinesisCliProducers
-   sh producers.sh
-   ```
-This will publish the messages in the Kinesis stream and the lambda function gets triggered based on that.
+After CDK deploy gets completed, navigate to the KinesisDataFirehose which got created and navigate to the testing secition in the console and click on the StartStreaming demom data. The transformed data will get created as files with json objects in the S3 bucket.
 
 ## Cleanup
- 
+
 1. Delete the stack
     ```bash
     cdk destroy
