@@ -41,8 +41,6 @@
     ```
    Alternatively infrastructure/deploy.sh can be used to build and deploy the stack
 
-6. Note the outputs of CDK and copy the Kinesis Resource Name. Use the copied stream name in the producer.sh file which will be used in the next step to put records in to the stream created.
-
 ## How it works
 
 This KinesisFirehose-Lambda integration for transformation processing pattern makes use of the L2 contructs aws-kinesisfirehose-alpha [Solution construct](https://constructs.dev/packages/@aws-cdk/aws-kinesisfirehose-alpha/v/2.101.1-alpha.0?lang=java) to create the infrastructure.
