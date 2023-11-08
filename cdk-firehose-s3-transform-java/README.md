@@ -45,13 +45,13 @@
 
 This KinesisFirehose-Lambda integration for transformation processing pattern makes use of the L2 contructs aws-kinesisfirehose-alpha [Solution construct](https://constructs.dev/packages/@aws-cdk/aws-kinesisfirehose-alpha/v/2.101.1-alpha.0?lang=java) to create the infrastructure.
 
-Lambda get triggered based on the events from the Kinesis Firehose. For any error in invocation of the lambda function or transformation outcome of the events, they are persisted in the configured S3 buckets.
+Lambda get triggered based on the events from the Kinesis DataFirehose. For any error in invocation of the lambda function or transformation outcome of the events, they are persisted in the configured S3 buckets.
 
 In the example the KinesisDatafirehose transformation lambda function is configured with max 5 retries, buffering interval of 5 minutes and max buffer size of 3 MB.
 
 Lambda code for transformation is a sample code which concantenates the sample data posted via Firehose to add additional element summary in the json written to S3 bucket.
 
-For more details on handling Success and Failure conditions in KinesisDatafirehose, refer the [documentation](https://docs.aws.amazon.com/firehose/latest/dev/data-transformation.html).
+For more details on handling Success and Failure conditions in Kinesis Datafirehose, refer the [documentation](https://docs.aws.amazon.com/firehose/latest/dev/data-transformation.html).
 
 ## Testing
 After CDK deploy gets completed, navigate to the KinesisDataFirehose which got created and navigate to the testing secition in the console and click on the StartStreaming demom data. The transformed data will get created as files with json objects in the S3 bucket.
