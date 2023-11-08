@@ -1,0 +1,48 @@
+{
+  "title": "EventBridge Pipes schema validation",
+  "description": "Validate and convert Kafka events from Avro to JSON using EventBridge Pipes",
+  "language": "Python",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern uses AWS Glue Schema Registry to deserialize Avro messages into JSON messages using Amazon Eventbridge Pipes and an enrichment AWS Lambda function.",
+      "The enrichment Lambda function is written in Java and uses the AWS Glue Schema Registry Library.",
+      "See the GitHub repository for a detailed description of how the pattern works and how to deploy it."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-schema-validation",
+      "templateURL": "serverless-patterns/eventbridge-pipes-schema-validation",
+      "projectFolder": "eventbridge-pipes-schema-validation",
+      "templateFile": "eventbridge-pipes-schema-validation/infrastructure/kafka_glue_validate.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Validate, evolve, and control schemas in Amazon MSK and Amazon Kinesis Data Streams with AWS Glue Schema Registry",
+        "link": "https://aws.amazon.com/blogs/big-data/validate-evolve-and-control-schemas-in-amazon-msk-and-amazon-kinesis-data-streams-with-aws-glue-schema-registry/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "Philipp Klose",
+      "image": "https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2023/08/24/Philipp-Kloss-Picture.jpeg",
+      "bio": "Philipp Klose is a Global Solutions Architect at AWS based in Munich. He works with enterprise FSI customers and helps them solve business problems by architecting serverless platforms. In this free time, Philipp spends time with his family and enjoys every geek hobby possible.",
+      "linkedin": "philipp-klose-31b19a195"
+    }
+  ]
+}
