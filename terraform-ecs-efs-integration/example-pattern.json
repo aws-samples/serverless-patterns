@@ -1,6 +1,6 @@
 {
   "title": "Terraform Code to Integrate ECS and EFS (Persistent File Storage)",
-  "description": "Sample Terraform IaC template to provision end to end Amazon Elastic Container Service (ECS) resources and deploy ECS task with integration of Elastic File System (EFS) for a persistent file storage.",
+  "description": "Terraform IaC template to provision Amazon Elastic Container Service (ECS) resources and with integration of Elastic File System (EFS).",
   "language": "",
   "level": "200",
   "framework": "Terraform",
