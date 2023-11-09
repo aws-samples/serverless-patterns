@@ -1,6 +1,7 @@
 {
   "title": "Demo on how to implement multi-region message replication with Amazon MQ for RabbitMQ",
   "description": "This pattern shows how to replicate messages from one region to another region in Amazon MQ for RabbitMQ ",
+  "language": " ",
   "level": "300",
   "framework": "Terraform",
   "introBox": {
