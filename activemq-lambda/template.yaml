@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-mq-lambda
+
+  Sample SAM Template for sam-mq-lambda
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Parameters:
+  SecretARN:
+    Type: String
+    Default: "arn:aws:secretsmanager:us-east-1:733304292857:secret:mq_secret_01-9T06KM"
+    Description: Enter the ARN for your AWS Secrets Manager secret
+  SecretName:
+    Type: String
+    Default: 'mq_secret_01'
+    Description: Enter the name of your secret
+  MQVpcId: 
+    Type: String
+    Default: 'vpc-0d465ccd5c4b66bba'
+    Description: Enter the VPC ID for AmazonMQ   
+  MQSubnetId:  
+    Type: String
+    Default: 'subnet-08220300a8cdd8635'
+    Description: Enter the Subnet for AmazonMQ 
+
+Resources:
+  MQSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: "Security Group for MQ"
+      GroupName: "mq-sg"
+      SecurityGroupEgress: 
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 61617
+          ToPort: 61617
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8162
+          ToPort: 8162
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref MQVpcId
+  MQBroker:
+    Type: AWS::AmazonMQ::Broker
+    Properties: 
+      AutoMinorVersionUpgrade: false
+      BrokerName: ActiveMQSAM
+      DeploymentMode: SINGLE_INSTANCE
+      EngineType: ACTIVEMQ
+      EngineVersion: "5.17.3"
+      HostInstanceType: mq.t3.micro
+      PubliclyAccessible: true
+      Users:
+        - Password: !Sub '{{resolve:secretsmanager:${SecretName}:SecretString:password::}}'
+          Username: !Sub '{{resolve:secretsmanager:${SecretName}:SecretString:username::}}'
+          ConsoleAccess: true
+      SubnetIds:
+           - !Ref MQSubnetId
+      SecurityGroups: [!Ref MQSecurityGroup]
+      
+           
+  MQListenerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: mq_listener/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            BatchSize: 10
+            Broker: !GetAtt MQBroker.Arn
+            Queues:
+              - lambdaQueue1
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Ref SecretARN
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Resource: '*'
+              Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeVpcs
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+
+Outputs:
+  MQListenerFunction:
+    Description: "MQ Listener Lambda Function ARN"
+    Value: !GetAtt MQListenerFunction.Arn
+  MQListenerFunctionIamRole:
+    Description: "Implicit IAM Role created for MQ Listener function"
+    Value: !GetAtt MQListenerFunctionRole.Arn
+  MQBroker: 
+    Description: "MQ Broker ARN"
+    Value: !GetAtt MQBroker.Arn    
+  MQSecurityGroup:
+    Description: "MQ Security Group ARN"
+    Value: !Ref MQSecurityGroup

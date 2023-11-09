@@ -1,0 +1,110 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AppSync to Bedrock
+
+Resources:
+##########################################################################
+#   AppSync API                                                          #
+##########################################################################
+  AppSyncToBedrockApi:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaUri: ./schema.graphql
+      ApiKeys:
+        TestApiKey:
+          Description: Test Api Key
+      Auth:
+        Type: API_KEY
+      Functions:
+        invokeModelFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: !GetAtt BedrockDataSource.Name
+          # CodeUri:
+          InlineCode: |
+            import { util } from '@aws-appsync/utils'
+            export function request(ctx) { 
+              return {
+                "version": "2023-09-30",
+                "method": "POST",
+                "resourcePath": `/model/anthropic.claude-instant-v1/invoke`,
+                "params": {
+                  "headers": {
+                    "content-type": "application/json",
+                    "accept": "*/*"
+                  },
+                  "body": JSON.stringify({
+                    "prompt": "Human: " + getInstructions(ctx.args.role) + ctx.args.query + "\\n\\nAssistant:",
+                    "max_tokens_to_sample": 1000,
+                    "temperature": 1,
+                    "top_k": 250,
+                    "top_p": 0.999,
+                    "anthropic_version": "bedrock-2023-05-31"
+                  })
+                }
+              };
+            }
+            export function response(ctx) {
+              if (ctx.error) util.error(ctx.error.message, ctx.error.type);
+              if (ctx.result.statusCode === 200) {
+                return { output: JSON.parse(ctx.result.body).completion }
+              } else {
+                util.appendError(ctx.result.body, ctx.result.statusCode);
+              }
+            }
+
+            function getInstructions (role) {
+              if (role === "philosopher") return "You play the role of a great philosopher, answer the following question as such: "
+              if (role === "schoolteacher") return "You play the role of a school teacher speaking to a 5 years old child, answer the following question as such: "
+              if (role === "politician") return "You play the role of a politician giving vague answers, answer the following question as such: "
+              return "Please answer the following question: "
+            }
+
+      Resolvers:
+        Mutation:
+          invokeModel:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: "1.0.0"
+            Pipeline:
+            - invokeModelFunction
+
+##########################################################################
+#   AppSync Data Sources                                                 #
+##########################################################################
+  BedrockDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt AppSyncToBedrockApi.ApiId
+      Name: BedrockDataSource
+      Type: HTTP
+      ServiceRoleArn: !GetAtt BedrockDataSourceRole.Arn
+      HttpConfig:
+        Endpoint: !Sub "https://bedrock-runtime.${AWS::Region}.amazonaws.com/"
+        AuthorizationConfig:
+          AuthorizationType: AWS_IAM
+          AwsIamConfig:
+            SigningRegion: !Ref AWS::Region
+            SigningServiceName: bedrock
+
+  BedrockDataSourceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: BedrockPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+                - Effect: Allow
+                  Action:
+                    - bedrock:InvokeModel
+                  Resource:
+                    - '*'

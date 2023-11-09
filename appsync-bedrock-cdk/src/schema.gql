@@ -1,0 +1,12 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Query {
+    ping: Boolean
+}
+
+type Mutation {
+    invoke(prompt: String!): String!
+}

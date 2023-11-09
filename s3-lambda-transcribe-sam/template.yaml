@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - S3 -> Lambda -> Transcribe
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 256
+
+Resources:
+  SpeechToTextFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      Environment:
+        Variables:
+          OUTPUT_BUCKET: !Ref OutputBucket
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref InputBucket
+            Events: s3:ObjectCreated:*
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: 
+                - "transcribe:StartTranscriptionJob"
+                - "s3:ListBucket"
+                - "s3:GetObject"
+                - "s3:PutObject"
+              Resource: "*"
+  InputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: speech2text-input-bucket # Replace this with a unique name. For more info about S3 bucket names: https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
+  OutputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: speech2text-output-bucket # Replace this with a unique name
+
+Outputs:
+  STOutputBucket:
+    Description: "The output bucket with the audio transcript file"
+    Value:
+      Ref: OutputBucket
