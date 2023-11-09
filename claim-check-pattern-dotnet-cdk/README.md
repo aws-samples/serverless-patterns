@@ -13,7 +13,6 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
 ## Deployment Instructions
 
@@ -21,25 +20,29 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/claim-check-pattern-dotnet-cdk/src
+    cd serverless-patterns/claim-check-pattern-dotnet-cdk/cdk
     ```
-1. Install dependencies:
+3. Build the solution:
+    #### Using VSCode.
     ```
-    npm install
+    dotnet build
     ```
-1. From the command line, configure AWS CDK:
+    #### Using Visual Studio IDE.
+    Rename the file ../ClaimCheckPattern.sln.template 
+    ``` cmd
+    mv  ../ClaimCheckPattern.sln.template ../ClaimCheckPattern.sln
+    ```
+4. From the command line, bootstrap the CDK if this is the first time you use the CDK for the given account:
    ```
-    cdk bootstrap ACCOUNT-NUMBER/REGION # e.g.
-    cdk bootstrap 1111111111/us-east-1
-    cdk bootstrap --profile test 1111111111/us-east-1
+    cdk bootstrap
    ```
-1. From the command line, use AWS CDK to deploy the AWS resources for the pattern:
+5. From the command line, use AWS CDK to deploy the AWS resources for the pattern:
     ```
     cdk deploy --all 
     ```
-1. During the prompts:
+6. During the prompts:
     * Enter the desired AWS Region
     
 
