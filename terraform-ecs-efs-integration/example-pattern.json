@@ -1,0 +1,55 @@
+{
+  "title": "Terraform Code to Integrate ECS and EFS (Persistent File Storage)",
+  "description": "Sample Terraform IaC template to provision end to end Amazon Elastic Container Service (ECS) resources and deploy ECS task with integration of Elastic File System (EFS) for a persistent file storage.",
+  "language": "",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern will provision Amazon Elastic Container Service (ECS) resources inlcuding Cluster and Task Definition along with Elastic File System (EFS) for a persistent file storage.",
+      "This pattern will also create a container with a example bash script to access the EFS File System during runtime which will be stored in Amazon Elastic Container Repository (ECR),."    
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-ecs-efs-integration",
+      "templateURL": "serverless-patterns/terraform-ecs-efs-integration",
+      "projectFolder": "terraform-ecs-efs-integration",
+      "templateFile": "terraform-ecs-efs-integration/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Amazon EFS file systems with Amazon ECS",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/tutorial-efs-volumes.html"
+      }
+    ]
+  },
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform plan",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the README in the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+		"name": "Nitin Jain",
+		"image": "",
+		"bio": "Sr Solution Architect, AWS",
+		"linkedin": ""
+	}
+]
+}

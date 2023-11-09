@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon EFS file system and integrates with ECS for a persisent file storage in a containerized environment.
 
-You will build a container as part of the build, publish it into ECR, and then publish it as an ECS Task in the end. A sample file will be created in the EFS (persistent file system) after the task has been completed. 
+You will build a container as part of the build, publish it into ECR, and then publish it as an ECS Task in the end. A sample file will be created in the EFS (persistent file system) after the task has been completed. The security component is likewise handled by KMS Keys and IAM Roles..
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
