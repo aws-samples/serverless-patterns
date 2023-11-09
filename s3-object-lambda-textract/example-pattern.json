@@ -1,0 +1,57 @@
+{
+  "title": "S3 Object Lambda using textract",
+  "description": "This pattern provides a simple On-demand mechanism of extracting key value pair from document for Intelligent document processing.Example Use case : If an enterprise has a large volume of PDF document and does not want to run a batch job due to the cost of processing of extracting / processing all the document, S3 Ojbect lambda provdies a good mechanism to extract only the OCR document on need basis without major changes to the architecture and in a serverless fashion, optimising cost.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to setup AWS S3 Object Lambda to invoke Amazon Textract. Amazon Textract can be used on a Object Lambda Access point to provide the extract of a document PDF / Image"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/sonihemish/serverless-patterns/tree/sonihemish-feature-s3-object-lambda-textract/s3-object-lambda-textract",
+      "templateURL": "serverless-patterns/s3-object-lambda-textract",
+      "projectFolder": "s3-object-lambda-textract",
+      "templateFile": "s3-object-lambda-textract/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Transforming S3 Objects with S3 Object Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-s3-object-lambda.html"
+      },
+      {
+        "text": "Analyzing Document Text with Amazon Textract",
+        "link": "https://docs.aws.amazon.com/textract/latest/dg/analyzing-document-text.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Hemish Soni",
+      "image": "https://badgephotos.corp.amazon.com/?uid=hnsoni",
+      "bio": "Sr Partner Solution Architect, Serverless Enthusiast",
+      "linkedin": "https://www.linkedin.com/in/sonihemish/",
+      "twitter": "@sonihemish"
+    }
+  ]
+}
