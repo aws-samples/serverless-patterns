@@ -2,7 +2,10 @@
 
 This pattern creates an Amazon EFS file system and integrates with ECS for a persisent file storage in a containerized environment.
 
-You will build a container as part of the build, publish it into ECR, and then publish it as an ECS Task in the end. A sample file will be created in the EFS (persistent file system) after the task has been completed. The security component is likewise handled by KMS Keys and IAM Roles..
+You will build a container as part of the build, publish it into ECR, and then publish it as an ECS Task in the end. A sample file will be created in the EFS (persistent file system) after the task has been completed. The security component is likewise handled by KMS Keys and IAM Roles.
+
+For the purpose of tagging, this pattern requires the input parameters env (environment) and organization. For the ECS task compute resources, provide value for task_cpu and task_memory.
+The necessary resources will be provisioned in a VPC which is provided via vpc_id, which comes last. Through terraform data resource, this pattern queries (using the tag { Network = "private"}) the VPC ID for a list of private subnet(s). 
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -55,8 +58,8 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_env"></a> [env](#input\_env) | Name of the environment the infrastructure is for | `string` | n/a | yes |
 | <a name="input_organization"></a> [organization](#input\_organization) | Name of the organization the infrastructure is for | `string` | n/a | yes |
-| <a name="input_task_cpu"></a> [task\_cpu](#input\_task\_cpu) | VCPUs for task task | `number` | n/a | yes |
-| <a name="input_task_memory"></a> [task\_memory](#input\_task\_memory) | Memory for task task | `number` | n/a | yes |
+| <a name="input_task_cpu"></a> [task\_cpu](#input\_task\_cpu) | VCPUs for ECS Task | `number` | n/a | yes |
+| <a name="input_task_memory"></a> [task\_memory](#input\_task\_memory) | Memory for ECS Task | `number` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID for ECS Task and EFS | `string` | n/a | yes |
 
 ## Outputs
