@@ -35,8 +35,7 @@
   },
   "deploy": {
     "text": [
-      "terraform init", 
-      "terraform apply"
+      "terraform init"
     ]
   },
   "testing": {
@@ -53,7 +52,7 @@
     {
       "name": "Daniel Fargano",
       "image": "https://i.postimg.cc/4xzhGDrZ/dan.jpg",
-      "bio": "Dan is a Sr. Solutions Architect at AWS. Dan is based in Chicago primarily supporting customers in the financial vertical but also supports customers across all sectors through his passion for serverless. He enjoys building new solutions and sharing new discoveries with customers.",
+      "bio": "Daniel Fargano is a Sr. Solutions Architect at AWS. Dan is based in Chicago primarily supporting customers in the financial vertical but also supports customers across all sectors through his passion for serverless. He enjoys building new solutions and sharing new discoveries with customers.",
     }
   ]
 }
