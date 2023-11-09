@@ -74,7 +74,7 @@ The following locals varible is used to strcuture the queue policy from the prov
     ```
 6.	During the prompts. 
     * Enter yes
-    * Note: This deployement takes about 20 minutes to complete
+    * Note: This deployement takes about 15 minutes to complete
 
 7.  Note the outputs from the deployment process. These contain the resource names which are used for testing.
 
