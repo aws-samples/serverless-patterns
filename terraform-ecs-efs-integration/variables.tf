@@ -15,10 +15,10 @@ variable "vpc_id" {
 
 variable "task_cpu" {
   type        = number
-  description = "VCPUs for task task"
+  description = "VCPUs for ECS Task"
 }
 
 variable "task_memory" {
   type        = number
-  description = "Memory for task task"
+  description = "Memory for ECS Task"
 }
