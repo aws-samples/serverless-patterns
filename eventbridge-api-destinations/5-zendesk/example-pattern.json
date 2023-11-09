@@ -1,0 +1,75 @@
+{
+    "title": "EventBridge API Destinations to Zendesk",
+    "description": "Create an EventBridge rule and API destination to route events to Zendesk",
+    "language": "YAML",
+    "level": "100",
+    "framework": "SAM",
+    "services": {
+        "from": "eventbridge",
+        "to": "eventbridge"
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an API Destination for the Zendesk Put Tickets API. Once deployed, the pattern allows a user to send events easily through Event Bridge to Zendesk to create tickets. The pattern creates the following resources: Event Bridge Bus, Event Bridge Connection, Event Bridge API Destination, Event Bridge Rule, IAM Role, and SQS Queue.",
+            "The Event Bridge rule uses the API Destination and Connection as a target, SQS Queue as a DLQ, and the IAM role as its role. To send events go to the bus and send sample events. To create a ticket enter “MyTestMessage” for the detail type, “MyTestApp” for the source, the bus created by the pattern for the Event Bus Name, and any call that follows the format for the Zendesk PUT Tickets API as the detail (https://developer.zendesk.com/api-reference/ticketing/tickets/tickets/#create-ticket).",
+            "The following information is needed to use the pattern: (1) Zendesk Username and Password: To create the AUTH for the Event Bridge Connection (2) Zendesk Workspace: To construct the API Destination to the user’s workspace.",
+            "The IAM Role created by the pattern only has the permission to allow InvokeApiDestination access to the EventBridge Rule.",
+            "To work the user must have Password Access enabled in Zendesk (https://support.zendesk.com/hc/en-us/articles/4408836402074-Using-the-API-dashboard)."
+        ]
+    },
+    "testing": {
+        "headline": "Testing",
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+            "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cd ./5-zendesk",
+            "sam deploy --guided"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "projectFolder": "eventbridge-api-destinations",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations",
+            "templateURL": "serverless-patterns/eventbridge-api-destinations",
+            "templateFile": "5-zendesk/ZendeskAPIDestination.yaml"
+        },
+        "payloads": [
+            {
+                "headline": "",
+                "payloadURL": ""
+            }
+        ]
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "Zendesk: Using the API dashboard",
+                "link": "https://support.zendesk.com/hc/en-us/articles/4408836402074-Using-the-API-dashboard"
+            },
+            {
+                "text": "Zendesk Developers",
+                "link": "https://developer.zendesk.com/api-reference/ticketing/tickets/tickets/#create-ticket"
+            },
+            {
+                "text": "Using API destinations with Amazon EventBridge",
+                "link": "https://aws.amazon.com/blogs/compute/using-api-destinations-with-amazon-eventbridge/"
+            },
+            {
+                "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+                "link": "https://serverlessland.com/learn/eventbridge"
+            }
+        ]
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "name": "sample-functions",
+    "version": "0.1.0",
+    "scripts": {
+      "clean": "rm -fr cdk.out/ cdk.local.out/",
+      "clean-build": "npm run clean && npm run build"
+    },
+    "dependencies": {
+      "@aws-cdk/aws-lambda-go-alpha": "2.55.1-alpha.0"
+    }
+  }

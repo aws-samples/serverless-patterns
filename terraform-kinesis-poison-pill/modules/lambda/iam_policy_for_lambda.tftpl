@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "kinesis:*",
+          "sqs:*"
+        ],
+        "Effect": "Allow",
+        "Resource":  ["*"]
+      },
+      {
+        "Action": [
+          "lambda:InvokeFunction",
+          "lambda:GetFunctionConfiguration"
+        ],
+        "Effect": "Allow",
+        "Resource":  ["${kinesis_strem_lambda_arn}"]
+      }
+    ]
+  }
+
+  
