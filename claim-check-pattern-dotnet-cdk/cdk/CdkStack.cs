@@ -289,7 +289,7 @@ namespace Cdk
         /// </summary>
         private (IFunction claimCheckSplitLambda, IFunction claimCheckRetrievalLambda) CreateFunctions(IQueue sampleDataWriteQueue, ITable claimCheckTable)
         {
-            const string lambdaBinPath = "../lambda/bin/debug/net6.0";
+            const string lambdaBinPath = "../lambda/bin/Debug/net6.0";
 
             // Lambda for generation of sample data
             var claimCheckSampleDataCreatorLambda = new Function(this, "ClaimCheckSampleDataCreatorLambda", new FunctionProps
