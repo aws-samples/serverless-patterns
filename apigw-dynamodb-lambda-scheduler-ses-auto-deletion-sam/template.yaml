@@ -133,7 +133,6 @@ Resources:
               Effect: Allow
               Action:
                 - ses:SendEmail
-                - iam:PassRole
               Resource: "*"
 
 Outputs:
