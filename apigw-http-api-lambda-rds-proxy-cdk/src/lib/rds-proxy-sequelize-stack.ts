@@ -138,7 +138,7 @@ export class RdsProxySequelizeStack extends Stack {
     rdsProxy.grantConnect(rdsProxyPopulateLambda, dbUsername);
     rdsProxy.grantConnect(rdsProxyGetDataLambda, dbUsername);
 
-    const httpApi: apigw.HttpApi = new apigw.HttpApi(this, 'HttpApi');
+    const httpApi: apigw.HttpApi = new apigw.HttpApi(this, 'StadiumApi');
 
     const populateLambdaIntegration = new HttpLambdaIntegration('rdsProxyPopulateLambda', rdsProxyPopulateLambda );
 
