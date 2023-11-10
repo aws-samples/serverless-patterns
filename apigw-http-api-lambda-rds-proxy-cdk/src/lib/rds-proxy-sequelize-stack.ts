@@ -76,7 +76,7 @@ export class RdsProxySequelizeStack extends Stack {
       },
       clusterIdentifier: 'RDSProxyExampleCluster',
       engine: rds.DatabaseClusterEngine.auroraPostgres({
-        version: rds.AuroraPostgresEngineVersion.VER_11_9
+        version: rds.AuroraPostgresEngineVersion.VER_15_2
       }),
       instances: 1,
       backup: { retention: Duration.days(1) },
