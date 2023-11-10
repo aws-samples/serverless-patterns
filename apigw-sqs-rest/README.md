@@ -53,7 +53,8 @@ ex:
   "message": "sample message from API Gateway"
 }
 
-3. Copy the SQS Queue name from the deploy output and check the message received in the SQS queue
+3. Copy the SQS Queue URL from the deploy output and check the message received in the SQS queue using below command by replacing {Queue URL } to the actual URL value you copied from output
+aws sqs receive-message --queue-url {Queue URL} --attribute-names All --message-attribute-names All --max-number-of-messages 10
 
 ## Cleanup
  

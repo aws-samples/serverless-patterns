@@ -111,29 +111,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - logs:CreateLogGroup
-                  - logs:CreateLogStream
-                  - logs:DescribeLogGroups
-                  - logs:DescribeLogStreams
-                  - logs:PutLogEvents
-                  - logs:GetLogEvents
-                  - logs:FilterLogEvents
-                Resource: "*"
-              - Effect: Allow
-                Action:
-                  - "iot:*"
-                  - "iotjobsdata:*"
-                Resource: "*"
-              - Effect: Allow
-                Action:
                   - "sqs:*"
-                Resource: "*"
-              - Effect: Allow
-                Action:
-                  - "kms:Decrypt"
-                  - "kms:GenerateDataKey"
-                  - "kms:Encrypt"
-                Resource: "*"
+                Resource:
+                  - !GetAtt MySqsQueue.Arn
 
 Outputs:
   # API Gateway endpoint to be used during tests
@@ -144,3 +124,7 @@ Outputs:
   QueueName:
     Description: SQS Name
     Value: !Sub ${MySqsQueue.QueueName}
+
+  QueueURL:
+    Description: SQS Queue URL
+    Value: !Ref MySqsQueue
