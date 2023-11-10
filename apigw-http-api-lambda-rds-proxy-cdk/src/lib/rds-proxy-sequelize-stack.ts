@@ -24,7 +24,7 @@ export class RdsProxySequelizeStack extends Stack {
         },
         {
           name: 'Private',
-          subnetType: ec2.SubnetType.PRIVATE_WITH_NAT,
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
         },
         {
           name: 'Public',
