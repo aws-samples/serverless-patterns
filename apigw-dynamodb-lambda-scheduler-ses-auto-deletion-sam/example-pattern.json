@@ -1,5 +1,5 @@
 {
-    "title": "Serverless Reminders Application using Amazon EventBridge Scheduler with Amazon SES",
+    "title": "Amazon EventBridge Scheduler with Amazon SES",
     "description": "A serverless event-driven pattern that creates Amazon EventBridge schedules dynamically to send email reminders using Amazon SES.",
     "language": "Python",
     "level": "200",
