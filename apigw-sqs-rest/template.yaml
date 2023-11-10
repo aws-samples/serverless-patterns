@@ -79,13 +79,6 @@ Resources:
               Service: "apigateway.amazonaws.com"
             Action:
               - SQS:SendMessage
-              - logs:CreateLogGroup
-              - logs:CreateLogStream
-              - logs:DescribeLogGroups
-              - logs:DescribeLogStreams
-              - logs:PutLogEvents
-              - logs:GetLogEvents
-              - logs:FilterLogEvents
             Resource: !GetAtt MySqsQueue.Arn
 
   ##########################################################################
@@ -111,7 +104,8 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - "sqs:*"
+                  - sqs:SendMessage
+                  - sqs:SetQueueAttributes
                 Resource:
                   - !GetAtt MySqsQueue.Arn
 
