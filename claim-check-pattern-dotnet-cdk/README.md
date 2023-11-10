@@ -27,12 +27,15 @@ Important: this application uses various AWS services and there are costs associ
 3. Build the solution:
     #### Using VSCode.
     ```
+    dotnet build "../lambda"
     dotnet build
     ```
     #### Using Visual Studio IDE.
     Rename the file ../ClaimCheckPattern.sln.template 
     ``` cmd
     mv  ../ClaimCheckPattern.sln.template ../ClaimCheckPattern.sln
+    dotnet build "../lambda"
+    dotnet build
     ```
 4. From the command line, bootstrap the CDK if this is the first time you use the CDK for the given account:
    ```

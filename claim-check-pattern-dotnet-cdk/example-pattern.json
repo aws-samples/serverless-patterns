@@ -28,6 +28,7 @@
   },
   "deploy": {
     "text": [
+      "dotnet build ../lambda",
       "cdk deploy --all"
     ]
   },
