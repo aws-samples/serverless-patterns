@@ -93,10 +93,10 @@ export class RdsProxySequelizeStack extends Stack {
       vpc
     });
 
-    const rdsProxyPopulateLambda: NodejsFunction = new NodejsFunction(this, id+'-populateLambda', {
+    const rdsProxyPopulateLambda: NodejsFunction = new NodejsFunction(this, id + '-populateLambda', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: path.join(__dirname, '../lambda/populate.ts'),
       vpc: vpc,
@@ -114,10 +114,10 @@ export class RdsProxySequelizeStack extends Stack {
       }
     });
 
-    const rdsProxyGetDataLambda: NodejsFunction = new NodejsFunction(this, id+'-getDataLambda', {
+    const rdsProxyGetDataLambda: NodejsFunction = new NodejsFunction(this, id + '-getDataLambda', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: path.join(__dirname, '../lambda/getData.ts'),
       vpc: vpc,
