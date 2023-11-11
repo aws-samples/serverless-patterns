@@ -37,7 +37,7 @@
 		        ]
 	},
 	"testing": {
-		"text": ["See the Github repo for detailed testing instructions."]
+		"text": "See the Github repo for detailed testing instructions."]
 	},
 	"cleanup": {
 		"text": [
@@ -45,7 +45,7 @@
 		          "terraform show"
 		        ]
 	},
-	"authors": [
+	"authors": 
 		{
 			"name": "Makendran G",
 			"image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
