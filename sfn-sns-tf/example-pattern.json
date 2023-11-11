@@ -1,5 +1,5 @@
 {
-  "title": "AWS Step Functions Express Workflow to Amazon SNS",
+  "title": "AWS Step Functions to Amazon SNS",
   "description": "This terraform template deploys a Step Functions workflow that sends the message to Amazon SNS and returns the response.",
   "language": "YAML",
   "level": "200",
@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Start the Workflow using the `start-execution` api command with a "InputAndMessage" string in the input payload. The Workflow will send the user-inputed message to the SNS Topic."
+      "Start the Workflow using the `start-execution` api command with a "InputAndMessage" string in the input payload. The Workflow will send the user-inputed message to the SNS Topic.",
     ]
   },
   "gitHub": {
