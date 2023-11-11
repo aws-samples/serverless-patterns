@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Start the Workflow using the `start-execution` api command with a `InputAndMessage` string in the input payload. The Workflow will send the user-inputed message to the SNS Topic.",
+      "Start the Workflow using the `start-execution` api command with a `InputAndMessage` string in the input payload. The Workflow will send the user-inputed message to the SNS Topic."
     ]
   },
   "gitHub": {
@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-sns-tf",
       "templateURL": "serverless-patterns/sfn-sns-tf",
       "projectFolder": "sfn-sns-tf",
-      "templateFile": "main.tf"
+      "templateFile": "sfn-sns-tf/main.tf"
     }
   },
   "resources": {
@@ -47,7 +47,7 @@
 		          "terraform show"
 		        ]
 	},
-	"authors": 
+	"authors": [
 		{
 			"name": "Makendran G",
 			"image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
@@ -55,5 +55,5 @@
 			"linkedin": "makendran",
 			"twitter": "@MakendranG"
 		}
-	
+	]
 }
