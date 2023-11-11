@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-sns-tf",
       "templateURL": "serverless-patterns/sfn-sns-tf",
       "projectFolder": "sfn-sns-tf",
-      "templateFile": "sfn-sns-tf/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {
