@@ -195,7 +195,8 @@ Resources:
                   - "redshift-data:CancelStatement"
                   - "redshift-data:DescribeStatement"
                   - "redshift-data:ListStatements"
-                Resource: "*"
+                Resource:
+                  - !Sub arn:aws:redshift-serverless:*:${AWS::AccountId}:workgroup/*
 
   ##########################################################################
   #   VPC and Subnet                                              #
