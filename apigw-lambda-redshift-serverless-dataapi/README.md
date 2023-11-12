@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Amazon API Gateway (HTTP API) to AWS Lambda to Amazon Redshift Serverless using DataAPI
 
 This pattern explains how to deploy a Data piepline with Amazon API Gateway (HTTP API), AWS Lambda and Amazon Redshift Serverless
 
