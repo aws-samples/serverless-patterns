@@ -1,0 +1,280 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: API Gateway to Lambda to Redshift Serverless
+
+Parameters:
+  DBName:
+    Type: String
+    Default: demo
+  AdminUser:
+    Type: String
+    Default: Admin
+  AdminPassword:
+    Type: String
+    Default: Password123
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+    Default: 10.0.0.0/16
+
+  PublicSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+    Default: 10.0.0.0/20
+
+  PublicSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+    Type: String
+    Default: 10.0.16.0/20
+
+  PublicSubnet3CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+    Type: String
+    Default: 10.0.128.0/20
+
+Resources:
+  ##########################################################################
+  #  Redshift serverless cluster                                               #
+  ##########################################################################
+  MyRedshiftWorkgroup:
+    Type: AWS::RedshiftServerless::Workgroup
+    Properties:
+      BaseCapacity: 16
+      NamespaceName: !Ref MyRedshiftNameSpace
+      Port: 5439
+      PubliclyAccessible: True
+      SecurityGroupIds:
+        - !Ref RedshiftSecurityGroup
+      SubnetIds:
+        - !Ref PublicSubnet2
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet3
+      WorkgroupName: demowg
+
+  MyRedshiftNameSpace:
+    Type: AWS::RedshiftServerless::Namespace
+    Properties:
+      AdminUsername: !Ref AdminUser
+      AdminUserPassword: !Ref AdminPassword
+      DbName: !Ref DBName
+      DefaultIamRoleArn: !GetAtt RedshiftDefaultRole.Arn
+      FinalSnapshotName: demosnapshot
+      FinalSnapshotRetentionPeriod: 1
+      IamRoles:
+        - !GetAtt RedshiftDefaultRole.Arn
+      NamespaceName: demo
+
+  ##########################################################################
+  #   Lambda publish                                                    #
+  ##########################################################################
+  RedshiftETL:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      FunctionName: RedshiftETL
+      Description: Lambda to do ETL with Redshift
+      Runtime: python3.9
+      Timeout: 60
+      MemorySize: 128
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          Exec_Redshift_Role: !Ref RedshiftDefaultRole
+      Events:
+        API:
+          Type: HttpApi
+
+  ##########################################################################
+  #   IAM Roles                                               #
+  ##########################################################################
+  RedshiftDefaultRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - redshift-serverless.amazonaws.com
+                - redshift.amazonaws.com
+                - sagemaker.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonRedshiftAllCommandsFullAccess
+        - !Ref RedhiftCommandsAccessPolicy
+
+  RedhiftCommandsAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowedResourcesForRedshiftCluster
+            Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:GetBucketAcl
+              - s3:GetBucketCors
+              - s3:GetEncryptionConfiguration
+              - s3:GetBucketLocation
+              - s3:ListBucket
+              - s3:ListAllMyBuckets
+              - s3:ListMultipartUploadParts
+              - s3:ListBucketMultipartUploads
+              - s3:PutObject
+              - s3:PutBucketAcl
+              - s3:PutBucketCors
+              - s3:DeleteObject
+              - s3:AbortMultipartUpload
+              - s3:CreateBucket
+            Resource:
+              - arn:aws:s3:::redshift/*
+              - arn:aws:s3:::redshift
+
+  LambdaExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: CustomPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+              #- Effect: Allow
+              #  Action:
+              #    - "redshift-data:GetStatementResult"
+              #    - "redshift-data:CancelStatement"
+              #    - "redshift-data:DescribeStatement"
+              #    - "redshift-data:ListStatements"
+              #  Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "redshift-serverless:*"
+                Resource:
+                  "*"
+                  #- !GetAtt MyRedshiftWorkgroup.WorkgroupArn
+              - Effect: Allow
+                Action:
+                  - "redshift-data:*"
+                Resource:
+                  "*"
+                  #- !GetAtt MyRedshiftWorkgroup.WorkgroupArn
+                  #- !GetAtt MyRedshiftNameSpace.NamespaceArn
+
+  ##########################################################################
+  #   VPC and Subnet                                              #
+  ##########################################################################
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet2CIDR
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet3CIDR
+      MapPublicIpOnLaunch: true
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+
+  PublicSubnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet3
+
+  RedshiftSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow all on Redshift port
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5439
+          ToPort: 5439
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 5439
+          ToPort: 5439
+          CidrIp: 0.0.0.0/0
+##########################################################################
+#   VPC and Subnet                                              #
+##########################################################################
+
+Outputs:
+  HttpApiUrl:
+    Description: URL of your API endpoint
+    Value:
+      Fn::Sub: "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"
