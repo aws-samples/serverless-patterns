@@ -157,27 +157,32 @@ Resources:
                   - "logs:CreateLogGroup"
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
-                Resource: "*"
-              #- Effect: Allow
-              #  Action:
-              #    - "redshift-data:GetStatementResult"
-              #    - "redshift-data:CancelStatement"
-              #    - "redshift-data:DescribeStatement"
-              #    - "redshift-data:ListStatements"
-              #  Resource: "*"
+                Resource:
+                  - !Sub arn:aws:logs:*:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
-                  - "redshift-serverless:*"
+                  - "redshift-serverless:GetCredentials"
+                  - "redshift-serverless:GetNamespace"
+                  - "redshift-serverless:GetWorkgroup"
+                  - "redshift-serverless:GetTableRestoreStatus"
+                  - "redshift-serverless:ListNamespaces"
+                  - "redshift-serverless:ListWorkgroups"
+                  - "redshift-serverless:ListTableRestoreStatus"
                 Resource:
-                  "*"
-                  #- !GetAtt MyRedshiftWorkgroup.WorkgroupArn
+                  - !Sub arn:aws:redshift-serverless:*:${AWS::AccountId}:namespace/*
+                  - !Sub arn:aws:redshift-serverless:*:${AWS::AccountId}:workgroup/*
               - Effect: Allow
                 Action:
-                  - "redshift-data:*"
+                  - "redshift-data:GetStatementResult"
+                  - "redshift-data:DescribeStatement"
+                  - "redshift-data:ListStatements"
+                  - "redshift-data:ListTables"
+                  - "redshift-data:DescribeTable"
+                  - "redshift-data:ListSchemas"
+                  - "redshift-data:ExecuteStatement"
+                  - "redshift-data:ListDatabases"
                 Resource:
-                  "*"
-                  #- !GetAtt MyRedshiftWorkgroup.WorkgroupArn
-                  #- !GetAtt MyRedshiftNameSpace.NamespaceArn
+                  - !Sub arn:aws:redshift-serverless:*:${AWS::AccountId}:workgroup/*
 
   ##########################################################################
   #   VPC and Subnet                                              #
