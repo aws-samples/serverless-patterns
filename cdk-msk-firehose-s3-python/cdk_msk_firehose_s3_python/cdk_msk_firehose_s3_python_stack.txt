@@ -1,0 +1,216 @@
+from aws_cdk import (
+    CfnOutput,
+    Stack,
+    aws_msk as msk,
+    aws_ec2 as ec2,
+    aws_s3 as s3, RemovalPolicy,
+)
+
+from aws_cdk import aws_kinesisfirehose as kinesisfirehose
+from constructs import Construct
+
+
+class CdkMskFirehoseS3PythonStack(Stack):
+
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
+
+        self.vpc = ec2.Vpc(self, "VPC",
+                           max_azs=2,
+                           ip_addresses=ec2.IpAddresses.cidr("10.10.0.0/16"),
+                           # configuration will create 3 groups in 2 AZs = 6 subnets.
+                           subnet_configuration=[ec2.SubnetConfiguration(
+                               subnet_type=ec2.SubnetType.PUBLIC,
+                               name="PUBLIC",
+                               cidr_mask=24
+                           )
+                           ],
+                           # nat_gateway_provider=ec2.NatProvider.gateway(),
+                           nat_gateways=2,
+                           )
+
+        pub_subnets = self.vpc.select_subnets(subnet_type=ec2.SubnetType.PUBLIC)
+
+        subnetIds = []
+
+        count = 1
+        for psub in pub_subnets.subnets:
+            subnetIds.append(psub.subnet_id)
+            # ssm.StringParameter(self, 'private-subnet-' + str(count),
+            #                     string_value=psub.subnet_id,
+            #                     parameter_name='/mskcluster/private-subnet-' + str(count)
+            #                     )
+            count += 1
+
+        cfn_serverless_cluster = msk.CfnServerlessCluster(self, "MyCfnServerlessCluster",
+                                                          client_authentication=msk.CfnServerlessCluster.ClientAuthenticationProperty(
+                                                              sasl=msk.CfnServerlessCluster.SaslProperty(
+                                                                  iam=msk.CfnServerlessCluster.IamProperty(
+                                                                      enabled=True
+                                                                  )
+                                                              )
+                                                          ),
+                                                          cluster_name="MSKFirehoseS3DeliveryCluster",
+                                                          vpc_configs=[msk.CfnServerlessCluster.VpcConfigProperty(
+                                                              subnet_ids=subnetIds
+                                                          )],
+
+                                                          # the properties below are optional
+                                                          tags={
+                                                              "tags_key": "tags"
+                                                          }
+                                                          )
+        clusterArn = cfn_serverless_cluster.attr_arn
+        accountId = 800247410067
+        desBucketName = "kinesisdatafirehose-dest-msk-demo-032582"
+        backUpBucketName = "kinesisdatafirehose-back-up-msk-demo-032582"
+        serviceName = "firehose.amazonaws.com"
+
+        clusterPolicy = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": [
+                            accountId
+                        ]
+                    },
+                    "Action": [
+                        "kafka:CreateVpcConnection",
+                        "kafka:GetBootstrapBrokers",
+                        "kafka:DescribeCluster",
+                        "kafka:DescribeClusterV2"
+                    ],
+                    "Resource": clusterArn
+                },
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": serviceName
+                    },
+                    "Action": [
+                        "kafka:CreateVpcConnection",
+                        "kafka:GetBootstrapBrokers",
+                        "kafka:DescribeCluster",
+                        "kafka:DescribeClusterV2"
+                    ],
+                    "Resource": clusterArn
+                }
+            ]
+        }
+        msk.CfnClusterPolicy(self, "MyCfnClusterPolicy",
+                             cluster_arn=clusterArn,
+                             policy=clusterPolicy
+                             )
+        #
+        # ssm.StringParameter(self, 'clusterArn',
+        #                     string_value=clusterArn,
+        #                     parameter_name='/mskcluster/clusterArn')
+
+        # firehoseS3 = KinesisFirehoseToS3(self, 'test_firehose_s3')
+        kinesisfirehose.CfnDeliveryStream.delivery_stream_type = "MSKAsSource"
+        kinesisfirehose.CfnDeliveryStream.delivery_stream_name = "MSKAsSourceFirehose"
+
+        msk_source_configuration_property = kinesisfirehose.CfnDeliveryStream.MSKSourceConfigurationProperty(
+            topic_name="TestTopic",
+            msk_cluster_arn=clusterArn,
+            authentication_configuration=kinesisfirehose.CfnDeliveryStream.AuthenticationConfigurationProperty(
+                connectivity="PRIVATE",
+                role_arn="arn:aws:iam::816085599212:role/mskfullaccess"
+            )
+        )
+
+        bucketName = s3.Bucket(self, "Bucket",
+                               # block_public_access=[s3.BlockPublicAccess.BLOCK_ALL],
+                               encryption=s3.BucketEncryption.S3_MANAGED,
+                               bucket_name=desBucketName,
+                               versioned=True,
+                               removal_policy=RemovalPolicy.DESTROY
+                               ).bucket_name
+        srArn = 'arn:aws:s3:::' + bucketName
+
+        # backupBucketName = s3.Bucket(self, "Bucket",
+        #                        # block_public_access=[s3.BlockPublicAccess.BLOCK_ALL],
+        #                        encryption=s3.BucketEncryption.S3_MANAGED,
+        #                        bucket_name=backUpBucketName,
+        #                        versioned=True,
+        #                        removal_policy=RemovalPolicy.DESTROY
+        #                        ).bucket_name
+        # srBackupArn = 'arn:aws:s3:::' + backupBucketName
+        #
+        # s3_destination_configuration_property = kinesisfirehose.CfnDeliveryStream.S3DestinationConfigurationProperty(
+        #     bucket_arn=srArn,
+        #     role_arn="arn:aws:iam::816085599212:role/mskfullaccess",
+        #     cloud_watch_logging_options=kinesisfirehose.CfnDeliveryStream.CloudWatchLoggingOptionsProperty(
+        #         enabled=False,
+        #         log_group_name="msk-firehose-s3-log-group",
+        #         log_stream_name="msk-firehose-s3-log-stream"
+        #     ),
+        #     # compression_format="compressionFormat",
+        #     encryption_configuration=kinesisfirehose.CfnDeliveryStream.EncryptionConfigurationProperty(
+        #         no_encryption_config="NoEncryption"
+        #     )
+        # )
+
+        # s3_backup_configuration_property = kinesisfirehose.CfnDeliveryStream.S3
+
+        s3_destination_configuration_property = kinesisfirehose.CfnDeliveryStream.ExtendedS3DestinationConfigurationProperty(
+            bucket_arn=srArn,
+            role_arn="arn:aws:iam::816085599212:role/mskfullaccess",
+            cloud_watch_logging_options=kinesisfirehose.CfnDeliveryStream.CloudWatchLoggingOptionsProperty(
+                enabled=False,
+                log_group_name="msk-firehose-s3-log-group",
+                log_stream_name="msk-firehose-s3-log-stream"
+            ),
+            # compression_format="compressionFormat",
+            encryption_configuration=kinesisfirehose.CfnDeliveryStream.EncryptionConfigurationProperty(
+                no_encryption_config="NoEncryption"
+            )
+        )
+
+        # streamProps = kinesisfirehose.CfnDeliveryStreamProps(msk_source_configuration=msk_source_configuration_property,
+        #                                                      s3_destination_configuration=s3_destination_configuration_property)
+        kinesisfirehose.CfnDeliveryStream(self, "MSKSourceKDFStreams", delivery_stream_type="MSKAsSource",
+                                          msk_source_configuration=msk_source_configuration_property,
+                                          extended_s3_destination_configuration=s3_destination_configuration_property)
+
+        # c9Props = c9.CfnEnvironmentEC2Props(self,instance_type="t3.small")
+
+        self.instance_ami = "ami-05c13eab67c5d8861"
+        self.instance_type = "t3.small"
+        self.vpc_id = self.vpc.vpc_id
+        self.security_group_id = "sg-083ed0694a6575fbc"
+        self.key_name = "msk-client-key-pair"
+        self.key_type = "rsa"
+
+        cfn_key_pair = ec2.CfnKeyPair(
+            self
+            , "MyCfnKeyPair"
+            , key_name=self.key_name
+            , key_type=self.key_type
+        )
+        #
+        # vpc = ec2.Vpc.from_lookup(
+        #     self
+        #     , "vpc"
+        #     , vpc_id=self.vpc_id
+        # )
+
+        security_group = ec2.SecurityGroup.from_lookup_by_id(
+            self
+            , "security_group"
+            , security_group_id=self.security_group_id
+        )
+
+        instance = ec2.Instance(
+            self
+            , "Instance"
+            , instance_type=ec2.InstanceType(self.instance_type)
+            , machine_image=ec2.MachineImage().lookup(name=self.instance_ami)
+            , vpc = self.vpc
+            , security_group = security_group
+            , key_name= cfn_key_pair.key_name
+        )
+
+        CfnOutput(self, "vpcIdOutput", value=self.vpc.vpc_id)
