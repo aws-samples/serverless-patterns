@@ -2,9 +2,9 @@
 
 This AWS CDK stack deploys an API Gateway HTTP API that integrates with a Lambda function and a DocumentDB cluster. The Lambda function is connected to the DocumentDB cluster through a VPC. The Lambda implements the CRUD operations function for this REST API.
 
-You should use this pattern if you want to migrate your application to DocumentDB using a serverless REST API application layer
+You should use this pattern if you want to migrate your application to DocumentDB using a serverless REST API application layer.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-http-lambda-documentdb-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -65,19 +65,19 @@ To use the API Gateway HTTP API, send a GET request to the root path (/). The La
 In the stack output, you can see `ApiGatewayUrl`. This URL can be used with the curl commands below to interact with the DocumentDB.
 
 ### Example
-1. **GET** - Retrieve data from the DocumentDB collection.:
+1. **GET** - Retrieve data from the DocumentDB collection:
 ```bash
 curl -X GET "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json"
 ```
-2. **POST**  - Insert data into the DocumentDB collection.:
+2. **POST**  - Insert data into the DocumentDB collection:
 ```bash
 curl -X POST "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"key": "value"}'
 ```
-3. **PUT** - Update data in the DocumentDB collection.:
+3. **PUT** - Update data in the DocumentDB collection:
 ```bash
 curl -X PUT "YOUR_API_ENDPOINT" -H "CONTENT-TYPE: application/json" -d '{"_id": "A_VALID_ID_FROM_THE_DATABASE", "key": "newvalue"}'
 ```
-4. **DELETE** - Delete data from the DocumentDB collection.:
+4. **DELETE** - Delete data from the DocumentDB collection:
 ```bash
 curl -X DELETE "YOUR_API_ENDPOINT?id=A_VALID_ID_FROM_THE_DATABASE"
 ```
