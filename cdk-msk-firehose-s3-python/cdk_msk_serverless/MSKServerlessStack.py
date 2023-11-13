@@ -9,6 +9,11 @@ from aws_cdk import (
 from constructs import Construct
 
 
+# def getclusterid(text):
+#
+#     return clusterId
+
+
 class CdkMSKServerlessVpcStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
@@ -55,13 +60,23 @@ class CdkMSKServerlessVpcStack(Stack):
                                                               "tags_key": "tags"
                                                           }
                                                           )
-        clusterArn = cfn_serverless_cluster.attr_arn+""
+        clusterArn = str(cfn_serverless_cluster.attr_arn + "")
         accountId = 816085599212
-        splitArn = clusterArn.split("/")
-        clusterId = splitArn[0]
-        clusterName = splitArn[0]
+        # splitArn = clusterArn.split("/")
+        # clusterId = cfn_serverless_cluster.get_att
+        clusterName = cfn_serverless_cluster.cluster_name
+        clusterId = ""
+        clusterStringId = clusterArn[-39::]
+        text = str(cfn_serverless_cluster.attr_arn)
+        # text = "arn:aws:kafka:us-east-1:816085599212:cluster/MSKFirehoseS3DeliveryCluster/d5550dbb-29f5-412f-990b-45733e6f56ef-s1"
+
+        # n = 12
+        # for i in range(len(text) - 1, len(text) - n - 1, -1):
+        #     clusterId = text[i] + clusterId
+        #
+        # ssmValue = clusterId
         ssm.StringParameter(self, 'clusterId',
-                            string_value=clusterId,
+                            string_value=clusterArn,
                             parameter_name='/mskcluster/clusterId')
         ssm.StringParameter(self, 'clusterName',
                             string_value=clusterName,

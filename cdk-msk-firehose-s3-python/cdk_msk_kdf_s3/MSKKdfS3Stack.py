@@ -14,17 +14,19 @@ class CdkMSKKdfS3Stack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        accountId = '816085599212'
+        accountId = str(Stack.account)
         topicName = 'msk-kdf-s3-topic'
         desBucketName = 'kinesisdatafirehose-dest-msk-demo-032582'
-        clusterArnNew = ssm.StringParameter.value_for_string_parameter(
+        clusterArn = ssm.StringParameter.value_for_string_parameter(
             self, '/mskcluster/clusterArnNew')
-        clusterId = ssm.StringParameter.value_for_string_parameter(
+
+        noOfChars = 39
+
+        clusterId = ssm.StringParameter.value_from_lookup(
             self, '/mskcluster/clusterId')
+        clusterIdStr = clusterId[-noOfChars::]
         clusterName = ssm.StringParameter.value_for_string_parameter(
             self, '/mskcluster/clusterName')
-
-        clusterArnAllTopics = clusterArnNew + '/*'
         kinesisfirehose.CfnDeliveryStream.delivery_stream_type = 'MSKAsSource'
         kinesisfirehose.CfnDeliveryStream.delivery_stream_name = 'MSKAsSourceFirehose'
 
@@ -43,43 +45,68 @@ class CdkMSKKdfS3Stack(Stack):
                                 )
         firehoseRole.add_to_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
+            actions=[
+                "glue:GetTable",
+                "glue:GetTableVersion",
+                "glue:GetTableVersions"
+            ],
             resources=[
-                'arn:aws:kafka:us-east-1:'+accountId+':cluster/'+clusterName+'/'+clusterId],
-            actions=[
-                'kafka:GetBootstrapBrokers',
-                'kafka:DescribeCluster',
-                'kafka:DescribeClusterV2',
-                'kafka-cluster:Connect'
+                'arn:aws:kafka:us-east-1:' + accountId + ':catalog'
+                'arn:aws:kafka:us-east-1:' + accountId + ':database/*'
+                'arn:aws:kafka:us-east-1:' + accountId + ':table/*'
             ]
+        )
+        )
+
+        firehoseRole.add_to_policy(iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=[
+                "kafka:GetBootstrapBrokers",
+                "kafka:DescribeCluster",
+                "kafka:DescribeClusterV2",
+                "kafka-cluster:Connect"
+            ],
+            resources=[
+                'arn:aws:kafka:us-east-1:' + accountId + ':cluster/' + clusterName + '/' + clusterIdStr]
         )
         )
         firehoseRole.add_to_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
-            resources=[ 'arn:aws:kafka:us-east-1:'+accountId+':topic/'+clusterName+'/'+clusterId + '/' + topicName],
             actions=[
-                'kafka-cluster:DescribeTopic',
-                'kafka-cluster:DescribeTopicDynamicConfiguration',
-                'kafka-cluster:ReadData'
-            ]
+                "kafka-cluster:DescribeTopic",
+                "kafka-cluster:DescribeTopicDynamicConfiguration",
+                "kafka-cluster:ReadData"
+            ],
+            resources=[
+                'arn:aws:kafka:us-east-1:' + accountId + ':topic/' + clusterName + '/' + clusterIdStr + '/' + topicName]
         )
         )
         firehoseRole.add_to_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
-            resources=[ 'arn:aws:kafka:us-east-1:'+accountId+':group/'+clusterName+'/'+clusterId + '/*'],
             actions=[
-                'kafka-cluster:DescribeGroup'
-            ]
+                "kafka-cluster:DescribeGroup"
+            ],
+            resources=['arn:aws:kafka:us-east-1:' + accountId + ':group/' + clusterName + '/' + clusterIdStr + '/*'],
         )
         )
         firehoseRole.add_to_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
-            resources=[srArn,srArn + '/*'],
             actions=['s3:AbortMultipartUpload',
                      's3:GetBucketLocation',
                      's3:GetObject',
                      's3:ListBucket',
                      's3:ListBucketMultipartUploads',
-                     's3:PutObject']
+                     's3:PutObject'],
+            resources=[srArn, srArn + '/*']
+        )
+        )
+        firehoseRole.add_to_policy(iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=[
+                        "lambda:InvokeFunction",
+                        "lambda:GetFunctionConfiguration"
+                     ],
+            resources=['arn:aws:kafka:us-east-1:' + accountId + ':function:*']
         )
         )
         firehoseRole.add_to_policy(iam.PolicyStatement(
@@ -89,9 +116,13 @@ class CdkMSKKdfS3Stack(Stack):
         )
         )
 
+        ssm.StringParameter(self, 'firehoseRole.role_arns',
+                            string_value=firehoseRole.role_arn,
+                            parameter_name='/mskcluster/role_arn')
+
         msk_source_configuration_property = kinesisfirehose.CfnDeliveryStream.MSKSourceConfigurationProperty(
             topic_name="msk-src-pattern",
-            msk_cluster_arn=clusterArnNew,
+            msk_cluster_arn=clusterArn,
             authentication_configuration=kinesisfirehose.CfnDeliveryStream.AuthenticationConfigurationProperty(
                 connectivity="PRIVATE",
                 role_arn=firehoseRole.role_arn

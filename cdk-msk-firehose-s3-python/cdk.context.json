@@ -1,0 +1,11 @@
+{
+  "availability-zones:account=816085599212:region=us-east-1": [
+    "us-east-1a",
+    "us-east-1b",
+    "us-east-1c",
+    "us-east-1d",
+    "us-east-1e",
+    "us-east-1f"
+  ],
+  "ssm:account=816085599212:parameterName=/mskcluster/clusterId:region=us-east-1": "arn:aws:kafka:us-east-1:816085599212:cluster/MSKFirehoseS3DeliveryCluster/af4ea225-7d3d-48db-a055-9c50f320b68b-s3"
+}
