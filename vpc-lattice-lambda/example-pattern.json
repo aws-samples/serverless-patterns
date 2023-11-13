@@ -32,7 +32,7 @@
   },
   "deploy": {
     "text": [
-      "sam build"
+      "sam build",
       "sam deploy"
     ]
   },
