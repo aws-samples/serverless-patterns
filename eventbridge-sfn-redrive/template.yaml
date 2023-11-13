@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - EventBridge to Lambda
+  
+Resources:
+  # Define the consumer Lambda function and EventBridge rule
+  ConsumerFunction:
+    Type: AWS::Serverless::Function
+    Description: Invoked by EventBridge rule
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs18.x
+      Role: !GetAtt MyLambdaFunctionRole.Arn
+      Timeout: 3
+      Events:
+        Trigger:
+          Type: EventBridgeRule 
+          Properties:
+            Pattern:
+              source:
+                - 'aws.states'
+              detail-type:
+                - 'Step Functions Execution Status Change'
+              detail:
+                status:
+                  - 'FAILED'
+                redriveStatus:
+                  - 'REDRIVABLE'
+  
+  MyLambdaExecutionPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: LambdaExecutionPolicy
+      Roles:
+        - !Ref MyLambdaFunctionRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'states:redriveExecution'
+            Resource: !GetAtt ConsumerFunction.Arn
+
+  MyLambdaFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: LambdaExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+
+Outputs:
+  ConsumerFunction:
+    Description: ConsumerFunction function name
+    Value: !Ref ConsumerFunction
