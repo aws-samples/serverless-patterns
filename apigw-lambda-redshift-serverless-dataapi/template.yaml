@@ -157,6 +157,7 @@ Resources:
                   - "logs:CreateLogGroup"
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
+                  - "logs:DescribeLogGroups"
                 Resource:
                   - !Sub arn:aws:logs:*:${AWS::AccountId}:log-group:*
               - Effect: Allow
