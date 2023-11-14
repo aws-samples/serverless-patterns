@@ -1,0 +1,59 @@
+{
+    "title": "DynamoDB stream to Amazon OpenSearch Serverless",
+    "description": "A pattern that stream the new added item in a specific DynamoDB to an Amazon OpenSearch Serverless collection",
+    "language": "Python, TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern will create a DynamoDB table, an OpenSearch Serverless collections.", 
+        "When any new item being created on the DynamoDB table, it will trigger the lambda function which index the item with it's partition key to the OpenSearch serverless collection.", \
+        "Removing the item in DynamoDB will also trigger the lambda function to remove the it from the OpenSearch Serverless collection. "
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-streams-aoss",
+        "templateURL": "serverless-patterns/dynamodb-streams-aoss",
+        "projectFolder": "",
+        "templateFile": "lib/resources-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "What is Amazon OpenSearch serverless?",
+          "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-overview.html"
+        },
+        {
+          "text": "Working with DynamoDB Streams",
+          "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "<code>cdk deploy</code>"      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Stan Fan",
+        "image": "https://avatars.githubusercontent.com/u/58756168?v=4",
+        "bio": "Your bio.",
+        "linkedin": "Stan Fan is a Solutions Architect at Amazon Web Services (AWS) based on Sydney, Australia.",
+        "twitter": "hongyi-fan-05101992"
+      }
+    ]
+  }
+  
