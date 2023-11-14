@@ -29,7 +29,7 @@
           "link": "https://aws.amazon.com/blogs/compute/using-amazon-api-gateway-as-a-proxy-for-dynamodb/"
         },
         {
-          "text": "Event Bridge Schedulers Universal Targets",
+          "text": "EventBridge Schedulers Universal Targets",
           "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-targets-universal.html"
         }
       ]
