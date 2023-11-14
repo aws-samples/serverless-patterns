@@ -21,7 +21,7 @@
     "resources": {
       "bullets": [
         {
-          "text": "Event Bridge Schedulers",
+          "text": "EventBridge Schedulers",
           "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
         },
         {
