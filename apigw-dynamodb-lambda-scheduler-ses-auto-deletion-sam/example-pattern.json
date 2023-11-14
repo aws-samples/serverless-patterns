@@ -7,7 +7,7 @@
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This pattern deploys a serverless reminder application. When a user creates/updates/deletes a reminder using API Gateway, the data is updated in DynamoDB Table, which inturn triggers a Lambda Function which creates one-time event bridge schedules with Amazon SES as target. Email reminders are sent to users before 10 minutes and at the scheduled time. After each schedule is triggered, EventBridge Scheduler deletes the schedule automatically (as the ActionAfterCompletion is set to DELETE)"
+        "This pattern deploys a serverless reminder application. When a user creates/updates/deletes a reminder using API Gateway, the data is updated in a DynamoDB Table, which triggers a Lambda Function. This creates a one-time EventBridge schedule with Amazon SES as the target. "
       ]
     },
     "gitHub": {
