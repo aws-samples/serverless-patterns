@@ -157,38 +157,13 @@ Resources:
                   - "logs:CreateLogGroup"
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
-                  - "logs:DescribeLogGroups"
                 Resource:
                   - !Sub arn:aws:logs:*:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
-                  - "redshift-serverless:GetTableRestoreStatus"
-                  - "redshift-serverless:ListUsageLimits"
-                  - "redshift-serverless:ListCustomDomainAssociations"
-                  - "redshift-serverless:ListNamespaces"
-                  - "redshift-serverless:PutResourcePolicy"
-                  - "redshift-serverless:GetResourcePolicy"
-                  - "redshift-serverless:ListWorkgroups"
-                  - "redshift-serverless:CreateUsageLimit"
-                  - "redshift-serverless:DeleteResourcePolicy"
-                  - "redshift-serverless:GetUsageLimit"
-                  - "redshift-serverless:DescribeOneTimeCredit"
-                  - "redshift-serverless:UpdateUsageLimit"
-                  - "redshift-serverless:ListTableRestoreStatus"
-                  - "redshift-serverless:DeleteUsageLimit"
+                  - "redshift-serverless:GetCredentials"
                 Resource:
                   - !Sub arn:aws:redshift-serverless:*:${AWS::AccountId}:namespace/*
-                  - !Sub arn:aws:redshift-serverless:*:${AWS::AccountId}:workgroup/*
-              - Effect: Allow
-                Action:
-                  - "redshift-serverless:*"
-                Resource:
-                  - !Sub arn:aws:redshift-serverless:*:${AWS::AccountId}:namespace/*
-                  - !Sub arn:aws:redshift-serverless:*:${AWS::AccountId}:workgroup/*
-              - Effect: Allow
-                Action:
-                  - "redshift-data:*"
-                Resource:
                   - !Sub arn:aws:redshift-serverless:*:${AWS::AccountId}:workgroup/*
               - Effect: Allow
                 Action:
@@ -196,8 +171,14 @@ Resources:
                   - "redshift-data:CancelStatement"
                   - "redshift-data:DescribeStatement"
                   - "redshift-data:ListStatements"
+                  - "redshift-data:ExecuteStatement"
                 Resource:
                   - !Sub arn:aws:redshift-serverless:*:${AWS::AccountId}:workgroup/*
+              - Effect: Allow
+                Action:
+                  - "redshift-data:GetStatementResult"
+                  - "redshift-data:DescribeStatement"
+                Resource: "*"
 
   ##########################################################################
   #   VPC and Subnet                                              #

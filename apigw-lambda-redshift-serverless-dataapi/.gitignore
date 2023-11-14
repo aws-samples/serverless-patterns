@@ -1,0 +1,4 @@
+template copy.yaml
+samconfig.toml
+.aws-sam
+.aws-sam/
