@@ -1,0 +1,56 @@
+{
+  "title": "SNS to SQS fanout pattern",
+  "description": "This example demonstrates a fan-out pattern using SNS topic and SQS queues.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Three SQS queues subscribe to the SNS topic. The topic routing logic is defined through the subscription filter policy.",
+      "The AllMetricsSqsQueue queue receives all the messages. Messages will route to the TemperatureSqsQueue when the MetricType is set to 'Temperature'. Messages will route to HumiditySqsQueue when MetricType is set to 'Humidity'."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-fanout-tf",
+      "templateURL": "serverless-patterns/sns-sqs-fanout-tf",
+      "projectFolder": "sns-sqs-fanout-tf",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Common Amazon SNS scenarios",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-common-scenarios.html"
+      }
+    ]
+  },
+	"deploy": {
+		"text": [
+		          "terraform init",
+		          "terraform apply"
+		        ]
+	},
+	"testing": {
+		"text": [
+		"See the Github repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+		          "terraform destroy",
+		          "terraform show"
+		        ]
+	},
+	"authors": [
+		{
+			"name": "Makendran G",
+			"image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
+			"bio": "Cloud Support Engineer @ AWS",
+			"linkedin": "makendran",
+			"twitter": "@MakendranG"
+		}
+	]
+}

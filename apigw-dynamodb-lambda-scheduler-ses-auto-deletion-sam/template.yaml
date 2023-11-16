@@ -1,0 +1,140 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Serverless Reminders Application with Event Bridge Scheduler
+
+Parameters:
+  SenderEmailAddress:
+    Description: Sender email address that is verified from Amazon SES
+    Type: String
+
+Resources:
+
+####### DynamoDb Table ######
+
+  RemindersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions: 
+        - AttributeName: id
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+####### REST API Gateway #########
+
+  APIGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Description: Reminders API Gateway
+      StageName: v1
+      EndpointConfiguration:
+        Type: REGIONAL
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './restapi/api.yaml'
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          LoggingLevel: ERROR
+
+  APIGatewayDynamoDBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-APIGatewayDynamoDB-Policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              Effect: Allow
+              Action:
+                - dynamodb:DeleteItem
+                - dynamodb:UpdateItem
+                - dynamodb:CreateItem
+                - dynamodb:GetItem
+                - dynamodb:Scan
+                - dynamodb:Query
+              Resource: !GetAtt RemindersTable.Arn
+
+## Lambda Function 
+
+  SchedulerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-scheduler-lambda"
+      Handler: scheduleHandler.lambda_handler
+      Runtime: python3.11
+      CodeUri: src/
+      Environment:
+        Variables:
+          SES_SENDER_IDENTITY: !Ref SenderEmailAddress
+          SCHEDULER_ROLE_ARN: !GetAtt SchedulerSESRole.Arn
+      Policies: 
+        - DynamoDBStreamReadPolicy:
+            TableName: !Ref RemindersTable
+            StreamName: !Select [3, !Split ["/", !GetAtt RemindersTable.StreamArn]]    
+        - Statement:
+            - Sid: EventBridgeSchedulerPolicy
+              Effect: Allow
+              Action:
+                - "scheduler:CreateSchedule"
+                - "scheduler:UpdateSchedule"
+                - "scheduler:DeleteSchedule"
+              Resource: !Sub "arn:aws:scheduler:${AWS::Region}:${AWS::AccountId}:schedule/*"
+            - Sid: SSMGetParameterPolicy
+              Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource: !GetAtt SchedulerSESRole.Arn
+      Events:
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt RemindersTable.StreamArn
+            StartingPosition: LATEST
+            BatchSize: 1
+
+## EventBridge Scheduler IAM Role
+
+  SchedulerSESRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-SchedulerSES-Policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              Effect: Allow
+              Action:
+                - ses:SendEmail
+              Resource: "*"
+
+Outputs:
+  apiGatewayInvokeURL:
+    Value: !Sub https://${APIGateway}.execute-api.${AWS::Region}.amazonaws.com/v1
