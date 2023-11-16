@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-kinesis-flink-firehose",
       "templateURL": "serverless-patterns/cdk-kinesis-flink-firehose",
       "projectFolder": "cdk-kinesis-flink-firehose",
-      "templateFile": "/cdk/lib/stack.ts"
+      "templateFile": "cdk/lib/stack.ts"
     }
   },
   "resources": {
