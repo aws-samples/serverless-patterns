@@ -3,7 +3,7 @@
 
 This demonstrates a CDK app with an instance of a stack (`CdkMSKServerlessVpcStack`) which contains an Amazon MSK Serverless cluster and stack (`CdkMSKKdfS3Stack`) which contains Amazon Kinesis Data FireHose with configurations for MSK as source and S3 as target.
 
-![architecture diagram](architecture.png)
+![architecture diagram](image/architecture.png)
 
 ## Requirements
 
@@ -33,14 +33,16 @@ This demonstrates a CDK app with an instance of a stack (`CdkMSKServerlessVpcSta
 5. Follow the bellow  instructions to create the topics in the MSK Cluster before proceeding with the KDF deployment as given in the shell instructions
 
 6. Login to the EC2 instance via Session Manager as shown below
-   ![ssmconnect diagram](ssm.png)
+7. 
+   ![ssmconnect diagram](image/ssm.png)
 
 6. Check whether the Java and Kafka installation are completed in the EC3 instance which got created by executing the following command
     ```bash
     sudo tail -f /var/log/cloud-init-output.log
     ```
 7. Copy the MSK Endpoint from cluster View Client Information as shown below, and In the following export command, replace BOOTSTRAP_ENDPOINT with the bootstrap-server string you that you saved.
-   ![CLIENT_INFO_MSK](msk.png)
+8. 
+   ![CLIENT_INFO_MSK](image/msk.png)
     ```bash
     export bs=<BOOTSTRAP_ENDPOINT>
     ```
@@ -55,9 +57,10 @@ This demonstrates a CDK app with an instance of a stack (`CdkMSKServerlessVpcSta
     ./bin/kafka-console-producer.sh --broker-list $bs --producer.config ./bin/client.properties --topic msk-kdf-s3-topic
    ```
 11. Check S3 bucket to validate the data S3 delivery pipeline.  
-    ![S3_SCREENSHOT](s3.png)
+12. 
+    ![S3_SCREENSHOT](image/s3.png)
 
 12. Once the testing and validation is completed empty the S3 bucket and execute the following command to clean up the stack.
     ```bash
-    ./deploy.sh
+    ./destroy.sh
     ```
