@@ -33,34 +33,34 @@ This demonstrates a CDK app with an instance of a stack (`CdkMSKServerlessVpcSta
 5. Follow the bellow  instructions to create the topics in the MSK Cluster before proceeding with the KDF deployment as given in the shell instructions
 
 6. Login to the EC2 instance via Session Manager as shown below
-7. 
+
    ![ssmconnect diagram](image/ssm.png)
 
-6. Check whether the Java and Kafka installation are completed in the EC3 instance which got created by executing the following command
+7. Check whether the Java and Kafka installation are completed in the EC3 instance which got created by executing the following command
     ```bash
     sudo tail -f /var/log/cloud-init-output.log
     ```
-7. Copy the MSK Endpoint from cluster View Client Information as shown below, and In the following export command, replace BOOTSTRAP_ENDPOINT with the bootstrap-server string you that you saved.
-8. 
+8. Copy the MSK Endpoint from cluster View Client Information as shown below, and In the following export command, replace BOOTSTRAP_ENDPOINT with the bootstrap-server string you that you saved.
+
    ![CLIENT_INFO_MSK](image/msk.png)
     ```bash
     export bs=<BOOTSTRAP_ENDPOINT>
     ```
-8. Run the following command to create a topic called
+9. Run the following command to create a topic called
    ```bash
     ./bin/kafka-topics.sh --bootstrap-server <MSK_BOOTSTRAP_URL> --command-config client.properties --create --topic msk-kdf-s3-topic --partitions 2
     ```
-9. Continue with the KDF Deployment on the SHELL Prompt.Deployment of KDF takes few minutes.
+10. Continue with the KDF Deployment on the SHELL Prompt.Deployment of KDF takes few minutes.
 
-10. After deployment is completed, produce messages in KAFKA TOPIC msk-kdf-s3-topic Created in step 8. 
+11. After deployment is completed, produce messages in KAFKA TOPIC msk-kdf-s3-topic Created in step 8. 
    ```bash
     ./bin/kafka-console-producer.sh --broker-list $bs --producer.config ./bin/client.properties --topic msk-kdf-s3-topic
    ```
-11. Check S3 bucket to validate the data S3 delivery pipeline.  
-12. 
+12. Check S3 bucket to validate the data S3 delivery pipeline.  
+
     ![S3_SCREENSHOT](image/s3.png)
 
-12. Once the testing and validation is completed empty the S3 bucket and execute the following command to clean up the stack.
+13. Once the testing and validation is completed empty the S3 bucket and execute the following command to clean up the stack.
     ```bash
     ./destroy.sh
     ```
