@@ -1,6 +1,6 @@
-# Amazon EventBridge to AWS Lambda
+# Amazon EventBridge to redrive AWS Step Functions 
 
-This template deploys a Lambda function that is triggered by an EventBridge rule. In this example, The lambda function redrives a Step Functions workflow from the point of failure 
+This template deploys an EventBridge rule to catch a Step Functions failure and redrive the workflow using a Lambda function . In this example, The lambda function redrives a Step Functions workflow from the point of failure.
 
 The Events section of the AWS::Serverless::Function type also sets up the required permissions for EventBridge to invoke this specific function.
 
