@@ -7,5 +7,5 @@
     "us-east-1e",
     "us-east-1f"
   ],
-  "ssm:account=816085599212:parameterName=/mskcluster/clusterId:region=us-east-1": "arn:aws:kafka:us-east-1:816085599212:cluster/MSKFirehoseS3DeliveryCluster/af4ea225-7d3d-48db-a055-9c50f320b68b-s3"
+  "ssm:account=816085599212:parameterName=/mskcluster/clusterId:region=us-east-1": "arn:aws:kafka:us-east-1:816085599212:cluster/MSKFirehoseS3DeliveryCluster/7f55fce0-05fe-4a29-a782-37ccbbd6b192-s3"
 }
