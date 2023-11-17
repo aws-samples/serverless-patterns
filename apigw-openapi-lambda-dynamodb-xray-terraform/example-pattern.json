@@ -1,5 +1,5 @@
 {
-  "title": "Deploying API Gateway REST API using OpenAPI spec with Lambda Powertools",
+  "title": "Amazon API Gateway to AWS Lambda using OpenAPI",
   "description": "Create a Lambda backed REST API using OpenAPI specification, integrated with lambda powertools for enhanced logging and traceability",
   "language": "TypeScript",
   "level": "200",
