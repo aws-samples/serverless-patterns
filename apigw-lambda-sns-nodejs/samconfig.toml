@@ -1,8 +1,0 @@
-version = 0.1
-[default.deploy.parameters]
-stack_name = "apigw-lambda-sns-3"
-resolve_s3 = true
-s3_prefix = "apigw-lambda-sns-3"
-region = "us-east-1"
-capabilities = "CAPABILITY_IAM"
-image_repositories = []
