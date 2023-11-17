@@ -1,0 +1,53 @@
+{
+  "title": "Claim Check Pattern using Dotnet",
+  "description": "This pattern shows how to implement the claim check pattern using Amazon EventBridge, SQS, Lambda and StepFunctions.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This implements the claim check pattern by storing large payloads in DynamoDB and passing a reference key via EventBridge rule to an SQS queue. A Lambda function retrieves the payload from DynamoDB based on the key and passes it to a StepFunctions state machine for processing. The implementation leverages these AWS services for a serverless, event-driven architecture."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/claim-check-pattern-dotnet-cdk",
+      "templateURL": "serverless-patterns/claim-check-pattern-dotnet-cdk",
+      "projectFolder": "claim-check-pattern-dotnet-cdk",
+      "templateFile": "/cdk/CdkStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Implementing architectural patterns with Amazon EventBridge Pipes",
+        "link": "https://aws.amazon.com/blogs/compute/implementing-architectural-patterns-with-amazon-eventbridge-pipes/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "dotnet build ../lambda",
+      "cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Michael Sundgaard",
+      "image": "https://media.licdn.com/dms/image/C5603AQFyPS9kMbQNug/profile-displayphoto-shrink_400_400/0/1516287623689?e=1704931200&v=beta&t=MG1d-_IetkdQRQFKpn6vnXFdcFWQJTuWd61Z15szd3M",
+      "bio": "Cloud and serverless evangelist with 15+ years experience architecting scalable enterprise solutions. Skilled in Java, C#, SQL, and modern web technologies. Passionate about bringing companies successfully to the cloud through well-designed architectures. Strong leadership abilities and excellent team collaboration skills.",
+      "linkedin": "michaelsundgaard"
+    }
+  ]
+}
