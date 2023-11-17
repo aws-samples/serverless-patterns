@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: This SAM template generating content using Amazon Bedrock API. This can be extended to use different supported models.
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 256
+
+Resources:
+  BedrockRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: v1
+
+  BedrockLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: 
+                - "bedrock:PutUseCaseForModelAccess"
+                - "bedrock:GetUseCaseForModelAccess"
+                - "bedrock:DeleteFoundationModelAgreement"
+                - "bedrock:CreateAgent"
+                - "bedrock:GetFoundationModelAvailability"
+                - "bedrock:GetModelInvocationLoggingConfiguration"
+                - "bedrock:ListFoundationModelAgreementOffers"
+                - "bedrock:AssociateThirdPartyKnowledgeBase"
+                - "bedrock:DeleteModelInvocationLoggingConfiguration"
+                - "bedrock:ListKnowledgeBases"
+                - "bedrock:PutFoundationModelEntitlement"
+                - "bedrock:ListModelCustomizationJobs"
+                - "bedrock:ListAgents"
+                - "bedrock:ListProvisionedModelThroughputs"
+                - "bedrock:ListCustomModels"
+                - "bedrock:CreateKnowledgeBase"
+                - "bedrock:PutModelInvocationLoggingConfiguration"
+                - "bedrock:ListFoundationModels"
+                - "bedrock:CreateFoundationModelAgreement"
+                - "bedrock:InvokeModel"
+              Resource: "*"
+      Events:
+        BedrockLambdaFunctionTrigger:
+          Type: Api
+          Properties:
+            Path: /bedrock_test
+            Method: post
+            RestApiId:
+              Ref: BedrockRestApi
+
+Outputs:
+  BedrockLambdaFunction:
+    Description: "BedrockLambdaFunction Name"
+    Value: !Ref BedrockLambdaFunction
+  BedrockRestApi:
+    Description: "API Gateway endpoint URL for the v1 stage of the Bedrock Rest API"
+    Value: !Sub "https://${BedrockRestApi}.execute-api.${AWS::Region}.amazonaws.com/v1/bedrock_test"

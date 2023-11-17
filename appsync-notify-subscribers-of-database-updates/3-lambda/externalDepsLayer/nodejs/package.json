@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-appsync": "^4.1.2",
-    "axios": "^0.22.0",
+    "axios": "^1.6.0"
     "graphql": "^15.6.1",
     "graphql-tag": "^2.12.5",
     "isomorphic-fetch": "^3.0.0"

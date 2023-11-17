@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: A rest endpoint hosted by an API Gateway which invokes Kinesis data stream, consumed by lambda function and persisted in a dynamoDB table.
+
+Parameters:
+  ContentBucketName:
+    Type: String
+
+Resources:
+  ContentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref ContentBucketName
+
+  ##########################################################################
+  #   Lambda Functions                                                     #
+  ##########################################################################
+  bedrockemb:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      FunctionName: BedrockEmb
+      Description: Lambda to get bedrock embedding for indexing
+      Runtime: python3.9
+      Timeout: 10
+      MemorySize: 128
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        FileUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref ContentBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: "content/"
+
+  ##########################################################################
+  #   Roles                                                                #
+  ##########################################################################
+
+  LambdaExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: CustomPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObjectAcl
+                  - s3:GetObject
+                  - s3:ListAllMyBuckets
+                  - s3:ListBucketVersions
+                  - s3:GetObjectAttributes
+                  - s3:ListBucket
+                Resource:
+                  - !Sub "arn:aws:s3:::${ContentBucketName}/*"
+                  - !Sub "arn:aws:s3:::${ContentBucketName}"
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+
+Outputs:
+  ContentBucket:
+    Description: "S3 bucket name"
+    Value: !Ref ContentBucket
+  LambdaFuncton:
+    Value: !Ref bedrockemb
+    Description: Lambda Function ARN
