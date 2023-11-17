@@ -1,0 +1,54 @@
+{
+  "title": "API Gateway REST API to Lambda to SNS (NodeJs)",
+  "description": "This sample project demonstrates how to publish to a SNS Topic whenever the REST API is invoked using Lambda function.",
+  "language": "NodeJs",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "Create an Amazon API Gateway REST API that calls Lambda and SNS.",
+    "text": "This pattern deploys a Amazon API Gateway REST API with Lambda Function integration and SNS Topic"
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/blob/main/apigw-lambda-sns-nodejs",
+      "templateURL": "serverless-patterns/apigw-lambda-sns-nodejs",
+      "projectFolder": "apigw-lambda-sns-nodejs",
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Publishing Messages in Amazon SNS",
+        "link": "https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/sns-examples-publishing-messages.html"
+      },
+      {
+        "text": "Choosing between messaging services for serverless applications.",
+        "link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Himanshu Goyal",
+      "image": "https://media.licdn.com/dms/image/D4D03AQGfOBBJOHCFnw/profile-displayphoto-shrink_200_200/0/1674582869052?e=1704326400&v=beta&t=PMspUbSZaTe1IrbT_W6kzowHJXEKQLd-YIicHKTTRmM",
+      "bio": "A Serverless Cloud Engineer and technical writer, dedicated to crafting efficient and scalable solutions using AWS services. My expertise in serverless architecture empowers me to create innovative and cost-effective cloud solutions. I enjoy sharing my knowledge with the serverless community through articles and patterns, helping others explore the vast potential of serverless computing. ",
+      "linkedin": "himanshugoyal20"
+    }
+  ]
+}
