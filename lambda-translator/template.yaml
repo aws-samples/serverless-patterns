@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: An AWS Lambda function that tranlsates text from one language to other language
+Description: An AWS Lambda function that translates text from one language to other language
 Resources:
   TranslateTextLambdaFunction:
     Type: AWS::Serverless::Function
