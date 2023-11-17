@@ -6,7 +6,7 @@
   "framework": "SAM",
   "introBox": {
     "headline": "Create an Amazon API Gateway REST API that calls Lambda and SNS.",
-    "text": "This pattern deploys a Amazon API Gateway REST API with Lambda Function integration and SNS Topic"
+    "text": ["This pattern deploys a Amazon API Gateway REST API with Lambda Function integration and SNS Topic"]
   },
   "gitHub": {
     "template": {
