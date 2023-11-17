@@ -1,4 +1,4 @@
-# VPC Lattice with Lambda as weighted targets
+# Amazon VPC Lattice with AWS Lambda as weighted targets
 
 This pattern demonstrates how to create a VPC Lattice which shifts traffic to different targets based on the weighted routing policy.
 
