@@ -21,30 +21,19 @@ Resources:
   lambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
+      CodeUri: src/index.zip
       Description: Example Lambda function
-      FunctionName: LambdaFunctionName
+      FunctionName: LambdaFunction
       Handler: index.handler
+      Role: !GetAtt 
+        - LambdaExecutionRole
+        - Arn
       MemorySize: 128
       Timeout: 5
-      Runtime: nodejs20.x
+      Runtime: nodejs18.x
       Environment:
         Variables:
           TOPIC_ARN: !Ref MySnsTopic
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-      Policies:
-        - S3FullAccessPolicy:
-            BucketName: severlesspatternlambda
-        - SNSPublishMessagePolicy:
-            TopicName: !GetAtt MySnsTopic.TopicName
       Events:
         APIEvent:
           Type: Api
@@ -52,6 +41,42 @@ Resources:
             Path: /
             Method: GET
             RestApiId: !Ref RestApi
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: 'arn:aws:logs:*:*:*'
+              - Sid: SNS
+                Effect: Allow
+                Action:
+                  - 'sns:Publish'
+                Resource: !Ref MySnsTopic
+              - Sid: SNS-topic
+                Effect: Allow
+                Action:
+                  - 'sns:List*'
+                  - 'sns:Get*'
+                Resource: *
+      
 Outputs:
   lambdaArn:
     Value: !GetAtt lambdaFunction.Arn
