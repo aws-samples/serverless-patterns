@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to deploy an API Gateway REST API with Lambda backend integration that is defined in an OpenAPI specification format using Terraform. The pattern also shows how backend Lambda is integrated with Lambda powertools for logging and more importantly tracing the requests end to end from API Gateway to DynamoDB data store.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: http://serverlessland.com/patterns/apigw-openapi-lambda-dynamodb-xray-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
