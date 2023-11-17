@@ -75,7 +75,7 @@ Resources:
                 Action:
                   - 'sns:List*'
                   - 'sns:Get*'
-                Resource: *
+                Resource: '*'
       
 Outputs:
   lambdaArn:
