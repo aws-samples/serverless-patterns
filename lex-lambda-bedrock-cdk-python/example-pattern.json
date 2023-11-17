@@ -1,0 +1,67 @@
+{
+    "title": "Lex - Lambda - Bedrock",
+    "description": "Interact with Bedrock models from a Lambda function fronted with a Lex Chatbot",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This project aims to build an integration between Amazon Lex, AWS Lambda, and Amazon Bedrock",
+        "The core functionality revolves around sending a user-defined prompt through Lex chatbot.",
+        "When a prompt is received through Amazon Lex chatbot, an AWS Lambda function captures the prompt. The Lambda function is responsible for invoking the foundation model (anthropic.claude-v2 in this case, but can be extended to include others) hosted through Amazon Bedrock.",
+        "To ensure compatibility with Bedrock, a Lambda Layer is utilized, it contains the latest version of the Boto3 library, as only the most recent Boto3 version includes a client for Amazon Bedrock."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lex-lambda-bedrock-cdk-python",
+        "templateURL": "serverless-patterns/lex-lambda-bedrock-cdk-python",
+        "projectFolder": "lex-lambda-bedrock-cdk-python",
+        "templateFile": "app.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Bedrock API Reference",
+          "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html"
+        },
+        {
+          "text": "Foundation Models on Amazon Bedrock",
+          "Link": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html#models-supported"
+        },
+        {
+          "text": "Amazon Lex",
+          "link": "https://aws.amazon.com/lex/"
+        },
+        {
+          "text": "Packaging custom boto3 version as a layer",
+          "link": "https://repost.aws/knowledge-center/lambda-python-runtime-errors"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Arjun Arippa",
+        "image": "https://github.com/awsarippa/amazon-textract-comprehend-pii-analysis/blob/main/image.png",
+        "bio": "Arjun Arippa is a Solutions Architect based in Bangalore, India. He works with some of the strategic and global customers in India, to build and architect their applications on AWS. Before joining AWS, Arjun spent over a decade working as a Software Developer. Reach out to him on LinkedIn",
+        "linkedin": "arjun-arippa"
+      }
+    ]
+  }
