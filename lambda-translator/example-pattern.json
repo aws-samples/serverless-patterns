@@ -1,0 +1,57 @@
+{
+  "title": "Text translation with Lambda and Translate",
+  "description": "Create a Lambda function that calls Translate service for text translation via the Boto3 SDK.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "services": {
+    "from": "Lambda",
+    "to": "Translate"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to deploy a SAM template that builds a Lambda function which calls translate for text translation."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-translate",
+      "templateURL": "https://github.com/aws-samples/serverless-patterns/main/lambda-translate/template.yaml",
+      "projectFolder": "lambda-translate",
+      "templateFile": "lambda-translate/template.yaml"
+    }
+  },
+    "resources": {
+      "headline": "Additional resources",
+      "bullets": [
+        {
+          "text": "Using AWS Lambda and Amazon Translate for text translation",
+          "link": "https://aws.amazon.com/blogs/machine-learning/translating-documents-with-amazon-translate-aws-lambda-and-the-new-batch-translate-api/"
+        }      
+      ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack:  sam delete --stack-name {StackName}"
+    ]
+  },
+  "author": [
+    {
+      "headline": "Presented by Abilashkumar P C",
+      "name": "Abilashkumar P C",
+      "image": "https://drive.google.com/file/d/1bxOh_WBw8J_xEqvT-qRezH8WXqSBPI24/view?usp=sharing",
+      "bio": "Cloud Support Engineer II @ AWS"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Lambda function that translates text from one language to other language
+Resources:
+  TranslateTextLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python3.10
+      CodeUri: src/
+      MemorySize: 128
+      Timeout: 60
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+          - Sid: LambdatranslateText
+            Effect: Allow
+            Action:
+            - translate:TranslateText
+            Resource: '*'       
+Outputs:
+  LambdaFunctionName:
+    Description: Lambda Function Name
+    Value: !Ref TranslateTextLambdaFunction
+
