@@ -1,6 +1,6 @@
-# Translate Text in real-time using Lambda function and Amazon Translate
+# Detect the Language (Dominant Language) of a text in real-time using API Gateway, Lambda function and Amazon Comprehend
 
-This pattern contains the source code and supporting files for a serverless application that you can deploy with the SAM CLI. Deploying the SAM file makes use of a Lambda function that calls the Comprehend service to peform real-time detection of the dominant langiage provided in the input text.
+This pattern contains the source code (in Python) and supporting files for a serverless application that you can deploy with the SAM CLI. Deploying the SAM file makes use of a Lambda function (uses Python Boto3 SDK) that calls the Comprehend service to peform real-time detection of the dominant langiage provided in the input text.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-translate
 
