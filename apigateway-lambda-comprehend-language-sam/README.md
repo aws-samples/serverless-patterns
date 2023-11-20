@@ -50,9 +50,9 @@ You can test the deployed language detection API by providing an input text. You
 curl -d '{"input": "Today is pretty warm and sunny"}' -H 'Content-Type: application/json' https://<API Gateway endpoint>.execute-api.<AWS Region>.amazonaws.com/Prod/detect_sentiment/
 ```
 
-The API endppint returns the dominant language:
+The API endpoint returns the following JSON response:
 ```
-The detected language (dominant language) is English.
+{"detected_language": "The detected language (dominant language) is English.", "confidence_score": 0.9988319873809814}
 ```
 
 ## Cleanup
