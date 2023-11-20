@@ -1,4 +1,4 @@
-## Amazon EFS and ECS Integration
+## Amazon EFS and Amazon ECS Integration
 
 This pattern creates an Amazon EFS file system and integrates with ECS for a persisent file storage in a containerized environment.
 
@@ -16,11 +16,18 @@ The deployment will require you to provide the AWS VPC id along with the Subnet 
 
 Optionally, you can also specify env and organization (tagging purposes) and task_cpu and task_memory (Amazon ECS Task compute purposes). These values default to entires in the variable.tf file if not provided at deployment.
 
+```shell
+# terraform init
 terraform init
 
+# terraform plan with sample values for vpc and subnet
 terraform plan  -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]' 
 
+# terraform apply
 terraform apply -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]' 
+```
+
+Once deployed you can run the ECS task from the ECS Console which will create a sample file on the persistent storage using Amazon EFS
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
