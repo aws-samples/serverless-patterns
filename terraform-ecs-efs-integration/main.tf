@@ -20,20 +20,23 @@ locals {
   ecr_base_arn           = "${local.account_id}.dkr.ecr.${local.region}.amazonaws.com"
   aws_path               = "/${var.env}/${var.organization}/"
   containercode_dir      = "./containercode/"
+  aws_subnets            = var.aws_subnets
 }
 
+/* Uncomment to dynamically get list of subnets based on tags
 #################################################################################
 # Query Subnets (Assumption that you have a VPC with subnets tagged as Private)
 #################################################################################
 data "aws_subnets" "private_subnet" {
   filter {
     name   = "vpc-id"
-    values = [var.vpc_id]
+    values = [var.aws_vpc_id]
   }
   tags = {
     Network = "private"
   }
 }
+*/
 
 ##############################
 # Create Security Group
@@ -41,7 +44,7 @@ data "aws_subnets" "private_subnet" {
 resource "aws_security_group" "this_security_group" {
   name        = local.standard_resource_name
   description = "Allow only outbound traffic for ECS Container"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.aws_vpc_id
   tags        = local.common_tags
   ingress {
     from_port = 0
@@ -91,7 +94,7 @@ resource "aws_efs_file_system" "efs_volume" {
 }
 
 resource "aws_efs_mount_target" "ecs_space_az" {
-  for_each        = toset(data.aws_subnets.private_subnet.ids)
+  for_each        = local.aws_subnets
   file_system_id  = aws_efs_file_system.efs_volume.id
   subnet_id       = each.value
   security_groups = [aws_security_group.this_security_group.id]
