@@ -1,0 +1,41 @@
+import json
+import logging
+import boto3
+import datetime
+from dateutil import parser
+
+def lambda_handler(event, context):
+    
+    scheduler=boto3.client('scheduler')
+    response = scheduler.list_schedules()
+    for schedule in response['Schedules']:
+        print(schedule)
+        print(schedule['Name'])        
+        if "myscheduleonetime" in schedule['Name']:
+            print("###############################scheduler###############################-------------------------------")
+            print(scheduler.get_schedule(Name=schedule['Name']))
+            scheduleinfo=json.loads(json.dumps(scheduler.get_schedule(Name=schedule['Name']),indent=2, sort_keys=True, default=str))
+            print(scheduleinfo['ScheduleExpression'])
+            scheduleinfostr=json.dumps(scheduleinfo['ScheduleExpression'])
+            print(scheduleinfostr)
+            if "at" in scheduleinfostr:
+                scheduleinfostr=scheduleinfostr[4:23]
+                print(scheduleinfostr)
+                date1 = parser.parse(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+                date2 = parser.parse(scheduleinfostr)
+                diff = date1 - date2
+                print(diff)
+                print(diff.days)
+                if diff.days > 7:           
+                     print("schedule is past the scheduled date by one week")
+                     scheduler.delete_schedule(Name=schedule['Name'])
+
+    return {
+         'statusCode': 200,
+         'body': json.dumps('Hello from Lambda!')
+        
+        
+    }
+    
+    
+
