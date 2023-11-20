@@ -19,7 +19,7 @@ paths:
                 $ref: "#/components/schemas/Empty"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
-        uri: "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:LambdaFunctionName/invocations"
+        uri: "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:LambdaFunction/invocations"
         responses:
           default:
             statusCode: "200"
