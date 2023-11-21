@@ -1,6 +1,6 @@
 {
   "title": "Language Detection with API Gateway, Lambda and Comprehend",
-  "description": "Create an API Gateway REST API with Lambda function backend integration that calls the Comprehend service for detecting the Language (dominant language) of the provided text using Boto3 SDK.",
+  "description": "API Gateway REST API with Lambda function backend integration calling Comprehend service Language detection using Boto3 SDK.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigateway-lambda-comprehend-language-sam",
       "templateURL": "https://github.com/aws-samples/serverless-patterns/main/apigateway-lambda-comprehend-language-sam/template.yaml",
       "projectFolder": "apigateway-lambda-comprehend-language-sam",
-      "templateFile": "apigateway-lambda-comprehend-language-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
     "resources": {
@@ -43,7 +43,7 @@
       "Delete the stack:  sam delete "
     ]
   },
-  "author": [
+  "authors": [
     {
       "headline": "Presented by Abilashkumar P C",
       "name": "Abilashkumar P C",
