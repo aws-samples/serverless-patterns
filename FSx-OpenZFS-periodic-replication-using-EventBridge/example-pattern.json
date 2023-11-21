@@ -1,5 +1,5 @@
 {
-  "title": "Amazon EventBridge to trigger Lambda to perform volume replication across file systems within/across accounts and regions",
+  "title": "Amazon EventBridge to trigger Lambda to perform periodic FSx-OpenZFS volume replication across file systems",
   "description": "The SAM template deploys an Amazon EventBridge, to trigger a Lambda function which will get triggered based on user schedule to copy the snapshot of the volume and copy them to the target FSx system.",
   "language": "Python",
   "level": "200",
