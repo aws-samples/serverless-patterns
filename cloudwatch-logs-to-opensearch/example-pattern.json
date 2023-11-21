@@ -1,0 +1,86 @@
+{
+  "title": "CloudWatch Logs to OpenSearch Analytics",
+  "description": "Stream CloudWatch Logs to OpenSearch Serverless for real-time log analytics using a serverless pipeline.",
+  "language": "Python",
+  "level": "300",
+  "framework": "Serverless",
+  
+  "introBox": {
+    "headline": "How it works", 
+    "text": [
+      "This project creates an automated pipeline to stream CloudWatch Logs into OpenSearch Serverless for real-time log analytics.",
+      "CloudWatch Logs collects and streams log data. Kinesis Firehose buffers and delivers to S3. A Lambda function transforms logs into JSON for OpenSearch.", 
+      "S3 and SQS enable durable storage and event notifications. OpenSearch Ingestion pulls logs and loads into a Serverless domain."
+    ]
+  },
+  
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudwatch-logs-to-opensearch",
+      "templateURL": "serverless-patterns/cloudwatch-logs-to-opensearch",
+      "projectFolder": "cloudwatch-logs-to-opensearch",
+      "templateFile": "cloudwatch-logs-to-opensearch/lambda/kdf-opensearch-transform-v2.py" 
+    }
+  },
+
+  "resources": {
+    "bullets": [
+      { 
+        "text": "CloudWatch Logs",
+        "link": "https://aws.amazon.com/cloudwatch/logs/"
+      },
+      {
+        "link": "https://aws.amazon.com/kinesis/data-firehose/", 
+        "text": "Kinesis Data Firehose product page"
+      },
+      {
+        "text": "OpenSearch Service",
+        "link": "https://aws.amazon.com/opensearch-service/"  
+      },
+      {
+        "link": "https://aws.amazon.com/lambda/",
+        "text": "AWS Lambda product page"
+      },
+      {
+        "link": "https://aws.amazon.com/s3/",
+        "text": "Amazon S3 product page"
+      },
+      {
+        "link": "https://aws.amazon.com/sqs/",
+        "text": "Amazon SQS product page" 
+      },
+      {
+        "text": "OpenSearch Ingestion",
+        "link": "https://aws.amazon.com/opensearch-service/features/ingestion/"
+      }
+    ]
+  },
+
+  "deploy": {
+    "text": [
+      "Deploy serverless resources in AWS console." 
+    ]
+  },
+
+  "testing": {
+    "text": [
+      "Send test log data to pipeline. Query indexed logs in OpenSearch."
+    ]
+  },
+
+  "cleanup": {
+   "text": [
+     "Delete resources in AWS console."
+   ]
+  },
+
+  "authors": [
+    {
+      "name": "Jason Salcido",
+      "image": "https://avatars.githubusercontent.com/u/151649141?v=4",
+      "bio": "Jason Salcido, Senior Startup Solutions Architect at Amazon Web Services, is an experienced and innovative IT leader known for architecting strategic cloud solutions that drive business impact.",
+      "linkedin": "salcido"
+    }
+  ]
+
+}

@@ -1,0 +1,48 @@
+version: "2"
+s3-pipeline:
+  source:
+    s3:
+      notification_type: "sqs"
+      # Note: CloudWatch logs are gzip compressed by default
+      compression: "gzip"
+      codec:
+        newline: null
+      sqs:
+        queue_url: "https://sqs.{region}.amazonaws.com/{account-id}/{queue-name}"
+        # Lower maximum_messages depending on the size of your S3 objects
+        maximum_messages: 10
+        # Modify the visibility_timeout of the sqs messages depending on the size of your access log S3 objects.
+        # Objects that are small (< 0.5 GB) and evenly distributed in size will result in the best performance
+        # It is recommended to allocate a minimum of 30 seconds, and to add 30 seconds for every 0.25 GB of data in each S3 Object
+        visibility_timeout: "30s"
+      aws:
+        region: "{region}"
+        # IAM role that the pipeline assumes to read data from the queue. This role must be the same as the pipeline role.
+        sts_role_arn: "arn:aws:iam::{account-id}:role/{pipeline-role-name}"
+  processor:
+  # Note: CloudWatch log data will be in a single JSON object format.
+  # This processor will parse the incoming file as JSON data.
+  - parse_json:
+  
+  # Adds an ingestion timestamp to all records
+  - date:
+      destination: "@timestamp"
+      from_time_received: true
+  
+  # Remove the original text string that was parsed into JSON
+  - substitute_string:
+        entries:
+          - source: "message"
+            from: ".*"
+            to: ""
+            
+  sink:
+  - opensearch:
+      hosts: ["https://search-domain-endpoint.{region}.es.amazonaws.com"]
+      index: "{index_name}"
+      aws:
+        # IAM role that the pipeline assumes to access the domain sink
+        sts_role_arn: "arn:aws:iam::{account-id}:role/{pipeline-role-name}"
+        region: "{region}"
+        # Enable the 'serverless' flag if the sink is an Amazon OpenSearch Serverless collection
+        serverless: true
