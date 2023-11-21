@@ -10,7 +10,7 @@ Read more about general requirements and deployment instructions for Terraform S
 
 You also need [docker](https://www.docker.com/) and md5 to be installed on your testing machine
 
-## Deployment Instructions
+## Deployment and Testing Instructions
 
 The deployment will require you to provide the AWS VPC id along with the Subnet id(s) where you want this pattern to be deployed. 
 
@@ -27,7 +27,17 @@ terraform plan  -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","sub
 terraform apply -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]' 
 ```
 
-Once deployed you can run the ECS task from the ECS Console which will create a sample file on the persistent storage using Amazon EFS
+Once deployed you can run the ECS task from the ECS Console or via AWS CLI which will create a sample file on the persistent storage using Amazon EFS
+
+```shell
+aws ecs run-task \
+    --cluster testing-serverlessland-efs-updater \
+    --task-definition testing-serverlessland-efs-updater:1 \
+    --network-configuration "awsvpcConfiguration={subnets=[subnet-xxxx],securityGroups=[sg-xxxx],assignPublicIp=DISABLED}" \
+    --count 1 \
+    --launch-type FARGATE
+```
+
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
