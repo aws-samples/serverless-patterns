@@ -12,6 +12,8 @@ To submit a template to the Serverless Patterns Collection, submit an issue with
 **IMPORTANT**
 Patterns are intended to be primarily IaC-focused implementations of 2-4 AWS services, with minimum custom code. They should be commonly used combinations that help developers get started quickly. If you have a utility, demo, or application, submit these to the [Serverless Repos Collection](https://serverlessland.com/repos) instead.
 
+**ONLY SUBMIT ONE PATTERN CHANGE PER PR**. Multiple patterns or files spanning multiple pattern directories will be automatically rejected.
+
 Patterns may take up to 4-6 weeks to review, test, and merge but there is no SLA and can take significantly longer due to other work the team has.
 
 **To learn more about submitting a pattern, read the [publishing guidelines page](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md).**
