@@ -231,7 +231,7 @@ def lambda_handler(event, context):
         comp_response = "The detected language (dominant language) is Chinese (Traditional)."
     else:
         comp_response = "The language (dominant language) cannot be identified. Please refer - https://docs.aws.amazon.com/comprehend/latest/dg/how-languages.html"
-    
+        
     return {
         "statusCode": 200,
         "body": json.dumps(
@@ -239,3 +239,4 @@ def lambda_handler(event, context):
         ),
     }
   
+    
