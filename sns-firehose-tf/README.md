@@ -2,7 +2,7 @@
 
 This pattern publishes SNS messages to a Kinesis Firehose Delivery Stream so that they can be forwarded to archival or analytics destinations.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sns-firehose-tf
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sns-firehose-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
