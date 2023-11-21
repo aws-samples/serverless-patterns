@@ -1,6 +1,6 @@
 {
   "title": "Amazon EventBridge to trigger Lambda to perform periodic FSx-OpenZFS volume replication across file systems",
-  "description": "The SAM template deploys an Amazon EventBridge, to trigger a Lambda function which will get triggered based on user schedule to copy the snapshot of the volume and copy them to the target FSx system.",
+  "description": "The SAM template deploys an Amazon EventBridge, to trigger a Lambda function which will get triggered based on user schedule to copy the snapshot of the volume and copy them to the target FSx system. The template contains a sample Lambda function that receives the user input for source and target VolumeId. The Lambda function creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region. With the help of the SNS topic, the users will be notified for any errors and snapshot creation details.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
@@ -9,6 +9,7 @@
     "text": [
       "This pattern sets up the following resources:",
   "An Amazon EventBridge rule that triggers a Lambda function based on the schedule defined by the customer to take create snapshots of the provided FSx VolumeID.",
+  "An SNS topic that notifies for any failures while creating snapshots.",
   "A sample Lambda functions that creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region."
     ]
   },
