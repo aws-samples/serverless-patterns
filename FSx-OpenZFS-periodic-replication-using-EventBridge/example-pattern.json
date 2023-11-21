@@ -47,6 +47,13 @@
       "image": "https://drive.google.com/file/d/1MqpPNLCqbU4kvvtTspNXZBqD99aVIJI9/view?usp=sharing",
       "bio":"Anup is passionate about serverless & event-driven architectures.",
       "linkedin": "https://www.linkedin.com/in/anup-rajpara-developer/"
+    },
+    {
+      "name": "Sahil Malhotra",
+      "image": "https://drive.google.com/file/d/1h1WM-m_gKNdeEKsBLcy3byJun2R6d28o/view",
+      "bio": "Serverless enthusiast",
+      "linkedin": "https://www.linkedin.com/in/smalhotraa/",
+      "twitter": "twitter-handle"
     }
   ]
 }
