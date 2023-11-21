@@ -1,6 +1,6 @@
 {
   "title": "Language Detection with Lambda and Comprehend",
-  "description": "Create a Lambda function that calls the Comprehend service for detecting the Language (dominant language) of the provided text using Boto3 SDK.",
+  "description": "Lambda function that calls Comprehend service for language detction using Boto3SDK.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
@@ -19,7 +19,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-comprehend-language-sam",
       "templateURL": "https://github.com/aws-samples/serverless-patterns/main/lambda-comprehend-language-sam/template.yaml",
       "projectFolder": "lambda-comprehend-language-sam",
-      "templateFile": "lambda-comprehend-language-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
     "resources": {
@@ -46,7 +46,7 @@
       "Delete the stack:  sam delete --stack-name {StackName}"
     ]
   },
-  "author": [
+  "authors": [
     {
       "headline": "Presented by Abilashkumar P C",
       "name": "Abilashkumar P C",
