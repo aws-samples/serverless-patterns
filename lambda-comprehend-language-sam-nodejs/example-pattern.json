@@ -11,7 +11,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern shows how to deploy a SAM template that builds a Lambda function which calls Amazon Comprehend for detecting the dominant language in a text using AWS Javascript v3 SDK."
+      "This pattern uses AWS SAM to build a Lambda function which calls Amazon Comprehend for detecting the dominant language in the provided text."
     ]
   },
   "gitHub": {
