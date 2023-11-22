@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A REST API is created with lambda back end integration that detects the dominant language in the provided input text using Amazon Comprehend.
+Resources:
+  DetectLanguageApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      OpenApiVersion: '2.0'
+
+  DetectLanguageLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs20.x
+      CodeUri: src/
+      MemorySize: 128
+      Architectures:
+        - arm64
+      Timeout: 10
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+          - Sid: LambdaDetectDominantLanguage
+            Effect: Allow
+            Action:
+            - comprehend:DetectDominantLanguage
+            Resource: '*'
+      Events:
+        DetectLanguage:
+          Type: Api # 
+          Properties:
+            Path: /detect_language
+            Method: post
+            RestApiId:
+              Ref: DetectLanguageApi      
+
+Outputs:
+  DetectLanguageAPI:
+    Description: "The API Gateway Invoke endpoint (invoke URL) that can be used to pass the text for which the dominant language is identified by Comprehend at the back end"
+    Value: !Sub "https://${DetectLanguageApi}.execute-api.${AWS::Region}.amazonaws.com/dev/detect_language/"
