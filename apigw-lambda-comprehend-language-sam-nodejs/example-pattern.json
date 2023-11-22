@@ -1,7 +1,7 @@
 {
   "title": "Language Detection with REST API, Lambda and Comprehend using Javascript",
   "description": "Create a REST API with  Lambda backend that calls Comprehend service for language detection using AWS Javscript v3 SDK.",
-  "language": "JavaScript",
+  "language": "Node.js",
   "level": "200",
   "framework": "SAM",
   "introBox": {
@@ -42,7 +42,7 @@
       "Delete the stack:  sam delete"
     ]
   },
-  "author": [
+  "authors": [
     {
       "headline": "Presented by Abilashkumar P C",
       "name": "Abilashkumar P C",
