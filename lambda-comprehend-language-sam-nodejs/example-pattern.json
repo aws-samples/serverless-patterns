@@ -1,6 +1,6 @@
 {
   "title": "Language detection with Lambda and Amazon Comprehend using JavaScript",
-  "description": "Create a Lambda function that calls the Comprehend service for detecting the Language (dominant language) of the provided text using Javscript v3 SDK.",
+  "description": "Creates a Lambda function that calls the Comprehend service for detecting the language of the provided text using JavaScript.",
   "language": "Node.js",
   "level": "200",
   "framework": "SAM",
