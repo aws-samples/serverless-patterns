@@ -1,0 +1,92 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "Format input",
+  "States": {
+    "Format input": {
+      "Type": "Pass",
+      "Next": "Check Type",
+      "Parameters": {
+        "bucket.$": "$.detail.bucket.name",
+        "key.$": "$.detail.object.key",
+        "type.$": "States.ArrayGetItem(States.StringSplit($.detail.object.key, '/'),0)"
+      }
+    },
+    "Check Type": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.type",
+          "StringMatches": "videos",
+          "Next": "ECS RunTask"
+        },
+        {
+          "Variable": "$.type",
+          "StringMatches": "images",
+          "Next": "Lambda Invoke"
+        }
+      ],
+      "Default": "Fail"
+    },
+    "Fail": {
+      "Type": "Fail"
+    },
+    "ECS RunTask": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.waitForTaskToken",
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${Cluster}",
+        "TaskDefinition": "${TaskDefinition}",
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "StepFunctionFargateTask1",
+              "Environment": [
+                {
+                  "Name": "TASK_TOKEN",
+                  "Value.$": "$$.Task.Token"
+                }
+              ]
+            }
+          ]
+        },
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": [
+              "${Subnet1}",
+              "${Subnet2}"
+            ],
+            "SecurityGroups": [
+              "${SecurityGroup}"
+            ]
+          }
+        }
+      },
+      "End": true,
+      "TimeoutSeconds": 60
+    },
+    "Lambda Invoke": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${LambdaFunction}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    }
+  }
+}
