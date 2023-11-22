@@ -1,4 +1,4 @@
-# Detect the Language (Dominant Language) of a text in real-time using Lambda and Amazon Comprehend through javascript
+# Detect the language (dominant language) of a text in real-time using Lambda and Amazon Comprehend through JavaScript
 
 This pattern contains the source code (in AWS Javascript v3 SDK) and supporting files for a serverless application that you can deploy with the SAM CLI. Deploying the SAM file makes use of a Lambda function (uses Javascript SDK) that calls the Comprehend service to perform real-time detection of the dominant language of the input text. It makes use of the Nodejs runtime in lambda function.
 
