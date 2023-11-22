@@ -23,8 +23,9 @@ class EventbridgeOnetimeScheduleRemoveToSnsCdkPythonStack(Stack):
         ## Create SNS Topic
         my_sns_topic = _sns.Topic(self, "my-sns-topic")
         
-        #subscribe an email to the sns topic
-        # my_sns_topic.add_subscription(snssubscriptions.EmailSubscription("XXXX"))
+        #subscribe an email to the sns topic (optional to replace command like option)
+        # my_sns_topic.add_subscription(snssubscriptions.EmailSubscription("EMAIL-XXX"))
+        my_sns_topic.add_subscription(snssubscriptions.EmailSubscription("maniyes@amazon.com"))
 
         ## Create schedule role
         scheduler_role = iam.Role(self, "scheduler-role",
@@ -47,6 +48,7 @@ class EventbridgeOnetimeScheduleRemoveToSnsCdkPythonStack(Stack):
                                                  runtime=_lambda.Runtime.PYTHON_3_9,
                                                  handler="scheduled_event_remover_lambda.lambda_handler",
                                                  code=_lambda.Code.from_asset("lambda"),
+                                                 environment={'TOPIC_ARN': my_sns_topic.topic_arn},
                                                  timeout = Duration.seconds(600)
                                                  )
                                                  
@@ -70,17 +72,17 @@ class EventbridgeOnetimeScheduleRemoveToSnsCdkPythonStack(Stack):
                     mode="OFF",
                 ),
                 
-                schedule_expression="rate(2 minute)",
+                schedule_expression="cron(0/1 * * * ? *)",
                 schedule_expression_timezone="America/New_York",   
                 target=scheduler.CfnSchedule.TargetProperty(
                     arn=scheduled_event_remover_lambda.function_arn,
                     role_arn=scheduler_role.role_arn,
-                    input="{\"key\":\"value1\"}"
+                    input="{\"key\":\"my-schedule\"}"
                 )
 
             )
 
-
+    
 
         # Create schedule to send a message to SNS  once on a specific time 
         my_schedule_onetime1 = scheduler.CfnSchedule(self, "my-schedule-onetime1",
@@ -113,6 +115,11 @@ class EventbridgeOnetimeScheduleRemoveToSnsCdkPythonStack(Stack):
 
             )
 
+
+        environment={ # ADD THIS, FILL IT FOR ACTUAL VALUE 
+        "mysns_topic_arn": my_sns_topic.topic_arn,
+        "testname": "testvalue"
+        }
 
 
 

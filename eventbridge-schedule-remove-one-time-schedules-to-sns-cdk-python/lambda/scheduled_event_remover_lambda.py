@@ -1,6 +1,9 @@
 import json
 import logging
 import boto3
+import os
+
+
 
 import datetime
 from dateutil import parser
@@ -10,12 +13,14 @@ logger.setLevel(logging.INFO)
 logger.info('Loading function')
 sns=boto3.client('sns')
 def lambda_handler(event, context):
-    
+    mysnstopicarn=os.environ['TOPIC_ARN']
+    print(mysnstopicarn)
+
     scheduler=boto3.client('scheduler')
     response = scheduler.list_schedules()
     for schedule in response['Schedules']:
         print(schedule)
-        print(schedule['Name'])        
+        print(schedule['Name'])    
         if "myscheduleonetime" in schedule['Name']:
             print("###############################scheduler###############################")
             print(scheduler.get_schedule(Name=schedule['Name']))
@@ -32,8 +37,10 @@ def lambda_handler(event, context):
                 print(diff)
                 print(diff.days)
                 if diff.days > 7:           
-                     print("schedule is past the scheduled date by one week")
+                     print("schedule is past the scheduled date by 7 seven days and criteria fullfilled to delete")
                      scheduler.delete_schedule(Name=schedule['Name'])
+                     mysns_topic_arn=os.environ['mysns_topic_arn']
+                     sns.publish(TopicArn=mysnstopicarn,Message="scheduler event is deleted")
 
     return {
          'statusCode': 200,
