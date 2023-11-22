@@ -1,9 +1,14 @@
 import json
 import logging
 import boto3
+
 import datetime
 from dateutil import parser
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.info('Loading function')
+sns=boto3.client('sns')
 def lambda_handler(event, context):
     
     scheduler=boto3.client('scheduler')
@@ -12,7 +17,7 @@ def lambda_handler(event, context):
         print(schedule)
         print(schedule['Name'])        
         if "myscheduleonetime" in schedule['Name']:
-            print("###############################scheduler###############################-------------------------------")
+            print("###############################scheduler###############################")
             print(scheduler.get_schedule(Name=schedule['Name']))
             scheduleinfo=json.loads(json.dumps(scheduler.get_schedule(Name=schedule['Name']),indent=2, sort_keys=True, default=str))
             print(scheduleinfo['ScheduleExpression'])
@@ -32,9 +37,7 @@ def lambda_handler(event, context):
 
     return {
          'statusCode': 200,
-         'body': json.dumps('Hello from Lambda!')
-        
-        
+         'body': json.dumps('Eventbridge Scheduler task completed successfully using Lambda!')
     }
     
     

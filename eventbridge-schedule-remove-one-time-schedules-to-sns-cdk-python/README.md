@@ -1,6 +1,6 @@
-# Remove Onetime EventBridge Schedules to Amazon SNS
+# Remove Onetime Amazon EventBridge Schedules to Amazon SNS
 
-This pattern will create an EventBridge schedule to identify expired and completed evenbridge schedules that are expired 7 days or more and will send an SNS notification once the activity is completed. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for Python. 
+This pattern will create an Amazon EventBridge Scheduler and will run every five minutes and will use AWS Lambda  to identify expired and completed Amazon Evenbridge Scheduler tasks that are expired 7 days or more and will send an SNS notification once the activity is completed. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for Python. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd eventbridge-schedule-remove-onetime-schedule-to-sns-cdk-python
+    cd eventbridge-schedule-remove-one-time-schedule-to-sns-cdk-python
     ```
 3. From the command line, bootstrap the CDK if you haven't already done so. 
     ```
@@ -39,11 +39,11 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-An EventBridge Scheduler job runs every day to identify and delete one time EventBridge Scheduler jobs expired more than 7 days.Scheduler job also sends a SNS notifications to confirm the activity is completed.
-Along with a schedule and topic, the CDK stack creates an IAM role and policy for EventBridge Scheduler to assume and send messages. 
+An Amazon EventBridge Scheduler job runs every five minutes and will use AWS lambda to identify and delete one time Amazon EventBridge Scheduler jobs expired more than 7 days.Scheduler job also sends a SNS notifications to confirm the activity is completed.
+Along with a schedule and topic, the CDK stack creates an IAM role and policy for Amazon EventBridge Scheduler to assume and send messages. 
 
 ## Testing
-After the stack has been deployed, you can verify EventBridge is successfully publishing to the topic by viewing the topics "NumberOfMessagesPublished" metric in CloudWatch and verifying positive data points. 
+After the stack has been deployed, you can verify Amazon EventBridge is successfully publishing to the topic by viewing the topics "NumberOfMessagesPublished" metric in CloudWatch and verifying positive data points. 
 
 You can also add a subscription to the SNS topic such as an email address or phone number to verify messages are being published successfully.
 

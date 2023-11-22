@@ -4,27 +4,27 @@ from aws_cdk import (
     Stack,
     aws_iam as iam,
     aws_sns as _sns,
+    aws_sns_subscriptions as snssubscriptions,
+    aws_sqs as sqs,
     aws_scheduler as scheduler,
     aws_ec2 as ec2,    
     aws_lambda as _lambda,    
     aws_events as events,
+
 )
 from constructs import Construct
-import boto3
 
-
-class EventbridgeScheduleToSnsCdkPythonStack(Stack):
+#add lamabda to sns subscription 
+class EventbridgeOnetimeScheduleRemoveToSnsCdkPythonStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Creates a new VPC
-        vpc = ec2.Vpc(self, "VPC")
-        vpc_cidr = vpc.vpc_cidr_block
-
-
         ## Create SNS Topic
         my_sns_topic = _sns.Topic(self, "my-sns-topic")
+        
+        #subscribe an email to the sns topic
+        # my_sns_topic.add_subscription(snssubscriptions.EmailSubscription("XXXX"))
 
         ## Create schedule role
         scheduler_role = iam.Role(self, "scheduler-role",
@@ -47,17 +47,16 @@ class EventbridgeScheduleToSnsCdkPythonStack(Stack):
                                                  runtime=_lambda.Runtime.PYTHON_3_9,
                                                  handler="scheduled_event_remover_lambda.lambda_handler",
                                                  code=_lambda.Code.from_asset("lambda"),
-                                                 vpc = vpc,
                                                  timeout = Duration.seconds(600)
                                                  )
+                                                 
+        #add lambda to sns topic 
+        my_sns_topic.grant_publish(scheduled_event_remover_lambda)
 
-        # event_policy = iam.PolicyStatement(effect=iam.Effect.ALLOW, resources=['*'], actions=['scheduler:ListSchedules','scheduler:DeleteSchedule','scheduler:ListTargetsBySchedule','scheduler:GetSchedule'])
-        event_policy = iam.PolicyStatement(effect=iam.Effect.ALLOW, resources=['*'], actions=['scheduler:*'])
-
+        event_policy = iam.PolicyStatement(effect=iam.Effect.ALLOW, resources=['*'], actions=['scheduler:*','sns:Publish'])
         scheduled_event_remover_lambda.add_to_role_policy(event_policy)
 
-
-               ## Create IAM policy
+        ## Create IAM policy
         scheduler_scheduled_events_policy = iam.PolicyStatement(
                 actions=["lambda:InvokeFunction"],
                 resources=[scheduled_event_remover_lambda.function_arn],
@@ -65,17 +64,13 @@ class EventbridgeScheduleToSnsCdkPythonStack(Stack):
         )
                
         scheduler_role.add_to_policy(scheduler_scheduled_events_policy)
-        
-
-        
-
 
         my_schedule_scheduled = scheduler.CfnSchedule(self, "my-schedule-scheduled",
                 flexible_time_window=scheduler.CfnSchedule.FlexibleTimeWindowProperty(
                     mode="OFF",
                 ),
                 
-                schedule_expression="rate(1 minute)",
+                schedule_expression="rate(2 minute)",
                 schedule_expression_timezone="America/New_York",   
                 target=scheduler.CfnSchedule.TargetProperty(
                     arn=scheduled_event_remover_lambda.function_arn,
@@ -97,7 +92,7 @@ class EventbridgeScheduleToSnsCdkPythonStack(Stack):
                 target=scheduler.CfnSchedule.TargetProperty(
                     arn=my_sns_topic.topic_arn,
                     role_arn=scheduler_role.role_arn,
-                    input="{\"key\":\"my-schedule-onetime1\"}"
+                    input="{\"key\":\"my-schedule-onetime1 removed\"}"
                 )
 
             )
@@ -113,13 +108,16 @@ class EventbridgeScheduleToSnsCdkPythonStack(Stack):
                 target=scheduler.CfnSchedule.TargetProperty(
                     arn=my_sns_topic.topic_arn,
                     role_arn=scheduler_role.role_arn,
-                    input="{\"key\":\"my-schedule-onetime2\"}"
+                    input="{\"key\":\"my-schedule-onetime2 removed\"}"
                 )
 
             )
 
 
+
+
         ## CloudFormation Stack Outputs
+        CfnOutput(self, "LAMBDA_REMOVE_SCHEDULED_EVENTS", value=scheduled_event_remover_lambda.function_arn)
         CfnOutput(self, "SCHEDULE_NAME", value=my_schedule_scheduled.ref)
         CfnOutput(self, "SCHEDULE_ONETIMENAME1", value=my_schedule_onetime1.ref)
         CfnOutput(self, "SCHEDULE_ONETIMENAME2", value=my_schedule_onetime2.ref)
