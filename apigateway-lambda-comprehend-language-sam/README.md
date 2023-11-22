@@ -1,6 +1,6 @@
 # Detect the Language (Dominant Language) of a text in real-time using API Gateway, Lambda function and Amazon Comprehend
 
-This pattern contains the application code in Python and supporting files for a serverless application that you can deploy using the SAM CLI. It creates a REST API (API Gateway) with a Lambda function as a back end integration that uses Python (Boto3 SDK) which calls the Comprehend service to peform real-time detection of the dominant language of the input text.
+This pattern contains the application code in Python and supporting files for a serverless application that you can deploy using the SAM CLI. It creates a REST API (API Gateway) with a Lambda function as a back end integration that uses Python (Boto3 SDK) which calls the Comprehend service to perform real-time detection of the dominant language of the input text.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigateway-lambda-comprehend-language-sam
 
