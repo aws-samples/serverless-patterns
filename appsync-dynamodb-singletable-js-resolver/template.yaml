@@ -1,0 +1,104 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - AppSync to DynamoDB single-table - JS Resolvers
+
+Resources:
+  ###################################################
+  ###           DynamoDB Single Table             ###
+  ###################################################
+  DDBTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+        - AttributeName: parentPK
+          AttributeType: S
+        - AttributeName: parentSK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: ParentGSI
+          KeySchema:
+            - AttributeName: parentPK
+              KeyType: HASH
+            - AttributeName: parentSK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  ###################################################
+  ###                 AppSync API                 ###
+  ###################################################
+  MyGraphQLAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaUri: ./sam_graphql_api/schema.graphql
+      ApiKeys:
+        TestApiKey:
+          Description: Test Api Key
+      Auth:
+        Type: API_KEY
+      DataSources:
+        DynamoDb:
+          ItemsDataSource:
+            TableName: !Ref DDBTable
+            TableArn: !GetAtt DDBTable.Arn
+      Functions:
+        getParentFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: ItemsDataSource
+          CodeUri: ./sam_graphql_api/resolvers/functions/getParent.js 
+
+        getParentChildrenFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: ItemsDataSource
+          CodeUri: ./sam_graphql_api/resolvers/functions/getParentChildren.js 
+
+        createParentFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: ItemsDataSource
+          CodeUri: ./sam_graphql_api/resolvers/functions/createParent.js 
+
+        createChildFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: ItemsDataSource
+          CodeUri: ./sam_graphql_api/resolvers/functions/createChild.js 
+      Resolvers:
+        Query:
+          getParentWithChildren:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: "1.0.0"
+            CodeUri: ./sam_graphql_api/resolvers/getParentWithChildren.js 
+            Pipeline:
+            - getParentFunction
+            - getParentChildrenFunction
+        Mutation:
+          createParentItem:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: "1.0.0"
+            Pipeline:
+            - createParentFunction
+          createChildItem:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: "1.0.0"
+            Pipeline:
+            - createChildFunction

@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - This SAM template creates a Regional REST API with a mapping template in the integration request to pass to the lambda function.
+
+Resources:
+  #Lambda function returning request id
+  LambdaFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Handler: index.handler
+      InlineCode: |
+        console.log('Loading function');
+        exports.handler = async (event, context) => {
+            var apiRequestId = event.context['request-id'];
+            var lambdaRequestId = context.awsRequestId;
+            console.log("API Gateway Request ID: " + apiRequestId + " Lambda Request ID: " + context.awsRequestId);
+            var logprefix = "APIG: " + apiRequestId + " -  ";
+            console.log(logprefix);
+            return "Hello from the mapping template API"; 
+        };
+      Runtime: nodejs18.x
+      Events:
+        HelloWorld:
+          Type: Api 
+          Properties: 
+            Path: /
+            Method: any
+            RestApiId:
+              Ref: ApiRegional
+
+  #API with Lambda no proxy integration
+  ApiRegional:
+    Type: AWS::Serverless::Api
+    OpenApiVersion: '2.0'
+    Properties:
+      StageName: prod
+      EndpointConfiguration: REGIONAL
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          title: API Gateway Mapping Templates
+        basePath: /prod
+        schemes:
+          - https
+        paths:
+          /:
+            x-amazon-apigateway-any-method:
+              produces:
+                - application/json
+              consumes:
+                - application/json
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws  
+                uri:  
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
+                passthroughBehavior: when_no_templates
+                requestTemplates:
+                  application/json: |
+                    {
+                      "context" : { 
+                        "request-id" : "$context.requestId"
+                      }
+                    }
+                responses:
+                  default:
+                    statusCode: 200
+              responses: 
+                '200':
+                  description: 'Default response for ANY method'
+
+
+

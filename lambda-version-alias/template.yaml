@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Lambda with an alias "dev" associated with the latest version
+
+
+Resources:
+# Function with version and alias
+  lambdaFunctionAlias:
+    Type: AWS::Serverless::Function
+    Properties: 
+      InlineCode: | 
+          import json 
+          def handler(event, context): 
+              return { 
+          "statusCode": 200, 
+          "body": json.dumps({ "message" : "Hello from Lambda! version 1"}), 
+          }
+      Runtime: python3.9
+      Handler: index.handler
+      AutoPublishAlias: dev
+      VersionDescription: "1"
+
+
+
+

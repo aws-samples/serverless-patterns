@@ -18,7 +18,9 @@
   },
   "deploy": {
     "text": [
-      "cd cdk && npm run prebuild && cdk deploy"
+      "cd cdk",
+      "npm run prebuild",
+      "cdk deploy"
     ]
   },
   "gitHub": {

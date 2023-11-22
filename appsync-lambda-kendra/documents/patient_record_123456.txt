@@ -1,0 +1,6 @@
+Patient ID: 123456
+Name: John Doe
+Age: 45
+Diagnosis: Type 2 Diabetes
+Medication: Metformin 500mg twice daily
+Latest Lab Results: HbA1c 7.8%, Fasting Glucose 156 mg/dl

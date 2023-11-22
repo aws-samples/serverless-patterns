@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  MyS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub 'serverlessland-${AWS::StackName}'
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: 'true'
+  MySNSTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      TopicName: MySNSTopic
+  MyEventRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Description: !Sub 'Object create events on bucket s3://${MyS3Bucket}'
+      EventPattern:
+        source:
+          - aws.s3
+        detail-type:
+          - Object Created
+        detail:
+          bucket:
+            name:
+              - !Ref MyS3Bucket
+      State: ENABLED
+      Targets:
+        - Arn: !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:MySNSTopic'
+          Id: MySNSTopicTarget
+  MySNSTopicPolicy:
+    Type: 'AWS::SNS::TopicPolicy'
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AWSEventsPermission
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: 'sns:Publish'
+            Resource: !Ref MySNSTopic
+            Condition:
+              ArnEquals:
+                'aws:SourceArn': !GetAtt MyEventRule.Arn
+      Topics:
+        - !Ref MySNSTopic
+Outputs:
+  S3Bucket:
+    Value: !Ref MyS3Bucket
+    Description: The S3 Bucket
+  SNSTopicARN:
+    Value: !Ref MySNSTopic
+    Description: The SNS Topic ARN
+  EventBridgeRule:
+    Value: !Ref MyEventRule
+    Description: The EventBridge Rule Name

@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Edge-Optimized Custom Domain Name that points to a REST API regional with Lambda proxy integration
+ 
+ #Parameters for certificate and domain name
+Parameters:
+  CertifArn:
+    Type: String
+    Description: ARN of the ACM Certificate you want to use
+
+  CustomDomainName:
+    Type: String
+    Description: "Name of the domain you want to use, eg: www.example.com" 
+
+Resources:
+#Lambda function
+  LambdaCustomEdge:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        def lambda_handler(event, context):
+            return {
+        "statusCode": 200,
+        "body": json.dumps({
+          "message" : "Hello World! This is the edge-optimized custom domain name and the regional API"}),
+        }
+      Runtime: python3.9
+      Events:
+        HelloWorld:
+          Type: Api 
+          Properties: 
+            Path: /
+            Method: get
+            RestApiId:
+              Ref: ApiRegional
+#Regional API with Edge-optimized domain name 
+  ApiRegional:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      EndpointConfiguration: REGIONAL
+      Domain:
+        DomainName: !Ref CustomDomainName
+        CertificateArn: !Ref CertifArn
+        EndpointConfiguration: EDGE
+        
+
+

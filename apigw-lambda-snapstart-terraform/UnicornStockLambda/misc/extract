@@ -1,0 +1,1 @@
+jq -r .message | cut -f1,2,6 -d$'\t'

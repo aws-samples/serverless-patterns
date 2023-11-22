@@ -1,0 +1,45 @@
+{
+  "Comment": "A state machine that processes an SQS message and sends it to DLQ if processing fails",
+  "StartAt": "SaveOriginalMessage",
+  "States": {
+    "SaveOriginalMessage": {
+      "Type": "Pass",
+      "Parameters": {
+        "originalInput.$": "$[0]"
+      },
+      "Next": "ProcessMessage"
+    },
+    "ProcessMessage": {
+      "Type": "Task",
+      "Resource": "${MyLambdaFunctionArn}",
+      "Parameters": {
+        "input.$": "$.originalInput.body"
+      },
+      "End": true,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.errorInfo",
+          "Next": "MoveMessageToDLQ"
+        }
+      ]
+    },
+    "MoveMessageToDLQ": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sqs:sendMessage",
+      "Parameters": {
+        "QueueUrl": "${DeadLetterQueueUrl}",
+        "MessageBody.$": "$.originalInput.body"
+      },
+      "End": true
+    }
+  }
+}

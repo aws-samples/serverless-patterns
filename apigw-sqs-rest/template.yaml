@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Rest API integration with SQS
+
+Resources:
+  ##########################################################################
+  #   API Gateway                                                    #
+  ##########################################################################
+
+  AppApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: apigw-rest-api-http-integration
+      Description: REST API Integration with SQS
+
+  # POST Method with HTTP integration
+  RootMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref AppApi
+      ResourceId: !GetAtt AppApi.RootResourceId
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Credentials: !GetAtt APISQSGatewayRole.Arn
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - StatusCode: "200"
+        PassthroughBehavior: NEVER
+        RequestParameters:
+          integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+        RequestTemplates:
+          application/json: Action=SendMessage&MessageBody=$input.body
+        Type: AWS
+        Uri: !Join
+          - ""
+          - - "arn:aws:apigateway:"
+            - !Ref "AWS::Region"
+            - :sqs:path/
+            - !Ref "AWS::AccountId"
+            - /
+            - !Sub ${MySqsQueue.QueueName}
+      MethodResponses:
+        - ResponseModels:
+            application/json: Empty
+          StatusCode: "200"
+  Deployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - RootMethodGet
+    Properties:
+      RestApiId: !Ref AppApi
+
+  Stage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: Prod
+      RestApiId: !Ref AppApi
+      DeploymentId: !Ref Deployment
+
+  ##########################################################################
+  #   SQS Queue                                                    #
+  ##########################################################################
+
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+
+  OrderServiceQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref MySqsQueue
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: order-api-send-msg-sqs
+            Effect: Allow
+            Principal:
+              Service: "apigateway.amazonaws.com"
+            Action:
+              - SQS:SendMessage
+            Resource: !GetAtt MySqsQueue.Arn
+
+  ##########################################################################
+  #   Roles                                                                #
+  ##########################################################################
+
+  APISQSGatewayRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: ApiGatewayLogsPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                  - sqs:SetQueueAttributes
+                Resource:
+                  - !GetAtt MySqsQueue.Arn
+
+Outputs:
+  # API Gateway endpoint to be used during tests
+  AppApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+
+  QueueName:
+    Description: SQS Name
+    Value: !Sub ${MySqsQueue.QueueName}
+
+  QueueURL:
+    Description: SQS Queue URL
+    Value: !Ref MySqsQueue

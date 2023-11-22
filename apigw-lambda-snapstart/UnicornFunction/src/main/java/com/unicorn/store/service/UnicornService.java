@@ -5,8 +5,11 @@ import com.unicorn.store.exceptions.ResourceNotFoundException;
 import com.unicorn.store.model.Unicorn;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class UnicornService {
+
     private final UnicornRepository unicornRepository;
 
     public UnicornService(UnicornRepository unicornRepository) {
@@ -14,20 +17,22 @@ public class UnicornService {
     }
 
     public Unicorn createUnicorn(Unicorn unicorn) {
-        return unicornRepository.save(unicorn);
-    }
-
-    public Unicorn updateUnicorn(Unicorn unicorn, String unicornId) {
+        String unicornId = UUID.randomUUID().toString();
         unicorn.setId(unicornId);
         return unicornRepository.save(unicorn);
     }
 
-    public Unicorn getUnicorn(String unicornId) {
-        return unicornRepository.findById(unicornId).orElseThrow(ResourceNotFoundException::new);
+    public Unicorn retrieveUnicorn(String unicornId) {
+        return unicornRepository.findById(unicornId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Unicorn with id %s not found", unicornId)));
+    }
+
+    public Unicorn updateUnicorn(String unicornId, Unicorn unicorn) {
+        unicorn.setId(unicornId);
+        return unicornRepository.update(unicorn);
     }
 
     public void deleteUnicorn(String unicornId) {
-        Unicorn unicorn = unicornRepository.findById(unicornId).orElseThrow(ResourceNotFoundException::new);
-        unicornRepository.delete(unicorn);
+        unicornRepository.deleteById(unicornId);
     }
 }

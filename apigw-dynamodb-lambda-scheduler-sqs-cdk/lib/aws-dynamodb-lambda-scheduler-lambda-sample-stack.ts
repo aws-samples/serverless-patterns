@@ -23,7 +23,9 @@ export class AwsDynamodbLambdaSchedulerLambdaSampleStack extends cdk.Stack {
     const table = new dynamodb.Table(this, 'SchedulerDDB', {
       partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'scheduleTime', type: dynamodb.AttributeType.STRING },
-      stream: dynamodb.StreamViewType.NEW_IMAGE
+      stream: dynamodb.StreamViewType.NEW_IMAGE,
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY
     });
 
     /**

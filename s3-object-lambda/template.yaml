@@ -66,7 +66,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       MemorySize: 2048
       # The function needs permission to call back to the S3 Object Lambda Access Point with the WriteGetObjectResponse.
       Policies:

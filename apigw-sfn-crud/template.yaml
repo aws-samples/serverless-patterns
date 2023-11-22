@@ -1,0 +1,110 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Step Functions Crud
+
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './api.openapi.yaml'
+      StageName: Prod
+      TracingEnabled: True
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiLogGroup.Arn
+        Format: >
+          {"requestId":"$context.requestId",
+          "waf-error":"$context.waf.error",
+          "waf-status":"$context.waf.status",
+          "waf-latency":"$context.waf.latency",
+          "waf-response":"$context.wafResponseCode",
+          "authenticate-error":"$context.authenticate.error",
+          "authenticate-status":"$context.authenticate.status",
+          "authenticate-latency":"$context.authenticate.latency",
+          "authorize-error":"$context.authorize.error",
+          "authorize-status":"$context.authorize.status",
+          "authorize-latency":"$context.authorize.latency",
+          "integration-error":"$context.integration.error",
+          "integration-status":"$context.integration.status",
+          "integration-latency":"$context.integration.latency",
+          "integration-requestId":"$context.integration.requestId",
+          "integration-integrationStatus":"$context.integration.integrationStatus",
+          "response-latency":"$context.responseLatency",
+          "status":"$context.status"}
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      DefinitionUri: ./crud.asl.json
+      Tracing:
+        Enabled: True
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DataBase
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogDelivery
+                - logs:GetLogDelivery
+                - logs:UpdateLogDelivery
+                - logs:DeleteLogDelivery
+                - logs:ListLogDeliveries
+                - logs:PutResourcePolicy
+                - logs:DescribeResourcePolicies
+                - logs:DescribeLogGroups
+              Resource: "*"
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+        IncludeExecutionData: true
+        Level: ALL
+      DefinitionSubstitutions:
+        DDBTable: !Ref DataBase
+        
+  DataBase:
+    Type: AWS::Serverless::SimpleTable
+
+#### Log Groups
+  ApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/vendedlogs/api/SFCrudLogGroup
+
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/vendedlogs/states/SFCrudLogGroup
+
+#### IAM Roles
+  ApiRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "apigateway.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: ApiToStateMachine
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Action:
+                - states:StartSyncExecution
+              Effect: Allow
+              Resource:
+                - !GetAtt StateMachine.Arn
+
+Outputs:
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod"

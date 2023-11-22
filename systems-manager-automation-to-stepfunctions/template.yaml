@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Systems Manager Automation to AWS lambda
+
+Resources:
+
+##########################################################################
+#   IAM Role to be assumed by the Systems Manager Automation Document                                                       #
+##########################################################################
+  AutomationExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ssm.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: automation-invoke-stepfunction
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                 - states:DescribeExecution
+                 - states:StartExecution
+                Resource: 
+                  - !GetAtt StateMachine.Arn
+                  - "arn:aws:states:us-east-1:*:execution:stepfunction:*"
+
+  StepFunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - states.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+
+      Policies:
+        - PolicyName: stepfunction-invoke-lambda
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - 
+                Effect: "Allow"
+                Action: "lambda:InvokeFunction" 
+                Resource: [
+                  !GetAtt "CreateSnapshotLambdaFunction.Arn",
+                  !GetAtt "GetSnapshotStatusLambdaFunction.Arn",
+                  !GetAtt "Iterate.Arn"
+                ]
+
+  rRDSSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+         Name: RDSDBSec
+         GenerateSecretString:
+              SecretStringTemplate: '{"username": "admin"}'
+              GenerateStringKey: "password"
+              PasswordLength: 15
+
+  RDSDatabase:
+    Type: AWS::RDS::DBInstance
+    DependsOn: rRDSSecret
+    Properties:
+      AllocatedStorage: '5'
+      DBInstanceClass: db.t2.small
+      Engine: mysql
+      StorageEncrypted: true
+      MasterUsername: '{{resolve:secretsmanager:RDSDBSec:SecretString:username}}'
+      MasterUserPassword: '{{resolve:secretsmanager:RDSDBSec:SecretString:password}}'
+
+  CreateSnapshotLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: create-snapshot-lamda-function.handler
+      CodeUri: ./src
+      Runtime: python3.8
+      Timeout: 60
+      ReservedConcurrentExecutions: 5
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - 'rds:CreateDBSnapshot'
+            Resource: [
+              !Sub "arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:db:${RDSDatabase}",
+              !Sub "arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:snapshot:*"
+            ]
+  GetSnapshotStatusLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: get-snapshot-status-lamda-function.handler
+      CodeUri: ./src
+      Runtime: python3.8
+      Timeout: 60
+      ReservedConcurrentExecutions: 5
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - 'rds:DescribeDBSnapshots'
+            Resource: [
+            !Sub "arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:db:${RDSDatabase}",
+            !Sub "arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:snapshot:*"
+            ]
+  Iterate:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: iterate.handler
+      CodeUri: ./src
+      Runtime: nodejs14.x
+      Timeout: 60
+      ReservedConcurrentExecutions: 5
+
+###################################################################################################################
+#SSM document of type "Automation" that is used to invoke a lambda function by passing in the Automation document's
+#execution time paramenter values to the function's payload data
+###################################################################################################################
+  SsmAutomationDocument:
+    Type: AWS::SSM::Document
+    Properties:
+      DocumentType: Automation
+      Content:
+        schemaVersion: "0.3"
+        assumeRole: !GetAtt AutomationExecutionRole.Arn
+        description: "Automation document for the invoking a step function"
+        parameters:
+          DocumentInput:
+            type: String
+
+        mainSteps:
+        - name: execute_statemachine
+          action: 'aws:executeStateMachine'
+          onFailure: Abort
+          inputs:
+            stateMachineArn: !GetAtt StateMachine.Arn
+            input: |
+              {
+                "ssm_automation_parameters":
+                  {
+                    "db_instance_id": "{{DocumentInput}}"
+                  }
+              }
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: ./src/statemchinedefinitionstring.asl.json 
+      Role: !GetAtt StepFunctionExecutionRole.Arn
+      Name: stepfunction
+      DefinitionSubstitutions:
+        create_snapshot_lambda_arn: !GetAtt CreateSnapshotLambdaFunction.Arn
+        get_snapshot_status_lambda_arn: !GetAtt GetSnapshotStatusLambdaFunction.Arn
+        iterator_lambda_arn: !GetAtt Iterate.Arn
+
+Outputs:
+  StateMachine:
+    Value: !Ref StateMachine
+    Description: Step function workflow Arn 
+
+#######################################################################
+#CF stack Output to Store the Systems Manger Automation Document's Name
+#######################################################################
+  SystemsManagerAutomationDocumentName:
+    Description: Automation document name
+    Value: !Ref SsmAutomationDocument
+
+#######################################################################
+#CF stack Output to Store the DynamoDB Table's Name
+#######################################################################
+  RDSDBName:
+    Description: Name of the sample RDS DB used.
+    Value: !Ref RDSDatabase
+  

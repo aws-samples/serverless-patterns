@@ -1,0 +1,31 @@
+{
+   "records":{
+      "myTopic-0":[
+         {
+            "topic":"myTopic",
+            "partition":0,
+            "offset":250,
+            "timestamp":1678072110111,
+            "timestampType":"CREATE_TIME",
+            "value":"Zg==",
+            "headers":[
+               
+            ]
+         },
+         {
+            "topic":"myTopic",
+            "partition":0,
+            "offset":251,
+            "timestamp":1678072111086,
+            "timestampType":"CREATE_TIME",
+            "value":"Zw==",
+            "headers":[
+               
+            ]
+         }
+      ]
+   },
+   "eventSource":"aws:kafka",
+   "eventSourceArn":"arn:aws:kafka:us-west-2:123456789012:cluster/MSKWorkshopCluster/a93759a9-c9d0-4952-984c-492c6bfa2be8-13",
+   "bootstrapServers":"b-2.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098,b-3.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098,b-1.mskworkshopcluster.z9kc4f.c13.kafka.us-west-2.amazonaws.com:9098"
+}

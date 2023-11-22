@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter
+        xmlns="https://github.com/spotbugs/filter/3.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
+
+    <!-- Disable expose internal representation error for DI  -->
+    <Match>
+        <Class name="com.unicorn.broker.core.TransactionService" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+
+    <!-- Disable public field for Simple POJO  -->
+    <Match>
+        <Class name="com.unicorn.broker.model.Transaction" />
+        <Bug pattern="UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.unicorn.broker.data.TransactionRepository" />
+        <Bug pattern="NP_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD" />
+    </Match>
+
+
+    <!-- Disable expose internal representation error for DI  -->
+    <Match>
+        <Class name="com.unicorn.broker.core.UnicornStockBrokerHandler" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+
+    <!-- All bugs in test classes, except for JUnit-specific bugs -->
+    <Match>
+        <Class name="~.*\.*Test" />
+        <Not>
+            <Bug code="IJU" />
+        </Not>
+    </Match>
+</FindBugsFilter>

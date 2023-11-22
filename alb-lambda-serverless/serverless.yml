@@ -1,0 +1,138 @@
+service: alb-lambda-serverless
+frameworkVersion: '^3.28.1'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  timeout: 30
+  # override the default stage (dev) to be `prod`, or you can use the `--stage` CLI option
+  stage: ${opt:stage, "prod"}
+  # specify the region using --region flag while deploying the stack, else the default region ap-south-1 will be chosen
+  region: ${opt:region, "ap-south-1"}
+  iamRoleStatements:
+    - Effect: Allow
+      Action: s3:*
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+      Resource: '*'
+
+functions:
+  # lambda function with the alb event configured in it.
+  functionOne:
+    handler: handlers/alb-lambda-handler.handler
+    events:
+      - alb:
+          listenerArn: { Ref: HTTPListener }
+          priority: 1
+          conditions:
+            path: /hello
+            method: GET
+
+resources:
+  Resources:
+    # creates a VPC with 2 Public subnets within the VPC
+    VPC:
+      Type: AWS::EC2::VPC
+      Properties:
+        CidrBlock: 12.2.1.0/24
+        EnableDnsHostnames: true
+        EnableDnsSupport: true
+    SubnetOne:
+      Type: AWS::EC2::Subnet
+      Properties:
+        VpcId: { Ref: VPC }
+        CidrBlock: 12.2.1.0/25
+        MapPublicIpOnLaunch: true
+        AvailabilityZone: !Select 
+          - 0
+          - Fn::GetAZs: {Ref: 'AWS::Region'}
+    SubnetTwo:
+      Type: AWS::EC2::Subnet
+      Properties:
+        VpcId: { Ref: VPC }
+        MapPublicIpOnLaunch: true
+        CidrBlock: 12.2.1.128/25
+        AvailabilityZone: !Select 
+          - 1
+          - Fn::GetAZs: { Ref: 'AWS::Region'}
+    # security group that allows all the http/s traffic to the load balancer
+    SecurityGroupALB:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: SG created via serverless framework
+        VpcId: { Ref: VPC }
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 443
+            ToPort: 443
+            CidrIp: 0.0.0.0/0
+    # internet gateway that connects the vpc to the internet
+    InternetGateway:
+      Type: AWS::EC2::InternetGateway
+    AttachGateway:
+      Type: AWS::EC2::VPCGatewayAttachment
+      Properties:
+        VpcId: { Ref: VPC }
+        InternetGatewayId: { Ref: InternetGateway }
+    PublicSubnetRouteTable:
+      Type: AWS::EC2::RouteTable
+      Properties:
+        VpcId: { Ref: VPC }
+    # creates public routes for the subnets
+    PublicSubnetRoute:
+      Type: AWS::EC2::Route
+      DependsOn: AttachGateway
+      Properties:
+        RouteTableId: { Ref: PublicSubnetRouteTable }
+        DestinationCidrBlock: 0.0.0.0/0
+        GatewayId: { Ref: InternetGateway }
+    PublicSubnetRouteTableAssociationOne:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: { Ref: PublicSubnetRouteTable }
+        SubnetId: { Ref: SubnetOne }
+    PublicSubnetRouteTableAssociationTwo:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: { Ref: PublicSubnetRouteTable }
+        SubnetId: { Ref: SubnetTwo }
+    # creates a internet-facing load balancer
+    LoadBalancer:
+      Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+      Properties:
+        Name: alb-lambda
+        Type: 'application'
+        IpAddressType: 'ipv4'
+        Scheme: 'internet-facing'
+        Subnets:
+          - { Ref: SubnetOne }
+          - { Ref: SubnetTwo }
+        SecurityGroups:
+          - { Ref: SecurityGroupALB }
+    # creates a http listener for the alb
+    HTTPListener:
+      Type: AWS::ElasticLoadBalancingV2::Listener
+      Properties:
+        DefaultActions:
+          - Type: fixed-response
+            FixedResponseConfig:
+              ContentType: application/json
+              MessageBody: 'Page Not Found'
+              StatusCode: '404'
+        LoadBalancerArn:
+          Ref: LoadBalancer
+        Port: 80
+        Protocol: HTTP
+  Outputs:
+      # DNS name for the load balancer that can be used to trigger the alb
+      LoadBalancerDNSName:
+        Value: !GetAtt LoadBalancer.DNSName
+

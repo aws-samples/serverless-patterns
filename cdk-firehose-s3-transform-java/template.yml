@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Serverless Spring Boot 2 API - org.example::cdk-firehose-s3-transform-java
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
+Resources:
+  CdkFirehoseS3TransformJavaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: org.example.StreamLambdaHandler::handleRequest
+      Runtime: java17
+      CodeUri: .
+      MemorySize: 512
+      Policies: AWSLambdaBasicExecutionRole
+      Timeout: 30
+      Events:
+        ProxyResource:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: any
+
+Outputs:
+  CdkFirehoseS3TransformJavaApi:
+    Description: URL for application
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ping'
+    Export:
+      Name: CdkFirehoseS3TransformJavaApi

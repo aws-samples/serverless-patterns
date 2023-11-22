@@ -1,0 +1,190 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: EventBridge Pipe with Amazon MSK Cluster as the source. Lambda function to enrich the data and Salesforce API destination to POST the message.
+
+Parameters:
+  MSKCluster:
+    Type: String
+    Description: 'MSK Cluster'
+  MSKTopic:
+    Type: String
+    Description: 'MSK Topic'
+  MskClusterPrivateSubnet1:
+    Type: String
+    Description: 'Private Subnet One'
+  MskClusterPrivateSubnet2:
+    Type: String
+    Description: 'Private Subnet Two'
+  ClusterName:
+    Type: String
+  ClusterId:
+    Type: String
+  SalesforceOauthUrl:
+    Type: String
+    Description: 'Salesforce Url for OAuth authentication.'
+  SFEndpointUrl:
+    Type: String
+    Description: 'Salesforce Endpoint Url'
+  SalesforceOauthClientId:
+    Type: String
+    Description: 'Salesforce Integration Application Client ID'
+    MinLength: 1
+    MaxLength: 256
+  SalesforceOauthClientSecret:
+    Type: String
+    Description: 'Salesforce Integration Application Client Secret'
+    MinLength: 1
+    MaxLength: 256
+
+Resources:
+  # Role + Permissions for Pipes
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: SourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kafka:DescribeCluster
+                  - kafka:DescribeClusterV2
+                  - kafka:GetBootstrapBrokers
+                Resource: !Ref MSKCluster
+              - Effect: Allow
+                Action:
+                  - kafka-cluster:Connect
+                  - kafka-cluster:DescribeGroup
+                  - kafka-cluster:AlterGroup
+                  - kafka-cluster:DescribeTopic
+                  - kafka-cluster:ReadData
+                  - kafka-cluster:DescribeClusterDynamicConfiguration
+                Resource:
+                  - !Ref MSKCluster
+                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:group/${ClusterName}/${ClusterId}/*'
+                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:topic/${ClusterName}/${ClusterId}/${MSKTopic}'
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeVpcs
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DescribeNetworkInterfaces
+                Resource: "*"
+                Condition:
+                  StringEqualsIfExists:
+                    "ec2:SubnetID":
+                      - !Ref MskClusterPrivateSubnet1
+                      - !Ref MskClusterPrivateSubnet2
+        - PolicyName: EncrichLambdaPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunction'
+                Resource: !GetAtt EnrichmentLambdaFunction.Arn
+        - PolicyName: CWLogging
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+        - PolicyName: InvokeApiDestPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:InvokeApiDestination'
+                Resource: !GetAtt SalesforceDestination.Arn
+
+  EnrichmentLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+            import json
+            import base64
+
+            def lambda_handler(event, context):
+                print(event)
+                enrichedEvent = {}
+                for record in event:
+                    #print(record)
+                    payload=base64.b64decode(record["value"])
+                    decoded_str= (payload.decode('utf-8'))
+                    print(decoded_str)
+                    jsonObj=json.loads(decoded_str)
+                    print(jsonObj)
+                    for key,val in jsonObj.items():
+                        enrichedEvent[key.lower()+"__c"] = val
+                    break
+                print(enrichedEvent)
+                return enrichedEvent
+      Handler: index.lambda_handler
+      Runtime: python3.11
+      Policies:
+      - AWSLambdaBasicExecutionRole
+
+  # Establishing Connection to Salesforce Account
+  SalesforceConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      Description: 'My connection with Salesforce through OAuth'
+      AuthorizationType: OAUTH_CLIENT_CREDENTIALS
+      AuthParameters:
+        OAuthParameters:
+          AuthorizationEndpoint: !Ref SalesforceOauthUrl
+          ClientParameters:
+            ClientID: !Ref SalesforceOauthClientId
+            ClientSecret: !Ref SalesforceOauthClientSecret
+          HttpMethod: POST
+          OAuthHttpParameters:
+            BodyParameters:
+              - Key: 'grant_type'
+                Value: 'client_credentials'
+                IsValueSecret: 'false'
+
+  # API Destination to SalesForce
+  SalesforceDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'SalesforceAPIDestination'
+      ConnectionArn:
+        Fn::GetAtt: [ SalesforceConnection, Arn ]
+      InvocationEndpoint: !Ref SFEndpointUrl
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+
+  Pipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: msk-pipe-lambda
+      Description: "EventBridge Pipe with Amazon MSK Cluster as the source and Lambda function as target"
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !Ref MSKCluster
+      SourceParameters:
+        ManagedStreamingKafkaParameters:
+          StartingPosition: LATEST
+          BatchSize: 1
+          TopicName: !Ref MSKTopic
+      Enrichment: !GetAtt EnrichmentLambdaFunction.Arn
+      Target: !GetAtt SalesforceDestination.Arn

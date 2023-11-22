@@ -1,0 +1,63 @@
+{
+  "title": "Multi-region message replication with Amazon MQ for RabbitMQ",
+  "description": "This pattern shows how to replicate messages from one region to another region in Amazon MQ for RabbitMQ.",
+  "language": "",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+    "This pattern provides an example on how to implement multi-region message replication with Amazon MQ for RabbitMQ.",
+    "This solution demonstrates how to configure Amazon MQ for RabbitMQ leveraging the federation plugin across regions.", 
+    "You will learn how federation of exchanges enable asynchronous data replication between two RabbitMQ clusters to achieve multi-region architecture.",
+    "This code base is deployed using Terraform to simplify the Rabbit MQ configuration."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/amazonmq-rabbitmq-msg-replication",
+      "templateURL": "serverless-patterns/amazonmq-rabbitmq-msg-replication",
+      "projectFolder": "amazonmq-rabbitmq-msg-replication",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+     {
+        "text": "Amazon MQ for RabbitMQ",
+        "link": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/working-with-rabbitmq.html"
+      },
+      {
+        "text": "RabbitMQ Federation Plugin ",
+        "link": "https://www.rabbitmq.com/federation.html"
+      },
+      {
+        "text": "RabbitMQ Disaster Recovery and High Availability 101",
+        "link": "https://blog.rabbitmq.com/posts/2020/07/disaster-recovery-and-high-availability-101/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+       "Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Daniel Fargano",
+     "image": "https://i.postimg.cc/4xzhGDrZ/dan.jpg",
+      "bio": "Daniel Fargano is a Sr. Solutions Architect at AWS. Dan is based in Chicago primarily supporting customers in the financial vertical but also supports customers across all sectors through his passion for serverless. He enjoys building new solutions and sharing new discoveries with customers."
+    }
+  ]
+}

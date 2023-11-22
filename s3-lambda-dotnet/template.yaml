@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  .NET Image resizing service
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Tracing: PassThrough
+    Timeout: 10
+    Runtime: dotnet6
+
+Resources:
+  ## S3 bucket
+  SourceBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "imageresizer-${AWS::AccountId}"
+
+  ResizerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ImageResize/
+      Handler: ImageResize::ImageResize.Function::FunctionHandler
+      MemorySize: 2048
+      Events:
+        FileUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref SourceBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: 'images/'
+                  - Name: suffix
+                    Value: '.jpeg'
+      Policies:
+        - S3FullAccessPolicy:
+            BucketName: !Sub "imageresizer-${AWS::AccountId}/*"
+
+Outputs:
+  SourceBucketName:
+    Value: !Ref SourceBucket
+    Description: S3 Bucket for object storage
+  FunctionArn:
+    Value: !Ref ResizerFunction
+    Description: ResizerFunction function  Arn

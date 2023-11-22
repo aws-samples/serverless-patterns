@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AppSync to Step Functions Express (Sync)
+
+Resources:
+##########################################################################
+#   AppSync API                                                          #
+##########################################################################
+  AppSyncApi:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaUri: ./schema.graphql
+      ApiKeys:
+        TestApiKey:
+          Description: Test Api Key
+      Auth:
+        Type: API_KEY
+      Functions:
+        addWorkflowArnToStashFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: None
+          InlineCode: !Sub |
+            export function request(ctx) {
+              ctx.stash.stateMachineArn = "${StateMachine}"
+              return {};
+            }
+            export function response(ctx) {
+              return ctx.args;
+            }
+        startWorkflowFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: !GetAtt StepFunctionDataSource.Name
+          InlineCode: |
+            import { util } from '@aws-appsync/utils'
+            export function request(ctx) { 
+              return {
+                "version": "2018-05-29",
+                "method": "POST",
+                "resourcePath": "/",
+                "params": {
+                  "headers": {
+                    "content-type": "application/x-amz-json-1.0",
+                    "x-amz-target":"AWSStepFunctions.StartSyncExecution"
+                  },
+                  "body": {
+                    "stateMachineArn": ctx.stash.stateMachineArn,
+                    "input": JSON.stringify(ctx.args)
+                  }
+                }
+              };
+            }
+            export function response(ctx) {
+              if (ctx.error) util.error(ctx.error.message, ctx.error.type);
+              if (ctx.result.statusCode === 200) {
+                return JSON.parse(ctx.result.body);
+              } else {
+                util.appendError(ctx.result.body, ctx.result.statusCode);
+              }
+            }
+      Resolvers:
+        Mutation:
+          startWorkflow:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: "1.0.0"
+            Pipeline:
+            - addWorkflowArnToStashFunction
+            - startWorkflowFunction
+
+##########################################################################
+#   AppSync Data Sources                                                 #
+##########################################################################
+  StepFunctionDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: StepFunctionDataSource
+      Type: HTTP
+      ServiceRoleArn: !GetAtt StepFunctionDataSourceRole.Arn
+      HttpConfig:
+        Endpoint: !Sub "https://sync-states.${AWS::Region}.amazonaws.com/"
+        AuthorizationConfig:
+          AuthorizationType: AWS_IAM
+          AwsIamConfig:
+            SigningRegion: !Ref AWS::Region
+            SigningServiceName: states
+
+  StepFunctionDataSourceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: WorkflowPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+                - Effect: Allow
+                  Action: states:StartSyncExecution
+                  Resource: !Ref StateMachine
+
+##########################################################################
+#   SFN State Machine                                                    #
+##########################################################################
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        Comment: StateMachine
+        StartAt: Pass
+        States:
+          Pass:
+            Type: Pass
+            End: true
+            Parameters:
+              message.$: States.Format('Hey {}, this is a message from your state machine',$.name)

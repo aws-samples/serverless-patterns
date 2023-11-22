@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SAM Template for private APIs with Lambda proxy integration.
+
+Parameters:
+  VpcEndpoint:
+    Type: String 
+    Description : The ID of the Vpc Endpoint you want to use
+
+
+Resources:
+  # Lambda function
+  LambdaFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        def lambda_handler(event, context):
+            return {
+        "statusCode": 200,
+        "body": json.dumps({
+          "message" : "Hello this is the private API"}),
+        }
+      Runtime: python3.9
+      Events:
+        APIRoot:
+          Type: Api 
+          Properties:
+            Path: /get
+            Method: ANY
+            RestApiId: !Ref PrivateApi
+  #Private API
+  PrivateApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      EndpointConfiguration: PRIVATE
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          title: PrivateApi
+        basePath: /Prod
+        schemes:
+          - https
+        x-amazon-apigateway-policy:
+          Version: "2012-10-17"
+          Statement:
+            -
+              Effect: "Allow"
+              Principal: "*"
+              Action:
+                - "execute-api:Invoke"
+              Resource: "execute-api:/*"
+              Condition:
+                StringEquals:
+                  aws:sourceVpce: !Ref VpcEndpoint
+        paths:
+          /get:
+            x-amazon-apigateway-any-method:
+              produces:
+              - application/json
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: 200
+                uri:  
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+
+

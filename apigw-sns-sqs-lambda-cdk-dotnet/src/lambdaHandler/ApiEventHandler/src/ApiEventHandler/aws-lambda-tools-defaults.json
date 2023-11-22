@@ -8,7 +8,7 @@
   "profile": "",
   "region": "",
   "configuration": "Release",
-  "framework": "netcoreapp3.1",
+  "framework": "net6.0",
   "function-runtime": "dotnetcore3.1",
   "function-memory-size": 256,
   "function-timeout": 30,
