@@ -39,7 +39,6 @@ def lambda_handler(event, context):
                 if diff.days > 7:           
                      print("schedule is past the scheduled date by 7 seven days and criteria fullfilled to delete")
                      scheduler.delete_schedule(Name=schedule['Name'])
-                     mysns_topic_arn=os.environ['mysns_topic_arn']
                      sns.publish(TopicArn=mysnstopicarn,Message="scheduler event is deleted")
 
     return {

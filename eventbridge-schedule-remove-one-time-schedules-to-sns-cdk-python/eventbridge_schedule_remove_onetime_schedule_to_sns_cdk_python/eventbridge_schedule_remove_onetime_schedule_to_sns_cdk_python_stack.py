@@ -10,7 +10,6 @@ from aws_cdk import (
     aws_ec2 as ec2,    
     aws_lambda as _lambda,    
     aws_events as events,
-
 )
 from constructs import Construct
 
@@ -25,8 +24,8 @@ class EventbridgeOnetimeScheduleRemoveToSnsCdkPythonStack(Stack):
         
         #subscribe an email to the sns topic (optional to replace command like option)
         # my_sns_topic.add_subscription(snssubscriptions.EmailSubscription("EMAIL-XXX"))
-        my_sns_topic.add_subscription(snssubscriptions.EmailSubscription("maniyes@amazon.com"))
-
+        my_sns_topic.add_subscription(snssubscriptions.EmailSubscription("XXXX"))
+        
         ## Create schedule role
         scheduler_role = iam.Role(self, "scheduler-role",
             assumed_by=iam.ServicePrincipal("scheduler.amazonaws.com")
@@ -72,7 +71,7 @@ class EventbridgeOnetimeScheduleRemoveToSnsCdkPythonStack(Stack):
                     mode="OFF",
                 ),
                 
-                schedule_expression="cron(0/1 * * * ? *)",
+                schedule_expression="cron(0/5 * * * ? *)",
                 schedule_expression_timezone="America/New_York",   
                 target=scheduler.CfnSchedule.TargetProperty(
                     arn=scheduled_event_remover_lambda.function_arn,

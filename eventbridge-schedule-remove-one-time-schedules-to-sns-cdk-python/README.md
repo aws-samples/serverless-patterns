@@ -36,7 +36,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cdk deploy
     ```
-
+6. Add your email as subscription to SNS after replacing YOURTOPICARN and YOUREMAIL
+    ```
+    aws sns subscribe --topic-arn YOURTOPICARN --protocol email --notification-endpoint YOUREMAIL
+    ```
 ## How it works
 
 An Amazon EventBridge Scheduler job runs every five minutes and will use AWS lambda to identify and delete one time Amazon EventBridge Scheduler jobs expired more than 7 days.Scheduler job also sends a SNS notifications to confirm the activity is completed.
