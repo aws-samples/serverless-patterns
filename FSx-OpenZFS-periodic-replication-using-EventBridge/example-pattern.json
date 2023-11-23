@@ -10,6 +10,7 @@
       "This pattern sets up the following resources:",
   "An Amazon EventBridge rule that triggers a Lambda function based on the schedule defined by the customer to take create snapshots of the provided FSx VolumeID.",
   "An SNS topic that notifies for any failures while creating snapshots.",
+  "The function also deletes the older snapshots.",
   "A sample Lambda functions that creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region."
     ]
   },
