@@ -2,7 +2,7 @@
 
 The SAM template deploys an Amazon EventBridge to trigger a Lambda function which will get periodic invocations based on user schedule to copy the snapshot of the volume and replicate them to the target FSx system. Users are also notified for snapshot creations and for any errors via SNS.
 
-The template contains a sample Lambda function that receives the user input for source and target VolumeId. The Lambda function creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region. With the help of the SNS topic, the users will be notified for any errors and snapshot creation details.
+The template contains a sample Lambda function that receives the user input for source and target VolumeId. The Lambda function creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region. The function also deletes the older snapshots. With the help of the SNS topic, the users will be notified for any errors and snapshot creation details.
 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -39,6 +39,7 @@ Important: this application uses various AWS services and there are costs associ
    - Enter a CopySnapshotAndUpdateVolume - "CopyStrategy" parameter
    - Enter a CopySnapshotAndUpdateVolume - "Options" parameter. Comma (,) separated values
    - Enter an Email for notifications
+   - Enter Number of days to retain custom-scheduled snapshots
    - Allow SAM CLI to create IAM roles with the required permissions.
 
    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -51,6 +52,7 @@ This pattern sets up the following resources:
 
 - An Amazon EventBridge rule that triggers a Lambda function based on the schedule defined by the customer to take create snapshots of the provided FSx VolumeID.
 - A sample [Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) A sample Lambda functions that creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region (https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/custom-snapshot-schedule.html).
+- The function also deletes the older snapshots.
 - An SNS topic that notifies for any failures while creating snapshots.
   
 
