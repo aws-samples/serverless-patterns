@@ -15,7 +15,7 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rekognition-video-tagging",
-      "templateURL": "serverless-patterns/rekognition-video-tagging",
+      "templateURL": "rekognition-video-tagging",
       "projectFolder": "rekognition-video-tagging",
       "templateFile": "rekognition-video-tagging/template.yaml"
     }
