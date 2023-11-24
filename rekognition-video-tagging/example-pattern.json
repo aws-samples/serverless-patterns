@@ -52,7 +52,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: sam destroy"
+      "Delete the stack: sam delete"
     ]
   },
   "authors": [
