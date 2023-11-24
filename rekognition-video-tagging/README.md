@@ -41,7 +41,7 @@ Important: this application uses various AWS services and there are costs associ
 <img src="docs/rekognition-video-tagging.png" alt="architecture diagram"/>
 
 - This pattern is designed to create all services required to run this workflow.
-- The workflow begings with an Amazon S3 bucket. 
+- The workflow begins with an Amazon S3 bucket. 
 - When an object is created within the S3 bucket, it sends an event to a AWS Lambda function.
 - This Lambda function invokes Amazon Rekognition's StartLabelDetection function, which asynchronously analyses the stored video.
 - Once this task is complete, Rekognition publishes a completion status to the Amazon Simple Notification Service (SNS) topic.
