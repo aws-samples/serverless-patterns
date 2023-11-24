@@ -1,6 +1,6 @@
 {
     "title": "Automatic Video Tagging with Amazon Rekognition",
-    "description": "Create an event-driven workflow to automatically detect and tag moderation labels within images using Amazon Rekognition, AWS Lambda, and Amazon DynamoDB.",
+    "description": "An event-driven workflow to automatically detect and tag moderation labels within images using Amazon Rekognition, AWS Lambda, and Amazon DynamoDB.",
     "language": "Python",
     "level": "200",
     "framework": "SAM",
