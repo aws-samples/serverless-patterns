@@ -13,6 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+- Make sure that you have the ID of the source and destination volumes that you would like to initiate the replication between. For more information on these resources, see [Creating a volume](https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/creating-volumes.html), [Creating a snapshot](https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/snapshots-openzfs.html#creating-snapshots), and [Using on-demand data replication](https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/on-demand-replication.html#how-to-use-data-replication).
 
 ## Deployment Instructions
 
@@ -26,7 +27,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```
-   sam deploy --guided
+   sam deploy --guided --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM CAPABILITY_NAMED_IAM
    ```
 1. During the prompts:
 
@@ -34,12 +35,12 @@ Important: this application uses various AWS services and there are costs associ
    - Enter the desired AWS Region
    - Enter a SourceVolumeID
    - Enter a TargetVolumeID
-   - Enter a CRON schedule for snapshots
-   - Enter a Value of snapshot Name
-   - Enter a CopySnapshotAndUpdateVolume - "CopyStrategy" parameter
+   - Enter a CRON schedule for snapshots (Default = [0 0/6 **?*] every six hours)
+   - Enter a Value of snapshot Name (Default = fsx_scheduled_snapshot)
+   - Enter a CopySnapshotAndUpdateVolume - "CopyStrategy" parameter (Default = INCREMENTAL_COPY)
    - Enter a CopySnapshotAndUpdateVolume - "Options" parameter. Comma (,) separated values
    - Enter an Email for notifications
-   - Enter Number of days to retain custom-scheduled snapshots
+   - Enter Number of days to retain custom-scheduled snapshots (Default = 7 days)
    - Allow SAM CLI to create IAM roles with the required permissions.
 
    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -51,8 +52,8 @@ Important: this application uses various AWS services and there are costs associ
 This pattern sets up the following resources:
 
 - An Amazon EventBridge rule that triggers a Lambda function based on the schedule defined by the customer to take create snapshots of the provided FSx VolumeID.
-- A sample [Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) A sample Lambda functions that creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region (https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/custom-snapshot-schedule.html).
-- The function also deletes the older snapshots.
+- A sample [Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) function that creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region (https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/custom-snapshot-schedule.html).
+- The function also deletes the older snapshots based on the retaintion period configured.
 - An SNS topic that notifies for any failures while creating snapshots.
   
 
@@ -60,7 +61,7 @@ This pattern sets up the following resources:
 
 1. In the Outputs tab of the AWS CloudFormation console, note the `SNSTopic` , `EventBridgeRule` , `LambdaExecutionRole`, `LambdaFunction` outputs. Kindly provide all the requested details.
 2. Based on the provided schedule, monitor the CloudWatch logs and the FSx snapshots that are created. 
-3. The Lambda will automatically send notifications for any kinds of failures within the API calls to the entered email ID.
+3. The Lambda will automatically send notifications for any kinds of failures within the API calls to the configured email ID.
 
 
 ## Cleanup
