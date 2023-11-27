@@ -1,46 +1,60 @@
 AWSTemplateFormatVersion: '2010-09-09'
+
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Description of the SAM template here.
-  TBD.
+  Configure periodic replication schedule for your Amazon FSx for OpenZFS file system volumes.
 
 Parameters:
   SourceVolumeID:
     Description: Amazon FSx for OpenZFS Source Volume ID
     Type: String
     AllowedPattern: "^fsvol-[A-Za-z0-9]+"
-    Default: fsvol-0b428631301385017
 
   TargetVolumeID:
     Description: Amazon FSx for OpenZFS Target Volume ID
     Type: String
     AllowedPattern: "^fsvol-[A-Za-z0-9]+"
-    Default: fsvol-0599ae2973d4a2729
 
   # Schedule for creating snapshot and calling CopySnapshotAndUpdateVolume API
   CronSchedule:
-    Description: CRON schedule for snapshots (default every 12 hours)
+    Description: CRON schedule for snapshots (default every 6 hours)
     Type: String
-    Default: "0 0/12 * * ? *"
+    Default: "0 0/6 * * ? *"
 
   # Value of snapshot Name (shows in Name column in snapshots list in console)
   SnapshotName:
     Description: The name of snapshots starts with (shown in FSx console)
     Type: String
-    Default: "FSx-scheduled_snapshot"
+    Default: "fsx_scheduled_snapshot"
     AllowedPattern: "^[a-zA-Z0-9_:.-]{1,179}$"
 
-  # CopySnapshotAndUpdateVolume - "Options" parameter. Comma (,) separated values
+  # CopySnapshotAndUpdateVolume - "Options" parameter.
+  # Comma (,) separated values such as "DELETE_INTERMEDIATE_SNAPSHOTS,DELETE_INTERMEDIATE_DATA,DELETE_CLONED_VOLUMES"
   Options:
     Description: Options parameter value for the CopySnapshotAndUpdateVolume API
     Type: String
-    Default: DELETE_INTERMEDIATE_SNAPSHOTS, DELETE_INTERMEDIATE_DATA
 
   # CopySnapshotAndUpdateVolume - "CopyStrategy" parameter.
+  # example = INCREMENTAL_COPY or FULL_COPY
   CopyStrategy:
     Description: CopyStrategy parameter value for the CopySnapshotAndUpdateVolume API
     Type: String
-    Default: FULL_COPY
+    Default: INCREMENTAL_COPY
 
   # Email for notifications
   Email:
@@ -49,7 +63,7 @@ Parameters:
 
   # If customer wants notification for successful snapshots
   SuccessNotification:
-    Description: Do you want to be notified for successful snapshots? *for failure, you will always be notified
+    Description: Do you want to be notified for successful replication initiation? For failures, you will always be notified
     Type: String
     AllowedValues:
       - "Yes"
