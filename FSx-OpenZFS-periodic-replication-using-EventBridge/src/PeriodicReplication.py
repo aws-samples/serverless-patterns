@@ -1,11 +1,15 @@
 import json
-import boto3
 import os
 import time
 import datetime
+import boto3
+import botocore
+
+print("boto3 version: " + boto3.__version__)
+print("botocore version: " + botocore.__version__)
 
 session = boto3.session.Session()
-fsx_client = session.client(service_name='fsx', endpoint_url='https://simba-gamma.us-east-1.amazonaws.com')
+fsx_client = session.client(service_name='fsx')
 sns_client = boto3.client('sns')
 
 sns_notification = os.environ.get('SUCCESS_NOTIFICATION', "No") == 'Yes'
