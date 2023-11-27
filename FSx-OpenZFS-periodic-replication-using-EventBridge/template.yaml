@@ -142,7 +142,7 @@ Resources:
   LatestPythonSDK:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: latest-python-SDK-layer
+      LayerName: Boto3-SDK-layer-latest
       ContentUri: dependencies/
       CompatibleRuntimes:
         - python3.10
