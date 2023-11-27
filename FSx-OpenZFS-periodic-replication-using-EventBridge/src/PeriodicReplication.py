@@ -92,7 +92,7 @@ def lambda_handler(event, context):
     copy_snapshot = False
     for i in range(1, 10):
         time.sleep(10)
-        print ("Describe Snapshot - Attept=" + str(i))
+        print ("Describe Snapshot - Attempt=" + str(i))
         ret = fsx_client.describe_snapshots(SnapshotIds=[src_snapshot["SnapshotId"]])
         print("Snapshot = " + src_snapshot["SnapshotId"] + " is in " + ret["Snapshots"][0]["Lifecycle"] +" state.")
         if ret["Snapshots"][0]["Lifecycle"] == "AVAILABLE":
@@ -102,11 +102,14 @@ def lambda_handler(event, context):
     if copy_snapshot:
         try:
             print ("Starting copy snapshot operation ...")
-            options = list(os.environ.get("OPTIONS").split(", "))
+            options_string = os.environ.get("OPTIONS")
+            options = [] if len(options_string) == 0 else list(options_string.split(", "))
             option_list = []
             for item in options:
                 option_list.append(item.strip())
+            print ("CopySnapshotAndUpdateVolume Options: ")
             print (option_list)
+
             response = fsx_client.copy_snapshot_and_update_volume(
                     VolumeId=os.environ.get("DEST_VOLUME_ID"),
                     SourceSnapshotARN=src_snapshot["ResourceARN"],
@@ -116,7 +119,8 @@ def lambda_handler(event, context):
             print (response)
             msg = "Started CopySnapshotAndUpdateVolume operation\n\n"
             msg += "Destination Volume ID : " + os.environ.get("DEST_VOLUME_ID") + "\n"
-            msg += "Source Snapshot ARN : " + src_snapshot["ResourceARN"] 
+            msg += "Source Snapshot ARN : " + src_snapshot["ResourceARN"]
+            print (msg)
             send_sns_notification (msg, 'Success Notification: CopySnapshotAndUpdateVolume')
 
         except Exception as e:
