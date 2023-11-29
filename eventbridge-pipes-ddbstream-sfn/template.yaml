@@ -126,6 +126,9 @@ Resources:
       RoleArn: !GetAtt EventBridgePipesRole.Arn
       Source: !GetAtt DynamoDBWCTable.StreamArn
       SourceParameters:
+        FilterCriteria:
+          Filters:
+            - Pattern: !Sub '{"dynamodb": {"NewImage": {"Nationality": {"S": [{"prefix": "${NationalTeam}"}]}}}}'
         DynamoDBStreamParameters:
           StartingPosition: LATEST
           BatchSize: 1
