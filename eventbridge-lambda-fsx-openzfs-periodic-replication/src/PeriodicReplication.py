@@ -14,6 +14,7 @@ sns_client = boto3.client('sns')
 
 sns_notification = os.environ.get('SUCCESS_NOTIFICATION', "No") == 'Yes'
 retain_days = int(os.environ.get('SNAPSHOT_RETAIN_DAYS'))
+snapshot_name = os.environ.get('SNAPSHOT_NAME')
 
 def send_sns_notification(msg, subject):
     sns_client.publish(
@@ -31,9 +32,9 @@ def deleteSnapshotIfOlderThanRetention(snapshot):
 
     if delta.days > retain_days:
         fsx_client.delete_snapshot(SnapshotId=snapshot_id)
-        print("Deleted FSx for OpenZFS volume snapshot " + snapshot_id)
+        print("Deleted FSx for OpenZFS volume snapshot " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
     else:
-        print("Skipping (retaining) FSx for OpenZFS volume snapshot " + snapshot_id)
+        print("Skipping (retaining) FSx for OpenZFS volume " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
 
 def deleteSnapshots():
     print ("deleting snapshots")
@@ -51,12 +52,8 @@ def deleteSnapshots():
         # loop thru the results, checking the snapshot date-time and call Fsx API to remove those older than x hours/days
         print("Starting purge of snapshots older than " + str(retain_days) + " days for volume " + volId)
         for snapshot in snapshots['Snapshots']:
-            response = fsx_client.list_tags_for_resource(ResourceARN=snapshot['ResourceARN'])
-            #print (response)
-            for tag in response['Tags']:
-                if tag['Key'] == 'CreatedBy' and tag['Value'] == os.environ.get("SNAPSHOT_TAG_VALUE"):
-                    deleteSnapshotIfOlderThanRetention(snapshot)
-
+            if snapshot['Name'].startswith(snapshot_name):
+                deleteSnapshotIfOlderThanRetention(snapshot)
 
 def lambda_handler(event, context):
     try:
