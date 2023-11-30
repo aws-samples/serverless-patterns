@@ -1,9 +1,8 @@
-# Amazon EventBridge to trigger Lambda to perform volume replication across file systems
+Amazon EventBridge to trigger AWS Lambda function to replicate FSx-OpenZFS volumes across file systems
 
-The SAM template deploys an Amazon EventBridge to trigger a Lambda function which will get periodic invocations based on user schedule to copy the snapshot of the volume and replicate them to the target FSx system. Users are also notified for snapshot creations and for any errors via SNS.
+The AWS SAM template deploys an Amazon EventBridge rule to trigger an AWS Lambda function based on a user schedule to copy the snapshot of the volume and copy them to the target FSx system.
 
-The template contains a sample Lambda function that receives the user input for source and target VolumeId. The Lambda function creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region. The function also deletes the older snapshots. With the help of the SNS topic, the users will be notified for any errors and snapshot creation details.
-
+The template contains a sample Lambda function that receives the user input for source and target VolumeId. The Lambda function creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region. Notify users using a SNS topic for any errors and snapshot creation details.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -74,6 +73,6 @@ sam delete
 
 ---
 
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
