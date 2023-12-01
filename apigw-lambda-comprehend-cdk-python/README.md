@@ -1,21 +1,16 @@
-# Text generation via Lex -> Lambda -> Bedrock
-The repository shows a serverless way of how to leverage GenAI capabilities to build a NextGen chatbot.
+# API Gateway -> Lambda -> Comprehend
+This patterns shows CDK deployment on how to leverage Amazon API Gateway, AWS Lambda, and Amazon Comprehend to perform Sentiment Analysis in a serverless fashion.
 
 ## Architecture
-![Diagram](diagrams/architecture.png)
+![Diagram](src/architecture.png)
 
 ### What resources will be created?
 This CDK code will create the following:
-   - 1 Lex bot
-   - 1 Lambda (to invoke the Bedrock api and subsequently the Foundation Model provided by Anthropic to generate the text content)
-   - 2 Iam roles (one for the lex bot to call Lambda, one for the Lambda to call Bedrock)
+   - 1 API Gateway with HTTP Endpoint
+   - 1 Lambda (to invoke the Comprehend API)
+   - 1 IAM role (for the Lambda to invoke Comprehend)
 
 ## Requirements
-
-### Bedrock Access
-
-Ensure you have sufficient access to Amazon Bedrock and the different Foundation Models provided by leading AI Foundation model providers. 
-For access, follow the [documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
 ### Development Environment
 **Cloud 9**
@@ -32,8 +27,7 @@ If you have not yet run `aws configure` and set a default region, you must do so
 You must use a role that has sufficient permissions to create Iam roles, as well as cloudformation resources
 
 #### Python >=3.8
-Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration has used python version 3.8 and a layer has been attached.
-The layer used in this demonstration has Boto3>=1.28.57 (for Bedrock service).
+Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration has used python version 3.10.
 
 #### AWS CDK
 Make sure you have the [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install) installed in the Cloud9 environment.
@@ -44,7 +38,7 @@ Make sure you have the [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/gettin
 ### Set up environment and gather packages
 
 ```
-cd lex-lambda-bedrock-cdk-python
+cd apigw-lambda-comprehend-cdk-python
 ```
 
 Install the required dependencies (aws-cdk-lib and constructs) into your Python environment 
@@ -69,91 +63,27 @@ cdk deploy
 
 The deployment will create a Lex bot, a Lambda and a S3 bucket.
 
-## Usage
-Once all the resources are created after `cdk deploy` finishes, go to AWS Management Console and search for Amazon Lex service. 
-If the deployment is successful, a Lex bot named `LexGenAIBot` should be seen in the Bots home page.
+## How it works
+The API Gateway handles the incoming requests from user and it invokes the relevant route. The Lambda, triggered by API Gateway, invokes the Comprehend's DetectSentiment API and the analyzed response from Comprehend service is routed back to the requester.
 
-![Diagram](diagrams/LexBotHomePage.png)
+## Testing
+Upon successful deployment of the stack, the Output section would provide the `APIEndpoint` in the CDK environment. Alternatively, the `APIEndpoint` can be found from the `Outputs` section of the CloudFormation stack.
 
-### Things to make sure in Lex console
+Use the below format to the test the API (replace the API Endpoint with the one retrieved from the above step):
 
-- Click on Bot `LexGenAIBot` and verify that three intents `Welcome Intent`, `GenerateTextIntent`, and `FallbackIntent` are present as per the below screenshot. 
-![Diagram](diagrams/LexIntentsPage.png)
+`curl -d '{"input": "I love AWS Services."}' -H 'Content-Type: application/json' https://<abcdefg>.execute-api.<region>.amazonaws.com/DetectSentiment`
+```
+{
+    "Sentiment": "POSITIVE",
+    "Confidence Score": {
+        "Positive": 0.9994897842407227,
+        "Negative": 0.0000562662971788086,
+        "Neutral": 0.00038276115083135664,
+        "Mixed": 0.00007121496309991926
+    }
+}
+```
 
+## Cleanup
 
-- Click on `WelcomeIntent` and scroll down to `Sample utterances` to ensure sample utterances are created. 
-![Diagram](diagrams/WelcomeIntentSampleUtterances.png)
-
-
-- Scroll down to find the `Closing response` section and expand the `Message group` dropdown. Ensure that a closing message is present. 
-![Diagram](diagrams/WelcomeIntentClosingResponse.png)
-
-
-- If all the above steps are in place, click on `GenerateTextIntent` available on the list of Intents (seen left-hand side).
-
-
-- Once you are in the `GenerateTextIntent` page, scroll down to `Sample utterances` to ensure the utterances are created.
-![Diagram](diagrams/GenerateTextIntentSampleUtterances.png)
-
-
-- Scroll down to find the `Fulfilment` section and click on the `Advanced options` button. Verify that `Fulfilment Lambda code hook option` is checked.
-![Diagram](diagrams/GenerateImageIntentLambdaHook.png)
-
-
-- Once the above steps are verified, go back ot the `Intents` page and under the `Deployment section`, click on `Aliases`.
-![Diagram](diagrams/Aliases.png)
-
-
-- Click on `TestBotAlias` and scroll down to `Languages` section to find the language that used in the deployment, i.e., `English (US)`. Click on `English (US)`.
-
-
-- The opened page shows the Lambda function for the Bot. Ensure the source Lambda and version or alias is properly set, as per the resource created from the CDK deployment.
-![Diagram](diagrams/AliasLambdaFunction.png)
-
-
-- Once all the above steps are verified, go back to the `LexGenAIBot` `All languages` section. Click on `Build` and you are ready to `Test` the bot post successful build.
-![Diagram](diagrams/Build.png)
-
-
-- Bot build in progress
-![Diagram](diagrams/Build.png)
-![Diagram](diagrams/Build_in-progress_I.png)
-![Diagram](diagrams/Build_in-progress_II.png)
-
-
-- Once the Bot is built successfully, we're ready to test the `LexGenAIBot` bot. Click on the `Test` button
-![Diagram](diagrams/Build_Complete.png)
-
-
-- The Test console opens up.
-![Diagram](diagrams/Test_Console.png)
-
-
-- Enter some sample queries and get the image generated.
-![Diagram](diagrams/Sample_Test_case_I.png)
-![Diagram](diagrams/Sample_Test_case_II.png)
-![Diagram](diagrams/Sample_Test_case_III.png)
-![Diagram](diagrams/Sample_Test_case_IV.png)
-
-
-### Tips for best results
-
-**Keep your lambda perpetually warm by provisioning an instance for the runtime lambda**
-
-Go to Lambda console > select the function LexGenAIServerlessStack-LexGenAIBotLambda*
-
-Versions > Publish new version
-
-Under this version 
-   - Provisioned Concurrency > set value to 1
-   - Permissions > Resource based policy statements > Add Permissions > AWS Service > Other, your-policy-name, lexv2.amazonaws.com, your-lex-bot-arn, lamdba:InvokeFunction
-
-Go to your Lex Bot (LexGenAIBot)
-
-Aliases > your-alias > your-language > change lambda function version or alias > change to your-version
-
-This will keep an instance running at all times and keep your lambda ready so that you won't have cold start latency. This will cost a bit extra (https://aws.amazon.com/lambda/pricing/) so use thoughtfully. 
-
-## Clean Up
-
-To clean up the resources created as part of this demonstration, run the command `cdk destroy` in the directory `lex-lambda-bedrock-cdk-python`.
+To clean up the resources created as part of this demonstration, run the command `cdk destroy` in the directory `apigw-lambda-comprehend-cdk-python`.

@@ -19,13 +19,19 @@ def lambda_handler(event, context):
     """
     try:
         LOG.info(f"Event is {event}")
-        LOG.info(event['body'])
-        user_input = json.loads(event['body'])['input']
+        LOG.info(event["body"])
+        user_input = json.loads(event["body"])["input"]
         response = comprehend_obj.detect_sentiment(Text=user_input, LanguageCode="en")
         LOG.info(response)
         LOG.info(f"Sentiment detect is {response['Sentiment']}!!")
     except ClientError:
-        LOG.error("Sentiment detection failed!!")
+        LOG.error("Sentinment detection failed!!")
         raise
     else:
-        return response
+        analyzed_response = json.dumps(
+            {
+                "Sentiment": response["Sentiment"],
+                "Confidence Score": response["SentimentScore"],
+            }
+        )
+        return analyzed_response
