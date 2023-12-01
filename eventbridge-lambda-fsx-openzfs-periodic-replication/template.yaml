@@ -78,29 +78,6 @@ Parameters:
 
 Resources:
   #
-  # Cloudwatch events/rule to trigger a Lambda function
-  #
-  FSxEventBridgeRule:
-    Type: AWS::Events::Rule
-    Properties:
-      Description: AWS EventBridge Schedule to trigger a lambda function
-      ScheduleExpression: !Sub 'cron(${CronSchedule})'
-      State: ENABLED
-      Targets:
-        - Arn: !GetAtt SnapshotLambda.Arn
-          Id: SnapshotLambdaRule
-
-  #
-  # Lambda resource based policy to allow EventBridge Rule to trigger a lambda function
-  #
-  SnapshotLambdaPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Sub ${SnapshotLambda}
-      Action: lambda:InvokeFunction
-      Principal: events.amazonaws.com
-
-  #
   # SNS topic to notify
   #
   SNSTopic:
@@ -188,6 +165,47 @@ Resources:
       CodeUri: src/
       Runtime: python3.11
       Timeout: 900
+
+  #
+  # EventBridge Schedule Role
+  #
+  FSxEventBridgeScheduleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: FSxEventBridgeScheduleRolePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunction'
+                Resource:
+                  - !GetAtt SnapshotLambda.Arn
+
+  #
+  # EventBridge Schedule to trigger a Lambda function
+  #
+  FSxEventBridgeSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: !Sub ${AWS::StackName}-Schedule
+      ScheduleExpression: !Sub 'cron(${CronSchedule})'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Target:
+        Arn: !GetAtt SnapshotLambda.Arn
+        RoleArn: !GetAtt FSxEventBridgeScheduleRole.Arn
+
 #
 # Stack output section
 #
@@ -195,9 +213,12 @@ Outputs:
   SNSTopic:
     Description: SNS Topic
     Value: !Ref 'SNSTopic'
-  EventBridgeRule:
-    Description: EventBridge Rule
-    Value: !GetAtt FSxEventBridgeRule.Arn
+  FSxEventBridgeScheduleRole:
+    Description: EventBridge Schedule Role
+    Value: !GetAtt FSxEventBridgeScheduleRole.Arn
+  FSxEventBridgeSchedule:
+    Description: EventBridge Schedule
+    Value: !GetAtt FSxEventBridgeSchedule.Arn
   LambdaExecutionRole:
     Description: Lambda Execution Role
     Value: !GetAtt SnapshotLambdaRole.Arn
