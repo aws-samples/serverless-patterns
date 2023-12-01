@@ -1,25 +1,12 @@
 
-### Project Structure within src/lex-gen-ai-demo-cdk:
+### Project Structure within apigw-lambda-comprehend-cdk-python:
 ```
-AWSLexKoiosBlogDemo/src/lex-gen-ai-demo-cdk
+apigw-lambda-comprehend-cdk-python/src/
 - app.py
 - cdk.json
-- endpoint_handler.py
-- upload_file_to_s3.py
-- shutdown_endpoint.py
-- index-creation-docker-image/
-   - index_creation_app.py
-   - Dockerfile
-   - index_creation_requirements.txt
-- lex_gen_ai_demo_cdk_files/
-   - __init__.py
-   - lex_gen_ai_demo_file_stack.py
-- lex-gen-ai-demo-docker-image/
-   - runtime_lambda_app.py
-   - Dockerfile
-   - runtime_lambda_requirements.txt
+- src/
+   - lambda_function.py
 - requirements.txt
-- source.bat
 ```
 
 ## Common Errors & Troubleshooting
