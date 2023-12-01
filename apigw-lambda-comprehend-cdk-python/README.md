@@ -61,7 +61,7 @@ and deploy with
 cdk deploy
 ```
 
-The deployment will create a Lex bot, a Lambda and a S3 bucket.
+The deployment will create a API Gateway endpoint, a Lambda and a IAM role.
 
 ## How it works
 The API Gateway handles the incoming requests from user and it invokes the relevant route. The Lambda, triggered by API Gateway, invokes the Comprehend's DetectSentiment API and the analyzed response from Comprehend service is routed back to the requester.
