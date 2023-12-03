@@ -1,6 +1,6 @@
 # Amazon CloudWatch Dashboard Monitoring with Lambda PowerTools
 
-The CDK Stack deploys CloudWatch Dashboard with AWS Lambda Metrics. Lambda Function is instrumented with Lambda Insights and leverage Powertool for custom metrics reporting.
+The CDK Stack deploys CloudWatch Dashboard with AWS Lambda Metrics. Lambda Function is instrumented with Lambda Insights and leverage Powertools for custom metrics reporting.
 
 The Dashboard is built with 3 widgets with the metrics,
 - Invocations - from AWS/Lambda Namespace
