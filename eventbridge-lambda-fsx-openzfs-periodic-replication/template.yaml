@@ -167,9 +167,9 @@ Resources:
       Timeout: 900
 
   #
-  # EventBridge Schedule Role
+  # EventBridge Scheduler Role
   #
-  FSxEventBridgeScheduleRole:
+  FSxEventBridgeSchedulerRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -182,7 +182,7 @@ Resources:
             Action:
               - sts:AssumeRole
       Policies:
-        - PolicyName: FSxEventBridgeScheduleRolePolicy
+        - PolicyName: FSxEventBridgeSchedulerRolePolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -193,18 +193,18 @@ Resources:
                   - !GetAtt SnapshotLambda.Arn
 
   #
-  # EventBridge Schedule to trigger a Lambda function
+  # EventBridge Scheduler to trigger a Lambda function
   #
-  FSxEventBridgeSchedule:
+  FSxEventBridgeScheduler:
     Type: AWS::Scheduler::Schedule
     Properties:
-      Name: !Sub ${AWS::StackName}-Schedule
+      Name: !Sub ${AWS::StackName}-Scheduler
       ScheduleExpression: !Sub 'cron(${CronSchedule})'
       FlexibleTimeWindow:
         Mode: 'OFF'
       Target:
         Arn: !GetAtt SnapshotLambda.Arn
-        RoleArn: !GetAtt FSxEventBridgeScheduleRole.Arn
+        RoleArn: !GetAtt FSxEventBridgeSchedulerRole.Arn
 
 #
 # Stack output section
@@ -213,12 +213,12 @@ Outputs:
   SNSTopic:
     Description: SNS Topic
     Value: !Ref 'SNSTopic'
-  FSxEventBridgeScheduleRole:
-    Description: EventBridge Schedule Role
-    Value: !GetAtt FSxEventBridgeScheduleRole.Arn
-  FSxEventBridgeSchedule:
-    Description: EventBridge Schedule
-    Value: !GetAtt FSxEventBridgeSchedule.Arn
+  EventBridgeSchedulerRole:
+    Description: EventBridge Scheduler Role
+    Value: !GetAtt FSxEventBridgeSchedulerRole.Arn
+  EventBridgeScheduler:
+    Description: EventBridge Scheduler
+    Value: !GetAtt FSxEventBridgeScheduler.Arn
   LambdaExecutionRole:
     Description: Lambda Execution Role
     Value: !GetAtt SnapshotLambdaRole.Arn
