@@ -1,13 +1,13 @@
 {
-    "title": "API Gateway - Lambda - Comprehend Sentiment Analysis CDK",
-    "description": "Perform Sentiment Analysis using Comprehend through Lambda and API Gateway",
+    "title": "Amazon API Gateway - AWS Lambda - Amazon Comprehend sentiment analysis",
+    "description": "Perform sentiment analysis using Amazon Comprehend through AWS Lambda and Amazon API Gateway",
     "language": "Python",
     "level": "200",
     "framework": "CDK",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This patterns shows CDK deployment on how to leverage Amazon API Gateway, AWS Lambda, and Amazon Comprehend to perform Sentiment Analysis in a serverless fashion."
+        "This patterns shows a CDK deployment on how to use Amazon API Gateway, AWS Lambda, and Amazon Comprehend to perform sentiment analysis in a serverless fashion."
       ]
     },
     "gitHub": {
