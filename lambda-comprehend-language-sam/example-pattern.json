@@ -1,6 +1,6 @@
 {
-  "title": "Language Detection with Lambda and Comprehend",
-  "description": "Lambda function that calls Comprehend service for language detction using Boto3 SDK.",
+  "title": "Using AWS Lambda and Amazon Comprehend to detect text language",
+  "description": "AWS Lambda function that calls Amazon Comprehend service to detect text language using Boto3 SDK.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
@@ -17,7 +17,7 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-comprehend-language-sam",
-      "templateURL": "https://github.com/aws-samples/serverless-patterns/main/lambda-comprehend-language-sam/template.yaml",
+      "templateURL": "lambda-comprehend-language-sam",
       "projectFolder": "lambda-comprehend-language-sam",
       "templateFile": "template.yaml"
     }
