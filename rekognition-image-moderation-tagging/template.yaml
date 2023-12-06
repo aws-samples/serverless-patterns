@@ -59,3 +59,11 @@ Resources:
       Environment:
         Variables:
           dynamoDBTableName: !Ref DynamoDBTable
+
+Outputs:
+  ImageFileBucket:
+    Value: !Ref ImageFileBucket
+    Description: S3 Bucket for object storage
+  DynamoDBTable:
+    Value: !Ref DynamoDBTable
+    Description: DynamoDB table containing ImageModerationTags
