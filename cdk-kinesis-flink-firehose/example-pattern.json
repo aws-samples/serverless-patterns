@@ -1,13 +1,13 @@
 {
-  "title": "Flink with Kinesis Data Stream Source and Firehose Sink",
-  "description": "Create a Managed Service for Apache Flink Application with a Kinesis data stream source and Firehose sink.",
+  "title": "Apache Flink with Kinesis Data Stream Source and Firehose Sink",
+  "description": "Create a Managed Service for Apache Flink application with an Amazon Kinesis Data Stream source and Amazon Kinesis Firehose sink.",
   "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use Managed Service for Apache Flink to consume a Kinesis data stream and produce to a firehose sink.",
+      "This sample project demonstrates how to use Managed Service for Apache Flink to consume a Kinesis Data Stream and produce to a Firehose sink.",
       "Managed Service for Apache Flink provides the underlying infrastructure for your Apache Flink applications. It handles core capabilities like provisioning compute resources, parallel computation, automatic scaling, and application backups (implemented as checkpoints and snapshots)."
     ]
   },
@@ -15,8 +15,8 @@
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-kinesis-flink-firehose",
       "templateURL": "serverless-patterns/cdk-kinesis-flink-firehose",
-      "projectFolder": "cdk-kinesis-flink-firehose",
-      "templateFile": "cdk/lib/stack.ts"
+      "projectFolder": "cdk-kinesis-flink-firehose/cdk/lib/",
+      "templateFile": "stack.ts"
     }
   },
   "resources": {
