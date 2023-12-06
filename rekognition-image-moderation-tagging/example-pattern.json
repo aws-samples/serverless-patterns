@@ -1,5 +1,5 @@
 {
-    "title": "Automatic Video Tagging with Amazon Rekognition",
+    "title": "Automatic Image Tagging with Amazon Rekognition",
     "description": "An event-driven workflow to automatically detect and tag moderation labels within images using Amazon Rekognition, AWS Lambda, and Amazon DynamoDB.",
     "language": "Python",
     "level": "200",
