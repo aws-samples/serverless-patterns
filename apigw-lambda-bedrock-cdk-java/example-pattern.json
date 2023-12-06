@@ -16,7 +16,7 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-cdk-java",
-      "templateURL": "serverless-patterns/apigw-lambda-bedrock-cdk-java",
+      "templateURL": "apigw-lambda-bedrock-cdk-java",
       "projectFolder": "apigw-lambda-bedrock-cdk-java",
       "templateFile": "apigw-lambda-bedrock-cdk-java/template.yaml"
     }
