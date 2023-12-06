@@ -1,0 +1,30 @@
+[package]
+name = "ddb-api-sample"
+version = "0.1.0"
+edition = "2021"
+authors = ["Benjamen Pyle <ben@binaryheap.com>"]
+
+[package.metadata.lambda.env]
+TABLE_NAME = "ddb-api-sample-DynamoDBTable-9VQJ4NVTZL9N"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+aws-config = { features = ["behavior-version-latest"], version = "1.0.1" }
+aws-sdk-dynamodb = "1.2.0"
+serde_dynamo = { version = "4", features = ["aws-sdk-dynamodb+1"] }
+serde_json = "1"
+aws_lambda_events = { version = "0.8.3", default-features = false, features = [
+    "apigw",
+] }
+lambda_runtime = "0.6.0"
+serde = "1.0.136"
+tokio = { version = "1", features = ["macros"] }
+tracing = { version = "0.1", features = ["log"] }
+tracing-subscriber = { version = "0.3", default-features = false, features = [
+    "fmt",
+    "json",
+] }
+thiserror = "1.0.50"
+display_json = "0.2.1"
