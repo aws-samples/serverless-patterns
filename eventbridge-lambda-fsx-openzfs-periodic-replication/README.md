@@ -1,6 +1,6 @@
 Amazon EventBridge to trigger AWS Lambda function to replicate FSx-OpenZFS volumes across file systems
 
-The AWS SAM template deploys an Amazon EventBridge rule to trigger an AWS Lambda function based on a user schedule to copy the snapshot of the volume and copy them to the target FSx system.
+The AWS SAM template deploys an Amazon EventBridge Scheduler to trigger an AWS Lambda function based on a user schedule to copy the snapshot of the volume and copy them to the target FSx system.
 
 The template contains a sample Lambda function that receives the user input for source and target VolumeId. The Lambda function creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region. Notify users using a SNS topic for any errors and snapshot creation details.
 
@@ -50,7 +50,7 @@ Important: this application uses various AWS services and there are costs associ
 
 This pattern sets up the following resources:
 
-- An Amazon EventBridge rule that triggers a Lambda function based on the schedule defined by the customer to take create snapshots of the provided FSx VolumeID.
+- An Amazon EventBridge Scheduler that triggers a Lambda function based on the schedule defined by the customer to take create snapshots of the provided FSx VolumeID.
 - A sample [Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) function that creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region (https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/custom-snapshot-schedule.html).
 - The function also deletes the older snapshots based on the retaintion period configured.
 - An SNS topic that notifies for any failures while creating snapshots.
@@ -58,7 +58,7 @@ This pattern sets up the following resources:
 
 ## Testing
 
-1. In the Outputs tab of the AWS CloudFormation console, note the `SNSTopic` , `EventBridgeRule` , `LambdaExecutionRole`, `LambdaFunction` outputs. Kindly provide all the requested details.
+1. In the Outputs tab of the AWS CloudFormation console, note the `SNSTopic` , `EventBridgeScheduler` , `EventBridgeSchedulerRole` , `LambdaExecutionRole`, `LambdaFunction` outputs. Kindly provide all the requested details.
 2. Based on the provided schedule, monitor the CloudWatch logs and the FSx snapshots that are created. 
 3. The Lambda will automatically send notifications for any kinds of failures within the API calls to the configured email ID.
 
