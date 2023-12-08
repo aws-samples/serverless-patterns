@@ -160,6 +160,20 @@ const main = async () => {
           labels: ['valid-example-pattern-file'],
         });
 
+
+        console.log('Create a comment')
+        console.log(process.env)
+        await octokit.rest.issues.createComment({
+          owner,
+          repo,
+          issue_number: process.env.PR_NUMBER,
+          body:
+            `Valid pattern file found. \n\n` +
+            `Reviewer you can view the pattern file here: https://beta.serverlessland.com/patterns/pattern-example?repo=XXX&pattern=${JSON.stringify(parsedJSON)} \n\n`
+        });
+
+
+
         try {
           // try and remove labels if they are there, will error if not, but that's OK.
           await octokit.rest.issues.removeLabel({

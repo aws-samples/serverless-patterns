@@ -33,7 +33,7 @@ jobs:
           echo "::set-output name=FORK_REPO_URL::$FORK_REPO_URL"  
       # Use the fork repo URL in subsequent steps
       - name: Use Fork Repo URL
-        run: echo "The Fork Repo URL is ${{ steps.get-fork-url.outputs.FORK_REPO_URL }}"    
+        run: echo "The Fork Repo URL is ${{ steps.get-fork-url.outputs.FORK_REPO_URL }}"      
       - name: Extract PR details
         id: extract_PR_details
         uses: actions/github-script@v6
