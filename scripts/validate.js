@@ -153,6 +153,7 @@ const main = async () => {
       console.info('Errors found: Added comments back to the pull request requesting changes');
     } else {
       if (githubAutomation) {
+        console.log('Create a comment')
         await octokit.rest.issues.addLabels({
           owner,
           repo,
@@ -169,7 +170,7 @@ const main = async () => {
           issue_number: process.env.PR_NUMBER,
           body:
             `Valid pattern file found. \n\n` +
-            `Reviewer you can view the pattern file here: https://beta.serverlessland.com/patterns/pattern-example?repo=XXX&pattern=${JSON.stringify(parsedJSON)} \n\n`
+            `Reviewer you can view the [pattern file here](https://beta.serverlessland.com/patterns/pattern-example?repo=XXX&pattern=${Buffer.from(JSON.stringify(parsedJSON)).toString('base64')}) \n\n`
         });
 
 
