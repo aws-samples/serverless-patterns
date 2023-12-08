@@ -176,7 +176,7 @@ const main = async () => {
           issue_number: process.env.PR_NUMBER,
           body:
             `Valid pattern file found. \n\n` +
-            `Reviewer you can view the [pattern file here](https://beta.serverlessland.com/patterns/sandbox?repo=${forkURL}&pattern=${encodeURIComponent(JSON.stringify(parsedJSON))}) \n\n`,
+            `Reviewer you can view the [pattern file here](https://beta.serverlessland.com/patterns/sandbox?repo=${encodeURIComponent(forkURL)}&pattern=${encodeURIComponent(JSON.stringify(parsedJSON))}) \n\n`,
         });
 
         try {
