@@ -160,6 +160,9 @@ const main = async () => {
           labels: ['valid-example-pattern-file'],
         });
 
+
+        console.log('Create a comment')
+        console.log(process.env)
         await octokit.rest.issues.createComment({
           owner,
           repo,
