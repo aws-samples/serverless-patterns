@@ -1,0 +1,157 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - REST API Edge-Optimized with Lambda proxy integration
+
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole   
+      Policies:
+        - PolicyName: AllowLogsAPIGWDynamo
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - logs:*
+              Resource: arn:aws:logs:*:*:*
+            - Effect: Allow
+              Action:
+              - dynamodb:GetItem
+              - dynamodb:UpdateItem
+              - dynamodb:PutItem
+              - dynamodb:DeleteItem
+              Resource: "*"
+  #Lambda function
+  LambdaFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaRole.Arn
+      InlineCode: |
+        import json
+        import boto3
+        dynamodb = boto3.resource('dynamodb')
+
+        table = dynamodb.Table('my-table')
+            
+        def lambda_handler(event, context):
+            # TODO implement
+            print('event ' , json.dumps(event))
+            
+
+            method = event['httpMethod']
+            para = event['pathParameters']
+            
+            if method == "DELETE":
+                return handle_delete(para)
+            elif method == 'POST':  
+                return handle_post(para,event['body'])
+            elif method == 'GET':
+                return handle_get(para)
+            else:
+                return "Invalid method", 405
+            
+        def handle_delete(para):
+          table.delete_item(
+            Key={'ID':para['ID']}
+          )
+          return {
+            'statusCode': 200,
+            'body': 'Item deleted'
+          }
+            
+        def handle_post(para, body):
+          body = json.loads(body) 
+            # print('here', body['Name'], body['Description'])
+          table.update_item(
+            Key={"ID":para['ID']},
+            UpdateExpression="SET ProductName = :n, Description = :p",
+            ExpressionAttributeValues={":n": body['ProductName'], ":p": body['Description']}
+          )
+          return {
+          'statusCode': 200,
+          'body': 'Item updated'
+          }
+                
+        def handle_get(para):
+          response = table.get_item(
+          Key={'ID':para['ID']}
+          )
+          return {
+          'statusCode': 200,
+          'body': json.dumps(response)
+          }
+      Runtime: python3.11
+      Events:
+        GETAPI:
+          Type: Api 
+          Properties: 
+            Path: /my-resource/{ID}
+            Method: GET
+            RestApiId:
+              Ref: MyAPI
+        POSTAPI:
+          Type: Api 
+          Properties: 
+            Path: /my-resource/{ID}
+            Method: POST
+            RestApiId:
+              Ref: MyAPI
+        DELETEAPI:
+          Type: Api 
+          Properties: 
+            Path: /my-resource/{ID}
+            Method: DELETE
+            RestApiId:
+              Ref: MyAPI
+        ANYAPI:
+          Type: Api 
+          Properties: 
+            Path: /
+            Method: ANY
+            RestApiId:
+              Ref: MyAPI
+
+  #Edge-optimized API
+  MyAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+
+  DynamoDBTable: 
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: my-table
+      AttributeDefinitions:
+        - AttributeName: ID 
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ID
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+    
+
+#API endpoint
+Outputs:
+  EndpointUrl:
+    Description: 'REST URL'
+    Value: !Sub 'https://${MyAPI}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  DynamoTable:
+    Description: 'DynamoDB Table'
+    Value: !GetAtt  DynamoDBTable.Arn
+  LambdaFunction:
+    Description: 'Lambda Function'
+    Value: !GetAtt  LambdaFunction.Arn
+  IAMRole:
+    Description: 'Lambda Role'
+    Value: !GetAtt  LambdaRole.Arn
