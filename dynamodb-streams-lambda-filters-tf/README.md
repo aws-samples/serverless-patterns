@@ -1,8 +1,8 @@
 # DynamoDB Stream to AWS Lambda with Filters 
 
-This pattern demonstrates how to lambda functions that can recieve DynamoDB Stream with filters. The IaC has been definied in Terraform. 
+This pattern demonstrates how to Lambda functions that be trigger by DynamoDB streams based on filters. The IaC has been definied in Terraform. 
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-streams-lambda-filters-tf
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -40,7 +40,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-DynamoDB Streams trigger Lambda Function based on filter. The stack has one DynamoDB Table with 4 Lambda with selective filters,
+A DynamoDB stream triggers different Lambda functions based on a filter. The stack has one DynamoDB table with 4 functions with selective filters:
+
 1. Bachelors Lambda (process-bachelors-request) - Triggers for every insert of Bachelors Record
 2. Masters Lambda (process-masters-requests) - Triggers for every insert of Masters Record
 3. Modify Lambda (process-modify-request) - Triggers for any updates
