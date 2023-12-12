@@ -230,33 +230,6 @@ Resources:
       Description: Prod Stage
       DeploymentId: !Ref Deployment
       ApiId: !Ref WebSocketApi
-  # # API Key    
-  # ApiKey:
-  #   Type: 'AWS::ApiGateway::ApiKey'
-  #   DependsOn:
-  #     - Deployment
-  #   Properties:
-  #     Enabled: true
-  # UsagePlan:
-  #   Type: 'AWS::ApiGateway::UsagePlan'
-  #   DependsOn:
-  #     - Deployment
-  #   Properties:
-  #     ApiStages:
-  #       - ApiId: !Ref WebSocketApi
-  #         Stage: !Ref Stage
-  #     Throttle:
-  #       RateLimit: 500
-  #       BurstLimit: 1000
-  #     Quota:
-  #       Limit: 10000
-  #       Period: MONTH
-  # UsagePlanKey:
-  #   Type: 'AWS::ApiGateway::UsagePlanKey'
-  #   Properties:
-  #     KeyType: API_KEY
-  #     KeyId: !Ref ApiKey
-  #     UsagePlanId: !Ref UsagePlan
   # Boto3 version with Bedrock support
   BedrockBoto3Bucket:
     Type: AWS::S3::Bucket
@@ -309,6 +282,3 @@ Outputs:
   WebSocketConnectionsTableNameArn:
     Description: "WebSocket connections table ARN"
     Value: !GetAtt WebSocketConnectionsTableName.Arn
-  # ApiKeyId:
-  #   Description: "API Key Id"
-  #   Value: !Ref ApiKey
