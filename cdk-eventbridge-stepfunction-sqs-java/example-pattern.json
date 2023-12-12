@@ -1,6 +1,6 @@
 {
     "title": "EventBridge to Step Functions with SQS failure",
-    "description": "Create a Step Functions workflow to Send Failure event to SQS for operational needs.",
+    "description": "This pattern creates a Step Functions workflow to send failure events to SQS",
     "language": "Java",
     "level": "200",
     "framework": "CDK",
