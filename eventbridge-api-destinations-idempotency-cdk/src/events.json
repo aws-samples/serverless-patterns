@@ -1,0 +1,8 @@
+[
+  {
+    "Source": "http.idempotency.demo.app",
+    "Detail": "{\"customID\":\"e9bf3c4d-638c-4fb3-898b-1ac6c1988000\",\"message\":\"hello world!\"}",
+    "DetailType": "http.idempotency.demo.event.v0",
+    "EventBusName": "<INSERT ARN OR NAME FROM CDK DEPLOYMENT>"
+  }
+]
