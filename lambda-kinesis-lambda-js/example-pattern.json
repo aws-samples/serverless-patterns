@@ -7,8 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern talks about how to use Lambda functions with nodejs runtime to push and read records from a Kinesis Data Stream."
-      "This specifically demonstrates the implementation of serverless producer and consumer for a stream."
+      "This pattern talks about how to use Lambda functions with nodejs runtime to push and read records from a Kinesis Data Stream.This specifically demonstrates the implementation of serverless producer and consumer for a stream."
     ]
   },
   "gitHub": {
