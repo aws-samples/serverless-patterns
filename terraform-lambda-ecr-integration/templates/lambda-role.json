@@ -5,8 +5,6 @@
       "Sid": "BasicDescribePolicy",
       "Effect": "Allow",
       "Action": [
-        "cloudwatch:DescribeAlarms",
-        "cloudwatch:PutMetricAlarm",
         "ecr:GetAuthorizationToken",
         "logs:CreateLogGroup",
         "logs:CreateLogStream",
