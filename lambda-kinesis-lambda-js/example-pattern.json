@@ -1,6 +1,6 @@
 {
   "title": "Lambda to Kinesis Data Stream to Kinesis using SAM",
-  "description": "This sample project creates a REST API with Lambda proxy integration that invokes Bedrock-runtime API for text generation.",
+  "description": "A demonstration of serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream.",
   "language": "Node.js",
   "level": "200",
   "framework": "SAM",
