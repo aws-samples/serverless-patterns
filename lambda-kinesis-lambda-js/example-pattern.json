@@ -1,5 +1,5 @@
 {
-  "title": "Lambda to Kinesis Data Stream to Kinesis using SAM",
+  "title": "Lambda to Kinesis Data Stream to Lambda with JS and SAM",
   "description": "A demonstration of serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream.",
   "language": "Node.js",
   "level": "200",
