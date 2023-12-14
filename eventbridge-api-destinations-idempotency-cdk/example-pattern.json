@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern describe how to use EventBridge API Destinations with the IETF HTTP Idempotency-Key header to invoke HTTP APIs supporting idempotent API operations.",
+      "This pattern describes how to use EventBridge API Destinations with the IETF HTTP Idempotency-Key header to invoke HTTP APIs supporting idempotent API operations.",
       "Using API destinations, you can route events between AWS services, integrated software as a service (SaaS) applications, and your applications outside of AWS by using API calls."
     ]
   },
