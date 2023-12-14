@@ -1,5 +1,5 @@
 {
-	"title": "Integrate Amazon ECR and AWS Lambda",
+	"title": "Integrate AWS Lambda with Amazon Elastic Container Service",
 	"description": "Terraform IaC template to provision Amazon Elastic Container Registry (ECR) resources to integrate with AWS Lambda.",
 	"language": "",
 	"level": "200",
