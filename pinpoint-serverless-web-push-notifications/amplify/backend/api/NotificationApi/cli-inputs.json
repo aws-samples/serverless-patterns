@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "paths": {
+    "/updateToken": {
+      "name": "/updateToken",
+      "lambdaFunction": "UpdateToken",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/sendNotification": {
+      "name": "/sendNotification",
+      "lambdaFunction": "SendNotification",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

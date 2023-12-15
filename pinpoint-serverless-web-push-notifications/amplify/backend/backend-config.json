@@ -1,0 +1,190 @@
+{
+  "analytics": {
+    "pinpointpushnotifica": {
+      "providerPlugin": "awscloudformation",
+      "service": "Pinpoint"
+    }
+  },
+  "api": {
+    "NotificationApi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "UpdateToken"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "SendNotification"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "auth": {
+    "pinpointpushnotifica5ca148ec": {
+      "customAuth": false,
+      "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito"
+    }
+  },
+  "function": {
+    "SendNotification": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "user"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "UpdateToken": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "user"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "notifications": {
+    "pinpointpushnotifica": {
+      "channels": [
+        "FCM"
+      ],
+      "service": "Pinpoint"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_analytics_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_function_SendNotification_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "SendNotification"
+        }
+      ]
+    },
+    "AMPLIFY_function_SendNotification_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "SendNotification"
+        }
+      ]
+    },
+    "AMPLIFY_function_UpdateToken_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "UpdateToken"
+        }
+      ]
+    },
+    "AMPLIFY_function_UpdateToken_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "UpdateToken"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "user": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
+    }
+  }
+}

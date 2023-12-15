@@ -1,0 +1,18 @@
+[
+  {
+    "Action": [
+      "dynamodb:GetItem"
+    ],
+    "Resource": [
+      "*"
+    ]
+  },
+  {
+    "Action": [
+      "mobiletargeting:SendMessages"
+    ],
+    "Resource": [
+      "*"
+    ]
+  }
+]

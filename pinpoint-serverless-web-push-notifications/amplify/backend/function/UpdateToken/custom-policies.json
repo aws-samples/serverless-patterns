@@ -1,0 +1,10 @@
+[
+  {
+    "Action": [
+      "dynamodb:PutItem"
+    ],
+    "Resource": [
+      "*"
+    ]
+  }
+]

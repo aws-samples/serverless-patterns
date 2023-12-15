@@ -1,0 +1,92 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-pinpointpushnotifica-dev-134543-authRole",
+      "UnauthRoleArn": "arn:aws:iam::895020454477:role/amplify-pinpointpushnotifica-dev-134543-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::895020454477:role/amplify-pinpointpushnotifica-dev-134543-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-pinpointpushnotifica-dev-134543-deployment",
+      "UnauthRoleName": "amplify-pinpointpushnotifica-dev-134543-unauthRole",
+      "StackName": "amplify-pinpointpushnotifica-dev-134543",
+      "StackId": "arn:aws:cloudformation:us-east-1:895020454477:stack/amplify-pinpointpushnotifica-dev-134543/d69a6f10-6794-11ee-adda-0a9a1e37a747",
+      "AmplifyAppId": "d1g6vs7zzmy3zy"
+    },
+    "categories": {
+      "auth": {
+        "pinpointpushnotifica5ca148ec": {}
+      },
+      "function": {
+        "device": {},
+        "UpdateToken": {},
+        "SendNotification": {}
+      },
+      "storage": {
+        "device": {}
+      },
+      "analytics": {
+        "pinpointpushnotifica": {},
+        "Pinpoint": {
+          "Name": "pinpointpushnotifica-dev",
+          "Id": "b23e3c7555fc499e810804edf2dfac56",
+          "Region": "us-east-1"
+        }
+      },
+      "notifications": {
+        "Pinpoint": {
+          "Name": "pinpointpushnotifica-dev",
+          "Id": "b23e3c7555fc499e810804edf2dfac56",
+          "Region": "us-east-1"
+        }
+      }
+    }
+  },
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-pinpointpushnotifica-prod-140750-authRole",
+      "UnauthRoleArn": "arn:aws:iam::895020454477:role/amplify-pinpointpushnotifica-prod-140750-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::895020454477:role/amplify-pinpointpushnotifica-prod-140750-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-pinpointpushnotifica-prod-140750-deployment",
+      "UnauthRoleName": "amplify-pinpointpushnotifica-prod-140750-unauthRole",
+      "StackName": "amplify-pinpointpushnotifica-prod-140750",
+      "StackId": "arn:aws:cloudformation:us-east-1:895020454477:stack/amplify-pinpointpushnotifica-prod-140750/ed84cc90-6797-11ee-8bed-0a3a8034cacf",
+      "AmplifyAppId": "d1g6vs7zzmy3zy"
+    },
+    "categories": {
+      "auth": {
+        "pinpointpushnotifica5ca148ec": {}
+      },
+      "analytics": {
+        "pinpointpushnotifica": {},
+        "Pinpoint": {
+          "Name": "pinpointpushnotifica-prod",
+          "Id": "6a3dc2995321464e931eb51a139b5ee4",
+          "Region": "us-east-1"
+        }
+      },
+      "function": {
+        "SendNotification": {
+          "deploymentBucketName": "amplify-pinpointpushnotifica-prod-140750-deployment",
+          "s3Key": "amplify-builds/SendNotification-55696551315732636232-build.zip"
+        },
+        "UpdateToken": {
+          "deploymentBucketName": "amplify-pinpointpushnotifica-prod-140750-deployment",
+          "s3Key": "amplify-builds/UpdateToken-6f56514f74546853692b-build.zip"
+        }
+      },
+      "notifications": {
+        "Pinpoint": {
+          "Name": "pinpointpushnotifica-prod",
+          "Id": "6a3dc2995321464e931eb51a139b5ee4",
+          "Region": "us-east-1"
+        }
+      },
+      "api": {
+        "NotificationApi": {}
+      },
+      "storage": {
+        "user": {}
+      }
+    }
+  }
+}
