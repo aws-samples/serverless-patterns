@@ -44,7 +44,7 @@ def create_scheduler(formatted_expirationDate, lambda_target_template):
         print(res)
     except Exception as e:
         print(e)
-        print("Error in creating scheduler")
+        print("Error in creating eventbridge scheduler")
         raise e  
      
 def lambda_handler(event, context):
