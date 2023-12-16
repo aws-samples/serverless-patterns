@@ -37,7 +37,7 @@ def create_scheduler(formatted_expirationDate, lambda_target_template):
             Name='pipeline_approval_reminder',
             Description='Pipeline Approval Reminder',
             FlexibleTimeWindow={'Mode': 'OFF'},
-            ScheduleExpression='at({0})'.format((formatted_expirationDate - timedelta(days=6, hours=12)).strftime("%Y-%m-%dT%H:%M:%S")),
+            ScheduleExpression='at({0})'.format((formatted_expirationDate - timedelta(days=6, hours=18)).strftime("%Y-%m-%dT%H:%M:%S")),
             Target=lambda_target_template,
             ActionAfterCompletion = 'DELETE',
         )

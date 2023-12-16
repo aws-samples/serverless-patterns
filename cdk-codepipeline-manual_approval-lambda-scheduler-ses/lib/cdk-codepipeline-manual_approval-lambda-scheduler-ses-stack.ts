@@ -40,7 +40,7 @@ export class CdkCodepipelineManualApprovalLambdaSchedulerSesStack extends cdk.St
       assumedBy: new iam.ServicePrincipal('scheduler.amazonaws.com')
     });
 
-    const triggerfn = new lambda.Function(this, 'TriggerFunction', {
+    const triggerfn = new lambda.Function(this, 'ReminderFunction', {
       runtime: lambda.Runtime.PYTHON_3_11,
       handler: 'trigger_function.lambda_handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../trigger_function')),
