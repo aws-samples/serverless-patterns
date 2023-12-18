@@ -59,7 +59,7 @@
             "x": 20,
             "y": 40,
             "service": "apigw",
-            "label": "API Gateway REST API"
+            "label": "API Gateway WebSocket API"
         },
         "icon2": {
             "x": 50,
