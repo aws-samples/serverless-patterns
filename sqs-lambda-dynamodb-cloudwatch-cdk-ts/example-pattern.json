@@ -1,7 +1,7 @@
 {
   "title": "Amazon SQS to AWS Lambda to Amazon DynamoDB with CloudWatch Alarms",
   "description": "Preventing Amazon DynamoDB write throttling with an Amazon SQS queue-based buffer using CDK and monitoring with CloudWatch alarms.",
-  "language": "Typescript/Javascript",
+  "language": "Typescript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-dynamodb-cloudwatch-cdk-ts",
       "templateURL": "serverless-patterns/sqs-lambda-dynamodb-cloudwatch-cdk-ts",
       "projectFolder": "sqs-lambda-dynamodb-cloudwatch-cdk-ts",
-      "templateFile": "sqs-lambda-dynamodb-cloudwatch-cdk-ts/lib/sqs-lambda-dynamo-stack.ts"
+      "templateFile": "lib/sqs-lambda-dynamo-stack.ts"
     }
   },
   "resources": {
@@ -44,13 +44,13 @@
   "authors": [
     {
       "name": "Andrei Stan",
-      "bio": "Cloud Application Developer working at AWS.",
-      "linkedin": "https://www.linkedin.com/in/astan54321/"
+      "bio": "Cloud Application Developer, AWS.",
+      "linkedin": "astan54321"
     },
     {
       "name": "Willes Mendoza",
-      "bio": "Cloud Application Developer working at AWS.",
-      "linkedin": "https://www.linkedin.com/in/willesfmendoza/"
+      "bio": "Cloud Application Developer, AWS.",
+      "linkedin": "willesfmendoza"
     }
   ]
 }
