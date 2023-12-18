@@ -1,4 +1,4 @@
-# Text generation via ApiGateway -> Lambda -> Bedrock
+# Image generation via ApiGateway -> Lambda -> Bedrock -> S3
 
 ![architecture](architecture/architecture.png)
 
