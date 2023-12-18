@@ -3,11 +3,11 @@ import os
 
 import aws_cdk as cdk
 
-from apigw_lambda_bedrock.apigw_lambda_bedrock_stack import ApigwLambdaBedrockStack
+from apigw_lambda_bedrock.apigw_lambda_bedrock_s3_stack import ApigwLambdaBedrockS3Stack
 
 
 app = cdk.App()
-ApigwLambdaBedrockStack(app, "ApigwLambdaBedrockStack",
+ApigwLambdaBedrockS3Stack(app, "ApigwLambdaBedrockS3Stack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.

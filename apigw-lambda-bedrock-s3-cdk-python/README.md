@@ -82,13 +82,12 @@ You must request access to a model before you can use it. If you try to use the 
 
 ## How it works
 
-CDK will create an Api Gateway, along with a resource and a POST method. There's a AWS Lambda function that will be taking the prompt and invoking an Amazon Bedrock model (anthropic.claude-v2) synchronously. If you wish to try other models, make sure to modify the policy attached to the Lambda function and invoke the right model. 
+CDK will create an Api Gateway, along with a resource and a POST method. There's a AWS Lambda function that will be taking the prompt and invoking an Amazon Bedrock synchronously. 
 
-This pattern is a synchronous pattern. For an asynchronous approach, please check [this](../apigw-rest-api-sqs-lambda-bedrock-cdk) pattern that involves the usage of Amazon SQS.
 
 ## Testing
 
-We'll be making requests to the  *image_gen* endpoint with a desired prompt.
+We'll be making requests to the *image_gen* endpoint with a desired prompt.
 
 Follow the example below and replace `{your-api-url}` with your api url from step 8. 
 
@@ -96,9 +95,15 @@ Follow the example below and replace `{your-api-url}` with your api url from ste
     curl -X POST \
     {your-api-url}/text_gen \
     -H "Content-Type: application/json" \
-    -d '{"prompt": "Write an email to my department announcing I will lead a gen-ai workshop with Amazon Bedrock"}'
+    -d '{"prompt": "Rusted oil pipeline weathered, damaged, old"}'
     ```
 
+## Review results
+
+Go to Amazon S3, and navigate to the S3 bucket. It will have a name similar to 'apigwlambdabedrockstack-mybucket...'. In the directory `\tmp\` you should see `image-{num}.png`. 
+
+Here is an example generated image:
+![Generated image of rusted oil pipeline](example/image-212.png)
 
 ## Cleanup
  

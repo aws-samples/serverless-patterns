@@ -45,7 +45,7 @@ def upload_file_s3(file_name, bucket):
     response = s3_client.upload_file(file_name, bucket, object_name)
     return response
 
-# save base64 string as png
+# save base64 string as png with random name
 def save_base64_as_png(base64_string):
     imgdata = base64.b64decode(base64_string)
     image = Image.open(io.BytesIO(imgdata))
@@ -76,7 +76,7 @@ def handler(event, context):
     }
 
 if __name__ == '__main__':
-    payload = create_payload_im('Offshore windturbine with rust')
+    payload = create_payload_im('Oil pipeline with slight rust')
     response = invoke_endpoint_br(payload)
-    print(save_base64_as_png(response["artifacts"][0]["base64"]))
-    print('hello')
+    file_name = save_base64_as_png(response["artifacts"][0]["base64"])
+

@@ -9,7 +9,7 @@ from aws_cdk import (
 )
 from constructs import Construct
 
-class ApigwLambdaBedrockStack(Stack):
+class ApigwLambdaBedrockS3Stack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -33,9 +33,10 @@ class ApigwLambdaBedrockStack(Stack):
         #create S3 bucket to store images
         my_bucket = s3.Bucket(
             self, 
-            "MyBucket",
+            "ImageBucket",
             versioned=True,
-            removal_policy=RemovalPolicy.DESTROY # This will delete the bucket on stack deletion
+            removal_policy=RemovalPolicy.DESTROY,
+             auto_delete_objects=True # This will delete the bucket on stack deletion
             )
         
         PIL_layer = _lambda.LayerVersion.from_layer_version_arn(self, "PIL_Layer",'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p311-Pillow:2')
@@ -58,5 +59,5 @@ class ApigwLambdaBedrockStack(Stack):
         api = apigw.RestApi(self, "ServerlessLandGenAI",)
 
         #create a new resource
-        text_gen_resource = api.root.add_resource("text_gen")
-        text_gen_resource.add_method("POST", apigw.LambdaIntegration(lambda_function))
+        image_gen_resource = api.root.add_resource("image_gen")
+        image_gen_resource.add_method("POST", apigw.LambdaIntegration(lambda_function))
