@@ -2,7 +2,7 @@
 
 ![architecture](architecture/architecture.png)
 
-This pattern demonstrates how to generate images using a serverless workflow to generate images using Amazon Bedrock (Stable Diffusion XL) and save the images to S3. The pattern has a default prompt to generate images of an rusted oil pipeline as pictured below.
+This pattern demonstrates how to generate images using a serverless workflow using Amazon Bedrock (Stable Diffusion XL) and save the images to S3. The pattern has a default prompt to generate images of an rusted oil pipeline as pictured below.
 
 Note: this pattern includes a layer with a custom version of boto3. Using an outdated boto3 version will result in an ["unknown service error"](https://repost.aws/knowledge-center/lambda-python-runtime-errors)
 Note: this patten also incldues a custom layer for Pillow
