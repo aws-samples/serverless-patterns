@@ -48,7 +48,7 @@ Now, we can directly integrate DynamoDB streams with AWS Step Functions without 
 
 ## Testing
 
-1. Stream logs from StepFunctions LogGroup
+1. Stream logs from the Step Functions log group
 
 ```
 sam logs --cw-log-group <LogGroup Name> --tail
