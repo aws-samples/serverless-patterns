@@ -63,7 +63,7 @@ aws dynamodb put-item \
     --item PlayerName={S="Lionel Messi"},Nationality={S="Argentina"},GoalsScored={S="1"}
 ```
 
-Step Function should be invoked and you should see the logs for the new execution.
+The Step Functions workflow should be invoked and you should see the logs for the new execution.
 
 Now add an item to the DynamoDB stream which doesn't match the filter.
 ```bash
