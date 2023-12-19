@@ -72,7 +72,7 @@ aws dynamodb put-item \
     --item PlayerName={S="Sergy Gnabry"},Nationality={S="Germany"},GoalsScored={S="1"}
 ```
 
-Step Function should not be invoked and you should not see any new logs.
+No Step Function workflow should be invoked and you should not see any new logs.
 
 ## Cleanup
  
