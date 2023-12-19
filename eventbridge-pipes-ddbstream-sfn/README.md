@@ -1,6 +1,6 @@
 # DynamoDB Stream to Step Functions with EventBridge Pipes
 
-This pattern shows how to use EventBridge Pipes to launch a StepFunctions state machine with a message coming from DynamoDB Stream
+This pattern shows how to use Amazon EventBridge Pipes to launch a AWS Step Functions state machine with a message coming from an Amazon DynamoDB stream
 
 ![Pipes diagram](./ArchDiagram.png)
 
