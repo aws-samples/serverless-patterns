@@ -55,8 +55,9 @@
     },
     {
       "name": "Sid Vantair",
-      "bio": "Solutions Architect @ Amazon Web Services",
-      "linkedin": "sidvantair"
+      "image": "https://d2908q01vomqb2.cloudfront.net/887309d048beef83ad3eabf2a79a64a389ab1c9f/2023/02/08/Sid-Vintair.jpg",
+      "bio": "I am a Solutions Architect with AWS and enjoy resolving technical issues to overcome customer hurdles.",
+      "linkedin": "sidvantair",
     },
     {
       "name": "Sachin Holla",
