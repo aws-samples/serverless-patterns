@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM template to build and maintain the following 
+  1/ Step Function to process a recorded audio file
+  2/ S3 Buckets for hosting the audio files as well as transcription output  
+
+Parameters:
+  EmailAddress:
+    Type: String
+    Default: "placeholder-email-address"
+
+Resources:
+  VoiceProcessingStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/state_machine.asl.json
+      DefinitionSubstitutions:
+        OutputBucketName: !Ref S3OutputBucket
+        EmailIdentityName: !Sub '${EmailAddress}'
+        SNSTopicARN: !Ref SNSTopic
+      Events:
+        StateChange:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: default
+            Pattern:
+              source:
+                - aws.s3
+              detail-type:
+                - Object Created
+              detail:
+                bucket:
+                  name:
+                    - !Ref S3HostingBucket
+      Policies:
+        - CloudWatchPutMetricPolicy: {}
+        - SNSPublishMessagePolicy: 
+            TopicName: !GetAtt SNSTopic.TopicName
+        - SESCrudPolicy:
+            IdentityName: !Sub '${EmailAddress}'
+        - Statement:
+          - Sid: S3AccessPolicy
+            Effect: Allow
+            Action: [
+                     "s3:Get*",
+                     "s3:PutObject"
+                    ]
+            Resource: '*'
+          - Sid: TranscribeAllPolicy
+            Effect: Allow
+            Action: [
+                     "transcribe:StartTranscriptionJob",
+                     "transcribe:GetTranscriptionJob"
+                    ]
+            Resource: '*'
+          - Sid: GetSecretsPolicy
+            Effect: Allow
+            Action: "secretsmanager:GetSecretValue"
+            Resource: !Sub 'arn:aws:secretsmanager:*:${AWS::AccountId}:secret:*'
+          - Sid: ComprehendPolicy
+            Effect: Allow
+            Action: [
+                      "comprehend:BatchDetectKeyPhrases",
+                      "comprehend:DetectDominantLanguage",
+                      "comprehend:DetectEntities",
+                      "comprehend:BatchDetectEntities",
+                      "comprehend:DetectKeyPhrases",
+                      "comprehend:DetectSentiment",
+                      "comprehend:BatchDetectDominantLanguage",
+                      "comprehend:BatchDetectSentiment"
+                    ]
+            Resource: '*'
+          
+  S3HostingBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+      
+  S3OutputBucket:
+    Type: AWS::S3::Bucket
+
+  SNSTopic:
+    Type: AWS::SNS::Topic
+
+Outputs:
+  VoiceProcessingStateMachineArn:
+    Description: "Voice Processing State Machine ARN"
+    Value: !Ref VoiceProcessingStateMachine
+  S3HostingBucketArn:
+    Description: "S3 Hosting bucket ARN"
+    Value: !GetAtt S3HostingBucket.Arn
+  S3OutputBucketArn:
+    Description: "S3 Output bucket ARN"
+    Value: !GetAtt S3OutputBucket.Arn
+  SNSTopicArn:
+    Description: "SNS Topic ARN"
+    Value: !Ref SNSTopic

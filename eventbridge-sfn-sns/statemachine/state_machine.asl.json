@@ -1,0 +1,174 @@
+{
+  "Comment": "State Machine to transcribe voice calls into sentiment and drive notification processing.",
+  "StartAt": "Append Output Bucket Name",
+  "States": {
+    "Append Output Bucket Name": {
+      "Type": "Pass",
+      "Next": "StartTranscriptionJob",
+      "Parameters": {
+        "OutputBucketName": "${OutputBucketName}"
+      },
+      "ResultPath": "$.OutputBucketName"
+    },
+    "StartTranscriptionJob": {
+      "Type": "Task",
+      "Parameters": {
+        "Media": {
+          "MediaFileUri.$": "States.Format('s3://{}/{}', $.detail.bucket.name, $.detail.object.key)"
+        },
+        "LanguageCode": "en-US",
+        "TranscriptionJobName.$": "States.Format('Transcription-Job-For-{}', $.detail.object.sequencer)",
+        "OutputBucketName.$": "$.OutputBucketName.OutputBucketName",
+        "OutputKey.$": "States.Format('Transcription-Output-for-{}.txt', $.detail.object.sequencer)"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:transcribe:startTranscriptionJob",
+      "Next": "Wait for Transcription to complete"
+    },
+    "Wait for Transcription to complete": {
+      "Type": "Wait",
+      "Seconds": 5,
+      "Next": "GetTranscriptionJob"
+    },
+    "GetTranscriptionJob": {
+      "Type": "Task",
+      "Next": "TranscriptionJobStatus",
+      "Parameters": {
+        "TranscriptionJobName.$": "$.TranscriptionJob.TranscriptionJobName"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:transcribe:getTranscriptionJob"
+    },
+    "TranscriptionJobStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.TranscriptionJob.TranscriptionJobStatus",
+          "StringEquals": "COMPLETED",
+          "Next": "Retrieve BucketName & Key"
+        },
+        {
+          "Variable": "$.TranscriptionJob.TranscriptionJobStatus",
+          "StringEquals": "FAILED",
+          "Next": "Fail"
+        }
+      ],
+      "Default": "Wait for Transcription to complete"
+    },
+    "Retrieve BucketName & Key": {
+      "Type": "Pass",
+      "Next": "GetObject",
+      "Parameters": {
+        "BucketName.$": "States.ArrayGetItem(States.StringSplit($.TranscriptionJob.Transcript.TranscriptFileUri, '/'),2)",
+        "TranscriptionOutput.$": "States.ArrayGetItem(States.StringSplit($.TranscriptionJob.Transcript.TranscriptFileUri, '/'),3)"
+      }
+    },
+    "GetObject": {
+      "Type": "Task",
+      "Next": "Retrieve Transcript from Body",
+      "Parameters": {
+        "Bucket.$": "$.BucketName",
+        "Key.$": "$.TranscriptionOutput"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:s3:getObject"
+    },
+    "Retrieve Transcript from Body": {
+      "Type": "Pass",
+      "Next": "Parse Transcript",
+      "Parameters": {
+        "Body.$": "States.StringToJson($.Body)"
+      },
+      "OutputPath": "$.Body.results"
+    },
+    "Parse Transcript": {
+      "Type": "Pass",
+      "Next": "DetectSentiment",
+      "Parameters": {
+        "transcripts.$": "States.Array($.transcripts)"
+      }
+    },
+    "DetectSentiment": {
+      "Type": "Task",
+      "Next": "ProcessSentiment",
+      "Parameters": {
+        "LanguageCode": "en",
+        "Text.$": "$.transcripts"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:comprehend:detectSentiment"
+    },
+    "ProcessSentiment": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "PublishToSNS",
+          "States": {
+            "PublishToSNS": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sns:publish",
+              "Parameters": {
+                "TopicArn": "${SNSTopicARN}",
+                "Message": {
+                  "Message.$": "$.Sentiment"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "CheckSentiment",
+          "States": {
+            "CheckSentiment": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.Sentiment",
+                  "StringEquals": "NEGATIVE",
+                  "Next": "Get Sender Identity"
+                }
+              ],
+              "Default": "EndState"
+            },
+            "Get Sender Identity": {
+              "Type": "Pass",
+              "Next": "SendEmail",
+              "Parameters": {
+                "EmailIdentityName": "${EmailIdentityName}"
+              },
+              "ResultPath": "$.EmailIdentityName"
+            },
+            "SendEmail": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::aws-sdk:ses:sendEmail",
+              "Parameters": {
+                "Destination": {
+                  "ToAddresses.$": "States.Array($.EmailIdentityName.EmailIdentityName)"
+                },
+                "Message": {
+                  "Body": {
+                    "Text": {
+                      "Data.$": "$.Sentiment"
+                    }
+                  },
+                  "Subject": {
+                    "Data": "Sentiment Analysis Result"
+                  }
+                },
+                "Source.$": "$.EmailIdentityName.EmailIdentityName"
+              },
+              "End": true
+            },
+            "EndState": {
+              "Type": "Pass",
+              "End": true
+            }
+          }
+        }
+      ],
+      "End": true
+    },
+    "Fail": {
+      "Type": "Fail",
+      "Error": "FAILED",
+      "Cause": "transcription job failed"
+    }
+  }
+}

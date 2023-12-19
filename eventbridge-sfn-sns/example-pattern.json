@@ -1,0 +1,64 @@
+{
+  "title": "EventBridge tp Step Functions to SNS",
+  "description": "Use EventBridge Rule to trigger a Step Function State Machine and generate system notifications using SNS.",
+  "language": "N/A",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern provides an automated, scalable, and cost-effective solution for processing audio recordings, transcribing spoken words into text, and analyzing the sentiment of the transcription.",
+      "This solution leverages AWS to handle audio files uploaded to an S3 bucket, initiating a state function workflow that transcribes and analyzes the audio and send out notifications via SNS.",
+      "This pattern deploys one Step Function, two S3 Buckets, and one SNS Topic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sfn-sns",
+      "templateURL": "serverless-patterns/eventbridge-sfn-sns",
+      "projectFolder": "eventbridge-sfn-sns",
+      "templateFile": "eventbridge-sfn-sns/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Creating Amazon EventBridge rules that react to events",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-rule.html"
+      },
+      {
+        "text": "Input and Output Processing in Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/concepts-input-output-filtering.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for cleanup instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kaiyin Hu",
+      "linkedin": "kaiyin-h-a6a3392a"
+    },
+    {
+      "name": "Sid Vantair",
+      "linkedin": "sidvantair"
+    },
+    {
+      "name": "Sachin Holla",
+      "linkedin": "sachinholla"
+    }
+  ]
+}
