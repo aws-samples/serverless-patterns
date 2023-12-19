@@ -1,6 +1,6 @@
 {
     "title": "WebSocket API to Lambda to Bedrock with streaming response",
-    "description": "Creates a WebSocket API and Lambda functions that provides a streaming response from the LLMs in Amazon Bedrock.",
+    "description": "Creates an API Gateway WebSocket API and Lambda functions that provides a streaming response from the LLMs in Amazon Bedrock.",
     "language": "Python",
     "level": "200",
     "framework": "SAM",
@@ -8,7 +8,7 @@
       "headline": "How it works",
       "text": [
         "This sample project demonstrates how to use WebSocket API as a front door to Lambda functions that perform inference on Amazon Bedrock LLMs using the [InvokeModelWithResponseStream](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModelWithResponseStream.html) API, where the LLM responses are returned in a stream.",
-        "With WebSockets API, developers of interactive LLM chatbot interfaces can provide a better user experience by displaying the LLM responses as they are generated (which at times can be long), rather than relying on the synchronous [InvokeModel](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html) API request.",
+        "With WebSocket API, developers of interactive LLM chatbot interfaces can provide a better user experience by displaying the LLM responses as they are generated (which at times can be long), rather than relying on the synchronous [InvokeModel](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html) API request.",
         "This pattern deploys one API Gateway WebSocket API, four Lambda functions, and one DynamoDB table."
       ]
     },
