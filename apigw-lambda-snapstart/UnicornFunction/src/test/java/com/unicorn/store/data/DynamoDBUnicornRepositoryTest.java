@@ -12,13 +12,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-import software.amazon.awssdk.http.crt.AwsCrtAsyncHttpClient;
+import software.amazon.awssdk.http.crt.AwsCrtHttpClient;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.net.URI;
 import java.util.Optional;
@@ -42,34 +42,34 @@ class DynamoDBUnicornRepositoryTest {
 
     @BeforeAll
     static void setupAllTests() {
-        unicornAsyncTable().createTable().join();
+        unicornTable().createTable();
     }
 
-    private static DynamoDbAsyncTable<Unicorn> unicornAsyncTable() {
-        DynamoDbAsyncClient dynamoDbAsyncClient = DynamoDbAsyncClient.builder()
+    private static DynamoDbTable<Unicorn> unicornTable() {
+        DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
                 .region(Region.EU_WEST_1)
                 .endpointOverride(URI.create(String.format("http://%s:%d", DYNAMODB_CONTAINER.getHost(), DYNAMODB_CONTAINER.getFirstMappedPort())))
-                .httpClient(AwsCrtAsyncHttpClient.create())
+                .httpClient(AwsCrtHttpClient.create())
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("fakeMyKeyId", "fakeSecretAccessKey")))
                 .build();
-        DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient = DynamoDbEnhancedAsyncClient.builder()
-                .dynamoDbClient(dynamoDbAsyncClient)
+        DynamoDbEnhancedClient dynamoDbEnhancedClient = DynamoDbEnhancedClient.builder()
+                .dynamoDbClient(dynamoDbClient)
                 .build();
-        return dynamoDbEnhancedAsyncClient.table("Unicorn-Local", TableSchema.fromClass(Unicorn.class));
+        return dynamoDbEnhancedClient.table("Unicorn-Local", TableSchema.fromClass(Unicorn.class));
     }
 
     @BeforeEach
     void setup() {
-        this.dynamoDBUnicornRepository = new DynamoDBUnicornRepository(unicornAsyncTable());
+        this.dynamoDBUnicornRepository = new DynamoDBUnicornRepository(unicornTable());
     }
 
     @Test
     @DisplayName("Unicorn is saved to DynamoDB")
     void testSave() {
         Unicorn unicornToSave = createTestUnicorn();
-        assertNull(unicornAsyncTable().getItem(Key.builder().partitionValue(unicornToSave.getId()).build()).join());
+        assertNull(unicornTable().getItem(Key.builder().partitionValue(unicornToSave.getId()).build()));
         Unicorn savedUnicorn = dynamoDBUnicornRepository.save(unicornToSave);
-        assertNotNull(unicornAsyncTable().getItem(Key.builder().partitionValue(unicornToSave.getId()).build()).join());
+        assertNotNull(unicornTable().getItem(Key.builder().partitionValue(unicornToSave.getId()).build()));
         assertEquals(unicornToSave.getId(), savedUnicorn.getId());
         assertEquals(unicornToSave.getName(), savedUnicorn.getName());
         assertEquals(unicornToSave.getAge(), savedUnicorn.getAge());
@@ -81,7 +81,7 @@ class DynamoDBUnicornRepositoryTest {
     @DisplayName("Unicorn is found in DynamoDB")
     void testFindByIdFound() {
         Unicorn existingUnicorn = createTestUnicorn();
-        unicornAsyncTable().putItem(existingUnicorn).join();
+        unicornTable().putItem(existingUnicorn);
 
         Optional<Unicorn> unicornFound = dynamoDBUnicornRepository.findById(existingUnicorn.getId());
         assertTrue(unicornFound.isPresent());
@@ -104,26 +104,26 @@ class DynamoDBUnicornRepositoryTest {
     @DisplayName("Unicorn is not deleted in DynamoDB")
     void testDelete() {
         Unicorn existingUnicorn = createTestUnicorn();
-        unicornAsyncTable().putItem(existingUnicorn).join();
+        unicornTable().putItem(existingUnicorn);
 
-        assertNotNull(unicornAsyncTable().getItem(Key.builder().partitionValue(existingUnicorn.getId()).build()).join());
+        assertNotNull(unicornTable().getItem(Key.builder().partitionValue(existingUnicorn.getId()).build()));
         dynamoDBUnicornRepository.deleteById(existingUnicorn.getId());
-        assertNull(unicornAsyncTable().getItem(Key.builder().partitionValue(existingUnicorn.getId()).build()).join());
+        assertNull(unicornTable().getItem(Key.builder().partitionValue(existingUnicorn.getId()).build()));
     }
 
     @Test
     @DisplayName("Unicorn is updated if found in DynamoDB")
     void testUpdateFound() {
         Unicorn existingUnicorn = createTestUnicorn();
-        unicornAsyncTable().putItem(existingUnicorn).join();
+        unicornTable().putItem(existingUnicorn);
 
-        Unicorn fromDynamoBeforeUpdate = unicornAsyncTable().getItem(Key.builder().partitionValue(existingUnicorn.getId()).build()).join();
+        Unicorn fromDynamoBeforeUpdate = unicornTable().getItem(Key.builder().partitionValue(existingUnicorn.getId()).build());
         assertEquals("Something", fromDynamoBeforeUpdate.getName());
 
         existingUnicorn.setName("Changed Name");
         dynamoDBUnicornRepository.update(existingUnicorn);
 
-        Unicorn fromDynamoAfterUpdate = unicornAsyncTable().getItem(Key.builder().partitionValue(existingUnicorn.getId()).build()).join();
+        Unicorn fromDynamoAfterUpdate = unicornTable().getItem(Key.builder().partitionValue(existingUnicorn.getId()).build());
         assertEquals("Changed Name", fromDynamoAfterUpdate.getName());
     }
 
@@ -131,7 +131,7 @@ class DynamoDBUnicornRepositoryTest {
     @DisplayName("ResourceNotFoundException if Unicorn not found in DynamoDB during Update")
     void testUpdateNotFound() {
         Unicorn unicorn = createTestUnicorn();
-        assertNull(unicornAsyncTable().getItem(Key.builder().partitionValue(unicorn.getId()).build()).join());
+        assertNull(unicornTable().getItem(Key.builder().partitionValue(unicorn.getId()).build()));
         assertThrows(ResourceNotFoundException.class, () -> dynamoDBUnicornRepository.update(unicorn));
     }
 

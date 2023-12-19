@@ -3,7 +3,7 @@ name: New serverless pattern submission
 about: Submit your a new pattern
 title: New pattern submission
 labels: ''
-assignees: jbesw
+assignees: 
 
 ---
 
