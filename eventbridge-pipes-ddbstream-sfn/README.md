@@ -54,7 +54,7 @@ Now, we can directly integrate DynamoDB streams with AWS Step Functions without 
 sam logs --cw-log-group <LogGroup Name> --tail
 ```
 
-2. The Pipe is configured to filter on the NationalTeam value of "Argentina"
+2. The EventBridge Pipe is configured to filter on the NationalTeam value of "Argentina"
 In another terminal, add an item to the DynamoDB stream which does match the filter.
 
 ```bash
