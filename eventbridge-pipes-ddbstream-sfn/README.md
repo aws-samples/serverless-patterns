@@ -40,7 +40,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Previously, whenever we needed DynamoDB Streams to send messages to Step Functions based on changes made to your DynamoDB table, we had to implement a Lambda function in between DynamoDB and Step Functions because DynamoDB streams only supported Lambda as its destination.
+Previously, whenever we needed DynamoDB Streams to send messages to Step Functions based on changes made to your DynamoDB table, we had to implement a Lambda function in between DynamoDB and Step Functions because Amazon DynamoDB streams did not support AWS Step Functions as a target directly.
 
 But at re:Invent 2022, AWS launched a new feature for Amazon EventBridge known as EventBridge Pipes.
 
