@@ -23,13 +23,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-import software.amazon.awssdk.http.crt.AwsCrtAsyncHttpClient;
+import software.amazon.awssdk.http.crt.AwsCrtHttpClient;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.io.IOException;
 import java.net.URI;
@@ -55,7 +55,7 @@ class StoreApplicationTest {
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @Autowired
-    private DynamoDbAsyncTable<Unicorn> dynamoDbAsyncTable;
+    private DynamoDbTable<Unicorn> dynamoDbTable;
 
     @LocalServerPort
     private Integer serverPort;
@@ -65,19 +65,19 @@ class StoreApplicationTest {
     @BeforeEach
     void setup() {
         serverUrl = String.format("http://localhost:%d", serverPort);
-        dynamoDbAsyncTable.createTable().join();
+        dynamoDbTable.createTable();
         Unicorn unicorn = new Unicorn();
         unicorn.setId("123");
         unicorn.setName("Something");
         unicorn.setAge("Older");
         unicorn.setSize("Very big");
         unicorn.setType("Animal");
-        dynamoDbAsyncTable.putItem(unicorn).join();
+        dynamoDbTable.putItem(unicorn);
     }
 
     @AfterEach
     void teardown() {
-        dynamoDbAsyncTable.deleteTable().join();
+        dynamoDbTable.deleteTable();
     }
 
     @Test
@@ -146,7 +146,7 @@ class StoreApplicationTest {
                     "type": "Test Type"
                 }
                 """, savedUnicorn.getId()), response.body(), JSONCompareMode.STRICT);
-        assertNotNull(dynamoDbAsyncTable.getItem(Key.builder().partitionValue(savedUnicorn.getId()).build()));
+        assertNotNull(dynamoDbTable.getItem(Key.builder().partitionValue(savedUnicorn.getId()).build()));
     }
 
     @Test
@@ -175,7 +175,7 @@ class StoreApplicationTest {
                   "type": "Test Type"
                 }
                 """, response.body(), JSONCompareMode.STRICT);
-        Unicorn updatedUnicorn = dynamoDbAsyncTable.getItem(Key.builder().partitionValue("123").build()).join();
+        Unicorn updatedUnicorn = dynamoDbTable.getItem(Key.builder().partitionValue("123").build());
         assertNotNull(updatedUnicorn);
         assertEquals("Test Name", updatedUnicorn.getName());
         assertEquals("Test Age", updatedUnicorn.getAge());
@@ -200,7 +200,7 @@ class StoreApplicationTest {
                 .build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(404, response.statusCode());
-        Unicorn updatedUnicorn = dynamoDbAsyncTable.getItem(Key.builder().partitionValue("123").build()).join();
+        Unicorn updatedUnicorn = dynamoDbTable.getItem(Key.builder().partitionValue("123").build());
         assertNotNull(updatedUnicorn);
         assertEquals("Something", updatedUnicorn.getName());
         assertEquals("Older", updatedUnicorn.getAge());
@@ -211,14 +211,14 @@ class StoreApplicationTest {
     @Test
     @DisplayName("DELETE /unicorns/{unicornId} - 200 Success")
     void testDeleteUnicornSuccess() throws IOException, InterruptedException {
-        assertNotNull(dynamoDbAsyncTable.getItem(Key.builder().partitionValue("123").build()).join());
+        assertNotNull(dynamoDbTable.getItem(Key.builder().partitionValue("123").build()));
         HttpRequest request = HttpRequest.newBuilder()
                 .DELETE()
                 .uri(URI.create(serverUrl.concat("/unicorns/123")))
                 .build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
-        assertNull(dynamoDbAsyncTable.getItem(Key.builder().partitionValue("123").build()).join());
+        assertNull(dynamoDbTable.getItem(Key.builder().partitionValue("123").build()));
     }
 
     @TestConfiguration
@@ -226,18 +226,18 @@ class StoreApplicationTest {
 
         @Bean
         @Primary
-        public DynamoDbAsyncClient dynamoDbAsyncClient() {
-            return DynamoDbAsyncClient.builder()
+        public DynamoDbClient dynamoDbClient() {
+            return DynamoDbClient.builder()
                     .region(Region.EU_WEST_1)
                     .endpointOverride(URI.create(String.format("http://%s:%d", DYNAMODB_CONTAINER.getHost(), DYNAMODB_CONTAINER.getFirstMappedPort())))
-                    .httpClient(AwsCrtAsyncHttpClient.create())
+                    .httpClient(AwsCrtHttpClient.create())
                     .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("fakeMyKeyId", "fakeSecretAccessKey")))
                     .build();
         }
 
         @Bean
         @Primary
-        public DynamoDbAsyncTable<Unicorn> unicornDynamoDbAsyncTable(DynamoDbEnhancedAsyncClient dynamoDbEnhancedClient) {
+        public DynamoDbTable<Unicorn> unicornDynamoDbTable(DynamoDbEnhancedClient dynamoDbEnhancedClient) {
             return dynamoDbEnhancedClient.table("Unicorn-Local", TableSchema.fromClass(Unicorn.class));
         }
     }
