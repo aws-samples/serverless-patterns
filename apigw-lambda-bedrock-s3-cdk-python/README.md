@@ -59,6 +59,10 @@ You must request access to a model before you can use it. If you try to use the 
     ```
     .venv\Scripts\activate.bat
     ```
+    For a OSX / Linux platform, activate the virtualenv like this:
+    ```
+    source .venv/bin/activate
+    ```
 1. Install the Python required dependencies:
     ```
     pip install -r requirements.txt

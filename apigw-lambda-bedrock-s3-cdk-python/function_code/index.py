@@ -39,19 +39,20 @@ def invoke_endpoint_br(payload):
     return response_body
 
 # upload to s3 bucket
-def upload_file_s3(file_name, bucket):
+def upload_file_s3(path,file_name, bucket):
     object_name = file_name
     s3_client = boto3.client('s3')
-    response = s3_client.upload_file(file_name, bucket, object_name)
+    response = s3_client.upload_file(path, bucket, object_name)
     return response
 
 # save base64 string as png with random name
 def save_base64_as_png(base64_string):
     imgdata = base64.b64decode(base64_string)
     image = Image.open(io.BytesIO(imgdata))
-    file_name = '/tmp/image-{num}.png'.format(num=random.randint(0,1000))
-    image.save(file_name)
-    return file_name
+    file_name = 'image-{num}.png'.format(num=random.randint(0,1000))
+    path = '/tmp/'+file_name
+    image.save(path)
+    return path,file_name
 
 def handler(event, context):
 
@@ -64,9 +65,9 @@ def handler(event, context):
 
     response = invoke_endpoint_br(payload)
 
-    file_name = save_base64_as_png(response["artifacts"][0]["base64"])
+    path,file_name = save_base64_as_png(response["artifacts"][0]["base64"])
 
-    upload_file_s3(file_name=file_name,bucket=os.environ['BUCKET'])
+    upload_file_s3(path=path,file_name=file_name,bucket=os.environ['BUCKET'])
 
     return {
         'statusCode': 200,

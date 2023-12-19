@@ -5,7 +5,8 @@ from aws_cdk import (
     Duration,
     aws_apigateway as apigw,
     aws_s3 as s3,
-    RemovalPolicy
+    RemovalPolicy,
+    CfnOutput
 )
 from constructs import Construct
 
@@ -61,3 +62,5 @@ class ApigwLambdaBedrockS3Stack(Stack):
         #create a new resource
         image_gen_resource = api.root.add_resource("image_gen")
         image_gen_resource.add_method("POST", apigw.LambdaIntegration(lambda_function))
+
+        CfnOutput(self, "S3-Generation-Bucket", value=my_bucket.bucket_name)
