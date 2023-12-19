@@ -1,7 +1,7 @@
 {
   "title": "EventBridge tp Step Functions to SNS",
   "description": "Use EventBridge Rule to trigger a Step Function State Machine and generate system notifications using SNS.",
-  "language": "N/A",
+  "language": "YAML",
   "level": "200",
   "framework": "SAM",
   "introBox": {
@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sfn-sns",
       "templateURL": "serverless-patterns/eventbridge-sfn-sns",
       "projectFolder": "eventbridge-sfn-sns",
-      "templateFile": "eventbridge-sfn-sns/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -50,14 +50,17 @@
   "authors": [
     {
       "name": "Kaiyin Hu",
+      "bio": "Solutions Architect @ Amazon Web Services",
       "linkedin": "kaiyin-h-a6a3392a"
     },
     {
       "name": "Sid Vantair",
+      "bio": "Solutions Architect @ Amazon Web Services",
       "linkedin": "sidvantair"
     },
     {
       "name": "Sachin Holla",
+      "bio": "Solutions Architect @ Amazon Web Services. I am passionate about serverless programming, all things data, machine learning and developer automation.",
       "linkedin": "sachinholla"
     }
   ]
