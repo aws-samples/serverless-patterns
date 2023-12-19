@@ -15,7 +15,8 @@
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-ddbstream-sfn",
       "templateURL": "serverless-patterns/eventbridge-pipes-ddbstream-sfn",
-      "templateFile": "eventbridge-pipes-ddbstream-sfn/template.yaml"
+      "projectFolder": "eventbridge-pipes-ddbstream-sfn",
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
