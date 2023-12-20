@@ -2,7 +2,6 @@ import boto3
 import os
 import logging
 import json
-from botocore.exceptions import ClientError
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.INFO)
@@ -24,10 +23,6 @@ def lambda_handler(event, context):
         response = comprehend_obj.detect_sentiment(Text=user_input, LanguageCode="en")
         LOG.info(response)
         LOG.info(f"Sentiment detect is {response['Sentiment']}!!")
-    except ClientError:
-        LOG.error("Sentinment detection failed!!")
-        raise
-    else:
         analyzed_response = json.dumps(
             {
                 "Sentiment": response["Sentiment"],
@@ -35,3 +30,6 @@ def lambda_handler(event, context):
             }
         )
         return analyzed_response
+    except Exception as e:
+        LOG.error("Sentiment detection failed!!")
+        raise e
