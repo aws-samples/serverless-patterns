@@ -39,7 +39,7 @@ You must request access to a model before you can use it. If you try to use the 
 
     ![Model Access View](bedrock_setup/model-access-view.png)
 
-6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Save changes** to activate the models in your account. For this pattern we only need Anthropic/Claude but feel free to experiment with others.
+6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Save changes** to activate the models in your account. For this pattern we only need StabilityAI /  model id: stability.stable-diffusion-xl-v1.
 
 ## Deployment Instructions
 
@@ -49,7 +49,7 @@ You must request access to a model before you can use it. If you try to use the 
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/apigw-lambda-bedrock-cdk-python
+    cd serverless-patterns/apigw-lambda-bedrock-cdk-python-s3
     ```
 1. Create virtual environment for Python
     ```
@@ -97,7 +97,7 @@ Follow the example below and replace `{your-api-url}` with your api url from ste
 
     ```
     curl -X POST \
-    {your-api-url}/text_gen \
+    {your-api-url}/prod/image_gen \
     -H "Content-Type: application/json" \
     -d '{"prompt": "Rusted oil pipeline weathered, damaged, old"}'
     ```
