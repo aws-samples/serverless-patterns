@@ -71,9 +71,9 @@ def handler(event, context):
 
     return {
         'statusCode': 200,
-        # 'body': json.dumps({
-        #     'generated-text': response_body
-        # })
+        'body': json.dumps({
+            'generated-text': file_name
+        })
     }
 
 if __name__ == '__main__':

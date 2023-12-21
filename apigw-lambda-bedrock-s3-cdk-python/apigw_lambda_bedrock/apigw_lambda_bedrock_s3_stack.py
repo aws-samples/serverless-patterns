@@ -15,11 +15,6 @@ class ApigwLambdaBedrockS3Stack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # #lambda layer containing boto
-        # layer = _lambda.LayerVersion(self, "Boto3Layer",
-        #     code=_lambda.Code.from_asset("./boto_layer.zip"),
-        #     compatible_runtimes=[_lambda.Runtime.PYTHON_3_10]
-        # )
 
         #add policy to invoke bedrock model
         invoke_model_policy = iam.Policy(self, "InvokeModelPolicy",

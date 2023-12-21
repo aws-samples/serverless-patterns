@@ -1,5 +1,5 @@
 {
-    "title": "ApiGateway - Lambda - Bedrock - S3",
+    "title": "API Gateway - Lambda - Bedrock - S3",
     "description": "Generate images using Amazon Bedrock from a lambda function fronted with an API Gateway and save to S3",
     "language": "Python",
     "level": "200",
@@ -7,7 +7,7 @@
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This project aims to build an integration between API Gateway, AWS Lambda, Amazon Bedrock and S3",
+        "This project aims to build an integration between API Gateway, AWS Lambda, Amazon Bedrock and Amazon S3",
         "The core functionality revolves around exposing an API endpoint via API Gateway that accepts a user-defined prompt.",
         "When a prompt is received, the API Gateway triggers an AWS Lambda function. This Lambda function is responsible for invoking a diffusion image generation model (Stable Diffusion XL 1.0) hosted on Amazon Bedrock, generating an image and saving it to Amazon S3.",
         "To ensure compatibility with Bedrock, a Lambda Layer is utilized, it contains the latest version of the Boto3 library, as only the most recent Boto3 version includes a client for Amazon Bedrock."

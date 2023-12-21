@@ -2,7 +2,7 @@
 
 ![architecture](architecture/architecture.png)
 
-This pattern demonstrates how to generate images using a serverless workflow using Amazon Bedrock (Stable Diffusion XL) and save the images to S3. The pattern has a default prompt to generate images of an rusted oil pipeline as pictured below.
+This pattern demonstrates how to generate images with a serverless workflow using Amazon Bedrock (Stable Diffusion XL) and save the images to Amazon S3. The pattern has a default prompt to generate images of an rusted oil pipeline as pictured below.
 
 Note: this pattern includes a layer with a custom version of boto3. Using an outdated boto3 version will result in an ["unknown service error"](https://repost.aws/knowledge-center/lambda-python-runtime-errors)
 Note: this patten also incldues a custom layer for Pillow
@@ -14,7 +14,8 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed
+* [Amazon Bedrock Stability Diffusion XL Access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html#add-model-access)
 
 ## Amazon Bedrock setup instructions
 You must request access to a model before you can use it. If you try to use the model (with the API or console) before you have requested access to it, you receive an error message. For more information, see [Model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
@@ -49,7 +50,7 @@ You must request access to a model before you can use it. If you try to use the 
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/apigw-lambda-bedrock-cdk-python-s3
+    cd serverless-patterns/apigw-lambda-bedrock-s3-cdk-python
     ```
 1. Create virtual environment for Python
     ```
@@ -71,7 +72,7 @@ You must request access to a model before you can use it. If you try to use the 
     ```
     cdk bootstrap
     ```
-1. Review the CloudFormation template the cdk generates for you stack using the following AWS CDK CLI command:
+1. Review the CloudFormation template CDK generates for you stack using the following AWS CDK CLI command:
     ```
     cdk synth
     ```
@@ -86,7 +87,7 @@ You must request access to a model before you can use it. If you try to use the 
 
 ## How it works
 
-CDK will create an Api Gateway, along with a resource and a POST method. There's a AWS Lambda function that will be taking the prompt and invoking an Amazon Bedrock synchronously. 
+CDK will create an API Gateway, along with a resource and a POST method. There's a AWS Lambda function that will be taking the prompt and invoking Amazon Bedrock synchronously. 
 
 
 ## Testing
@@ -104,14 +105,14 @@ Follow the example below and replace `{your-api-url}` with your api url from ste
 
 ## Review results
 
-Go to Amazon S3, and navigate to the S3 bucket. It will have a name similar to 'apigwlambdabedrockstack-mybucket...'. In the directory `\tmp\` you should see `image-{num}.png`. 
+Go to Amazon S3, and navigate to the S3 bucket. It will have a name similar to 'apigwlambdabedrockstack-mybucket...'. In the S3 bucket you should see `image-{num}.png`. 
 
 Here is an example generated image:
 ![Generated image of rusted oil pipeline](example/image-212.png)
 
 ## Cleanup
  
-1. Run below script in the `apigw-lambda-bedrock-cdk-python` directory to delete AWS resources created by this sample stack.
+1. Run below script in the `apigw-lambda-bedrock-s3-cdk-python` directory to delete AWS resources created by this sample stack.
     ```bash
     cdk destroy
     ```
