@@ -1,5 +1,5 @@
 {
-  "title": "Amazon Kinesis Data Streams data-processing and event filtering with AWS Lambda",
+  "title": "Kinesis Data Streams data-processing and event filtering with AWS Lambda",
   "description": "Process filtered events from a Kinesis data stream with AWS Lambda",
   "language": "Python",
   "level": "200",
