@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/firehose-transformation-cdk-typescript",
       "templateURL": "serverless-patterns/firehose-transformation-cdk-typescript",
       "projectFolder": "firehose-transformation-cdk-typescript",
-      "templateFile": "firehose-transformation-cdk-typescript/src/lib/firehost-lambda-transform"
+      "templateFile": "src/lib/firehost-lambda-transform"
     }
   },
   "resources": {
