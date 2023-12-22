@@ -1,14 +1,100 @@
-# Welcome to your CDK TypeScript project
+# Using EventBridge Scheduler to send scheduled reminder emails. 
 
-This is a blank project for CDK development with TypeScript.
+This pattern demonstrates how to create an EventBridge scheduler that would send scheduled reminder email and would then be deleted. The pattern uses a SNS, Lambda, EventBridge scheduler and SES. 
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
-## Useful commands
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+## Requirements
+
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/cli.html)
+
+
+## Deployment Instructions
+
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+2. Change directory to the pattern directory:
+    ```
+    cd cdk-sns-lambda-eventbridge-ses
+    ```
+3. Install dependencies
+    ```
+    npm install
+    ```
+4. From the command line, configure AWS CDK:
+    ```
+    cdk bootstrap aws://ACCOUNT-NUMBER/REGION
+
+    eg: 
+    cdk bootstrap aws://123456789012/us-east-1
+    ```
+
+5. Synthesize CloudFormation template from the AWS CDK app:
+    ```
+    cdk synth
+    ```
+6. To deploy your stack, run the following the command line : 
+    ```
+    cdk deploy --all --parameters SenderEmail={source-email-address} --parameters SNSTopicARN={sns-topic-arn}
+
+    ```
+    Here, 
+    
+    * Replace {source-email-address} with the email address that should be sending reminder email address. The email address should be verified identity from Amazon SES.
+
+    * Substitute "{sns-topic-arn}" with the actual Amazon SNS topic that should trigger the Lambda function.
+
+## Architecture 
+
+![Architecture](images/scheduler-reminder-architecture.png)
+
+## How it works
+
+Let us now dive deeper into the architecture : 
+
+1. Notification Process via SNS Topic:
+
+The SNS topic is used to publish a custom message and invoke the Lambda function. The custom message holds details like Email address to whom the email has to be sent, time when the email has to be sent. Content that should be present in the email.
+
+3. Scheduler Lambda Invocation:
+
+Upon receiving the notification, the Scheduler Lambda is invoked. It extracts the message published to SNS topic and based off the details provided in the message creates the scheduler. 
+
+4. EventBridge Scheduler Activation:
+
+The EventBridge Scheduler sends email using SES. After the scheduler has sent email, it is deleted automatically.
+
+## Testing
+
+Once the whole setup is deployed using CDK, you can carry out testing by publishing message to the SNS topic provided during 'cdk deploy'
+
+```
+
+     {
+         "message": "Hello, this is a simple test",
+         "datetime": "2023-12-22T10:02:00Z",
+         "email": "{email-address-to-whom-email-should-be-sent}"
+     }
+
+
+```
+These three fields are required and are case-sensitive. Also note that "{email-address-to-whom-email-should-be-sent}" should be a verified identity from Amazon SES
+
+## Cleanup
+ 
+1. Delete the stack
+
+    ```
+    cdk destroy --all
+    ```
+    
+----
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
