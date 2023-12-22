@@ -1,7 +1,7 @@
 {
   "title": "Kinesis Firehose Data Transformation with Lambda",
   "description": "Transform incoming source data and deliver the transformed data to destinations.",
-  "language": "typescript",
+  "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/firehose-transformation-cdk-typescript",
       "templateURL": "serverless-patterns/firehose-transformation-cdk-typescript",
       "projectFolder": "firehose-transformation-cdk-typescript",
-      "templateFile": "firehose-transformation-cdk-typescript/src/lib/firehost-lambda-transform.ts"
+      "templateFile": "firehose-transformation-cdk-typescript/src/lib/firehost-lambda-transform"
     }
   },
   "resources": {
