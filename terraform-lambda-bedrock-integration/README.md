@@ -8,7 +8,7 @@ As part of the build process, a container will be built, pushed into ECR, and ul
 
 Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md).
 
-You will need to enable [model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) in your AWS Account before trying out this pattern. You can enable all or model of your choice to give you flexibility of foundation models. By default, this pattern uses anthropic.claude-v2 model.
+Before attempting this pattern, you must enable [model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) in your AWS Account. To provide you flexibility with foundation models, you can enable all or some of the foundation models. This pattern employs the anthropic.claude-v2 model by default so that's must be enabled for this pattern to work
 
 You also need [docker](https://www.docker.com/) and md5 to be installed on your testing machine
 
