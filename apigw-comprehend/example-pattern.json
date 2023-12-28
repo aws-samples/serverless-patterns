@@ -1,13 +1,13 @@
 {
-  "title": "API Gateway to Comprehend",
-  "description": "Create a REST API that acts as a proxy to Comprehend DetectSentiment API operation.",
-  "language": "Python",
+  "title": "Amazon API Gateway to Amazon Comprehend",
+  "description": "Create a REST API that acts as a proxy to Amazon Comprehend DetectSentiment API operation.",
+  "language": "",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an API Gateway REST API as a proxy to Comprehend DetectSentiment API.",
+      "This sample project demonstrates how to use Amazon API Gateway REST API as a proxy to Amazon Comprehend DetectSentiment API.",
       "You can easily utilise this solution to expose other Comprehend API operations as well with minimal efforts"
     ]
   },

@@ -1,9 +1,7 @@
-# API Gateway REST API to Amazon Comprehend
+# Amazon API Gateway REST API to Amazon Comprehend
 
-This template creates an API Gateway REST API integration with Amazon Comprehend.
-
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-rest-api-comprehend.
-
+In this use case, we have API Gateway REST API as a proxy to Amazon Comprehend's [DetectSentiment](https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectSentiment.html) API operation.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-comprehend.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -22,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/apigw-rest-api-comprehend
+    cd serverless-patterns/apigw-comprehend
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -39,21 +37,77 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-To test the endpoint first send data using the following command. Be sure to update the API Endpoint, Job Definition and the Job Queue from the Cloudformation Stack Output.
+To test the endpoint first send data using the following command. Be sure to update the API Endpoint from the Cloudformation Stack Output.
 
 ```
 curl --location --request POST '[YOUR API ENDPOINT]' --header 'Content-Type: application/json' \
 --data-raw '{
-        "LanguageCode": "en",
-        "Text": "Bob lives in Seattle. He is a software engineer at Amazon."
+        "LanguageCode": "String",
+        "Text": "String"
     }'
 ```
+You will observe a complete sentiment analysis of the 'Text' inputs that are passed as payload to your API endpoint as follows:
 
-You can also run the following commands on a terminal prompt to get the API Endpoint, Job Queue and Job definition.
+1. Test payload 1 -
+```{
+   "LanguageCode": "en",
+   "Text": "Comprehend is great to use."
+    }
+```
+ Output:
+```
+{
+    "Sentiment": "POSITIVE",
+    "SentimentScore": {
+        "Mixed": 3.2229068892775103E-5,
+        "Negative": 2.691979352675844E-5,
+        "Neutral": 1.229004265042022E-4,
+        "Positive": 0.9998179078102112
+    }
+}
+```
+1. Test payload 2 -
+```{
+   "LanguageCode": "en",
+   "Text": "It is not good to skip using Comprehend."
+    }
+```
+ Output:
+```
+{
+    "Sentiment": "NEGATIVE",
+    "SentimentScore": {
+        "Mixed": 0.03624984249472618,
+        "Negative": 0.9486008286476135,
+        "Neutral": 0.004839026369154453,
+        "Positive": 0.010310239158570766
+    }
+}
+```
+1. Test payload 3 -
+```{
+   "LanguageCode": "en",
+   "Text": "It's normal to use Comprehend."
+    }
+```
+ Output:
+```
+{
+    "Sentiment": "NEUTRAL",
+    "SentimentScore": {
+        "Mixed": 0.002466087695211172,
+        "Negative": 0.0034168041311204433,
+        "Neutral": 0.8172720074653625,
+        "Positive": 0.17684519290924072
+    }
+}
+```
+
+You can also run the following commands on a terminal prompt to get the API Endpoint -
 
 **API Endpoint**
 ```
-aws cloudformation describe-stacks --stack-name [YOUR STACK NAME] --query "Stacks[0].Outputs[?OutputKey=='ApiEndpoint'].OutputValue" --output text
+aws cloudformation describe-stacks --stack-name [YOUR STACK NAME] --query "Stacks[0].Outputs[?OutputKey=='ComprehendApiEndpoint'].OutputValue" --output text
 ```
 
 ## Cleanup
