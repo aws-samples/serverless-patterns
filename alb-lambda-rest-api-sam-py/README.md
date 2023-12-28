@@ -76,7 +76,7 @@ Once the application is deployed, retrieve the Application Load Balancer endpoin
 curl --request GET --header "Client-Correlation-Id:bb245" --url http://{ALB_ID}.{REGION}.elb.amazonaws.com/hello'
 ```
 
-Alternatively, you use [xh utility](https://github.com/ducaale/xh), a lightweight, nicely formatted CLI too as:
+Alternatively, you can use [xh utility](https://github.com/ducaale/xh), a lightweight, nicely formatted CLI too as:
 
 ```commandline
 xh http://{ALB_ID}.{REGION}.elb.amazonaws.com/hello Client-Correlation-Id:bb245
