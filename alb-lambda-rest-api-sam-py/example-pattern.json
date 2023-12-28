@@ -44,7 +44,7 @@
   },
   "deploy": {
     "text": [
-      "sam validate && sam build && sam deploy"
+      "sam validate && sam build && sam deploy --guided"
     ]
   },
   "testing": {

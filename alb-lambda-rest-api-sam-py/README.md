@@ -38,9 +38,14 @@ AWS costs incurred. No warranty is implied in this example.
     ```
 4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
-    sam validate && sam build && sam deploy
+    sam validate && sam build && sam deploy --guided
     ```
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for
+5. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region
+    * Allow SAM CLI to create IAM roles with the required permissions.
+   
+6Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for
    testing.
 
 ## How it works
