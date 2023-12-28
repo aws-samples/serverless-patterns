@@ -55,14 +55,12 @@ context objects, logging them to an Amazon CloudWatch Logs log group and Amazon 
 
 ### SAM CLI for Local API Testing
 
-The SAM CLI is an extension of the AWS CLI that ass functionality for building and test Lambda applications.
-It uses Docker to run the function in an Amazon Linux environment that matches Lambda runtime
-from [sam/build-python3.9](https://gallery.ecr.aws/sam/build-python3.9). It emulates application's build environment and
-API.
-To build and execute your function, run the following:
+The SAM CLI seamlessly extends the capabilities of the AWS CLI, introducing essential features for constructing and validating Lambda applications. Leveraging the power of Docker, it orchestrates the execution of functions within an Amazon Linux environment meticulously aligned with the Lambda runtime specifications, all sourced from [sam/build-python3.9](https://gallery.ecr.aws/sam/build-python3.9). This emulation meticulously replicates the application's build environment and API.
 
-[event.json](./events/event.json) corresponds to ALB event. Generated using SAM
-command: `sam local generate-event alb request`
+To simulate an ALB (Application Load Balancer) event, the CLI relies on the configuration stored in [event.json](./events/event.json). This file precisely corresponds to the ALB event, and its generation is effortlessly managed by the SAM command: `sam local generate-event alb request`.
+
+Now, to seamlessly build and execute your function, execute the following command:
+
 
 ```commandline
 pipenv requirements > requirements.txt
