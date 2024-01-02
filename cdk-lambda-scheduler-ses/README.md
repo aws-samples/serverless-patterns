@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cdk-sns-lambda-eventbridge-ses
+    cd cdk-lambda-scheduler-ses
     ```
 3. Install dependencies
     ```
@@ -30,8 +30,8 @@ Important: this application uses various AWS services and there are costs associ
 4. From the command line, configure AWS CDK:
     ```
     cdk bootstrap aws://ACCOUNT-NUMBER/REGION
-    eg: 
-    cdk bootstrap aws://123456789012/us-east-1
+
+    eg: cdk bootstrap aws://123456789012/us-east-1
     ```
 
 5. Synthesize CloudFormation template from the AWS CDK app:
@@ -56,16 +56,16 @@ Let us now dive deeper into the architecture :
 
 1. Scheduler Lambda Invocation:
 
-When the Scheduler Lambda is invoked. It extracts the following details from event:
-* Message to be sent. 
-* Date and time when the message should be sent.
-* Email ID to whom the message should be sent. 
+    When the Scheduler Lambda is invoked. It extracts the following details from event:
+    * Message to be sent. 
+    * Date and time when the message should be sent.
+    * Email ID to whom the message should be sent. 
 
-The lambda function then creates the EventBridge schedule and passes the details extracted as a payload to the scheduler.
+    The lambda function then creates the EventBridge schedule and passes the details extracted as a payload to the scheduler.
 
 2. EventBridge Scheduler Activation:
 
-The EventBridge Scheduler sends email using SES. After the scheduler has sent email, it is deleted automatically.
+    The EventBridge Scheduler sends email using SES. After the scheduler has sent email, it is deleted automatically.
 
 ## Testing
 
