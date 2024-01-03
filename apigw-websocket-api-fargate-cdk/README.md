@@ -10,6 +10,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
+- [Python 3.x Installed](https://www.python.org/) Python 3.x installed with pip.
 
 ## Deployment Instructions
 
@@ -32,13 +33,28 @@ Important: this application uses various AWS services and there are costs associ
    $ source .venv/bin/activate
    ```
 
+   Windows:
+
+   ```powershell
+   python3 -m venv .venv
+   .venv\Scripts\activate.bat
+   ```
+
 4. Once virtualenv is activated, install dependencies:
 
    ```bash
    $ pip install -r requirements.txt
    ```
 
-5. Deploy the stack to your default AWS account and region. The output of this command contains the WebSocket API URL.
+5. Bootstrap AWS account (if not already done):
+
+   ```bash
+   cdk bootstrap ACCOUNT-NUMBER/REGION # e.g.
+   cdk bootstrap 1111111111/us-west-2
+   cdk bootstrap --profile test 1111111111/us-west-2
+   ```
+
+6. Deploy the stack to your default AWS account and region. The output of this command contains the WebSocket API URL.
 
    ```bash
    cdk deploy
