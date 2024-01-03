@@ -49,8 +49,9 @@ Important: this application uses various AWS services and there are costs associ
 5. Bootstrap AWS account (if not already done):
 
    ```bash
-   cdk bootstrap ACCOUNT-NUMBER/REGION # e.g.
-   cdk bootstrap 1111111111/us-west-2
+   cdk bootstrap aws://ACCOUNT-NUMBER/REGION
+   # e.g.
+   cdk bootstrap aws://1111111111/us-west-2
    cdk bootstrap --profile test 1111111111/us-west-2
    ```
 
