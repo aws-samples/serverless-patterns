@@ -12,7 +12,6 @@ from aws_cdk import (
 import aws_cdk as core
 from constructs import Construct
 from aws_cdk.aws_logs import RetentionDays
-import json
 
 
 class ApigwWebsocketFargateCdkStack(Stack):
@@ -30,19 +29,6 @@ class ApigwWebsocketFargateCdkStack(Stack):
         # create api gateway websocket api
         websockets_api = apigw.WebSocketApi(self, "apigw-websocket-fargate-api")
 
-        # stage = apigw.WebSocketStage(
-        #     self,
-        #     "dev",
-        #     web_socket_api=websockets_api,
-        #     stage_name="dev",
-        #     auto_deploy=True,
-        #     default_route_settings=apigw.CfnStage.RouteSettingsProperty(
-        #         data_trace_enabled=True,
-        #         detailed_metrics_enabled=True,
-        #         logging_level='INFO',
-        #     )
-        # )
-
         stage = apigw.CfnStage(
             scope=self,
             id="DEV-WS-API-STAGE",
@@ -59,11 +45,6 @@ class ApigwWebsocketFargateCdkStack(Stack):
                 format='{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "routeKey":"$context.routeKey", "status":"$context.status","responseLength":"$context.responseLength"}',
             ),
         )
-
-        # stage.access_log_settings = apigw.CfnStage.AccessLogSettingsProperty(
-        #     destination_arn=api_log_group.log_group_arn,
-        #     format='{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "routeKey":"$context.routeKey", "status":"$context.status","responseLength":"$context.responseLength"}',
-        # )
 
         # create VPC for fargate cluster
         vpc = ec2.Vpc(self, "apigw-websocket-fargate-vpc", max_azs=2)
