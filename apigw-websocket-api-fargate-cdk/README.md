@@ -1,6 +1,6 @@
-# Amazon API Gateway Websocket API to AWS ECS Fargate
+# Amazon API Gateway Websocket API to Amazon ECS Fargate
 
-This pattern deploys an API Gateway WebSocket API integrated with Application Load Balancer to AWS ECS Fargate.
+This pattern deploys an API Gateway WebSocket API integrated with an Application Load Balancer(ALB) and Amazon ECS Fargate.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -25,20 +25,20 @@ Important: this application uses various AWS services and there are costs associ
    cd apigw-websocket-api-fargate-cdk
    ```
 
-3. Create manually create a Python virtualenv on MacOS and Linux:
+3. Manually create a Python virtualenv on MacOS and Linux:
 
    ```bash
    $ python3 -m venv .venv
    $ source .venv/bin/activate
    ```
 
-4. Once virtualenv is activated then install dependencies
+4. Once virtualenv is activated, install dependencies:
 
    ```bash
    $ pip install -r requirements.txt
    ```
 
-5. Deploy the stack to your default AWS account and region. The output of this command should give you the WebSocket API URL.
+5. Deploy the stack to your default AWS account and region. The output of this command contains the WebSocket API URL.
 
    ```bash
    cdk deploy
@@ -46,7 +46,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern deploys, API Gateway WebSocket API, Fargate Cluster, Networking, and Application Load Balancer. WebSocket client connects using API endpoint url, and communicates using default route. Using http integration API gateway communicates with ALB which in turns invokes Fargate Tasks. The Fargate task running FASTAPI framework receives the POST request and communicates back using connectionId in the request context from API Gateway.
+This pattern deploys API Gateway WebSocket API, Fargate Cluster, Networking, and an Application Load Balancer. The webSocket client connects using the API endpoint url, and communicates using the default route. Using http integration, API gateway communicates with the ALB and invokes the Fargate task. The Fargate task, running the FASTAPI framework, receives the POST request and communicates back to the client through API Gateway using the connectionId in the request context.
 
 ## Testing
 
@@ -58,7 +58,7 @@ This pattern deploys, API Gateway WebSocket API, Fargate Cluster, Networking, an
    wscat -c wss://hxxraj3sh.execute-api.us-west-2.amazonaws.com/dev
    ```
 
-2. Send a payload to the API in the below format and api will echo back:
+2. Send a payload to the API in the below format and the api will echo back:
 
    ```bash
    > {"data": "this is the way!"}
@@ -67,7 +67,7 @@ This pattern deploys, API Gateway WebSocket API, Fargate Cluster, Networking, an
 
 ## Cleanup
 
-Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
+Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to delete.
 
 ```bash
 cdk destroy
