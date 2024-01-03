@@ -52,6 +52,7 @@ Resources:
       DatabaseName: !Ref DatabaseName
       Engine: aurora-mysql
       EngineMode: serverless
+      StorageEncrypted: true
       # Enable the Data API for Aurora Serverless
       EnableHttpEndpoint: true
       ScalingConfiguration:
