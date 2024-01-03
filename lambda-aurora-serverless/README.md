@@ -1,6 +1,6 @@
 # AWS Lambda and Amazon Aurora Serverless
 
-This pattern creates an AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret.
+This pattern creates an AWS Lambda function and an [Amazon Aurora MySQL version 2 (with MySQL 5.7 compatibility)](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraMySQLReleaseNotes/AuroraMySQL.Updates.20Updates.html) in an [Aurora Serverless version 1](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html) DB cluster with Data API and a Secrets Manager secret.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-aurora
 
@@ -38,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates an AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret. The function creates an example table named "music", inserts a row with data from the event object, then returns the results of a select query.
+This pattern creates an AWS Lambda function and an [Amazon Aurora MySQL version 2 (with MySQL 5.7 compatibility)](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraMySQLReleaseNotes/AuroraMySQL.Updates.20Updates.html) in an [Aurora Serverless version 1](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html) DB cluster with Data API and a Secrets Manager secret. The function creates an example table named "music", inserts a row with data from the event object, then returns the results of a select query.
 
 ## Testing
 
