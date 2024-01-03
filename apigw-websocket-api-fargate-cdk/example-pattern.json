@@ -14,8 +14,8 @@
     "gitHub": {
         "template": {
             "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-fargate-cdk",
-            "templateURL": "serverless-patterns/apigw-websocket-fargate-cdk",
-            "projectFolder": "apigw-websocket-fargate-cdk",
+            "templateURL": "serverless-patterns/apigw-websocket-api-fargate-cdk",
+            "projectFolder": "apigw-websocket-api-fargate-cdk",
             "templateFile": "apigw_websocket_fargate_cdk/apigw_websocket_fargate_cdk_stack.py"
         }
     },

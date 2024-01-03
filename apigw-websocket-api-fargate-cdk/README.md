@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
 2. Change the working directory to this pattern's directory
 
    ```bash
-   cd apigw-websocket-fargate-cdk
+   cd apigw-websocket-api-fargate-cdk
    ```
 
 3. Create manually create a Python virtualenv on MacOS and Linux:
