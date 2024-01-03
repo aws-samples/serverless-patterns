@@ -39,13 +39,31 @@ Important: this application uses various AWS services and there are costs associ
    ```
 
 5. Deploy the stack to your default AWS account and region. The output of this command should give you the WebSocket API URL.
+
    ```bash
    cdk deploy
    ```
 
 ## How it works
 
-The CDK deploys, API Gateway WebSocket API, Fargate Cluster, Networking, and Application Load Balancer. WebSocket client connects using API endpoint url, and communicates using default route. Using http integration API gateway communicated to ALB which in turns invokes Fargate Tasks. Fargate task running FASTAPI framework receives the POST request and communicates back using connectionId in the request context from API Gateway.
+This pattern deploys, API Gateway WebSocket API, Fargate Cluster, Networking, and Application Load Balancer. WebSocket client connects using API endpoint url, and communicates using default route. Using http integration API gateway communicates with ALB which in turns invokes Fargate Tasks. The Fargate task running FASTAPI framework receives the POST request and communicates back using connectionId in the request context from API Gateway.
+
+## Testing
+
+### Testing with `wscat` CLI
+
+1. The stack will output the **websocketsapiendpoint**. Use wscat to test the API (see [documentation](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-how-to-call-websocket-api-wscat.html) for more details on how to set it up):
+
+   ```bash
+   wscat -c wss://hxxraj3sh.execute-api.us-west-2.amazonaws.com/dev
+   ```
+
+2. Send a payload to the API in the below format and api will echo back:
+
+   ```bash
+   > {"data": "this is the way!"}
+   < {"data": "this is the way!"}
+   ```
 
 ## Cleanup
 

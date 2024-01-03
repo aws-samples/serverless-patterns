@@ -12,6 +12,7 @@ from aws_cdk import (
 import aws_cdk as core
 from constructs import Construct
 from aws_cdk.aws_logs import RetentionDays
+import json
 
 
 class ApigwWebsocketFargateCdkStack(Stack):
@@ -29,17 +30,40 @@ class ApigwWebsocketFargateCdkStack(Stack):
         # create api gateway websocket api
         websockets_api = apigw.WebSocketApi(self, "apigw-websocket-fargate-api")
 
-        stage = apigw.WebSocketStage(
-            self,
-            "dev",
-            web_socket_api=websockets_api,
+        # stage = apigw.WebSocketStage(
+        #     self,
+        #     "dev",
+        #     web_socket_api=websockets_api,
+        #     stage_name="dev",
+        #     auto_deploy=True,
+        #     default_route_settings=apigw.CfnStage.RouteSettingsProperty(
+        #         data_trace_enabled=True,
+        #         detailed_metrics_enabled=True,
+        #         logging_level='INFO',
+        #     )
+        # )
+
+        stage = apigw.CfnStage(
+            scope=self,
+            id="DEV-WS-API-STAGE",
+            api_id=websockets_api.api_id,
             stage_name="dev",
             auto_deploy=True,
+            default_route_settings=apigw.CfnStage.RouteSettingsProperty(
+                data_trace_enabled=True,
+                detailed_metrics_enabled=True,
+                logging_level="INFO",
+            ),
+            access_log_settings=apigw.CfnStage.AccessLogSettingsProperty(
+                destination_arn=api_log_group.log_group_arn,
+                format='{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "routeKey":"$context.routeKey", "status":"$context.status","responseLength":"$context.responseLength"}',
+            ),
         )
 
-        stage.access_log_settings = apigw.CfnStage.AccessLogSettingsProperty(
-            destination_arn=api_log_group.log_group_arn, format="$context.requestId"
-        )
+        # stage.access_log_settings = apigw.CfnStage.AccessLogSettingsProperty(
+        #     destination_arn=api_log_group.log_group_arn,
+        #     format='{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "routeKey":"$context.routeKey", "status":"$context.status","responseLength":"$context.responseLength"}',
+        # )
 
         # create VPC for fargate cluster
         vpc = ec2.Vpc(self, "apigw-websocket-fargate-vpc", max_azs=2)
@@ -73,7 +97,10 @@ class ApigwWebsocketFargateCdkStack(Stack):
                 stream_prefix="apigw-websocket-fargate", log_group=log_group
             ),
             port_mappings=[ecs.PortMapping(container_port=8000)],
-            environment={"WEBSOCKET_API_ENDPOINT": stage.callback_url},
+            # add web socket api endpoint as env variable
+            environment={
+                "WEBSOCKET_API_ENDPOINT": f"https://{websockets_api.api_id}.execute-api.{core.Aws.REGION}.amazonaws.com/{stage.stage_name}"
+            },
         )
 
         # add task role policy for cloud watch
@@ -129,6 +156,8 @@ class ApigwWebsocketFargateCdkStack(Stack):
         # setup auto scaling for the Fargate service
         fargate_service.service.auto_scale_task_count(max_capacity=2)
 
+        template = """{"connectionId": "$context.connectionId", "body": $input.body}"""
+
         # http integration
         http_api_integration = apigw.CfnIntegration(
             self,
@@ -137,23 +166,8 @@ class ApigwWebsocketFargateCdkStack(Stack):
             integration_type="HTTP",
             integration_method="POST",
             integration_uri=f"http://{fargate_service.load_balancer.load_balancer_dns_name}",
-            request_templates={
-                "connectionId": "$context.connectionId",
-                "stage": "$context.stage",
-                "request_id": "$context.requestId",
-                "api_id": "$context.apiId",
-                "resource_path": "$context.resourcePath",
-                "resource_id": "$context.resourceId",
-                "http_method": "$context.httpMethod",
-                "source_ip": "$context.identity.sourceIp",
-                "user-agent": "$context.identity.userAgent",
-                "account_id": "$context.identity.accountId",
-                "api_key": "$context.identity.apiKey",
-                "caller": "$context.identity.caller",
-                "user": "$context.identity.user",
-                "user_arn": "$context.identity.userArn",
-                "body": "$input.json('$')",
-            },
+            template_selection_expression="\\$default",
+            request_templates={"\\$default": template},
         )
 
         # create default route for api and associate http integration
