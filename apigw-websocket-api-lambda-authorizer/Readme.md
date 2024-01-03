@@ -62,9 +62,7 @@ aws cognito-idp admin-confirm-sign-up \
 
 ```
 ### Step 2. Obtain ID Token for the user
-Run the following command to get Cognito tokens with USER_PASSWORD_AUTH authentication flow.
-
-> Note: Replace YOUR_USERNAME & YOUR_PASSWORD placeholders with the values that you used in the previous step.
+Run the following command to get the Cognito tokens for the user.
 
 ```bash
 # run the initiate-auth Command:
@@ -74,7 +72,7 @@ aws cognito-idp initiate-auth \
   --client-id your_app_client_id \
   --region YOUR_COGNITO_REGION
 ```
-Copy the ID Token for the use in next step.
+Copy the ID Token for use in the following step.
 
 ### Step 3. Invoke WebSocket API with ID Token
 An easy way to test the WebSocket after deploying is to use the tool [wscat](https://github.com/websockets/wscat) from NPM. To install the tool from NPM
@@ -85,14 +83,14 @@ npm install -g wscat
 > Note: It is important to understand that only the initial web-socket connect request (handshake) that establishes a WebSocket connection between client and server requires authentication. Once the channel has been established, subsequent request works just fine.
 
 To continue testing, follow the steps below:
-1. Run the below command (in more than one window) to establish a websocket connections with the API Gateway.
+1. Run the below command (in more than one window) to establish websocket connections with the API Gateway.
     ```
     wscat -c wss://{YOUR-API-ID}.execute-api.{YOUR-REGION}.amazonaws.com/{STAGE}?ID_Token={ID_TOKEN}
     ```
-    - Note 1: The url to connect to can also be found as the output parameter of the CloudFormation stack.
-    - Note 2: Query parameter `ID_Token` is case sensitive. If you want to change it, then update it in `template.yaml` file at `route.request.querystring.ID_Token`.
+    The url to connect to can also be found as the output parameter of the CloudFormation stack.
+ 2. Just for your information, query parameter `ID_Token` is case sensitive. If you want to change it, then update it in `template.yaml` file at `route.request.querystring.ID_Token`.
 2. If the token is valid, the response is `Connected`; otherwise, the response is 401 unauthorized. 
-3. Optionally, to perform a negative test, send an invalid value for `ID_Token` and verify you get 401 unauthorized response.
+3. Optionally, to perform a negative test, send an invalid value for `ID_Token` and verify you get 401 unauthorized in the response.
 4. In one of the windows use the following command to send a message to the WebSocket which will broadcast the message to all other open console windows:
     ```
     $ wscat -c wss://{YOUR-API-ID}.execute-api.{YOUR-REGION}.amazonaws.com/prod
