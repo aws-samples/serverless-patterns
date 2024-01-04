@@ -78,6 +78,7 @@ Resources:
       Engine: aurora-postgresql
       DBInstanceClass: db.serverless
       DBClusterIdentifier: !Ref AuroraCluster
+      PubliclyAccessible: false
   # Lambda Function - uses Globals to define additional configuration values
   LambdaFunction:
     Type: 'AWS::Serverless::Function'
