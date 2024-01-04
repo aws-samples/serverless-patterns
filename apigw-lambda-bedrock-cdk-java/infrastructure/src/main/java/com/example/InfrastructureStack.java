@@ -2,6 +2,7 @@ package com.example;
 
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Duration;
+import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.apigateway.LambdaIntegration;
@@ -11,6 +12,8 @@ import software.amazon.awscdk.services.iam.PolicyStatementProps;
 import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
+import software.amazon.awscdk.services.logs.LogGroup;
+import software.amazon.awscdk.services.logs.RetentionDays;
 import software.constructs.Construct;
 
 import java.util.List;
@@ -29,6 +32,12 @@ public class InfrastructureStack extends Stack {
                 .resources(List.of("arn:aws:bedrock:" + getRegion() + "::foundation-model/anthropic.claude-v2"))
                 .build());
 
+        // Create CloudWatch log group for storing Lambda logs
+        LogGroup functionLogGroup = LogGroup.Builder.create(this, "server-log-group")
+                .retention(RetentionDays.THREE_DAYS)
+                .logGroupName("/aws/lambda/LambdaBedrockFunction")
+                .removalPolicy(RemovalPolicy.DESTROY)
+                .build();
 
         // Create a Lambda function
         Function lambdaFunction = Function.Builder.create(this, "LambdaBedrockFunction")
@@ -37,6 +46,7 @@ public class InfrastructureStack extends Stack {
                 .code(Code.fromAsset("../software/target/BedrockClient-1.0.jar"))
                 .timeout(Duration.seconds(60))
                 .initialPolicy(List.of(invokeModelPolicy))
+                .logGroup(functionLogGroup)
                 .build();
 
         // Create an API Gateway
