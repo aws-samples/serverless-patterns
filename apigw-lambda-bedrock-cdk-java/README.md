@@ -10,14 +10,14 @@ Important: this application uses various AWS services and there are costs associ
 
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-- [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [Java 21](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) installed
-
-- [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Java 21](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) 
+- [Maven 3](https://maven.apache.org/)
+- [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK)
 
 
 ## Prerequisite
-Amazon Bedrock users need to request access to models before they are available for use. If you want to add additional models for text, chat, and image generation, you need to request access to models in Amazon Bedrock. Please refer to the link below for instruction:
+This pattern uses `Anthropic Claude` fundamental model provided by Amazon Bedrock. It is required to request access to the model before starting using the pattern. Please refer to the link below for an instruction:
 [Model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
 ## Deployment Instructions
@@ -41,15 +41,10 @@ Amazon Bedrock users need to request access to models before they are available 
    ```bash
    deploy.sh
    ```
-   
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
-   ```bash
-   sam deploy --guided
-   ```
 
 ## How it works
 
-This CDK project uses Amazon Bedrock API for Anthropic Claude-v2 model to generate content based on given prompt. This is exposed through a serverless REST API. Please refer to the architecture diagram below:
+This CDK project uses the Amazon Bedrock API for Anthropic Claude-v2 model to generate content based on given prompt. This is exposed through a serverless REST API. Please refer to the architecture diagram below:
 ![End to End Architecture](images/architecture.png)
 
 
@@ -65,13 +60,13 @@ Here's a breakdown of the steps:
 
 ## Testing
 
-Test the deployed content generation API by providing a prompt. You can use [curl](https://curl.se/) to send a HTTP POST request to the API. Make sure to replace `BedrockRestApi` with the provided by CDK output which name starts with `ApiGatewayLambdaBedrockStack.LambdaBedrockAPIEncpoind` :
+Test the deployed content generation API by providing a prompt. You can use [curl](https://curl.se/) to send a HTTP POST request to the API. Replace `BedrockRestApi` with the API URL in the CDK output, which has a name beginning with `ApiGatewayLambdaBedrockStack.LambdaBedrockAPIEncpoind` :
 
 ```bash
 curl -d '{"prompt": "Please calculate with step-by-step explanation: 2+2*2"}' -H 'Content-Type: application/json'  <BedrockRestApi>
 ```
 
-The API returns a response with generated content. Such as (Your output may vary):
+The API returns a response with generated content. Your output may vary:
 
 ```
 {
