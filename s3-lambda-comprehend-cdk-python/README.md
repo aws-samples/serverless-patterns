@@ -28,7 +28,7 @@ If you have not yet run `aws configure` and set a default region, you must do so
 You must use a role that has sufficient permissions to create IAM roles, as well as CloudFormation resources
 
 #### Python >=3.8
-Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration has used python version 3.10.
+Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration uses python 3.10.
 
 #### AWS CDK
 Make sure you have the [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install) installed in the Cloud9 environment.
