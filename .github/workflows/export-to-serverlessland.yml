@@ -19,13 +19,11 @@ jobs:
       NODE_ENV: dev
       fileName: ${{ inputs.fileName }}
     steps:
-      - name: Debug PAT Secret
-        run: echo "PAT Secret: ${{ secrets.patterns_pat }}"
       - name: Copycat
         uses: andstor/copycat-action@v3
         with:
           personal_token: ${{ secrets.patterns_pat }}
-          dst_path: /content/patterns/
+          dst_path: /content/patterns/import/
           dst_owner: bls20aws
           dst_repo_name: serverless-land
           dst_branch: main
