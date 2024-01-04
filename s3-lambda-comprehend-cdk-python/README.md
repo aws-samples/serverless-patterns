@@ -6,10 +6,10 @@ This patterns shows CDK deployment on how to leverage Amazon S3, AWS Lambda, Ama
 
 ### What resources will be created?
 This CDK code will create the following:
-   - 1 S3 bucket (to hold the text for which sentiment analysis has to be done)
-   - 1 Lambda (to invoke the Comprehend API)
-   - 1 DynamoDB (to store the result of Sentiment Analysis)
-   - 1 IAM role (for the Lambda to invoke Comprehend and DynamoDB)
+   - One S3 bucket (to hold the text for which sentiment analysis has to be done)
+   - One Lambda (to invoke the Comprehend API)
+   - One DynamoDB (to store the result of Sentiment Analysis)
+   - One IAM role (for the Lambda function to invoke Comprehend and DynamoDB)
 
 ## Requirements
 
@@ -66,13 +66,13 @@ The deployment will create a S3 bucket, a Lambda and a S3 bucket.
 
 ## How it works
 The S3 bucket acts as a placeholder to upload the text, required for performing Sentiment Analysis. In the demonstration, we use the contents inside `src\user_input_text.txt`. 
-The file is uploaded to S3 bucket, which triggers the Lambda. The Lambda processes the contents within the uploaded file and invokes the Comprehend's BatchDetectSentiment API and the analyzed response from Comprehend service is stored in DynamoDB.
+The file is uploaded to S3 bucket, which triggers the Lambda function. The Lambda function processes the contents within the uploaded file and invokes the Comprehend's `BatchDetectSentiment` API and the analyzed response from Comprehend service is stored in DynamoDB.
 
 ## Testing
 Upon successful deployment of the stack, the Output section would provide the `S3 Bucket` in the CDK environment. 
-Upload the sample file `src\user_input_text.txt` into the `S3 bucket`. The upload action triggers the `Lambda` and the input text is analyzed.
-A response as below is returned from the `Comprehend` service and stored in a `DynamoDB` with file name as the `partition key`. 
-As per specific use-cases, the responses can be converted into a flat file to be stored in `S3`.
+Upload the sample file `src\user_input_text.txt` into the `S3 bucket`. The upload action triggers the Lambda function and the input text is analyzed.
+A response as below is returned from Amazon Comprehend service and stored in a DynamoDB table with file name as the partition key. 
+As per specific use-cases, the responses can be converted into a flat file to be stored in S3.
 
 Response from Comprehend Service:
 ```
