@@ -19,6 +19,8 @@ jobs:
       NODE_ENV: dev
       fileName: ${{ inputs.fileName }}
     steps:
+      - name: Debug PAT Secret
+        run: echo "PAT Secret: ${{ secrets.patterns_pat }}"
       - name: Copycat
         uses: andstor/copycat-action@v3
         with:
