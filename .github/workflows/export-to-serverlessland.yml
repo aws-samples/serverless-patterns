@@ -27,6 +27,6 @@ jobs:
           dst_owner: bls20aws
           dst_repo_name: serverless-land
           dst_branch: main
-          src_branch: master
+          src_branch: main
           file_filter: "*.json"
           src_path: ${{ inputs.dirName }}/${{ inputs.fileName }}
