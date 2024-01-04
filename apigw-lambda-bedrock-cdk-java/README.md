@@ -9,6 +9,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+- `Anthropic Claude` fundamental model access requested (check [Prerequisite](#Prerequisite) to see details).
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Java 21](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) 
