@@ -62,7 +62,7 @@ and deploy with
 cdk deploy
 ```
 
-The deployment will create a S3 bucket, a Lambda and a S3 bucket.
+The deployment will create a S3 bucket, a Lambda function and a DynamoDB table.
 
 ## How it works
 The S3 bucket acts as a placeholder to upload the text, required for performing Sentiment Analysis. In the demonstration, we use the contents inside `src\user_input_text.txt`. 
