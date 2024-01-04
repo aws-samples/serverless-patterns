@@ -49,7 +49,7 @@ pip install -r requirements.txt
 
 ### Gather and deploy resources with the CDK
 
-First synthesize, which executes the application, defines which resources will be created, and translates this into a cloudformation template
+First synthesize, which executes the application, defines which resources will be created, and translates this into a CloudFormation template
 ```
 cdk synth
 ```
