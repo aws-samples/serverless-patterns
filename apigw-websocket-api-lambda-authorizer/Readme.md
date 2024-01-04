@@ -104,7 +104,7 @@ To continue testing, follow the steps below:
 ## Cleanup
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete
     ```
 2. Confirm the stack has been deleted
     ```bash
