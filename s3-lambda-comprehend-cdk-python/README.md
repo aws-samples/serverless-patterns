@@ -21,7 +21,7 @@ This code for this pattern is executed in AWS Cloud9 environment. The EC2 instan
 ### AWS setup
 **Region**
 
-If you have not yet run `aws configure` and set a default region, you must do so, or you can also run `export AWS_DEFAULT_REGION=<your-region>`. The region used in the demonstration is us-east-1 as Bedrock service is available only in limited regions.
+If you have not yet run `aws configure` and set a default region, you must do so, or you can also run `export AWS_DEFAULT_REGION=<your-region>`. The region used in the demonstration is us-east-1 as Amazon Bedrock is currently not available in every region.
 
 **Authorization**
 
