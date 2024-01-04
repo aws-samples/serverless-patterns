@@ -23,10 +23,10 @@ jobs:
         uses: andstor/copycat-action@v3
         with:
           personal_token: ${{ secrets.patterns_pat }}
-          dst_path: /content/patterns/import/
+          dst_path: /content/patterns/example/
           dst_owner: bls20AWS
           dst_repo_name: serverless-land
-          dst_branch: main
+          dst_branch: master
           src_branch: main
           file_filter: "*.json"
           src_path: /${{ inputs.dirName }}/${{ inputs.fileName }}
