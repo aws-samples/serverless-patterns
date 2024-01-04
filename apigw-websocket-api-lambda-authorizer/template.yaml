@@ -196,7 +196,7 @@ Resources:
         - email
       AutoVerifiedAttributes:
         - email
-      MfaConfiguration: 'OFF'
+      MfaConfiguration: 'OPTIONAL'
 
 # Cognito User Pool Client
   CognitoUserPoolClient:
