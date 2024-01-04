@@ -38,7 +38,7 @@ API Gateway Websocket API doesn't support [Cognito authorizer](https://docs.aws.
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy -guided` mode and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 5. Note the outputs from the SAM deployment process. These contain the WebSocketURI, UserpoolId, and ClientId which are used for testing.
 
@@ -65,7 +65,7 @@ aws cognito-idp admin-confirm-sign-up \
 Run the following command to get the Cognito tokens for the user.
 
 ```bash
-# run the initiate-auth Command:
+# run the initiate-auth command to get cognito tokens
 aws cognito-idp initiate-auth \
   --auth-flow USER_PASSWORD_AUTH \
   --auth-parameters USERNAME=YOUR_USERNAME,PASSWORD=YOUR_PASSWORD \
@@ -80,7 +80,7 @@ use the following command:
 ```
 npm install -g wscat
 ```
-> Note: It is important to understand that only the initial web-socket connect request (handshake) that establishes a WebSocket connection between client and server requires authentication. Once the channel has been established, subsequent request works just fine.
+> Note: It is important to understand that only the initial web-socket connect request (handshake) that establishes a WebSocket connection between client and server requires authentication. Once the channel has been established, subsequent requests work just fine.
 
 To continue testing, follow the steps below:
 1. Run the below command (in more than one window) to establish websocket connections with the API Gateway.
@@ -89,8 +89,8 @@ To continue testing, follow the steps below:
     ```
     The url to connect to can also be found as the output parameter of the CloudFormation stack.
  2. Just for your information, query parameter `ID_Token` is case sensitive. If you want to change it, then update it in `template.yaml` file at `route.request.querystring.ID_Token`.
-2. If the token is valid, the response is `Connected`; otherwise, the response is 401 unauthorized. 
-3. Optionally, to perform a negative test, send an invalid value for `ID_Token` and verify you get 401 unauthorized in the response.
+2. If the token is valid, the response is `Connected`; otherwise, the response is 401 unauthorized or 403 forbidden. 
+3. Optionally, to perform a negative test, send an invalid value for `ID_Token` and verify you get 401 or 403 in the response.
 4. In one of the windows use the following command to send a message to the WebSocket which will broadcast the message to all other open console windows:
     ```
     $ wscat -c wss://{YOUR-API-ID}.execute-api.{YOUR-REGION}.amazonaws.com/prod
