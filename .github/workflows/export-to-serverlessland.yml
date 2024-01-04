@@ -22,7 +22,7 @@ jobs:
       - name: Copycat
         uses: andstor/copycat-action@v3
         with:
-          personal_token: ${{ secrets.PERSONAL_TOKEN }}
+          personal_token: ${{ secrets.patterns_pat }}
           dst_path: /content/patterns/
           dst_owner: bls20aws
           dst_repo_name: serverless-land
