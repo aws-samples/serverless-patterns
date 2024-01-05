@@ -78,7 +78,7 @@ Resources:
             Effect: Allow
             Action: execute-api:ManageConnections
             Resource: !Sub 
-            - arn:aws:execute-api:${region}:{accountId}:*/@connections/*
+            - arn:aws:execute-api:${region}:${accountId}:*/@connections/*
             - region: !Ref 'AWS::Region'
               accountId: !Ref 'AWS::AccountId'
       Environment:
