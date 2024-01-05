@@ -53,7 +53,7 @@ First synthesize, which executes the application, defines which resources will b
 ```
 cdk synth
 ```
-Now bootstrap, which provisions the resources you'll use when deploying the application
+All AWS CDK v2 deployments use dedicated AWS resources to hold data during deployment. Therefore, your AWS account and Region must be bootstrapped to create these resources before you can deploy. If you haven't already bootstrapped execute the below command
 ```
 cdk bootstrap
 ```
