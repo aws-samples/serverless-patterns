@@ -7,7 +7,7 @@ This patterns shows CDK deployment on how to leverage Amazon S3, AWS Lambda, Ama
 ### What resources will be created?
 This CDK code will create the following:
    - One S3 bucket (to hold the text for which sentiment analysis has to be done)
-   - One Lambda (to invoke the Comprehend API)
+   - One Lambda function (to invoke the Comprehend API)
    - One DynamoDB (to store the result of Sentiment Analysis)
    - One IAM role (for the Lambda function to invoke Comprehend and DynamoDB)
 
