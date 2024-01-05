@@ -16,7 +16,7 @@ This CDK code will create the following:
 ### Development Environment
 **Cloud 9**
 
-This demonstration for this pattern is executed in an AWS Cloud9 environment. The EC2 instance used is m5.large (8 GiB RAM + 2 vCPU).
+This demonstration for this pattern is executed in an AWS Cloud9 environment. The EC2 instance used is m5.large (8 GiB RAM + 2 vCPU). However, users have an option to deploy the application using CDK from local environment as well.
 
 ### AWS setup
 **Region**
@@ -124,4 +124,4 @@ Response from Comprehend Service:
 
 ## Cleanup
 
-To clean up the resources created as part of this demonstration, run the command `cdk destroy` in the directory `s3-lambda-comprehend-cdk-python`.
+To clean up the resources created as part of this demonstration, run the command `cdk destroy` in the directory `s3-lambda-comprehend-cdk-python`. In addition, users are required to shutdown the Cloud9 EC2 instance to avoid any unexpected charges.
