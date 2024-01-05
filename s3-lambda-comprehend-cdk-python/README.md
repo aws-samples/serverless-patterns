@@ -124,4 +124,4 @@ Response from Comprehend Service:
 
 ## Cleanup
 
-To clean up the resources created as part of this demonstration, run the command `cdk destroy` in the directory `s3-lambda-comprehend-cdk-python`. In addition, users are required to shutdown the Cloud9 EC2 instance to avoid any unexpected charges.
+To clean up the resources created as part of this demonstration, run the command `cdk destroy` in the directory `s3-lambda-comprehend-cdk-python`. In addition, users are advised to terminate the Cloud9 EC2 instance to avoid any unexpected charges.
