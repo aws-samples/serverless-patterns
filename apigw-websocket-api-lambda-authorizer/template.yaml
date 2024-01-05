@@ -77,7 +77,10 @@ Resources:
         - Statement:
             Effect: Allow
             Action: execute-api:ManageConnections
-            Resource: arn:aws:execute-api:*:*:*/@connections/*
+            Resource: !Sub 
+            - arn:aws:execute-api:${region}:{accountId}:*/@connections/*
+            - region: !Ref 'AWS::Region'
+              accountId: !Ref 'AWS:AccountId'
       Environment:
         Variables:
           TABLE_NAME: !Ref 'ConnectionMappingTableName'

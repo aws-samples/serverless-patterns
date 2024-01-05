@@ -1,6 +1,6 @@
 # WebSocket API Cognito Authentication using Lambda Authorizer
 
-This pattern demonstrates how to integrate Cognito authentication with Amazon API Gateway WebSocket API.
+This pattern demonstrates how to integrate Amazon Cognito authentication with Amazon API Gateway WebSocket API.
 
 It includes the Lambda implementations for Lambda Authorizer, Lambda functions for $connect, $disconnect and custom route, and AWS Serverless Application Model (SAM) code to deploy backend infrastructure.
 
@@ -48,13 +48,15 @@ API Gateway Websocket API doesn't support [Cognito authorizer](https://docs.aws.
 In order to test, follow the steps given below:
 
 ### Step 1. Create a user in Cognito user pool
+> Note: For production workloads, you should use a strong password; the password given below is simply for demonstration purposes.
+
 ```bash
 # perform sign-up
 aws cognito-idp sign-up \
   --region YOUR_COGNITO_REGION \
   --client-id YOUR_COGNITO_APP_CLIENT_ID  \
   --username admin@example.com \
-  --password Passw0rd!
+  --password Passw0rd! 
 
 # confirm sign-up  
 aws cognito-idp admin-confirm-sign-up \

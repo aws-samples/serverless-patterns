@@ -3,6 +3,7 @@
 This starter project consists of:
 * Function.cs - class file containing a class with a single function handler method
 * aws-lambda-tools-defaults.json - default argument settings for use with Visual Studio and command line deployment tools for AWS
+* CognitoJwtVerifier - class file to verify ID and access JWT tokens obtained from Amazon Cognito 
 
 You may also have a test project depending on the options selected.
 
