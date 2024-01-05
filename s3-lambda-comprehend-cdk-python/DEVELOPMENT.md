@@ -9,7 +9,6 @@ s3-lambda-comprehend-cdk-python
    - architecture.png
    - user_input_text.txt
 - requirements.txt
-- source.bat
 ```
 
 ## Common Errors & Troubleshooting
