@@ -80,7 +80,7 @@ Resources:
             Resource: !Sub 
             - arn:aws:execute-api:${region}:{accountId}:*/@connections/*
             - region: !Ref 'AWS::Region'
-              accountId: !Ref 'AWS:AccountId'
+              accountId: !Ref 'AWS::AccountId'
       Environment:
         Variables:
           TABLE_NAME: !Ref 'ConnectionMappingTableName'
