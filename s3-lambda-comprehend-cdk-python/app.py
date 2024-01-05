@@ -27,6 +27,7 @@ class S3LambdaComprehendServerless(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        # Replace the bucket name with a preferred unique name, since S3 bucket names are globally unique.
         self.user_input_bucket = s3.Bucket(
             self,
             "s3-upload-input-text",
@@ -65,8 +66,8 @@ class S3LambdaComprehendServerless(Stack):
             runtime=lambda_.Runtime.PYTHON_3_10,
             handler="lambda_function.lambda_handler",
             code=lambda_.Code.from_asset(os.path.join(DIRNAME, "src")),
-            timeout=Duration.minutes(10),
-            memory_size=2048,
+            timeout=Duration.minutes(1),
+            memory_size=512,
             environment={
                 "environment": "dev",
                 "dynamodb_table": dynamodb_table.table_name,
@@ -75,9 +76,6 @@ class S3LambdaComprehendServerless(Stack):
 
         # lambda version
         version = lambda_function.current_version
-
-        # lambda alias
-        alias = lambda_.Alias(self, "Alias", alias_name="Prod", version=version)
 
         # lambda policy
         lambda_function.add_to_role_policy(
