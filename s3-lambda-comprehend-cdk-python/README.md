@@ -16,7 +16,7 @@ This CDK code will create the following:
 ### Development Environment
 **Cloud 9**
 
-This code for this pattern is executed in AWS Cloud9 environment. The EC2 instance used is m5.large (8 GiB RAM + 2 vCPU).
+This demonstration for this pattern is executed in an AWS Cloud9 environment. The EC2 instance used is m5.large (8 GiB RAM + 2 vCPU).
 
 ### AWS setup
 **Region**
