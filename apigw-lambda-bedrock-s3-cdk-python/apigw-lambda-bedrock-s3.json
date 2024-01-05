@@ -1,0 +1,96 @@
+{
+    "title": "Generate image with Amazon Bedrock, AWS Lambda, and API Gateway",
+    "description": "Generate images using Amazon Bedrock from an AWS Lambda function fronted with API Gateway and save to Amazon S3",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This project aims to build an integration between API Gateway, AWS Lambda, Amazon Bedrock and Amazon S3",
+            "The core functionality revolves around exposing an API endpoint via API Gateway that accepts a user-defined prompt.",
+            "When a prompt is received, API Gateway triggers an AWS Lambda function. This function is responsible for invoking a diffusion image generation model (Stable Diffusion XL 1.0) hosted on Amazon Bedrock, generating an image and saving it to Amazon S3.",
+            "To ensure compatibility with Bedrock, a Lambda Layer is utilized, it contains the latest version of the Boto3 library, as only the most recent Boto3 version includes a client for Amazon Bedrock."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-s3-cdk-python",
+            "templateURL": "serverless-patterns/apigw-lambda-bedrock-s3-cdk-python",
+            "projectFolder": "apigw-lambda-bedrock-cdk-s3-python",
+            "templateFile": "apigw_lambda_bedrock/apigw_lambda_bedrock_s3_stack.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon Bedrock API Reference",
+                "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html"
+            },
+            {
+                "text": "Packaging custom boto3 version as a layer",
+                "link": "https://repost.aws/knowledge-center/lambda-python-runtime-errors"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Chris Peter Francis",
+            "bio": "Chris Peter Francis is a Solutions Architect based out of Austin, Texas. He helps mature AI transformation across the energy and utilties sectors.",
+            "linkedin": "chrispeterfrancis"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway REST API"
+        },
+        "icon2": {
+            "x": 40,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 65,
+            "y": 50,
+            "service": "bedrock",
+            "label": "Amazon Bedrock"
+        },
+        "icon4": {
+            "x": 90,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        }
+    }
+}
