@@ -20,7 +20,7 @@ Solution: You must set an AWS region with `export AWS_DEFAULT_REGION=<your-regio
 ```
 botocore.exceptions.ClientError: An error occurred (AccessDenied) when calling the CreateRole operation: User: <user-arn> is not authorized to perform: iam:CreateRole on resource: <role-arn> because no identity-based policy allows the iam:CreateRole action
 ```
-Solution: you must ensure the IAM role you are using has sufficient permissions to create Iam roles
+Solution: you must ensure the IAM role you are using has sufficient permissions to create IAM roles
 
 #### Error processing tar file(exit status 1): write /path/libcublas.so.11: no space left on device
 Issue: Docker has run out of memory due to too many images
