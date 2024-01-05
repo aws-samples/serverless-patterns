@@ -14,9 +14,9 @@ You also need [docker](https://www.docker.com/) and md5 to be installed on your 
 
 ## Deployment and Testing Instructions
 
-The deployment will require you to provide the AWS VPC id along with the Subnet id(s) where you want this pattern to be deployed. 
+The deployment will require you to provide the AWS VPC id along with the Subnet id(s) where you want this pattern to be deployed. It is expected that the subnets provided have internet access via NAT Gateway (incase of private subnets) or otherwise. Additionally, You can use AWS PrivateLink to create a private connection between your VPC and Amazon Bedrock. You can access Amazon Bedrock as if it were in your VPC, without the use of an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. You establish this private connection by creating an interface endpoint, powered by AWS PrivateLink. For more information, see [ Access AWS services through AWS PrivateLink](https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html) in the AWS PrivateLink Guide.
 
-Optionally, you can also specify foundation model name, env and organization (tagging purposes), timeout and memory_size (AWS Lmabda function compute purposes) and lastly logging_level to specify the logging level for your function. These values default to entires in the variable.tf file if not provided at deployment.
+Optionally, you can also specify foundation model name, env and organization (tagging purposes), timeout and memory_size (AWS Lambda function compute purposes) and lastly logging_level to specify the logging level for your function. These values default to entires in the variable.tf file if not provided at deployment.
 
 ```shell
 # terraform init
