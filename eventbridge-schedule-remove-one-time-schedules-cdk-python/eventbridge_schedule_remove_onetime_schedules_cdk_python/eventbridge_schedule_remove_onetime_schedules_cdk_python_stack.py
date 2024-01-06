@@ -16,7 +16,7 @@ from constructs import Construct
 #use everybridge scheduler that runs every 5 minutes to remove one time eventbridge schedules completed and not used 
 #add lambda to sns subscription 
 
-class EventbridgeOnetimeScheduleRemoveToSnsCdkPythonStack(Stack):
+class EventBridgeRemoveOnetimeSchedulesCdkPythonStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
