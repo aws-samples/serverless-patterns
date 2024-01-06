@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd eventbridge-schedule-remove-one-time-schedule-to-sns-cdk-python
+    cd eventbridge-schedule-remove-one-time-schedules-cdk-python
     ```
 3. From the command line, bootstrap the CDK if you haven't already done so. 
     ```
