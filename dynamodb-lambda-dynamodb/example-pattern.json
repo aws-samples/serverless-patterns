@@ -3,7 +3,7 @@
     "description": "Create a AWS Lambda Function to consume streams from Amazon DynamoDB and replicate the data to another region.",
     "language": "Java",
     "level": "100",
-    "framework": "AWS SDK for Java",
+    "framework": "Terraform",
     "introBox": {
       "headline": "How it works",
       "text": [
@@ -52,7 +52,7 @@
         "name": "Sai Aung Hlyan Htet",
         "image": "",
         "bio": "Software Engineer @ Global Innovation Consulting",
-        "linkedin": "https://www.linkedin.com/in/saiaunghlyanhtet/",
+        "linkedin": "saiaunghlyanhtet",
         "twitter": ""
       }
     ]
