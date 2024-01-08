@@ -24,6 +24,7 @@ Important: this application uses various AWS services and there are costs associ
 * To run example #9, an account with [Shopify](https://www.shopify.com/). Follow the instructions to [Create an app and configure Admin API Access scopes](https://shopify.dev/apps/auth/admin-app-access-tokens#step-1-create-and-install-the-app). Make sure to note the Admin Key.
 * To run example #10, an account with [Stripe](https://dashboard.stripe.com/login). Follow the instructions to [Set up your development environment](https://stripe.com/docs/development/quickstart) and note the api key.
 * To run example #11, an account with [Salesforce](https://login.salesforce.com/). Follow the Prerequisites to [Create an app and configure security token](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-tutorial-salesforce.html). Make sure to note the Authorization endpoint, Client ID, Client Secret and OAuth Http Parameters Key.
+* To run example #13, an account with [Auth0](https://auth0.com/signup?place=header&type=button&text=sign%20up). Navigate to the Application settings to [Find your Auth0 Client ID and Domain Name](https://auth0.com/docs/get-started/applications/application-settings). Use your Domain Name and Client ID to [Send a API call for the Sign up API](https://auth0.com/docs/api/authentication?http#signup). For the connection field, all that is needed is the value: CONNECTION.
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -45,6 +46,7 @@ Important: this application uses various AWS services and there are costs associ
 - To run the Shopify API Destination example, cd to `9-shopify`.
 - To run the Stripe API Destination example, cd to `10-stripe`.
 - To run the API Destination with OAuth credentials example, cd to `11-oauth-api`.
+- To run the API Destination with OAuth credentials example, cd to `12-auth0`.
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
@@ -74,6 +76,7 @@ aws events put-events --entries file://testEvent.json
 9. For the shopify example use the testEvent.json within the 9-shopify directory
 10. For the stripe example use the testEvent.json within the 10-stripe directory
 11. For the OAuth example use the testEvent.json within the 11-oauth-api directory
+11. For the OAuth example use the testEvent.json within the 12-auth0 directory
 ```
 aws events put-events --entries file://3-sumologic/testEvent.json
 ```
