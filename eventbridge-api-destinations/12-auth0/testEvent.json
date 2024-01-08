@@ -1,0 +1,8 @@
+[
+    {
+        "DetailType": "MyTestMessage",
+        "EventBusName": "MyAuth0EventBus",
+        "Source": "MyAuth0App",
+        "Detail": "{\"email\":\"example@email.com”\",\"password\":\"StrongPass12345\", \"connection\":\"CONNECTION\"}}"
+    }
+  ]
