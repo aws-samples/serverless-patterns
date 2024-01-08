@@ -1,0 +1,74 @@
+{
+    "title": "Integrate AWS Lambda with Amazon Bedrock",
+    "description": "Terraform IaC template to deploy AWS Lambda making Amazon Bedrock calls.",
+    "language": "",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern will use Amazon Bedrock and AWS Lambda function to show how to develop a GenAI application with minimum code.",
+            "With this design, customers will be able to choose their preferred Foundation Model from the Amazon Bedrock"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-lambda-bedrock-integration",
+            "templateURL": "serverless-patterns/terraform-lambda-bedrock-integration",
+            "projectFolder": "terraform-lambda-bedrock-integration",
+            "templateFile": "main.tf"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Set up the Amazon Bedrock API",
+                "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/api-setup.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "terraform init",
+            "terraform plan",
+            "terraform apply"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the README in the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "terraform destroy",
+            "terraform show"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Nitin Jain",
+            "image": "",
+            "bio": "Sr. Solution Architect, AWS",
+            "linkedin": "annjay"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 30,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon2": {
+            "x": 70,
+            "y": 50,
+            "service": "bedrock",
+            "label": "Amazon Bedrock"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        }
+    }
+}
