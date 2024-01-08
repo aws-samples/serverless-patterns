@@ -1,0 +1,61 @@
+{
+  "title": "AWS Lambda and Amazon Aurora Serverless v2",
+  "description": "Creates a Lambda function with access to an Amazon Aurora Serverless v2 DB cluster.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an AWS Lambda function and an Amazon Aurora PostgreSQL DB in an Aurora Serverless v2 DB cluster with RDS Data API and a Secrets Manager secret.",
+      "The function creates an example table in the DB, inserts a row with data from the event object, then returns the results of a select query."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-aurora-serverlessv2-postgresql",
+      "templateURL": "serverless-patterns/lambda-aurora-serverlessv2-postgresql",
+      "projectFolder": "lambda-aurora-serverlessv2-postgresql",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using the Data API for Aurora Serverless",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html"
+      },
+      {
+        "text": "Data API - ExecuteStatement",
+        "link": "https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html"
+      },
+      {
+        "text": "Using Aurora Serverless v2",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Yusuf Mayet",
+      "image": "https://d2908q01vomqb2.cloudfront.net/9e6a55b6b4563e652a23be9d623ca5055c356940/2021/11/24/Yusuf-mayet-aws.jpg",
+      "bio": "I am a Solutions Architect at AWS, where I help customers realise that true transformation lies at the intersection of Cloud, DevOps cultural practices, Agile principles, modular and scalable architectures, and efficient team structures.",
+      "linkedin": "yusufmayet"
+    }
+  ]
+}
