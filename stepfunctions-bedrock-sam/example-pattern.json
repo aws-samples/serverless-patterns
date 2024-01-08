@@ -1,6 +1,6 @@
 {
-  "title": "AWS Step Functions Express Workflow to Amazon Bedrock Anthropic Claud Model v2.1 for Content Generation",
-  "description": "The SAM template deploys a Step Functions Express workflow that invokes Amazon Bedrock Anthropic Claud Model v2.1 and returns the generated content by the model in the response. The SAM template contains the required resouces with IAM permission to run the application with logging enabled.",
+  "title": "AWS Step Functions to Amazon Bedrock Integration",
+  "description": "The SAM template deploys a Step Functions workflow that invokes Amazon Bedrock Anthropic Claud Model v2.1 to generate content for a given prompt.",
   "language": "YAML",
   "level": "200",
   "framework": "SAM",
@@ -19,7 +19,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunctions-bedrock-sam",
       "templateURL": "serverless-patterns/stepfunctions-bedrock-sam",
       "projectFolder": "stepfunctions-bedrock-sam",
-      "templateFile": "stepfunctions-bedrock-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -54,7 +54,7 @@
       "name": "Biswanath Mukherjee",
       "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
-      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+      "linkedin": "biswanathmukherjee"
     }
   ]
 }
