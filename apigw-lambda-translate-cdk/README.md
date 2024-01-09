@@ -65,7 +65,7 @@ cdk deploy
 The deployment will create a API Gateway and a Lambda function.
 
 ## How it works
-The API Gateway handles the incoming requests from the user and it invokes the relevant route. The Lambda, triggered by API Gateway, invokes the Translate's TranslateText API and the analyzed response from Translate is routed back to the requester. The target language for translation is set to French by default and users are requested to change it as per their use-case.
+The API Gateway handles the incoming requests from the user and it invokes the relevant route. The Lambda function, triggered by API Gateway, invokes the Translate's TranslateText API and the analyzed response from Translate is routed back to the requester. The target language for translation is set to French by default and users are requested to change it as per their use-case.
 
 ## Testing
 Upon successful deployment of the stack, the Output section would provide the `APIEndpoint` in the CDK environment. Alternatively, the `APIEndpoint` can be found from the Outputs section of the `CloudFormation` stack.
