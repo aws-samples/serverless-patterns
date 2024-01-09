@@ -48,8 +48,6 @@ class LambdaEventBridgeSQSLambda(Stack):
                 "environment": "dev",                
             }            
         )
-
-        lambda_function.add_function_url(auth_type = lambda_.FunctionUrlAuthType.NONE)
         
         
         # lambda version
@@ -71,13 +69,14 @@ class LambdaEventBridgeSQSLambda(Stack):
         email_queue = sqs_.Queue(self, "EmailQueue")
         sftp_queue  = sqs_.Queue(self, "SftpQueue")
         tpapi_queue = sqs_.Queue(self, "TpapiQueue")
+        dlq = sqs_.Queue(self, "DLQ")
         
 
         # EventBridge Rule
 
-        email_rule = self.create_rule(email_queue,'email')
-        sftp_rule = self.create_rule(sftp_queue,'sftp')
-        tpapi_rule= self.create_rule(tpapi_queue,'3papi') 
+        email_rule = self.create_rule(email_queue,'email',dlq)
+        sftp_rule = self.create_rule(sftp_queue,'sftp',dlq)
+        tpapi_rule= self.create_rule(tpapi_queue,'3papi',dlq) 
         
 
 
@@ -108,7 +107,7 @@ class LambdaEventBridgeSQSLambda(Stack):
             )                                    
         )
 
-    def create_rule(self, queue, preference):
+    def create_rule(self, queue, preference,dlq):
         eventPattern = {
                             "source": [{
                                         "equals-ignore-case": "content-generator"
@@ -117,8 +116,8 @@ class LambdaEventBridgeSQSLambda(Stack):
                                    "equals-ignore-case": preference
                              }]
                        }               
-                                                    
-        target_queue = events.CfnRule.TargetProperty(arn= queue.queue_arn,id = preference+'-queue-target')        
+        dlq_property = events.CfnRule.DeadLetterConfigProperty(arn=dlq.queue_arn)                                                    
+        target_queue = events.CfnRule.TargetProperty(arn= queue.queue_arn,id = preference+'-queue-target', dead_letter_config=dlq_property)        
         return events.CfnRule(self,preference+"-rule",event_pattern=eventPattern, targets=[target_queue])
     
 

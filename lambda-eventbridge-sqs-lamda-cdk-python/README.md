@@ -47,14 +47,14 @@ pip install -r requirements.txt
 
 ## How it works
 
-- Go to the Lambda ARN printed as part of the CDK output. Invoke the Lambda from the function url.
+- Go to the Lambda ARN printed as part of the CDK output. Do a Test invocation of the Lambda from the console.
 - This will send three events to EventBridge and each will be routed to either the email/sftp/3papi SQS queue.
 - Finally each of the processing Lambdas get triggered by the message on their respective queues.
 
 
 ## Testing
 
-1. Go to the Lambda ARN printed as part of the CDK output. Invoke the Lambda from the function url.
+1. Go to the Lambda ARN printed as part of the CDK output. Do a Test invocation of the Lambda from the console.
 1. This will send three events to EventBridge and each will be routed to either the email/sftp/3papi SQS queue and eventually to the processor Lambdas.
 
 

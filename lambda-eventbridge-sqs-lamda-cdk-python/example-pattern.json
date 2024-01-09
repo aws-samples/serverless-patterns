@@ -1,6 +1,6 @@
 {
-    "title": "Lambda event generation, their distribution via EventBridge rules to rate controlled processing using SQS+Lambda",
-    "description": "The pattern demonstrates creating and sending events to EventBridge, routing them to targets based on message contents to SQS targets consumed by Lambdas.",
+    "title": "Create and route events using Lambda, EventBridge, SQS",
+    "description": "The pattern sends custom events to EventBridge, routes them using content-based rules to rate-controlled SQS+Lambda pattern",
     "language": "Python",
     "level": "200",
     "framework": "CDK",
