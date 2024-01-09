@@ -235,3 +235,4 @@ terraform.rc
 #Ignore Intellij files
 *.iml
 *.idea
+.torchignore
