@@ -6,7 +6,7 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::bedrock:invokeModel",
       "Parameters": {
-        "ModelId": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-v2:1",
+        "ModelId": "${ModelId}",
         "Body": {
           "prompt.$": "$.prompt",
           "max_tokens_to_sample": 200

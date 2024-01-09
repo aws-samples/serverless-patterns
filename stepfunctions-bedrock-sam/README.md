@@ -14,6 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* You must have enabled the Anthropic Claud Model access on Amazon Bedrock console.
 
 ## Deployment Instructions
 
@@ -31,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 4. During the prompts:
     * Enter a stack name
-    * Enter `us-east-1` AWS Region. Please note this setup currently tested on `us-east-1` region.
+    * Enter `us-east-1` AWS Region. 
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -56,7 +57,7 @@ Please refer to the architecture diagram below:
 Run the following AWS CLI command to send a 'start-sync-execution` comand to start the Step Functions workflow. Note, you must edit the {StateMachineExpressSyncToBedrockArn} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs.
 
 ```bash
-aws stepfunctions start-sync-execution  --name "test" --state-machine-arn "{StateMachineExpressSyncToBedrockArn}" --input "{\"prompt\": \"\n\nHuman:Write 5 lines about how Moon was formed.\n\nAssistant:\"}"
+aws stepfunctions start-sync-execution  --name "test" --state-machine-arn "{StateMachineExpressSyncToBedrockArn}" --input "{\"prompt\": \"\n\nHuman:Write 5 lines about how Moon was formed.\n\nAssistant:\"}" --region {your-region}
 ```
 
 ### Example output:
