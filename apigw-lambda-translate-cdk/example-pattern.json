@@ -27,6 +27,14 @@
         {
           "text": "Amazon Translate Features",
           "Link": "https://aws.amazon.com/translate/"
+        },
+        {
+          "text": "Amazon API Gateway",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
+        },
+        {
+          "text": "Amazon API Gateway Features",
+          "link": "https://aws.amazon.com/api-gateway/"
         }
       ]
     },
