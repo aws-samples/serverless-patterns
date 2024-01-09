@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/amplify-codecommit",
       "templateURL": "serverless-patterns/amplify-codecommit",
       "projectFolder": "amplify-codecommit",
-      "templateFile": "amplify-codecommit/lib/amplify-webapp-construct.js"
+      "templateFile": "lib/amplify-webapp-construct.js"
     }
   },
   "resources": {
