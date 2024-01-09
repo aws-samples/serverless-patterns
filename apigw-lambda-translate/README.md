@@ -1,97 +1,89 @@
-# Amazon API Gateway REST API to AWS Lambda and AWS Translate service
+# API Gateway -> Lambda -> Translate
+This patterns shows CDK deployment on how to leverage Amazon API Gateway, AWS Lambda, and Amazon Translate to perform language translation in a serverless fashion.
 
-This pattern creates an Amazon API Gateway REST API and an AWS Lambda function that calls AWS Translate service.
+## Architecture
+![Diagram](src/architecture.png)
 
-Learn more about this pattern at: https://serverlessland.com/patterns/apigw-lambda-translate.
-
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+### What resources will be created?
+This CDK code will create the following:
+   - One Lambda function (to invoke the Translate API)
+   - One API Gateway (to trigger the Lambda function with user input)
+   - One IAM role (for the Lambda function to invoke Translate service)
 
 ## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [AWS Translate](https://aws.amazon.com/translate/)
-* [AWS Translate Languages](https://docs.aws.amazon.com/translate/latest/dg/pairs.html)
+### Development Environment
+**Cloud 9**
 
-## Deployment Instructions
+This demonstration for this pattern is executed in an AWS Cloud9 environment. The EC2 instance used is t2.micro (1 GiB RAM + 1 vCPU). However, users have an option to deploy the application using CDK from local environment as well.
 
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ```
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-2. Change directory to the pattern directory:
-    ```
-    cd apigw-lambda-translate
-    ```
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
-    ```
-    sam deploy --guided
-    ```
-4. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
+### AWS setup
+**Region**
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+If you have not yet run `aws configure` and set a default region, you must do so, or you can also run `export AWS_DEFAULT_REGION=<your-region>`. The region used in the demonstration is us-east-1. Please make sure the region selected supports both Translate and Comprehend service.
+(If the user does not know the source language that needs to be translated, the source language is set as `auto` in the lambda function and Translate service internally invokes Comprehend API to detect the source language.) 
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs that were created.
+**Authorization**
+
+You must use a role that has sufficient permissions to create IAM roles, as well as CloudFormation resources
+
+#### Python >=3.8
+Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration uses python 3.10.
+
+#### AWS CDK
+Make sure you have the [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install) installed in the Cloud9 environment.
+
+
+## Setup
+
+### Set up environment and gather packages
+
+```
+cd apigw-lambda-translate
+```
+
+Install the required dependencies (aws-cdk-lib and constructs) into your Python environment 
+```
+pip install -r requirements.txt
+```
+
+### Gather and deploy resources with the CDK
+
+First synthesize, which executes the application, defines which resources will be created, and translates this into a CloudFormation template
+```
+cdk synth
+```
+All AWS CDK v2 deployments use dedicated AWS resources to hold data during deployment. Therefore, your AWS account and Region must be bootstrapped to create these resources before you can deploy. If you haven't already bootstrapped execute the below command
+```
+cdk bootstrap
+```
+and deploy with
+```
+cdk deploy
+```
+
+The deployment will create a S3 bucket, a Lambda function and a DynamoDB table.
 
 ## How it works
-
-This pattern deploys an Amazon API Gateway REST API and a default route integrated with an AWS LAMBDA function written in Python. The lambda function calls AWS Translate service using the text and language given in the request body and returns the translated text or error response if the language code is not supported.
+The API Gateway handles the incoming requests from user and it invokes the relevant route. The Lambda, triggered by API Gateway, invokes the Translate's TranslateText API and the analyzed response from Translate service is routed back to the requester.
 
 ## Testing
+Upon successful deployment of the stack, the Output section would provide the `APIEndpoint` in the CDK environment. Alternatively, the `APIEndpoint` can be found from the Outputs section of the `CloudFormation` stack.
 
-Once the application is deployed, either use a curl or call the endpoint from Postman.
-
-Example POST Request to translate text to Spanish:
-```
-    curl -X POST "https://{api-gateway-endpoint}/prod"  -H 'Content-Type: application/json' -d '{"OriginalText":"Hello, my name is AWS","TranslateToLanguage":"es"}'
-```
-
-Response:
-```
-  "Hola, mi nombre es AWS"
+Use the below format to the test the API (replace the API Endpoint with the one retrieved from the above step):
+```bash
+curl -d '{"input": "I love AWS Services."}' -H 'Content-Type: application/json' https://<abcdefg>.execute-api.<region>.amazonaws.com/TranslateText
 ```
 
-Example POST Request to translate text to Afrikaans:
+A response as below would be seen on the terminal console:
 ```
-    curl -X POST "https://{api-gateway-endpoint}/prod"  -H 'Content-Type: application/json' -d '{"OriginalText":"Hello, my name is AWS","TranslateToLanguage":"af"}'
+{
+    "Translated Text": "J'adore AWS Services.",
+    "statusCode": 200,
+    "Source Text": "I love AWS Services."
+}
 ```
-
-Response:
-```
-  "Hallo, my naam is AWS"
-```
-
-Example POST Request with unsupported language:
-```
-    curl -X POST "https://{api-gateway-endpoint}/prod"  -H 'Content-Type: application/json' -d '{"OriginalText":"Hello, my name is AWS","TranslateToLanguage":"ef"}'
-```
-
-Response:
-```
-  "An error occurred (UnsupportedLanguagePairException) when calling the TranslateText operation: Unsupported language pair: en to ef. Target language 'ef' is not supported"
-```
-
-## Documentation
-- [Working with HTTP APIs](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html)
-- [Working with AWS Lambda proxy integrations for HTTP APIs](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html)
-- [AWS Lambda - the Basics](https://docs.aws.amazon.com/whitepapers/latest/serverless-architectures-lambda/aws-lambdathe-basics.html)
-- [Lambda Function Handler](https://docs.aws.amazon.com/whitepapers/latest/serverless-architectures-lambda/the-handler.html)
-- [Function Environment Variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html)
 
 ## Cleanup
 
-1. Delete the stack
-    ```bash
-    sam delete
-    ```
-
-This pattern was contributed by Sudheer Yalamanchili.
-
-----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-SPDX-License-Identifier: MIT-0
+To clean up the resources created as part of this demonstration, run the command `cdk destroy` in the directory `apigw-lambda-translate`. In addition, users are advised to terminate the Cloud9 EC2 instance to avoid any unexpected charges.
