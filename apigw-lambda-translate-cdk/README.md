@@ -7,7 +7,7 @@ This patterns shows CDK deployment on how to leverage Amazon API Gateway, AWS La
 ### What resources will be created?
 This CDK code will create the following:
    - One Lambda function (to invoke the Translate API)
-   - One API Gateway (to trigger the Lambda function with user input)
+   - One API Gateway (to trigger the Lambda function with user input. The API Gateway does not perform any authorization or authentication of the incoming requests and this pattern should only be used for demonstration purposes only.)
    - One IAM role (for the Lambda function to invoke Translate service)
 
 ## Requirements
@@ -62,10 +62,10 @@ and deploy with
 cdk deploy
 ```
 
-The deployment will create a S3 bucket, a Lambda function and a DynamoDB table.
+The deployment will create a API Gateway and a Lambda function.
 
 ## How it works
-The API Gateway handles the incoming requests from user and it invokes the relevant route. The Lambda, triggered by API Gateway, invokes the Translate's TranslateText API and the analyzed response from Translate service is routed back to the requester.
+The API Gateway handles the incoming requests from the user and it invokes the relevant route. The Lambda, triggered by API Gateway, invokes the Translate's TranslateText API and the analyzed response from Translate is routed back to the requester. The target language for translation is set to French by default and users are requested to change it as per their use-case.
 
 ## Testing
 Upon successful deployment of the stack, the Output section would provide the `APIEndpoint` in the CDK environment. Alternatively, the `APIEndpoint` can be found from the Outputs section of the `CloudFormation` stack.
