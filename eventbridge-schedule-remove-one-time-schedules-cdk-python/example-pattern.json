@@ -24,7 +24,7 @@
     "bullets": [
       {
         "text": "Eventbridge Schedueler one time schedule",
-        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html#one-time"
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html"
       },
       {
         "text": "Amazon Eventbridge Scheduler - Scheduler to run and manage tasks ",
