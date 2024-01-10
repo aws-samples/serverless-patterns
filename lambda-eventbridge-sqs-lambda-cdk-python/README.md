@@ -2,7 +2,7 @@
 
 This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template for creating a Lambda function that posts AWS EventBridge events to the default domain bus. This CDK template defines EventBridge rules to distribute events based on rules to SQS queues and deploys a AWS Lambda function linked to each queue for event-type specific processing.
 
-Learn more about this pattern at Serverless Land Patterns:: https://serverlessland.com/patterns/s3-eventbridge-lambda
+Learn more about this pattern at Serverless Land Patterns:: https://serverlessland.com/patterns/lambda-eventbridge-sqs-lambda-cdk-python
 
 Important: This template uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -30,6 +30,8 @@ cd lambda-eventbridge-sqs-lambda-cdk-python
 
 Install the required dependencies (aws-cdk-lib and constructs) into your Python environment 
 ```
+python3 -m venv v-env
+source v-env/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -39,7 +41,7 @@ pip install -r requirements.txt
    cdk bootstrap 1111111111/us-east-1
    cdk bootstrap --profile test 1111111111/us-east-1
    ```
-1. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `stack/s3-eventbridge-lambda-stack.ts`
+1. From the command line, use AWS CDK to deploy the AWS resources for the pattern.
    ```bash
    cdk deploy
    ```
@@ -47,9 +49,9 @@ pip install -r requirements.txt
 
 ## How it works
 
-- Go to the Lambda ARN printed as part of the CDK output. Do a Test invocation of the Lambda from the console.
-- This will send three events to EventBridge and each will be routed to either the email/sftp/3papi SQS queue.
-- Finally each of the processing Lambdas get triggered by the message on their respective queues.
+- The eventsGenerator lambda function publishes three events to the default bus. Each event has distinct id and distribution-mechanism-preference pair. The events are also stamped with source as "content-generator"
+- Each message is evaluated against the rules defined in EventBridge. We have three rules each with a matching criteria of source matching "content-generator" and preferenceDistribution matching email|sftp|3papi respectively. (3papi refers to third-party API.)
+- The rules are configured with targets as SQS queues that trigger Lambdas for processing. The SQS queues are configured with concurrency settings to match the rate of the distribution-channel.
 
 
 ## Testing
@@ -57,7 +59,7 @@ pip install -r requirements.txt
 1. Go to the Lambda ARN printed as part of the CDK output. Do a Test invocation of the Lambda from the console.
 1. Create a new test event, accepting the default Event JSON. Choose **Invoke**.
 
-This will send three events to EventBridge and each will be routed to either the email/sftp/3papi SQS queue. The consumer Lambda function on each queue will process the message. 
+1. This will send three events to EventBridge and each will be routed to either the email/sftp/3papi SQS queue. The consumer Lambda function on each queue will process the message. For each of the Lambda's you can check the CloudWatch logs to see the message received and confirm it matches one of email|sftp|3papi.
 
 
 

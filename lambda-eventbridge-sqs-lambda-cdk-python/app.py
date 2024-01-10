@@ -12,7 +12,9 @@ from aws_cdk import (
     aws_sqs as sqs_,
     aws_events as events,    
     aws_events_targets as targets,
+    aws_logs as logs,
     CfnOutput,
+    RemovalPolicy
 )
 from aws_solutions_constructs.aws_sqs_lambda import SqsToLambda
 from constructs import Construct
@@ -34,8 +36,8 @@ class LambdaEventBridgeSQSLambda(Stack):
         lambda_cfn_role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name("AWSLambdaExecute")
         )
-
-        # lambda function for processing the incoming request from S3 bucket
+        lambdaLogGroup = logs.LogGroup(self,"EventGeneratorLogGroup",removal_policy=RemovalPolicy.DESTROY)
+        # Lambda function that generates and publishes events to the default EventBridge bus 
         lambda_function = lambda_.Function(
             self,
             "EventGenerator",
@@ -46,7 +48,10 @@ class LambdaEventBridgeSQSLambda(Stack):
             memory_size=512,
             environment={
                 "environment": "dev",                
-            }            
+            },            
+            log_group = lambdaLogGroup
+            
+                        
         )
         
         
@@ -56,8 +61,7 @@ class LambdaEventBridgeSQSLambda(Stack):
         # lambda policy
         lambda_function.add_to_role_policy(
             iam.PolicyStatement(
-                actions=[
-                    "events:CreateEventBus",
+                actions=[                    
                     "events:PutEvents",                    
                 ],
                 resources=["*"],
