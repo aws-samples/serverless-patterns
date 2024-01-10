@@ -56,7 +56,7 @@ pip install -r requirements.txt
 
 ## Testing
 
-1. Go to the Lambda ARN printed as part of the CDK output. Do a Test invocation of the Lambda from the console.
+1. Open the AWS Lambda Console and locate the Lambda function printed in the stack output.
 1. Create a new test event, accepting the default Event JSON. Choose **Invoke**.
 
 1. This will send three events to EventBridge and each will be routed to either the email/sftp/3papi SQS queue. The consumer Lambda function on each queue will process the message. For each of the Lambda's you can check the CloudWatch logs to see the message received and confirm it matches one of email|sftp|3papi.
