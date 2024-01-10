@@ -1,6 +1,6 @@
 # Event generation, their distribution via Amazon EventBridge rules to rate controlled processing using Amazon SQS and AWS Lambda
 
-This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template for creating a Lambda function that posts AWS EventBridge events to the default domain bus. This CDK template defines EventBridge rules to distribute events based on rules to SQS queues also created in the CK template.  This CDK template also deploys a AWS Lambda functions linked to each queue for event-type specific processing.
+This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template for creating a Lambda function that posts AWS EventBridge events to the default domain bus. This CDK template defines EventBridge rules to distribute events based on rules to SQS queues and deploys a AWS Lambda function linked to each queue for event-type specific processing.
 
 Learn more about this pattern at Serverless Land Patterns:: https://serverlessland.com/patterns/s3-eventbridge-lambda
 
