@@ -1,7 +1,7 @@
 # AWS Lambda RESTful API with Amazon ALB and Path Based Listener Rules
 
-This configuration employs Python 3.9 and the Serverless Application Model (SAM) CLI to establish an Application Load
-Balancer with path-based listener rules, paired with an AWS Lambda RESTful API function as the target.
+This configuration pattern creates an Application Load
+Balancer with path-based listener rules, paired with an AWS Lambda RESTful API function as the target. It uses  Python 3.9 and the Serverless Application Model (SAM) CLI.
 
 Learn more about this pattern
 at [Serverless Land Patterns](https://serverlessland.com/patterns/alb-lambda-rest-api-sam-py).
@@ -20,6 +20,7 @@ AWS costs incurred. No warranty is implied in this example.
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (
   AWS SAM) installed
 * [Python 3 installed](https://www.python.org/downloads/)
+* [AWS Lambda Powertools for Python](https://docs.powertools.aws.dev/lambda/python/latest/)
 * [Docker](https://www.docker.com/products/docker-desktop/)
 
 ## Deployment Instructions
@@ -43,6 +44,8 @@ AWS costs incurred. No warranty is implied in this example.
 5. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
+    * Enter VPC ID
+    * Enter comma seperated Subnet IDs for e.g, subnet-1,subnet-2
     * Allow SAM CLI to create IAM roles with the required permissions.
    
 6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for
@@ -52,9 +55,11 @@ AWS costs incurred. No warranty is implied in this example.
 
 This setup orchestrates the deployment of an Application Load Balancer, configures path-based routes directing traffic
 to a Python-based AWS Lambda function, and leverages
-the [AWS Lambda Powertools for Python](https://docs.powertools.aws.dev/lambda/python/latest/core/event_handler/api_gateway/)
+the [AWS Lambda Powertools for Python](https://docs.powertools.aws.dev/lambda/python/latest/core/event_handler/api_gateway/#application-load-balancer)
 library. The Lambda function, serving as the target, records details of the incoming ALB event, along with the API and
 context objects, logging them to an Amazon CloudWatch Logs log group and Amazon X-Ray.
+
+Note: ALB has no authentication or authorization and should only be used for demo purposes.
 
 ## Testing
 
