@@ -1,0 +1,56 @@
+{
+  "title": "AWS Step Functions Workflow to demonstrate wait for callback functionality",
+  "description": "AWS Step Functions Workflow to demonstrate wait for callback functionality using SQS, SNS and Lambda function",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Start the Standard Workflow using the start-execution api command with a JSON input payload.",
+      "The Workflow sends the payload along with a task token into an Amazon SQS Queue and waits for a callback.",
+      "An AWS Lambda Function processes the message from the SQS queue and calls back the Step Functions workflow with the task token. The Lambda Function either calls with the send_task_success or send_task_failure API at random.",
+      "If the Step Functions workflow publishes a notification message to Amazon SNS topic either through usual next step or through error handling depending the callback API used by the Lambda Function.",
+      "For vlidation purpose, an Amazon SQS queue is subscribed to the SNS topic to check the notification messages."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunctions-callback-sam",
+      "templateURL": "serverless-patterns/stepfunctions-callback-sam",
+      "projectFolder": "stepfunctions-callback-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Step Functions Callback pattern",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/callback-task-sample-sqs.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

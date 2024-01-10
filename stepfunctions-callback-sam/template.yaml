@@ -1,0 +1,202 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A Step Functions Workflow that demonstrates callback and wait functionality
+
+Resources:
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+
+  StateMachineWaitForCallback:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: statemachine/wait-for-callback.asl.json
+      DefinitionSubstitutions:
+        SQSSendMessageWaitForTaskToken: !Sub arn:${AWS::Partition}:states:::sqs:sendMessage.waitForTaskToken
+        WaitForCallbackDemoQueueUrl: !Ref WaitForCallbackDemoQueue
+        WaitForCallbackTopic: !Ref WaitForCallbackTopic
+      Role: !GetAtt StatesExecutionRole.Arn
+      Type: STANDARD
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+        IncludeExecutionData: false
+        Level: 'ALL'
+
+##########################################################################
+#  STEP FUNCTION LOG GROUP                                               #
+##########################################################################
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", StateMachineWaitForCallback]]
+       
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+  StatesExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: CWLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogDelivery"
+                  - "logs:CreateLogStream"
+                  - "logs:GetLogDelivery"
+                  - "logs:UpdateLogDelivery"
+                  - "logs:DeleteLogDelivery"
+                  - "logs:ListLogDeliveries"
+                  - "logs:PutLogEvents"
+                  - "logs:PutResourcePolicy"
+                  - "logs:DescribeResourcePolicies"
+                  - "logs:DescribeLogGroups"
+                Resource: "*"         
+        - PolicyName: SQSSendMessagePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "sqs:SendMessage"
+                Resource: !GetAtt WaitForCallbackDemoQueue.Arn
+        - PolicyName: SNSPublishPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "sns:Publish"
+                Resource: !Ref WaitForCallbackTopic
+  LambdaExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: StepFunctionCallbackPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "states:SendTaskSuccess"
+                  - "states:SendTaskFailure"
+                  - "states:SendTaskHeartbeat"
+                Resource: !Ref StateMachineWaitForCallback
+        - PolicyName: SQSSendMessage
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "sqs:ReceiveMessage"
+                  - "sqs:DeleteMessage"
+                  - "sqs:GetQueueAttributes"
+                  - "sqs:ChangeMessageVisibility"
+                Resource: !GetAtt WaitForCallbackDemoQueue.Arn
+
+##########################################################################
+#  SQS Queue                                                                                                           #
+##########################################################################
+  WaitForCallbackDemoQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: "WaitForCallbackDemoQueue"
+      VisibilityTimeout: 60
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt WaitForCallbackDemoQueueDLQ.Arn
+        maxReceiveCount: 5
+  WaitForCallbackDemoQueueDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: "WaitForCallbackDemoQueueDLQ"
+  WaitForCallbackDemoNotificationTestQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: "WaitForCallbackDemoNotificationTestQueue"
+      VisibilityTimeout: 60
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt WaitForCallbackDemoNotificationTestQueueDLQ.Arn
+        maxReceiveCount: 5
+  WaitForCallbackDemoNotificationTestQueueDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: "WaitForCallbackDemoNotificationTestQueueDLQ"      
+##########################################################################
+#  SNS Topic                                                                                                                                                                                                                      #
+##########################################################################
+  WaitForCallbackTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint: !GetAtt WaitForCallbackDemoNotificationTestQueue.Arn
+          Protocol: sqs
+      TopicName: "WaitForCallbackTopic"
+##########################################################################
+#  SNS to SQS Publish Policy                                                                                                                                                                                                                                                                                                                                                                                                                                          #
+##########################################################################
+  SnsToSqsPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: sns.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt WaitForCallbackDemoNotificationTestQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref WaitForCallbackTopic
+      Queues:
+        - !Ref WaitForCallbackDemoNotificationTestQueue
+##########################################################################
+#  Lambda Function                                                                                                                                                                                                                                                                                                                                                                                                                                            #
+##########################################################################
+  WaitForCallbackLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: source/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt WaitForCallbackDemoQueue.Arn
+            BatchSize: 1
+
+##########################################################################
+#   Outputs                                                              #
+##########################################################################
+Outputs:
+  StateMachineWaitForCallbackArn:
+    Value: !Ref StateMachineWaitForCallback
+    Description: StateMachineWaitForCallback Arn
+  WaitForCallbackDemoNotificationTestQueueUrl:
+    Value: !GetAtt WaitForCallbackDemoNotificationTestQueue.QueueUrl
+    Description: WaitForCallbackDemoNotificationTestQueue Url

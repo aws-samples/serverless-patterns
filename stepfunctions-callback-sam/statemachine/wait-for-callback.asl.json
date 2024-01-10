@@ -1,0 +1,51 @@
+{
+  "Comment": "This state machine demonstrates wait for callback functionality",
+  "StartAt": "Charge Customer",
+  "States": {
+    "Charge Customer": {
+      "Type": "Task",
+      "Resource": "${SQSSendMessageWaitForTaskToken}",
+      "Parameters": {
+        "QueueUrl": "${WaitForCallbackDemoQueueUrl}",
+        "MessageBody": {
+          "orderId.$": "$.orderId",
+          "customerId.$": "$.customerId",
+          "orderDate.$": "$.orderDate",
+          "nameOnCard.$": "$.nameOnCard",
+          "creditCardNumber.$": "$.creditCardNumber",
+          "expiry.$": "$.expiry",
+          "cvv.$": "$.cvv",
+          "myTaskToken.$": "$$.Task.Token"
+        }
+      },
+      "Next": "Notify Payment Success",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Notify Payment Failure",
+          "Comment": "If any error encountered while waiting"
+        }
+      ]
+    },
+    "Notify Payment Failure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "${WaitForCallbackTopic}",
+        "Message.$": "$"
+      },
+      "End": true
+    },
+    "Notify Payment Success": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "${WaitForCallbackTopic}",
+        "Message.$": "$"
+      },
+      "End": true
+    }
+  }
+}
