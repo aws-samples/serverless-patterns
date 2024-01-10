@@ -13,8 +13,6 @@
     "analyse": "esbuild --bundle ./src/hello-world.ts --external:@aws-sdk --outfile=out.js --target=es2020 --tree-shaking=true --platform=node --minify --analyze"
   },
   "devDependencies": {
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.114.1-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.114.1-alpha.0",
     "@types/aws-lambda": "^8.10.131",
     "@types/jest": "^29.5.8",
     "@types/node": "20.9.0",
