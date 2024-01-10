@@ -1,4 +1,4 @@
-# Amazon Kinesis Data Streams data-processing and event filtering with AWS Lambda
+# Amazon Kinesis Data Streams to AWS Lambda with event filtering
 
 This pattern demonstrates the ability configure Amazon Kinesis as an event source for AWS Lambda to use event filtering to control which records are sent to your function for processing. The pattern deploys a Kinesis data stream and Lambda functions that are subscribed to the stream with different event filter configurations.
 
@@ -26,11 +26,28 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd kinesis-data-stream-lambda-esm-cdk-python/cdk
     ```
-1. Bootstrap environment (if you have not done so already)
+1. Create a Python virtual environment
+    ```
+    python -m venv .venv
+    ```
+1. Activate the virtualenv
+    ```
+    source .venv/bin/activate
+    ```
+
+    If you are using a Windows platform, you would activate the virtualenv like this:
+    ```
+    .venv\Scripts\activate.bat
+    ```
+2. After the virtualenv is activated, you can install the required dependencies.
+    ```
+    pip install -r requirements.txt
+    ```
+3. Bootstrap your AWS account and Region (if you have not already done so)
     ```
     cdk bootstrap
     ```
-1. Deploy the stack to your default AWS account and region.
+4. Deploy the stack to your AWS account and region.
     ```
     cdk deploy
     ```
