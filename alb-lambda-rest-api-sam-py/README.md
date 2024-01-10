@@ -74,7 +74,9 @@ Now, to build and execute your function, execute the following command:
 
 
 ```commandline
+pipenv install
 pipenv requirements > requirements.txt
+
 sam build
 sam local invoke -e events/event.json
 ```
