@@ -72,7 +72,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - "bedrock:InvokeModel"
-                Resource: "*"                               
+                Resource: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-v2:1                               
 ##########################################################################
 #   Outputs                                                              #
 ##########################################################################

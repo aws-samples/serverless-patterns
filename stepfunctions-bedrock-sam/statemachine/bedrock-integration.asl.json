@@ -1,5 +1,5 @@
 {
-  "Comment": "This state machine demonstrates the integration with Amazon Bedrock Anthropic Claud 2.1 Model",
+  "Comment": "This state machine demonstrates the integration with Amazon Bedrock Anthropic Claude v2.1 Model",
   "StartAt": "Bedrock InvokeModel",
   "States": {
     "Bedrock InvokeModel": {
