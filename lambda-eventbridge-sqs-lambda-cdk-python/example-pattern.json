@@ -1,0 +1,142 @@
+{
+    "title": "Create and route events using Lambda, EventBridge, SQS",
+    "description": "The pattern sends custom events to EventBridge, routes them using content-based rules to rate-controlled SQS+Lambda pattern",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This patterns shows CDK deployment on how to leverage AWS Lambda, Amazon EventBridge, Amazon SQS to generate and process events."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge-sqs-lambda-cdk-python",
+            "templateURL": "serverless-patterns/lambda-eventbridge-sqs-lambda-cdk-python",
+            "projectFolder": "lambda-eventbridge-sqs-lambda-cdk-python",
+            "templateFile": "app.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Reducing custom code by using advanced rules in Amazon EventBridge"
+                ,
+                "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+            },
+            {
+                "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+                "Link": "https://serverlessland.com/learn/eventbridge"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Anagh Lal",
+            "image": "",
+            "bio": "Anagh Lal is a Senior Solutions Architect at AWS",
+            "linkedin": "anagh-lal-58b7151"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 45,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon2": {
+            "x": 42,
+            "y": 45,
+            "service": "eventbridge",
+            "label": "EventBridge"
+        },
+        "icon4": {
+            "x": 85,
+            "y": 25,
+            "service": "sqs",
+            "label": "SQS (flow1)"
+        },
+        "icon3": {
+            "x": 85,
+            "y": 45,
+            "service": "sqs",
+            "label": "SQS (flow2)"
+        },
+        "icon5": {
+            "x": 85,
+            "y": 70,
+            "service": "sqs",
+            "label": "SQS (flow3)"
+        },
+        "icon6": {
+            "x": 125,
+            "y": 25,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon7": {
+            "x": 125,
+            "y": 45,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon8": {
+            "x": 125,
+            "y": 70,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Event"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": "flow2"
+        },
+        "line3": {
+            "from": "icon2",
+            "to": "icon4",
+            "label": "flow1"
+        },
+        "line4": {
+            "from": "icon2",
+            "to": "icon5",
+            "label": "flow3"
+        },
+        "line5": {
+            "from": "icon3",
+            "to": "icon7",
+            "label": "flow2"
+        },
+        "line6": {
+            "from": "icon4",
+            "to": "icon6",
+            "label": "flow1"
+        },
+        "line7": {
+            "from": "icon5",
+            "to": "icon8",
+            "label": "flow3"
+        }
+    }
+}
