@@ -10,7 +10,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "analyse": "esbuild --bundle ./src/hello-world.ts --external:@aws-sdk --outfile=out.js --target=es2020 --tree-shaking=true --platform=node --minify --analyze"
+    "analyse": "esbuild --bundle ./src/hello-world.ts --outfile=out.js --target=es2020 --tree-shaking=true --platform=node --minify --analyze"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.131",
