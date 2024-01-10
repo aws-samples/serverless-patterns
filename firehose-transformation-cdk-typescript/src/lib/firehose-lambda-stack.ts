@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import {
   aws_iam as iam,
   aws_s3 as s3,
+  aws_logs as logs,
   aws_kinesisfirehose as firehose,
   aws_lambda_nodejs as lambda,
   aws_lambda as lambda_,
@@ -12,7 +13,7 @@ import {
 export class FirehoseLambdaStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-   
+ 
     const lambda_role = new iam.Role(this, 'firehose-lambda-role', {
       assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com')
     });
@@ -52,13 +53,30 @@ export class FirehoseLambdaStack extends cdk.Stack {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL
     });
 
+    const fhLogGroup = new logs.LogGroup(this, 'firehose-log-group', {
+      retention: logs.RetentionDays.ONE_WEEK
+    });
+
+    const fhLogStreamS3 = new logs.LogStream(this, 'firehose-log-stream-s3', {
+      logGroup: fhLogGroup,
+      logStreamName: 'S3Delivery'
+    });
+
+    const fhLogStreamS3Backup = new logs.LogStream(this, 'firehose-log-stream-s3-backup', {
+      logGroup: fhLogGroup,
+      logStreamName: 'BackupDelivery'
+    });
+
     const firehose_role = new iam.Role(this, 'firehose-role', {
       assumedBy: new iam.ServicePrincipal('firehose.amazonaws.com')
     });
 
     firehose_role.addToPolicy(
       new iam.PolicyStatement({
-        resources: [bucket.bucketArn, bucket.bucketArn + '/*'],
+        resources: [
+          bucket.bucketArn,
+          `${bucket.bucketArn}/*`
+        ],
         actions: ['s3:AbortMultipartUpload', 's3:GetBucketLocation', 's3:GetObject', 's3:ListBucket', 's3:ListBucketMultipartUploads', 's3:PutObject'],
         effect: iam.Effect.ALLOW
       })
@@ -71,10 +89,14 @@ export class FirehoseLambdaStack extends cdk.Stack {
         effect: iam.Effect.ALLOW
       })
     );
+
     firehose_role.addToPolicy( 
       new iam.PolicyStatement({
-        resources: ['*'],
-        actions: ['logs:*'],
+        resources: [
+          `${fhLogGroup.logGroupArn}:log-stream:${fhLogStreamS3.logStreamName}`,
+          `${fhLogGroup.logGroupArn}:log-stream:${fhLogStreamS3Backup.logStreamName}`
+        ],
+        actions: ['logs:CreateLogStream', 'logs:PutLogEvents'],
         effect: iam.Effect.ALLOW
       })
     );
@@ -83,9 +105,15 @@ export class FirehoseLambdaStack extends cdk.Stack {
       deliveryStreamType: 'DirectPut',
       extendedS3DestinationConfiguration: {
         bucketArn: bucket.bucketArn,
+        prefix: 'transformed-data/',
         bufferingHints: {
           intervalInSeconds: 60,
           sizeInMBs: 1
+        },
+        cloudWatchLoggingOptions: {
+          enabled: true,
+          logGroupName: fhLogGroup.logGroupName,
+          logStreamName: fhLogStreamS3.logStreamName
         },
         roleArn: firehose_role.roleArn,
         processingConfiguration: {
@@ -100,7 +128,18 @@ export class FirehoseLambdaStack extends cdk.Stack {
         },
         encryptionConfiguration: {
           noEncryptionConfig: 'NoEncryption'
-        }
+        },
+        s3BackupMode: 'Enabled',
+        s3BackupConfiguration: {
+          bucketArn: bucket.bucketArn,
+          prefix: 'original-source-data/',
+          roleArn: firehose_role.roleArn,
+          cloudWatchLoggingOptions: {
+            enabled: true,
+            logGroupName: fhLogGroup.logGroupName,
+            logStreamName: fhLogStreamS3Backup.logStreamName
+          }
+        },
       }
     }
     );

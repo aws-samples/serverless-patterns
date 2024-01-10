@@ -4,6 +4,7 @@ import {
     FirehoseTransformationResultRecord
 } from 'aws-lambda';
 import { FirehoseTransformationEvent } from 'aws-lambda/trigger/kinesis-firehose-transformation'
+import { Buffer } from 'buffer';
 
 export const handler = async (event: FirehoseTransformationEvent, context: Context): Promise<FirehoseTransformationResult> => {
 
@@ -12,11 +13,23 @@ export const handler = async (event: FirehoseTransformationEvent, context: Conte
     const records: FirehoseTransformationResultRecord[] = []
 
     for (const record of event.records) {
-        /* This transformation is the "identity" transformation, the data is left intact */
+        const recordData = JSON.parse(Buffer.from(record.data, 'base64').toString('utf8'));
+
+        /** do some record transformation here */     
+
+        /** 
+         *  This example assumes source data is similar to Kinesis Data Firehose console demo data
+         *  simulated stock ticker data: https://docs.aws.amazon.com/firehose/latest/dev/test-drive-firehose.html
+         * */
+       
+        const oldPrice = recordData["PRICE"] - recordData["CHANGE"];
+        recordData["CUSTOM_RECORDID"] = record.recordId
+        recordData["CUSTOM_OLDPRICE"] = oldPrice.toFixed(2)
+
         records.push({
             recordId: record.recordId,
             result: 'Ok',
-            data: record.data,
+            data: Buffer.from(JSON.stringify(recordData), 'utf-8').toString('base64')
         });
     }
 

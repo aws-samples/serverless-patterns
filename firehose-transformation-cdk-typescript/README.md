@@ -1,8 +1,10 @@
 # Amazon Kinesis Data Firehose Data Transformation with AWS Lambda
 
-This pattern deploys a Kinesis Data Firehose Delivery Stream that invokes a Lambda function to transform incoming source data and delivers the transformed data to a destination Amazon S3 bucket. 
+This pattern demonstrates how to transform streaming data received by Amazon Kinesis Data Firehose using AWS Lambda before delivering the transformed data to Amazon S3.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/firehose-transformation-cdk-typescript](https://serverlessland.com/patterns/firehose-transformation-cdk-typescript)
+The pattern uses the AWS Cloud Development Kit (AWS CDK) to deploy a Kinesis Data Firehose delivery stream, a Lambda function to transform source data, and an Amazon S3 bucket to receive the transformed data. 
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/firehose-transformation-cdk-typescript
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -16,7 +18,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
+    ```
     git clone https://github.com/aws-samples/serverless-patterns
     ```
 1. Change directory to the pattern directory:
@@ -24,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
     cd serverless-patterns/firehose-transformation-cdk-typescript/src
     ```
 1. Install dependencies:
-   ```bash
+   ```
    npm install
    ```
 1. Bootstrap environment (if you have not done so already)
@@ -44,7 +46,7 @@ Kinesis Data Firehose can invoke a Lambda function to transform incoming source 
 
 1. Open the Kinesis Data Firehose console at https://console.aws.amazon.com/firehose/
 
-2. Choose the {stack-name}-firehoststream-{stream-id} delivery stream
+2. Choose the {stack-name}-firehosestream-{stream-id} delivery stream
 
 3. Under **Test with demo data**, choose **Start sending demo data** to generate sample stock ticker data.
 
@@ -52,11 +54,11 @@ Kinesis Data Firehose can invoke a Lambda function to transform incoming source 
 
 5. Verify that test events are being sent to the destination S3 bucket. Note that it might take a few minutes for new objects to appear in the bucket, based on the buffering configuration.
 
-```
-aws s3 ls s3://{destination_bucket_name} --recursive --human-readable --summarize
-```
+    ```
+    aws s3 ls s3://{destination_bucket_name} --recursive --human-readable --summarize
+    ```
 
-Or nagivate to the S3 console and manually verify that the demo data has been sent to S3
+    Or nagivate to the S3 console and manually verify that the demo data has been sent to S3
 
 ## Cleanup
  
