@@ -73,7 +73,7 @@ For more informations: [Amazon EventBridge Pipes with SQS ](https://docs.aws.ama
 ## Testing Steps
 For testing you will be using AWS CLI commands to send a message source SQS queue and Redshift cluster data API queries to read data from Redshift cluster.
 
-1. Send a test message to source SQS queue, run the below CLI command and replace the Update `--queue-url` with source SQS queue url from CDK deployment output  
+1. Send a test message to source SQS queue, run the below CLI command and replace `--queue-url` with source SQS queue url from CDK deployment output  
     ```
     aws sqs send-message --queue-url <Source SQS Queue URL:> --message-body "Message To Redshift via EventBridge Pipe."
     ```
