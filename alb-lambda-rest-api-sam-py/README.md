@@ -33,11 +33,12 @@ AWS costs incurred. No warranty is implied in this example.
     ```
     cd alb-lambda-rest-api-sam-py
     ```
-3. Install dependencies and build:
+3. Install dependencies:
     ```
     pipenv install
+    pipenv requirements > requirements.txt
     ```
-4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+4. From the command line, use AWS SAM to validate, build and deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam validate && sam build && sam deploy --guided
     ```
