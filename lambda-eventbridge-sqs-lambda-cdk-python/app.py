@@ -13,6 +13,7 @@ from aws_cdk import (
     aws_events as events,    
     aws_events_targets as targets,
     aws_logs as logs,
+    aws_iam as iam,
     CfnOutput,
     RemovalPolicy
 )
@@ -68,12 +69,13 @@ class LambdaEventBridgeSQSLambda(Stack):
             )
         )
 
-
+        
         # SQS queue
         email_queue = sqs_.Queue(self, "EmailQueue")
         sftp_queue  = sqs_.Queue(self, "SftpQueue")
         tpapi_queue = sqs_.Queue(self, "TpapiQueue")
-        dlq = sqs_.Queue(self, "DLQ")
+        dlq = sqs_.Queue(self,"DLQ")
+        
         
 
         # EventBridge Rule
@@ -81,8 +83,12 @@ class LambdaEventBridgeSQSLambda(Stack):
         email_rule = self.create_rule(email_queue,'email',dlq)
         sftp_rule = self.create_rule(sftp_queue,'sftp',dlq)
         tpapi_rule= self.create_rule(tpapi_queue,'3papi',dlq) 
-        
 
+        
+        email_queue.grant_send_messages(iam.ServicePrincipal("events.amazonaws.com"))
+        sftp_queue.grant_send_messages(iam.ServicePrincipal("events.amazonaws.com"))
+        tpapi_queue.grant_send_messages(iam.ServicePrincipal("events.amazonaws.com"))
+        dlq.grant_send_messages(iam.ServicePrincipal("events.amazonaws.com"))
 
         email_integration = self.sqs_to_lambda_integration(email_queue,'Email',5)
         sftp_integration = self.sqs_to_lambda_integration(sftp_queue,'Sftp',2)
@@ -112,6 +118,11 @@ class LambdaEventBridgeSQSLambda(Stack):
         )
 
     def create_rule(self, queue, preference,dlq):
+
+        #detail = "\"detail.preferenceDistribution\": [{ \"equals-ignore-case\":"+preference+"}]\"" 
+        #eventPattern = events.EventPattern(source = ["[{\"equals-ignore-case\": \"content-generator\"}]"],
+        #                                   detail=[detail]])
+
         eventPattern = {
                             "source": [{
                                         "equals-ignore-case": "content-generator"
@@ -119,10 +130,12 @@ class LambdaEventBridgeSQSLambda(Stack):
                             "detail.preferenceDistribution": [{
                                    "equals-ignore-case": preference
                              }]
-                       }               
+                       }                                
+        #return events.Rule(self, preference+'-queue-target', event_pattern= eventPattern,targets=[queue])       
         dlq_property = events.CfnRule.DeadLetterConfigProperty(arn=dlq.queue_arn)                                                    
         target_queue = events.CfnRule.TargetProperty(arn= queue.queue_arn,id = preference+'-queue-target', dead_letter_config=dlq_property)        
         return events.CfnRule(self,preference+"-rule",event_pattern=eventPattern, targets=[target_queue])
+        
     
 
 app = cdk.App()
