@@ -1,6 +1,6 @@
 {
   "title": "AWS Lambda REST API and Amazon ALB with Listener Rules",
-  "description": "This pattern creates an Application Load Balancer with route-based listener rules, paired with an AWS Lambda RESTful API function as the target. It uses Python 3.9 and the Serverless Application Model (SAM) CLI.",
+  "description": "This pattern creates an Application Load Balancer with route-based listener rules, paired with an AWS Lambda function as the target.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
