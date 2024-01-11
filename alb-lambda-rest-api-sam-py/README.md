@@ -141,15 +141,15 @@ Server: awselb/2.0
 ## Cleanup
 
 1. Delete the stack
-    ```bash
+    ```commandline
     sam delete
     ```
 2. Confirm the stack has been deleted
-    ```bash
+    ```commandline
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
