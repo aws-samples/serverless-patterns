@@ -51,7 +51,7 @@ pip install -r requirements.txt
 
 - The eventsGenerator lambda function publishes three events to the default bus. Each event has distinct id and distribution-mechanism-preference pair. The events are also stamped with source as "content-generator"
 - Each message is evaluated against the rules defined in EventBridge. We have three rules each with a matching criteria of source matching "content-generator" and preferenceDistribution matching email|sftp|3papi respectively. (3papi refers to third-party API.)
-- The rules are configured with targets as SQS queues that trigger Lambdas for processing. The SQS queues are configured with concurrency settings to match the rate of the distribution-channel.
+- The rules are configured with targets as SQS queues that trigger Lambdas for processing. The SQS queues are configured with concurrency settings to match the rate of the distribution-channel. See details of the rate limiting feature in the docs [SQS Max Concurrency] (https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#events-sqs-max-concurrency)
 
 
 ## Testing
