@@ -27,6 +27,10 @@
             {
                 "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
                 "link": "https://serverlessland.com/learn/eventbridge"
+            },
+            {
+                "text": "Configuring maximum concurrency for Amazon SQS event sources",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
             }
         ]
     },
