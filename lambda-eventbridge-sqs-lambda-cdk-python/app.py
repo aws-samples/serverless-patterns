@@ -74,10 +74,9 @@ class LambdaEventBridgeSQSLambda(Stack):
         email_queue = sqs_.Queue(self, "EmailQueue")
         sftp_queue  = sqs_.Queue(self, "SftpQueue")
         tpapi_queue = sqs_.Queue(self, "TpapiQueue")
-        dlq = sqs_.Queue(self,"DLQ")
+        dlq = sqs_.Queue(self, "DLQ")
         
         
-
         # EventBridge Rule
 
         email_rule = self.create_rule(email_queue,'email',dlq)
@@ -85,6 +84,7 @@ class LambdaEventBridgeSQSLambda(Stack):
         tpapi_rule= self.create_rule(tpapi_queue,'3papi',dlq) 
 
         
+        # Grant send messages to EventBridge
         email_queue.grant_send_messages(iam.ServicePrincipal("events.amazonaws.com"))
         sftp_queue.grant_send_messages(iam.ServicePrincipal("events.amazonaws.com"))
         tpapi_queue.grant_send_messages(iam.ServicePrincipal("events.amazonaws.com"))
@@ -118,11 +118,6 @@ class LambdaEventBridgeSQSLambda(Stack):
         )
 
     def create_rule(self, queue, preference,dlq):
-
-        #detail = "\"detail.preferenceDistribution\": [{ \"equals-ignore-case\":"+preference+"}]\"" 
-        #eventPattern = events.EventPattern(source = ["[{\"equals-ignore-case\": \"content-generator\"}]"],
-        #                                   detail=[detail]])
-
         eventPattern = {
                             "source": [{
                                         "equals-ignore-case": "content-generator"
@@ -130,8 +125,7 @@ class LambdaEventBridgeSQSLambda(Stack):
                             "detail.preferenceDistribution": [{
                                    "equals-ignore-case": preference
                              }]
-                       }                                
-        #return events.Rule(self, preference+'-queue-target', event_pattern= eventPattern,targets=[queue])       
+                       }                                        
         dlq_property = events.CfnRule.DeadLetterConfigProperty(arn=dlq.queue_arn)                                                    
         target_queue = events.CfnRule.TargetProperty(arn= queue.queue_arn,id = preference+'-queue-target', dead_letter_config=dlq_property)        
         return events.CfnRule(self,preference+"-rule",event_pattern=eventPattern, targets=[target_queue])
