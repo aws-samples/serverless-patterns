@@ -13,8 +13,9 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
+* [Docker](https://docs.docker.com/engine/install/) installed
 
-## Deployment Instructions
+## Deployment Instructions for Windows
 
 1. Clone the project to your local working directory
     ```
