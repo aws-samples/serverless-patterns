@@ -7,7 +7,7 @@
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This patterns shows CDK deployment on how to leverage Amazon API Gateway, AWS Lambda, and Amazon Translate to perform language translation in a serverless fashion."
+            "How to leverage Amazon API Gateway, AWS Lambda, and Amazon Translate to perform language translation in a serverless fashion."
         ]
     },
     "gitHub": {
