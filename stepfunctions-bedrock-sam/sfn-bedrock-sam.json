@@ -1,17 +1,3 @@
-Serverless Land
-Content 
-Learn
-Code 
-EDA 
-Search
-Serverless Patterns Sandbox
-Please enter the forked branch and example-pattern.json file into the text fields below to see a preview of the pattern.
-
-Using this tool you can validate your pattern and also generate a default architecture diagram for your pattern. You will have to change the diagram that is generated.
-
-Click "Generate preview" to see what this pattern would look like on ServerlessLand.
-
-https://github.com/biswanathmukherjee/serverless-patterns/tree/biswanathmukherjee-feature-stepfunctions-bedrock-sam
 {
     "title": "AWS Step Functions to Amazon Bedrock Integration",
     "description": "This SAM template deploys a Step Functions workflow that invokes Amazon Bedrock Anthropic Claude Model v2.1 to generate content for a given prompt.",
@@ -90,6 +76,5 @@ https://github.com/biswanathmukherjee/serverless-patterns/tree/biswanathmukherje
         }
     }
 }
-  
-Privacy | Site Terms | Cookie Preferences | © Copyright 2024 Amazon.com, Inc. or its affiliates. All rights reserved.
+
 
