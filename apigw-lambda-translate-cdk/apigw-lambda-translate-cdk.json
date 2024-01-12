@@ -1,5 +1,5 @@
 {
-    "title": "API Gateway - Lambda - Translate",
+    "title": "API Gateway to Lambda to Translate",
     "description": "Perform language translation using Translate through Lambda and API Gateway",
     "language": "Python",
     "level": "200",
