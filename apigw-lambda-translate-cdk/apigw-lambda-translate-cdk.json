@@ -40,7 +40,7 @@
     },
     "deploy": {
         "text": [
-            "cdk deploy"
+            "<code>cdk deploy</code>"
         ]
     },
     "testing": {
