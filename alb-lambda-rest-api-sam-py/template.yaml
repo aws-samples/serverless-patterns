@@ -25,7 +25,7 @@ Globals:
     Environment:
       Variables:
         POWERTOOLS_SERVICE_NAME: alb-lambda-rest-api-sam-py
-        LOG_LEVEL: DEBUG
+        POWERTOOLS_LOG_LEVEL: INFO
   Api:
     TracingEnabled: true
 Resources:
