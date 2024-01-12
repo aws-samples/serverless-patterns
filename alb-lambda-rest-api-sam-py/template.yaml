@@ -4,11 +4,9 @@ Description: AWS Lambda REST API and Amazon ALB with Listener Rules
 Parameters:
   VPCId:
     Type: String
-# TODO: Substitute VPC ID - AWS::EC2::VPC::Id
     Default: VPC_ID
   Subnets:
     Type: String
-# TODO: Substitute comma separated subnet IDs (AWS::EC2::Subnet::Id)
     Default: subnet-1,subnet-2,subnet-3
   AppName:
     Type: String
