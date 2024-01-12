@@ -1,0 +1,58 @@
+{
+  "title": "AWS AppRunner API Deployment",
+  "description": "The CDK stack that creates an AWS App Runner service to deploy a .NET Web API application.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The pattern shows how to use an AWS App Runner service to deploy a .NET Web API application. App Runner eliminates the need to manage servers, containers, or clusters. Simply provide your code or container image, and App Runner handles the rest, making it ideal for developers who want to focus on their application logic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apprunner-cdk-dotnet",
+      "projectFolder": "apprunner-cdk-dotnet",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apprunner-cdk-dotnet/README.md",
+      "templateURL": "serverless-patterns/apprunner-cdk-dotnet",
+      "templateFile": "src/ApprunnerCdkDotnet/ApprunnerCdkDotnetStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS App Runner",
+        "link": "https://docs.aws.amazon.com/apprunner/latest/dg/what-is-apprunner.html"
+      },
+      {
+        "text": "AppRunner Construct Library",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/dotnet/api/Amazon.CDK.AWS.AppRunner.Alpha.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sanjay Chaudhari",
+      "image": "https://avatars.githubusercontent.com/u/9101436?v=4",
+      "bio": "Application Development Consultant at AWS Professional Services.",
+      "linkedin": "sanjay-chaudhari-it",
+      "twitter": "sanjaypc"
+    }
+  ]
+}
