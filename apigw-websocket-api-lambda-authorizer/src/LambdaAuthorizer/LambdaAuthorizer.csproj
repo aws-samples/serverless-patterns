@@ -17,6 +17,6 @@
 		<PackageReference Include="AWS.Lambda.Powertools.Logging" Version="1.4.4" />
 		<PackageReference Include="AWSSDK.ApiGatewayManagementApi" Version="3.7.300.28" />
 		<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.0.3" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
 	</ItemGroup>
 </Project>
