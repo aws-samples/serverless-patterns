@@ -107,6 +107,9 @@ Resources:
       GroupName: !Ref AWS::StackName
       GroupDescription: Allow http on port 80
       VpcId: !Ref VPCId
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
