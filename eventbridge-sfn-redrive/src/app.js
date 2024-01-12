@@ -2,22 +2,22 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-const { StepFunctions } = require('@aws-sdk/client-sfn');
+const { SFNClient, StartExecutionCommand } = require('@aws-sdk/client-sfn');
 
 exports.handler = async (event) => {
   try {
     // Define the Step Functions client
-    const stepFunctions = new StepFunctions({});
+    const stepFunctions = new SFNClient({});
 
-    // Define the parameters for the redriveExecution operation
+    // Define the parameters for the StartExecutionCommand
     const params = {
       stateMachineArn: event.detail.executionArn
     };
 
     // Start the Step Functions workflow
-    const result = await stepFunctions.redriveExecution(params);
+    const result = await stepFunctions.send(new StartExecutionCommand(params));
 
-    console.log('Workflow redriven:', result.executionArn);
+    console.log('Workflow started:', result.executionArn);
 
     return {
       statusCode: 200,

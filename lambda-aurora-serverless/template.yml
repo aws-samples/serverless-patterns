@@ -50,8 +50,9 @@ Resources:
       MasterUsername: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:username}}'
       MasterUserPassword: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:password}}'
       DatabaseName: !Ref DatabaseName
-      Engine: aurora
+      Engine: aurora-mysql
       EngineMode: serverless
+      StorageEncrypted: true
       # Enable the Data API for Aurora Serverless
       EnableHttpEndpoint: true
       ScalingConfiguration:
