@@ -127,11 +127,11 @@ xh http://{ALB_ID}.{REGION}.elb.amazonaws.com/nf-test Client-Correlation-Id:'not
 Response:
 
 ```commandline
-HTTP/1.1 400 Bad Request
+HTTP/1.1 404 Not Found
 Connection: keep-alive
 Content-Length: 27
 Content-Type: text/plain; charset=utf-8
-Date: Wed, 27 Dec 2023 23:13:43 GMT
+Date: Fri, 12 Jan 2024 18:44:09 GMT
 Server: awselb/2.0
 
 404 Error!!! Page Not Found
