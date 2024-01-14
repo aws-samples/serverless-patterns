@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pystache = "*"
+requests = "*"
+urllib3= "1.26"
+aws-requests-auth = "*"
+[dev-packages]
+boto3 = "*"
+python-dotenv = "*"
+[requires]
+python_version = "3.9"

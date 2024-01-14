@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "serverless-export-env": "^2.2.0",
+    "serverless-plugin-log-retention": "^2.0.0",
+    "serverless-python-requirements": "^6.0.1"
+  }
+}

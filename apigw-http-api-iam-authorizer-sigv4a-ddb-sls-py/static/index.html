@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pattern Demo: Dummy Product Inventory</title>
+    <style>
+      .fullscreenDiv {
+        background-color: #ffffff;
+        width: 100%;
+        height: auto;
+        bottom: 0px;
+        top: 0px;
+        left: 0;
+        position: absolute;
+      }
+      .productsDiv {
+        background-color: #ffffff;
+        width: 100%;
+        height: auto;
+      }
+      .inventoryTitle {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 32px;
+        padding: 10px;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        color: grey
+      }
+      .dayOfWeek {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 25px;
+        padding: 10px;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        color: blue
+      }
+      .column-container {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        display: flex;
+        flex-flow: column;
+        flex-wrap: wrap;
+        justify-content: left;
+      }
+      .row-container {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        display: flex;
+        flex-flow: row;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .item {
+        padding: 5px;
+        height: auto;
+        margin-top: 10px;
+        display: flex;
+        flex-flow: row;
+        flex-wrap: wrap;
+        justify-content: left;
+      }
+      .product {
+        background-color: snow;
+        border-radius: 10px;
+        padding: 5px;
+        height: auto;
+        width: auto;
+        margin-left: 20px;
+        margin-right: 20px;
+        margin-top: 15px;
+        margin-bottom: 0px;
+        display: flex;
+        justify-content: left;
+      }
+      .product-detail {
+        font-size: 18px;
+        font-family:Arial, Helvetica, sans-serif;
+        color: grey;
+        padding: 5px;
+        margin: 0px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="fullscreenDiv">
+      <ul class="column-container">
+        <li>
+          <div class="productsDiv column-container">
+            <h5 class="inventoryTitle">Pattern Demo: Product Inventory</h5>
+            <h5 class="dayOfWeek">Today is: {{dayOfWeek}}</h5>
+            <ul class="row-container">
+              {{#products}}
+              <li class="product">
+                <ul class="column-container">
+                    <li class="item product-detail">Product Code: {{code}}</li>
+                    <li class="item product-detail">Product Name: {{name}}</li>
+                    <li class="item product-detail">Per unit Cost: ${{itemPrice}}</li>
+                    <li class="item product-detail">In-stock Qty: {{inStockQty}}</li>
+                </ul>
+              </li>
+              {{/products}}
+            </ul> 
+          </div>
+        </li>
+      </ul>
+  </div>
+  </body>
+</html>
