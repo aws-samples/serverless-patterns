@@ -3,8 +3,6 @@ import { Construct } from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import path = require('path');
 import * as iam from 'aws-cdk-lib/aws-iam';
-import * as sns from 'aws-cdk-lib/aws-sns';
-import * as event_source from 'aws-cdk-lib/aws-lambda-event-sources';
 
 export class CdkLambdaSchedulerSesStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -56,3 +54,12 @@ export class CdkLambdaSchedulerSesStack extends cdk.Stack {
 
   }
 }
+
+
+
+
+
+
+
+
+
