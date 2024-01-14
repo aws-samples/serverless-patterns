@@ -14,7 +14,6 @@
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-lambda-scheduler-ses",
         "templateURL": "serverless-patterns/cdk-lambda-scheduler-ses",
-        "projectFolder": "cdk-lambda-scheduler-ses",
         "templateFile": "lib/cdk-lambda-scheduler-ses-stack.ts"
       }
     },
@@ -54,7 +53,7 @@
         "name": "Anirudh Sharma",
         "image": "https://avatars.githubusercontent.com/u/144559992?s=96&v=4",
         "bio": "Cloud Support Engineer 2 @AWS",
-        "linkedin": "https://www.linkedin.com/in/anirudh-sharma-279248142/"
+        "linkedin": "anirudh-sharma-279248142"
       }
     ]
   }
