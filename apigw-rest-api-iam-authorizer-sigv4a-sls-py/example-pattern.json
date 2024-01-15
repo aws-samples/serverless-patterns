@@ -1,20 +1,20 @@
 {
-  "title": "AWS API Gateway HTTP API, Lambdas, IAM Auth, DynamoDB, Python, and the Serverless Framework",
-  "description": "This pattern secures an API endpoint with an AWS_IAM authorizer, allowing a public API to access it through AWS API Gateway. The process involves signing HTTP requests using IAM credentials per the AWS v4 signing process, and the endpoint interacts with AWS DynamoDB data.",
+  "title": "AWS API Gateway IAM authorization and AWS v4 request signing",
+  "description": "This pattern secures an API endpoint with AWS_IAM authorizer, allowing a public API to access it through AWS API Gateway. The process involves signing HTTP requests using IAM credentials per the AWS v4 signing process.",
   "language": "Python",
-  "level": "300",
+  "level": "200",
   "framework": "Serverless Framework",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern uses an AWS_IAM authorizer to secure an API endpoint using Python 3 and the Serverless framework. It demonstrates how to sign the HTTP request using IAM credentials and follow the AWS v4 signing process in order to grant access to the secured endpoint to a public API. AWS DynamoDB data is further interacted with by the secured endpoint. AWS ApiGateway facilitates all communication with the APIs. For more details refer to this pattern's documentation."
+      "This pattern demonstrates signing the HTTP request using IAM credentials and follow the AWS v4 signing process in order to grant access to the secured endpoint from a public API. AWS API Gateway facilitates all communication with the APIs. For more details refer to this pattern's documentation."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-iam-authorizer-sigv4a-ddb-sls-py",
-      "templateURL": "serverless-patterns/apigw-http-api-iam-authorizer-sigv4a-ddb-sls-py",
-      "projectFolder": "apigw-http-api-iam-authorizer-sigv4a-ddb-sls-py",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-iam-authorizer-sigv4a-sls-py",
+      "templateURL": "serverless-patterns/apigw-rest-api-iam-authorizer-sigv4a-sls-py",
+      "projectFolder": "apigw-rest-api-iam-authorizer-sigv4a-sls-py",
       "templateFile": "serverless.yaml"
     }
   },

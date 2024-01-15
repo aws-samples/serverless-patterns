@@ -1,0 +1,41 @@
+service: serverless-land-${self:custom.name}
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.9
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: execute-api:Invoke
+          Resource: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/${sls:stage}/GET/private
+custom:
+  name: bb245
+  logRetentionInDays: 1
+
+functions:
+  get-public:
+    handler: functions.public.handler
+    events:
+      - http:
+          path: /public
+          method: get
+    environment:
+      private_api: !Sub https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/private
+  get-private:
+    handler: functions.private.handler
+    events:
+      - http:
+          path: /private
+          method: get
+          authorizer: aws_iam
+plugins:
+  - serverless-python-requirements
+  - serverless-plugin-log-retention
+package:
+  exclude:
+    - 'docs/**'
+    - 'example-pattern.json'
