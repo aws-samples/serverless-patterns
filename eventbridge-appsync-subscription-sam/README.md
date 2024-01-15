@@ -2,7 +2,7 @@
 
 This pattern shows how to create an Appsync API that allows you to listen to events going into an Eventbridge event bus. This is especially useful if you want your frontend users to be aware of changes happening in your backend. Those events coming in your event bus can either be pushed as custom events or can come from AWS services.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-appsync-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-appsync-subscription-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd eventbridge-appsync-sam
+    cd eventbridge-appsync-subscription-sam
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
