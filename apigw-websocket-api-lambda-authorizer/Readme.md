@@ -1,4 +1,4 @@
-# WebSocket API Cognito Authentication using Lambda Authorizer
+# WebSocket API Cognito authentication using Lambda Authorizer
 
 This pattern demonstrates how to integrate Amazon Cognito authentication with Amazon API Gateway WebSocket API.
 
@@ -7,7 +7,7 @@ It includes the Lambda implementations for Lambda Authorizer, Lambda functions f
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-websocket-api-lambda-authorizer
 
 ## Why Lambda Authorizer, not Cognito Authorizer?
-API Gateway Websocket API doesn't support [Cognito authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-enable-cognito-user-pool.html) as of now. To enable Cognito Authentication for API Gateway Websocket API you need to create a Lambda authorizer instead of using the built-in Cognito authorizer.
+API Gateway Websocket API doesn't support [Cognito authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-enable-cognito-user-pool.html) as of now. To enable Cognito authentication for API Gateway Websocket API you need to create a Lambda authorizer instead of using the built-in Cognito authorizer.
 
 ## Requirements
 
