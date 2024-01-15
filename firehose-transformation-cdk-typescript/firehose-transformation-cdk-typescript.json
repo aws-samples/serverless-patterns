@@ -51,7 +51,7 @@
     },
     "cleanup": {
         "text": [
-            "<ode>cdk delete</code>"
+            "<code>cdk delete</code>"
         ]
     },
     "authors": [
