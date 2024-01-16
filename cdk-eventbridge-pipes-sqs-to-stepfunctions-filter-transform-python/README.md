@@ -50,7 +50,7 @@ step to activate your virtualenv.
 
 The template will create an Amazon SQS queue, AWS Step Functions workflow and Amazon EventBridge Pipe. 
 Sending messages to the Amazon Simple Queue Service will trigger the pipe to initiate AWS Step Function execution.
-SQS Messages will be filtered and transformed before sending to AWS Step Functions.
+The messages from SQS will be filtered and transformed before being send to AWS Step Functions.
 
 
 Replace the "SQS_URL" with your SQS URL in the below command and send SQS message that will trigger step function execution as below:
