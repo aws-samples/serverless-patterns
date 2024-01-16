@@ -23,7 +23,11 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd amplify-codecommit
     ```
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. Install dependencies:
+    ```
+    npm install
+    ```
+4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     cdk deploy
     ```
