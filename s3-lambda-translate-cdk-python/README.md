@@ -29,7 +29,7 @@ You must use a role that has sufficient permissions to create IAM roles, as well
 
 #### Python >=3.8
 Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration uses python 3.10.
-Since `TranslateDocument` API is available only in the Boto3 version >= 1.28.57, a layer `python.zip` has been attached.
+As `TranslateDocument` API is yet to be made available in the latest Boto3 library, a layer `python.zip` with Boto3 version >= 1.28.56 has been attached.
 
 #### AWS CDK
 Make sure you have the [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install) installed in the Cloud9 environment.
