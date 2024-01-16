@@ -70,7 +70,7 @@ Replace the "SQS_URL" with your SQS URL in the below command to send message to 
 
 Validate the result from the Step Functions execution history page. 
 The filter allows only messages with a status of `COMPLETE` to be delivered to AWS Step Functions. 
-AWS Stepfunctions receive the transformed message attributes as below. 
+AWS Step Functions receive the transformed message attributes as shown below. 
     "id" tranformed to "playerid" 
     "team" transformed to "teamname"
     "status" transformed to "teamstatus"
