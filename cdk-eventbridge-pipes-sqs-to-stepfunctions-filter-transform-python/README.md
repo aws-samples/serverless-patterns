@@ -68,7 +68,7 @@ Replace the "SQS_URL" with your SQS URL in the below command and send SQS messag
  --queue-url=SQS_URL \
  --message-body '{"id":"id3","team": "Team3", "status": "NOTSTARTED"}'
 
-Validate the below from the step functions execution window. 
+Validate the result from the Step Functions execution history page. 
 Amazon SQS messsages are filtered with status COMPLETE only filered and delivered to AWS Step Functions. 
 AWS Stepfunctions receive the transformed message attributes as below. 
     "id" tranformed to "playerid" 
