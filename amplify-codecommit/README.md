@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy
     ```
 
-4. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing. See below for a sample output from this pattern. 
+5. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing. See below for a sample output from this pattern. 
     ```
     Outputs:
         AmplifyWebAppStack.AmplifyWebAppConstructAppIDF7BCB5B3 = XXXXXXXX
