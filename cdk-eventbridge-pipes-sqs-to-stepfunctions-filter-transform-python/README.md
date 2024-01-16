@@ -1,7 +1,7 @@
 # EventBridge Pipe from SQS to Step Functions with filter and transformation
 
 This pattern will use Amazon EventBridge Pipes to connect an Amazon SQS queue with an AWS Step Functions workflow. The pipe will apply a filter and transformation before sending the message to AWS Step Functions.
-This example project implemented with CDK/Python.
+This pattern is implemented with CDK and Python.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-sqs-to-stepfunctions-cdk-python
 
