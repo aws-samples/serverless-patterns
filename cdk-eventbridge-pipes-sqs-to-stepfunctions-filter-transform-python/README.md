@@ -53,7 +53,7 @@ Sending messages to the queue will trigger the pipe to initiate AWS Step Functio
 The messages from SQS will be filtered and transformed before being send to AWS Step Functions.
 
 
-Replace the "SQS_URL" with your SQS URL in the below command and send SQS message that will trigger step function execution as below:
+Replace the "SQS_URL" with your SQS URL in the below command to send message to SQS that will trigger Step Function workflow execution:
 
 ```sh
  aws sqs send-message \
