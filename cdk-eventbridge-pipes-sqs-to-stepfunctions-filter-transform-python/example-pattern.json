@@ -23,7 +23,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Eventbridge Pipe filter and transformation",
+        "text": "Eventbridge Pipes filter and transformation",
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
       }
     ]
