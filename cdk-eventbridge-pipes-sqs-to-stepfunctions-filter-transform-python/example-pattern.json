@@ -1,6 +1,6 @@
 {
   "title": "EventBridge Pipe from SQS to Step Functions with filter and transformation",
-  "description": "Amazon EventBridge Pipe apply filter and transformation from Amazon Simple Queue Service to AWS Step Functions.",
+  "description": "Amazon EventBridge Pipe that filters and transforms messages from Amazon SQS to AWS Step Functions.",
   "language": "Python",
   "level": "300",
   "framework": "CDK",
