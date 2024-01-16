@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The example will create an Amazon Simple Queue Service, AWS Step Functions and Amazon EventBridge Pipe.",
+      "The example will create an Amazon SQS queue, a AWS Step Functions workflow and an Amazon EventBridge Pipe.",
       "Sending messages to the Amazon Simple Queue Service will trigger the pipe to initiate AWS Step Function execution.",
       "SQS Messages will be filtered and transformed before sending to AWS Step Functions."
     ]
