@@ -29,4 +29,4 @@ jobs:
           dst_branch: master
           src_branch: main
           file_filter: "*.json"
-          src_path: /${{ inputs.dirName }}/example-workflow.json
+          src_path: /${{ inputs.dirName }}/${{ inputs.fileName }}
