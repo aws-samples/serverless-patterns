@@ -68,7 +68,7 @@ The deployment will create two S3 buckets and a Lambda function.
 ## How it works
 The S3 bucket acts as a placeholder to upload the document, required for performing language translation. In the demonstration, we use the file `AmazonSimpleStorageService.html` inside the `assets` folder. 
 Uploading a file to the S3 bucket invokes the Lambda function.
-The Lambda function invokes the Translate's `TranslateDocument` API  and the response document with the nomenclature `target_language`-`source_file_name` is uploaded to the output S3 bucket. 
+The Lambda function invokes Translate's `TranslateDocument` API  and uploads the  response document with the naming pattern `target_language`-`source_file_name`. 
 The target language for translation is set to French by default and users are requested to change it as per their use-case.
 At the time of creating this pattern, `TranslateDocument` API supports three formats of document:
    - `text/html` - The input data consists of HTML content. Amazon Translate translates only the text in the HTML element.
