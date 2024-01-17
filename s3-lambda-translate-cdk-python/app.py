@@ -28,6 +28,8 @@ class S3LambdaTranslateServerless(Stack):
             encryption=s3.BucketEncryption.S3_MANAGED,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             enforce_ssl=True,
+            removal_policy=cdk.RemovalPolicy.DESTROY,
+            auto_delete_objects=True,
         )
 
         # Replace the output bucket name with a preferred unique name, since S3 bucket names are globally unique.
@@ -39,6 +41,8 @@ class S3LambdaTranslateServerless(Stack):
             encryption=s3.BucketEncryption.S3_MANAGED,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             enforce_ssl=True,
+            removal_policy=cdk.RemovalPolicy.DESTROY,
+            auto_delete_objects=True,
         )
 
         # Iam role to invoke lambda
