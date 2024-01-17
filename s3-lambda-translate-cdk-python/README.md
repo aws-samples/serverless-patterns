@@ -1,5 +1,5 @@
 # S3 -> Lambda -> Translate
-This patterns shows CDK deployment on how to leverage Amazon S3, AWS Lambda, and Amazon Translate to perform document language translation in a serverless fashion.
+This pattern uses AWS Cloud Development Kit (AWS CDK) to deploy Amazon S3, AWS Lambda, and Amazon Translate to perform document language translation.
 
 ## Architecture
 ![Diagram](src/architecture.png)
