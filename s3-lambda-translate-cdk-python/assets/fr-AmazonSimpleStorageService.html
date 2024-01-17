@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Qu&#39;est-ce qu&#39;Amazon S3 ? - Service de stockage Amazon Simple</title><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="assets_root" content="/assets" /><meta name="target_state" content="Welcome" /><meta name="default_state" content="Welcome" /><link rel="icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="shortcut icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="canonical" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" /><meta name="description" content="Stockez des données dans le cloud et découvrez les concepts de base des compartiments et des objets grâce au service Web Amazon S3." /><meta name="deployment_region" content="IAD" /><meta name="product" content="Amazon Simple Storage Service" /><meta name="guide" content="User Guide" /><meta name="abstract" content="Learn how to use Amazon Simple Storage Service (Amazon S3) to store and retrieve any amount of data from anywhere. This guide explains Amazon S3 concepts, such as buckets, objects, and related configurations, and includes code examples for common operations." /><meta name="guide-locale" content="en_us" /><meta name="tocs" content="toc-contents.json" /><link rel="canonical" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" /><link rel="alternative" href="https://docs.aws.amazon.com/id_id/AmazonS3/latest/userguide/Welcome.html" hreflang="id-id" /><link rel="alternative" href="https://docs.aws.amazon.com/id_id/AmazonS3/latest/userguide/Welcome.html" hreflang="id" /><link rel="alternative" href="https://docs.aws.amazon.com/de_de/AmazonS3/latest/userguide/Welcome.html" hreflang="de-de" /><link rel="alternative" href="https://docs.aws.amazon.com/de_de/AmazonS3/latest/userguide/Welcome.html" hreflang="de" /><link rel="alternative" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" hreflang="en-us" /><link rel="alternative" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" hreflang="en" /><link rel="alternative" href="https://docs.aws.amazon.com/es_es/AmazonS3/latest/userguide/Welcome.html" hreflang="es-es" /><link rel="alternative" href="https://docs.aws.amazon.com/es_es/AmazonS3/latest/userguide/Welcome.html" hreflang="es" /><link rel="alternative" href="https://docs.aws.amazon.com/fr_fr/AmazonS3/latest/userguide/Welcome.html" hreflang="fr-fr" /><link rel="alternative" href="https://docs.aws.amazon.com/fr_fr/AmazonS3/latest/userguide/Welcome.html" hreflang="fr" /><link rel="alternative" href="https://docs.aws.amazon.com/it_it/AmazonS3/latest/userguide/Welcome.html" hreflang="it-it" /><link rel="alternative" href="https://docs.aws.amazon.com/it_it/AmazonS3/latest/userguide/Welcome.html" hreflang="it" /><link rel="alternative" href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/Welcome.html" hreflang="ja-jp" /><link rel="alternative" href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/Welcome.html" hreflang="ja" /><link rel="alternative" href="https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/userguide/Welcome.html" hreflang="ko-kr" /><link rel="alternative" href="https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/userguide/Welcome.html" hreflang="ko" /><link rel="alternative" href="https://docs.aws.amazon.com/pt_br/AmazonS3/latest/userguide/Welcome.html" hreflang="pt-br" /><link rel="alternative" href="https://docs.aws.amazon.com/pt_br/AmazonS3/latest/userguide/Welcome.html" hreflang="pt" /><link rel="alternative" href="https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/Welcome.html" hreflang="zh-cn" /><link rel="alternative" href="https://docs.aws.amazon.com/zh_tw/AmazonS3/latest/userguide/Welcome.html" hreflang="zh-tw" /><link rel="alternative" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" hreflang="x-default" /><meta name="feedback-item" content="S3" /><meta name="this_doc_product" content="Amazon Simple Storage Service" /><meta name="this_doc_guide" content="User Guide" /><script defer="" src="/assets/r/vendor4.js?version=2021.12.02"></script><script defer="" src="/assets/r/vendor3.js?version=2021.12.02"></script><script defer="" src="/assets/r/vendor1.js?version=2021.12.02"></script><script defer="" src="/assets/r/awsdocs-common.js?version=2021.12.02"></script><script defer="" src="/assets/r/awsdocs-doc-page.js?version=2021.12.02"></script><link href="/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet" /><link href="/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet" /><link href="/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet" /><script async="" id="awsc-panorama-bundle" type="text/javascript" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'s3'}"></script><meta id="panorama-serviceSubSection" value="User Guide" /><meta id="panorama-serviceConsolePage" value="What is Amazon S3?" /></head><body class="awsdocs awsui"><div class="awsdocs-container"><awsdocs-header></awsdocs-header><awsui-app-layout id="app-layout" class="awsui-util-no-gutters" ng-controller="ContentController as $ctrl" header-selector="awsdocs-header" navigation-hide="false" navigation-width="$ctrl.navWidth" navigation-open="$ctrl.navOpen" navigation-change="$ctrl.onNavChange($event)" tools-hide="$ctrl.hideTools" tools-width="$ctrl.toolsWidth" tools-open="$ctrl.toolsOpen" tools-change="$ctrl.onToolsChange($event)"><div id="guide-toc" dom-region="navigation"><awsdocs-toc></awsdocs-toc></div><div id="main-column" dom-region="content" tabindex="-1"><awsdocs-view class="awsdocs-view"><div id="awsdocs-content"><head><title>Qu&#39;est-ce qu&#39;Amazon S3 ? - Service de stockage Amazon Simple</title><meta name="pdf" content="/pdfs/AmazonS3/latest/userguide/s3-userguide.pdf#Welcome" /><meta name="rss" content="s3-userguide-rss-updates.rss" /><meta name="forums" content="http://forums.aws.amazon.com/forum.jspa?forumID=24" /><meta name="feedback" content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=S3&amp;topic_url=http://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/Welcome.html" /><meta name="feedback-yes" content="feedbackyes.html?topic_url=http://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/Welcome.html" /><meta name="feedback-no" content="feedbackno.html?topic_url=http://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/Welcome.html" /><meta name="keywords" content="S3, Amazon S3, Guide de l&#39;utilisateur S3, Guide de l&#39;utilisateur Amazon S3, Guide de l&#39;utilisateur Amazon, compartiment S3, objet S3, stockage dans le cloud, stockage de données" /><script type="application/ld+json">
+{
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Amazon Simple Storage Service (S3)",
+        "item" : "https://docs.aws.amazon.com/s3/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "User Guide",
+        "item" : "https://docs.aws.amazon.com/AmazonS3/latest/userguide"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "What is Amazon S3?",
+        "item" : "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+      }
+    ]
+}
+</script></head><body><div id="main"><div style="display: none"><a href="/pdfs/AmazonS3/latest/userguide/s3-userguide.pdf#Welcome" target="_blank" rel="noopener noreferrer" title="Ouvrir le PDF"></a></div><div id="breadcrumbs" class="breadcrumb"><a href="/index.html">Documentation</a> <a href="https://aws.amazon.com">AWS</a> <a href="Welcome.html">Guide de l&#39;utilisateur</a> d&#39;<a href="/s3/index.html">Amazon Simple Storage Service (S3)</a></div><div id="page-toc-src"><a href="#S3Features">Caractéristiques d&#39;Amazon S3 Fonctionnement</a> <a href="#CoreConcepts">d&#39;Amazon S3</a> <a href="#ConsistencyModel">Modèle de cohérence des données Amazon S3</a> <a href="#RelatedAmazonWebServices">Services associés</a> <a href="#API">Accès à Amazon S3</a> <a href="#PayingforStorage">Paiement pour la conformité à la <a href="#pci-dss-compliance">norme PCI DSS</a> d&#39;Amazon S3</a></div><awsdocs-doc-page-banner></awsdocs-doc-page-banner><div id="main-content" class="awsui-util-container"><div id="main-col-body"><awsdocs-language-banner data-service="$ctrl.pageService"></awsdocs-language-banner><h1 class="topictitle" id="Welcome">Qu&#39;est-ce qu&#39;Amazon S3 ?</h1><div class="awsdocs-page-header-container"><awsdocs-page-header></awsdocs-page-header><awsdocs-filter-selector id="awsdocs-filter-selector"></awsdocs-filter-selector></div><p>Amazon Simple Storage Service (Amazon S3) est un service de stockage d&#39;objets qui offre une évolutivité, une disponibilité 
+ des données, une sécurité et des performances de pointe. Les clients de toutes tailles et de tous secteurs peuvent utiliser 
+ Amazon S3 pour stocker et protéger n&#39;importe quel volume de données dans de nombreux cas d&#39;utilisation, tels que les lacs de données, les 
+ sites Web, les applications mobiles, la sauvegarde et la restauration, l&#39;archivage, les applications d&#39;entreprise, 
+ les appareils IoT et l&#39;analyse des mégadonnées. Amazon S3 fournit des fonctionnalités de gestion qui vous permettent d&#39;optimiser, 
+ d&#39;organiser et de configurer l&#39;accès à vos données afin de répondre à vos exigences commerciales, organisationnelles 
+ et de conformité spécifiques.</p><div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Remarque</h6></div><div class="awsdocs-note-text"><p>Pour plus d&#39;informations sur l&#39;utilisation de la classe de stockage Amazon S3 Express One Zone avec des compartiments de répertoires, consultez <a href="./s3-express-one-zone.html">Qu&#39;est-ce que S3 Express One Zone ?</a> et <a href="./directory-buckets-overview.html">des 
+ compartiments Directory</a>.</p></div></div><div class="highlights" id="inline-topiclist"><h6>Sujets</h6><ul><li><a href="#S3Features">Caractéristiques d&#39;Amazon S3</a></li><li><a href="#CoreConcepts">Comment fonctionne Amazon S3</a></li><li><a href="#ConsistencyModel">Modèle de cohérence des données Amazon S3</a></li><li><a href="#RelatedAmazonWebServices">Services connexes</a></li><li><a href="#API">Accès à Amazon S3</a></li><li><a href="#PayingforStorage">Payer pour Amazon S3</a></li><li><a href="#pci-dss-compliance">Conformité à la norme PCI DSS</a></li></ul></div>
+		<h2 id="S3Features">Caractéristiques d&#39;Amazon S3</h2>
+		 
+			<h3 id="RRS">Classes de stockage</h3>
+			<p>Amazon S3 propose une gamme de classes de stockage conçues pour différents cas d&#39;utilisation. Par 
+ exemple, vous pouvez stocker des données de production critiques dans S3 Standard ou S3 Express One Zone pour un 
+ accès fréquent, réduire les coûts en stockant les données rarement consultées dans S3 Standard-IA ou S3 One Zone-IA, et archiver des données aux coûts les plus bas dans 
+ S3 Glacier Instant Retrieval, 
+ S3 Glacier Flexible Retrieval et S3 Glacier Deep Archive. </p>
+			<p>Amazon S3 Express One Zone est une classe de stockage Amazon S3 mono-zone hautes performances spécialement conçue 
+ pour fournir un accès aux données cohérent en millisecondes à vos applications les plus sensibles à la latence. 
+ S3 Express One Zone est la classe de 
+ stockage d&#39;objets cloud à plus faible latence disponible aujourd&#39;hui, avec des 
+ vitesses d&#39;accès aux données 
+ jusqu&#39;à 10 fois plus rapides et des coûts de demande 
+ 50 
+ % inférieurs à ceux de S3 Standard. S3 Express One Zone est la première classe de stockage S3 dans laquelle vous pouvez sélectionner une seule zone de disponibilité avec 
+ la possibilité de partager votre stockage d&#39;objets avec vos ressources informatiques, ce qui garantit la vitesse d&#39;accès la plus élevée possible. 
+En outre, pour augmenter encore la vitesse d&#39;accès et prendre en charge des centaines de milliers de 
+ demandes par seconde, les données sont stockées dans un nouveau type de compartiment : un compartiment d&#39;annuaire 
+ Amazon S3. Pour plus d&#39;informations, consultez <a href="./s3-express-one-zone.html">Qu&#39;est-ce que S3 Express One Zone ?</a> et <a href="./directory-buckets-overview.html">des 
+ compartiments Directory</a>.</p>
+			<p>Vous pouvez stocker des données dont les modèles d&#39;accès sont changeants ou inconnus dans 
+ S3 Intelligent-Tiering, qui optimise les coûts de stockage en déplaçant automatiquement vos 
+ données entre quatre niveaux d&#39;accès lorsque vos modèles d&#39;accès changent. Ces quatre 
+ niveaux d&#39;accès comprennent deux niveaux d&#39;accès à faible latence optimisés pour les accès fréquents et peu fréquents, et deux niveaux 
+ d&#39;accès aux archives optionnels conçus pour un accès asynchrone aux données rarement consultées. 
+</p>
+			<p>Pour plus d&#39;informations, consultez la section <a href="./storage-class-intro.html">Utilisation des classes de stockage Amazon S3</a>. Pour plus d&#39;informations sur 
+ S3 Glacier Flexible Retrieval, consultez le <a href="https://docs.aws.amazon.com/amazonglacier/latest/dev/introduction.html"><em>guide du développeur Amazon S3 Glacier</em></a>.</p>
+		 
+		 
+			<h3 id="features-storage-management">Gestion du stockage</h3>
+			<p>Amazon S3 possède des fonctionnalités de gestion du stockage que vous pouvez utiliser pour gérer les coûts, répondre aux exigences 
+ réglementaires, réduire la latence et enregistrer plusieurs copies distinctes de vos 
+ données conformément aux exigences de conformité.</p>
+			<div class="itemizedlist">
+				 
+				 
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html">Cycle de vie S3</a> : configurez une configuration de cycle de vie pour gérer 
+ vos objets et les stocker de manière rentable tout au long de leur cycle de vie. Vous 
+ pouvez transférer des objets vers d&#39;autres classes de stockage S3 ou faire expirer des objets qui 
+ atteignent la fin de leur durée de vie.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html">S3 Object Lock</a> : empêchez la 
+ suppression ou le remplacement d&#39;objets Amazon S3 pendant une durée déterminée ou indéfiniment. Vous pouvez 
+ utiliser Object Lock pour répondre aux exigences réglementaires qui nécessitent un stockage <em>WORM 
+ (<em>write-once-read-many</em>)</em> ou simplement pour ajouter une 
+ couche de protection supplémentaire contre les modifications et les suppressions d&#39;objets.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html">Réplication S3</a> 
+ : répliquez les objets et leurs métadonnées et balises d&#39;objet respectives vers 
+ un ou plusieurs compartiments de destination dans les mêmes régions AWS ou dans des régions AWS différentes pour 
+ réduire la latence, la conformité, la sécurité et d&#39;autres cas d&#39;utilisation. </p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/batch-ops.html">Opérations par lots S3</a> : gérez des milliards d&#39;objets à grande échelle à l&#39;
+aide d&#39;une seule demande d&#39;API S3 ou de quelques clics sur la console Amazon S3. Vous pouvez 
+ utiliser les opérations par lots pour effectuer des opérations telles que la <b>copie</b>, l&#39;<b>appel de la 
+ fonction AWS Lambda</b> et la <b>restauration</b> sur 
+ des millions, voire des milliards d&#39;objets.</p>
+				</li></ul></div>
+		 
+		 
+			<h3 id="features-access-management">Gestion des accès et sécurité</h3>
+			<p>Amazon S3 fournit des fonctionnalités permettant d&#39;auditer et de gérer l&#39;accès à vos compartiments et à vos 
+ objets. Par défaut, les compartiments S3 et les objets qu&#39;ils contiennent sont privés. Vous n&#39;avez accès 
+ qu&#39;aux ressources S3 que vous créez. Pour accorder des autorisations de ressources granulaires 
+ adaptées à votre cas d&#39;utilisation spécifique ou pour auditer les autorisations de vos 
+ ressources Amazon S3, vous pouvez utiliser les fonctionnalités suivantes. </p>
+			<div class="itemizedlist">
+				 
+				 
+				 
+				 
+				 
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html">Accès public par blocage S3</a> : bloquez l&#39;accès public aux 
+ compartiments et aux objets S3. Par défaut, les paramètres de blocage de l&#39;accès public sont activés 
+ au niveau du bucket. Nous vous recommandons de laisser tous les 
+ paramètres de blocage de l&#39;accès public activés, sauf si vous savez que vous devez désactiver un ou plusieurs d&#39;
+entre eux pour votre cas d&#39;utilisation spécifique. Pour plus d&#39;informations, consultez <a href="./configuring-block-public-access-bucket.html">Configuration des 
+ paramètres de blocage de l&#39;accès public pour vos compartiments S3</a>.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-access-control.html">AWS Identity and Access Management (IAM)</a> — IAM est un service Web qui 
+ vous permet de contrôler en toute sécurité l&#39;accès aux ressources AWS, y compris à vos ressources Amazon S3
+. Avec IAM, vous pouvez gérer de manière centralisée les autorisations qui contrôlent les ressources AWS 
+ auxquelles les utilisateurs peuvent accéder. Vous utilisez IAM pour contrôler qui est 
+ authentifié (connecté) et autorisé (possède des autorisations) à utiliser 
+ les ressources.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html">
+Politiques relatives aux compartiments</a> : utilisez un langage de stratégie basé sur IAM pour configurer des autorisations 
+ basées sur les ressources pour vos compartiments S3 et les objets qu&#39;ils contiennent. 
+</p>
+				</li><li class="listitem">
+					<p>
+<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-points.html">Points d&#39;accès Amazon S3 
+ : configurez des points</a> de terminaison réseau nommés avec des politiques d&#39;accès dédiées afin de 
+ gérer l&#39;accès aux données à grande échelle pour les ensembles de données partagés dans Amazon S3. </p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acls.html">
+Listes de contrôle d&#39;accès (ACL)</a> : accordez des autorisations de lecture et d&#39;écriture pour 
+ des buckets et des objets individuels aux utilisateurs autorisés. En règle générale, nous 
+ recommandons d&#39;utiliser les politiques basées sur les ressources S3 (politiques de compartiment et politiques de point d&#39;accès) ou 
+ les politiques utilisateur IAM pour le contrôle d&#39;accès au lieu des ACL. 
+Les politiques constituent une option de contrôle d&#39;accès simplifiée et plus flexible. Grâce aux politiques de 
+ compartiment et aux politiques de point d&#39;accès, vous pouvez définir des règles qui s&#39;appliquent de 
+ manière générale à toutes les demandes adressées à vos ressources Amazon S3. <a href="./access-policy-alternatives-guidelines.html">Pour plus d&#39;informations 
+ sur les cas spécifiques dans lesquels vous utiliseriez des ACL au lieu de 
+ politiques basées sur les ressources ou de politiques utilisateur IAM, consultez la section Directives relatives aux politiques d&#39;accès.</a></p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html">Propriété des objets S3</a> : prenez possession de chaque objet 
+ de votre compartiment, simplifiant ainsi la gestion des accès aux données stockées dans Amazon S3. 
+S3 Object Ownership est un paramètre au niveau du bucket Amazon S3 que vous pouvez utiliser pour 
+ désactiver ou activer les ACL. Par défaut, les ACL sont désactivées. Lorsque les ACL sont désactivées, 
+ le propriétaire du bucket est propriétaire de tous les objets du bucket et gère l&#39;accès aux 
+ données exclusivement à l&#39;aide de politiques de gestion d&#39;accès.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-analyzer.html">IAM Access Analyzer pour S3</a> 
+ : évaluez et surveillez vos politiques d&#39;accès au compartiment S3, en vous assurant que 
+ celles-ci fournissent uniquement l&#39;accès prévu à vos ressources S3. </p>
+				</li></ul></div>
+		 
+		 
+			<h3 id="features-data-processing">Traitement des données</h3>
+			<p>Pour transformer les données et déclencher des flux de travail afin d&#39;automatiser diverses autres 
+ activités de traitement à grande échelle, vous pouvez utiliser les fonctionnalités suivantes.</p>
+			<div class="itemizedlist">
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/transforming-objects.html">S3 Object Lambda</a> 
+ : ajoutez votre propre code aux requêtes S3 GET, HEAD et LIST pour modifier et traiter les données lorsqu&#39;
+elles sont renvoyées à une application. Filtrez les lignes, redimensionnez dynamiquement les images
+, supprimez les données confidentielles et bien plus encore.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html">
+Notifications d&#39;événements</a> : déclenchez des flux de travail qui utilisent Amazon Simple Notification Service 
+ (Amazon SNS), Amazon Simple Queue Service (Amazon SQS) et AWS Lambda lorsqu&#39;une modification est apportée à vos ressources S3. 
+</p>
+				</li></ul></div>
+		 
+		 
+			<h3 id="features-storage-monitoring">Enregistrement et surveillance du stockage</h3>
+			<p>Amazon S3 fournit des outils de journalisation et de surveillance que vous pouvez utiliser pour surveiller et contrôler la 
+ façon dont vos ressources Amazon S3 sont utilisées. Pour plus d&#39;informations, consultez la section <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/monitoring-automated-manual.html">
+Outils de surveillance</a>.</p>
+			<div class="itemizedlist">
+				<h6>Outils de surveillance automatisés</h6>
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html">Statistiques Amazon CloudWatch 
+ pour Amazon S3</a> : suivez l&#39;état de fonctionnement de vos ressources 
+ S3 et configurez des alertes de facturation lorsque les frais estimés atteignent un seuil 
+ défini par l&#39;utilisateur. </p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging.html">AWS CloudTrail</a> 
+ : enregistrez les actions effectuées par un utilisateur, un rôle ou un service AWS dans 
+ Amazon S3. Les journaux CloudTrail vous fournissent un suivi détaillé des API pour les opérations au niveau du compartiment S3 
+ et au niveau de l&#39;objet.</p>
+				</li></ul></div>
+			<div class="itemizedlist">
+				<h6>Outils de surveillance manuels</h6>
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerLogs.html">
+Journalisation des accès au serveur</a> : obtenez des enregistrements détaillés des demandes 
+ adressées à un bucket. Vous pouvez utiliser les journaux d&#39;accès aux serveurs pour de nombreux cas d&#39;utilisation, tels que la 
+ réalisation d&#39;audits de sécurité et d&#39;accès, l&#39;apprentissage de votre clientèle 
+ et la compréhension de votre facture Amazon S3.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor.html">AWS Trusted 
+ Advisor</a> : évaluez votre compte à l&#39;aide des vérifications des meilleures 
+ pratiques AWS pour identifier les moyens d&#39;optimiser votre infrastructure AWS, d&#39;
+améliorer la sécurité et les performances, de réduire les coûts et de surveiller les quotas de service. 
+Vous pouvez ensuite suivre les recommandations pour optimiser vos services et vos 
+ ressources.</p>
+				</li></ul></div>
+		 
+		 
+			<h3 id="features-analytics-insights">Analyses et informations</h3>
+			<p>Amazon S3 propose des fonctionnalités qui vous aident à gagner en visibilité sur votre utilisation du stockage, 
+ ce qui vous permet de mieux comprendre, analyser et optimiser votre stockage à 
+ grande échelle.</p>
+
+			<div class="itemizedlist">
+				 
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage_lens.html">Amazon S3 Storage Lens</a> 
+ : comprenez, analysez et optimisez votre stockage. S3 Storage Lens fournit plus de 
+ 60 indicateurs d&#39;utilisation et d&#39;activité ainsi que des tableaux de bord interactifs 
+ pour agréger les données relatives à l&#39;ensemble de votre organisation, à des comptes spécifiques, à des régions AWS, à des compartiments ou à des préfixes. 
+</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/analytics-storage-class.html">Analyse des 
+ classes</a> de stockage : analysez les modèles d&#39;accès au stockage pour 
+ décider quand il est temps de déplacer les données vers une classe de stockage plus rentable. 
+					</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-inventory.html">Inventaire S3 avec rapports 
+ d&#39;inventaire</a> — Auditez et créez des rapports sur les objets et leurs métadonnées 
+ correspondantes, et configurez d&#39;autres fonctionnalités d&#39;Amazon S3 pour qu&#39;elles prennent des mesures dans les rapports d&#39;
+inventaire. Par exemple, vous pouvez créer un rapport sur l&#39;état de réplication et de 
+ chiffrement de vos objets. Pour obtenir la liste de toutes les métadonnées disponibles 
+ pour chaque objet dans les rapports d&#39;inventaire, consultez la <a href="./storage-inventory.html#storage-inventory-contents">liste d&#39;inventaire Amazon S3</a>.</p>
+				</li></ul></div>
+		 
+		 
+			<h3 id="features-strong-consistency">Cohérence forte</h3>
+			<p>Amazon S3 assure une forte cohérence en lecture après écriture pour les requêtes PUT et DELETE des 
+ objets de votre compartiment Amazon S3 dans toutes les régions AWS. Ce comportement s&#39;applique à la fois aux 
+ écritures de nouveaux objets ainsi qu&#39;aux requêtes PUT qui remplacent des objets existants et aux requêtes 
+ DELETE. En outre, les opérations de lecture sur Amazon S3 Select, les 
+ listes de contrôle d&#39;accès (ACL) Amazon S3, les balises d&#39;objet Amazon S3 et les métadonnées des objets (par exemple, l&#39;objet HEAD) 
+ sont très cohérentes. Pour plus d&#39;informations, consultez le <a href="#ConsistencyModel">modèle de cohérence des données Amazon S3</a>.</p>
+		 
+	 
+		<h2 id="CoreConcepts">Comment fonctionne Amazon S3</h2>
+		<p>Amazon S3 est un service de stockage d&#39;objets qui stocke les données sous forme d&#39;objets dans des compartiments. Un 
+ <em>objet</em> est un fichier et toutes les métadonnées qui décrivent 
+ ce fichier. Un <em>seau</em> est un contenant pour les objets. </p>
+		<p>Pour stocker vos données dans Amazon S3, vous devez d&#39;abord créer un compartiment et spécifier un nom de compartiment et une région 
+ AWS. Ensuite, vous chargez vos données dans ce compartiment en tant qu&#39;objets dans Amazon S3. Chaque objet 
+ possède une <em>clé</em> (ou un <em>
+nom de clé</em>), qui est l&#39;identifiant unique de l&#39;objet dans le 
+ compartiment.</p>
+		<p>S3 fournit des fonctionnalités que vous pouvez configurer en fonction de votre cas d&#39;utilisation spécifique. Par 
+ exemple, vous pouvez utiliser la gestion des versions S3 pour conserver plusieurs versions d&#39;un objet dans le même 
+ compartiment, ce qui vous permet de restaurer des objets supprimés ou 
+ remplacés accidentellement.</p>
+		<p>Les compartiments et les objets qu&#39;ils contiennent sont privés et ne sont accessibles que si vous 
+ accordez des autorisations d&#39;accès explicites. Vous pouvez utiliser des politiques de compartiment, des politiques AWS Identity and Access Management (IAM), des listes de contrôle 
+ d&#39;accès (ACL) et des points d&#39;accès S3 pour gérer l&#39;accès.</p>
+		<div class="highlights" id="inline-topiclist"><h6>Sujets</h6><ul><li><a href="#BasicsBucket">Seaux</a></li><li><a href="#BasicsObjects">Objets</a></li><li><a href="#BasicsKeys">Clés</a></li><li><a href="#Versions">Versionnage S3</a></li><li><a href="#BasicsVersionID">ID de version</a></li><li><a href="#BucketPolicies">Politique relative aux compartiments</a></li><li><a href="#BasicsAccessPoints">Points d&#39;accès S3</a></li><li><a href="#S3_ACLs">Listes de contrôle d&#39;accès (ACL)</a></li><li><a href="#Regions">Régions</a></li></ul></div>
+		 
+			<h3 id="BasicsBucket">Seaux</h3>
+			<p>Un bucket est un conteneur pour les objets stockés dans Amazon S3. Vous pouvez stocker un nombre illimité d&#39;
+objets dans un compartiment et vous pouvez avoir jusqu&#39;à 100 compartiments sur votre compte. Pour demander une 
+ augmentation, rendez-vous sur la <a href="https://console.aws.amazon.com/servicequotas/home/services/s3/quotas/" rel="noopener noreferrer" target="_blank"> <span>
+console Service Quotas</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>.</p>
+			<p>Chaque objet est contenu dans un seau. <code class="code">Par exemple, si l&#39;objet nommé 
+ <code class="code">photos/puppy.jpg</code> est stocké dans le compartiment 
+ <code class="code">DOC-EXAMPLE-BUCKET</code> de la 
+ région Ouest des États-Unis (Oregon), il est adressable à l&#39;aide de l&#39;URL https://DOC-EXAMPLE-BUCKET.s3.us-west-2.amazonaws.com/photos/puppy.jpg. 
+</code> 
+Pour plus d&#39;informations, consultez la section <a href="./access-bucket-intro.html">Accès à un 
+ bucket</a>. </p>
+			<p>Lorsque vous créez un compartiment, vous entrez un nom de compartiment et vous choisissez la région AWS dans 
+ laquelle le compartiment résidera. Une fois que vous avez créé un compartiment, vous ne pouvez pas modifier le nom 
+ du compartiment ni sa région. Les noms des compartiments doivent respecter les <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html">règles de dénomination des compartiments</a>. Vous pouvez également configurer un compartiment pour utiliser la gestion des <a href="./Versioning.html">versions S3 ou d&#39;</a>autres 
+ fonctionnalités <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/managing-storage.html">de gestion du stockage</a>.</p>
+			<p> Les seaux sont également :</p>
+			<div class="itemizedlist">
+				 
+				 
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p>Organisez l&#39;espace de noms Amazon S3 au plus haut niveau.</p>
+				</li><li class="listitem">
+					<p>Identifiez le compte responsable des 
+ frais de stockage et de transfert de données.</p>
+				</li><li class="listitem">
+					<p>Fournissez des options de contrôle d&#39;accès, telles que des politiques de compartiment, 
+ des listes de contrôle d&#39;accès (ACL) et des points d&#39;accès S3, que vous pouvez utiliser pour gérer l&#39;accès à 
+ vos ressources Amazon S3.</p>
+				</li><li class="listitem">
+					<p>Servir d&#39;unité d&#39;agrégation pour les rapports d&#39;utilisation.</p>
+				</li></ul></div>
+			<p> Pour plus d&#39;informations sur les compartiments, consultez la section Présentation <a href="./UsingBucket.html">des compartiments</a>. </p>
+		 
+		 
+			<h3 id="BasicsObjects">Objets</h3>
+			<p>Les objets sont les entités fondamentales stockées dans Amazon S3. Les objets sont composés de 
+ données et de métadonnées. Les métadonnées sont un ensemble de paires nom-valeur qui décrivent l&#39;
+objet. Ces paires incluent certaines métadonnées par défaut, telles que la date de dernière modification, 
+ et des métadonnées HTTP standard, telles que <code class="code">Content-Type</code>. Vous pouvez également spécifier des métadonnées 
+ personnalisées au moment du stockage de l&#39;objet.</p>
+			<p>Un objet est identifié de manière unique au sein d&#39;un compartiment par une <a href="#BasicsKeys">clé (nom)</a> et un <a href="#BasicsVersionID">ID de version</a> (si la gestion des versions 
+ S3 est activée sur le compartiment). Pour plus d&#39;informations sur les objets, consultez la section <a href="./UsingObjects.html">Présentation des objets 
+ Amazon S3</a>.</p>
+		 
+		 
+			<h3 id="BasicsKeys">Clés</h3>
+			<p>Une <em>clé d&#39;objet</em> (ou <em>
+nom de clé</em>) est l&#39;identifiant unique d&#39;un objet dans un compartiment. Chaque 
+ objet d&#39;un seau possède exactement une clé. La combinaison d&#39;un compartiment, d&#39;une clé d&#39;objet et, 
+ éventuellement, d&#39;un ID de version (si la gestion des versions S3 est activée pour le compartiment) permet d&#39;identifier de manière unique 
+ chaque objet. Vous pouvez donc considérer Amazon S3 comme une carte de données de base entre « bucket + key + 
+ version » et l&#39;objet lui-même. </p>
+			<p>Chaque objet d&#39;Amazon S3 peut être adressé de manière unique en combinant le point de 
+ terminaison du service Web, le nom du compartiment, la clé et, éventuellement, une version. Par exemple, dans l&#39;URL 
+ <code class="code">https://DOC-EXAMPLE-BUCKET.s3.us-west-2.amazonaws.com/photos/puppy.jpg</code>, 
+ <code>DOC-EXAMPLE-BUCKET</code> est le nom du bucket 
+ et <code>photos/puppy.jpg</code> est la clé.</p>
+			<p>Pour plus d&#39;informations sur les clés d&#39;objet, voir <a href="./object-keys.html">Création de noms de clés d&#39;objet</a>. </p>
+		 
+		 
+			<h3 id="Versions">Versionnage S3</h3>
+			<p>Vous pouvez utiliser la gestion des versions S3 pour conserver plusieurs variantes d&#39;un objet dans le même 
+ compartiment. Avec S3 Versioning, vous pouvez conserver, récupérer et restaurer chaque version de 
+ chaque objet stocké dans vos compartiments. Vous pouvez facilement vous remettre d&#39;une action involontaire de 
+ l&#39;utilisateur ou d&#39;une défaillance de l&#39;application.</p>
+			<p>Pour plus d&#39;informations, consultez la section <a href="./Versioning.html">Utilisation de la gestion des versions dans les compartiments S3</a>.</p>
+		 
+		 
+			<h3 id="BasicsVersionID">ID de version</h3>
+			<p>Lorsque vous activez la gestion des versions S3 dans un compartiment, Amazon S3 génère un ID de version unique pour 
+ chaque objet ajouté au compartiment. Les objets qui existaient déjà dans le compartiment au 
+ moment où vous activez la gestion des versions ont un ID de version <code class="code">nul</code>. Si vous 
+ modifiez ces objets (ou tout autre) à l&#39;aide d&#39;autres opérations, telles que <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html">CopyObject</a> et <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html">PutObject</a>, les nouveaux objets 
+ obtiennent un ID de version unique.</p>
+			<p>Pour plus d&#39;informations, consultez la section <a href="./Versioning.html">Utilisation de la gestion des versions dans les compartiments S3</a>.</p>
+		 
+		 
+			<h3 id="BucketPolicies">Politique relative aux compartiments</h3>
+			<p>Une politique de compartiment est une politique AWS Identity and Access Management (IAM) basée sur les ressources que vous pouvez utiliser pour 
+ accorder des autorisations d&#39;accès à votre compartiment et aux objets qu&#39;il contient. Seul le propriétaire du bucket 
+ peut associer une politique à un bucket. Les autorisations associées au compartiment s&#39;appliquent 
+ à tous les objets du compartiment qui appartiennent au propriétaire du compartiment. Les 
+ politiques relatives aux compartiments sont limitées à 20 Ko.</p>
+			<p>Les politiques relatives aux compartiments utilisent un langage de politique d&#39;accès basé sur JSON qui est standard sur 
+ AWS. Vous pouvez utiliser des politiques de compartiment pour ajouter ou refuser des autorisations pour les objets d&#39;un 
+ compartiment. Les politiques de bucket autorisent ou refusent les demandes en fonction des éléments de la politique, 
+ notamment le demandeur, les actions S3, les ressources et les aspects ou conditions de la 
+ demande (par exemple, l&#39;adresse IP utilisée pour effectuer la demande). Par exemple, vous pouvez 
+ créer une politique de compartiment qui accorde des autorisations intercomptes pour charger des objets vers un compartiment 
+ S3 tout en garantissant que le propriétaire du compartiment a le contrôle total des 
+ objets chargés. Pour plus d&#39;informations, consultez la section <a href="./example-bucket-policies.html">Exemples de politiques relatives aux compartiments</a>.</p>
+			<p>Dans votre politique en matière de bucket, vous pouvez utiliser des caractères génériques sur les Amazon Resource Names 
+ (ARN) et d&#39;autres valeurs pour accorder des autorisations à un sous-ensemble d&#39;objets. Par exemple, 
+ vous pouvez contrôler l&#39;accès à des groupes d&#39;objets qui commencent par un <a href="https://docs.aws.amazon.com/general/latest/gr/glos-chap.html#keyprefix">préfixe</a> commun ou se terminent par une extension donnée, telle que 
+ <code class="code">.html.</code></p>
+		 
+		 
+			<h3 id="BasicsAccessPoints">Points d&#39;accès S3</h3>
+			<p>Les points d&#39;accès Amazon S3 sont des points de terminaison réseau nommés dotés de politiques d&#39;accès dédiées qui 
+ décrivent comment accéder aux données à l&#39;aide de ce point de terminaison. Les points d&#39;accès sont attachés à 
+ des compartiments que vous pouvez utiliser pour effectuer des opérations sur les objets S3, telles que GetObject et 
+ PutObject. Les points d&#39;accès simplifient la gestion de l&#39;accès aux données à grande échelle pour les ensembles de données partagés 
+ dans Amazon S3. </p>
+			<p>Chaque point d&#39;accès possède sa propre politique de point d&#39;accès. Vous pouvez configurer les paramètres de <a href="./access-control-block-public-access.html">blocage de l&#39;accès public</a> 
+ pour chaque point d&#39;accès. Pour restreindre l&#39;accès aux données Amazon S3 à un réseau privé, vous pouvez 
+ également configurer n&#39;importe quel point d&#39;accès pour qu&#39;il n&#39;accepte que les demandes provenant d&#39;un cloud privé virtuel 
+ (VPC).</p>
+			<p>Pour plus d&#39;informations, consultez <a href="./access-points.html">la section Gestion de l&#39;accès aux données avec les points d&#39;accès Amazon S3</a>. </p>
+		 
+		 
+			<h3 id="S3_ACLs">Listes de contrôle d&#39;accès (ACL)</h3>
+			<p>Vous pouvez utiliser les ACL pour accorder des autorisations de lecture et d&#39;écriture aux utilisateurs autorisés pour des buckets et des objets 
+ individuels. Chaque bucket et chaque objet sont associés à une ACL en 
+ tant que sous-ressource. L&#39;ACL définit les comptes ou groupes AWS auxquels l&#39;accès est autorisé et 
+ le type d&#39;accès. Les ACL sont un mécanisme de contrôle d&#39;accès antérieur à l&#39;IAM. Pour 
+ plus d&#39;informations sur les ACL, voir <a href="./acl-overview.html">Présentation de la liste de contrôle d&#39;accès (ACL)</a>.</p>
+			<p>S3 Object Ownership est un paramètre au niveau du bucket Amazon S3 que vous pouvez utiliser pour contrôler la propriété des objets qui sont 
+ chargés dans votre bucket et pour désactiver ou activer les ACL. Par défaut, Object Ownership est défini sur le paramètre imposé par le propriétaire du bucket, 
+ et toutes les ACL sont désactivées. Lorsque les ACL sont désactivées, le propriétaire du compartiment est propriétaire de tous les objets du compartiment et gère l&#39;accès à ceux-ci 
+ exclusivement à l&#39;aide de politiques de gestion des accès.</p>
+	<p> La plupart des cas d&#39;utilisation modernes d&#39;Amazon S3 ne nécessitent plus l&#39;utilisation de listes de contrôle d&#39;accès. Nous vous recommandons de garder les ACL désactivées, sauf 
+ dans des circonstances exceptionnelles où vous devez contrôler l&#39;accès pour chaque objet individuellement. Lorsque les ACL sont désactivées, vous pouvez utiliser des politiques 
+ pour contrôler l&#39;accès à tous les objets de votre compartiment, indépendamment de la personne qui les a chargés dans votre compartiment. 
+Pour plus d&#39;informations, consultez la section <a href="./about-object-ownership.html">Contrôle de la propriété des objets et désactivation des ACL 
+ pour votre bucket</a>.</p>
+		 
+		 
+			<h3 id="Regions">Régions</h3>
+			<p>Vous pouvez choisir la région géographique AWS dans laquelle Amazon S3 stocke les compartiments que 
+ vous créez. Vous pouvez choisir une région pour optimiser la latence, minimiser les coûts ou 
+ répondre aux exigences réglementaires. Les objets stockés dans une région AWS ne quittent jamais cette 
+ région, sauf si vous les transférez ou les répliquez explicitement dans une autre région. <span>Par exemple, les objets stockés dans la région Europe (Irlande) n&#39;en sortent 
+ jamais.</span> 
+			</p>
+			<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Remarque</h6></div><div class="awsdocs-note-text"><p>Vous pouvez accéder à Amazon S3 et à ses fonctionnalités uniquement dans les régions AWS 
+ activées pour votre compte. Pour plus d&#39;informations sur l&#39;activation d&#39;une région pour créer 
+ et gérer des ressources AWS, consultez <a href="https://docs.aws.amazon.com/general/latest/gr/rande-manage.html">la section Gestion des régions AWS</a> <em>dans 
+ la référence générale AWS</em>.</p></div></div>
+			<p>Pour obtenir la liste des régions et des points de terminaison Amazon S3, consultez la section <a href="https://docs.aws.amazon.com/general/latest/gr/s3.html">Régions et points de terminaison</a> dans la référence <em>générale 
+ AWS</em>. </p>
+		 
+	 
+		<h2 id="ConsistencyModel">Modèle de cohérence des données Amazon S3</h2>
+		<p>Amazon S3 assure une forte cohérence en lecture après écriture pour les requêtes PUT et DELETE des 
+ objets de votre compartiment Amazon S3 dans toutes les régions AWS. Ce comportement s&#39;applique à la fois 
+ aux écritures dans de nouveaux objets ainsi qu&#39;aux requêtes PUT qui remplacent des objets existants et aux 
+ requêtes DELETE. En outre, les opérations de lecture sur Amazon S3 Select, les listes de contrôles d&#39;accès 
+ (ACL) Amazon S3, les balises d&#39;objet Amazon S3 et les métadonnées des objets (par exemple, l&#39;objet HEAD) sont 
+ très cohérentes. </p>
+		<p>Les mises à jour d&#39;une seule clé sont atomiques. Par exemple, si vous envoyez une requête PUT à une clé 
+ existante provenant d&#39;un thread et que vous exécutez simultanément une requête GET sur la même clé à partir d&#39;un second 
+ thread, vous obtiendrez soit les anciennes données, soit les nouvelles données, mais jamais des données partielles 
+ ou corrompues.</p>
+
+
+		<p>Amazon S3 atteint une haute disponibilité en répliquant les données sur plusieurs serveurs au sein des centres de données 
+ AWS. Si une requête PUT aboutit, vos données sont stockées en toute sécurité. Toute lecture 
+ (requête GET ou LIST) initiée suite à la réception d&#39;une 
+ réponse PUT réussie renverra les données écrites par la requête PUT. Voici des exemples de ce 
+ comportement : </p>
+		<div class="itemizedlist">
+			 
+			 
+			 
+			 
+		<ul class="itemizedlist"><li class="listitem">
+				<p>Un processus écrit un nouvel objet dans Amazon S3 et répertorie immédiatement les clés dans son 
+ compartiment. Le nouvel objet apparaît dans la liste.</p>
+			</li><li class="listitem">
+				<p>Un processus remplace un objet existant et essaie immédiatement de le lire. Amazon S3 
+ renvoie les nouvelles données. </p>
+			</li><li class="listitem">
+				<p>Un processus supprime un objet existant et essaie immédiatement de le lire. Amazon S3 
+ ne renvoie aucune donnée car l&#39;objet a été supprimé. </p>
+			</li><li class="listitem">
+				<p>Un processus supprime un objet existant et répertorie immédiatement les clés dans son 
+ compartiment. L&#39;objet n&#39;apparaît pas dans la liste. </p>
+			</li></ul></div>
+		<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Remarque</h6></div><div class="awsdocs-note-text"><div class="itemizedlist">
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p>Amazon S3 ne prend pas en charge le verrouillage d&#39;objets pour les rédacteurs simultanés. Si deux 
+ requêtes PUT sont adressées simultanément à la même clé, la demande dont l&#39;horodatage est le 
+ plus récent l&#39;emporte. Si c&#39;est le cas, vous devez intégrer un 
+ mécanisme de verrouillage des objets à votre application. </p>
+				</li><li class="listitem">
+					<p>Les mises à jour sont basées sur des clés. Il n&#39;existe aucun moyen d&#39;effectuer des mises à jour atomiques entre les clés. 
+Par exemple, vous ne pouvez pas faire dépendre la mise à jour d&#39;une clé de la mise à jour 
+ d&#39;une autre clé à moins de concevoir cette fonctionnalité dans votre 
+ application.</p>
+				</li></ul></div></div></div>
+		<p>Les configurations de godets ont un éventuel modèle de cohérence. Concrètement, cela signifie 
+ que :</p>
+		<div class="itemizedlist">
+			 
+			 
+
+		<ul class="itemizedlist"><li class="listitem">
+				<p>Si vous supprimez un compartiment et que vous listez immédiatement tous les compartiments, il est 
+ possible que le compartiment supprimé apparaisse toujours dans la liste.</p>
+			</li><li class="listitem">
+				<p>Si vous activez la gestion des versions sur un bucket pour la première fois, la propagation complète de la modification peut prendre peu 
+ de temps. Nous vous recommandons d&#39;
+attendre 15 minutes après avoir activé le versionnement avant d&#39;effectuer des opérations d&#39;écriture (requêtes PUT ou 
+ DELETE) sur les objets du bucket.</p>
+			</li></ul></div>
+
+		 
+			<h3 id="ApplicationConcurrency">Demandes simultanées</h3>
+			<p>Cette section fournit des exemples du comportement à attendre d&#39;Amazon S3 lorsque plusieurs 
+ clients écrivent sur les mêmes articles.</p>
+			<p>Dans cet exemple, W1 (écriture 1) et W2 (écriture 2) se terminent avant le début de R1 
+ (lecture 1) et R2 (lecture 2). Comme S3 est fortement cohérent, R1 et R2 renvoient tous deux 
+ <code class="code">couleur = rubis</code>. </p>
+			<div class="mediaobject">
+
+<img src="/images/AmazonS3/latest/userguide/images/consistency1.png" class="aws-docs-img-whiteBg aws-docs-img-padding aws-docs-img-filter" />
+
+			</div>
+			<p>Dans l&#39;exemple suivant, W2 ne se termine pas avant le début de R1. Par conséquent, R1 
+ peut renvoyer <code class="code">couleur = rubis</code> ou <code class="code">couleur = grenat</code>. Cependant, comme 
+ W1 et W2 se terminent avant le début de R2, R2 renvoie <code class="code">color = 
+</code> grenat. </p>
+			<div class="mediaobject">
+
+<img src="/images/AmazonS3/latest/userguide/images/consistency2.png" class="aws-docs-img-whiteBg aws-docs-img-padding aws-docs-img-filter" />
+
+			</div>
+			<p>Dans le dernier exemple, W2 commence avant que W1 n&#39;ait reçu un accusé de réception. 
+Par conséquent, ces écritures sont considérées comme simultanées. Amazon S3 utilise en interne la sémantique 
+ last-writer-wins pour déterminer quelle écriture est prioritaire. Cependant, l&#39;
+ordre dans lequel Amazon S3 reçoit les demandes et l&#39;ordre dans lequel les applications 
+ reçoivent les accusés de réception ne peuvent pas être prédits en raison de divers facteurs, tels que la latence du 
+ réseau. Par exemple, W2 peut être initié par une instance Amazon EC2 dans la même 
+ région, tandis que W1 peut être initié par un hôte plus éloigné. La meilleure façon de 
+ déterminer la valeur finale est d&#39;effectuer une lecture une fois que les deux écritures ont été 
+ confirmées. </p>
+			<div class="mediaobject">
+
+<img src="/images/AmazonS3/latest/userguide/images/consistency3.png" class="aws-docs-img-whiteBg aws-docs-img-padding aws-docs-img-filter" />
+
+			</div>
+		 
+	 
+		<h2 id="RelatedAmazonWebServices">Services connexes </h2>
+
+		<p>Après avoir chargé vos données dans Amazon S3, vous pouvez les utiliser avec d&#39;autres services AWS. 
+Voici les services que vous pourriez utiliser le plus fréquemment :</p>
+		<div class="itemizedlist">
+			 
+			 
+			 
+			 
+		<ul class="itemizedlist"><li class="listitem">
+				<p><span class="topcom"><a href="https://aws.amazon.com/ec2/" rel="noopener noreferrer" target="_blank"><span>Amazon Elastic Compute Cloud 
+ (Amazon EC2)</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a></span>— Fournit une 
+ capacité informatique sécurisée et évolutive dans le cloud AWS. L&#39;utilisation d&#39;Amazon EC2 vous évite d&#39;avoir à investir dans du 
+ matériel dès le départ, ce qui vous permet de développer et de déployer des applications plus rapidement. Vous pouvez 
+ utiliser Amazon EC2 pour lancer autant ou aussi peu de serveurs virtuels que nécessaire, configurer la 
+ sécurité et la mise en réseau et gérer le stockage.</p>
+			</li><li class="listitem">
+				<p><span class="topcom"><a href="https://aws.amazon.com/elasticmapreduce/" rel="noopener noreferrer" target="_blank"><span>Amazon EMR</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a></span>— Aide les entreprises, les chercheurs, les 
+ analystes de données et les développeurs à traiter facilement et à moindre coût de grandes quantités de 
+ données. Amazon EMR utilise un framework Hadoop hébergé qui s&#39;exécute sur l&#39;
+infrastructure Web d&#39;Amazon EC2 et d&#39;Amazon S3. </p>
+			</li><li class="listitem">
+				<p><span class="topcom"><a href="http://aws.amazon.com/snow/" rel="noopener noreferrer" target="_blank"><span>
+Famille AWS Snow</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a></span>— Aide les clients qui ont besoin de mener 
+ leurs activités dans des environnements austères, autres que des centres de données, et dans des endroits où 
+ la connectivité réseau n&#39;est pas cohérente. Vous pouvez utiliser les 
+ appareils de la famille AWS Snow pour accéder localement et de manière rentable au stockage et à 
+ la puissance de calcul du cloud AWS là où une connexion Internet n&#39;est peut-être pas une option. 
+				</p>
+			</li><li class="listitem">
+				<p><span class="topcom"><a href="http://aws.amazon.com/aws-transfer-family/" rel="noopener noreferrer" target="_blank"><span>Famille AWS Transfer</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a></span>— Fournit un support entièrement géré pour les transferts de 
+ fichiers directement depuis et vers Amazon S3 ou Amazon Elastic File System (Amazon EFS) à l&#39;aide du protocole SFTP (Secure 
+ Shell), du protocole FTPS (File Transfer Protocol over SSL) et du protocole FTP 
+ (File Transfer Protocol). </p>
+			</li></ul></div>
+	 
+		<h2 id="API">Accès à Amazon S3</h2>
+		<p>Vous pouvez travailler avec Amazon S3 de l&#39;une des manières suivantes :</p>
+		 
+			<h3 id="access-aws-management-console">Console de gestion AWS</h3>
+			<p>La console est une interface utilisateur Web permettant de gérer les ressources Amazon S3 et AWS. 
+Si vous avez créé un compte AWS, vous pouvez accéder à la console Amazon S3 en vous 
+ connectant à l&#39;AWS Management Console et en choisissant <b>S3</b> sur la 
+ page d&#39;accueil d&#39;AWS Management Console.</p>
+		 
+		 
+			<h3 id="access-aws-cli">Interface de ligne de commande AWS</h3>
+			<p>Vous pouvez utiliser les outils de ligne de commande AWS pour émettre des commandes ou créer des scripts sur la ligne de commande de 
+ votre système afin d&#39;exécuter des tâches AWS (y compris S3).</p>
+			<p>L&#39;<a href="http://aws.amazon.com/cli/" rel="noopener noreferrer" target="_blank"><span>interface de ligne de commande AWS (AWS CLI)</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>fournit des commandes 
+ pour un large éventail de services AWS. L&#39;AWS CLI est prise en charge sous Windows, macOS et 
+ Linux. Pour commencer, consultez le <a href="https://docs.aws.amazon.com/cli/latest/userguide/"><em>guide de l&#39;utilisateur de l&#39;interface de ligne de commande AWS</em></a>. Pour plus d&#39;informations sur les commandes pour 
+ Amazon S3, consultez <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/index.html" rel="noopener noreferrer" target="_blank"> <span>s3api</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>et <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3control/index.html" rel="noopener noreferrer" target="_blank"> <span>s3control</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>dans la <em>référence des commandes de l&#39;interface de ligne de commande AWS</em>.</p>
+		 
+		 
+			<h3 id="access-aws-sdks">SDK AWS</h3>
+			<p>AWS fournit des kits de développement logiciel (SDK) composés de bibliothèques et d&#39;exemples de code 
+ pour différents langages de programmation et plateformes (Java, Python, Ruby, .NET, iOS, 
+ Android, etc.). Les kits SDK AWS constituent un moyen pratique de créer un 
+ accès programmatique à S3 et AWS. Amazon S3 est un service REST. Vous pouvez envoyer des demandes à Amazon S3 à 
+ l&#39;aide des bibliothèques du SDK AWS, qui encapsulent l&#39;API REST Amazon S3 sous-jacente et simplifient vos tâches de 
+ programmation. Par exemple, les SDK prennent en charge des tâches telles que le calcul des 
+ signatures, la signature cryptographique des demandes, la gestion des erreurs et la relance automatique des demandes. 
+ Pour plus d&#39;informations sur les kits SDK AWS, notamment sur la manière de les 
+ télécharger et de les installer, consultez la section <a href="http://aws.amazon.com/tools/" rel="noopener noreferrer" target="_blank"> <span>Outils pour 
+</span> AWS<awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>.</p>
+			<p>Chaque interaction avec Amazon S3 est authentifiée ou anonyme. Si vous utilisez 
+ les kits SDK AWS, les bibliothèques calculent la signature pour l&#39;authentification à partir des clés 
+ que vous fournissez. Pour plus d&#39;informations sur la manière d&#39;envoyer des demandes à Amazon S3, consultez la section <a href="./MakingRequests.html">Création de demandes</a>.</p>
+		 
+		 
+			<h3 id="UsingRESTAPI">API REST Amazon S3</h3>
+			<p>L&#39;architecture d&#39;Amazon S3 est conçue pour être indépendante du langage de programmation, en utilisant des interfaces 
+ prises en charge par AWS pour stocker et récupérer des objets. Vous pouvez accéder à S3 et 
+ AWS par programmation à l&#39;aide de l&#39;API REST Amazon S3. L&#39;API REST est une interface HTTP 
+ pour Amazon S3. Avec l&#39;API REST, vous utilisez des requêtes HTTP standard pour créer, récupérer et 
+ supprimer des compartiments et des objets.</p>
+			<p>Pour utiliser l&#39;API REST, vous pouvez utiliser n&#39;importe quelle boîte à outils prenant en charge le protocole HTTP. Vous pouvez même utiliser 
+ un navigateur pour récupérer des objets, à condition qu&#39;ils soient lisibles de manière anonyme.</p>
+			<p>L&#39;API REST utilise des en-têtes et des codes d&#39;état HTTP standard, de sorte que les 
+ navigateurs et les boîtes à outils standard fonctionnent comme prévu. Dans certains domaines, nous avons ajouté des fonctionnalités 
+ au protocole HTTP (par exemple, nous avons ajouté des en-têtes pour permettre le contrôle d&#39;accès). Dans ces cas, 
+ nous avons fait de notre mieux pour ajouter les nouvelles fonctionnalités d&#39;une manière qui corresponde au style 
+ d&#39;utilisation standard du protocole HTTP.</p>
+			<p>Si vous effectuez des appels directs à l&#39;API REST dans votre application, vous devez écrire le code pour 
+ calculer la signature et l&#39;ajouter à la demande. Pour plus d&#39;informations sur la manière d&#39;
+envoyer des demandes à Amazon S3, consultez la section <a href="./MakingRequests.html">Création de demandes</a>.</p>
+			<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Remarque</h6></div><div class="awsdocs-note-text"><p>La prise en charge de l&#39;API SOAP via HTTP est obsolète, mais elle est toujours disponible via 
+ HTTPS. Les nouvelles fonctionnalités d&#39;Amazon S3 ne sont pas prises en charge pour SOAP. Nous vous recommandons d&#39;utiliser 
+ l&#39;API REST ou les kits SDK AWS.</p></div></div>
+		 
+	 
+		<h2 id="PayingforStorage">Payer pour Amazon S3</h2>
+		<p>La tarification d&#39;Amazon S3 est conçue pour que vous n&#39;ayez pas à planifier les 
+ besoins de stockage de votre application. La plupart des fournisseurs de stockage exigent que vous achetiez une quantité 
+ prédéterminée de capacité de stockage et de transfert réseau. Dans ce scénario, si vous 
+ dépassez cette capacité, votre service est interrompu ou des frais de dépassement élevés vous sont facturés. Si 
+ vous ne dépassez pas cette capacité, vous payez comme si vous aviez tout utilisé. </p>
+		<p>Amazon S3 ne vous facture que ce que vous utilisez réellement, sans frais cachés ni frais d&#39;excédent
+. Ce modèle vous offre un service à coût variable qui peut évoluer avec votre activité 
+ tout en vous offrant les avantages financiers de l&#39;infrastructure AWS. Pour plus d&#39;informations, 
+ consultez la rubrique <a href="https://aws.amazon.com/s3/pricing/" rel="noopener noreferrer" target="_blank"> <span>Tarification d&#39;Amazon S3</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>.</p>
+		<p>Lorsque vous vous inscrivez à AWS, votre compte AWS est automatiquement inscrit à tous les 
+ services d&#39;AWS, y compris Amazon S3. Toutefois, seuls les services que 
+ vous utilisez vous sont facturés. Si vous êtes un nouveau client Amazon S3, vous pouvez commencer à utiliser Amazon S3 gratuitement. Pour 
+ plus d&#39;informations, consultez la <a href="http://aws.amazon.com/free" rel="noopener noreferrer" target="_blank"> <span>version gratuite d&#39;AWS</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>. </p>
+		<p>Pour consulter votre facture, rendez-vous sur le tableau de bord de facturation et de gestion des coûts de la <a href="https://console.aws.amazon.com/billing/" rel="noopener noreferrer" target="_blank"> <span>console AWS Billing and Cost Management</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>. Pour en savoir plus sur la facturation des comptes AWS, consultez le <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-what-is.html"><em>guide de l&#39;utilisateur AWS Billing</em></a>. Si vous avez 
+ des questions concernant la facturation AWS et les comptes AWS, contactez <a href="http://aws.amazon.com/contact-us/" rel="noopener noreferrer" target="_blank"> <span>AWS Support</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>.</p>
+	 
+		<h2 id="pci-dss-compliance">Conformité à la norme PCI DSS</h2>
+		
+<p>Amazon S3 prend en charge le traitement, le stockage et la transmission 
+ des données de carte de crédit par un commerçant ou un fournisseur de services, et a été 
+ validé comme étant conforme à la norme de sécurité des données (DSS) PCI (Payment Card Industry). 
+Pour plus d&#39;informations sur la norme PCI DSS, notamment sur la procédure à suivre pour demander une copie du package de conformité PCI d&#39;AWS, 
+ consultez la section PCI DSS niveau <a href="https://aws.amazon.com/compliance/pci-dss-level-1-faqs/" rel="noopener noreferrer" target="_blank"> <span>1</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>. 
+</p>
+
+	<awsdocs-copyright class="copyright-print"></awsdocs-copyright><awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}"></awsdocs-thumb-feedback></div><noscript><div><div><div><div id="js_error_message"><p><img src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png" alt="Avertissement" /><strong>Javascript est désactivé ou n&#39;est pas disponible dans votre navigateur.</strong></p><p>Pour utiliser la documentation Amazon Web Services, Javascript doit être activé. Consultez les pages d&#39;aide de votre navigateur pour obtenir des instructions.</p></div></div></div></div></noscript><div id="main-col-footer" class="awsui-util-font-size-0"><div id="doc-conventions"><a target="_top" href="/general/latest/gr/docconventions.html">Conventions relatives aux documents</a></div><div class="prev-next"><div id="next" class="next-link" accesskey="n" href="./GetStartedWithS3.html">Pour commencer</div></div></div><awsdocs-page-utilities></awsdocs-page-utilities></div><div id="quick-feedback-yes" style="display: none;"><div class="title">Cette page vous a-t-elle aidé ? - Oui</div><div class="content"><p>Merci de nous avoir fait savoir que nous faisions du bon travail !</p><p>Si vous avez un moment, dites-nous ce que nous avons bien fait afin que nous puissions en faire davantage.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=S3&amp;topic_url=https://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/Welcome.html"></awsui-button></p></div></div><div id="quick-feedback-no" style="display: none;"><div class="title">Cette page vous a-t-elle aidé ? - Non</div><div class="content"><p>Merci de nous avoir fait savoir que cette page avait besoin d&#39;être modifiée. Nous sommes désolés de vous avoir déçu.</p><p>Si vous avez un moment, veuillez nous dire comment nous pouvons améliorer la documentation.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=S3&amp;topic_url=https://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/Welcome.html"></awsui-button></p></div></div></div></body></div></awsdocs-view><div class="page-loading-indicator" id="page-loading-indicator"><awsui-spinner size="large"></awsui-spinner></div></div><div id="tools-panel" dom-region="tools"><awsdocs-tools-panel id="awsdocs-tools-panel"></awsdocs-tools-panel></div></awsui-app-layout><awsdocs-cookie-banner class="doc-cookie-banner"></awsdocs-cookie-banner></div></body></html>
