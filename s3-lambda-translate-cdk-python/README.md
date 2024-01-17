@@ -81,7 +81,7 @@ In this demonstration, we've chosen the `text/html` document format.
 Upon successful deployment of the stack, the Output section would provide the names of the S3 buckets from the variables `S3InputBucket` and `S3OutputBucket` in the CDK environment. 
 Alternatively, these values can be found from the Output section of the `CloudFormation` stack.
 Upload the sample file `assets\AmazonSimpleStorageService.html` to the input S3 bucket. The upload action invokes the Lambda function and the document is analyzed. 
-The translated document is stored in the output S3 bucket. In this demonstration, we have chosen to use a html document to convert it to `French` language. 
+The translated document is stored in the output S3 bucket. In this demonstration, we have chosen to convert an html document to `French. 
 Hence, the converted document would look similar to `assets\fr-AmazonSimpleStorageService.html`.
 
 ## Cleanup
