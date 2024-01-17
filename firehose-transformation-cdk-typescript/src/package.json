@@ -1,0 +1,25 @@
+{
+  "name": "firehose-lambda-transform",
+  "version": "0.1.0",
+  "bin": {
+    "cdk": "bin/firehose-lambda-transform.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "20.7.1",
+    "aws-cdk": "2.102.0",
+    "ts-node": "^10.9.1",
+    "typescript": "~5.2.2"
+  },
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.130",
+    "aws-cdk-lib": "2.102.0",
+    "constructs": "^10.0.0",
+    "source-map-support": "^0.5.21"
+  }
+}
