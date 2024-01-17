@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-appsync-subscription-sam",
       "templateURL": "serverless-patterns/eventbridge-appsync-subscription-sam",
       "projectFolder": "eventbridge-appsync-subscription-sam",
-      "templateFile": "eventbridge-appsync-subscription-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
