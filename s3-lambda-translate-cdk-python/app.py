@@ -9,6 +9,7 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_lambda_event_sources as eventsources,
     CfnOutput,
+    aws_logs as logs
 )
 from constructs import Construct
 
@@ -64,6 +65,9 @@ class S3LambdaTranslateServerless(Stack):
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_10],
         )
 
+        # Log group for Lambda function
+        log_group = logs.LogGroup(self, "Lambda Group", removal_policy=cdk.RemovalPolicy.DESTROY)
+
         # Lambda function for processing the incoming request triggered as part of S3 upload. Source and Target language are passed as environment variables to the Lambda function.
         lambda_function = lambda_.Function(
             self,
@@ -74,6 +78,7 @@ class S3LambdaTranslateServerless(Stack):
             timeout=Duration.minutes(1),
             layers=[layer],
             memory_size=256,
+            log_group=log_group,
             environment={
                 "environment": "dev",
                 "src_lang": "auto",
@@ -89,10 +94,28 @@ class S3LambdaTranslateServerless(Stack):
                     "translate:TranslateText",
                     "translate:TranslateDocument",
                     "comprehend:DetectDominantLanguage",
-                    "s3:PutObject",
-                    "s3:GetObject",
                 ],
                 resources=["*"],
+            )
+        )
+
+        # iam policy for S3 Get
+        lambda_function.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "s3:GetObject",
+                ],
+                resources=[self.user_input_bucket.arn_for_objects("*")],
+            )
+        )
+
+        # iam policy for S3 Put
+        lambda_function.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "s3:PutObject",
+                ],
+                resources=[self.user_output_bucket.arn_for_objects("*")],
             )
         )
 
