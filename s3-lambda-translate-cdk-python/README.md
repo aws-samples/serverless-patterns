@@ -1,4 +1,4 @@
-# S3 -> Lambda -> Translate
+# Translate file with AWS Lambda, Amazon S3, and Amazon Translate
 This pattern uses AWS Cloud Development Kit (AWS CDK) to deploy Amazon S3, AWS Lambda, and Amazon Translate to perform document language translation.
 
 ## Architecture
