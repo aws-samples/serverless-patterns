@@ -76,12 +76,12 @@
         },
         "line1": {
             "from": "icon1",
-            "to": "icon2",
-            "label": "cron (5 minutes)"
+            "to": "icon2"
         },
         "line2": {
             "from": "icon2",
-            "to": "icon3"
+            "to": "icon3",
+            "label": "Notify Completed"
         }
     }
 }
