@@ -1,6 +1,6 @@
 # S3 to EventBridge to SQS with wildcard pattern match
 
-Publish events directly from Amazon S3 to EventBridge. There are multiple dynamic subfolders within the S3 buckets. EventBridge rule uses wildcard filters to select the required events from all the events and sends message to an Amazon SQS Queue.
+The wildcard filter in Amazon EventBridge rule provides more flexible event matching patterns to reduce rule management and optimize consumers. The SAM template deploys an Amazon S3 bucket, an Amazon EventBridge rule with wildcard pattern match having target as an Amazon SQS queue.
 
 Learn more about this pattern at Serverless Land Patterns:https://serverlessland.com/patterns/s3-eventbridge-wildcard-sam
 
@@ -35,10 +35,10 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-* This template creates an S3 bucket that publishes events to Amazon EventBridge, an EventBridge rule with wildcard filter to select only the desired events from dynamic subfolders in Amazon S3 bucket and also an Amazon SQS Queue as the target.
+* This template creates an S3 bucket that publishes events to Amazon EventBridge, an EventBridge rule with wildcard filter to select only the desired events from dynamic subfolders in Amazon S3 bucket and also an Amazon SQS queue as the target.
 * Once the stack is deployed, we will use `upload-to-s3.sh` to create dynamic subfolders based on current date and timestamp within the S3 bucket and upload new files. 
-* This will trigger multiple events, however, only the events that will match the wildcard pattern as per the EventBridge rule, will be selected and a message will be sent to the SQS Queue.
-* We will inspect the messages from the SQS Queue to validate the same.
+* This will trigger multiple events, however, only the events that will match the wildcard pattern as per the EventBridge rule, will be selected and a message will be sent to the SQS queue.
+* We will inspect the messages from the SQS queue to validate the same.
 
 Please refer to the architecture diagram below:
 
@@ -64,13 +64,13 @@ Please refer to the architecture diagram below:
          "ServerSideEncryption": "AES256"
       }
       upload: ./xyz-data.csv to s3://{your-bucket-name}/2024-01-17/1705479398/XYZ/xyz-data.csv
-      ABC and XYZ data uploaded to S3 bucket serverlessland-s3-eb-sqs-wildcard
+      ABC and XYZ data uploaded to S3 bucket {your-bucket-name}
       2024-01-17 13:46:42          0 2024-01-17/1705479398/ABC/
       2024-01-17 13:46:45          7 2024-01-17/1705479398/ABC/abc-data.csv
       2024-01-17 13:46:48          0 2024-01-17/1705479398/XYZ/
       2024-01-17 13:46:51          7 2024-01-17/1705479398/XYZ/xyz-data.csv
    ```
-2. Please use the below aws cli command to read message from the SQS Queue. Please replace the {SQSQueueURL} with the URL from the deployent output and also replace the {your-region} with the region that you selected during deployment:
+2. Please use the below aws cli command to read message from the SQS queue. Please replace the {SQSQueueURL} with the URL from the deployent output and also replace the {your-region} with the region that you selected during deployment:
     ```bash
     aws sqs receive-message --queue-url {SQSQueueURL} --attribute-names All  --message-attribute-names All --region {your-region}
     ```
@@ -81,7 +81,7 @@ Please refer to the architecture diagram below:
             "MessageId": "9b441910-c70b-4ac0-90b7-7eb7372a8418",
             "ReceiptHandle": "AQEBHRT2rKwvVD4HkdFXSUZ55T9ofuQChbD1N52VZMwzdOrHq6fgHodHlfeIsiLGKRHqc87VQxTkfylUHmhwnMgpbqsW7GNjPiIuYZrwMMdlqZb1A0249J/WMa8gVe2oMde6xAUdSAN0zLP9biJLjLFFtmBDnI4HhvUvs42B1ApQ998+TMwD3Rbc9SmFFDXtUcafwESGTLpR9rNEa6IbegT4ubu31pP0jtw2dw9REIhq8LU0VPwxLvBMgFMVZczyi3RnVyQYN79afSALrx/zYRINu0COTVWEw53tnqPle/8pl/uJg+PE2fyPiWXHVaemClQXRHDNX1X6iP392lGzc6pU/mL8ZCtWTYkfYbBv0wdMIs0BcVVjuFmsB0mrm5By/DiAcLDUtZ8GhlRhlZli7V0ycg==",
             "MD5OfBody": "63a538841fd7c7e8c4f4551a18391fa8",
-            "Body": "{\"version\":\"0\",\"id\":\"a2b89aa3-d845-e241-e0ed-f5a14b646d4f\",\"detail-type\":\"Object Created\",\"source\":\"aws.s3\",\"account\":\"796495736600\",\"time\":\"2024-01-17T07:01:40Z\",\"region\":\"us-west-2\",\"resources\":[\"arn:aws:s3:::serverlessland-s3-eb-sqs-wildcard\"],\"detail\":{\"version\":\"0\",\"bucket\":{\"name\":\"serverlessland-s3-eb-sqs-wildcard\"},\"object\":{\"key\":\"2024-01-17/1705474885/XYZ/xyz-data.csv\",\"size\":7,\"etag\":\"4f8d938c2f3606be69d0d2c42384cab8\",\"sequencer\":\"0065A77B54899B2CC1\"},\"request-id\":\"N1BFC1PRNEYWJAP7\",\"requester\":\"796495736600\",\"source-ip-address\":\"15.248.4.199\",\"reason\":\"PutObject\"}}",
+            "Body": "{\"version\":\"0\",\"id\":\"a2b89aa3-d845-e241-e0ed-f5a14b646d4f\",\"detail-type\":\"Object Created\",\"source\":\"aws.s3\",\"account\":\"796495736600\",\"time\":\"2024-01-17T07:01:40Z\",\"region\":\"us-west-2\",\"resources\":[\"arn:aws:s3:::{your-bucket-name}\"],\"detail\":{\"version\":\"0\",\"bucket\":{\"name\":\"{your-bucket-name}\"},\"object\":{\"key\":\"2024-01-17/1705474885/XYZ/xyz-data.csv\",\"size\":7,\"etag\":\"4f8d938c2f3606be69d0d2c42384cab8\",\"sequencer\":\"0065A77B54899B2CC1\"},\"request-id\":\"N1BFC1PRNEYWJAP7\",\"requester\":\"796495736600\",\"source-ip-address\":\"15.248.4.199\",\"reason\":\"PutObject\"}}",
             "Attributes": {
                 "SenderId": "AIDAIE6VAXUQU2DKHA7DK",
                 "ApproximateFirstReceiveTimestamp": "1705477859273",

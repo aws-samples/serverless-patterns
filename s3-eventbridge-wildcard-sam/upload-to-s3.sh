@@ -24,13 +24,13 @@ else
 fi
 
 
-# S3 folder for ABC 
+# S3 folder for XYZ 
 FOLDER="$DATE/$TIMESTAMP/XYZ"
 
-# Create folder structure for ABC data in S3
+# Create folder structure for XYZ data in S3
 aws s3api put-object --bucket $BUCKET --key $FOLDER/
 
-# Upload ABC data to S3 
+# Upload XYZ data to S3 
 CSV_FILE="xyz-data.csv"
 
 if [ -f "$CSV_FILE" ]; then
