@@ -1,6 +1,6 @@
 # Amazon MQ for ActiveMQ Integration with Amazon Redshift using Amazon EventBridge Pipes 
 
-This pattern demonstrates how to send messages from Amazon MQ for ActiveMQ queue to Amazon Redshift cluster using Amazon EventBridge Pipes and utilizing Amazon Redshift data API queries as a target.
+This pattern demonstrates how to send messages from Amazon MQ for ActiveMQ to an Amazon Redshift cluster using Amazon EventBridge Pipes and utilizing Amazon Redshift data API queries as a target.
 
 When using Message-Oriented Middleware such as ActiveMQ or RabbitMQ message brokers, often messages are moved to Dead Letter Queues (DLQs) due to processing errors at consumer or invalid message or if messages are expired. This pattern can help to move the DLQ messages into Amazon Redshift database for analyzing later without writing any code or managing separate consumer application to process the DLQs messages.
 
