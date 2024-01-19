@@ -14,7 +14,7 @@ on:
 jobs:
   copy:
     runs-on: ubuntu-latest
-    if: github.actor == 'bls20aws'
+    if: ${{ (github.actor == 'bls20aws') || (github.actor == 'julianwood') }}
     env:
       NODE_ENV: dev
       fileName: ${{ inputs.fileName }}
