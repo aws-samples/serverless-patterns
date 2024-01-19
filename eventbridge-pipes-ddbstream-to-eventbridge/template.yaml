@@ -55,7 +55,10 @@ Resources:
                   - "dynamodb:GetRecords"
                   - "dynamodb:GetShardIterator"
                   - "dynamodb:ListStreams"
-                Resource: !GetAtt DynamoDBUsersTable.StreamArn
+                  - "sqs:SendMessage"
+                Resource: 
+                  - !GetAtt DynamoDBUsersTable.StreamArn
+                  - !GetAtt PipeDLQueue.Arn
         - PolicyName: TargetPolicy
           PolicyDocument:
             Version: 2012-10-17

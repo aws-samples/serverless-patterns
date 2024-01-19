@@ -1,0 +1,235 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  lambda-msk-esm
+
+  Sample SAM Template for lambda-msk-esm
+
+Parameters:
+  MSKStreamARN:
+    Type: String
+    Default: "StreamARNNotPassed"
+  MSKTopicName:
+    Type: String
+    Default: "TopicNameNotPassed"
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    CodeUri: src/
+    Handler: app.lambda_handler
+    Runtime: python3.7
+    Architectures:
+      - x86_64
+
+Resources:
+
+# 1. this Lambda is invoked for all messages, regardless of the payload format and contents
+  NoFilterFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: 1-fn-esm-no-filter
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Ref MSKStreamARN
+            Topics:
+              - !Ref MSKTopicName
+
+# 2. this Lambda is invoked for:
+# {
+#   "kind": "Event"
+# }
+
+  FilterEventsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: 2-fn-filter-events
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Ref MSKStreamARN
+            Topics:
+              - !Ref MSKTopicName
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"value":{"kind":["Event"]}}'
+
+
+
+
+  # 3. this Lambda is invoked for:
+  # {
+  #   "kind": "Event"
+  #   "responseStatus": {
+  #     "code": 300
+  #   }
+  # }
+
+  FilterEventsAndResponseCodeFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: 3-fn-filter-events-and-response-code
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Ref MSKStreamARN
+            Topics:
+              - !Ref MSKTopicName
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"value":{"kind":["Event"],"responseStatus":{"code":[{"numeric":["=",300]}]}}}'
+
+
+  # 4. this Lambda is invoked for either of the following messages:
+  # - option 1 - code is >= 300
+  #   {
+  #     "responseStatus": {
+  #       "code": 300
+  #     }
+  #   }
+  # - option 2 - RBAC flag is set to true
+  #   {
+  #     "RBAC": true
+  #   }
+
+  FilterMultiplePatternsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: 4-fn-filter-multiple-patterns
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Ref MSKStreamARN
+            Topics:
+              - !Ref MSKTopicName
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"value":{"responseStatus":{"code":[{"numeric":[">=",300]}]}}}'
+                - Pattern: '{"value":{"RBAC":[true]}}'
+
+
+  # 5. this Lambda is invoked for the messages having kind set to anything other than Event
+  FilterNotEventKindFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: 5-fn-filter-not-event-kind
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Ref MSKStreamARN
+            Topics:
+              - !Ref MSKTopicName
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"value":{"kind":[{"anything-but":["Event"]}]}}'
+
+
+  # 6. this Lambda is invoked for the messages having region property starting with `us-`
+  FilterStartsWithFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: 6-fn-filter-starts-with
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Ref MSKStreamARN
+            Topics:
+              - !Ref MSKTopicName
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"value":{"region":[{"prefix":"us-"}]}}'
+
+  # 7. this Lambda is invoked for the messages having code between 300 and 350 (both end inclusive)
+  FilterBetweenInclusiveFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: 7-fn-filter-between-inclusive
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Ref MSKStreamARN
+            Topics:
+              - !Ref MSKTopicName
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"value":{"responseStatus":{"code":[{"numeric":[">=",300,"<=",350]}]}}}'
+              
+
+  FilterOnPlainStringFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: 8-fn-filter-on-plain-string
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Ref MSKStreamARN
+            Topics:
+              - !Ref MSKTopicName
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"value":[{"prefix":"OrderNumber"}]}'
+
+  FilterOnPlainStringAndMetadataFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: 9-fn-filter-on-plain-string-metadata
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Ref MSKStreamARN
+            Topics:
+              - !Ref MSKTopicName
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"topic":[{"prefix":"!Ref MSKTopicName"}],"value":[{"prefix":"Order"}]}'
+
+
+Outputs:
+  NoFilterFunction:
+    Description: "Function without any ESM filters"
+    Value: !GetAtt NoFilterFunction.Arn
+  FilterEventsFunction:
+    Description: "Function demonstrating 'Equals' Comparison operator"
+    Value: !GetAtt FilterEventsFunction.Arn
+  FilterEventsAndResponseCodeFunction:
+    Description: "Function demonstrating 'Equals' and 'Numeric (equals)' Comparison operator"
+    Value: !GetAtt FilterEventsAndResponseCodeFunction.Arn
+  FilterMultiplePatternsFunction:
+    Description: "Function demonstrating using multiple filters patterns. One pattern filters by 'Numeric (range) operator'. Another pattern filters by 'Exists' operator"
+    Value: !GetAtt FilterMultiplePatternsFunction.Arn
+  FilterNotEventKindFunction:
+    Description: "Function demonstrating 'Not' operator"
+    Value: !GetAtt FilterNotEventKindFunction.Arn
+  FilterStartsWithFunction:
+    Description: "Function demonstrating 'Begins with' operator"
+    Value: !GetAtt NoFilterFunction.Arn
+  FilterBetweenInclusiveFunction:
+    Description: "Function demonstrating 'Numeric (range) operator'"
+    Value: !GetAtt FilterBetweenInclusiveFunction.Arn
+  FilterOnPlainStringFunction:
+    Description: "Function demonstrating 'Begins with' operator applied on  plain string payloads"
+    Value: !GetAtt FilterOnPlainStringFunction.Arn
+  FilterOnPlainStringAndMetadataFunction:
+    Description: "Function demonstrating 'Begins with' operator on payload metadata and data"
+    Value: !GetAtt FilterOnPlainStringAndMetadataFunction.Arn
+  

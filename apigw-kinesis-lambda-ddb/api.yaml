@@ -1,0 +1,58 @@
+openapi: "3.0.1"
+info:
+  title: "Rest Api"
+  version: "2023-06-25 17:32:29UTC"
+paths:
+  /submit/{streamName}/{eventId}:
+    post:
+      parameters:
+        - in: path
+          name: streamName
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: eventId
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: "Response for POST /"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  SequenceNumber:
+                    type: string
+                  ShardId:
+                    type: string
+      x-amazon-apigateway-integration:
+        type: aws
+        credentials:
+          Fn::GetAtt: [ApiGatewayRole, Arn]
+        uri: arn:aws:apigateway:us-east-1:kinesis:action/PutRecord
+        responses:
+          default:
+            statusCode: "200"
+        requestParameters:
+          integration.request.header.Content-Type: "'application/x-amz-json-1.1'"
+        requestTemplates:
+          application/json: |-
+            {
+                "StreamName": "$input.params('streamName')",
+                "Data": "$util.base64Encode($input.json('$'))",
+                "PartitionKey": "$input.params('eventId')"
+            }
+        passthroughBehavior: NEVER
+        httpMethod: POST
+
+x-amazon-apigateway-cors:
+  allowMethods:
+    - "*"
+  maxAge: 0
+  allowCredentials: false
+  allowOrigins:
+    - "*"
+x-amazon-apigateway-importexport-version: "1.0"

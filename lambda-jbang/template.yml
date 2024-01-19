@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Serverless patterns - An AWS Serverless Specification template showcasing the JBang Lambda function
+Resources:
+  JBangFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: JBangFunction
+      FunctionName: JBangFunction
+      Handler: 'JBangHandler'
+      Runtime: java17
+      Description: 'Hello Java 17 with JBang'
+      MemorySize: 1769
+      Timeout: 15
+      AutoPublishAlias: live
+      SnapStart:
+        ApplyOn: PublishedVersions
+    Metadata:
+      BuildMethod: makefile

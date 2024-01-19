@@ -21,7 +21,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Handler: app.lambdaHandler
       Tracing: Active
       Events:

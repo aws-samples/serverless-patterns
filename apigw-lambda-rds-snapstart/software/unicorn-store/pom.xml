@@ -10,7 +10,7 @@
   <parent>
     <groupId>io.micronaut</groupId>
     <artifactId>micronaut-parent</artifactId>
-    <version>3.8.3</version>
+    <version>3.9.6</version>
   </parent>
 
   <properties>
@@ -35,24 +35,21 @@
     <dependency>
       <groupId>io.micronaut</groupId>
       <artifactId>micronaut-inject</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.micronaut</groupId>
       <artifactId>micronaut-validation</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.micronaut.aws</groupId>
       <artifactId>micronaut-function-aws-api-proxy</artifactId>
-      <version>3.13.1</version>
-      <scope>compile</scope>
+      <version>3.18.0</version>
     </dependency>
     <dependency>
       <groupId>io.micronaut.aws</groupId>
       <artifactId>micronaut-function-aws-api-proxy-test</artifactId>
       <scope>test</scope>
-      <version>3.13.1</version>
+      <version>3.18.0</version>
     </dependency>
     <dependency>
       <groupId>io.micronaut</groupId>

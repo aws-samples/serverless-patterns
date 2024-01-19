@@ -1,0 +1,425 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  capstone
+
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: "capstone-translator-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+  LambdaRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub "ConnectRoutePolicy-${AWS::StackName}"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: "logs:*"
+            Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/translator-dev*:*"
+          - Effect: "Allow"
+            Action: "transcribe:*"
+            Resource: "*"
+          - Effect: "Allow"
+            Action: "s3:*"
+            Resource: "*"
+          - Effect: "Allow"
+            Action: "translate:TranslateText"
+            Resource: "*"
+          - Effect: "Allow"
+            Action: "Polly:*"
+            Resource: "*"
+          - Effect: "Allow"
+            Action: "execute-api:*"
+            Resource: "*"
+          - Effect: "Allow"
+            Action: "states:*"
+            Resource: "*"
+      Roles:
+        - !Ref LambdaRole
+  transcribeLaunch:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/transcribeLaunch.handler
+      FunctionName: "translator-dev-transcribeLaunch"
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Role: !GetAtt LambdaRole.Arn
+  transcribeCheck:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/transcribeCheck.handler
+      FunctionName: "translator-dev-transcribeCheck"
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Role: !GetAtt LambdaRole.Arn
+  translate:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/translate.handler
+      FunctionName: "translator-dev-translate"
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Role: !GetAtt LambdaRole.Arn
+  speech:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/speech.handler
+      FunctionName: "translator-dev-speech"
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Role: !GetAtt LambdaRole.Arn
+
+  TranslatorBucket:
+    Type: AWS::S3::Bucket
+  InvokeTranslatorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws/lambda/translator-dev-invokeTranslator"
+  OrchestratorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws/sfn/translator-dev-statemachine"
+  AuthorizerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws/lambda/translator-dev-authorizer"
+  InvokerLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: "nodejs14.x"
+      FunctionName: "translator-dev-invokeTranslator"
+      Timeout: 300
+      MemorySize: 1024
+      Handler: src/invokeTranslator.handler
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          APIG_ENDPOINT:
+            !Join [
+              "",
+              [
+                !Ref CapstoneWebSocketApi,
+                ".execute-api.",
+                !Ref "AWS::Region",
+                ".amazonaws.com/dev",
+              ],
+            ]
+          statemachine_arn: !Ref Orchestrator
+  AuthorizerLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: "translator-dev-authorizer"
+      Runtime: "nodejs18.x"
+      Timeout: 300
+      MemorySize: 1024
+      Handler: index.handler
+      Role: !GetAtt LambdaRole.Arn
+      Code:
+        ZipFile: |
+          exports.handler = async function(event, context) {
+            console.log("EVENT: \n" + JSON.stringify(event, null, 2));
+            const { headers, queryStringParameters, methodArn } = event;
+            if((headers && headers['X-Forwarded-Proto'] === 'https') 
+              || (queryStringParameters && queryStringParameters.proto === 'https')) {
+              return {
+                principalId: 'me',
+                policyDocument: {
+                  Version: '2012-10-17',
+                  Statement: [{
+                    Action: 'execute-api:Invoke',
+                    Effect: 'Allow',
+                    Resource: methodArn
+                  }]
+                }
+              };
+            } else {
+              throw new Error('Unauthorized');
+            }
+          }
+  InvokerLambdaPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - InvokerLambda
+      - CapstoneWebSocketApi
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref InvokerLambda
+      Principal: apigateway.amazonaws.com
+  AuthorizerLambdaPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - AuthorizerLambda
+      - CapstoneWebSocketApi
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref AuthorizerLambda
+      Principal: apigateway.amazonaws.com
+  ConnectRouteApiRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "ConnectRouteApiRole-${AWS::StackName}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action:
+              - sts:AssumeRole
+  RouterApiPolicy:
+    Type: AWS::IAM::Policy
+    DependsOn:
+      - ConnectRouteApiRole
+      - AuthorizerLambda
+      - InvokerLambda
+    Properties:
+      PolicyName: !Sub "ConnectRoutePolicy-${AWS::StackName}"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: "lambda:InvokeFunction"
+            Resource:
+              - !GetAtt AuthorizerLambda.Arn
+              - !GetAtt InvokerLambda.Arn
+      Roles:
+        - !Ref ConnectRouteApiRole
+  CapstoneWebSocketApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      ProtocolType: WEBSOCKET
+      Name: capstone
+      RouteSelectionExpression: "$request.body.action"
+  CapstoneAuthorizer:
+    Type: AWS::ApiGatewayV2::Authorizer
+    Properties:
+      Name: LambdaAuthorizer
+      ApiId: !Ref CapstoneWebSocketApi
+      AuthorizerType: REQUEST
+      AuthorizerUri: !Join
+        - ""
+        - - "arn:"
+          - !Ref "AWS::Partition"
+          - ":apigateway:"
+          - !Ref "AWS::Region"
+          - ":lambda:path/2015-03-31/functions/"
+          - !GetAtt AuthorizerLambda.Arn
+          - /invocations
+      IdentitySource:
+        - route.request.header.X-Forwarded-Proto
+  CapstoneConnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref CapstoneWebSocketApi
+      IntegrationType: AWS_PROXY
+      CredentialsArn: !GetAtt ConnectRouteApiRole.Arn
+      IntegrationUri:
+        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${InvokerLambda.Arn}/invocations
+      TimeoutInMillis: 28000
+  CapstoneConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - CapstoneConnectIntegration
+    Properties:
+      ApiId: !Ref CapstoneWebSocketApi
+      RouteKey: $connect
+      AuthorizationType: CUSTOM
+      AuthorizerId: !Ref CapstoneAuthorizer
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref CapstoneConnectIntegration
+  CapstoneDisconnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref CapstoneWebSocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Join
+        - ""
+        - - "arn:"
+          - !Ref "AWS::Partition"
+          - ":apigateway:"
+          - !Ref "AWS::Region"
+          - ":lambda:path/2015-03-31/functions/"
+          - !GetAtt InvokerLambda.Arn
+          - /invocations
+      TimeoutInMillis: 28000
+  CapstoneDisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - CapstoneDisconnectIntegration
+    Properties:
+      ApiId: !Ref CapstoneWebSocketApi
+      RouteKey: $disconnect
+      AuthorizationType: NONE
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref CapstoneDisconnectIntegration
+  CapstoneDefaultIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref CapstoneWebSocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Join
+        - ""
+        - - "arn:"
+          - !Ref "AWS::Partition"
+          - ":apigateway:"
+          - !Ref "AWS::Region"
+          - ":lambda:path/2015-03-31/functions/"
+          - !GetAtt InvokerLambda.Arn
+          - /invocations
+      TimeoutInMillis: 28000
+  CapstoneDefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - CapstoneDefaultIntegration
+    Properties:
+      ApiId: !Ref CapstoneWebSocketApi
+      RouteKey: $default
+      AuthorizationType: NONE
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref CapstoneDefaultIntegration
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - CapstoneDefaultRoute
+      - CapstoneConnectRoute
+      - CapstoneDisconnectRoute
+    Properties:
+      ApiId: !Ref CapstoneWebSocketApi
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref CapstoneWebSocketApi
+      DeploymentId: !Ref Deployment
+      StageName: "dev"
+  Orchestrator:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      StateMachineType: EXPRESS
+      LoggingConfiguration:
+        Level: ALL
+        IncludeExecutionData: true
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt OrchestratorLogGroup.Arn
+      Definition:
+        {
+          "StartAt": "StartTranscribe",
+          "Version": "1.0",
+          "States":
+            {
+              "StartTranscribe":
+                {
+                  "Type": "Task",
+                  "Resource": !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:translator-dev-transcribeLaunch",
+                  "ResultPath": "$",
+                  "Next": "WaitState",
+                },
+              "WaitState":
+                {
+                  "Type": "Wait",
+                  "Seconds": 3,
+                  "Next": "CheckTranscribe",
+                  "InputPath": "$",
+                },
+              "CheckTranscribe":
+                {
+                  "Type": "Task",
+                  "Resource": !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:translator-dev-transcribeCheck",
+                  "ResultPath": "$",
+                  "Next": "ChoiceState",
+                },
+              "ChoiceState":
+                {
+                  "Type": "Choice",
+                  "Choices":
+                    [
+                      {
+                        "Variable": "$.continue",
+                        "BooleanEquals": true,
+                        "Next": "WaitState",
+                      },
+                    ],
+                  "Default": "Translate",
+                },
+              "Translate":
+                {
+                  "Type": "Task",
+                  "Resource": !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:translator-dev-translate",
+                  "ResultPath": "$",
+                  "Next": "Speech",
+                },
+              "Speech":
+                {
+                  "Type": "Task",
+                  "Resource": !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:translator-dev-speech",
+                  "ResultPath": "$",
+                  "Next": "Done",
+                },
+              "Done": { "Type": "Succeed" },
+            },
+        }
+      RoleArn: !GetAtt "OrchestratorRole.Arn"
+  OrchestratorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub "states.${AWS::Region}.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: stepfn
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: "lambda:InvokeFunction"
+                Resource:
+                  - "*"
+              - Effect: Allow
+                Action: "logs:*"
+                Resource: "*"
+Outputs:
+  StateMachine:
+    Value:
+      Ref: Orchestrator
+  InputBucket:
+    Value:
+      Ref: TranslatorBucket
+  WebsocketAPI:
+    Value:
+      Ref: CapstoneWebSocketApi
+  InvokerLambdaName:
+    Value:
+      Ref: InvokerLambda

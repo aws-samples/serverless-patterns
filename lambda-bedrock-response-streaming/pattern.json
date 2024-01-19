@@ -1,0 +1,57 @@
+{
+  "title": "Lambda with Bedrock response streaming",
+  "description": "Create a Lambda function that invokes a Bedrock model with response streaming.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to write a Lambda function, exposes a function URL, uses the Bedrock InvokeModelWithResponseStreamCommand API, and streams the response back to the API client."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-bedrock-response-streaming",
+      "templateURL": "serverless-patterns/lambda-bedrock-response-streaming",
+      "projectFolder": "lambda-bedrock-response-streaming",
+      "templateFile": "lambda-bedrock-response-streaming/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Configuring a Lambda function to stream responses",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html"
+      },
+      {
+        "text": "Amazon Bedrock InvokeModelWithResponseStream API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModelWithResponseStream.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy -g"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Heeki Park",
+      "image": "https://www.dropbox.com/s/ug4pq9ot52bmjko/profile_amazon_badge_retake_square.jpg?dl=0",
+      "bio": "Heeki Park is a Principal Solutions Architect at AWS and has been helping customers build serverless and cloud-native applications since joining AWS in 2016.",
+      "linkedin": "heekipark",
+      "twitter": "hpark"
+    }
+  ]
+}

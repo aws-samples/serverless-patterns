@@ -1,0 +1,59 @@
+{
+    "title": "ApiGateway - Lambda - Bedrock",
+    "description": "Interact with Bedrock models from a lambda function fronted with an API Gateway",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This project aims to build an integration between API Gateway, AWS Lambda, and Amazon Bedrock",
+        "The core functionality revolves around exposing an API endpoint via API Gateway that accepts a user-defined prompt.",
+        "When a prompt is received, the API Gateway triggers an AWS Lambda function. This Lambda function is responsible for invoking a machine learning model (anthropic.claude-v2 for now, but can be extended to include others) hosted on Amazon Bedrock.",
+        "To ensure compatibility with Bedrock, a Lambda Layer is utilized, it contains the latest version of the Boto3 library, as only the most recent Boto3 version includes a client for Amazon Bedrock."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-cdk-python",
+        "templateURL": "serverless-patterns/apigw-lambda-bedrock-cdk-python",
+        "projectFolder": "apigw-lambda-bedrock-cdk-python",
+        "templateFile": "apigw_lambda_bedrock/apigw_lambda_bedrock_stack.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Bedrock API Reference",
+          "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html"
+        },
+        {
+          "text": "Packaging custom boto3 version as a layer",
+          "link": "https://repost.aws/knowledge-center/lambda-python-runtime-errors"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Guillermo Mansilla",
+        "image": "https://d2908q01vomqb2.cloudfront.net/cb4e5208b4cd87268b208e49452ed6e89a68e0b8/2022/03/08/guillermo_mansilla.jpeg",
+        "bio": "Guillermo Mansilla is a Solutions Architect based in Orlando, Florida. He has helped startups in the USA and Canada build and architect their applications on AWS. Before joining AWS, Guillermo spent over a decade working as a Software Developer. When he’s not at his desk, you can find him playing chess tournaments at his local chess club.",
+        "linkedin": "gmansilla"
+      }
+    ]
+  }

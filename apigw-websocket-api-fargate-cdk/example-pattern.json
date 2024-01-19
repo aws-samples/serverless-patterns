@@ -1,0 +1,80 @@
+{
+    "title": "WebSocket API to ALB to ECS Fargate",
+    "description": "Creates a WebSocket API and integrates with ECS Fargate using ALB.",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to use WebSocket API and integrate with ECS Fargate using ALB",
+            "WebSocket client connects using API endpoint url, and communicates using default route. Using http integration API gateway communicates with ALB which in turns invokes Fargate Tasks. The Fargate task running FASTAPI framework receives the POST request and communicates back using connectionId in the request context from API Gateway."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-fargate-cdk",
+            "templateURL": "serverless-patterns/apigw-websocket-api-fargate-cdk",
+            "projectFolder": "apigw-websocket-api-fargate-cdk",
+            "templateFile": "apigw_websocket_fargate_cdk/apigw_websocket_fargate_cdk_stack.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Working with WebSocket APIs",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html"
+            },
+            {
+                "text": "AWS ECS",
+                "link": "https://docs.aws.amazon.com/ecs/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "cdk destroy"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Rajesh Sitaraman",
+            "bio": "Cloud Application Architect @ AWS.",
+            "linkedin": "rajesh.sitaraman",
+            "twitter": "rjesh"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 40,
+            "service": "apigw",
+            "label": "API Gateway WebSocket API"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 40,
+            "service": "alb",
+            "label": "Application Load Balancer"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 40,
+            "service": "fargate",
+            "label": "AWS Fargate"
+        },
+        "line1": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line2": {
+            "from": "icon1",
+            "to": "icon2"
+        }
+    }
+}

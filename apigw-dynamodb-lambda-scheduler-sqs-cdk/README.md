@@ -1,14 +1,10 @@
 # AWS DynamoDB to EventBridge Scheduler via AWS Lambda function
 
-This pattern demonstrates a sample to delay processing of data or workflow using an Amazon EventBridge Scheduler. A schedule that invokes a target one-time or at regular intervals defined by a cron or rate expression.
+This pattern demonstrates a sample to delay Amazon DynamoDB Stream processing using Amazon EventBridge Scheduler. EventBridge Scheduler invokes a target one-time or at regular intervals defined by a cron or rate expression.
 
-In this sample, Amazon Apigateway receives a request from end users that has schedule time and event category provided in the body. The data is stored in Amazon DynamoDB table. 
+Amazon DynamoDB streams are used to deliver event payload to the handlers in near real time. This pattern will help customers with usecases such as process stream events at a particular time window, as well as triggring one target AWS service from EventBridge Scheduler. 
 
-Amazon DynamoDB table has stream enabled and it publisehs to a Lambda function. Lambda function then calls Amzon EventBridge Scheduler and selects the groups as per the request body.
-
-EventBridge Scheduler provides a universal target parameter that you can use to create customized triggers that targets more than 270 AWS service and over 6,000 API operation on a schedule. In this example, we are showing integration with two targets, i.e. AWS Lamdba Function and Amazon SQS queue.
-
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [Delayed processing of Dynamodb stream with EventBridge Scheduler](https://serverlessland.com/patterns/apigw-dynamodb-lambda-scheduler-sqs-cdk)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -43,9 +39,13 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy
     ```
 
+## Architecture
+
+![Architecture Diagram](architecture.png)
+
 ## How it works
 
-This pattern is designed to help connect producers that are submitting messages into SNS with EventBridge as a way to deliver those same events in a more configuration driven and scalable way. It also helps reduce load and needless code downstream by leveraging AWS EventBridge Pipes to both filter and transform the data from the producer before attaching to an EventBus for further consumption.
+In this sample, Amazon Apigateway receives a request from end-users that has a schedule time and event category provided in the request body. The data is stored in Amazon DynamoDB table. Amazon DynamoDB table has stream enabled and it publishes event to a Lambda function. Lambda function invokes Amazon EventBridge Scheduler and selects the groups provided the request body. EventBridge Scheduler provides a universal target parameter that you can use to create customized triggers that targets more than 270 AWS service and over 6,000 API operation on a schedule. In this example, we are showing integration with two targets, i.e. AWS Lamdba Function, and Amazon SQS queue.
 
 Once the pattern is deployed to AWS, you will have the following resources created with the described capabilities
 
@@ -53,7 +53,7 @@ Once the pattern is deployed to AWS, you will have the following resources creat
     - A Post method to add a new record in Amazon DynamoDB.
     - A Get method sent with an id to retrive the scheduler. 
 - DynamoDB table with DynamoDB Stream enabled.
-- Two Amazon Lambda functions
+- Amazon Lambda functions
     - Producer Lambda function that listens to DynamoDB stream and calls Amazon EventBridge Scheduler
     - Consumer Lambda function acts as a target and listens to EventBridge Scheduler. It performs given actions and deletes the schedule. 
 -  An EventBridge Schedule groups in which Producer Lambda function can categories an event.

@@ -1,0 +1,88 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: DynamoDB Stream event filtering for Lambda demo stack
+
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  # Ingress queue resource that will receive and buffer all incoming messages
+  IngressQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 20 # (lambda_function_timeout * 6) + max_batching_window_in_seconds
+      # Dead letter queue configuration
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt Dlq.Arn
+        maxReceiveCount: 20 # big enough to allow for multiple retries due to DDB throttling
+
+  # Dead letter queue resource
+  Dlq:
+    Type: AWS::SQS::Queue
+
+  # Destination DynamoDB table resource 
+  DestinationTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      # Limit DDB table throughput for illustrative purposes, so that test code can easily observe throttling
+      # Removing the below property will provision the DDB table with "BillingMode: PAY_PER_REQUEST"
+      ProvisionedThroughput: # DEMO: For testing purposes only!!!
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 1
+
+  # Lambda function that will receive messages from the IngressQueue and write them to the DestinationTable
+  IngressProcessingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Lambda function to process messages from the IngressQueue and write them to the DestinationTable
+      Handler: app.handler
+      Runtime: nodejs18.x
+      CodeUri: ./src # Relative path to the handler function code - must have app.ts and package.json files
+      Timeout: 10
+      MemorySize: 1024 # Use https://github.com/alexcasalboni/aws-lambda-power-tuning/ to calculate optimal memory size for the actual payload
+      Architectures:
+        - arm64 # Configure Lambda to use ARM64 architecture
+
+      Environment:
+        Variables:
+          DESTINATION_TABLE_NAME: !Ref DestinationTable # expected by the handler function
+      Policies:
+        - AWSLambdaBasicExecutionRole # required for the handler function
+        - SQSPollerPolicy: # required for the handler to be able to poll the IngressQueue
+            QueueName: !GetAtt IngressQueue.QueueName
+        - DynamoDBWritePolicy: # required for the handler to write to the DestinationTable
+            TableName: !Ref DestinationTable
+
+      Events:
+        IngressSQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt IngressQueue.Arn
+            FunctionResponseTypes: [ ReportBatchItemFailures ]
+            MaximumBatchingWindowInSeconds: 2 # DEMO: For testing purposes only!!!
+            # set the minimal possible value for the maximum concurrent invokes setting, so that multiple Lambda functions are not invoked and throttled in parallel
+            ScalingConfig: # DEMO: For testing purposes only!!!
+              MaximumConcurrency: 2
+
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        Minify: true
+        OutExtension:
+          - .js=.mjs
+        Sourcemap: false
+        # This option will configure esbuild to prefer using ESM versions for all NPM modules (if both CJS and ESM are available)
+        # Using ESM dependencies enables tree-shaking capabilities of esbuild, which can lead to Lambda function's size reduction
+        MainFields: module,main
+        EntryPoints: 
+          - app.ts
+
+Outputs:
+  QueueURL:
+    Value: !Ref IngressQueue
+  TableName:
+    Value: !Ref DestinationTable
+  Region:
+    Value: !Ref AWS::Region

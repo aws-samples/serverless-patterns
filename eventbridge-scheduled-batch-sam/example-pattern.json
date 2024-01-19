@@ -1,0 +1,66 @@
+{
+  "title": "Amazon EventBridge Scheduled invocation to AWS Batch using SAM",
+  "description": "This SAM template creates an Amazon EventBus, EventRule with scheduluer having target as AWS Batch and IAM Role with the required permission to invoke AWS Batch periodically from Amazon EventBridge.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The EventBridge rule specified in `template.yaml` used default Event Bus to schedule trigger for AWS Batch. There are two ways to schedule the trigger - using cron expression or using rate. The template has examples for both.",
+      "Please uncomment the want you want to test. AWS Batch job is triggered based on the specified schedule.",
+      "Please refer to the architecture diagram."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduled-batch-sam",
+      "templateURL": "serverless-patterns/eventbridge-scheduled-batch-sam",
+      "projectFolder": "eventbridge-scheduled-batch-sam",
+      "templateFile": "eventbridge-scheduled-batch-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Batch jobs as EventBridge targets",
+        "link": "https://docs.aws.amazon.com/batch/latest/userguide/batch-cwe-target.html"
+      },
+      {
+        "text": "SAM EventBridge Rule",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineeventbridgerule.html"
+      },
+      {
+        "text": "SAM - AWS Batch",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/AWS_Batch.html"
+      },
+      {
+        "text": "Cron Expression Reference",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-cron-expressions.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+    }
+  ]
+}

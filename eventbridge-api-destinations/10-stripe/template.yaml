@@ -1,0 +1,161 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create an API destination in EventBridge for Stripe Create Product API
+
+Parameters:
+  CreateAProductAPI:
+    Type: String
+    Default: 'https://api.stripe.com/v1/products'
+  StripeAPIKeyName:
+    NoEcho: false
+    Type: String
+    Default: 'Authorization' 
+  StripeAPIKeyValue:
+    NoEcho: false
+    Type: String
+    Default: 'Bearer <<Enter your APIKeyValue>>'
+  StripeAPIEventBridgeRole:
+    NoEcho: false
+    Type: String
+    Default: 'EventBridgeIAMRole'
+   
+
+Resources:
+
+  # Define the EventBridge Event Bus
+  StripeEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "StripeEventBus"
+
+  # Define the Connection
+  StripeConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      Description: 'My connection with a username and password'
+      AuthParameters:
+        ApiKeyAuthParameters :
+          ApiKeyName: !Ref StripeAPIKeyName
+          ApiKeyValue: !Ref StripeAPIKeyValue
+
+  # Define the API Destination
+  CreateAProductAPIDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'CreateAProductAPIDestination'
+      ConnectionArn: !GetAtt StripeConnection.Arn
+      InvocationEndpoint: !Ref CreateAProductAPI
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+
+  # Define the EventBridge Target Role
+  EventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt CreateAProductAPIDestination.Arn
+      RoleName: !Ref StripeAPIEventBridgeRole
+  
+  # Define the SQS queue
+  StripeDLQueue: 
+    Type: AWS::SQS::Queue
+
+  # Define the Event Rule to filter for events
+  EventRuleCreateAProduct: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      State: "ENABLED"
+      EventBusName: !Ref StripeEventBus
+      EventPattern:
+       source:
+          - "PartnerApp"
+       detail-type:
+          - "PartnerAppDetailType"
+      Targets: 
+        - Arn: !GetAtt CreateAProductAPIDestination.Arn
+          RoleArn: !GetAtt EventBridgeTargetRole.Arn
+          Id: "CreateAProduct"
+          HttpParameters:
+            QueryStringParameters:
+                name : "$.detail.name"
+                description: "$.detail.description"           
+          InputPath : "$.detail"
+          RetryPolicy:
+            MaximumRetryAttempts: 0
+            MaximumEventAgeInSeconds: 60
+          DeadLetterConfig:
+            Arn:  !GetAtt StripeDLQueue.Arn
+  
+  # Allow EventBridge to invoke SQS
+  StripeDLQueueEventBridgePolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: SQS:SendMessage
+            Resource:  !GetAtt StripeDLQueue.Arn
+        Queues:
+          - Ref: StripeDLQueue
+          
+Outputs:
+  StripeEventBusName:
+    Description: Application EventBus Name
+    Value: !Ref StripeEventBus
+  StripeEventBusArn:
+    Description: Application EventBus ARN
+    Value: !GetAtt StripeEventBus.Arn
+    
+  EventRuleCreateAProductName:
+    Description: Create A Product Event Rule
+    Value: !Ref EventRuleCreateAProduct  
+  EventRuleCreateAProductArn:
+    Description: Create A Product Event Rule ARN
+    Value: !GetAtt EventRuleCreateAProduct.Arn  
+  
+  StripeConnectionName:
+    Description: Stripe Connection
+    Value: !Ref StripeConnection
+  StripeConnectionArn:
+    Description: Stripe Connection ARN
+    Value: !GetAtt StripeConnection.Arn        
+
+  CreateAProductAPIDestinationName:
+    Description: Create A Product API Destination
+    Value: !Ref CreateAProductAPIDestination
+  CreateAProductAPIDestinationArn:
+    Description: Create A Product API Destination ARN
+    Value: !GetAtt CreateAProductAPIDestination.Arn
+
+  EventBridgeTargetRole:
+    Description: EventBridge Target Role
+    Value: !Ref EventBridgeTargetRole
+  EventBridgeTargetRoleArn:
+    Description: EventBridge Target Role ARN
+    Value: !GetAtt EventBridgeTargetRole.Arn
+    
+  StripeDLQueue:
+    Description: Stripe Dead Letter Queue
+    Value: !Ref StripeDLQueue
+  StripeDLQueueArn:
+    Description: Stripe Dead Letter Queue ARN
+    Value: !GetAtt StripeDLQueue.Arn

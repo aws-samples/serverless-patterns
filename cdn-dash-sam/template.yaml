@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM template to create a dashboard with custom metrics
+
+Resources:
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.11
+      Timeout: 90
+      MemorySize: 1028
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonAPIGatewayAdministrator
+        - CloudWatchFullAccess
+      Architectures:
+        - x86_64
+      Events:
+        cdn:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              source:
+                - aws.apigateway
+              detail-type:
+                - AWS API Call via CloudTrail
+              detail:
+                eventSource:
+                  - apigateway.amazonaws.com
+                eventName:
+                  - UpdateDomainName
+                  - CreateApiMapping
+                  - DeleteApiMapping
+                  - UpdateApiMapping
+
+
+Outputs:
+  HelloWorldFunction:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt LambdaFunction.Arn
+  HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt LambdaFunctionRole.Arn

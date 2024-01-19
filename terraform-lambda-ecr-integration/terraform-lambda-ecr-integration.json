@@ -1,0 +1,74 @@
+{
+    "title": "Integrate AWS Lambda with Amazon Elastic Container Service",
+    "description": "Terraform IaC template to provision Amazon Elastic Container Registry (ECR) resources to integrate with AWS Lambda.",
+    "language": "",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern will provision Amazon Elastic Container Registry (ECR), create a container along with AWS Lambda to call a container from AWS Lambda.",
+            "This create container has example bash script to demonstrate on how to modernize existing bash code via minimum code change."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-lambda-ecr-integration",
+            "templateURL": "serverless-patterns/terraform-lambda-ecr-integration",
+            "projectFolder": "terraform-lambda-ecr-integration",
+            "templateFile": "main.tf"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Working with Lambda container images",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/images-create.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "terraform init",
+            "terraform plan",
+            "terraform apply"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the README in the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "terraform destroy",
+            "terraform show"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Nitin Jain",
+            "image": "",
+            "bio": "Sr. Solution Architect, AWS",
+            "linkedin": "annjay"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 50,
+            "service": "ecs",
+            "label": "Elastic Container Service"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        }
+    }
+}

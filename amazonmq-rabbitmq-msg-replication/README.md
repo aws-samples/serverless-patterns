@@ -2,7 +2,7 @@
 
 This pattern provides an example on how to implement multi-region message replication with Amazon MQ for RabbitMQ. This solution demonstrates how to configure Amazon MQ for RabbitMQ leveraging the federation plugin across regions. You will learn how federation of exchanges enable asynchronous data replication between two RabbitMQ clusters to achieve multi-region architecture. This code base is deployed using Terraform to simplify the Rabbit MQ configuration.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/amazonmq-rabbitmq-msg-replication/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/activemq-rabbitmq-message-replication-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

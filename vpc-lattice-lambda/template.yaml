@@ -1,0 +1,178 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  VL-test
+
+  Sample SAM Template for VL-test
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    
+Resources:
+  VPCLatticeVPC:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: "default"
+  
+  VPCSubnet:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: !Sub "${AWS::Region}b"
+      CidrBlock: "10.0.7.0/24"
+      VpcId: !Ref VPCLatticeVPC
+      MapPublicIpOnLaunch: false
+      Tags: 
+        - 
+          Key: "Name"
+          Value: "Private-new-availability"
+                
+                
+  VPCLatticeServiceNetworkSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupName: "VPCLatticeServiceNetworkSecurityGroup"
+      GroupDescription: "Security group for VPC LatticeService"
+      VpcId: !Ref VPCLatticeVPC
+      SecurityGroupIngress: 
+        - 
+          CidrIp: "10.0.0.0/16"
+          FromPort: 443
+          IpProtocol: "tcp"
+          ToPort: 443
+      SecurityGroupEgress: 
+        - 
+          CidrIp: "0.0.0.0/0"
+          FromPort: 443
+          IpProtocol: "tcp"
+          ToPort: 443
+          
+  VLServiceNetwork:
+    Type: AWS::VpcLattice::ServiceNetwork
+    Properties: 
+      AuthType: "NONE"
+      Name: "vl-test-service-network"
+      
+  VLService:
+    Type: AWS::VpcLattice::Service
+    Properties: 
+      AuthType: "NONE"
+      Name: "vl-test-service"
+      
+  VLServiceListener:
+    Type: AWS::VpcLattice::Listener
+    Properties: 
+      DefaultAction: 
+        Forward:
+          TargetGroups: # As per requirement you may update the weight configuration for targets
+            - TargetGroupIdentifier: !Ref VLServicePrimaryTG
+              Weight: 60
+            - TargetGroupIdentifier: !Ref VLServiceSecondaryTG
+              Weight: 40
+            
+      Name: "vl-service-listener"
+      Port: 443
+      Protocol: "HTTPS"
+      ServiceIdentifier: !Ref VLService
+  
+  VLServiceAssociation:
+    Type: AWS::VpcLattice::ServiceNetworkServiceAssociation
+    Properties: 
+      ServiceIdentifier: !Ref VLService
+      ServiceNetworkIdentifier: !Ref VLServiceNetwork
+      
+  VLServiceNetworkVPCAssociation:
+    Type: AWS::VpcLattice::ServiceNetworkVpcAssociation
+    Properties: 
+      SecurityGroupIds: 
+        - !Ref VPCLatticeServiceNetworkSecurityGroup
+      ServiceNetworkIdentifier: !Ref VLServiceNetwork
+      VpcIdentifier: !Ref VPCLatticeVPC
+
+  VLServicePrimaryTG:
+    Type: AWS::VpcLattice::TargetGroup
+    Properties: 
+     Config: 
+       LambdaEventStructureVersion: "V2"
+     Name: "vl-primary-target-group"
+     Targets: 
+       -
+         Id: !GetAtt VLFunctionPrimary.Arn
+     Type: "LAMBDA"
+  
+  VLServiceSecondaryTG:
+    Type: AWS::VpcLattice::TargetGroup
+    Properties: 
+     Config: 
+       LambdaEventStructureVersion: "V2"
+     Name: "vl-secondary-target-group"
+     Targets: 
+       -
+         Id: !GetAtt VLFunctionSecondary.Arn
+     Type: "LAMBDA"
+                
+  VLFunctionPrimary:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: primary/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+        
+  VLFunctionSecondary:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: secondary/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+        
+  DemoLambda:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: demolambda/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Environment:
+        Variables: 
+          URL: !GetAtt VLService.DnsEntry.DomainName
+      Architectures:
+        - x86_64
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref VPCLatticeServiceNetworkSecurityGroup
+        SubnetIds: 
+          - !Ref VPCSubnet
+      
+        
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  VLFunctionPrimary:
+    Description: "Hello World VPC Lattice Lambda Function ARN"
+    Value: !GetAtt VLFunctionPrimary.Arn
+  VLFunctionPrimary:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt VLFunctionPrimary.Arn
+  VLFunctionSecondary:
+    Description: "Hello World VPC Lattice Lambda Function ARN"
+    Value: !GetAtt VLFunctionSecondary.Arn
+  VLFunctionSecondary:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt VLFunctionSecondary.Arn
+  VLServiceNetwork:
+    Description: "VL-Test Service Network ID"
+    Value: !GetAtt VLServiceNetwork.Id
+  VLService:
+    Description: "VL-Test Service ID"
+    Value: !GetAtt VLService.Id
+    Description: "VL-Test Service DNS"
+    Value: !GetAtt VLService.DnsEntry.DomainName

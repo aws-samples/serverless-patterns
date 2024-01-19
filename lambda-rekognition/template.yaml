@@ -77,7 +77,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Description: Lambda function that will recieve CloudWatch events and will trigger
         CodeBuild build job.
       FunctionName: 'TextRecognitionLambdaFunction'

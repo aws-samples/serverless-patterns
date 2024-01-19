@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon DynamoDB
+Parameters:
+  KinesisStreamName:
+    Type: String
+    Default: testDataStream
+    Description: Enter a name for the Kinesis Data Stream.
+Resources:
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: !Ref KinesisStreamName
+      ShardCount: 1
+  LambdaProducerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: LambdaProducerFunction
+      Handler: apiHandler.lambda_handler
+      Runtime: python3.9
+      CodeUri: src/
+      Policies:
+        DynamoDBCrudPolicy:
+          TableName: !Ref DynamoDBTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions: 
+        - AttributeName: id
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+      TableName: Transaction
+      KinesisStreamSpecification: 
+        StreamArn: !GetAtt KinesisStream.Arn
+        
+  LambdaConsumerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: LambdaConsumerFunction
+      Handler: messageHandler.lambda_handler
+      Runtime: python3.9
+      CodeUri: src/
+      Policies: 
+      - KinesisStreamReadPolicy:
+          StreamName: !Ref KinesisStreamName      
+      Events:
+        Stream:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream.Arn
+            StartingPosition: LATEST
+            BatchSize: 100
+
+Outputs:
+  EndpointUrl:
+    Description: 'HTTP REST endpoint URL'
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'

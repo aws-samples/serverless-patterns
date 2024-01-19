@@ -1,0 +1,214 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: An Amazon API Gateway REST API that integrates with a SageMaker endpoint.
+Parameters:
+  ApigatewayName:
+    Type: String
+    Default: sagemaker-api
+    Description: Name of application.
+
+  ApigatewayStageName:
+    Type: String
+    Default: v1
+    Description: Name of API stage.
+    
+  SageMakerImageURI:
+    Type: String
+    Default: 763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-inference:1.10.2-transformers4.17.0-gpu-py38-cu113-ubuntu20.04
+    Description: Container URI for inference endpoint
+
+  SageMakerModelData:
+    Type: String
+    Default: s3://jumpstart-cache-prod-us-east-1/huggingface-infer/prepack/v1.0.3/infer-prepack-huggingface-text2text-flan-t5-xl.tar.gz
+    Description: S3 location for SageMaker JumpStart model
+
+  SageMakerInstanceType:
+    Type: String
+    Default: ml.p3.2xlarge
+    Description: Instance type for SageMaker endpoint
+
+  SageMakerInstanceCount:
+    Type: String
+    Default: 1
+    Description: Number of instances for SageMaker endpoint
+
+Resources:
+  # Execution IAM role for SageMaker Model
+  SageMakerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - sagemaker.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+
+  # SageMaker Model
+  SageMakerModel:
+    Type: AWS::SageMaker::Model
+    Properties:
+      ModelName: apigateway-SageMakerModel
+      Containers:
+        - Image: !Ref SageMakerImageURI
+          ModelDataUrl: !Ref SageMakerModelData
+          Mode: SingleModel
+          Environment:
+            {
+              "MODEL_CACHE_ROOT": "/opt/ml/model",
+              "SAGEMAKER_ENV": "1",
+              "SAGEMAKER_MODEL_SERVER_TIMEOUT": "3600",
+              "SAGEMAKER_MODEL_SERVER_WORKERS": "1",
+              "SAGEMAKER_PROGRAM": "inference.py",
+              "SAGEMAKER_SUBMIT_DIRECTORY": "/opt/ml/model/code/",
+              "TS_DEFAULT_WORKERS_PER_MODEL": 1,
+            }
+      EnableNetworkIsolation: true
+      ExecutionRoleArn: !GetAtt SageMakerExecutionRole.Arn
+
+  # SageMaker Endpoint Config
+  SageMakerEndpointConfig:
+    Type: AWS::SageMaker::EndpointConfig
+    Properties:
+      EndpointConfigName: apigateway-SageMakerEndpointConfig
+      ProductionVariants:
+        - ModelName: !GetAtt SageMakerModel.ModelName
+          VariantName: !Sub ${SageMakerModel.ModelName}-1
+          InitialInstanceCount: !Ref SageMakerInstanceCount
+          InstanceType: !Ref SageMakerInstanceType
+          InitialVariantWeight: 1.0
+          VolumeSizeInGB: 40
+
+  # SageMaker Endpoint
+  SageMakerEndpoint:
+    Type: AWS::SageMaker::Endpoint
+    Properties:
+      EndpointName: apigateway-sagemakerendpoint
+      EndpointConfigName: !GetAtt SageMakerEndpointConfig.EndpointConfigName
+
+  # Execution IAM role for API gateway
+  APIGatewayRole:
+    Type: 'AWS::IAM::Role'
+    DependsOn:
+      - SageMakerEndpoint
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: APIGatewaySageMakerPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sagemaker:InvokeEndpoint'
+                Resource: !Sub
+                  - '${varEndpointArn}'
+                  - varEndpointArn: !Join ['', ['arn:aws:sagemaker:', !Ref AWS::Region, ':',!Ref AWS::AccountId, ':endpoint/', !GetAtt SageMakerEndpoint.EndpointName]]
+  
+  # REST API
+  Api:
+    Type: 'AWS::ApiGateway::RestApi'
+    DependsOn:
+      - APIGatewayRole
+    Properties:
+      Name: !Sub '${ApigatewayName}'
+      ApiKeySourceType: HEADER
+
+  # API Resource
+  TextResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: !Ref Api
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: 'text'
+
+  # API method
+  TextMethodPost:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      RestApiId: !Ref Api
+      ResourceId: !Ref TextResource
+      HttpMethod: POST
+      ApiKeyRequired: true
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS
+        Credentials: !GetAtt APIGatewayRole.Arn
+        # Should always be POST when integrating with AWS services
+        IntegrationHttpMethod: POST
+        # More info: https://docs.aws.amazon.com/apigateway/api-reference/resource/integration/
+        Uri: !Join ['', ['arn:aws:apigateway:', !Ref AWS::Region, ':runtime.sagemaker:path/endpoints/', !GetAtt SageMakerEndpoint.EndpointName, '/invocations']]
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+          - StatusCode: '200'
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels: { "application/json": "Empty" }
+
+  # Deployment of API. Note: Change the logical ID every time when updating the API configuration as redeployment through CFN does not work if logical ID is the same
+  ApiDeployment:
+    Type: 'AWS::ApiGateway::Deployment'
+    DependsOn:
+      - TextMethodPost
+    Properties:
+      RestApiId: !Ref Api
+      StageName: !Sub '${ApigatewayStageName}'
+
+  # API key that client will pass in 'x-api-key' header
+  ApiKey:
+    Type: 'AWS::ApiGateway::ApiKey'
+    DependsOn:
+      - ApiDeployment
+    Properties:
+      Enabled: true
+      Name: !Sub '${ApigatewayName}-apikey'
+      StageKeys:
+        - RestApiId: !Ref Api
+          StageName: !Sub '${ApigatewayStageName}'
+
+  #API Usage plan to define Throttle limits
+  ApiUsagePlan:
+    Type: 'AWS::ApiGateway::UsagePlan'
+    DependsOn:
+      - ApiDeployment
+    Properties:
+      ApiStages:
+        - ApiId: !Ref Api
+          Stage: !Sub '${ApigatewayStageName}'
+      Throttle:
+        RateLimit: 500
+        BurstLimit: 1000
+      UsagePlanName: !Sub '${ApigatewayName}-usage-plan'
+      Quota:
+        Limit: 10000
+        Period: MONTH
+  
+  #Associate API key with Usage plan
+  ApiUsagePlanKey:
+    Type: 'AWS::ApiGateway::UsagePlanKey'
+    Properties:
+      KeyType: API_KEY
+      KeyId: !Ref ApiKey
+      UsagePlanId: !Ref ApiUsagePlan
+
+Outputs:
+  ApiRootUrl:
+    Description: Root Url of the API
+    Value: !Sub 
+      - 'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/${ApigatewayStageName}'
+      - ApiId: !Ref Api
+  ApiKeyId:
+    Description: API Key Id
+    Value: !Ref ApiKey

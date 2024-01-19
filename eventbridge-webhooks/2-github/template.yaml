@@ -6,9 +6,9 @@ Description: >
   Amazon EventBridge Inbound webhooks using lambda fURLs CFNs Template.
 
 Parameters:
-  GithubWebhookSecret:
+  GitHubWebhookSecret:
     Type: String
-    Description: Github webhook secret
+    Description: GitHub webhook secret
     NoEcho: true
     AllowedPattern: ".+"
 
@@ -28,7 +28,7 @@ Resources:
     Properties:
       Name: !Sub WebhookSecret-${AWS::StackName}
       Description: Secrets Manager for storing Webhook Secret
-      SecretString: !Ref GithubWebhookSecret
+      SecretString: !Ref GitHubWebhookSecret
 
   LambdaInvocationsAlarm:
     Type: AWS::CloudWatch::Alarm

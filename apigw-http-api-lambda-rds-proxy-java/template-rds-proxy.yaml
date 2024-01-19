@@ -13,7 +13,7 @@ Mappings:
   ClusterSettings:
     global:
       dbSchema: mylab
-      dbVersion: 5.7.mysql_aurora.2.09.1
+      dbVersion: 5.7.mysql_aurora.2.11.2
       dbEngine: aurora-mysql
       dbFamily: aurora-mysql5.7
       port: 3306

@@ -1,0 +1,67 @@
+{
+    "title": "Automatic Image Tagging with Amazon Rekognition",
+    "description": "An event-driven workflow to automatically detect and tag moderation labels within images using Amazon Rekognition, AWS Lambda, and Amazon DynamoDB.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to deliver an event-driven architecture to detect moderation labels within images, while storing these tags in Amazon DynamoDB.",
+        "This pattern allows you to store image files in an Amazon S3 bucket, which triggers the workflow. Upon an object being created in the S3 bucket, a Lambda function is invoked, which initiates Amazon Rekognition's DetectModerationLabels function. Once a the function call is finished and it has retrieved the potential moderation labels, the Lambda stores this information in our DynamoDB table.",
+        "This pattern deploys one S3 bucket, 1 Lambda Function, and 1 DynamoDB Table."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rekognition-image-moderation-tagging",
+        "templateURL": "https://github.com/aws-samples/serverless-patterns/main/rekognition-image-moderation-tagging/template.yaml",
+        "projectFolder": "rekognition-image-moderation-tagging",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Simple Storage Service (S3)",
+          "link": "https://aws.amazon.com/s3/"
+        },
+        {
+          "text": "AWS Lambda",
+          "link": "https://aws.amazon.com/lambda/"
+        },
+        {
+          "text": "Amazon Rekognition",
+          "link": "https://aws.amazon.com/rekognition/"
+        },
+        {
+          "text": "Amazon DynamoDB",
+          "link": "https://aws.amazon.com/dynamodb/"
+        }      
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: sam delete"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Jack Le Bon",
+        "image": "https://media.licdn.com/dms/image/C4E03AQHvuSBgwssMBQ/profile-displayphoto-shrink_800_800/0/1663884739192?e=1706140800&v=beta&t=jAtE5SqZKE3J0BqaBOTSn8GKg995guStVwsQmodM7O0",
+        "bio": "AWS Solutions Architect",
+        "linkedin": "jack-le-bon"
+      }
+    ]
+  }
+  

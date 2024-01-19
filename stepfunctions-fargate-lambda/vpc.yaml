@@ -1,0 +1,191 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 10.20.0.0/16
+      Tags:
+        - Key: Name
+          Value: EB-VPC
+
+  VPCEndpointSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Allows Fargate to access VPC Endpoints
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        FromPort: -1
+        CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - FromPort: 443
+          IpProtocol: tcp
+          SourceSecurityGroupId: !GetAtt VPC.DefaultSecurityGroup
+          ToPort: 443
+      VpcId: !Ref VPC
+
+  ECREndpointApi:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      PrivateDnsEnabled: true
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.api
+      SubnetIds: 
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SecurityGroupIds:
+        - !Ref VPCEndpointSG
+
+  ECREndpointDkr:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: true
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.dkr
+      SubnetIds: 
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SecurityGroupIds:
+        - !Ref VPCEndpointSG
+
+  ECSEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: true
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs
+      SubnetIds: 
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SecurityGroupIds:
+        - !Ref VPCEndpointSG
+
+  ECSEndpointAgent:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: true
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs-agent
+      SubnetIds: 
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SecurityGroupIds:
+        - !Ref VPCEndpointSG
+
+  ECSEndpointTelemetry:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: true
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs-telemetry
+      SubnetIds: 
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SecurityGroupIds:
+        - !Ref VPCEndpointSG
+
+  LogsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: true
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.logs
+      SubnetIds: 
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SecurityGroupIds:
+        - !Ref VPCEndpointSG
+
+  StatesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: true
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.states
+      SubnetIds: 
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SecurityGroupIds:
+        - !Ref VPCEndpointSG
+
+  S3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
+      VpcEndpointType: Gateway
+      VpcId: !Ref VPC
+      RouteTableIds:
+        - !Ref Private1RouteTable
+        - !Ref Private2RouteTable
+
+  Private1RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: eb-rt-1
+
+  Private2RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: eb-rt-2
+
+  Private1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref Private1RouteTable
+      SubnetId: !Ref PrivateSubnetOne
+
+  Private2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref Private2RouteTable
+      SubnetId: !Ref PrivateSubnetTwo
+
+  PrivateSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: 10.20.128.0/18
+      Tags:
+        - Key: Name
+          Value: EB-Subnet-One
+
+  PrivateSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 1
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: 10.20.192.0/18
+      Tags:
+        - Key: Name
+          Value: EB-Subnet-Two
+
+Outputs:
+  Subnet1:
+    Value: !Ref PrivateSubnetOne
+  Subnet2:
+    Value: !Ref PrivateSubnetTwo
+  SG:
+    Value: !GetAtt VPC.DefaultSecurityGroup

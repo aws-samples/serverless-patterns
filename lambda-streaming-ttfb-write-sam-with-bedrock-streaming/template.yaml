@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  StreamingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Timeout: 300
+      MemorySize: 512
+      AutoPublishAlias: live
+      FunctionUrlConfig:
+        AuthType: AWS_IAM
+        InvokeMode: RESPONSE_STREAM
+      Events:
+        GenerateApi:
+          Type: Api
+          Properties:
+            Path: /generate
+            Method: post
+      Environment:
+        Variables:
+          BEDROCK_AWS_ACCESS_KEY_ID: 
+          BEDROCK_AWS_SECRET_ACCESS_KEY: 
+  MyFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !Ref StreamingFunction
+      AuthType: AWS_IAM
+      InvokeMode: RESPONSE_STREAM       
+Outputs:
+  StreamingFunction:
+    Description: "Streaming Lambda Function ARN"
+    Value: !GetAtt StreamingFunction.Arn
+  StreamingFunctionURL:
+    Description: "Streaming Lambda Function URL"
+    Value: !GetAtt MyFunctionUrl.FunctionUrl
+

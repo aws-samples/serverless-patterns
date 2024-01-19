@@ -1,0 +1,57 @@
+{
+  "title": "Amazon RDS instance event notification to Amazon SNS",
+  "description": "Amazon RDS event subscriptions allow users to configure notifications for RDS events (provided through an SNS topic).",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon RDS event subscriptions allow users to configure notifications for RDS events (provided through an SNS topic).",
+      "This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rds-sns-event-notification-cdk-python",
+      "templateURL": "serverless-patterns/rds-sns-event-notification-cdk-python",
+      "projectFolder": "rds-sns-event-notification-cdk-python",
+      "templateFile": "rds_sns_event_notification_cdk_python/rds_sns_event_notification_cdk_python_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with Amazon RDS event notification",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Events.html"
+      },
+      {
+        "text": "Creating an Amazon RDS DB instance",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html#USER_CreateDBInstance.Creating"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --parameters SNSEndpoint=EmailID --parameters RDSInstanceName=RDSInstanceName"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tejendra Khatri",
+      "image": "https://drive.google.com/file/d/1FR9bL3aJz2YRYkIsmfR_zL3RvE65oR0b/view",
+      "bio": "Cloud Support Engineer @ AWS",
+      "linkedin": "https://www.linkedin.com/in/tejendrakhatri"
+    }
+  ]
+}

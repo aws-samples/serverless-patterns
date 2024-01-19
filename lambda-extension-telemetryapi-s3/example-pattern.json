@@ -1,0 +1,54 @@
+{
+  "title": "Lambda Extension Telemetry API to S3",
+  "description": "Create a Lambda extension to send Lambda logs to S3",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to use the Lambda extension telemetry API to persist Lambda logs to an S3 bucket",
+      "The SAM template deploys a sample Lambda application, Lambda extension as Lambda layer and an S3 bucket to store the Lambda function logs. The Lambda extension uses the  telemetry API together with the extensions API to capture Lambda Log and persist to S3."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-extension-telemetryapi-s3",
+      "templateURL": "serverless-patterns/lambda-extension-telemetryapi-s3",
+      "projectFolder": "lambda-extension-telemetryapi-s3",
+      "templateFile": "lambda-extension-telemetryapi-s3/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Extension Telemetry API",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/telemetry-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Thanit Youruchatangern",
+      "image": "link-to-your-photo.jpg",
+      "bio": "I am a Technical Account Manager at AWS based in Thailand. I help customer solving complex problems with simple solutions.",
+      "linkedin": "www.linkedin.com/in/thanit-youruchatangern-a90060216",
+      "twitter": ""
+    }
+  ]
+}

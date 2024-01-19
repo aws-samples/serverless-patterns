@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'RDS Instance Event Subscription for Failure, Low Storage and Availability Events'
+Parameters:
+  SNSEndpoint:
+    Type: String
+    Description: Provide your email address to receive notification from SNS
+  RDSInstanceName:
+    Type: String
+    Description: Provide name of your existing RDS Instance for which you want to receive event notifications
+Resources:
+  SnsForRdsEventSubscription:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      Subscription:
+        - Endpoint: !Ref SNSEndpoint
+          Protocol: 'email'
+      TopicName: 'rds-subscription-topic'
+  SnsTopicPolicyEventRule:
+    Type: 'AWS::SNS::TopicPolicy'
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Sid: '__default_statement_ID'
+            Effect: 'Allow'
+            Principal:
+              AWS: !Ref 'AWS::AccountId'
+            Action:
+              - 'SNS:GetTopicAttributes'
+              - 'SNS:SetTopicAttributes'
+              - 'SNS:AddPermission'
+              - 'SNS:RemovePermission'
+              - 'SNS:DeleteTopic'
+              - 'SNS:Subscribe'
+              - 'SNS:ListSubscriptionsByTopic'
+              - 'SNS:Publish'
+              - 'SNS:Receive'
+            Resource:
+              Ref: 'SnsForRdsEventSubscription'
+            Condition:
+              StringEquals:
+                AWS:SourceOwner:
+                  Ref: 'AWS::AccountId'
+          - Sid: 'TrustRDSToPublishEventsToMyTopic'
+            Effect: 'Allow'
+            Principal:
+              Service: 'events.rds.amazonaws.com'
+            Action: 'sns:Publish'
+            Resource:
+              Ref: 'SnsForRdsEventSubscription'
+      Topics:
+        - Ref: 'SnsForRdsEventSubscription'
+  RdsEventSubscription:
+    Type: 'AWS::RDS::EventSubscription'
+    Properties:
+      Enabled: true
+      SnsTopicArn:
+        Ref: 'SnsForRdsEventSubscription'
+      SourceIds:
+        - !Ref RDSInstanceName
+      SourceType: 'db-instance'
+      EventCategories:
+        - 'failure'
+        - 'low storage'
+        - 'availability'
+Outputs:
+  MySnsTopicName:
+    Description: SNS topic name
+    Value: !GetAtt SnsForRdsEventSubscription.TopicName
+  RDSInstanceName:
+    Value: !Ref RDSInstanceName

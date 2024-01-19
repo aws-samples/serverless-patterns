@@ -15,7 +15,7 @@
   "devDependencies": {
     "@types/jest": "^29.2.5",
     "@types/node": "18.11.18",
-    "aws-cdk": "2.69.0",
+    "aws-cdk": "2.80.0",
     "jest": "^29.3.1",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
@@ -27,7 +27,7 @@
     "@aws-sdk/util-dynamodb": "^3.294.0",
     "@aws-solutions-constructs/aws-apigateway-dynamodb": "^2.34.0",
     "@types/aws-lambda": "^8.10.114",
-    "aws-cdk-lib": "2.69.0",
+    "aws-cdk-lib": "2.80.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }

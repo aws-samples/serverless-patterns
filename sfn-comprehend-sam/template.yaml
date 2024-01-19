@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A Step Functions Express Workflow that invokes Amazon Comprehend syncronously for sentiment analysis
+
+Resources:
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+
+  StateMachineExpressSyncToComprehend:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: statemachine/detectSentiment.asl.json
+      Role:
+        Fn::GetAtt: [ StatesExecutionRole, Arn ]
+      Type: EXPRESS
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+        IncludeExecutionData: false
+        Level: 'ALL'
+
+##########################################################################
+#  STEP FUNCTION LOG GROUP                                               #
+##########################################################################
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", StateMachineExpressSyncToComprehend]]
+       
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+  StatesExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: CWLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogDelivery"
+                  - "logs:CreateLogStream"
+                  - "logs:GetLogDelivery"
+                  - "logs:UpdateLogDelivery"
+                  - "logs:DeleteLogDelivery"
+                  - "logs:ListLogDeliveries"
+                  - "logs:PutLogEvents"
+                  - "logs:PutResourcePolicy"
+                  - "logs:DescribeResourcePolicies"
+                  - "logs:DescribeLogGroups"
+                Resource: "*"
+        - PolicyName: ComprehendAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "comprehend:BatchDetectKeyPhrases"
+                  - "comprehend:DetectDominantLanguage"
+                  - "comprehend:DetectEntities"
+                  - "comprehend:BatchDetectEntities"
+                  - "comprehend:DetectKeyPhrases"
+                  - "comprehend:DetectSentiment"
+                  - "comprehend:BatchDetectDominantLanguage"
+                  - "comprehend:BatchDetectSentiment"
+                Resource: "*"                     
+##########################################################################
+#   Outputs                                                              #
+##########################################################################
+Outputs:
+  StateMachineExpressSyncToComprehend:
+    Value: !Ref StateMachineExpressSyncToComprehend
+    Description: StateMachineExpressSyncToComprehend Arn

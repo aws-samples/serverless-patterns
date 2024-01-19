@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Appsync DynamoDB Streams Subscription
+
+Resources:
+##########################################################################
+#   DynamoDB Table                                                       #
+##########################################################################
+  DDBTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+
+##########################################################################
+#   AppSync API                                                          #
+##########################################################################
+  AppSyncApi:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaUri: ./sam_graphql_api/schema.graphql
+      ApiKeys:
+        TestApiKey:
+          Description: Test Api Key
+      Auth:
+        Type: API_KEY
+        Additional:
+          - Type: AWS_IAM
+      Functions:
+        onCreateItemFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: None
+          CodeUri: ./sam_graphql_api/resolvers/functions/onCreateItem.js 
+      Resolvers:
+        Mutation:
+          onCreateItem:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: "1.0.0"
+            Pipeline:
+            - onCreateItemFunction
+
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  DDBStreamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/DDBStreamFunction
+      Handler: app.handler
+      Runtime: nodejs18.x
+      Architectures: ["arm64"]
+      Timeout: 30
+      MemorySize: 1024
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: appsync:GraphQL
+              Resource: !Sub ${AppSyncApi}/types/Mutation/*
+      Events:
+        DynamoStream:
+          Type: DynamoDB
+          Properties:
+            BatchSize: 100
+            ParallelizationFactor: 10
+            StartingPosition: LATEST
+            MaximumRetryAttempts: 2
+            BisectBatchOnFunctionError: true
+            MaximumRecordAgeInSeconds: 120
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"eventName": ["INSERT"]}'
+            Stream: !GetAtt DDBTable.StreamArn
+      Environment:
+        Variables:
+          APP_SYNC_API: !GetAtt AppSyncApi.GraphQLUrl
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        External: 
+          - '@aws-sdk/util-dynamodb'
+          - '@aws-sdk/credential-provider-node'
+          - '@aws-sdk/signature-v4'
+          - '@aws-sdk/protocol-http'
+        Minify: true
+        Target: "es2022"
+        Sourcemap: true
+        EntryPoints: 
+          - app.ts
+  DDBStreamFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub /aws/lambda/${DDBStreamFunction}

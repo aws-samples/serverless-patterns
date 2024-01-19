@@ -1,0 +1,51 @@
+{
+  "title": "S3 - Lambda - Transcribe",
+  "description": "Trigger a Transcribe job from an S3 upload.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern contains a Lambda Function with an S3 object trigger to start an Amazon Transcribe job and place the transcription results into a seperate S3 bucket.",
+      "This pattern deploys one Lambda Function and two S3 Buckets."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-transcribe-sam",
+      "templateURL": "serverless-patterns/s3-lambda-transcribe-sam",
+      "projectFolder": "s3-lambda-transcribe-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Invoke a Lambda Function using an Amazon S3 trigger",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Amazon Transcribe - Speech to Text Conversion",
+        "link": "https://aws.amazon.com/transcribe/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy --guided"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "Anushree Umesh",
+      "image": "/assets/images/resources/contributors/umeshanu.jpeg",
+      "bio": "Anushree Umesh is an Associate Solutions Architect with Amazon Web Services",
+      "linkedin": "nushreeumesh"
+    }
+  ]
+}

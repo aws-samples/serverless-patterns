@@ -1,0 +1,156 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Description: >
+  This pattern shows 
+  1. Integration of Amazon Inspector2, Amazon EventBridge, AWS Lambda, AWS DynamoDB using the AWS SAM 
+  2. Creating custom EventBridge rules to listen only for the needed events instead of all the events(noise)
+  3. Creating multiple targets for the same rule to handle the Critical findings 
+  4. Persistent storage of the findings in DynamoDB for access from WebApplication
+
+Resources:
+  # Lambda function to write data to DynamoDB
+  WriteToDynamoDBFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: write_to_dynamodb/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      MemorySize: 128
+      Timeout: 10
+      Tracing: Active
+      Tags:
+        AppName: serverless-pattern
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
+      # Policy to provide permission for the lambda to have CRUD permissions on DynamoDB table
+
+  # DynamoDB table to store the Amazon Inspector findings
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: MyDynamoDBTable
+      AttributeDefinitions:
+        - AttributeName: UUID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: UUID
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      Tags:
+        - Key: AppName 
+          Value: serverless-pattern
+
+  # Rule to consider CRITICAL or HIGH findings with status ACTIVE from Amazon Inspector and store them in DynamoDB
+  CriticalOrHighFindingsRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Rule to consider CRITICAL/HIGH and ACTIVE findings from Amazon Inspector and store them in DynamoDB
+      EventPattern:
+        source:
+          - aws.inspector2
+        detail-type:
+          - "Inspector2 Finding"
+        detail:
+          severity:
+            - HIGH
+            - CRITICAL
+          status:
+            - ACTIVE          
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt WriteToDynamoDBFunction.Arn
+          Id: TargetFunction
+      
+  # Rule to consider CRITICAL and ACTIVE findings with score greater than 8 and trigger SNS for email notification 
+  CriticalOrHighFindingsWithScoreRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Rule to consider CRITICAL and ACTIVE findings with score greater than 8 and trigger SNS for email notification 
+      EventPattern:
+        source:
+          - aws.inspector2
+        detail-type:
+          - "Inspector2 Finding"
+        detail:
+          severity:
+            - CRITICAL
+          status:
+            - ACTIVE
+          inspectorScore:
+            - numeric:
+                - '>'
+                - 8
+      State: ENABLED
+      Targets:
+        - Arn: !Ref VulnerabilityNotifierTopic
+          Id: VulnerabilityNotifierTopic
+
+  # Create SNS Topic for vulnerability notifications
+  VulnerabilityNotifierTopic:
+    Type: AWS::SNS::Topic
+
+  # Permission for Event Rule to trigger Lambda function
+  PermissionForRuleToTriggerLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: !Ref WriteToDynamoDBFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt CriticalOrHighFindingsRule.Arn
+
+  # SNS Topic Policy to allow Event Bridge to publish to the SNS Topic
+  SNSPolicyEventBridgeTopicAllow:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: "SNS:Publish"
+            Resource:
+              - !Ref VulnerabilityNotifierTopic
+      Topics:
+        - !Ref VulnerabilityNotifierTopic
+
+  VulnerableLambdaFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: test-package-vulnerability/
+      Handler: vulnerable-lambda-fn.lambda_handler
+      Runtime: python3.9
+      MemorySize: 128
+      Timeout: 10
+      Tracing: Active
+      Tags:
+        AppName: serverless-pattern
+
+Outputs:
+  # Output for DynamoDB table name
+  DynamoDBTableName:
+    Description: "Name of the DynamoDB table"
+    Value: !Ref DynamoDBTable
+
+  # Output for Lambda function name
+  WriteToDynamoDBFunctionName:
+    Description: "Name of the Lambda function for writing to DynamoDB"
+    Value: !Ref WriteToDynamoDBFunction
+
+  # Output for Event Rule name
+  InspectorEventRuleNameOne:
+    Description: "Name of the First Event Rule for Amazon Inspector findings"
+    Value: !Ref CriticalOrHighFindingsRule
+
+  # Output for Event Rule name
+  InspectorEventRuleNameTwo:
+    Description: "Name of the Second Event Rule for Amazon Inspector findings"
+    Value: !Ref CriticalOrHighFindingsWithScoreRule
+
+  # Output for SNS Topic name
+  VulnerabilityNotifierTopicName:
+    Description: "Name of the SNS Topic for vulnerability notifications"
+    Value: !Ref VulnerabilityNotifierTopic
