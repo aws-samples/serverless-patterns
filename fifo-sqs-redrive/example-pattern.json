@@ -1,6 +1,6 @@
 {
   "title": "Redrive SQS FIFO Queue messages from DLQ",
-  "description": "The SAM template deploys two Amazon SQS FIO queues with DLQ, and two AWS Lambda functions to simulate the redrive capability of Amazon SQS FIFO queues from dead letter queue.", 
+  "description": "The SAM template deploys Amazon SQS FIFO queues with DLQ and AWS Lambda functions to simulate the redrive capability of SQS FIFO queues from DLQ.", 
   "language": "Python",
   "level": "200",
   "framework": "SAM",
