@@ -10,21 +10,23 @@ on:
       dirName:
         description: "new pattern dir"
         required: true
+
 jobs:
   copy:
     runs-on: ubuntu-latest
-    uses: tspascoal/get-user-teams-membership@v2
-      id: checkUserMember
-      with:
-        username: ${{ github.actor }}
-        team: 'aws-serverless-da'
-        GITHUB_TOKEN: ${{ secrets.GET_USER_TEAMS_MEMBERSHIP }}
-    if: ${{ steps.checkUserMember.outputs.isTeamMember == 'true' }}
     env:
       NODE_ENV: dev
       fileName: ${{ inputs.fileName }}
     steps:
+      - name: Check if user is a member of the team
+        uses: tspascoal/get-user-teams-membership@v2
+        id: checkUserMember
+        with:
+          username: ${{ github.actor }}
+          team: 'aws-serverless-da'
+          GITHUB_TOKEN: ${{ secrets.GET_USER_TEAMS_MEMBERSHIP }}
       - name: Copycat
+        if: ${{ steps.checkUserMember.outputs.isTeamMember == 'true' }}
         uses: andstor/copycat-action@v3
         with:
           personal_token: ${{ secrets.patterns_pat }}
