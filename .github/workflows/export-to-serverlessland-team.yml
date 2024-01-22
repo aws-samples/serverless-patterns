@@ -25,7 +25,7 @@ jobs:
         with:
           username: ${{ github.actor }}
           team: 'aws-serverless-da'
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GET_USER_TEAMS_MEMBERSHIP }}
       - name: Check if user is a member of the team
         if: ${{ steps.checkUserMember.outputs.isTeamMember == 'true' }}
         uses: andstor/copycat-action@v3
