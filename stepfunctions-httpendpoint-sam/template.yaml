@@ -94,8 +94,8 @@ Resources:
       AuthorizationType: BASIC
       AuthParameters:
         BasicAuthParameters:
-          Password: " "
-          Username: "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
+          Password: "<PASSWORD_UPDATE_ME>"
+          Username: "<USER_UPDATE_ME>"
 
 ##########################################################################
 #   Outputs                                                              #

@@ -14,6 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Stripe Test User](https://stripe.com/docs/connect/express-accounts)
 
 ## Deployment Instructions
 
@@ -25,18 +26,20 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd stepfunctions-httpendpoint-sam
     ```
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. Please update the `<USER_UPDATE_ME>` and `<PASSWORD_UPDATE_ME>` in `template.yaml` file with the Strip test user based on [Stripe Documentation](https://stripe.com/docs/connect/express-accounts). At the time of writing, as per the documentation the `USER_UPDATE_ME` is `sk_test_4eC39HqLyjWDarjtT1zdp7dc` and `PASSWORD_UPDATE_ME` is ` ` i.e. empty string. Please refer to the Stripe documentation for latest details.
+
+4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
     ```
-4. During the prompts:
+5. During the prompts:
     * Enter a stack name
     * Enter `us-east-1` or any AWS Region where you have access. 
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
@@ -54,8 +57,11 @@ Please refer to the architecture diagram below:
 1. Run the following AWS CLI command to start the Step Functions workflow. Note, you must edit the {StateMachineHTTPEndpointArn} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs. Please replace {your-region} with the region selected at the time of deployment.
 
 ```bash
-aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMachineHTTPEndpointArn}" --input "" --region {your-region}
+aws stepfunctions start-execution --state-machine-arn "{StateMachineHTTPEndpointArn}" --region {your-region}
 ```
+
+This Step Function does not require any input. However, If you need to pass any input to your own AWS Step Function, then you can pass the same using `--input {stringifiedJson}` format. For example:  `--input "{\"orderId\": \"1234567\",\"customerId\": \"98766\",\"orderDate\": \"2024-01-14\",\"amount\": 100,\"nameOnCard\": \"FIRSTNAME LASTNAME\",\"creditCardNumber\": \"1234 1234 1234 1234\",\"expiry\": \"XX/YY\",\"cvv\": \"123\"}"`
+
 
 ### Example output:
 
@@ -73,6 +79,8 @@ aws stepfunctions describe-execution --execution-arn {executionArn} --query 'out
 ```
 
 This will output the response of the third-party API. The same can also be validated from the AWS Step Functions console.
+
+
 
 ## Cleanup
  
