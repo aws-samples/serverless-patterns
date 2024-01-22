@@ -1,13 +1,13 @@
 {
   "title": "AWS API Gateway IAM authorization and AWS v4 request signing",
-  "description": "This pattern secures an API endpoint with AWS_IAM authorizer, allowing a public API to access it through AWS API Gateway. The process involves signing HTTP requests using IAM credentials per the AWS v4 signing process.",
+  "description": "Creates an API with AWS_IAM authorizer, accessible via AWS APIGW with AWSv4 signing for public API.",
   "language": "Python",
   "level": "200",
   "framework": "Serverless Framework",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates signing the HTTP request using IAM credentials and follow the AWS v4 signing process in order to grant access to the secured endpoint from a public API. AWS API Gateway facilitates all communication with the APIs. For more details refer to this pattern's documentation."
+      "This pattern illustrates the process of signing the HTTP request using IAM credentials and adhering to the AWS v4 signing method. This ensures access to the protected endpoint from a public API. The interaction with APIs is facilitated by AWS API Gateway. For more details refer to this pattern's documentation."
     ]
   },
   "gitHub": {

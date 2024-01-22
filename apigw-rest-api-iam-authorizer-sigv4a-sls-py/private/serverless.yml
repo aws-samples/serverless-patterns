@@ -1,0 +1,32 @@
+service: serverless-land-${self:custom.name}-private
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.12
+
+custom:
+  name: bb245
+  logRetentionInDays: 1
+
+plugins:
+  - serverless-python-requirements
+  - serverless-plugin-log-retention
+
+functions:
+  get-private:
+    handler: app.handler
+    events:
+      - http:
+          path: /private
+          method: get
+          authorizer: aws_iam
+
+resources:
+  Outputs:
+    PrivateApiEndpoint:
+      Value: !Sub 'https://${ApiGatewayRestApi}.execute-api.${aws:region}.amazonaws.com/${sls:stage}/private'
+    PrivateApiGatewayRestApi:
+      Value: !Ref ApiGatewayRestApi
+

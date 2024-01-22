@@ -5,8 +5,8 @@ name = "pypi"
 
 [packages]
 requests = "*"
-botocore = "*"
 [dev-packages]
 boto3 = "*"
+botocore = "*"
 [requires]
-python_version = "3.9"
+python_version = "3.12"

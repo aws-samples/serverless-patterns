@@ -1,0 +1,11 @@
+
+services:
+
+  get-private:
+    path: private
+
+  get-public:
+    path: public
+    params:
+      PrivateApiEndpoint: ${get-private.PrivateApiEndpoint}
+      PrivateApiGatewayRestApi: ${get-private.PrivateApiGatewayRestApi}

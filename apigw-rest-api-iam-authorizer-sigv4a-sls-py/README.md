@@ -1,8 +1,14 @@
-# AWS API Gateway IAM authorization and AWS v4 request signing
+# AWS API Gateway, IAM authorization and AWS v4 request signing
 
-This pattern uses an AWS_IAM authorizer to secure an API endpoint using Python 3 and the Serverless framework. 
-It demonstrates how to sign the HTTP request using IAM credentials and follow the
-[AWS v4 signing process](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-signing.html) in order to grant access to the secured endpoint from a public API. AWS ApiGateway facilitates all communication with the APIs.
+This pattern involves employing an AWS_IAM authorizer to secure an API endpoint through Python 3 and the Serverless framework. 
+It illustrates the process of signing the HTTP request using IAM credentials and adhering to the AWS v4 signing method. 
+This ensures access to the protected endpoint from a public API. 
+The interaction with APIs is facilitated by AWS API Gateway.
+
+**Note**: The pattern employs Lambda behind an APIGW as a Public API. 
+However, even if Lambda is not used in the system, the core considerations remain consistent. 
+The scenario involves a public API making calls to a private API, secured by AWS_IAM. 
+Consequently, the signing process with AWS v4 is essential, irrespective of specific implementation details.
 
 Learn more about this pattern
 at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-lambdas-ddb-authorizer-sigv4a-sls-py).
@@ -31,11 +37,11 @@ AWS costs incurred. No warranty is implied in this example.
     ```commandline
     cd apigw-rest-api-iam-authorizer-sigv4a-sls-py
     ```
-3. Install dependencies:
+3. Install dependencies by navigating to `/private` and `/public` folders and running:
     ```commandline
     pipenv install
     ```
-4. From the command line, install following Serverless (sls) Framework plugins:
+4. From the project root, install following Serverless (sls) Framework plugins:
     ```commandline
     sls plugin install -n serverless-python-requirements
     sls plugin install -n serverless-plugin-log-retention
@@ -43,12 +49,15 @@ AWS costs incurred. No warranty is implied in this example.
    - `serverless-python-requirements` plugin will automatically detect `Pipfile` and pipenv installed and generate a `requirements.txt` file
    - `serverless-plugin-log-retention` plugin will control the retention of serverless function's cloudwatch logs
 
-5. Deploy the AWS resources specified in [serverless.yml](./serverless.yml) for the pattern using:
+5. From the project root, deploy the services specified in [serverless-compose.yml](./serverless-compose.yml) for the pattern using:
    ```commandline
       sls deploy --stage dev --verbose
    ```
-6. Note the outputs from the Serverless deployment process. These contain the resource names and/or ARNs which are used for
-   testing.
+6. The outputs from the Serverless deployment process containing the resource names and/or ARNs which are used for
+   testing can be obtained any time using:
+   ```commandline
+      sls outputs
+   ```
 
 ## How it works
 
@@ -75,13 +84,13 @@ Response:
 HTTP/2.0 200 OK
 content-length: 47
 content-type: application/json
-date: Thu, 18 Jan 2024 02:52:59 GMT
-via: 1.1 a770e75e0ebdb44f23f7a7ef20bbbffa.cloudfront.net (CloudFront)
-x-amz-apigw-id: RtvV4HlsoAMEASw=
-x-amz-cf-id: 7XFrsfopdXijC-PgWWDUOTRUcSVRqWCTanaomRTphlzgXJHUEQ-TIQ==
-x-amz-cf-pop: IAD55-P1
-x-amzn-requestid: 64422709-d4f1-43a5-8613-5215d0e30617
-x-amzn-trace-id: Root=1-65a8928b-0b4c78e27eb050ee2d760ad3;Sampled=0;lineage=c10ff951:0
+date: Sat, 27 Jan 2024 22:25:36 GMT
+via: 1.1 f762d56afc88f7f52f51da3b63ad4658.cloudfront.net (CloudFront)
+x-amz-apigw-id: SOFjIFt9oAMEW5Q=
+x-amz-cf-id: plGeuXjziKSzYMtMx5laDkMVzrJJWPstajMWT-rCiyw2FY6sDkT7Aw==
+x-amz-cf-pop: IAD50-C2
+x-amzn-requestid: 767b548d-c1d2-404c-913a-0a730553019d
+x-amzn-trace-id: Root=1-65b582e0-3d9b1e793369a0f811c5ca7c;Sampled=0;lineage=0cf5a4d5:0
 x-cache: Miss from cloudfront
 
 {
@@ -92,12 +101,12 @@ x-cache: Miss from cloudfront
 When `GET /private` is directly called as:
 
 ```commandline
-xh https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/private
+xh https://${PrivateApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/private
 ```
 _Or_
 
 ```commandline
-curl -i --request GET --url https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/private
+curl -i --request GET --url https://${PrivateApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/private
 ```
 
 Response:
@@ -106,13 +115,13 @@ Response:
 HTTP/2.0 403 Forbidden
 content-length: 42
 content-type: application/json
-date: Thu, 18 Jan 2024 02:56:18 GMT
-via: 1.1 6e44ac4753bea102fe3aae286f68acfe.cloudfront.net (CloudFront)
-x-amz-apigw-id: Rtv0-HmFoAMEm8g=
-x-amz-cf-id: MiZeGJuX9zPl9o8gIhWx0OgmBSLDASwapI2PFLNX1kSpWiRWaYdvMg==
-x-amz-cf-pop: IAD55-P1
+date: Sat, 27 Jan 2024 22:25:17 GMT
+via: 1.1 64287378cade03feddd2042bfe0ee6a4.cloudfront.net (CloudFront)
+x-amz-apigw-id: SOFgFFoEoAMERDw=
+x-amz-cf-id: rl2Okhix_AnRpaZH9hp3xvAIF0RrA-a3bJJwfRyFj4Ii17c-HewH3Q==
+x-amz-cf-pop: IAD79-C3
 x-amzn-errortype: MissingAuthenticationTokenException
-x-amzn-requestid: 3aa6efbe-6824-436d-8433-a0af57435fcf
+x-amzn-requestid: 6feb0801-eb82-455d-ad49-dae1516a6b7e
 x-cache: Error from cloudfront
 
 {
