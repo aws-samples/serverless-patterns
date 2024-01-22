@@ -1,5 +1,5 @@
 {
-    "title": "Amazon EventBridge Scheduler remove One time Schedule",
+    "title": "Amazon EventBridge Scheduler remove one time schedule",
     "description": "Amazon EventBridge Scheduler job runs every five minutes to identify and delete one time Amazon EventBridge Scheduler jobs expired more than 7 days.",
     "language": "Python",
     "level": "300",
@@ -7,8 +7,8 @@
     "introBox": {
         "headline": "How it works",
         "text": [
-            "Amazon EventBridge Scheduler job runs every five minutes and uses AWS Lambda to identify and delete one time Amazon EventBridge Scheduler jobs that are expired more than 7 days",
-            "Scheduler job sends a Amazon Simple Notification Service to send email notification once the activity is completed.",
+            "Amazon EventBridge Scheduler job runs every five minutes and uses AWS Lambda to identify and delete one time Scheduler jobs that are expired more than 7 days",
+            "Scheduler job uses Amazon Simple Notification Service to send email notification once the activity is complete.",
             "This pattern deploys AWS Lambda, Amazon EventBridge Scheduler(one recurring ,and two one-time jobs) and Amazon Simple Notification Service"
         ]
     },
