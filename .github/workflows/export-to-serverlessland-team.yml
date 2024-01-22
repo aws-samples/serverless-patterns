@@ -13,12 +13,12 @@ on:
 jobs:
   copy:
     runs-on: ubuntu-latest
-	uses: tspascoal/get-user-teams-membership@v2
-	id: checkUserMember
-	with:
-	  username: ${{ github.actor }}
-	  team: 'aws-serverless-da'
-      GITHUB_TOKEN: ${{ secrets.GET_USER_TEAMS_MEMBERSHIP }}
+    uses: tspascoal/get-user-teams-membership@v2
+      id: checkUserMember
+      with:
+        username: ${{ github.actor }}
+        team: 'aws-serverless-da'
+        GITHUB_TOKEN: ${{ secrets.GET_USER_TEAMS_MEMBERSHIP }}
     if: ${{ steps.checkUserMember.outputs.isTeamMember == 'true' }}
     env:
       NODE_ENV: dev
