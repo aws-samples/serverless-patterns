@@ -1,6 +1,6 @@
 {
-    "title": "WebSocket API Cognito Authentication using Lambda Authorizer",
-    "description": "This pattern demonstrates how to integrate Cognito authentication with Amazon API Gateway WebSocket API.",
+    "title": "Amazon Cognito authentication with Amazon API Gateway Websockets",
+    "description": "How to integrate Cognito authentication with Amazon API Gateway WebSocket API.",
     "language": ".NET",
     "level": "200",
     "framework": "SAM",
@@ -8,7 +8,7 @@
         "headline": "How it works",
         "text": [
             "This pattern demonstrates how to integrate Cognito authentication with Amazon API Gateway WebSocket API.",
-            "It includes the Lambda implementations for Lambda Authorizer, Lambda functions for $connect, $disconnect and custom route, and AWS Serverless Application Model (SAM) code to deploy backend infrastructure."
+            "It includes the Lambda implementations for Lambda authorizer, Lambda functions for $connect, $disconnect and custom route, and AWS Serverless Application Model (SAM) code to deploy backend infrastructure."
         ]
     },
     "gitHub": {
@@ -28,12 +28,12 @@
     },
     "testing": {
         "text": [
-            "See the Github repo for detailed testing instructions."
+            "See the GitHub repo for detailed testing instructions."
         ]
     },
     "cleanup": {
         "text": [
-            "Delete the stack: sam delete"
+            "sam delete"
         ]
     },
     "authors": [
