@@ -26,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd stepfunctions-httpendpoint-sam
     ```
-3. Please update the `<USER_UPDATE_ME>` and `<PASSWORD_UPDATE_ME>` in `template.yaml` file with the Strip test user based on [Stripe Documentation](https://stripe.com/docs/connect/express-accounts). At the time of writing, as per the documentation the `USER_UPDATE_ME` is `sk_test_4eC39HqLyjWDarjtT1zdp7dc` and `PASSWORD_UPDATE_ME` is ` ` i.e. empty string. Please refer to the Stripe documentation for latest details.
+3. Please update the `<USER_UPDATE_ME>` and `<PASSWORD_UPDATE_ME>` in `template.yaml` file with the Strip test user based on [Stripe Documentation](https://stripe.com/docs/connect/express-accounts). At the time of writing, as per the documentation the `USER_UPDATE_ME` is `sk_test_4eC39HqLyjWDarjtT1zdp7dc` and `PASSWORD_UPDATE_ME` can be a random string. It is not validated from Stripe but it can not be set to empty as Amazon EventBridge API Connection with empty password. Please refer to the Stripe documentation for latest user details.
 
 4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
