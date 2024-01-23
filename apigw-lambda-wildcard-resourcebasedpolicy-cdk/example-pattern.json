@@ -45,23 +45,5 @@
             "bio": "I am Saborni working as a Cloud Engineer at AWS SE Serverless.",
             "linkedin": "saborni-bhattacharya-5b523812a"
         }
-    ],
-    "patternArch": {
-        "icon1": {
-            "x": 20,
-            "y": 50,
-            "service": "apigw",
-            "label": "API Gateway REST API"
-        },
-        "icon2": {
-            "x": 80,
-            "y": 50,
-            "service": "lambda",
-            "label": "AWS Lambda"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2"
-        }
-    }
+    ]
 }
