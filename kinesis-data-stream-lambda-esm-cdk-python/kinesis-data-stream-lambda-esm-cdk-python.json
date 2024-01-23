@@ -7,7 +7,7 @@
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This pattern demonstrates the ability configure Amazon Kinesis as an event source for AWS Lambda to use event filtering to control which records are sent to your function for processing.",
+            "This pattern shows how to configure Amazon Kinesis as an event source for AWS Lambda and use event filtering to control which records are sent to your function for processing.",
             "This pattern deploys a Kinesis data stream and Lambda functions that are subscribed to the stream with different event filter configurations."
         ]
     },
@@ -26,11 +26,11 @@
                 "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
             },
             {
-                "text": "Lambda event source mappings",
+                "text": "AWS Lambda event source mappings",
                 "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
             },
             {
-                "text": "Filtering Kinesis events",
+                "text": "Filtering Amazon Kinesis events",
                 "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html"
             }
         ]
@@ -47,7 +47,7 @@
     },
     "cleanup": {
         "text": [
-            "cdk destroy"
+            "Delete the stack: <code>cdk destroy --all</code>."
         ]
     },
     "authors": [
