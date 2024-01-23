@@ -34,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 5. During the prompts:
     * Enter a stack name
-    * Enter `us-east-1` or any AWS Region where you have access. 
+    * Enter `us-east-1` or any AWS Region where you have access. Please refer to the list of supported regions for `Invoke public HTTPS endpoints and test individual states` feature in [recent feature launches](https://docs.aws.amazon.com/step-functions/latest/dg/recent-launches.html) 
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
