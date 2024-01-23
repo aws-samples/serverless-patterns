@@ -29,7 +29,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 4. During the prompts:
     * Enter a stack name
-    * Enter `us-east-1` or any other AWS Region. 
+    * Enter `us-east-1` or any other supported AWS Region. Please refer to the list of supported regions for `Invoke public HTTPS endpoints and test individual states` feature in [recent feature launches](https://docs.aws.amazon.com/step-functions/latest/dg/recent-launches.html) 
     * Allow SAM CLI to create IAM roles with the required permissions. Please keep all other options to default.
 5. Make a note of the output, which will be used during testing.
 
