@@ -55,6 +55,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cdk deploy
     ```
+    Optionally you can add the optional variables using the `--context`, see [API Gateway Configuration](#API-Gateway-Configuration) and [Cognito Integration and Configuration](#Cognito-Integration-and-Configuration).
+    ```
+    cdk deploy --context API_THROTTLE_RATE_LIMIT=1 --context API_THROTTLE_BURST_LIMIT=2 --context API_QUOTA_LIMIT=25 --context API_QUOTA_PERIOD=DAY --context ORGANIZATION_DOMAIN=@example.com
+    ```    
 9. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
@@ -80,7 +84,7 @@ This pattern deploys an Amazon API Gateway REST API with the following routes: `
 - These limits can be modified during deployment using context variables (`API_THROTTLE_RATE_LIMIT`, `API_THROTTLE_BURST_LIMIT`, `API_QUOTA_LIMIT`, `API_QUOTA_PERIOD`)
 - Logging: Enabled for all Error and Info request logs.
 
-#### Cognito Integration
+#### Cognito Integration and Configuration
 - User Pool: Manages user registration and login.
 - Organization Domain Restriction: The organization domain restriction can be adjusted during deployment using the context variable `ORGANIZATION_DOMAIN`. A Pre SignUp Lambda trigger will be added to enforce specific domain restrictions.
 
