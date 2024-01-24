@@ -16,8 +16,8 @@
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-eventbridge-pipes-sqs-to-stepfunctions-filter-transform-python",
       "templateURL": "serverless-patterns/cdk-eventbridge-pipes-sqs-to-stepfunctions-filter-transform-python",
-      "projectFolder": "eventbridge_pipes_sqs_to_stepfunctions_python",
-      "templateFile": "eventbridge_pipes_sqs_to_stepfunctions_python_stack.py"
+      "projectFolder": "src",
+      "templateFile": "src/cdkstack.py"
     }
   },
   "resources": {
