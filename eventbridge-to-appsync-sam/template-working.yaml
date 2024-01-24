@@ -1,0 +1,117 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Sample SAM Template for EventBus, AppSync API, and EventBridge Rule with targets
+
+Resources:
+  # EventBus Resource
+  MyEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: MyCustomEventBus
+
+  # AppSync API Resource
+  MyGraphQlApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: MyGraphQLApi
+      AuthenticationType: AWS_IAM
+
+  # AppSync API GraphQL Schema
+  MyGraphQlApiSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt MyGraphQlApi.ApiId
+      DefinitionS3Location: './schema.graphql'
+
+  # AppSync Data Source for DynamoDB
+  AppSyncNotesTableDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      Name: NoneDataSource
+      ApiId: !GetAtt MyGraphQlApi.ApiId
+      Description: "None"
+      Type: NONE
+
+  # Resolver: Query - get one note
+  AppSyncMutationResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: MyGraphQlApiSchema
+    Properties:
+      ApiId: !GetAtt MyGraphQlApi.ApiId
+      TypeName: Mutation
+      FieldName: publish
+      DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "payload": {
+              "name": "$context.arguments.name",
+              "data": $util.toJson($context.arguments.data)
+          }
+        }
+      ResponseMappingTemplate: "$util.toJson($context.result)"    
+
+  TargetDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: eventbridge-appsync-dlq
+
+  # EventBridge Rule with two targets: CloudWatch Logs and AppSync API
+  MyEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref MyEventBus
+      EventPattern:
+        source:
+          - "my.source"
+      Targets:
+        - Id: "Target1"
+          Arn: !GetAtt MyCloudWatchLogGroup.Arn
+        - Id: "Target2"
+          Arn: !GetAtt MyGraphQlApi.GraphQLEndpointArn
+          RoleArn: !GetAtt MyInvocationRole.Arn
+          DeadLetterConfig:
+            Arn: !GetAtt TargetDLQ.Arn
+          InputTransformer:
+            InputPathsMap:
+              data: "$.source"
+              name: "$.source"
+            InputTemplate: "{\"data\": <data>, \"name\": <name>}"
+          AppSyncParameters:
+            GraphQLOperation: "mutation Publish($data:String!,$name:String!){publish(data:$data,name:$name){data name}}"
+
+
+  # CloudWatch Log Group as a target
+  MyCloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/events/my-custom-log-group
+
+  # IAM Role for invoking the AppSync API
+  MyInvocationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AppSyncInvokePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: appsync:GraphQL
+                Resource: !Sub "${MyGraphQlApi.Arn}/*"
+
+Outputs:
+  EventBusName:
+    Description: "Name of the event bus"
+    Value: !Ref MyEventBus
+  GraphQLApiUrl:
+    Description: "URL of the GraphQL API"
+    Value: !GetAtt MyGraphQlApi.GraphQLUrl

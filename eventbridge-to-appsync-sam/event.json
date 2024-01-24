@@ -1,0 +1,9 @@
+[
+    {
+      "Source": "my.source",
+      "DetailType": "testing",
+      "Detail": "{ \"key1\": \"value1\", \"key2\": \"value2\" }",
+      "EventBusName": "MyCustomEventBus"
+    }
+  ]
+  

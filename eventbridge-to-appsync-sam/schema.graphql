@@ -1,0 +1,30 @@
+type EventBridgeEvent {
+	version: String!
+	id: String!
+	detailType: String!
+	source: String!
+	account: String!
+	time: String!
+	region: String!
+	resources: [String]
+	detail: AWSJSON!
+}
+
+type Event {
+	id: String
+	detailType: String
+	data: AWSJSON
+}
+
+type Mutation {
+	publish(detailType: String!, id:String! data: String!): Event
+}
+
+type Query {
+	getEvent: Event
+}
+
+type Subscription {
+	subscribe(detailType: String!): Event
+		@aws_subscribe(mutations: ["publish"])
+}
