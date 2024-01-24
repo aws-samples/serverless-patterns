@@ -25,10 +25,6 @@
       {
         "text": "Using the HTTP Endpoint Task",
         "link": "https://aws.amazon.com/blogs/aws/external-endpoints-and-testing-of-task-states-now-available-in-aws-step-functions/#:~:text=HTTPS%20endpoints,-HTTPS%20endpoints%20are&text=Step%20Functions%20invokes%20the%20HTTP,such%20as%20GET%20or%20POST."
-      },
-      {
-        "text": "Call APIs From Step Functions using SAM",
-        "link": "https://www.andmore.dev/blog/http-invoke-with-sam/"
       }
     ]
   },
