@@ -1,0 +1,76 @@
+{
+  "StartAt": "Call HTTP Invoke Task",
+  "States": {
+    "Call HTTP Invoke Task": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::http:invoke",
+      "Parameters": {
+        "Method": "GET",
+        "Authentication": {
+          "ConnectionArn": "${OpenWeatherConnectionArn}"
+        },
+        "ApiEndpoint": "${OpenWeatherBaseUrl}",
+        "QueryParameters": {
+          "lat.$": "$.latitude",
+          "lon.$": "$.longitude",
+          "units": "imperial"
+        }
+      },
+      "ResultSelector": {
+        "temperature.$": "$.ResponseBody.main.temp"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "BackoffRate": 2,
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "What Should I Wear?"
+    },
+    "What Should I Wear?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.temperature",
+              "NumericGreaterThanEquals": 55
+            },
+            {
+              "Variable": "$.temperature",
+              "NumericLessThan": 70
+            }
+          ],
+          "Next": "Light Jacket"
+        },
+        {
+          "Variable": "$.temperature",
+          "NumericGreaterThanEquals": 70,
+          "Next": "No Jacket"
+        },
+        {
+          "Variable": "$.temperature",
+          "NumericLessThan": 55,
+          "Next": "Warm Jacket"
+        }
+      ]
+    },
+    "Light Jacket": {
+      "Type": "Pass",
+      "End": true
+    },
+    "No Jacket": {
+      "Type": "Pass",
+      "End": true
+    },
+    "Warm Jacket": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}

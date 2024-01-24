@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Should I Wear A Jacket Service
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  OpenWeatherBaseUrl:
+    Type: String
+    Default: https://api.openweathermap.org/data/2.5/weather
+  OpenWeatherAPIKey:
+    Type: String
+    NoEcho: true
+
+Resources:
+##########################################################################
+#   Event Bridge Connection                                                     #
+##########################################################################
+  OpenWeatherConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: Authorization
+          ApiKeyValue: !Ref OpenWeatherAPIKey
+        InvocationHttpParameters:
+          QueryStringParameters:
+            - IsValueSecret: true
+              Key: appid
+              Value: !Ref OpenWeatherAPIKey
+
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+  ShouldIWearAJacketStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      DefinitionUri: ./src/step-function.asl.json
+      DefinitionSubstitutions:
+        OpenWeatherBaseUrl: !Ref OpenWeatherBaseUrl
+        OpenWeatherConnectionArn: !GetAtt OpenWeatherConnection.Arn
+      Policies:
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:DescribeSecret
+                - secretsmanager:GetSecretValue
+              Resource: !GetAtt OpenWeatherConnection.SecretArn
+            - Effect: Allow
+              Action:
+                - events:RetrieveConnectionCredentials
+              Resource: !GetAtt OpenWeatherConnection.Arn
+            - Effect: Allow
+              Action:
+                - states:InvokeHTTPEndpoint
+              Resource: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:ShouldIWearAJacketStateMachine*
+              Condition:
+                StringEquals:
+                  states:HTTPMethod: GET
+                StringLike:
+                  states:HTTPEndpoint: !Ref OpenWeatherBaseUrl
+
+Outputs:
+  StepFunction:
+    Description: Arn for the step function
+    Value: !Ref ShouldIWearAJacketStateMachine
