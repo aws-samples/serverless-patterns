@@ -1,5 +1,7 @@
 # EventBridge to AppSync (Realtime subscriptions)
 
+![alt](./architecture.png)
+
 This pattern creates a new GraphQL AppSync URL that can be subscribed to with events from EventBridge. EventBridge target to AppSync is configured.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-to-appsync-sam
