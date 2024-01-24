@@ -1,0 +1,59 @@
+{
+  "title": "HTTP Endpoint Task From Step Function with SAM  ",
+  "description": "Create a Step Functions workflow that calls an API using the HTTP Endpoint task.",
+  "language": "ASL",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Start the Step Function with the latitude and longitude of the location you want to get the temperature from in the input payload.",
+      "The step function will call the API using the HTTP Endpoint task and check what type of jacket you will need.",
+      "You will get the execution ARN and the start date."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-http-endpoint",
+      "templateURL": "serverless-patterns/sfn-http-endpoint",
+      "projectFolder": "sfn-http-endpoint",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using the HTTP Endpoint Task",
+        "link": "https://aws.amazon.com/blogs/aws/external-endpoints-and-testing-of-task-states-now-available-in-aws-step-functions/#:~:text=HTTPS%20endpoints,-HTTPS%20endpoints%20are&text=Step%20Functions%20invokes%20the%20HTTP,such%20as%20GET%20or%20POST."
+      },
+      {
+        "text": "Call APIs From Step Functions using SAM",
+        "link": "https://www.andmore.dev/blog/http-invoke-with-sam/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Andres Moreno",
+      "image": "./andres-moreno.png",
+      "bio": "Andres is a principal software engineer for Tyler Technologies. Andres has been working with Serverless on AWS since 2018 and is big on API First and Serverless First patterns.",
+      "linkedin": "andmoredev",
+      "twitter": "andmoredev"
+    }
+  ]
+}
