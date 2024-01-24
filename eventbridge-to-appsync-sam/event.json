@@ -1,9 +1,8 @@
 [
-    {
-      "Source": "my.source",
-      "DetailType": "testing",
-      "Detail": "{ \"key1\": \"value1\", \"key2\": \"value2\" }",
-      "EventBusName": "MyCustomEventBus"
-    }
-  ]
-  
+  {
+    "Source": "app.orders",
+    "DetailType": "OrderPlaced",
+    "Detail": "{ \"orderId\": \"123\", \"value\": \"10\" }",
+    "EventBusName": "EventBridgeAppSyncDemoBus"
+  }
+]

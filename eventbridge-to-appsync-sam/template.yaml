@@ -1,20 +1,21 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Sample SAM Template for EventBus, AppSync API, and EventBridge Rule with targets
+  Sample SAM template to connect AppSync as an EventBridge target
 
 Resources:
   # EventBus Resource
-  MyEventBus:
+  EventBus:
     Type: AWS::Events::EventBus
     Properties:
-      Name: MyCustomEventBus
+      Name: EventBridgeAppSyncDemoBus
 
   # AppSync API Resource
   MyGraphQlApi:
     Type: AWS::AppSync::GraphQLApi
     Properties:
       Name: MyGraphQLApi
+      # AppSync targets only support AWS_IAM auth https://docs.aws.amazon.com/eventbridge/latest/userguide/target-appsync.html
       AuthenticationType: AWS_IAM
 
   # AppSync API GraphQL Schema
@@ -24,7 +25,6 @@ Resources:
       ApiId: !GetAtt MyGraphQlApi.ApiId
       DefinitionS3Location: './schema.graphql'
 
-  # AppSync Data Source for DynamoDB
   AppSyncNotesTableDataSource:
     Type: AWS::AppSync::DataSource
     Properties:
@@ -33,7 +33,7 @@ Resources:
       Description: "None"
       Type: NONE
 
-  # Resolver: Query - get one note
+  # Mutation resolver
   AppSyncMutationResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: MyGraphQlApiSchema
@@ -42,25 +42,23 @@ Resources:
       TypeName: Mutation
       FieldName: publish
       DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+      # Map the request into the desired payload
       RequestMappingTemplate: |
         {
           "version": "2017-02-28",
           "payload": {
-              "detailType": "$context.arguments.detailType",
               "id": "$context.arguments.id",
+              "source": "$context.arguments.source",
+              "account": "$context.arguments.account",
+              "time": "$context.arguments.time",
+              "region": "$context.arguments.region",
+              "detailType": "$context.arguments.detailType",
               "data": "$context.arguments.data"
           }
         }
-      # ResponseMappingTemplate: "$util.toJson($context.result)"    
       ResponseMappingTemplate: "$util.toJson($context.result)"    
-      # ResponseMappingTemplate: |
-      #   #set($result = $context.result)
-      #   {
-      #     "id": "$result.data.id",
-      #     "detailType": "$result.detailType",
-      #     "data": "$result.data"
-      #   }
 
+  # DLQ for the AppSync integration     
   TargetDLQ:
     Type: AWS::SQS::Queue
     Properties:
@@ -70,26 +68,35 @@ Resources:
   MyEventRule:
     Type: AWS::Events::Rule
     Properties:
-      EventBusName: !Ref MyEventBus
+      EventBusName: !Ref EventBus
       EventPattern:
+        # Listen to all events by this source, change this to what you want.
         source:
-          - "my.source"
+          - "app.orders"
       Targets:
+        # First target is CloudWatch for logging
         - Id: "Target1"
           Arn: !GetAtt MyCloudWatchLogGroup.Arn
+        # Second target is AppSync  
         - Id: "Target2"
           Arn: !GetAtt MyGraphQlApi.GraphQLEndpointArn
           RoleArn: !GetAtt MyInvocationRole.Arn
           DeadLetterConfig:
             Arn: !GetAtt TargetDLQ.Arn
           InputTransformer:
+            ## Map the fields required for mutation
             InputPathsMap:
               id: "$.id"
+              source: "$.source"
+              account: "$.account"
+              time: "$.time"
+              region: "$.region"
               data: "$"
               detailType: "$.detail-type"
-            InputTemplate: "{\"data\": <data>, \"detailType\": <detailType>, \"id\": <id>}"
+            InputTemplate: "{\"data\": <data>, \"detailType\": <detailType>, \"id\": <id>, \"source\": <source>, \"account\": <account>, \"time\": <time>,\"region\": <region>}"
+          # Mutation opreation EventBridge will do on your behalf, mapping to the publish schema.  
           AppSyncParameters:
-            GraphQLOperation: "mutation Publish($data:String!,$detailType:String!,$id:String!){publish(data:$data,detailType:$detailType, id:$id){data detailType id}}"
+            GraphQLOperation: "mutation Publish($data:String!,$detailType:String!,$id:String!,$source:String!,$account:String!,$time:String!,$region:String!){publish(data:$data,detailType:$detailType,id:$id,source:$source,account:$account,time:$time,region:$region){data detailType id source account time region}}"
 
 
   # CloudWatch Log Group as a target
@@ -121,7 +128,7 @@ Resources:
 Outputs:
   EventBusName:
     Description: "Name of the event bus"
-    Value: !Ref MyEventBus
+    Value: !Ref EventBus
   GraphQLApiUrl:
     Description: "URL of the GraphQL API"
     Value: !GetAtt MyGraphQlApi.GraphQLUrl
