@@ -1,6 +1,6 @@
 openapi: "3.0.1"
 info:
-  title: "DynamoDB Crud API with Canary releases"
+  title: "DynamoDB Crud API"
   version: "1.0.0"
 paths:
   /pets/{id}:
