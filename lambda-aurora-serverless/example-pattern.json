@@ -1,7 +1,7 @@
 {
   "title": "AWS Lambda and Amazon Aurora Serverless v1",
   "description": "Creates a Lambda function with access to an Amazon Aurora Serverless v1 DB cluster.",
-  "language": "Node",
+  "language": "Node.js",
   "level": "200",
   "framework": "SAM",
   "introBox": {
