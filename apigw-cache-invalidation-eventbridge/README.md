@@ -57,7 +57,7 @@ sam list outputs
 }
 ```
 
-- Using the returned ID, you can do a GET request to the endpoint `<endpoint>/<returned ID>` to fetch the record.
+- Using the returned ID, you can do a GET request to the endpoint `<endpoint>/pets/<returned ID>` to fetch the record.
 - Available endpoints are:
   - < endpoint >/pets:GET - lists all items
   - < endpoint >/pets:POST - creates an item
