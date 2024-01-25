@@ -50,7 +50,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - transcribe:*
+                  - transcribe:StartMedicalScribeJob
                 Resource: !Sub arn:aws:transcribe:${AWS::Region}:${AWS::AccountId}:*
               - Effect: Allow
                 Action:

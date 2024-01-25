@@ -107,6 +107,7 @@ This code asset has dependency on boto3 v1.34.26 or above. This is not the curre
 
 
 Please refer to the architecture diagram below:
+
 ![End to End Architecture](images/architecture.png)
 
 Here's a breakdown of the steps:
