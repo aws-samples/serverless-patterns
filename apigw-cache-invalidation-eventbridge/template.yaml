@@ -156,9 +156,10 @@ Resources:
       MethodSettings:
         - HttpMethod: GET
           # CachingEnabled: true
-          # CacheTtlInSeconds: 300
+          # CacheTtlInSeconds: 300 # 5 minutes
           ResourcePath: "/pets/{id}"
           LoggingLevel: INFO
+          DataTraceEnabled: true
       DefinitionBody:
         "Fn::Transform":
           Name: "AWS::Include"
