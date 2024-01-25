@@ -19,15 +19,15 @@ Important: this application uses various AWS services and there are costs associ
    ```
    git clone https://github.com/aws-samples/serverless-patterns
    ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
    ```
-   cd _patterns-model
+   cd apigw-cache-invalidation-eventbridge
    ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```
    sam deploy --guided
    ```
-1. During the prompts:
+4. During the prompts:
 
    - Enter a stack name
    - Enter the desired AWS Region
@@ -35,7 +35,7 @@ Important: this application uses various AWS services and there are costs associ
 
    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
