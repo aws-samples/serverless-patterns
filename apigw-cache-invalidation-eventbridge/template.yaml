@@ -1,0 +1,171 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - API Gateway, DynamoDB & EventBridge Cache Invalidation
+
+Resources:
+  PetTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+  PetTableRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "apigateway.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: DDBCrudPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              Action:
+                - dynamodb:DeleteItem
+                - dynamodb:UpdateItem
+                - dynamodb:CreateItem
+                - dynamodb:GetItem
+                - dynamodb:Scan
+                - dynamodb:Query
+              Effect: Allow
+              Resource: !GetAtt PetTable.Arn
+
+  PetEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "PetEventBus"
+
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: pipes.amazonaws.com
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-SourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action: dynamodb:ListStreams
+                Effect: Allow
+                Resource: "*"
+              - Action:
+                  - dynamodb:DescribeStream
+                  - dynamodb:GetRecords
+                  - dynamodb:GetShardIterator
+                Effect: Allow
+                Resource: !GetAtt PetTable.StreamArn
+              - Action: events:PutEvents
+                Effect: Allow
+                Resource: !GetAtt PetEventBus.Arn
+
+  PetModifyPipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Description: "Product Event Bus Modify Pipe for DynamoDB to EventBus"
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt PetTable.StreamArn
+      Target: !GetAtt PetEventBus.Arn
+      SourceParameters:
+        DynamoDBStreamParameters:
+          BatchSize: 1
+          StartingPosition: LATEST
+        FilterCriteria:
+          Filters:
+            - Pattern: '{"eventName":["MODIFY"]}'
+      TargetParameters:
+        EventBridgeEventBusParameters:
+          DetailType: PetUpdated
+          Source: com.acme.pet
+        InputTemplate: '{ "metadata":{ "service": "pet-service", "correlationId": "<$.eventID>" }, "data": { "id": <$.dynamodb.NewImage.id.S>}}'
+
+  CacheInvalidationTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: AllowAPIGatewayAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "execute-api:InvalidateCache"
+                  - "execute-api:Invoke"
+                Resource: !Sub
+                  - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIId}/Prod/GET/pets/*"
+                  - APIId: !Ref Api
+
+  CacheInvalidationRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Cache Invalidation Rule"
+      EventBusName: !GetAtt PetEventBus.Name
+      EventPattern:
+        source:
+          - com.acme.pet
+        detail-type:
+          - PetUpdated
+      Targets:
+        - Id: APIGatewayTarget
+          Arn: !Sub
+            - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIId}/Prod/GET/pets/*"
+            - APIId: !Ref Api
+          RoleArn: !GetAtt CacheInvalidationTargetRole.Arn
+          HttpParameters:
+            HeaderParameters:
+              Cache-Control: max-age=0
+            PathParameterValues:
+              - $.detail.data.id
+          DeadLetterConfig:
+            Arn: !GetAtt CacheInvalidationTargetDeadLetterQueue.Arn
+
+  CacheInvalidationTargetDeadLetterQueue:
+    Type: AWS::SQS::Queue
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      # CacheClusterEnabled: true
+      # CacheClusterSize: "0.5"
+      MethodSettings:
+        - HttpMethod: GET
+          # CachingEnabled: true
+          # CacheTtlInSeconds: 300
+          ResourcePath: "/pets/{id}"
+          LoggingLevel: INFO
+      DefinitionBody:
+        "Fn::Transform":
+          Name: "AWS::Include"
+          Parameters:
+            Location: "./api.yaml"
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
