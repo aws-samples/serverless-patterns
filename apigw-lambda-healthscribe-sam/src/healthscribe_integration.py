@@ -1,14 +1,10 @@
 import os
 import boto3
 from botocore.exceptions import ClientError
-# import time
 import uuid
 import json
 
 transcribe = boto3.client('transcribe')
-# job_name = "my-first-medical-scribe-job"
-# job_uri = "s3://healthscribe-conversation/conversation.mp3"
-# output_bucket = "healthscribe-conversation"   
 
 
 def lambda_handler(event, context):

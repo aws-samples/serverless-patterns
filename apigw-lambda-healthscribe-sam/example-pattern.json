@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway to AWS Lambda to AWS HealthScribe using SAM",
-  "description": "Showcases how to use AWS HealthScribe API to automatically generate clinical notes from patient-clinician conversations in serverless architecture.",
+  "description": "How to use AWS HealthScribe API to automatically generate clinical notes from patient-clinician conversations in a serverless architecture.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",

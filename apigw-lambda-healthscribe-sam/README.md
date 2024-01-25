@@ -2,7 +2,7 @@
 
 This sample project deploys an Amazon API Gateway REST API with an AWS Lambda integration. The Lambda function is written in Python, calls the AWS HealthScribe API to automatically generate clinical notes from patient-clinician conversations.
 
-Learn more about this pattern at Serverless Land Patterns: serverlessland.com/patterns/apigw-lambda-healthscribe-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-healthscribe-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -14,7 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
 ## Prerequisite
-This code asset has dependency on boto3 v1.34.26 or above. This is not the current default version of boto3 on AWS Lambda. Hence we will use Lambda layer. Please refer [API Documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/transcribe/client/start_medical_scribe_job.html).  
+This code asset has a dependency on [boto3 v1.34.26](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/transcribe/client/start_medical_scribe_job.html) or above. This is not the current default version of boto3 on AWS Lambda. Hence we will use a Lambda layer.
 
 ## Deployment Instructions
 
@@ -33,7 +33,7 @@ This code asset has dependency on boto3 v1.34.26 or above. This is not the curre
 4. During the prompts:
 
    - Enter a stack name
-   - Enter the desired AWS Region. At the time of developing this sample application, AWS HealthScribe is GA in `us-east-1` only. So please check the service availability while selecting region.
+   - Enter the desired AWS Region. At the time of developing this sample application, AWS HealthScribe is only generally available in the `us-east-1` region. So please check the service availability while selecting a region.
    - Allow SAM CLI to create IAM roles with the required permissions.
 
    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -43,7 +43,7 @@ This code asset has dependency on boto3 v1.34.26 or above. This is not the curre
    For production applications, you should [enable authentication for the API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html) using one of several available options and [follow the API Gateway security best practices](https://docs.aws.amazon.com/apigateway/latest/developerguide/security-best-practices.html).
 
 5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for next step as well as testing.
-6. Run the `create_lambda_layer.sh`. You may have to change the file permission to make it executable.  This will create the lambda layer with necessary boto3 api for calling AWS HealthScribe API.
+6. Run the `create_lambda_layer.sh`. You may have to change the file permission to make it executable.  This will create the Lambda layer with the necessary boto3 version for calling AWS HealthScribe API.
    ```bash
    bash create_lambda_layer.sh
    ```
@@ -116,7 +116,7 @@ Here's a breakdown of the steps:
 
 2. **AWS Lambda**: The function calls AWS HealthScribe API using boto3 to start the medical scribe job. 
 
-3. **AWS HealthScribe**: Analyses the patient-clinician conversations audio file from Amazon S3 bucket and generates clinical notes from patient-clinician conversations. It then uploads the the clinical note in a JSON format into a given S3 bucket.
+3. **AWS HealthScribe**: Analyses the patient-clinician conversations audio file from Amazon S3 bucket and generates clinical notes from patient-clinician conversations. It then uploads the the clinical note in JSON format to a given S3 bucket.
 
 
 ## Testing
@@ -152,7 +152,7 @@ Here's a breakdown of the steps:
 
 ## Cleanup
 
-1. Delete content of the Amazon S3 bucket using the following command:
+1. Delete the content in the Amazon S3 bucket using the following command. Please *ensure* that the correct bucket name is provided to avoid accidental data loss:
    ```bash
    aws s3 rm s3://{TranscribeNotesBucket} --recursive
    ```

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: This SAM template is used generating generate clinical notes from patient-clinician conversations using AWS HealthScribe API.
+Description: This SAM template is used to generate clinical notes from patient-clinician conversations using AWS HealthScribe API.
 Resources:
   GenerateClinicalNotesAPI:
     Type: AWS::Serverless::Api
