@@ -15,6 +15,9 @@ paths:
         "200":
           description: "200 response"
           content: {}
+          headers:
+            cache-timestamp:
+              type: "string"
       x-amazon-apigateway-integration:
         type: "aws"
         credentials:
@@ -29,6 +32,8 @@ paths:
         responses:
           default:
             statusCode: "200"
+            responseParameters:
+              method.response.header.cache-timestamp: "integration.response.header.Date"
             responseTemplates:
               application/json:
                 "#set($inputRoot = $input.path('$')) {\n  \"id\":\
