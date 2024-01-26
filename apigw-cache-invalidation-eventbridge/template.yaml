@@ -151,12 +151,12 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      # CacheClusterEnabled: true
-      # CacheClusterSize: "0.5"
+      CacheClusterEnabled: true
+      CacheClusterSize: "0.5"
       MethodSettings:
         - HttpMethod: GET
-          # CachingEnabled: true
-          # CacheTtlInSeconds: 300 # 5 minutes
+          CachingEnabled: true
+          CacheTtlInSeconds: 3600 # 1 hour
           ResourcePath: "/pets/{id}"
           LoggingLevel: INFO
           DataTraceEnabled: true

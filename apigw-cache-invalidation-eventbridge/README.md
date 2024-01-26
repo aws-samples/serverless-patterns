@@ -1,6 +1,6 @@
 # AWS API Gateway to DynamoDB, including EventBridge for cache invalidation
 
-This pattern creates a basic create, read, update, and delete (CRUD) REST API with DynamoDB as the backend storage. The API Gateway showcases a cache configuration for the /< id >:GET endpoint, where the cache is invalidated when the same record is modified in the DynamoDB, this is captured and processed with DynamoDB Streams, EventBridge Pipes & EventBridge.
+This pattern creates a basic create, read, update, and delete (CRUD) REST API with DynamoDB as the backend storage. The API Gateway showcases a cache configuration for the /< id >:GET endpoint, where the cache is invalidated when the same record is modified in the DynamoDB. This is captured and processed with DynamoDB Streams, EventBridge Pipes & EventBridge.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-cache-invalidation-eventbridge
 
@@ -43,7 +43,7 @@ Important: this application uses resources that are not eligible for the AWS Fre
 
 ## How it works
 
-Upon the first request for each record, within the configured cache time frame, will be stored within a cache layer associated with the API. Updating a record will function-lessly trigger a process to invalidate the record currently persisted inside the cache. This is achieved via event driven systems and database change capture. When retrieving the updated record, this will be served from the cache due to the invalidation process that had occurred in the background.
+Upon the first request for each record, within the configured cache time frame, the response will be stored within a cache layer associated with the API. Updating a record will function-lessly trigger a process to invalidate the record currently persisted inside the cache. This is achieved via event driven systems and database change capture. When retrieving the updated record, this will be served from the cache due to the invalidation process that had occurred in the background.
 
 > **Note:** This process has been implemented with the assumption that the update record can be published into a wider architecture and consumed by many consumers through use of the event bus and suitable filters.
 
@@ -66,6 +66,8 @@ sam list outputs
 3. Using the returned ID, you can do a GET request to the endpoint `<endpoint>/pets/<returned ID>` to fetch the record.
 
 This record will be stored in the cache, configured on the API Gateway. You can observe this via CloudWatch Metrics using `CacheHitCount` & `CacheMissCount`.
+
+An additional header has been included in the response `cache-timestamp` from the endpoint `<endpoint>/pets/<returned ID>`. This will support validation of a functioning cache.
 
 > **Note**: Caching is best-effort. You can use the `CacheHitCount` and `CacheMissCount` metrics in Amazon CloudWatch to monitor requests that API Gateway serves from the API cache. _Source : [Api Gateway Developer Guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html)_
 
