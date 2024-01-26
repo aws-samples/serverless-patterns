@@ -6,6 +6,8 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
+Important: this application uses resources that are not eligible for the AWS Free Tier ([AWS REST APIS - Caching](https://aws.amazon.com/api-gateway/pricing/))
+
 ## Requirements
 
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
@@ -35,35 +37,59 @@ Important: this application uses various AWS services and there are costs associ
 
    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+5. Outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+
+> **Note**: Creating or deleting a cache takes about 4 minutes for API Gateway to complete. When a cache is created, the API status value changes from Create in progress to Active. When cache deletion is completed, the Cache status value changes from Delete in progress to Inactive. _Source: [Api Gateway Developer Guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html#enable-api-gateway-caching)_
 
 ## How it works
 
-Explain how the service interaction works.
+Upon the first request for each record, within the configured cache time frame, will be stored within a cache layer associated with the API. Updating a record will function-lessly trigger a process to invalidate the record currently persisted inside the cache. This is achieved via event driven systems and database change capture. When retrieving the updated record, this will be served from the cache due to the invalidation process that had occurred in the background.
+
+> **Note:** This process has been implemented with the assumption that the update record can be published into a wider architecture and consumed by many consumers through use of the event bus and suitable filters.
 
 ## Testing
 
-- After the application is deployed, grab the ApiUrl endpoint from the outputs. If you missed it, simple use the SAM list command to retrieve.
+1. After the application is deployed, grab the ApiUrl endpoint from the outputs. If you missed it, simple use the SAM list command to retrieve.
 
 ```
 sam list outputs
 ```
 
-- using Postman or another API tool send a POST to the endpoint with the following payload:
+2. using Postman or another API tool send a POST to the endpoint with the following payload:
 
-```
+```json
 {
   "message": "Hello World!"
 }
 ```
 
-- Using the returned ID, you can do a GET request to the endpoint `<endpoint>/pets/<returned ID>` to fetch the record.
-- Available endpoints are:
-  - < endpoint >/pets:GET - lists all items
-  - < endpoint >/pets:POST - creates an item
-  - < endpoint >/pets/< id >:GET - retrieves one item
-  - < endpoint >/pets/< id >:PUT - updates one item
-  - < endpoint >/pets/< id >:DELETE - delete one item
+3. Using the returned ID, you can do a GET request to the endpoint `<endpoint>/pets/<returned ID>` to fetch the record.
+
+This record will be stored in the cache, configured on the API Gateway. You can observe this via CloudWatch Metrics using `CacheHitCount` & `CacheMissCount`.
+
+> **Note**: Caching is best-effort. You can use the `CacheHitCount` and `CacheMissCount` metrics in Amazon CloudWatch to monitor requests that API Gateway serves from the API cache. _Source : [Api Gateway Developer Guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html)_
+
+4. Using the PUT endpoint `<endpoint>/pets/<returned ID>` you can request an update the record by providing a different value in the `message` property.
+
+```json
+{
+  "message": "Hello Serverless Gurus!"
+}
+```
+
+This will return the updated record. Based on the record update within DynamoDB, through the configured stream a `MODIFY` event will be published to an EventBridge via EventBridge Pipes.
+
+The published event will subsequently trigger a rule configured using Targets and authorized via IAM to complete a GET request to the endpoint `<endpoint>/pets/<returned ID>` including cache invalidation headers `Cache-Control: max-age=0`. CloudWatch Metrics can provide visibility of the EventBridge Pipe processing the change capture event.
+
+This will ensure the updated record is available for other services requesting the record via the GET `<endpoint>/pets/<returned ID>` endpoint. You can observe this in CloudWatch Logs, in the execution Log Group for the API Gateway by viewing the Method Request Headers log line.
+
+Available endpoints are:
+
+- < endpoint >/pets:GET - lists all items
+- < endpoint >/pets:POST - creates an item
+- < endpoint >/pets/< id >:GET - retrieves one item
+- < endpoint >/pets/< id >:PUT - updates one item
+- < endpoint >/pets/< id >:DELETE - delete one item
 
 ## Cleanup
 
