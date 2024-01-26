@@ -181,7 +181,7 @@ const main = async () => {
           });
         } catch (error) {
 
-          console.log(`Failed generating preview. Error - ${JSON.stringify(error)}`)
+          console.info(`Failed generating preview. Error - ${JSON.stringify(error)}`)
 
         }
 
