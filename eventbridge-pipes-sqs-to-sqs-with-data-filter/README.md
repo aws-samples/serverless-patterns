@@ -47,9 +47,9 @@ Please refer to the architecture diagram below:
 
 ## Testing
 
-1. Run the script `receive-messages-from-target-queue.sh` to send four messages to the `source-queue` with a payload in `{"id":1, "color":"<value>"}` format having `red`, `blue`, `green` and `yellow` as color values. The script will ask for the queue URL and the region. Please provide the `SourceQueueURL` value received from the outout of the deployment step and your deployment region.
+1. Run the script `send-messages-to-source-queue.sh` to send four messages to the `source-queue` with a payload in `{"id":1, "color":"<value>"}` format having `red`, `blue`, `green` and `yellow` as color values. The script will ask for the queue URL and the region. Please provide the `SourceQueueURL` value received from the outout of the deployment step and your deployment region.
     ```bash
-    bash receive-messages-from-target-queue.sh
+    bash send-messages-to-source-queue.sh
     ```
 
    Sample output:
