@@ -9,7 +9,8 @@
     "text": [
       "This sample project demonstrates how to use a functionless cache invalidation process when utilizing API Gateway and DynamoDB as a simple CRUD.",
       "By introducing EventBridge to this architecture and enabling DynamoDB Streams, the MODIFY event fired into the Stream can be captured, processed and published to a custom EventBridge by EventBridge Pipes. ",
-      "Once the event is available on the custom EventBridge, a Rule can consume the event and target the API Gateway with a `Cache-Control: max-age=0` header and correct AWS IAM permissions `execute-api:InvalidateCache` using the Arn method for the Target."
+      "Once the event is available on the custom EventBridge, a Rule can consume the event and target the API Gateway with a `Cache-Control: max-age=0` header and correct AWS IAM permissions `execute-api:InvalidateCache` using the Arn method for the Target.",
+      "Note: This application uses resources that are not eligible for the AWS Free Tier"
     ]
   },
   "gitHub": {
@@ -24,7 +25,7 @@
     "bullets": [
       {
         "text": "Simple CRUD with API Gateway & DynamboDB",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "link": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-ddb-openapi-crud"
       },
       {
         "text": "Cache invalidation with EventBridge & EventBridge Pipes",
