@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 2. Change directory to the pattern directory:
    ```
-   cd fifio-sqs-redrive
+   cd fifo-sqs-redrive
    ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```
@@ -36,10 +36,10 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 * This template creates two Amazon SQS queues - `MyOriginalQueue.fifo` and `MyReProcessQueue.fifo` along with DLQ `MyDeadLetterQueue.fifo`. 
-* The template also creates two AWS Lambda functions `MyOriginalQueuePollerFunction` and `MyReProcessQueuePollerFunction` to poll messages from `MyOriginalQueue.fifo` and `MyReProcessQueue.fifo` respectively through event source mapping.
-* The Lambda function `MyOriginalQueuePollerFunction` raises exception to similate message processing failure. Hence the message moves to DLQ `MyDeadLetterQueue.fifo` once the retry is exhausted. 
+* The template also creates two AWS Lambda functions `MyOriginalQueueFunction` and `ReProcessQueueFunction` to poll messages from `MyOriginalQueue.fifo` and `MyReProcessQueue.fifo` respectively through event source mapping.
+* The Lambda function `MyOriginalQueueFunction` raises exception to simulate message processing failure. Hence the message moves to DLQ `MyDeadLetterQueue.fifo` once the retry is exhausted. 
 * We then redrive the message from DLQ `MyDeadLetterQueue.fifo` to `MyReProcessQueue.fifo` using AWS CLI command.
-* Message is successfully processed by `MyReProcessQueuePollerFunction` Lambda function.
+* Message is successfully processed by `ReProcessQueueFunction` Lambda function.
 
 
 Please refer to the architecture diagram below:
@@ -61,13 +61,13 @@ Please refer to the architecture diagram below:
          "SequenceNumber": "18883xxxxxxx616"
       }
    ```
-2. Now, open [AWS SQS Console](https://console.aws.amazon.com/sqs), select your deployment region and validate the number of messages in `MyOriginalQueue.fifo`, `MyReProcessQueue.fifo` and `MyDeadLetterQueue.fifo` queues. You may have to refresh a few times while the message is being processed by `MyOriginalQueuePollerFunction` AWS Lambda function. The message should be in the DLQ. PLease refer to the diagram below:
+2. Now, open [AWS SQS Console](https://console.aws.amazon.com/sqs), select your deployment region and validate the number of messages in `MyOriginalQueue.fifo`, `MyReProcessQueue.fifo` and `MyDeadLetterQueue.fifo` queues. You may have to refresh a few times while the message is being processed by `MyOriginalQueueFunction` AWS Lambda function. The message should be in the DLQ. PLease refer to the diagram below:
    ![The message in DLQ](image/msg-in-dlq.png)
 
 
 
 
-3. Also, validate from the Amazon CloudWatch log of `MyOriginalQueuePollerFunction` that it failed to process the message due to an exception.
+3. Also, validate from the Amazon CloudWatch log of `MyOriginalQueueFunction` that it failed to process the message due to an exception.
    ![Lambda processing error](image/lambda-processing-error.png) 
 
 
@@ -85,12 +85,12 @@ Please refer to the architecture diagram below:
    ```
 
 
-5. Again, let us validate the number of messages in `MyOriginalQueue.fifo`, `MyReProcessQueue.fifo` and `MyDeadLetterQueue.fifo` queues from [AWS SQS Console](https://console.aws.amazon.com/sqs). You may have to refresh a few times while the message is being processed by `MyReProcessQueuePollerFunction` AWS Lambda function. There should not be any messages in any of the queues now as the message got successfully reprocessed now. PLease refer to the diagram below:
+5. Again, let us validate the number of messages in `MyOriginalQueue.fifo`, `MyReProcessQueue.fifo` and `MyDeadLetterQueue.fifo` queues from [AWS SQS Console](https://console.aws.amazon.com/sqs). You may have to refresh a few times while the message is being processed by `ReProcessQueueFunction` AWS Lambda function. There should not be any messages in any of the queues now as the message got successfully reprocessed now. PLease refer to the diagram below:
    ![The message in DLQ](image/all-msg-processed.png)
 
 
 
-6. Also, validate from the Amazon CloudWatch log of `MyReProcessQueuePollerFunction` that it processed the message successfully.
+6. Also, validate from the Amazon CloudWatch log of `ReProcessQueueFunction` that it processed the message successfully.
    ![Lambda processing error](image/lambda-reprocessed-msg.png) 
 
 

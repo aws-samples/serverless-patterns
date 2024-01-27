@@ -8,17 +8,17 @@
     "headline": "How it works",
     "text": [
       "This template creates two Amazon SQS queues - MyOriginalQueue.fifo and MyReProcessQueue.fifo along with DLQ MyDeadLetterQueue.fifo.",
-      "The template also creates two AWS Lambda functions MyOriginalQueuePollerFunction and MyReProcessQueuePollerFunction to poll messages from MyOriginalQueue.fifo and MyReProcessQueue.fifo respectively through event source mapping.",
-      "The Lambda function MyOriginalQueuePollerFunction raises exception to similate message processing failure. Hence the message moves to DLQ MyDeadLetterQueue.fifo once the retry is exhausted.",
+      "The template also creates two AWS Lambda functions MyOriginalQueueFunction and ReProcessQueueFunction to poll messages from MyOriginalQueue.fifo and MyReProcessQueue.fifo respectively through event source mapping.",
+      "The Lambda function MyOriginalQueueFunction raises exception to simulate message processing failure. Hence the message moves to DLQ MyDeadLetterQueue.fifo once the retry is exhausted.",
       "We then redrive the message from DLQ MyDeadLetterQueue.fifo to MyReProcessQueue.fifo using AWS CLI command.",
-      "Message is successfully processed by MyReProcessQueuePollerFunction Lambda function."
+      "Message is successfully processed by ReProcessQueueFunction Lambda function."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/fifio-sqs-redrive",
-      "templateURL": "serverless-patterns/fifio-sqs-redrive",
-      "projectFolder": "fifio-sqs-redrive",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/fifo-sqs-redrive",
+      "templateURL": "serverless-patterns/fifo-sqs-redrive",
+      "projectFolder": "fifo-sqs-redrive",
       "templateFile": "template.yaml"
     }
   },

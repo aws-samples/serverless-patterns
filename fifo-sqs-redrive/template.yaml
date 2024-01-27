@@ -40,13 +40,13 @@ Resources:
 
 
   ## Define the Lambda Functions ##
-  MyOriginalQueuePollerFunction:
+  MyOriginalQueueFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: originalmessage/
       Handler: app.lambda_handler
       Runtime: python3.12
-      FunctionName: MyOriginalQueuePollerFunction
+      FunctionName: MyOriginalQueueFunction
       Policies:
         - SQSPollerPolicy:
             QueueName: !GetAtt MyOriginalQueue.QueueName
@@ -58,15 +58,15 @@ Resources:
           Type: SQS 
           Properties:
             Queue: !GetAtt MyOriginalQueue.Arn
-            BatchSize: 1
+            BatchSize: 10
 
-  MyReProcessQueuePollerFunction:
+  ReProcessQueueFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: redrivenmessage/
       Handler: app.lambda_handler
       Runtime: python3.12
-      FunctionName: MyReProcessQueuePollerFunction
+      FunctionName: ReProcessQueueFunction
       Policies:
         - SQSPollerPolicy:
             QueueName: !GetAtt MyReProcessQueue.QueueName
@@ -78,60 +78,7 @@ Resources:
           Type: SQS 
           Properties:
             Queue: !GetAtt MyReProcessQueue.Arn
-            BatchSize: 1
-
-  
-  ## Define the SQS Queue Policies ##
-  MyOriginalQueuePolicy:
-    Type: AWS::SQS::QueuePolicy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Sid: Allow-Queue-operations
-            Effect: Allow
-            Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-            Action:
-              - SQS:DeleteMessage
-              - SQS:ReceiveMessage
-              - SQS:SendMessage
-            Resource: !GetAtt MyOriginalQueue.Arn
-      Queues:
-        - !Ref MyOriginalQueue
-
-  MyDeadLetterQueuePolicy:
-    Type: AWS::SQS::QueuePolicy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Sid: Allow-Queue-operations
-            Effect: Allow
-            Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-            Action:
-              - SQS:DeleteMessage
-              - SQS:ReceiveMessage
-              - SQS:SendMessage
-            Resource: !GetAtt MyDeadLetterQueue.Arn
-      Queues:
-        - !Ref MyDeadLetterQueue
-
-  MyReProcessQueuePolicy:
-    Type: AWS::SQS::QueuePolicy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Sid: Allow-Queue-operations
-            Effect: Allow
-            Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-            Action:
-              - SQS:DeleteMessage
-              - SQS:ReceiveMessage
-              - SQS:SendMessage
-            Resource: !GetAtt MyReProcessQueue.Arn
-      Queues:
-        - !Ref MyReProcessQueue  
+            BatchSize: 10
 
 Outputs:
   MyOriginalQueueUrl:
