@@ -39,7 +39,7 @@ Resources:
         - EndpointType: REGIONAL
           CertificateArn: !Ref CertArn
 
-  RestApiMapping: #Create a maooing to a REST API
+  RestApiMapping: #Create a mapping to a REST API
     Type: AWS::ApiGatewayV2::ApiMapping
     Properties: 
       ApiId: !Ref RestApiGateway
