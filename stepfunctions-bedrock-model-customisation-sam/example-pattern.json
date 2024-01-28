@@ -1,0 +1,63 @@
+{
+  "title": "AWS Step Functions to customise Amazon Bedrock Cohere Command Light model",
+  "description": "The SAM template deploys a Step Functions workflow that creates custom model by fine tuning Amazon Bedrock Cohere Command Light model.",
+  "language": "YAML",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Upload the training data in JSON Line format into the Amazon S3 bucket.",
+      "Start the AWS Step Functions Workflow using the `start-execution` api command with the input payload in JSON format.",
+      "The workflow invokes Amazon Bedrock's `CreateModelCustomizationJob` API to fine tune `Cohere Command Light` model with the traing data from the Amazon S3 bucket.",
+      "The workflow periodically checks for the status of the `CreateModelCustomizationJob`.",
+      "Once the custom fine tuned `Cohere Command Light` is created, the workflow invokes Amazon Bedrock's `CreateProvisionedModelThroughput` API to create a Provisioned Throughput with no commitment."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunctions-bedrock-model-customisation-sam",
+      "templateURL": "serverless-patterns/stepfunctions-bedrock-model-customisation-sam",
+      "projectFolder": "stepfunctions-bedrock-model-customisation-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock user guide",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html"
+      },
+      {
+        "text": "Customise Models in Amazon Bedrock Blog",
+        "link": "https://aws.amazon.com/blogs/aws/customize-models-in-amazon-bedrock-with-your-own-data-using-fine-tuning-and-continued-pre-training/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Amazon Bedrock provisioned throughput: <code>aws bedrock delete-provisioned-model-throughput --provisioned-model-id {ProvisionedModelArn} --region {your-region}</code>.",
+      "Delete the Amazon Bedrock custom model: <code>aws bedrock delete-custom-model --model-identifier {CustomModelName} --region {your-region}</code>",
+      "Delete the content in the Amazon S3 bucket: <code>aws s3 rm s3://{BedrockModelCustomisationS3Bucket} --recursive</code>.",
+      "Delete the stack: <code>sam delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

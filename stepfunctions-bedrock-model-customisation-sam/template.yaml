@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A Step Functions Standard Workflow that customises Amazon Bedrock Cohere Command Light Model and creates provisioned throughput
+
+Resources:
+##########################################################################
+#   Step Functions                                                        #
+##########################################################################
+
+  StateMachineCustomiseBedrockModel:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: statemachine/bedrock-model-customisation.asl.json
+      DefinitionSubstitutions:
+        ModelId: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-v2:1
+      Role:
+        Fn::GetAtt: [ StatesExecutionRole, Arn ]
+      Type: STANDARD
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+        IncludeExecutionData: false
+        Level: 'ALL'
+
+##########################################################################
+#  Step Functions Log Group                                             #
+##########################################################################
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", StateMachineCustomiseBedrockModel]]
+       
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+  StatesExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: CWLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogDelivery"
+                  - "logs:CreateLogStream"
+                  - "logs:GetLogDelivery"
+                  - "logs:UpdateLogDelivery"
+                  - "logs:DeleteLogDelivery"
+                  - "logs:ListLogDeliveries"
+                  - "logs:PutLogEvents"
+                  - "logs:PutResourcePolicy"
+                  - "logs:DescribeResourcePolicies"
+                  - "logs:DescribeLogGroups"
+                Resource: "*"         
+        - PolicyName: BedrockAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:CreateModelCustomizationJob
+                  - bedrock:GetModelCustomizationJob
+                  - bedrock:CreateProvisionedModelThroughput
+                Resource: 
+                  - !Sub arn:aws:bedrock:${AWS::Region}::*
+                  - !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:custom-model/*
+                  - !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:model-customization-job/*
+                  - !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:provisioned-model-throughput/*
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: !GetAtt BedrockModelCustomisationServiceRole.Arn      
+  BedrockModelCustomisationServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - bedrock.amazonaws.com
+            Action: "sts:AssumeRole"
+            Condition:
+              StringEquals:
+                "aws:SourceAccount": !Sub ${AWS::AccountId}
+              ArnEquals:
+                "aws:SourceArn": !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:model-customization-job/*
+      # Path: "/"
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                  - "s3:ListBucket"
+                Resource:
+                  - !Sub ${BedrockModelCustomisationS3Bucket.Arn}/*
+                  - !Sub ${BedrockModelCustomisationS3Bucket.Arn}
+                Condition:
+                  StringEquals:
+                    "aws:PrincipalAccount": !Sub ${AWS::AccountId}
+                              
+##########################################################################
+#   S3 Bucket                                                              #
+##########################################################################
+  BedrockModelCustomisationS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
+
+
+##########################################################################
+#   Outputs                                                              #
+##########################################################################
+Outputs:
+  StateMachineCustomiseBedrockModelArn:
+    Value: !Ref StateMachineCustomiseBedrockModel
+    Description: StateMachineCustomiseBedrockModel Arn
+  BedrockModelCustomisationS3Bucket:
+    Description: S3 Bucket for storing Bedrock Model Customisation Training Data
+    Value: !Ref BedrockModelCustomisationS3Bucket  
+  BedrockModelCustomisationServiceRoleArn:
+    Description: Service Role for the Bedrock Model Customisation
+    Value: !GetAtt BedrockModelCustomisationServiceRole.Arn

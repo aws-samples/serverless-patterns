@@ -1,0 +1,73 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "CreateCustomCohereCommandLightModel",
+  "States": {
+    "CreateCustomCohereCommandLightModel": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrock:createModelCustomizationJob",
+      "Parameters": {
+        "BaseModelIdentifier.$": "$.BaseModelIdentifier",
+        "CustomModelName.$": "$.CustomModelName",
+        "JobName.$": "$.JobName",
+        "CustomizationType": "FINE_TUNING",
+        "HyperParameters": {
+          "epochCount": "1",
+          "batchSize": "8",
+          "learningRate": "0.00001"
+        },
+        "OutputDataConfig": {
+          "S3Uri.$": "$.OutputDataConfigS3Uri"
+        },
+        "RoleArn.$": "$.RoleArn",
+        "TrainingDataConfig": {
+          "S3Uri.$": "$.TrainingDataConfigS3Uri"
+        }
+      },
+      "Next": "Wait for next iteration"
+    },
+    "Wait for next iteration": {
+      "Type": "Wait",
+      "Next": "GetModelCustomizationJob",
+      "Seconds": 300
+    },
+    "GetModelCustomizationJob": {
+      "Type": "Task",
+      "Next": "Job Complete?",
+      "Parameters": {
+        "JobIdentifier.$": "$.JobArn"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:bedrock:getModelCustomizationJob"
+    },
+    "Job Complete?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Status",
+          "StringEquals": "Failed",
+          "Next": "Fail"
+        },
+        {
+          "Variable": "$.Status",
+          "StringEquals": "Completed",
+          "Next": "CreateProvisionedModelThroughput"
+        }
+      ],
+      "Default": "Wait for next iteration"
+    },
+    "CreateProvisionedModelThroughput": {
+      "Type": "Task",
+      "Parameters": {
+        "ModelId.$": "$.OutputModelArn",
+        "ModelUnits": 1,
+        "ProvisionedModelName.$": "$.OutputModelName"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:bedrock:createProvisionedModelThroughput",
+      "End": true
+    },
+    "Fail": {
+      "Type": "Fail",
+      "CausePath": "$.FailureMessage",
+      "ErrorPath": "$.Status"
+    }
+  }
+}
