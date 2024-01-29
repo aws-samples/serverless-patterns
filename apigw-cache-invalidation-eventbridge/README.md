@@ -4,9 +4,9 @@ This pattern creates a basic create, read, update, and delete (CRUD) REST API wi
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-cache-invalidation-eventbridge
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
-
-Important: this application uses resources that are not eligible for the AWS Free Tier ([AWS REST APIS - Caching](https://aws.amazon.com/api-gateway/pricing/))
+> **Important**
+>
+> This application uses various AWS services and there are costs associated with these services - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. To avoid unexpected costs be sure the hourly charged [API Gateway Cache](https://aws.amazon.com/api-gateway/pricing/) and resources are cleaned up at the end. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
@@ -51,6 +51,8 @@ Upon the first request for each record, within the configured cache time frame, 
 
 > **Note:** This process has been implemented with the assumption that the update record can be published into a wider architecture and consumed by many consumers through use of the event bus and suitable filters.
 
+![Detailed architecture diagram](img/apigw-cache-invalidation-eventbridge-architecture.png)
+
 ## Testing
 
 1. After the application is deployed, grab the ApiUrl endpoint from the outputs. If you missed it, simple use the SAM list command to retrieve.
@@ -59,7 +61,7 @@ Upon the first request for each record, within the configured cache time frame, 
 sam list outputs
 ```
 
-2. using Postman or another API tool send a POST to the endpoint with the following payload:
+2. using Postman or another API tool send a POST request to the endpoint `<endpoint>/pets` with the following payload:
 
 ```json
 {
@@ -100,9 +102,13 @@ Available endpoints are:
 ## Cleanup
 
 1. Delete the stack
+
+   _This will also remove the package uploaded to S3 created by the `sam deploy` command_
+
    ```bash
    aws cloudformation delete-stack --stack-name STACK_NAME
    ```
+
 1. Confirm the stack has been deleted
    ```bash
    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
