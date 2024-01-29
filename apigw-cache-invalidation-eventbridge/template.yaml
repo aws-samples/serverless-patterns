@@ -2,6 +2,15 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Serverless patterns - API Gateway, DynamoDB & EventBridge Cache Invalidation
 
+Parameters:
+  DeployMetricsDashboard:
+    Description: Deploy Cloudwatch Metrics dashboard for visibility
+    Type: String
+    Default: "true"
+
+Conditions:
+  deployMetricsDashboard: !Equals [!Ref DeployMetricsDashboard, "true"]
+
 Resources:
   PetTable:
     Type: AWS::DynamoDB::Table
@@ -166,7 +175,132 @@ Resources:
           Parameters:
             Location: "./api.yaml"
 
+  APICacheInvalidationDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Condition: deployMetricsDashboard
+    Properties:
+      DashboardBody: !Sub
+        - |
+          {
+            "widgets": [
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 0,
+                    "x": 12,
+                    "type": "metric",
+                    "properties": {
+                        "metrics": [
+                            [ "AWS/ApiGateway", "CacheMissCount", "ApiName", "DynamoDB Crud API", { "region": "${AWS::Region}" } ],
+                            [ ".", "CacheHitCount", ".", ".", { "region": "${AWS::Region}" } ]
+                        ],
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "region": "${AWS::Region}",
+                        "period": 30,
+                        "stat": "Average",
+                        "title": "Api Gateway - Cache Hit Rate"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 0,
+                    "x": 0,
+                    "type": "metric",
+                    "properties": {
+                        "metrics": [
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", { "region": "${AWS::Region}" } ]
+                        ],
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "region": "${AWS::Region}",
+                        "period": 300,
+                        "stat": "Average",
+                        "title": "Api Gateway - Request Count"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 18,
+                    "y": 6,
+                    "x": 0,
+                    "type": "log",
+                    "properties": {
+                        "query": "SOURCE 'API-Gateway-Execution-Logs_${Api}/Prod' | fields @timestamp, @message, @logStream, @log\n| sort @timestamp desc\n| limit 30",
+                        "region": "${AWS::Region}",
+                        "stacked": false,
+                        "title": "Log group: API-Gateway-Execution-Logs_${Api}/Prod",
+                        "view": "table"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 12,
+                    "x": 6,
+                    "type": "metric",
+                    "properties": {
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "metrics": [
+                            [ "AWS/Events", "TriggeredRules", "EventBusName", "PetEventBus", "RuleName", "cache-application-CacheInvalidationRule-rDVS3hZt2zRW", { "region": "${AWS::Region}" } ],
+                            [ ".", "MatchedEvents", ".", ".", ".", ".", { "region": "${AWS::Region}" } ],
+                            [ ".", "Invocations", ".", ".", ".", ".", { "region": "${AWS::Region}" } ]
+                        ],
+                        "region": "${AWS::Region}",
+                        "period": 300,
+                        "title": "EventBridge - Cache Invalidation Rule"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 12,
+                    "x": 0,
+                    "type": "metric",
+                    "properties": {
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "metrics": [
+                            [ "AWS/EventBridge/Pipes", "Invocations", "PipeName", "PetModifyPipe-pI4diXmDgwa7", { "region": "${AWS::Region}" } ]
+                        ],
+                        "region": "${AWS::Region}",
+                        "period": 300,
+                        "title": "EventBridge Pipe - Invocations"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 0,
+                    "x": 6,
+                    "type": "metric",
+                    "properties": {
+                        "view": "timeSeries",
+                        "stacked": true,
+                        "metrics": [
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", "Resource", "/pets/{id}", "Stage", "Prod", "Method", "GET", { "region": "${AWS::Region}" } ],
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", "Resource", "/pets/{id}", "Stage", "Prod", "Method", "PUT", { "region": "${AWS::Region}" } ],
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", "Resource", "/pets/{id}", "Stage", "Prod", "Method", "DELETE", { "region": "${AWS::Region}" } ],
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", "Resource", "/pets", "Stage", "Prod", "Method", "POST", { "region": "${AWS::Region}" } ],
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", "Resource", "/pets", "Stage", "Prod", "Method", "GET", { "region": "${AWS::Region}" } ]
+                        ],
+                        "region": "${AWS::Region}",
+                        "period": 300,
+                        "title": "API Gateway - Method distribution"
+                    }
+                }
+            ]
+          }
+        - Api: !Ref Api
+
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint URL for Prod stage"
     Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
+  CloudWatchDashboard:
+    Condition: deployMetricsDashboard
+    Description: "Cloudwatch Dashboard"
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards/dashboard/${APICacheInvalidationDashboard}"

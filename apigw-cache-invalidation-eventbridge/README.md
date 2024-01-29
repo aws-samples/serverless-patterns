@@ -41,6 +41,10 @@ Important: this application uses resources that are not eligible for the AWS Fre
 
 > **Note**: Creating or deleting a cache takes about 4 minutes for API Gateway to complete. When a cache is created, the API status value changes from Create in progress to Active. When cache deletion is completed, the Cache status value changes from Delete in progress to Inactive. _Source: [Api Gateway Developer Guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html#enable-api-gateway-caching)_
 
+This sample contains an example collection of Cloudwatch Metrics as a dashboard to aid solution understanding. This will be deployed by default, to opt out of this deployment there is an additional parameter `DeployMetricsDashboard` that is required during the `sam deploy` step. This will instruct the cloudformation not to deploy the Cloudwatch dashboard.
+
+To provide the value for `DeployMetricsDashboard`, it is possible to provide an override with the initial command by including `--parameter-overrides DeployMetricsDashboard=false`. This will override the guided process and update the default value to `true`. Alternatively, this can be provided as part of the guided flow.
+
 ## How it works
 
 Upon the first request for each record, within the configured cache time frame, the response will be stored within a cache layer associated with the API. Updating a record will function-lessly trigger a process to invalidate the record currently persisted inside the cache. This is achieved via event driven systems and database change capture. When retrieving the updated record, this will be served from the cache due to the invalidation process that had occurred in the background.
