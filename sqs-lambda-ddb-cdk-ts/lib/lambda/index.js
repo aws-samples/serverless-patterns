@@ -3,7 +3,6 @@
  */
 
 const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
-const { SQSClient } = require("@aws-sdk/client-sqs");
 const { marshall } = require("@aws-sdk/util-dynamodb");
 
 // Get destination DynamoDB table name from the environment variables

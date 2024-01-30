@@ -75,7 +75,7 @@ cd test-scripts
 
 2. In the script, replace 'YOUR_REGION' and 'YOUR_SQS_QUEUE_URL' with your desired AWS Region and SQS Queue URL respectively
 
-3. Using the command line, run the script and specify an integer for N (the number of requests per time interval - 5 is a sufficient number for this demo) and for T(the frequency in seconds with which to send the N events - 1 is sufficient for this demo). Keep this script running in the background until later in step 10. You should begin to see continuous messages in your terminal saying "Batch of N items pushed to SQS at ...".
+3. Using the command line, run the script and specify an integer for N (the number of requests per time interval - 5 is a sufficient number for this demo) and for T(the frequency in milliseconds with which to send the N events - 1000 is sufficient for this demo). Keep this script running in the background until later in step 10. You should begin to see continuous messages in your terminal saying "Batch of N items pushed to SQS at ...".
 
 ```
 node push-sqs-messages.js N T
@@ -91,7 +91,7 @@ filter @message like /ProvisionedThroughputExceededException/
 
 
 
-6. Once you have confirmed that DynamoDB is throttling write requests, go back to the [config](./lib/config/tables.config.ts) file in repo and lower the `lambdaReservedConcurrency` property to a value less than or equal to the current writeCapacity value of the table (1 is a sufficient value for this demo). If the writeCapacity of the table is already at 1, the lowest `lambdaReservedConcurency` value possible is 1. Increase the `retryAttempts` property value to a high value (20 should be sufficient for this demo) to give Lambda time to keep up with any subsequent throttling events.
+6. Once you have confirmed that DynamoDB is throttling write requests, go back to the [config](./lib/config/tables.config.ts) file in repo and lower the `sqsMaxConcurrency` property to a value less than or equal to the current writeCapacity value of the table (2 is a sufficient value for this demo). If the writeCapacity of the table is already at 2, the lowest `sqsMaxConcurrency` value possible is 2. Increase the `retryAttempts` property value to a high value (20 should be sufficient for this demo) to give Lambda time to keep up with any subsequent throttling events.
 \
 \
 **IMPORTANT:** Write down the approximate timestamp of when you make this change. It will come in handy when reading CloudWatch Logs.

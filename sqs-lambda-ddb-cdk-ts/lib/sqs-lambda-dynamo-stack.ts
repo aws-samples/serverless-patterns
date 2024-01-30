@@ -16,11 +16,9 @@ import { CfnOutput } from "aws-cdk-lib";
 export interface TableConfig {
   readonly name: string,
   readonly writeCapacity: number,
-  readonly lambdaReservedConcurrency: number,
+  readonly sqsMaxConcurrency: number,
   readonly retryAttempts: number,
   readonly lambdaRetryAttempts: number,
-  readonly alarmThreshold: number,
-  readonly alarmEvaluationPeriods: number,
 }
 
 export class SqsLambdaDynamoStack extends cdk.Stack {
@@ -79,7 +77,6 @@ export class SqsLambdaDynamoStack extends cdk.Stack {
           runtime: lambda.Runtime.NODEJS_18_X,
           code: lambda.Code.fromAsset("lib/lambda"),
           handler: "index.handler",
-          reservedConcurrentExecutions: table.lambdaReservedConcurrency,
           environment: {
             DESTINATION_TABLE_NAME: ddbTable.tableName, // need the actual generated name of the table
           },
@@ -98,16 +95,9 @@ export class SqsLambdaDynamoStack extends cdk.Stack {
       lambdaFunction.addEventSource(
         new lambda_event_source.SqsEventSource(sqsQueue, {
           batchSize: 1,
+          maxConcurrency: table.sqsMaxConcurrency,
         })
       );
-
-      // CloudWatch DLQ alarm
-      const alarm = new cloudwatch.Alarm(this, `${table.name}-Alarm`, {
-        comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
-        threshold: table.alarmThreshold,
-        evaluationPeriods: table.alarmEvaluationPeriods,
-        metric: dlq.metricApproximateNumberOfMessagesVisible(),
-      });
 
       // print the SQS Queue URL for use with testing script
       new CfnOutput(this, `${table.name}-Queue-URL`, { value: sqsQueue.queueUrl });

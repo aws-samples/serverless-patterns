@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
 
-AWS.config.update({ region: 'YOUR_REGION' }); // Replace 'YOUR_REGION' with your AWS region
+AWS.config.update({ region: 'YOUR_REGION' }); // Replace 'YOUR_REGION' with your AWS region (i.e. us-west-2)
 
 const sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
 
@@ -56,7 +56,7 @@ const t = process.argv[3]; // Time interval between each item batch, in millisec
 if (!n || isNaN(n)) {
     console.error('Please provide a valid number for the batch size.');
 } else if (!t || isNaN(t)) {
-    console.error('Please provide a valid number for the time interval between batches.');
+    console.error('Please provide a valid number for the time interval (in milliseconds) between batches.');
 } else {
     setInterval(() => {
         pushBatchToSQS(parseInt(n, 10));
