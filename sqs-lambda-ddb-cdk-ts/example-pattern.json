@@ -33,13 +33,13 @@
     ]
   },
   "deploy": {
-    "text": ["<code>cdk deploy</code>"]
+    "text": ["cdk deploy"]
   },
   "testing": {
     "text": ["See the GitHub repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>cdk destroy</code>."]
+    "text": ["<code>cdk destroy</code>"]
   },
   "authors": [
     {
