@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 2. Change directory to the pattern directory:
    ```
-   cd eventbridge-pipes-sqs-to-sqs-with-data-filter
+   cd sqs-eventbridgepipes-sqs-msg-copy-data-filter-sam
    ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```
