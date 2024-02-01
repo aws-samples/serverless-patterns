@@ -73,12 +73,12 @@
         "line1": {
             "from": "icon1",
             "to": "icon2",
-            "label": ""
+            "label": "filter"
         },
         "line2": {
             "from": "icon2",
             "to": "icon3",
-            "label": ""
+            "label": "transform"
         }
     }
 }
