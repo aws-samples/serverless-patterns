@@ -1,6 +1,6 @@
-# SQS to SQS message copy with filter using EventBridge Pipe
+# Copying Amazon SQS messages between queues using an Amazon EventBridge Pipes filte
 
-The patterns shows the filter capability of the Amazon EventBridge Pipe while copying data from one Amazon SQS queue to another. The SAM template deploys two Amazon SQS queues, an Amazon EventBridge Pipe with filter having source as one of the SQS queues and target as another queue.
+The pattern shows the filter capability of Amazon EventBridge Pipes while copying data from one Amazon SQS queue to another queue. The SAM template deploys two Amazon SQS queues, an Amazon EventBridge Pipe with filter having source as one of the SQS queues and target as another queue.
 
 Learn more about this pattern at Serverless Land Patterns:https://serverlessland.com/patterns/eventbridge-pipes-sqs-to-sqs-with-data-filter
 
