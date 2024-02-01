@@ -1,5 +1,5 @@
 {
-    "title": "Copying Amazon SQS messages between queues using an Amazon EventBridge Pipes filter",
+    "title": "Copying Amazon SQS messages between queues using Amazon EventBridge Pipes",
     "description": "The pattern shows the filter capability of Amazon EventBridge Pipes while copying data from one Amazon SQS queue to another queue.",
     "language": "YAML",
     "level": "200",
