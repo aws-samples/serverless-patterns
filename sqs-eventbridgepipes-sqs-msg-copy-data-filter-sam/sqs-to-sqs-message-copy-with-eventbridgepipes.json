@@ -1,6 +1,6 @@
 {
-    "title": "SQS to SQS message copy with filter using EventBridge Pipe",
-    "description": "The patterns shows the filter capability of the Amazon EventBridge Pipe while copying data from one Amazon SQS queue to another queue using SAM.",
+    "title": "Copying Amazon SQS messages between queues using an Amazon EventBridge Pipes filter",
+    "description": "The pattern shows the filter capability of Amazon EventBridge Pipes while copying data from one Amazon SQS queue to another queue.",
     "language": "YAML",
     "level": "200",
     "framework": "SAM",
@@ -9,8 +9,8 @@
         "text": [
             "This template creates two Amazon SQS queues - source-queue and target-queue along with an Amazon EventBridge Pipe.",
             "The Amazon EventBridge pipe copies messages from source-queue to target-queue only if message payload (JSON) contains color attribute having values red or blue.",
-            "Once the stack is deployed, we will use send-messages-to-source-queue.sh to send messages to the source-queue. This scripts send four messages with different values for color attribute.",
-            "We will validate received messages on `target-queue` using receive-messages-from-target-queue.sh. Only the messages with red and blue values for color attribute will be available in target-queue."
+            "Once the stack is deployed, use `send-messages-to-source-queue.sh` to send messages to the source-queue. This scripts sends four messages with different values for color attribute.",
+            "Validate received messages on `target-queue` using `receive-messages-from-target-queue.sh`. Only the messages with red and blue values for color attribute are available in `target-queue`."
         ]
     },
     "gitHub": {
