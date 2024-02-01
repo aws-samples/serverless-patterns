@@ -1,5 +1,5 @@
 {
-    "title": "EventBridge Pipe from SQS to Step Functions with filter and transformation",
+    "title": "Amazon SQS to AWS Step Functions via Amazon EventBridge Pipes filter",
     "description": "Amazon EventBridge Pipe that filters and transforms messages from Amazon SQS to AWS Step Functions.",
     "language": "Python",
     "level": "300",
@@ -7,9 +7,9 @@
     "introBox": {
         "headline": "How it works",
         "text": [
-            "The pattern will create an Amazon SQS queue, a AWS Step Functions workflow and an Amazon EventBridge Pipe.",
-            "Sending messages to the Amazon Simple Queue Service will trigger the pipe to start the AWS Step Function workflow execution.",
-            "SQS Messages will be filtered and transformed before sending to AWS Step Functions."
+            "The pattern will create an Amazon SQS queue, an AWS Step Functions workflow and an Amazon EventBridge Pipe.",
+            "Sending messages to the Amazon SQS queue triggers the pipe to start the AWS Step Functions workflow execution.",
+            "SQS messages are filtered and transformed before sending to Step Functions."
         ]
     },
     "gitHub": {
@@ -23,7 +23,7 @@
     "resources": {
         "bullets": [
             {
-                "text": "Eventbridge Pipes filter and transformation",
+                "text": "Amazon Eventbridge Pipes filter and transformation",
                 "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
             }
         ]
@@ -56,19 +56,19 @@
             "x": 20,
             "y": 50,
             "service": "sqs",
-            "label": "SQS queue"
+            "label": "Amazon SQS"
         },
         "icon2": {
             "x": 50,
             "y": 50,
             "service": "eventbridge-pipes",
-            "label": "EventBridge Pipe"
+            "label": "Amazon EventBridge Pipes"
         },
         "icon3": {
             "x": 80,
             "y": 50,
             "service": "sfn",
-            "label": "Step Functions"
+            "label": "AWS Step Functions"
         },
         "line1": {
             "from": "icon1",
