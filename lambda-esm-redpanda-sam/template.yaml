@@ -1,0 +1,231 @@
+Transform: AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: 2010-09-09
+Description: "This template is for deploying resources to integrate a Lambda function with a Redpanda deployment in EKS"
+Parameters:
+  Prefix:
+    Description: "Prefix to be added to all the resources name for tracking purposes"
+    Type: String
+    MinLength: 2
+    MaxLength: 20
+  VPC:
+    Description: "Enter the VPC ID of your EKS VPC"
+    Type: AWS::EC2::VPC::Id
+  PublicSubnetIDs: 
+    Description: "Enter the two Public subnets for the EKS VPC. For example: subnet-0123abc,subnet-0456def"
+    Type: "List<AWS::EC2::Subnet::Id>"
+  DomainName:
+    Description: "Full Domain Name for the Redpanda Cluster"
+    Type: String
+    MinLength: 15
+    MaxLength: 90
+  InternalIPnode0:
+    Description: "The internal ip address of node 0 from the cluster"
+    Type: String
+    MinLength: 7
+    MaxLength: 15
+  InternalIPnode1:
+    Description: "The internal ip address of node 1 from the cluster"
+    Type: String
+    MinLength: 7
+    MaxLength: 15
+  InternalIPnode2:
+    Description: "The internal ip address of node 2 from the cluster"
+    Type: String
+    MinLength: 7
+    MaxLength: 15
+  UserName:
+    Description: "Username used to access Redpanda"
+    Type: String
+    MinLength: 8
+    MaxLength: 30
+  Password:
+    Description: "Password used to access Redpanda"
+    Type: String
+    MinLength: 8
+    MaxLength: 30
+
+Resources:
+# Lambda VPC Endpoint
+  VPCEndpointLambda:
+    Type: AWS::EC2::VPCEndpoint
+    DependsOn:
+      - DNS
+    #  - HostedZoneRecordSet
+    Properties: 
+      PrivateDnsEnabled: true
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.lambda
+      SubnetIds: 
+        - !Select [ 0, !Ref PublicSubnetIDs ]
+        - !Select [ 1, !Ref PublicSubnetIDs ]
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+
+# STS VPC Endpoint
+  VPCEndpointSTS:
+    Type: AWS::EC2::VPCEndpoint
+    DependsOn:
+      - DNS
+    Properties: 
+      PrivateDnsEnabled: true
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.sts
+      SubnetIds: 
+        - !Select [ 0, !Ref PublicSubnetIDs ]
+        - !Select [ 1, !Ref PublicSubnetIDs ]
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+
+# Secrets Manager VPC Endpoint
+  VPCEndpointSecrets:
+    Type: AWS::EC2::VPCEndpoint
+    DependsOn:
+      - DNS
+    Properties: 
+      PrivateDnsEnabled: true
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.secretsmanager
+      SubnetIds: 
+        - !Select [ 0, !Ref PublicSubnetIDs ]
+        - !Select [ 1, !Ref PublicSubnetIDs ]
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+
+# Define the role for our Lambda function
+  LambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Select [0, [!Join ['-', [!Ref Prefix, 'custom-lambda-function-role']]]]
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: !Sub
+            - '${Prefix}-LambdaRedpandaPolicy'
+            - Prefix: !Ref Prefix
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                - "ec2:DescribeNetworkInterfaces"
+                - "ec2:CreateNetworkInterface"
+                - "ec2:DeleteNetworkInterface"
+                - "ec2:AssignPrivateIpAddresses"
+                - "ec2:UnassignPrivateIpAddresses"
+                - "ec2:DescribeSecurityGroups"
+                - "ec2:DescribeSubnets"
+                - "ec2:DescribeVpcs"
+                - "secretsmanager:GetSecretValue"
+                - "kms:DescribeKey"
+                - "kms:ListAliases"
+                - "kms:ListKeys"
+                Resource: '*'
+        - PolicyName: BasicExecutionRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action: logs:CreateLogGroup
+              Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+            - Effect: Allow
+              Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              Resource: !Sub 
+                - 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${functionName}:*'
+                - functionName: !Select [0, [!Join ['-', [!Ref Prefix, Redpanda-Event-Processor]]]]
+
+  RedpandaEventProcessor:
+    Type: AWS::Serverless::Function 
+    DependsOn:
+      - DNS
+      - HostedZoneRecordSet0
+      - HostedZoneRecordSet1
+      - HostedZoneRecordSet2
+      - UserNamePasswordSecret
+      - VPCEndpointLambda
+      - VPCEndpointSTS
+      - VPCEndpointSecrets
+    Properties:
+      FunctionName: !Select [0, [!Join ['-', [!Ref Prefix, Redpanda-Event-Processor]]]]
+      InlineCode: |
+          import json
+          def lambda_handler(event, context):
+              print('## EVENT')
+              print(event)
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps('Event received from Redpanda!')
+              }
+      Timeout: 60
+      Handler: index.lambda_handler
+      Runtime: python3.11
+      Role: !GetAtt LambdaRole.Arn
+
+# Create the Private Hosted Zone
+  DNS: 
+    Type: AWS::Route53::HostedZone
+    Properties: 
+      HostedZoneConfig: 
+          Comment: 'Hosted zone for Redpanda nodes'
+      Name: !Ref DomainName
+      VPCs: 
+      - VPCId: !Ref VPC
+        VPCRegion: !Ref 'AWS::Region'
+# Create the A record for the host redpanda-0  
+  HostedZoneRecordSet0:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref DNS
+      Name: !Select [0, [!Join ['', [ 'redpanda-0.',!Ref DomainName]]]]
+      Type: "A"
+      ResourceRecords: 
+      - !Ref InternalIPnode0
+      TTL: '300'
+# Create the A record for the host redpanda-1  
+  HostedZoneRecordSet1:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref DNS
+      Name: !Select [0, [!Join ['', [ 'redpanda-1.',!Ref DomainName]]]]
+      Type: "A"
+      ResourceRecords: 
+      - !Ref InternalIPnode1
+      TTL: '300'
+# Create the A record for the host redpanda-2  
+  HostedZoneRecordSet2:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref DNS
+      Name: !Select [0, [!Join ['', [ 'redpanda-2.',!Ref DomainName]]]]
+      Type: "A"
+      ResourceRecords: 
+      - !Ref InternalIPnode2
+      TTL: '300'      
+
+# Secrets Manager Secrets
+  UserNamePasswordSecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: pandacredentials
+      Description: "Username and password key pairs for Redpanda access"
+      SecretString: !Join [ '', ['{"username":"',!Ref UserName,'","password":"',!Ref Password,'"}'] ]
+
+Outputs:
+  VPCEndpointLambda:
+    Value: !Ref VPCEndpointLambda
+  VPCEndpointSTS:
+    Value: !Ref VPCEndpointSTS
+  VPCEndpointSecrets:
+    Value: !Ref VPCEndpointSecrets
+  RedpandaEventProcessor:
+    Value: !Ref RedpandaEventProcessor
+  HostedZoneId:
+    Description: 'The ID of the hosted zone.'
+    Value: !Ref DNS
+    Export:
+      Name: !Sub '${AWS::StackName}-HostedZoneId'

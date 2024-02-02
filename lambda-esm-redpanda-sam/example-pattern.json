@@ -1,0 +1,66 @@
+{
+  "title": "Lambda Integration with Redpanda",
+  "description": "Integrate Lambda with Redpanda.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to deploy and configure a Redpanda cluster in Amazon EKS, and to enable integration with Lambda event triggering via the Kafka API interface.",
+      "This allows you to easily use Lambda functions to consume data streams from your topics in Redpanda."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-esm-redpanda-sam",
+      "templateURL": "serverless-patterns/lambda-esm-redpanda-sam",
+      "projectFolder": "lambda-esm-redpanda-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/lambda-functions.html"
+      },
+      {
+        "text": "Amazon EKS",
+        "link": "https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html"
+      },
+      {
+        "text": "Deploy a Redpanda Cluster in Amazon Elastic Kubernetes Service",
+        "link": "https://docs.redpanda.com/current/deploy/deployment-option/self-hosted/kubernetes/eks-guide/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy -t template.yaml --guided --capabilities CAPABILITY_NAMED_IAM"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>. See the GitHub repo for detailed cleanup instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Lamb",
+      "image": "./DavidLamb.jpg",
+      "bio": "Solutions Architect at AWS.",
+      "linkedin": "david-lamb-1059a62"
+    },
+    {
+       "name": "Mithun Mallick",
+       "image": "./MithunMallick.jpg",
+       "bio": "Serverless Principal Solutions Architect at AWS.",
+    }
+  ]
+}
