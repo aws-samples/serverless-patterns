@@ -1,0 +1,54 @@
+{
+  "title": "API Gateway REST API to Lambda to SES (Python)",
+  "description": "This sample project demonstrates how to publish an Email using SES whenever the REST API is invoked using Lambda function.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "Create an Amazon API Gateway REST API that calls Lambda and SES.",
+    "text": ["This pattern deploys a Amazon API Gateway REST API with Lambda Function integration and SES"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/blob/main/apigw-lambda-ses",
+      "templateURL": "serverless-patterns/apigw-lambda-ses",
+      "projectFolder": "apigw-lambda-ses",
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Publishing Emails in Amazon SES.",
+        "link": "https://docs.aws.amazon.com/ses/latest/dg/getting-started.html"
+      },
+      {
+        "text": "Creating and verifying identities in Amazon SES.",
+        "link": "https://docs.aws.amazon.com/ses/latest/dg/creating-identities.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided --parameter-overrides  SENDER=sender@email.com RECIPIENT=recipient@email.com"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Himanshu Goyal",
+      "image": "https://media.licdn.com/dms/image/D4D03AQGfOBBJOHCFnw/profile-displayphoto-shrink_200_200/0/1674582869052?e=1704326400&v=beta&t=PMspUbSZaTe1IrbT_W6kzowHJXEKQLd-YIicHKTTRmM",
+      "bio": "A Serverless Cloud Engineer and technical writer, dedicated to crafting efficient and scalable solutions using AWS services. My expertise in serverless architecture empowers me to create innovative and cost-effective cloud solutions. I enjoy sharing my knowledge with the serverless community through articles and patterns, helping others explore the vast potential of serverless computing. ",
+      "linkedin": "himanshugoyal20"
+    }
+  ]
+}
