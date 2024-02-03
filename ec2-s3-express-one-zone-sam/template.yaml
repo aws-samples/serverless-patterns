@@ -73,7 +73,12 @@ Resources:
         - CidrIp: 0.0.0.0/0 
           IpProtocol: tcp
           FromPort: 22
-          ToPort: 22        
+          ToPort: 22
+      SecurityGroupEgress:
+        - IpProtocol: all
+          CidrIp: 0.0.0.0/0
+          
+
 
   # Create EC2 Instance Profile, Role  
   EC2InstanceProfile: 
@@ -158,14 +163,6 @@ Resources:
           SubnetId: !Ref Subnet
           GroupSet:
             - !Ref SecurityGroup
-      # UserData:
-      #   Fn::Base64: |
-      #     #!/bin/bash
-      #     yum update -y
-      #     yum install -y httpd
-      #     systemctl start httpd
-      #     systemctl enable httpd
-      #     echo "Hello World from $(hostname -f)" > /var/www/html/index.html
       Tags:
         - Key: Name
           Value: !Sub "EC2-Instance-${AvailabilityZoneName}"
@@ -179,12 +176,6 @@ Resources:
       DataRedundancy: SingleAvailabilityZone
       LocationName: !Sub "${AvailabilityZoneId}"
 
-  # OutputBucketExpressOneZone:
-  #   Type: AWS::S3Express::DirectoryBucket
-  #   Properties:
-  #     # BucketName: input-bucket-express-one-zone
-  #     DataRedundancy: SingleAvailabilityZone
-  #     LocationName: !Sub "${AvailabilityZoneId}"
 
 # Output EC2 ARN, Bucket names
 Outputs:
