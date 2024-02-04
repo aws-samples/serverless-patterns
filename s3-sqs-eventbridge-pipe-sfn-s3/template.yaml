@@ -1,0 +1,239 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - S3 to SQS to EventBridge Pipes to Step Function to S3
+
+Parameters:
+  SourceBucketName:
+    Type: String
+  DestinationBucketName:
+    Type: String
+    
+Resources:
+  ## Source S3 bucket
+  SourceBucket:
+    Type: AWS::S3::Bucket
+    DependsOn:
+      - NotificationQueuePolicy
+    Properties:
+      BucketName: !Ref SourceBucketName
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: "s3:ObjectCreated:*"
+            Queue: !GetAtt NotificationQueue.Arn
+
+  ## Destination S3 Bucket
+  DestinationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DestinationBucketName
+
+  ## SQS Queue
+  NotificationQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt NotificationQueueDLQ.Arn
+        maxReceiveCount: 5
+
+  # DLQ for source
+  NotificationQueueDLQ:
+    Type: AWS::SQS::Queue
+
+  ## Policy allowing S3 Event Notifications to be in SQS
+  NotificationQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Id: QueuePolicy
+        Statement:
+          - Sid: Allow-SendMessage-To-Queue-From-S3-Event-Notification
+            Effect: Allow
+            Principal:
+              Service: "s3.amazonaws.com"
+            Action:
+              - "sqs:SendMessage"
+            Resource: !GetAtt NotificationQueue.Arn
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Join [ "",[ 'arn:aws:s3:::',!Ref SourceBucketName ] ]
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Queues:
+        - Ref: NotificationQueue
+
+  # Logs for EventBridge Pipe
+  EventBridgePipeLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+      LogGroupName: /s3-sqs-eventbridge-pipe-sfn-s3/EventBridgePipe
+
+  # Eventbridge Pipe Definition
+  S3FileCopy:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      RoleArn: !GetAtt EventBridgePipesRole.Arn
+      Name: s3-sqs-eventbridge-pipe-sfn-s3
+      DesiredState: RUNNING
+      Source: !GetAtt NotificationQueue.Arn
+      SourceParameters:
+        SqsQueueParameters:
+          BatchSize: 1
+      LogConfiguration:
+        CloudwatchLogsLogDestination:
+          LogGroupArn: !GetAtt EventBridgePipeLogGroup.Arn
+        IncludeExecutionData:
+          - ALL
+        Level: TRACE
+      Target: !Ref TargetStateMachine
+
+  ## Role for EventBridge Pipes to read from SQS and execute Step Function
+  EventBridgePipesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogDelivery'
+                  - 'logs:GetLogDelivery'
+                  - 'logs:UpdateLogDelivery'
+                  - 'logs:DeleteLogDelivery'
+                  - 'logs:ListLogDeliveries'
+                  - 'logs:PutResourcePolicy'
+                  - 'logs:DescribeResourcePolicies'
+                  - 'logs:DescribeLogGroups'
+                Resource: '*'
+        - PolicyName: ReadSQS
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource: !GetAtt NotificationQueue.Arn
+        - PolicyName: ExecuteSFN
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'states:StartExecution'
+                  - 'states:StartSyncExecution'
+                Resource: !Ref TargetStateMachine
+
+  # Logs for StepFunctions
+  TargetStateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+      LogGroupName: /s3-sqs-eventbridge-pipe-sfn-s3/StateMachine
+
+  # Execution Role for StepFunctions
+  TargetStateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - states.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogDelivery'
+                  - 'logs:GetLogDelivery'
+                  - 'logs:UpdateLogDelivery'
+                  - 'logs:DeleteLogDelivery'
+                  - 'logs:ListLogDeliveries'
+                  - 'logs:PutResourcePolicy'
+                  - 'logs:DescribeResourcePolicies'
+                  - 'logs:DescribeLogGroups'
+                Resource: '*'
+        - PolicyName: SourceBucketList
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:ListBucket'
+                Resource: !GetAtt SourceBucket.Arn
+        - PolicyName: SourceBucketReadOnly
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:Get*'
+                  - 's3:List*'
+                  - 's3:Describe*'
+                Resource: !Join
+                  - ''
+                  - - !GetAtt SourceBucket.Arn
+                    - /*
+        - PolicyName: DestinationBucketList
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:ListBucket'
+                Resource: !GetAtt DestinationBucket.Arn
+        - PolicyName: DestinationBucketReadWrite
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:*Object'
+                Resource: !Join
+                  - ''
+                  - - !GetAtt DestinationBucket.Arn
+                    - /*
+
+  # Step Function Definition
+  TargetStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      DefinitionUri: workflow/s3-sqs-eventbridge-pipe-sfn-s3.asl.json
+      DefinitionSubstitutions:
+        DestinationBucketName: !Ref DestinationBucketName
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt TargetStateMachineLogGroup.Arn
+        Level: ALL
+        IncludeExecutionData: true
+      Role: !GetAtt TargetStateMachineRole.Arn
+
+Outputs:
+  SourceBucketName:
+    Value: !Ref SourceBucketName
+    Description: S3 Bucket for object storage
+  DestinationBucketName:
+    Value: !Ref DestinationBucketName
+    Description: S3 destination Bucket for object storage

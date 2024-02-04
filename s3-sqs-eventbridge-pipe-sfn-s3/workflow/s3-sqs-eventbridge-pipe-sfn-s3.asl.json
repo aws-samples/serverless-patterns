@@ -1,0 +1,58 @@
+{
+  "Comment": "Copies file from source to destination bucket",
+  "StartAt": "Loop through each SQS Message",
+  "States": {
+    "Loop through each SQS Message": {
+      "Type": "Map",
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "INLINE"
+        },
+        "StartAt": "Extract and decode S3 Event Notification JSON",
+        "States": {
+          "Extract and decode S3 Event Notification JSON": {
+            "Type": "Pass",
+            "Next": "Loop through each S3 Event Notification Record",
+            "Parameters": {
+              "Body.$": "States.StringToJson($.body)"
+            }
+          },
+          "Loop through each S3 Event Notification Record": {
+            "Type": "Map",
+            "ItemProcessor": {
+              "ProcessorConfig": {
+                "Mode": "INLINE"
+              },
+              "StartAt": "Get S3 Object from Source Bucket",
+              "States": {
+                "Get S3 Object from Source Bucket": {
+                  "Type": "Task",
+                  "Parameters": {
+                    "Bucket.$": "$.s3.bucket.name",
+                    "Key.$": "$.s3.object.key"
+                  },
+                  "Resource": "arn:aws:states:::aws-sdk:s3:getObject",
+                  "Next": "Write S3 Object to Destination Bucket",
+                  "ResultPath": "$.Object"
+                },
+                "Write S3 Object to Destination Bucket": {
+                  "Type": "Task",
+                  "End": true,
+                  "Parameters": {
+                    "Body.$": "$.Object.Body",
+                    "Bucket": "${DestinationBucketName}",
+                    "Key.$": "$.s3.object.key"
+                  },
+                  "Resource": "arn:aws:states:::aws-sdk:s3:putObject"
+                }
+              }
+            },
+            "ItemsPath": "$.Body.Records",
+            "End": true
+          }
+        }
+      },
+      "End": true
+    }
+  }
+}
