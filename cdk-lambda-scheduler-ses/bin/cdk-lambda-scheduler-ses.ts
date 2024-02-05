@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CdkLambdaSchedulerSesStack } from '../lib/cdk-lambda-scheduler-ses-stack';
+import { CdkLambdaSchedulerSesStack } from '../lib/lambda-scheduler-ses-stack';
 
 const app = new cdk.App();
 new CdkLambdaSchedulerSesStack(app, 'CdkLambdaSchedulerSesStack', {

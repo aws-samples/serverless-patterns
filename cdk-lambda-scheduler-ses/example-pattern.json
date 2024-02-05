@@ -15,7 +15,7 @@
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-lambda-scheduler-ses",
         "templateURL": "serverless-patterns/cdk-lambda-scheduler-ses",
         "projectFolder": "cdk-lambda-scheduler-ses",
-        "templateFile": "lib/cdk-lambda-scheduler-ses-stack.ts"
+        "templateFile": "lib/lambda-scheduler-ses-stack.ts"
       }
     },
     "resources": {
