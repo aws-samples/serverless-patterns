@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09' 
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template that creates an EC2 Instance, an Amazon S3 Express One Zone directory bucket and required IAM Role to access the bucket from the instance
+
+# Get the required input parameters
+Parameters:
+  BusinessName:
+    Type: String
+    Description: Please enter the business name
+  Email:
+    Type: String
+    Description: Please enter email id
+  Phone:
+    Type: String
+    Description: Please enter phone number
+  EDI214InputBucketName:
+    Type: String
+    Description: Please enter the name of the input bucket
+  EDI214OutputBucketName:
+    Type: String
+    Description: Please enter the name of the output bucket
+  MyProfileId:
+    Type: String
+    Description: Please enter the id of the profile
+  MyTransformerId:
+    Type: String
+    Description: Please enter the id of the transformer
+
+ 
+Resources:
+  # Create create a trading capability
+  MyTradingCapability: 
+    Type: AWS::B2BI::Capability
+    Properties:
+      Configuration: 
+        Edi: 
+          InputLocation: 
+            BucketName: !Sub "${EDI214InputBucketName}"
+            Key: input
+          OutputLocation: 
+            BucketName: !Sub "${EDI214OutputBucketName}"
+            Key: output
+          TransformerId: !Sub "${MyTransformerId}"
+          Type: 
+            X12Details: 
+              TransactionSet: X12_214
+              Version: VERSION_4010
+      Name: EDI214-AWSNewBlog
+      Type: edi
+
+  # Create a B2BI Partnership
+  MyPartner: 
+    Type: AWS::B2BI::Partnership
+    Properties:
+      Capabilities: 
+        - !Ref MyTradingCapability
+      Email: !Sub "${Email}"
+      Name: MyPartner
+      Phone: !Sub "${Phone}"
+      ProfileId: !Sub "${MyProfileId}"
+
+
+# Output the TradingCapability and Partner
+Outputs:
+  MyTradingCapability:
+    Value: !Ref MyTradingCapability
+  MyPartner:
+    Value: !Ref MyPartner
+
