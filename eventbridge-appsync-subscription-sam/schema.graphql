@@ -13,6 +13,6 @@ type Subscription {
   @aws_subscribe(mutations: ["onEbUpdate"])
 }
 
-type Query {
-  getUpdate(): Update
-}
+# Any Query you need for your application
+type QueryOutput { output: String! }
+type Query { myQuery(input: String!): QueryOutput }
