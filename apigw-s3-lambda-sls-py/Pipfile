@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+urllib3 = "1.26.15"
+retry = "*"
+aws-requests-auth = "*"
+[dev-packages]
+boto3 = "*"
+aws-lambda-powertools = "*"
+[requires]
+python_version = "3.9"
