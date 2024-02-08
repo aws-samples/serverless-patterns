@@ -1,0 +1,57 @@
+{
+  "title": "AWS Lambda Canary Deployment with Monitoring",
+  "description": "Creates a Canary Deployment for a Lambda function and creates a CloudWatch Dashboard for Monitoring",
+  "language": "Typescript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample projects demonstrates how to deploy a Lambda Function with CodeDeploy through CDK. It also creates a CloudWatch Dashboard through CodeDeploys BeforeAllowTraffic Hook to monitor the traffic-shift during a canary deployment."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
+      "templateURL": "serverless-patterns/lambda-canary-monitoring-cdk",
+      "projectFolder": "lambda-canary-monitoring-cdk",
+      "templateFile": "cdk/bin/cdk.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Alias Configuration",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html"
+      },
+      {
+        "text": "Practical experience with a serverless-first strategy at Capital One (SVS311)",
+        "link": "https://www.youtube.com/watch?v=NZVNAEK6shc"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm i",
+      "cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Julian Lang",
+      "image": "https://avatars.githubusercontent.com/u/56228802?v=4",
+      "bio": "Solutions Architect at Amazon Web Services",
+      "linkedin": "langjulian"
+    }
+  ]
+}
