@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09' 
 Transform: AWS::Serverless-2016-10-31
-Description: This SAM Template demonstrates how AWS B2B Data Interchange can transform EDI Files into JSON as per the transformation logic
+Description: This is part 1 of a 2 part template to demonstrate how AWS B2B Data Interchange can transform EDI Files into JSON as per the transformation logic. This is part 1 of the template.
 
 # Get the required input parameters
 Parameters:
@@ -10,6 +10,8 @@ Parameters:
   Email:
     Type: String
     Description: Please enter email id
+    AllowedPattern: ^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$
+    ConstraintDescription: You should enter a valid email
   Phone:
     Type: String
     Description: Please enter phone number
@@ -86,7 +88,7 @@ Resources:
     Properties: 
       BucketName: !Sub "edi-214-output-${AWS::AccountId}-${AWS::Region}"
 
-  # Create bucket policy to allow read operations from AWS B2B Data Interchange
+  # Create bucket policy to allow write operations from AWS B2B Data Interchange
   EDI214OutputBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:

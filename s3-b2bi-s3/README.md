@@ -26,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```bash
-   sam deploy -g -t template1.yaml
+   sam deploy -g -t template-part1.yaml
    ```
 4. During the prompts:
 
@@ -40,7 +40,7 @@ Important: this application uses various AWS services and there are costs associ
 
 7. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```bash
-   sam deploy -g -t template2.yaml
+   sam deploy -g -t template-part2.yaml
    ```
 8. During the prompts:
 
@@ -48,7 +48,6 @@ Important: this application uses various AWS services and there are costs associ
    - Enter the desired AWS Region. Please refer to the documentation for the list of supported regions.
    - Enter `BusinessName`, `Email`, `Phone`, `EDI214InputBucketName`, `EDI214OutputBucketName`, `MyProfileId` and `MyTransformerId`. Please note the last four parameter values should be given as per the output from the `b2bi-stack1` output. 
 
-   Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 
 ## How it works
