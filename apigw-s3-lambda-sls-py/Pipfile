@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 urllib3 = "1.26.15"
 retry = "*"
-aws-requests-auth = "*"
 [dev-packages]
 boto3 = "*"
 aws-lambda-powertools = "*"
