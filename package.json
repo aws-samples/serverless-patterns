@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@aws-sdk/client-sfn": "^3.449.0"
+  }
+}

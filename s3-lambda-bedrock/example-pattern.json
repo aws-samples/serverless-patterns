@@ -1,0 +1,56 @@
+{
+  "title": "S3 to Lambda to Bedrock",
+  "description": "Generate vector embeddings for the documents uploaded to S3",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A new S3 bucket is created that has event notification set to call a Lambda function. Lambda function is integrated with Bedrock Titan Embedding Model",
+      "The S3 put request creates an event to Lambda function which extracts the content from the object and call Bedrock Titan Embedding model",
+      "The Lambda function return the Vector embeddings of the document as JSON"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-bedrock",
+      "templateURL": "serverless-patterns/s3-lambda-bedrock",
+      "projectFolder": "s3-lambda-bedrock",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/blogs/aws/amazon-bedrock-is-now-generally-available-build-and-scale-generative-ai-applications-with-foundation-models/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abdul Waheed",
+      "image": "https://avatars.githubusercontent.com/u/15647692?v=4",
+      "bio": "Solutions Architect @ AWS",
+      "linkedin": "linked-in-ID",
+      "twitter": "waheed2"
+    }
+  ]
+}

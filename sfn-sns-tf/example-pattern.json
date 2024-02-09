@@ -1,0 +1,59 @@
+{
+  "title": "AWS Step Functions to Amazon SNS",
+  "description": "This terraform template deploys a Step Functions workflow that sends the message to Amazon SNS and returns the response.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Start the Workflow using the `start-execution` api command with a `InputAndMessage` string in the input payload. The Workflow will send the user-inputed message to the SNS Topic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-sns-tf",
+      "templateURL": "serverless-patterns/sfn-sns-tf",
+      "projectFolder": "sfn-sns-tf",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Call Amazon SNS with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-sns.html"
+      },
+      {
+        "text": "Service Integration Patterns",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html"
+      }
+    ]
+  },
+	"deploy": {
+		"text": [
+		          "terraform init",
+		          "terraform apply"
+		        ]
+	},
+	"testing": {
+		"text": [
+		"See the Github repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+		          "terraform destroy",
+		          "terraform show"
+		        ]
+	},
+	"authors": [
+		{
+			"name": "Makendran G",
+			"image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
+			"bio": "Cloud Support Engineer @ AWS",
+			"linkedin": "makendran",
+			"twitter": "@MakendranG"
+		}
+	]
+}
