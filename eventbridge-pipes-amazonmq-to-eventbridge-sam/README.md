@@ -135,7 +135,13 @@ Please Note: If deploying this pattern with the AWS SAM *Parameters* `MQPublicly
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 
+1. Delete the AWS Secret Manager secret created to hold the credentials for the AmazonMQ broker
+
+    ```bash
+    aws secretsmanager delete-secret --secret-id arn:aws:secretsmanager:us-east-1:12345678912:secret:MQaccess-ABCD --force-delete-without-recovery 
+    ```
+
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
