@@ -5,7 +5,7 @@
   "level": "200",
   "framework": "SAM",
   "introBox": {
-    "headline": "Create an Amazon API Gateway REST API that calls Lambda and SES.",
+    "headline": "Create an Amazon API Gateway REST API that invokes a Lambda function to send email through SES.",
     "text": ["This pattern deploys a Amazon API Gateway REST API with Lambda Function integration and SES"]
   },
   "gitHub": {
