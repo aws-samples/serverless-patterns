@@ -40,7 +40,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+      "Delete the stack: <code>sam delete </code>."
     ]
   },
   "authors": [
