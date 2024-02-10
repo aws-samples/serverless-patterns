@@ -54,7 +54,7 @@ curl --location --request GET 'https://<api_id>.execute-api.<region>.amazonaws.c
 
 1. Delete the stack 
     ```
-    aws cloudformation delete-stack —stack-name STACK_NAME
+    sam delete
     ```
 2. Confirm the stack has been deleted 
     ```
