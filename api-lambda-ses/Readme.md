@@ -56,10 +56,6 @@ curl --location --request GET 'https://<api_id>.execute-api.<region>.amazonaws.c
     ```
     sam delete
     ```
-2. Confirm the stack has been deleted 
-    ```
-    aws cloudformation list-stacks —query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
 
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
