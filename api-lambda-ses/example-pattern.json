@@ -1,5 +1,5 @@
 {
-  "title": "API Gateway REST API to Lambda to SES (Python)",
+  "title": "Amazon API Gateway REST API to AWS Lambda to Amazon SES",
   "description": "This sample project demonstrates how to publish an Email using SES whenever the REST API is invoked using Lambda function.",
   "language": "Python",
   "level": "200",
