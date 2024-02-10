@@ -1,4 +1,4 @@
-# Integration of Amazon API Gateway REST API with Amazon Lambda and Amazon SES
+# Integration of Amazon API Gateway REST API with AWS Lambda and Amazon SES
 
 The SAM template deploys a API Gateway REST API with Lambda function integration and the IAM permissions required to run the application. Whenever the REST API is invoked, the Lambda function publishes a message to the SES. The AWS SAM template deploys the resources and the IAM permissions required to run the application.
 
