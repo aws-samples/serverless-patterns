@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway REST API to AWS Lambda to Amazon SES",
-  "description": "This sample project demonstrates how to publish an Email using SES whenever the REST API is invoked using Lambda function.",
+  "description": "This sample project demonstrates publishing an email through SES by invoking a Lambda function through a REST API.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
