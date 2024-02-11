@@ -54,7 +54,7 @@
   "authors": [
     {
       "name": "Josh Rodgers",
-      "image": "https://github.com/awsjosh/serverless-patterns/stepfunctions-create-delete-ngw/docs/awsjosh.jpg",
+      "image": "https://raw.githubusercontent.com/awsjosh/serverless-patterns/awsjosh-feature-create-and-delete-ngw/stepfunctions-create-delete-ngw/docs/awsjosh.jpg",
       "bio": "Josh Rodgers is a Senior Solutions Architect for AWS who works with enterprise customers in the Travel and Hospitality vertical. Josh enjoys working with customers to solve complex problems with a focus on serverless technologies, DevOps, and security. Outside of work, Josh enjoys hiking, playing music, skydiving, painting, and spending time with family.",
       "linkedin": "https://www.linkedin.com/in/joshuamrodgers/"
     }
