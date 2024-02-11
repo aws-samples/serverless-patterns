@@ -1,0 +1,505 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Sample allocates an Elastic IP, Creates a NAT Gateway, and Creates a NAT Gateway route in a route table
+
+  Sample SAM Template for ngw-auto
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Parameters:
+  SNSTopic:
+    Type: String
+    Default: email@email.com
+    Description: Enter a valid email for your SNS topic subscription
+
+  RouteTableId:
+    Type: String
+    Default: rtb-XXXXXXXXXXXXXXXXX
+    Description: Enter a valid route table id for your NGW routes
+
+  SubnetId:
+    Type: String
+    Default: subnet-XXXXXXXXXXXXXXXXX
+    Description: Enter a valid SubnetId for your NAT Gateway
+
+  ScheduleDay:
+    Type: String
+    Default: SAT
+    AllowedValues: 
+      - SUN
+      - MON
+      - TUE
+      - WED
+      - THU
+      - FRI
+      - SAT
+    Description: Select a day for the schedule
+
+  StartTime:
+    Type: String
+    Default: 12
+    AllowedValues: 
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 11
+      - 12
+      - 13
+      - 14
+      - 15
+      - 16
+      - 17
+      - 18
+      - 19
+      - 20
+      - 21
+      - 22
+      - 23
+    Description: Select a time to create the NAT Gateway
+
+  DeleteTime:
+    Type: String
+    Default: 14
+    AllowedValues: 
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 11
+      - 12
+      - 13
+      - 14
+      - 15
+      - 16
+      - 17
+      - 18
+      - 19
+      - 20
+      - 21
+      - 22
+      - 23
+    Description: Select a time to delete the NAT Gateway
+
+Resources:
+  CreateNatGateway:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/create-ngw/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Timeout: 20
+      Architectures:
+        - x86_64
+      Role: !GetAtt LambdaCreateNGWRole.Arn
+      
+  CreateNatGatewayRoute:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/create-ngw-route/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Timeout: 20
+      Architectures:
+        - x86_64
+      Role: !GetAtt LambdaCreateNGWRouteRole.Arn
+
+  DeleteNatGateway:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/delete-ngw/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Timeout: 20
+      Architectures:
+        - x86_64
+      Role: !GetAtt LambdaDeleteNGWRole.Arn
+
+  ReleaseEIP:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/release-eip/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Timeout: 20
+      Architectures:
+        - x86_64
+      Role: !GetAtt LambdaReleaseEIPRole.Arn
+
+  NGWSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+      - Endpoint: !Ref SNSTopic
+        Protocol: email
+
+  CreateNGWStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: create-nat-gateway
+      Type: EXPRESS
+      Logging:
+        Level: ERROR
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StepFunctionCreateNGWLogGroup.Arn
+      DefinitionUri: src/ngw-state-machine/create-ngw.asl.json
+      DefinitionSubstitutions:
+        CreateNatGatewayArn: !Ref CreateNatGateway
+        CreateNatGatewayRouteArn: !Ref CreateNatGatewayRoute
+        SNSTopicArn: !Ref NGWSNSTopic
+      Role: !GetAtt CreateNGWInvokeRole.Arn
+
+  DeleteNGWStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: delete-nat-gateway
+      Type: EXPRESS
+      Logging:
+        Level: ERROR
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StepFunctionDeleteNGWLogGroup.Arn
+      DefinitionUri: src/ngw-state-machine/delete-ngw.asl.json
+      DefinitionSubstitutions:
+        DeleteNatGatewayArn: !Ref DeleteNatGateway
+        ReleaseEIPArn: !Ref ReleaseEIP
+        SNSTopicArn: !Ref NGWSNSTopic
+      Role: !GetAtt DeleteNGWInvokeRole.Arn
+
+  StepFunctionCreateNGWLogGroup:
+    Type: AWS::Logs::LogGroup
+
+  StepFunctionDeleteNGWLogGroup:
+    Type: AWS::Logs::LogGroup
+
+  ScheduleCreateNGW:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Description: Schedule runs at user-defined interval
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      ScheduleExpression: !Join [ "", ["cron(0 ",!Ref StartTime," ?"," * ",!Ref ScheduleDay," *)"] ]
+      Target:
+        Arn: !GetAtt CreateNGWStateMachine.Arn
+        RoleArn: !GetAtt ScheduleCreateNGWRole.Arn
+        Input: !Join [ "", ["{ \"rtbid\" : ", "\"",!Ref RouteTableId, "\"", ", \"subnetid\":", "\"",  !Ref SubnetId, "\"", " }"] ]
+
+  ScheduleDeleteNGW:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Description: Schedule runs at user-defined interval
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      ScheduleExpression: !Join [ "", ["cron(0 ",!Ref DeleteTime," ?"," * ",!Ref ScheduleDay," *)"] ]
+      Target:
+        Arn: !GetAtt DeleteNGWStateMachine.Arn
+        RoleArn: !GetAtt ScheduleDeleteNGWRole.Arn
+        Input: !Join [ "", ["{ \"rtbid\" : ", "\"",!Ref RouteTableId, "\"", " }"] ]
+
+  CreateNGWInvokeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - states.amazonaws.com
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: CreateNGWInvokePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt CreateNatGateway.Arn
+                  - !GetAtt CreateNatGatewayRoute.Arn
+        - PolicyName: NGWPublishSNS
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - SNS:Publish
+                Resource:
+                  - !Ref NGWSNSTopic
+        - PolicyName: StepCloudwatchWrite
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogDelivery
+                  - logs:GetLogDelivery
+                  - logs:UpdateLogDelivery
+                  - logs:DeleteLogDelivery
+                  - logs:ListLogDeliveries
+                  - logs:PutResourcePolicy
+                  - logs:DescribeResourcePolicies
+                  - logs:DescribeLogGroups
+                Resource: '*'
+        - PolicyName: SNSInvoke
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !Ref NGWSNSTopic
+
+  DeleteNGWInvokeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - states.amazonaws.com
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: DeleteNGWInvokePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt DeleteNatGateway.Arn
+                  - !GetAtt ReleaseEIP.Arn
+        - PolicyName: NGWPublishSNS
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - SNS:Publish
+                Resource:
+                  - !Ref NGWSNSTopic
+        - PolicyName: StepCloudwatchWrite
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogDelivery
+                  - logs:GetLogDelivery
+                  - logs:UpdateLogDelivery
+                  - logs:DeleteLogDelivery
+                  - logs:ListLogDeliveries
+                  - logs:PutResourcePolicy
+                  - logs:DescribeResourcePolicies
+                  - logs:DescribeLogGroups
+                Resource: '*'
+
+  LambdaCreateNGWRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: lambda-create-ngw-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+        Version: 2012-10-17
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:CreateNatGateway
+                  - ec2:CreateRoute
+                  - ec2:CreateTags
+                  - ec2:AllocateAddress
+                Resource: '*'
+          PolicyName: CreateNATGatewayPolicy
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+          PolicyName: LambdaCloudwatchWrite
+
+  LambdaCreateNGWRouteRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: lambda-create-ngw-route-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+        Version: 2012-10-17
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:CreateRoute
+                Resource: '*'
+          PolicyName: CreateNATGatewayRoutePolicy
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+          PolicyName: LambdaCloudwatchWrite
+
+  LambdaDeleteNGWRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: lambda-delete-ngw-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+        Version: 2012-10-17
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:DeleteRoute
+                  - ec2:DeleteNatGateway
+                  - ec2:DescribeNatGateways
+                Resource: '*'
+          PolicyName: DeleteNATGatewayPolicy
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+          PolicyName: LambdaCloudwatchWrite
+
+  LambdaReleaseEIPRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: lambda-release-eip-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+        Version: 2012-10-17
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:ReleaseAddress
+                Resource: '*'
+          PolicyName: ReleaseEIPPolicy
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+          PolicyName: LambdaCloudwatchWrite
+
+  ScheduleCreateNGWRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeCreateNGWStateMachine
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'states:startExecution'
+                Resource:
+                  - !GetAtt CreateNGWStateMachine.Arn
+
+  ScheduleDeleteNGWRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeDeleteNGWStateMachine
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'states:startExecution'
+                Resource:
+                  - !GetAtt DeleteNGWStateMachine.Arn
+
+
+

@@ -1,0 +1,62 @@
+{
+  "title": "Create and Delete a NAT Gateway",
+  "description": "Automate the Creation and Deletion of NAT Gateways with EventBridge Scheduler, Step Functions, Lambda, and SNS",
+  "language": "NodeJS",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "As a best practice, AWS customers should deploy resources that don’t require direct internet access, such as EC2 instances, databases, queues, caching, or other infrastructure, into a VPC private subnet. Those workloads can take advantage of VPC endpoints to call AWS services privately without having to traverse the public internet. Some workloads require occaisional updates from external sources. You can use a NAT gateway so that instances in a private subnet can connect to services outside your VPC but external services cannot initiate a connection with those instances. Since these updates often occur during a scheduled maintenance window, NAT Gateways aren't necessarily required to be in place all the time, and can be created and deleted only when needed.",
+      "This project contains source code and supporting files for a serverless application that allocates an Elastic IP address, creates a NAT Gateway, and adds a route to the NAT Gateway in a VPC route table. The application also deletes the NAT Gateway and releases the Elastic IP address. The process to create and delete a NAT Gateway is orchestrated by an AWS Step Functions State Machine, triggered by an EventBridge Scheduler. The schedule can be defined by parameters during the SAM deployment process.",
+      "The application uses several AWS resources, including an EventBridge Scheduler, Lambda functions, a Step Function State Machine, and an SNS topic. These resources are defined in a template.yaml file. You can update the template to add AWS resources through the same deployment process that updates your application code. This ReadMe.md includes deployment instructions. Note: In order to delete your NAT Gateway, it will need to be in an available state."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunctions-create-delete-ngw",
+      "templateURL": "serverless-patterns/stepfunctions-create-delete-ngw",
+      "projectFolder": "stepfunctions-create-delete-ngw",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "NAT Gateways",
+        "link": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html"
+      },
+      {
+        "text": "What is Amazon EventBridge Scheduler?",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "What is AWS Step Functions?",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+      }      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Josh Rodgers",
+      "image": "https://github.com/awsjosh/serverless-patterns/stepfunctions-create-delete-ngw/docs/awsjosh.jpg",
+      "bio": "Josh Rodgers is a Senior Solutions Architect for AWS who works with enterprise customers in the Travel and Hospitality vertical. Josh enjoys working with customers to solve complex problems with a focus on serverless technologies, DevOps, and security. Outside of work, Josh enjoys hiking, playing music, skydiving, painting, and spending time with family.",
+      "linkedin": "https://www.linkedin.com/in/joshuamrodgers/"
+    }
+  ]
+}
