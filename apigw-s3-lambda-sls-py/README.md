@@ -73,7 +73,7 @@ This setup can be tested using the [curl command](https://github.com/curl/curl/b
 In this context, the inclusion of 'suffix' alongside 'order_object_path' suggests that we have the flexibility to substitute multiple folders in place of 'order_object_path'.
 
 ```commandline
-xh https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json X-Api-Key:ttLMU7hv2S4qEpBVaCYXt4OWoy38jRmF7txgEBXy orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=USD customerId:=10002
+xh put https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json X-Api-Key:ttLMU7hv2S4qEpBVaCYXt4OWoy38jRmF7txgEBXy orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=USD customerId:=10002
 ```
 _Or_
 ```commandline
@@ -128,7 +128,7 @@ S3 Event Triggered Lambda logs:
 #### II. Testing Request Validator:
 In this scenario, a value of "ZZZ" is passed for `orderPaymentCurrency` in the request body, which is not among the permitted values.
 ```commandline
-xh https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json X-Api-Key:ttLMU7hv2S4qEpBVaCYXt4OWoy38jRmF7txgEBXy orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=ZZZ customerId:=10002
+xh put https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json X-Api-Key:ttLMU7hv2S4qEpBVaCYXt4OWoy38jRmF7txgEBXy orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=ZZZ customerId:=10002
 ```
 _Or_
 ```commandline
@@ -163,7 +163,7 @@ x-amzn-trace-id: Root=1-65c2f6f5-79d73edc65b20ee1272f2fb0
 
 #### III. Testing without API Key:
 ```commandline
-xh https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=USD customerId:=10002
+xh put https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=USD customerId:=10002
 ```
 _Or_
 ```commandline
