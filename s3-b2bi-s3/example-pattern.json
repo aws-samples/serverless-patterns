@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-b2bi-s3",
       "templateURL": "serverless-patterns/s3-b2bi-s3",
       "projectFolder": "s3-b2bi-s3",
-      "templateFile": "template-part1.yaml, template-part2.yaml"
+      "templateFile": "template-part1.yaml"
     }
   },
   "resources": {
