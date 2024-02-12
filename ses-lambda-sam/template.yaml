@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template to receive email by Amazon SES and process by AWS Lambda
+
+Parameters:
+  DomainName:
+    Type: String
+    Description: Please enter the Amazon Route53 domain name (public hosted zone)
+
+  ResourceRecords:
+    Type: String
+    Description: Please enter the Email Receiving Endpoint for your region  
+
+
+Resources:
+
+# Email SES identity to receive emails
+  EmailIdentity:
+    Type: AWS::SES::EmailIdentity
+    DependsOn: 
+      - EmailProcessingLambdaFunctionPolicy
+    Properties:
+      EmailIdentity: !Ref DomainName
+
+# Create SES Email Receipt RuleSet
+  EmailReceiptRuleSet:
+    Type: AWS::SES::ReceiptRuleSet
+    DependsOn: 
+      - EmailProcessingLambdaFunctionPolicy
+    Properties:
+      RuleSetName: !Sub ${DomainName}-email-receipt-rule-set
+
+# Create SES Email Receipt Rule
+  EmailReceiptRule:
+    Type: AWS::SES::ReceiptRule
+    DependsOn: 
+      - EmailProcessingLambdaFunctionPolicy
+    Properties:
+      RuleSetName: !Ref EmailReceiptRuleSet
+      Rule:
+        Name: !Sub ${DomainName}-email-receipt-rule
+        Enabled: true
+        ScanEnabled: true
+        Actions:
+          - LambdaAction:
+              FunctionArn: !GetAtt EmailProcessingLambdaFunction.Arn
+              InvocationType: Event
+
+# Route53 MX record to route emails
+  Route53MXRecord:  
+    Type: AWS::Route53::RecordSet   
+    Properties:
+      HostedZoneName: !Join ['', [!Ref DomainName, .]]
+      Comment: "MX record for email receiving"
+      Name: !Ref DomainName
+      Type: MX
+      TTL: '600'
+      ResourceRecords:
+        - !Ref ResourceRecords
+
+# Create SES Indentity verification CNAME records in Route53
+  EmailIdentityCNAMERecord1:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Join ['', [!Ref DomainName, .]]
+      Comment: "Identity CNAME record for email receiving"
+      Name: !GetAtt EmailIdentity.DkimDNSTokenName1
+      Type: CNAME
+      TTL: '600'
+      ResourceRecords:
+        - !GetAtt EmailIdentity.DkimDNSTokenValue1
+
+  EmailIdentityCNAMERecord2:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Join ['', [!Ref DomainName, .]]
+      Comment: "Identity CNAME record for email receiving"
+      Name: !GetAtt EmailIdentity.DkimDNSTokenName2
+      Type: CNAME
+      TTL: '600'
+      ResourceRecords:
+        - !GetAtt EmailIdentity.DkimDNSTokenValue2
+
+  EmailIdentityCNAMERecord3:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Join ['', [!Ref DomainName, .]]
+      Comment: "Identity CNAME record for email receiving"
+      Name: !GetAtt EmailIdentity.DkimDNSTokenName3
+      Type: CNAME
+      TTL: '600'
+      ResourceRecords:
+        - !GetAtt EmailIdentity.DkimDNSTokenValue3
+
+# Lambda function
+  EmailProcessingLambdaFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Handler: process-email.lambda_handler
+      Runtime: python3.12
+      CodeUri: src/
+
+# Create AWS Lambda resoure based policy to allow SES to invoke Lambda
+  EmailProcessingLambdaFunctionPolicy:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt EmailProcessingLambdaFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: ses.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Sub arn:aws:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/*
+
+# Output the AWS Lambda Function Name, EmailReceiptRuleSet Name, email id where mail needs to be sent
+Outputs:
+  FunctionName:
+    Value: !Ref EmailProcessingLambdaFunction
+    Description: EmailProcessingLambdaFunction Name
+  EmailReceiptRuleSet:
+    Description: "Email Receipt RuleSet Name"  
+    Value: !Ref EmailReceiptRuleSet
+  ReceivingEmailAddress:
+    Description: "Email address for receiving emails"  
+    Value: !Join ['', ['contact@',!Ref DomainName]] 
