@@ -1,6 +1,6 @@
 {
-  "title": "Receive email by Amazon SES and process using AWS Lambda function",
-  "description": "This sample project demonstrates how to receive email using Amazon SES and process using AWS Lambda.",
+  "title": "Receive email with Amazon SES and process them using an AWS Lambda function",
+  "description": "This sample project demonstrates how to receive email with Amazon SES and process them using AWS Lambda.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
@@ -9,7 +9,7 @@
     "text": [
       "User sends email to the configured domain in Amazon SES.",
       "Amazon SES receives the email and then applies the rule set to trigger an AWS Lambda function.",
-      "The AWS Lambda functoin processes information from the SES event."
+      "The AWS Lambda function processes the information from the SES event."
     ]
   },
   "gitHub": {

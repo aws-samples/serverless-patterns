@@ -1,6 +1,6 @@
-# Receive email by Amazon SES and process using AWS Lambda function
+# Receive email with Amazon SES and process them using an AWS Lambda function
 
-This sample project demonstrates how to receive email using Amazon SES and process using AWS Lambda.
+This sample project demonstrates how to receive email with Amazon SES and process them using AWS Lambda.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/ses-lambda-sam
 
@@ -59,7 +59,7 @@ Please refer to the architecture diagram below:
 
 * User sends email to the configured domain in Amazon SES.
 * Amazon SES receives the email and then applies the rule set to trigger an AWS Lambda function. 
-* The AWS Lambda functoin processes information from the SES event.
+* The AWS Lambda function processes the information from the SES event.
 
 ## Testing
 
@@ -70,10 +70,10 @@ Please refer to the architecture diagram below:
    ```
 
 
-2. Make a note of `ReceivingEmailAddress` from the `sam deploy` output and send email to that email id. Send an email to this Id.
+2. Make a note of `ReceivingEmailAddress` from the `sam deploy` output and send email to that email address.
 
 
-3. You should see logline similar to following in the Lambda function log: 
+3. You should see logline similar to following in the Lambda function log. You may have to wait a few seconds to see the logs: 
    ```bash
      Received email from {your-email} with subject {your-email-subject}
    ```
