@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:apigw-http-api-lambda-rds-proxy)
   apigw-http-api-lambda-rds-proxy
 
   Sample SAM Template for apigw-http-api-lambda-rds-proxy
