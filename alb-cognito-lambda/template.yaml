@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: Setup ALB, Cognito and Lambda integration using AWS SAM template
+Description: Setup ALB, Cognito and Lambda integration using AWS SAM template (uksb-1tthgi812) (tag:alb-cognito-lambda)
 
 Parameters:
   VpcId:
