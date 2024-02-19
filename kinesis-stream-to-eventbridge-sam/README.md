@@ -30,7 +30,7 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the desired AWS Region
     * Enter an IAM role name for the parameter `IAMRoleName` 
     * Allow SAM CLI to create IAM roles with the required permissions
-    Once you have run `sam deploy —guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 
@@ -44,11 +44,10 @@ When data is sent to the Amazon Kinesis data stream, Amazon EventBridge Pipe con
 ## Testing
 
 From the command line, please run the following command to send a single data record to the Kinesis data stream. Note that you must edit the <value> with the Kinesis data name that is deployed. 
-
-    ```bash
-    aws kinesis put-record --stream-name <value> --data testdata --partition-key "test" 
-    ```
-
+```bash
+aws kinesis put-record --stream-name <value> --data testdata --partition-key "test" 
+```
+    
 ## Cleanup
  
 1. Delete the stack
