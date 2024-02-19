@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template to connect Kinesis Stream to EventBus
+
+Parameters:
+  IAMRoleName:
+    Type: String
+    Default: SAMDemoIAMRole
+    Description: Enter a name for IAM Role used by Pipe.
+Resources:
+  # Define a Kinesis Data Stream
+  KinesisStream:
+    Type: "AWS::Kinesis::Stream"
+    Properties:
+      Name: !Sub ${AWS::StackName}-Stream
+      ShardCount: 1  
+  # Define a custom Event Bus (Target)
+  CustomEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub ${AWS::StackName}-Bus
+  # Define an IAM role for Pipe
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref IAMRoleName
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: pipes.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'kinesis:DescribeStream'
+                  - 'kinesis:DescribeStreamSummary'
+                  - 'kinesis:GetRecords'
+                  - 'kinesis:GetShardIterator'
+                  - 'kinesis:ListStreams'
+                  - 'kinesis:ListShards'
+                Resource: 
+                  - !GetAtt KinesisStream.Arn
+        - PolicyName: TargetPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:PutEvents'
+                Resource: !GetAtt CustomEventBus.Arn
+  # Define EventBridge Pipe              
+  Pipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: !Sub ${AWS::StackName}-pipe
+      Description: "Pipe to connect Kinesis stream to event bus"
+      DesiredState: RUNNING
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt KinesisStream.Arn
+      SourceParameters:
+        KinesisStreamParameters:
+          StartingPosition: LATEST
+          BatchSize: 1
+      TargetParameters:
+        InputTemplate: '{"data": <$.data>}'    
+      Target: !GetAtt CustomEventBus.Arn
