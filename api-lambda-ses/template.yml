@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: s1
+      DefinitionBody: # an OpenApi definition
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: 'src/api.yml'
+      OpenApiVersion: 3.0.3
+      EndpointConfiguration:
+          Type: REGIONAL
+
+  lambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/index.zip
+      Description: Example Lambda function
+      FunctionName: LambdaFunctionName
+      Handler: index.handler
+      Role: !GetAtt 
+        - LambdaExecutionRole
+        - Arn
+      MemorySize: 128
+      Timeout: 5
+      Runtime: python3.9
+      Environment:
+        Variables:
+          RECIPIENT: !Ref RECIPIENT
+          SENDER: !Ref SENDER
+      Events:
+        APIEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId: !Ref RestApi
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: 'arn:aws:logs:*:*:*'
+              - Sid: SES
+                Effect: Allow
+                Action:
+                  - 'ses:SendEmail'
+                Resource: '*'
+
+Parameters:
+  RECIPIENT:
+    Type: String
+    Default: abc@xyz.com
+    Description: Enter the recipent's email address
+  SENDER:
+    Type: String
+    Default: abc@xyz.com
+    Description: Enter the sender's email address
+  
+Outputs:
+  lambdaArn:
+    Value: !GetAtt lambdaFunction.Arn
+
+  apiGatewayInvokeURL:
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/s1
