@@ -40,9 +40,9 @@ When data is sent to the Amazon Kinesis data stream, Amazon EventBridge Pipe con
 ## Testing
 
 From the command line, please run the following command to send a single data record to the Kinesis data stream. Note that you must edit the <value> with the Kinesis data name that is deployed.
-    ```bash
+```bash
     aws kinesis put-record --stream-name <value> --data testdata --partition-key "test" 
-    ```
+ ```
 
 ## Cleanup
  
