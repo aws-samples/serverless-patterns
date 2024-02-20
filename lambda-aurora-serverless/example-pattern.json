@@ -1,0 +1,63 @@
+{
+  "title": "AWS Lambda and Amazon Aurora Serverless v1",
+  "description": "Creates a Lambda function with access to an Amazon Aurora Serverless v1 DB cluster.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an AWS Lambda function and an Amazon Aurora MySQL database version 2 (with MySQL 5.7 compatibility) in an Aurora Serverless version 1 DB cluster with Data API and a Secrets Manager secret.",
+      "The function creates an example table in the DB, inserts a row with data from the event object, then returns the results of a select query.",
+      "For Aurora Serverless v2, please use [another pattern](https://serverlessland.com/patterns/lambda-aurora-serverlessv2-postgresql)"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-aurora-serverless",
+      "templateURL": "serverless-patterns/lambda-aurora",
+      "projectFolder": "lambda-aurora-serverless",
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using the Data API for Aurora Serverless",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html"
+      },
+      {
+        "text": "Data API - ExecuteStatement",
+        "link": "https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html"
+      },
+      {
+        "text": "AWS Lambda and Aurora Serverless v2",
+        "link": "https://serverlessland.com/patterns/lambda-aurora-serverlessv2-postgresql"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Greg Davis",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/greg-davis.jpg",
+      "bio": "I am a Principal Solutions Architect, Serverless Developer, Database Engineer, and Data Integration Architect. I specialize in architecting and developing Serverless, event-driven solutions.",
+      "linkedin": "gregtx",
+      "twitter": "ServerlessGuy"
+    }
+  ]
+}
