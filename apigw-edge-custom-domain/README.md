@@ -36,6 +36,8 @@ This pattern deploys an Edge-optimized API Gateway with a single method (/hello)
 ## How it works
 <img width="1273" alt="image" src="assets/architecture.png">
 
+In this pattern we use CloudFormation custom resources, you can check out this [workshop](https://mng.workshop.aws/cloudformation/customresource.html).
+
 1. As you can see in the diagram above, the first step is to create the "certificate.yaml" file.
 
 To create an ACM certificate on AWS with DNS as DomainValidationOptions, we need to provide the DomainName and the HostedZoneId. CloudFormation does not get the HostedZoneId dynamically from now. I made a custom resource for a dynamic approach, not hardcoded.
