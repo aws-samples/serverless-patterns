@@ -1,5 +1,5 @@
 # Edge-optimized AWS API Gateway with custom domain name
-This pattern provides a simple stack (API Gateway /hello) to deploy an EDGE-Optimized API Gateway in your preferred region with ACM certificate in us-east-1(mandatory with EDGE API).
+This pattern deploys an Edge-optimized API Gateway with a single method (/hello) in your preferred region with an AWS Certificate Manager certificate in us-east-1 (which is mandatory for Edge-optimized API Gateways).
 
 ## Requirements
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
