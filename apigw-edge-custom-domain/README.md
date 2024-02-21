@@ -1,4 +1,4 @@
-# AWS API Gateway @EDGE with custom domain name
+# Edge-optimized AWS API Gateway with custom domain name
 This pattern provides a simple stack (API Gateway /hello) to deploy an EDGE-Optimized API Gateway in your preferred region with ACM certificate in us-east-1(mandatory with EDGE API).
 
 ## Requirements
