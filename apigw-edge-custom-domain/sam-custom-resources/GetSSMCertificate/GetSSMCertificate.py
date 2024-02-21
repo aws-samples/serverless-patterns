@@ -27,6 +27,7 @@ def send_response(event, context, response_status, response_data):
 def handler(event, context):
     LOG.info(f'REQUEST RECEIVED: {event}')
     # For Delete requests, immediately send a SUCCESS response.
+    # We do this because the custom resource does not create AWS resources, only retrieves values.
     if event['RequestType'] == 'Delete':
         LOG.info('Entering Delete')
         send_response(event, context, "SUCCESS", {})
