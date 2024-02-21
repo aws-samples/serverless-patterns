@@ -36,6 +36,15 @@ This pattern deploys an Edge-optimized API Gateway with a single method (/hello)
 ## How it works
 <img width="1273" alt="image" src="assets/architecture.png">
 
+1. As you can see in the diagram above, the first step is to create the "certificate.yaml" file.
+
+To create an ACM certificate on AWS with DNS as DomainValidationOptions, we need to provide the DomainName and the HostedZoneId. CloudFormation does not get the HostedZoneId dynamically from now. I made a custom resource for a dynamic approach, not hardcoded.
+To get the ARN of this certificate from the other stack I store it in a ParameterStore.
+
+2. Deploy the main stack with the template named "template.yaml".
+
+Now we need to deploy the main stack, our EDGE API Gateway. We need to get the certificate we created in Step 1 and the HostedZoneId for our domain. To do this we will create a second custom resource.
+
 ## Testing
     $ wget sample-api.<your-domain-name>/hello
 
