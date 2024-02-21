@@ -11,11 +11,27 @@ This pattern deploys an Edge-optimized API Gateway with a single method (/hello)
 ## Deployment Instructions
 1. Create the certificate in us-east-1
     ```
-    $ sam deploy -t certificate.yaml --stack-name cert-sample-api --parameter-overrides "Domain=sample.com" --region us-east-1 --resolve-s3 --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --no-progressbar
+    $ sam deploy \ # Deploy command for SAM
+        -t certificate.yaml \ # the path to the SAM template to deploy the ACM certificate
+        --stack-name cert-sample-api \ # Specifies the name of the CloudFormation stack
+        --parameter-overrides "Domain=sample.com" \ # Overrides parameters defined in the SAM template
+        --region us-east-1 \ # Specifies the AWS region where the stack will be deployed, us-east-1 is mandatory for certificate
+        --resolve-s3 \ # Automatically create an Amazon S3 bucket to use for packaging and deploying
+        --capabilities CAPABILITY_IAM \ # Specifies the IAM capabilities required for the stack to create/modify IAM resources
+        --no-fail-on-empty-changeset \ # Indicates that the deployment should not fail if there are no changes to be made
+        --no-progressbar # Do not display a progress bar when uploading artifacts to Amazon S3
     ```
 1. Create the main stack in your preferred region
     ```
-    $ sam deploy -t template.yaml --stack-name sample-api --parameter-overrides "Env=Dev Domain=sample.com" --region eu-west-1 --resolve-s3 --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset --no-progressbar
+    $ sam deploy \ # Deploy command for SAM
+        -t template.yaml \ # the path to the SAM template to deploy our application (EDGE API Gateway)
+        --stack-name sample-api \ # Specifies the name of the CloudFormation stack
+        --parameter-overrides "Domain=sample.com" \ # Overrides parameters defined in the SAM template
+        --region eu-west-1 \ # Specifies your preferred AWS region where the stack will be deployed, eu-west-1 for me
+        --resolve-s3 \ # Automatically create an Amazon S3 bucket to use for packaging and deploying
+        --capabilities CAPABILITY_IAM \ # Specifies the IAM capabilities required for the stack to create/modify IAM resources
+        --no-fail-on-empty-changeset \ # Indicates that the deployment should not fail if there are no changes to be made
+        --no-progressbar # Do not display a progress bar when uploading artifacts to Amazon S3
     ```
 ## How it works
 <img width="1273" alt="image" src="assets/architecture.png">
