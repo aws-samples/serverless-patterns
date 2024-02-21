@@ -46,7 +46,9 @@ To get the ARN of this certificate from the other stack I store it in a Paramete
 Now we need to deploy the main stack, our EDGE API Gateway. We need to get the certificate we created in Step 1 and the HostedZoneId for our domain. To do this we will create a second custom resource.
 
 ## Testing
-    $ wget sample-api.<your-domain-name>/hello
+This is a sample 'hello world' API, you can test it with the following command.
+
+    $ wget sample-api.<your-domain-name>/hello # The domain name you set during your deployment ("--parameter-overrides")
 
 ## Cleanup
 
