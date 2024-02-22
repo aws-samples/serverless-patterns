@@ -198,7 +198,7 @@ Resources:
                         "stacked": false,
                         "region": "${AWS::Region}",
                         "period": 30,
-                        "stat": "Average",
+                        "stat": "Sum",
                         "title": "Api Gateway - Cache Hit Rate"
                     }
                 },

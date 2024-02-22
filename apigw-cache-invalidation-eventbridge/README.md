@@ -58,7 +58,7 @@ Upon the first request for each record, within the configured cache time frame, 
 1. After the application is deployed, grab the ApiUrl endpoint from the outputs. If you missed it, simple use the SAM list command to retrieve.
 
 ```
-sam list outputs
+sam list stack-outputs --stack-name STACK_NAME
 ```
 
 2. using Postman or another API tool send a POST request to the endpoint `<endpoint>/pets` with the following payload:
@@ -106,12 +106,12 @@ Available endpoints are:
    _This will also remove the package uploaded to S3 created by the `sam deploy` command_
 
    ```bash
-   aws cloudformation delete-stack --stack-name STACK_NAME
+   sam delete --stack-name STACK_NAME
    ```
 
 1. Confirm the stack has been deleted
    ```bash
-   aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+   sam list resources --stack-name STACK_NAME
    ```
 
 ---

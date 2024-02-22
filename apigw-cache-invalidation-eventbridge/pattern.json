@@ -18,7 +18,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-cache-invalidation-eventbridge",
       "templateURL": "serverless-patterns/apigw-cache-invalidation-eventbridge",
       "projectFolder": "apigw-cache-invalidation-eventbridge",
-      "templateFile": ""
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -45,9 +45,9 @@
   "authors": [
     {
       "name": "Mark White",
-      "image": "https://media.licdn.com/dms/image/C4D03AQE17W81CnvT0w/profile-displayphoto-shrink_400_400/0/1633262092892?e=1706140800&v=beta&t=m6z_Nel7szyg1sPhngIvhkGE9cnpgU65WuaVn6Eo110",
+      "image": "https://avatars.githubusercontent.com/u/8914061?v=4",
       "bio": "Principal Engineer at Dunelm",
-      "linkedin": "https://www.linkedin.com/in/mark--white/"
+      "linkedin": "mark--white"
     }
   ]
 }
