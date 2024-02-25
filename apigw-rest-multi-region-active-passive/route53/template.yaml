@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - REST API multi-region failover route 53 arc resorces
+
+
+
+Resources:
+  MultiRegionApisCluster:
+    Type: AWS::Route53RecoveryControl::Cluster
+    Properties:
+      Name: multi-region-apis-cluster
+
+  ExternalApiControlPanel:
+    Type: AWS::Route53RecoveryControl::ControlPanel
+    DependsOn:
+      - MultiRegionApisCluster
+    Properties:
+      Name: ExternalApiControlPanel
+      ClusterArn: !Ref MultiRegionApisCluster
+
+  Service1ControlPanel:
+    Type: AWS::Route53RecoveryControl::ControlPanel
+    DependsOn:
+      - MultiRegionApisCluster
+    Properties:
+      Name: Service1ControlPanel
+      ClusterArn: !Ref MultiRegionApisCluster
+
+  Service2ControlPanel:
+    Type: AWS::Route53RecoveryControl::ControlPanel
+    DependsOn:
+      - MultiRegionApisCluster
+    Properties:
+      Name: Service2ControlPanel
+      ClusterArn: !Ref MultiRegionApisCluster
+
+Outputs:
+  Route53ClusterArn:
+    Description: 'Route 53 Cluster Arn'
+    Value: !Ref MultiRegionApisCluster
+  ExtenalApiControlPanelArn:
+    Description: 'Route 53 Cluster Arn'
+    Value: !Ref ExternalApiControlPanel
+  Service1ControlPanelArn:
+    Description: 'Route 53 Cluster Arn'
+    Value: !Ref Service1ControlPanel
+  Service2ControlPanelArn:
+    Description: 'Route 53 Cluster Arn'
+    Value: !Ref Service2ControlPanel

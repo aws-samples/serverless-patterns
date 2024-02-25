@@ -1,0 +1,39 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "external-api",
+  },
+  "paths" : {
+    "/" : {
+      "get" : {
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri" : { "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RootLambdaRegionalApi.Arn}/invocations" },
+          "passthroughBehavior" : "when_no_match",
+          "type" : "aws_proxy"
+        }
+      }
+    },
+    "/service1" : {
+      "get" : {
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "GET",
+          "uri" : { "Ref" : "Service1HttpsEndpoint" },
+          "passthroughBehavior" : "when_no_match",
+          "type" : "http_proxy"
+        }
+      }
+    },
+    "/service2" : {
+      "get" : {
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "GET",
+          "uri" : { "Ref" : "Service2HttpsEndpoint" },
+          "passthroughBehavior" : "when_no_match",
+          "type" : "http_proxy"
+        }
+      }
+    }
+  },
+  "components" : { }
+}

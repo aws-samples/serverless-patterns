@@ -1,0 +1,18 @@
+version = 0.1
+
+[primary.deploy.parameters]
+stack_name = "external-api"
+resolve_s3 = true
+s3_prefix = "external-api"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+
+[secondary.deploy.parameters]
+stack_name = "external-api"
+resolve_s3 = true
+s3_prefix = "external-api"
+region = "us-west-2"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "FailoverType=\"SECONDARY\""
+image_repositories = []

@@ -1,0 +1,154 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - REST API multi-region failover service 2
+
+Parameters:
+
+  PublicHostedZoneId:
+    Type: String
+
+  DomainName:
+    Type: String
+    Default: service2.mydomain.com
+
+  CertificateArn:
+    Type: String
+
+  Route53ArcClusterArn:
+    Type: String
+
+  Service2ControlPanelArn:
+    Type: String
+
+  Stage:
+    Type: String
+    Default: prod
+  
+  FailoverType:
+    Type: String
+    Default: PRIMARY
+    AllowedValues:
+      - PRIMARY
+      - SECONDARY
+
+Conditions:
+  isPrimaryRegion: !Equals [!Ref FailoverType, PRIMARY]
+  isSecondaryRegion: !Equals [!Ref FailoverType, SECONDARY]
+
+Resources:
+#Lambda function
+  Service2LambdaRegionalApi:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        import os
+
+        def lambda_handler(event, context):
+            return {
+        "statusCode": 200,
+        "body": json.dumps({
+          "service" : "service2",
+          "region" : os.environ['AWS_REGION']}),
+        }
+      Runtime: python3.9
+      Events:
+        HelloWorld:
+          Type: Api 
+          Properties: 
+            Path: /
+            Method: get
+            RestApiId:
+              Ref: ApiRegional
+              
+  # REST Regional API
+  ApiRegional:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: service2
+      StageName: !Ref Stage
+      EndpointConfiguration: REGIONAL
+
+  # Custom domains
+  CustomDomainRegional:
+    Type: AWS::ApiGatewayV2::DomainName
+    DependsOn:
+      - ApiRegional
+    Properties:
+      DomainName: !Ref DomainName
+      DomainNameConfigurations:
+      - SecurityPolicy: TLS_1_2
+        CertificateArn: !Ref CertificateArn
+        EndpointType: REGIONAL
+
+  MappingRegional:
+    Type: AWS::ApiGatewayV2::ApiMapping
+    DependsOn:
+      - CustomDomainRegional
+    Properties:
+      DomainName: !Ref DomainName
+      ApiId: !Ref ApiRegional
+      Stage: !Ref Stage
+
+  Service2RoutingControlPrimary:
+    Type: AWS::Route53RecoveryControl::RoutingControl
+    Condition: isPrimaryRegion
+    Properties:
+      ClusterArn: !Ref Route53ArcClusterArn
+      ControlPanelArn: !Ref Service2ControlPanelArn
+      Name: service2-primary-rc
+
+  Service2PrimaryHealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Condition: isPrimaryRegion
+    DependsOn:
+      - Service2RoutingControlPrimary
+    Properties:
+      HealthCheckConfig:
+        Type: RECOVERY_CONTROL
+        RoutingControlArn: !Ref Service2RoutingControlPrimary
+
+  Service2RoutingControlSecondary:
+    Type: AWS::Route53RecoveryControl::RoutingControl
+    Condition: isSecondaryRegion
+    Properties:
+      ClusterArn: !Ref Route53ArcClusterArn
+      ControlPanelArn: !Ref Service2ControlPanelArn
+      Name: service2-secondary-rc
+
+  Service2SecondaryHealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Condition: isSecondaryRegion
+    DependsOn:
+      - Service2RoutingControlSecondary
+    Properties:
+      HealthCheckConfig:
+        Type: RECOVERY_CONTROL
+        RoutingControlArn: !Ref Service2RoutingControlSecondary
+
+  Route53AliasRecordRegionalPrimary:
+    Type: AWS::Route53::RecordSet
+    DependsOn:
+      - CustomDomainRegional
+    Properties:
+      Name: !Ref DomainName
+      Type: A
+      Failover: !Ref FailoverType
+      SetIdentifier: !If [isPrimaryRegion, 1, 2]
+      HealthCheckId: !If [isPrimaryRegion, !Ref Service2PrimaryHealthCheck, !Ref Service2SecondaryHealthCheck]
+      HostedZoneId: !Ref PublicHostedZoneId
+      AliasTarget:
+        DNSName: !GetAtt CustomDomainRegional.RegionalDomainName
+        HostedZoneId: !GetAtt CustomDomainRegional.RegionalHostedZoneId
+
+
+# Outputs
+Outputs:
+  EndpointUrl:
+    Description: 'REST regional endpoint URL'
+    Value: !Sub 'https://${ApiRegional}.execute-api.${AWS::Region}.amazonaws.com/${Stage}'
+  CustomDomainNameEndpoint:
+    Description: Custom Domain Name endpoint
+    Value: !Sub "https://${DomainName}"
+

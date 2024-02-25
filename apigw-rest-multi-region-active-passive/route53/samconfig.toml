@@ -1,0 +1,9 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "multi-region-apis-r53-arc"
+resolve_s3 = true
+s3_prefix = "multi-region-apis-r53-arc"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
