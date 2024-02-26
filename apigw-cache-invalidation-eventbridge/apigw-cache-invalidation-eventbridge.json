@@ -1,5 +1,5 @@
 {
-    "title": "Api Gateway to DynamoDB including cache invalidation",
+    "title": "API Gateway to DynamoDB including cache invalidation",
     "description": "Create a functionless cache invalidation process",
     "language": "TypeScript",
     "level": "200",
@@ -9,7 +9,7 @@
         "text": [
             "This sample project demonstrates how to use a functionless cache invalidation process when utilizing API Gateway and DynamoDB as a simple CRUD.",
             "By introducing EventBridge to this architecture and enabling DynamoDB Streams, the MODIFY event fired into the Stream can be captured, processed and published to a custom EventBridge by EventBridge Pipes. ",
-            "Once the event is available on the custom EventBridge, a Rule can consume the event and target the API Gateway with a `Cache-Control: max-age=0` header and correct AWS IAM permissions `execute-api:InvalidateCache` using the Arn method for the Target.",
+            "Once the event is available on the custom EventBridge, a Rule can consume the event and target the API Gateway with a `Cache-Control: max-age=0` header and correct AWS IAM permissions `execute-api:InvalidateCache` using the ARN method for the Target.",
             "Note: This application uses resources that are not eligible for the AWS Free Tier"
         ]
     },
@@ -55,5 +55,43 @@
             "bio": "Principal Engineer at Dunelm",
             "linkedin": "mark--white"
         }
-    ]
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 10,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway"
+        },
+        "icon2": {
+            "x": 35,
+            "y": 50,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "icon3": {
+            "x": 60,
+            "y": 50,
+            "service": "dynamodb-stream",
+            "label": "DynamoDB Streams"
+        },
+        "icon4": {
+            "x": 85,
+            "y": 50,
+            "service": "eventbridge",
+            "label": "Amazon EventBridge"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        }
+    }
 }
