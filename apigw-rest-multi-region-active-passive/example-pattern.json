@@ -1,0 +1,66 @@
+{
+    "title": "Multi-Region REST API Failover",
+    "description": "Companies often have multiple teams managing different services behind a shared public API. In disaster recovery scenarios, each team needs the ability to fail over their services independently. This pattern demonstrates a multi-region active-passive external API that proxies to independent multi-region active-passive service APIs. The primary and secondary regions can be configured independently for the external API and each internal service. This allows you to fail over the external API and each internal service independently as needed for disaster recovery.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "You will deploy 3 applications (external api, service2 and service 2) in two separate regions. The external api (i.e. https://externalapi.mydomain.com) is your entry point to access service 1 (i.e. https://externalapi.mydomain.com/service1) and service 2 (i.e. https://externalapi.mydomain.com/service2). The external api uses public HTTP endpoint integrations (/service1 and /service2) to access service 1 and service 2.",
+        "If an issue with the primary region occurs, you can user Route53 ARC to route traffic to the secondary region. You can failover each application (external api, service1 and service2) independently.",
+        "This example demonstrates the failover only and does not encompass authentication and data for the multiple regions."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-multi-region-active-passive",
+        "templateURL": "serverless-patterns/apigw-rest-multi-region-active-passive",
+        "projectFolder": "apigw-rest-multi-region-active-passive",
+        "templateFile": "apigw-rest-multi-region-active-passive/route53/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Routing control in Amazon Route 53 Application Recovery Controller ",
+          "link": "https://docs.aws.amazon.com/r53recovery/latest/dg/routing-control.html"
+        },
+        {
+          "text": "Creating Disaster Recovery Mechanisms Using Amazon Route 53",
+          "link": "https://aws.amazon.com/blogs/networking-and-content-delivery/creating-disaster-recovery-mechanisms-using-amazon-route-53/"
+        },
+        {
+          "text": "Building highly resilient applications using Amazon Route 53 Application Recovery Controller, Part 2: Multi-Region stack",
+          "link": "https://aws.amazon.com/blogs/networking-and-content-delivery/building-highly-resilient-applications-using-amazon-route-53-application-recovery-controller-part-2-multi-region-stack/"
+        },
+        {
+          "text": "Disaster Recovery with Amazon Route 53 Application Recovery Controller (ARC)",
+          "link": "https://catalog.us-east-1.prod.workshops.aws/workshops/4d9ab448-5083-4db7-bee8-85b58cd53158/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "See the GitHub repo for detailed deployment instructions."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "See the GitHub repo for detailed cleanup instructions."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Marcos Ortiz",
+        "image": "https://avatars.githubusercontent.com/u/293381?v=4",
+        "bio": "I am a Principal Solutions Architect at AWS.",
+        "linkedin": "ortizmarcos"
+      }
+    ]
+  }
