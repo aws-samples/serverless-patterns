@@ -6,7 +6,7 @@ This pattern demonstrates a multi-region active-passive external API that proxie
 
 ![alt text](images/diagram.jpg)
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland/patterns/apigateway-multi-region-active-passive-rest-apis
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland/patterns/apigw-rest-multi-region-active-passive
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
