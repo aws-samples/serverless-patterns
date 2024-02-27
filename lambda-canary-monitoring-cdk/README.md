@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Canary Deployments with Lambda and CodeDeploy with Monitoring
 
 This pattern demonstrates how to deploy a Lambda Function with CodeDeploy canary deployments through CDK. It also creates a CloudWatch Dashboard through CodeDeploys BeforeAllowTraffic Hook to monitor the traffic-shift during a canary deployment.
 
