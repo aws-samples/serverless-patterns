@@ -9,6 +9,6 @@ const app = new cdk.App();
 const monitoring = new MonitoringStack(app, 'MonitoringStack');
 
 new LambdaCanaryMonitoringStack(app, 'LambdaCanaryStack', {
-  VERSION_NUMBER: '6',
+  VERSION_NUMBER: '1',
   monitoring,
 });

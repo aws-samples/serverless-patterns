@@ -66,7 +66,7 @@ export class LambdaCanaryMonitoringStack extends Stack {
       {
         application: application,
         alias: aliasBusinessLambda,
-        deploymentConfig: codedeploy.LambdaDeploymentConfig.ALL_AT_ONCE,
+        deploymentConfig: codedeploy.LambdaDeploymentConfig.CANARY_10PERCENT_5MINUTES,
         preHook: dashboardLambda,
       }
     );

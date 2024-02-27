@@ -1,6 +1,6 @@
 # AWS Service 1 to AWS Service 2
 
-This pattern << explain usage >>
+This pattern demonstrates how to deploy a Lambda Function with CodeDeploy canary deployments through CDK. It also creates a CloudWatch Dashboard through CodeDeploys BeforeAllowTraffic Hook to monitor the traffic-shift during a canary deployment.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -37,22 +37,36 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-TODO: Explain basics, Explain subsequent deployments with change of version number
+After you have finished the initial deployment of the CDK application, you can increase the version Number in `cdk/bin/cdk.ts` for your next deployment. This is just a mechanism to make it easier for you to distinguish between the two versions when calling the API, or looking at the logs. However it is not necessary, since a new version will be created whenever you make changes to your Function Code.
+
+When you do your first deployment you can go to your AWS Console, to monitor the Deployment in CodeDeploy and on the CloudWatch Dashboard.
+It is recommended to run a small load test during the deployment against this Lambda function, to see the traffic gradually shift over in the CloudWatch Dashboard.
+
+You can adjust the Deployment Strategy in `cdk/lib/lambda-canary-stack.ts`, by changing `deploymentConfig` of the `LambdaDeploymentGroup`
+
+```
+    const deploymentGroup = new codedeploy.LambdaDeploymentGroup(this,
+      'LambdaCanaryMonitoringDeploymentGroup',
+      {
+        application: application,
+        alias: aliasBusinessLambda,
+        deploymentConfig: codedeploy.LambdaDeploymentConfig.CANARY_10PERCENT_5MINUTES,
+        preHook: dashboardLambda,
+      }
+    );
+```
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+After the initial deployment you will get an HTTPS Endpoint from the Function URL of the Lambda function. You can send simple GET requests to this endpoint to get a response with the configured Version number of the Lambda Function.
 
 ## Cleanup
  
-1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
+1. From the command line run this AWS CDK command to delete the Serverless application stack
+
+```node
+   cdk destroy
+```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 

@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample projects demonstrates how to deploy a Lambda Function with CodeDeploy through CDK. It also creates a CloudWatch Dashboard through CodeDeploys BeforeAllowTraffic Hook to monitor the traffic-shift during a canary deployment."
+      "This sample project demonstrates how to deploy a Lambda Function with CodeDeploy canary deployments through CDK. It also creates a CloudWatch Dashboard through CodeDeploys BeforeAllowTraffic Hook to monitor the traffic-shift during a canary deployment."
     ]
   },
   "gitHub": {
