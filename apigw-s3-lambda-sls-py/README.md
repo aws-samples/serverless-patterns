@@ -45,7 +45,7 @@ AWS costs incurred. No warranty is implied in this example.
    ```commandline
       sls deploy --stage dev --verbose
    ```
-6. The outputs from the Serverless deployment process containing the resource names, IDs and/or ARNs which are used for
+6. The outputs from the Serverless deployment process contain the resource names, IDs and/or ARNs which are used for
    testing.
 
 
