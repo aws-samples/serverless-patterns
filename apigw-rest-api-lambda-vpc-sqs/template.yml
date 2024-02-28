@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An application that includes an API Gateway (with an API key) that sends the request to the Lambda function in a vpc. Then, the lambda funciton sends the message to SQS queue
+Description: An application that includes an API Gateway (with an API key) that sends the request to the Lambda function in a vpc. Then, the lambda funciton sends the message to SQS queue (uksb-1tthgi812) (tag:apigw-rest-api-lambda-vpc-sqs)
 
 Parameters:
   Subnets:

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon DynamoDB
+Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon DynamoDB (uksb-1tthgi812) (tag:apigw-lambda-dynamodb-kinesis-lambda)
 Parameters:
   KinesisStreamName:
     Type: String
