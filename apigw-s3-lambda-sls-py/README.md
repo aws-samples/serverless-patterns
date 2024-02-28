@@ -69,14 +69,15 @@ This setup can be tested using the [curl command](https://github.com/curl/curl/b
 In this context, the inclusion of 'suffix' alongside 'order_object_path' suggests that we have the flexibility to substitute multiple folders in place of 'order_object_path'.
 
 ```commandline
-xh put https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json X-Api-Key:ttLMU7hv2S4qEpBVaCYXt4OWoy38jRmF7txgEBXy orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=USD customerId:=10002
+xh put https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json X-Api-Key:<Api-Key> orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=USD customerId:=10002
 ```
 _Or_
+
 ```commandline
 
 curl --request PUT \
   --url https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json \
-  --header 'x-api-key: ttLMU7hv2S4qEpBVaCYXt4OWoy38jRmF7txgEBXy' \
+  --header 'x-api-key: <Api-Key>' \
   --data '{
 		"orderId": 10023,
 		"orderDate": "2024-02-03",
@@ -102,14 +103,15 @@ x-amzn-trace-id: Root=1-65c2e2dd-737319bc469770c954e78a1c
 In this scenario, a value of "ZZZ" is passed for `orderPaymentCurrency` in the request body, which is not among the permitted values.
 
 ```commandline
-xh put https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json X-Api-Key:ttLMU7hv2S4qEpBVaCYXt4OWoy38jRmF7txgEBXy orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=ZZZ customerId:=10002
+xh put https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json X-Api-Key:<Api-Key> orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=ZZZ customerId:=10002
 ```
 _Or_
+
 ```commandline
 
 curl --request PUT \
   --url https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json \
-  --header 'x-api-key: ttLMU7hv2S4qEpBVaCYXt4OWoy38jRmF7txgEBXy' \
+  --header 'x-api-key:<Api-Key>' \
   --data '{
 		"orderId": 10023,
 		"orderDate": "2024-02-03",
@@ -140,6 +142,7 @@ x-amzn-trace-id: Root=1-65c2f6f5-79d73edc65b20ee1272f2fb0
 xh put https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json orderDate=2024-02-06 orderPaymentAmount:=23.99 orderPaymentCurrency=USD customerId:=10002
 ```
 _Or_
+
 ```commandline
 
 curl --request PUT \
