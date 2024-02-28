@@ -1,6 +1,6 @@
 # Redrive SQS FIFO Queue messages from DLQ 
 
-The patterns shows the redrive capability of Amazon SQS FIFO queues from dead letter queue. The SAM template deploys two Amazon SQS FIO queues with DLQ, and two AWS Lambda functions to simulate the redrive capability of SQS.
+The pattern shows the redrive capability of Amazon SQS FIFO queues from a dead letter queue. The SAM template deploys two Amazon SQS FIO queues with DLQ, and two AWS Lambda functions to simulate the redrive capability of SQS.
 
 Learn more about this pattern at Serverless Land Patterns:https://serverlessland.com/patterns/fifio-sqs-redrive
 
