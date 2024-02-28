@@ -3,7 +3,8 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: > 
+Description: >
+  (uksb-1tthgi812) (tag:apigw-websocket-api-connection-dynamodb)
   Serverless patterns - Amazon API Gateway WebSocket API connection
   tracking using AWS Service integration type and Amazon DynamoDB
 
