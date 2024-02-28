@@ -1,6 +1,6 @@
 {
     "title": "Serverless ETL Pattern with AWS Glue and DynamoDB ",
-    "description": "Effortlessly deploy Glue scripts with AWS SAM in this streamlined serverless pattern",
+    "description": "Deploy Glue scripts with AWS SAM in this streamlined serverless pattern",
     "language": "YAML",
     "level": "200",
     "framework": "SAM",
