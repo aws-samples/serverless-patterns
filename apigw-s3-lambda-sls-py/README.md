@@ -1,7 +1,7 @@
 # REST API as an Amazon S3 proxy in API Gateway
 
 This pattern utilizes the Serverless framework to deploy a REST API via API Gateway, acting as an S3 proxy for write operations. 
-It includes API-Key Setup, Request Body Validator, Lambda invocation on S3 events, and enables CloudWatch logs and X-Ray tracing for API Gateway and Lambda using AWS Powertool for Lambda framework.
+It includes API-Key Setup, Request Body Validator, Lambda function invocation on S3 events, and enables CloudWatch logs and X-Ray tracing for API Gateway and Lambda using the Powertools for AWS Lambda.
 
 Learn more about this pattern
 at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-s3-lambda-sls-py).
