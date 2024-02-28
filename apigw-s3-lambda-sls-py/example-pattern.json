@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This setup orchestrates the deployment of a REST API via API Gateway, acting as an S3 proxy for write operations. It includes API-Key Setup, basic Request Validator, Lambda invocation on S3 events, and enables CloudWatch logs and X-Ray tracing for API Gateway and Lambda using AWS Powertool for Lambda framework."
+      "This setup orchestrates the deployment of a REST API via API Gateway, acting as an S3 proxy for write operations. It includes API-Key Setup, basic Request Validator, Lambda invocation on S3 events, and enables CloudWatch logs and X-Ray tracing for API Gateway and Lambda using the Powertool for AWS Lambda developer toolkit."
     ]
   },
   "gitHub": {
