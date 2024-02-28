@@ -30,11 +30,11 @@ Important: this application uses various AWS services and there are costs associ
    ```
 4. During the prompts:
 
-   - Enter a stack name. I am assuming stack name to be `b2bi-stack1`.
+   - Enter a stack name. I am assuming the stack name to be `b2bi-stack1`.
    - Enter the desired AWS Region. Please refer to the documentation for the list of supported regions.
    - Enter `BusinessName`, `Email` and `Phone`.
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or Ids which are used for next step as well as testing.
+5. Note the outputs from the SAM deployment process. These contain the resource names and/or Ids which are used for the next step as well as testing.
 
 6. Log into [AWS B2B Data Interchange](https://us-east-1.console.aws.amazon.com/b2bi/home). Click on the Transformers tab on the left hand navigation menu. Click on the `MyTransformer`. Click on the `Set Status` button and select `Active`. Please ensure that the `MyTransformer` status is set to `Active`. 
 
@@ -44,7 +44,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 8. During the prompts:
 
-   - Enter a stack name. I am assuming stack name to be `b2bi-stack2`.
+   - Enter a stack name. I am assuming the stack name to be `b2bi-stack2`.
    - Enter the desired AWS Region. Please refer to the documentation for the list of supported regions.
    - Enter `BusinessName`, `Email`, `Phone`, `EDI214InputBucketName`, `EDI214OutputBucketName`, `MyProfileId` and `MyTransformerId`. Please note the last four parameter values should be given as per the output from the `b2bi-stack1` output. 
 
