@@ -56,7 +56,7 @@ The high-level diagram below serves to visually represent this pattern.
 ![apigw-s3-lambda-sls-py.png](./docs/apigw-s3-lambda-sls-py.png)
 
 This setup involves creating and launching a REST API using API Gateway, allowing direct writing to an Amazon S3 bucket without additional services. 
-It utilizes an open-source Serverless framework for deployment. The pattern includes setting up API keys with Usage Plan, Request Body Validator, and triggering Lambda functions on S3 events.
+It utilizes the open-source Serverless framework for deployment. The pattern includes setting up API keys with Usage Plan, Request Body Validator, and triggering Lambda functions on S3 events.
 Additionally, this setup establishes Cloudwatch logs and X-Ray tracing for both API Gateway and Lambda, harnessing the capabilities of AWS Powertool specifically for Lambda functions.
 
 ## Testing
