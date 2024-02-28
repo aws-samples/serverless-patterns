@@ -77,7 +77,7 @@ _Or_
 
 curl --request PUT \
   --url https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/api/orders_recevied/order001.json \
-  --header 'x-api-key: <Api-Key>' \
+  --header 'x-api-key:<Api-Key>' \
   --data '{
 		"orderId": 10023,
 		"orderDate": "2024-02-03",
