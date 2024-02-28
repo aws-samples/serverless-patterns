@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: An Amazon API Gateway REST API that integrates with a SageMaker endpoint.
+Description: An Amazon API Gateway REST API that integrates with a SageMaker endpoint. (uksb-1tthgi812) (tag:apigw-rest-sagemaker)
 Parameters:
   ApigatewayName:
     Type: String

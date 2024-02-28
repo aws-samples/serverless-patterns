@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Cognito to API Gateway to Lambda to IOT
+Description: Cognito to API Gateway to Lambda to IOT (uksb-1tthgi812) (tag:apigw-sqs-lambda-iot)
 
 Parameters:
   IOTEndpoint:

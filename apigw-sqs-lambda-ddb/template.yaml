@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: A endpoint hosted by an API Gateway which invokes SQS, consumed by lambda function and persisted in a dynamoDB table.
+Description: A endpoint hosted by an API Gateway which invokes SQS, consumed by lambda function and persisted in a dynamoDB table. (uksb-1tthgi812) (tag:apigw-sqs-lambda-ddb)
 
 Resources:
   ##########################################################################
