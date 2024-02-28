@@ -1,4 +1,4 @@
-# Receive email with Amazon SES and process them using an AWS Lambda function
+# Receive email with Amazon SES and process using an AWS Lambda function
 
 This sample project demonstrates how to receive email with Amazon SES and process them using AWS Lambda.
 
@@ -35,23 +35,20 @@ Important: this application uses various AWS services and there are costs associ
    - Enter a stack name. 
    - Enter the desired AWS Region. Please refer to the [documentation](https://docs.aws.amazon.com/ses/latest/dg/regions.html#region-receive-email) for the list of supported regions.
    - Enter `DomainName`. This is your Route 53 public hosted zone name. Please refer to the prerequisite section for additional details.
-   - Enter `ResourceRecords`. Depending on your selected region, please get the Email Receiving Endpoint from this [AWS Documentation](https://docs.aws.amazon.com/ses/latest/dg/regions.html#region-receive-email). Then you need to provide the value as `10 {Email Receiving Endpoint}`. For example, for US East N. Virginia region, please enter `10 inbound-smtp.us-east-1.amazonaws.com`. 
-   - Leave rest of the options as default.
+   - Enter `ResourceRecords`. Depending on your selected region, please get the Email Receiving Endpoint from this [AWS Documentation](https://docs.aws.amazon.com/ses/latest/dg/regions.html#region-receive-email). Then you need to provide the value as `10 {Email Receiving Endpoint}`. For example, for the US East N. Virginia region, please enter `10 inbound-smtp.us-east-1.amazonaws.com`. 
+   - Leave the rest of the options as default.
 
-5. Note the outputs from the SAM deployment process. This contain the resource names and/or Ids which are used for next step as well as for testing.
+5. Note the outputs from the SAM deployment process. This contains the resource names and/or Ids which are used for the next step as well as for testing.
 
 6. From the command line, please execute the below command. Please replace `EmailReceiptRuleSet` from the `sam deploy` output and also your region. This will activate the Amazon SES ruleset to invoke the AWS Lambda function once it receives the email.
    ```bash
    aws ses set-active-receipt-rule-set  --rule-set-name {EmailReceiptRuleSet} --region {your-region}
    ```
 
-7. By now, you should receive an email confirmation with subject line `DKIM setup SUCCESS for {DomainName} in {your-region}`. 
-
-
+7. By now, you should receive an email confirmation with the subject line `DKIM setup SUCCESS for {DomainName} in {your-region}`. 
 
 
 ## How it works
-
 
 Please refer to the architecture diagram below:
 
@@ -63,17 +60,14 @@ Please refer to the architecture diagram below:
 
 ## Testing
 
-
 1. From the command line, please execute the below command to tail logs of the AWS Lambda function. Please replace `FunctionName` from the `sam deploy` output and also your region. 
    ```bash
    aws logs tail --follow /aws/lambda/{FunctionName} --region {your-region}
    ```
 
-
 2. Make a note of `ReceivingEmailAddress` from the `sam deploy` output and send email to that email address.
 
-
-3. You should see logline similar to following in the Lambda function log. You may have to wait a few seconds to see the logs: 
+3. You should see a logline similar to the following in the Lambda function log. You may have to wait a few seconds to see the logs: 
    ```bash
      Received email from {your-email} with subject {your-email-subject}
    ```
