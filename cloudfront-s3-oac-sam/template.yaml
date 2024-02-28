@@ -1,7 +1,7 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - CloudFront distribution with an S3 origin secured with origin access control (OAC).
+Description: Serverless patterns - CloudFront distribution with an S3 origin secured with origin access control (OAC). (uksb-1tthgi812) (tag:cloudfront-s3-oac-sam)
 
 Parameters:
     DeploymentName:
