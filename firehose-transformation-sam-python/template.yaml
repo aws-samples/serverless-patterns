@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Deploys the resources necessary to enable Kinesis Data Firehose data transformation via a Lambda function
+Description: Deploys the resources necessary to enable Kinesis Data Firehose data transformation via a Lambda function (uksb-1tthgi812) (tag:firehose-transformation-sam-python)
 Parameters:
   DestinationS3BucketName:
     Type: String
