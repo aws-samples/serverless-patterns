@@ -18,18 +18,18 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-s3-replication-sam",
       "templateURL": "serverless-patterns/s3-s3-replication-sam",
       "projectFolder": "s3-s3-replication-sam",
-      "templateFile": "s3-s3-replication-sam.py"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "text": "Replicating Objects",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html"
       },
       {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Cross Region Replication",
+        "link": "https://www.youtube.com/watch?v=_6admeBN-lI"
       }
     ]
   },

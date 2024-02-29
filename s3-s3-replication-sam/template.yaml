@@ -39,7 +39,9 @@ Resources:
                   - s3:GetObjectVersionTagging
                   - s3:GetObjectRetention
                   - s3:GetObjectLegalHold
-                Resource: '*'
+                Resource: 
+                  - !Sub "arn:aws:s3:::${BucketSource}"
+                  - !Sub "arn:aws:s3:::${BucketReplica}"
               - Effect: 'Allow'
                 Action:
                   - 's3:ReplicateObject'
@@ -47,8 +49,10 @@ Resources:
                   - 's3:ReplicateTags'
                   - 's3:GetObjectVersionTagging'
                   - 's3:ObjectOwnerOverrideToBucketOwner'
-                
-                Resource: '*'
+                Resource: 
+                  - !Sub "arn:aws:s3:::${BucketSource}"
+                  - !Sub "arn:aws:s3:::${BucketReplica}"
+
 
   BucketSource:
     Type: 'AWS::S3::Bucket'
