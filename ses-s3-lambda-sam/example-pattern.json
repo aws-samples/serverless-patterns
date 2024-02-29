@@ -15,9 +15,9 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ses-s3-sam",
-      "templateURL": "serverless-patterns/ses-s3-sam",
-      "projectFolder": "ses-s3-sam",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ses-s3-lambda-sam",
+      "templateURL": "serverless-patterns/ses-s3-lambda-sam",
+      "projectFolder": "ses-s3-lambda-sam",
       "templateFile": "template.yaml"
     }
   },
