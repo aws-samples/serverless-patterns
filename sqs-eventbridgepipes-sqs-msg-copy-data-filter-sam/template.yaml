@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Sample SAM template for an EventBridge pipe from SQS to SQS
+Description: Sample SAM template for an EventBridge pipe from SQS to SQS (uksb-1tthgi812) (tag:sqs-eventbridgepipes-sqs-msg-copy-data-filter-sam)
 
 Globals:
   Function:
