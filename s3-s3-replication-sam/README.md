@@ -1,6 +1,6 @@
 # AWS S3 Bucket Replication
 
-This pattern enables you to replicate objects across Amazon S3 buckets, providing a reliable and scalable solution for data redundancy and disaster recovery.
+This pattern demonstrates how to replicate S3 bucket objects to multiple S3 buckets. Implemented with SAM.
 
 **Key Benefits**:
 
@@ -52,25 +52,29 @@ Learn more about this pattern at Serverless Land Patterns: [https://serverlessla
 
 ## How it Works
 
-Explain how the service interaction works.
+S3 replication in the same region involves copying objects from one S3 bucket to another within the same AWS region. When replication is configured, S3 automatically copies objects from the source bucket to the destination bucket, ensuring redundancy and data durability. This process helps in scenarios such as data backup, compliance requirements, and minimizing latency for accessing data.
+
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Upload some images to the source bucket, and then check the replication bucket. You should be able to see the same data replicated there.
 
 ## Cleanup
  
-1. Delete the stack:
+1. Empty buckets
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    aws s3 rm s3://BUCKET_NAME_SOURCE --recursive
+    aws s3 rm s3://BUCKET_NAME_REPLICA --recursive
+
     ```
-1. Confirm the stack has been deleted:
+2. Confirm the stack has been deleted:
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete --stack-name STACK_NAME
+
     ```
 
 ----
 
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

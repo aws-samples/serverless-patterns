@@ -7,18 +7,11 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Data Redundancy and Durability: Safeguard against data loss with automatic and asynchronous replication of objects between S3 buckets.",
-      "Disaster Recovery: Establish a robust disaster recovery strategy by replicating data to different regions or accounts.",
-      "Global Content Distribution: Reduce latency and enhance user experience by replicating frequently accessed data to various geographical locations.",
-      "Compliance and Data Retention: Address regulatory standards and compliance requirements by replicating data to separate accounts or regions.",
+      "Data Redundancy and Durability: Safeguard against data loss with automatic and asynchronous replication of objects between S3 buckets.",      "Global Content Distribution: Reduce latency and enhance user experience by replicating frequently accessed data to various geographical locations.",
+      "Compliance and Data Retention: Address regulatory standards and compliance requirements by replicating data to separate regions.",
       "Operational Efficiency: Asynchronous replication allows you to focus on other tasks while data is efficiently copied in the background.",
-      "Cross-Region Replication (CRR): Achieve low-latency access for users in different AWS regions by replicating data across regions.",
-      "Same-Region Replication (SRR): Ensure redundancy, compliance, or operational efficiency by copying data to a separate bucket within the same region.",
-      "Cross-Account Replication: Securely share data across AWS accounts by replicating objects to a destination bucket in a different account.",
-      "Granular Control: Configure replication rules at the bucket level for precise control over which objects to replicate and where.",
-      "Flexible Implementation: Leverage native S3 replication features to configure replication behavior through JSON-based, structured language."
+      "Same-Region Replication (SRR): Ensure redundancy, compliance, or operational efficiency by copying data to a separate bucket within the same region."
     ]
-    
   },
   "gitHub": {
     "template": {
