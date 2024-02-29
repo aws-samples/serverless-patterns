@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: SAM application to POST data to API Gateway from Kinesis Data Streams via Kinesis Firehose
+Description: SAM application to POST data to API Gateway from Kinesis Data Streams via Kinesis Firehose (uksb-1tthgi812) (tag:kinesis-data-stream-firehose-apigw-sam)
 
 Parameters:
   SecretName:

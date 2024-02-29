@@ -5,6 +5,7 @@ Globals:
   Function:
     Timeout: 5
 
+Description: (uksb-1tthgi812) (tag:eventbridge-schedule-to-lambda-sam-go)
 Resources:
   SchedulerLambdaFunction:
     Type: AWS::Serverless::Function 

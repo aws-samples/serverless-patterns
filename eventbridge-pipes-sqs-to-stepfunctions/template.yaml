@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Template to connect launch StepFunctions with SQS
+Description: Template to connect launch StepFunctions with SQS (uksb-1tthgi812) (tag:eventbridge-pipes-sqs-to-stepfunctions)
 
 Resources:
   #Source SQS
