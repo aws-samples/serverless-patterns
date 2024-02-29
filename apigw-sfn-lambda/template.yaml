@@ -1,0 +1,192 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - REST APIGW ---> SFN ---> Lambda integration
+
+Resources:
+############################################
+#             Lambda function              #
+############################################
+  MyLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: python3.11
+      Timeout: 30
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+
+          def handler(event, context):
+              print("Event received:", event)
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps('Hello from Lambda!')
+              }
+############################################
+#            Lambda function role          #
+############################################
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: LambdaExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: '*'
+
+                
+############################################
+#                REST API                  #
+############################################
+  MyApi:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Name: !Sub ${AWS::StackName}-api
+
+  MyResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: !Ref MyApi
+      ParentId: !GetAtt
+        - MyApi
+        - RootResourceId
+      PathPart: execution
+
+  MyMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref MyResource
+      RestApiId: !Ref MyApi
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS
+        Uri: !Join
+          - ''
+          - - 'arn:aws:apigateway:'
+            - !Ref 'AWS::Region'
+            - ':states:action/StartExecution'
+        Credentials: !GetAtt
+          - MyApiGatewayRole
+          - Arn
+        RequestTemplates:
+          application/json: !Sub
+            - >-
+              { 
+                  "input": "$util.escapeJavaScript($input.json('$'))",
+                  "stateMachineArn": "${MyStateMachine}" 
+              }
+            - MyStateMachine: !Ref MyStateMachine
+        IntegrationResponses:
+          - StatusCode: 200
+
+  MyApiGatewayRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: MyApiGatewayPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'states:StartExecution'
+                Resource: !Ref MyStateMachine
+  
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - MyMethod
+    Properties:
+      RestApiId: !Ref MyApi
+      StageName: 'dev'
+
+
+############################################
+#             Step Function                #
+############################################
+  MyStateMachine:
+    Type: 'AWS::StepFunctions::StateMachine'
+    Properties:
+      DefinitionString: !Sub
+        - |
+          {
+            "Comment": "A simple Step Functions state machine",
+            "StartAt": "InvokeLambdaFunction",
+            "States": {
+              "InvokeLambdaFunction": {
+                "Type": "Task",
+                "Resource": "${LambdaFunctionArn}",
+                "ResultPath": "$.LambdaOutput",
+                "End": true
+              }
+            }
+          }
+        - LambdaFunctionArn: !GetAtt MyLambdaFunction.Arn
+      RoleArn: !GetAtt
+        - StepFunctionRole
+        - Arn
+
+  StepFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - states.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: StepFunctionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'lambda:InvokeFunction'
+                Resource: !GetAtt MyLambdaFunction.Arn
+
+############################################
+#                  OUTPUT                  #
+############################################      
+
+Outputs:
+  ApiGatewayInvokeURL:
+    Description: Invoke URL for the API Gateway
+    Value: !Sub 'https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/dev/execution'
+
+  LambdaFunctionArn:
+    Description: ARN of the Lambda function
+    Value: !GetAtt MyLambdaFunction.Arn
