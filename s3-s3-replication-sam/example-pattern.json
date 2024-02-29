@@ -1,5 +1,5 @@
 {
-  "title": "S3 to S3 replication",
+  "title": "AWS S3 bucket replication",
   "description": "Create a stack template that you can use to replicate objects between S3 buckets across AWS accounts and regions.",
   "language": "Python",
   "level": "200",
