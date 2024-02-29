@@ -45,7 +45,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "<code>sam delete</code>"
     ]
   },
   "authors": [
