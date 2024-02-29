@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
-Transform: 'AWS::Serverless-2016-10-31'
-Description: An AWS Lambda function and an Amazon Aurora PostgreSQL DB in an Aurora Serverless v2 DB cluster with RDS Data API and a Secrets Manager secret.
+Description: >
+  An AWS Lambda function and an Amazon Aurora PostgreSQL DB in an Aurora Serverless v2 DB cluster with RDS Data API and a Secrets Manager secret.
+  (uksb-1tthgi812) (tag:lambda-aurora-serverlessv2-postgresql)
 
 # Global values that are applied to all applicable resources in this template
 Globals:

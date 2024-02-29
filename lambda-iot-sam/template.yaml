@@ -10,6 +10,7 @@ Globals:
       Variables:
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
 
+Description: (uksb-1tthgi812) (tag:lambda-iot-sam)
 Resources:
 ##########################################################################
 #   IOT                                                                  #
