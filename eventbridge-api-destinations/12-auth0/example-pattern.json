@@ -3,7 +3,7 @@
     "description": "Create an EventBridge rule and API destination to sign up events to Auth0",
     "language": "YAML",
     "level": "100",
-    "framework": "cloudformation",
+    "framework": "SAM",
     "services": {
         "from": "eventbridge",
         "to": "eventbridge"
