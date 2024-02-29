@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:lambda-s3-sfn)
   Lambda function to store an uploaded file in S3 and start sync workflow to process it.
 
 Globals:

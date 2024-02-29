@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:lambda-extension-telemetryapi-s3)
   aws-extension-telemetryapi-s3-app
 
   Sample SAM Template for aws-extension-telemetryapi-s3-app

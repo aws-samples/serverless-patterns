@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret
+Description: An AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret (uksb-1tthgi812) (tag:lambda-aurora-serverless)
 
 # Global values that are applied to all applicable resources in this template
 Globals:

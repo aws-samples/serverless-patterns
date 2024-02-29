@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: A demonstration of serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream
+Description: A demonstration of serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream (uksb-1tthgi812) (tag:lambda-kinesis-lambda-js)
 Parameters:
   KinesisStreamName:
     Type: String
