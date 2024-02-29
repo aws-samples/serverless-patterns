@@ -1,4 +1,4 @@
-# AWS S3 Replication Pattern
+# AWS S3 Bucket Replication
 
 This pattern enables you to replicate objects across Amazon S3 buckets, providing a reliable and scalable solution for data redundancy and disaster recovery.
 
