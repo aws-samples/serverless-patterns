@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: aws-lambda-sns-sqs-lambda
+Description: aws-lambda-sns-sqs-lambda (uksb-1tthgi812) (tag:lambda-sns-sqs-lambda-sam-java)
 
 Globals:
   Function:

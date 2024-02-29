@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Service to Service description
+Description: Serverless patterns - Service to Service description (uksb-1tthgi812) (tag:s3-lambda-mediaconvert)
 
 # Comment on each global 
 Globals:
