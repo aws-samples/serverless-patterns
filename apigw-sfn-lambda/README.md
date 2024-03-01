@@ -54,7 +54,7 @@ curl --location --request POST {api-stage-url} \
 --data '{                    
     "key":"value"
 }'
-
+```
 ## Cleanup
  
 1. Delete the stack
