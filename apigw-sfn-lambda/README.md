@@ -1,6 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# Integration of REST API Gateway with Standard Step Function Workflow containing a Lambda task state
 
-This pattern << explain usage >>
+The SAM template orchestrates an integration between an Amazon REST API Gateway endpoint and a step function. The step function definition forwards the payload to a Lambda task state for further processing. 
+
+The template automates the creation of resources including, API Gateway, Step Function, and Lambda, along with their respective IAM roles equipped with minimum required permissions.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -38,11 +40,20 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+* Send a `POST` request to the "execution" resource path of REST API's "dev" stage.
+* The REST API's integration will initiate a synchronous execution of the Step Functions workflow.
+* The Step Function will trigger the Lambda function, forwarding the JSON input provided through the API Gateway request for subsequent processing.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Run the following command to send an HTTP `POST` request to the REST APIs endpoint. Note, you must edit the {api-stage-url} placeholder with the URL of the deployed REST API's endpoint. This is provided in the stack output.
+
+```bash
+curl --location --request POST {api-stage-url} \
+--header 'Content-Type: application/json' \  
+--data '{                    
+    "key":"value"
+}'
 
 ## Cleanup
  
