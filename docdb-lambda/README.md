@@ -141,7 +141,7 @@ You can use an EC2 instance / AWS Cloud9 for connecting to the DocumentDB Cluste
     db.products.remove( { "name": "Pencil" } )
     ```
 
-6. Go to the CloudWatch log group **aws/lambda/MyDocDBLambda** of the Lambda Function to verify the invocations. There should be three execution logs generated for the above tests.
+6. Go to the CloudWatch log group **aws/lambda/DocDBLambda** of the Lambda Function to verify the invocations. There should be three execution logs generated for the above tests.
 
 
 ## Cleanup
