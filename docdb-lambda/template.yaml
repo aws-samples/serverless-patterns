@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: 'Template for Lambda Function with DocumentDB Event Source Mapping'
+Description: 'Template for a Lambda function with DocumentDB Event Source Mapping'
 
 # Paramters input
 Parameters: 
@@ -47,6 +47,17 @@ Parameters:
   SubnetId2: 
     Description : "Private Subnet ID of the mentioned VPC"
     Type: "String"
+
+  SecretUserName:
+    Description : "Username for the Secrets Manager and DocDB Cluster. Should not contain 'admin'"
+    Type: "String"
+    AllowedPattern : "[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*"
+
+  SecretPassword:
+    Description : "Password for the Secrets Manager and DocDB Cluster"
+    Type: "String"
+    AllowedPattern : "[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*"
+
 
 Resources:
 
@@ -109,23 +120,20 @@ Resources:
         - AWSLambdaVPCAccessExecutionRole
         - Version: '2012-10-17' 
           Statement:
-            - Effect: Allow
+            - Sid: LambdaDocDBESMAccess
+              Effect: Allow
               Action:
-                - ec2:DescribeSubnets
-                - ec2:DescribeSecurityGroups
-                - kms:Decrypt
                 - rds:DescribeDBClusters
                 - rds:DescribeDBClusterParameters
                 - rds:DescribeDBSubnetGroups
+                - kms:Decrypt
+              Resource: !Sub arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBCluster}
+            - Sid: LambdaDocDBESMGetSecretValueAccess
+              Effect: Allow
+              Action:
                 - secretsmanager:GetSecretValue
-              Resource: '*'
-      InlineCode: |
-        console.log('Loading function');
-        exports.handler = async (event) => {
-          // TODO implement
-          console.log('Received event:', JSON.stringify(event, null, 2));
-            return 'OK';
-        };
+              Resource: !Ref DocDBLambdaSecret
+      CodeUri: src/
       Description: Trigger Lambda from Document DB
       VpcConfig:
         SecurityGroupIds:
@@ -152,8 +160,14 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: SecretForDocDBLambda
-      Description: This secret has a hardcoded username and password which is used to authenticate Lambda to DynamoDB.
-      SecretString: '{"username": "testadmin", "password": "testpassword"}'
+      Description: This secret dynamically accepts username and password which is used to connect to DynamoDB.
+      SecretString: !Join
+          - ''
+          - - '{"username":"'
+            - !Ref SecretUserName
+            - '","password":"'
+            - !Ref SecretPassword
+            - '"}'
 
 # Creating a DocumentDB Cluster
   DBCluster:
@@ -200,6 +214,9 @@ Outputs:
   ClusterPort:
     Description : "Cluster Port"
     Value: !GetAtt DBCluster.Port
+  SecretName:
+    Description : "Secret Name"
+    Value: !Ref DocDBLambdaSecret
   LambdaFunctionName:
     Description : "Lambda Function Name"
     Value: !Ref MyLambdaFunction

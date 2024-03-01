@@ -1,6 +1,6 @@
 # Amazon DocumentDB to AWS Lambda Event Source Mapping
 
-This pattern creates an AWS Lambda function to process events in an Amazon DocumentDB (with MongoDB compatibility) change stream by configuring an Amazon DocumentDB cluster as an event source"
+This pattern creates an AWS Lambda function to process events in an Amazon DocumentDB (with MongoDB compatibility) change stream by configuring an Amazon DocumentDB cluster as an event source.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/docdb-lambda
 
@@ -38,6 +38,8 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the VPC ID where the resources needs to be created
     * Enter the First Private Subnet ID that belongs to the above VPC
     * Enter the Second Private Subnet ID that belongs to the above VPC
+    * Enter the Username for AWS Secrets manager to authenicate with Amazon DocumentDB
+    * Enter the Password for AWS Secrets manager to authenicate with Amazon DocumentDB
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -46,16 +48,14 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates Amazon DocumentDB Cluster along with AWS Lambda Function in the supplied VPC configurations. An Event Source Mapping (ESM) is created that will help Lambda to process the events from a Change Stream in DocumentDB. The ESM will use AWS Secrets manager to authenticate the Lambda Client to DocumentDB. Two Security Groups will be created for DocumentDB and Lambda function, to ensure connectivity.
+This pattern creates Amazon DocumentDB Cluster along with an AWS Lambda Function in the supplied VPC configurations. An Event Source Mapping (ESM) is created that will help Lambda to process the events from a change stream in DocumentDB. The ESM will use AWS Secrets Manager to authenticate the Lambda client to DocumentDB. Two Security Groups will be created for DocumentDB and Lambda function to ensure connectivity for DocumentDB and the Lambda function.
 
-In this tutorial, we will be creating a database **'docdbdemo'** and a collection **'products'**. We will be tracking changes to this **'products'** collection and activate Change Streams here.
+In this tutorial, we will be creating a database **'docdbdemo'** and a collection **'products'**. We will be tracking changes to this **'products'** collection and activate change streams here.
 
-Whenever a record in the **'products'** collection updates, the Lambda will receive an Event and invoke the Lambda Function. 
-This function will print the Event received from ESM in its CloudWatch logs.
+Whenever a record in the **'products'** collection updates, the Lambda service will receive an Event and invoke the Lambda function. 
+This function will print the event received from ESM in its CloudWatch logs.
 
-The Secret Manager and DocumentDB credentials are as follows:
-**username** - testadmin
-**password** - testpassword
+The credentials mentioned under Secret Manager will be used by clients for connecting to DocumentDB.
 
 You can check this [AWS Documentation](https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb.html) for more information.
 
@@ -64,15 +64,15 @@ You can check this [AWS Documentation](https://docs.aws.amazon.com/lambda/latest
 
 We will be referring this [AWS Tutorial](https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html) for testing.
 
-You can use a EC2 Instance / Cloud9 for connecting to the DocumentDB Cluster and test the architecture using below steps:
+You can use an EC2 instance / AWS Cloud9 for connecting to the DocumentDB Cluster and test the architecture using below steps:
 
-1. Setup an EC2 Instance / AWS Cloud9 in the same VPC and configure the Security Group for connecting to the DocumentDB Cluster. 
+1. Setup an EC2 instance / AWS Cloud9 in the same VPC and configure the Security Group for connecting to the DocumentDB Cluster. 
     The Default Outbound Rule allows All Traffic to everything, which should be fine for our scenario.
     [AWS Documentation](https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html#docdb-cloud9-environment)
 
-2. Install Mongo Shell in your EC2 / Cloud9 by executing below commands in the terminal:
+2. Install Mongo Shell in your EC2 instance / Cloud9 by executing below commands in the terminal:
     
-    Create the MongoDB repository file 
+    Create the MongoDB repository file by downloading the metadata from repo.mongodb.org for Amazon linux and save the repository file in /etc/yum.repos.d directory.
     ```
     echo -e "[mongodb-org-4.0] \nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/4.0/x86_64/\ngpgcheck=1 \nenabled=1 \ngpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc" | sudo tee /etc/yum.repos.d/mongodb-org-4.0.repo
     ```
@@ -91,17 +91,18 @@ You can use a EC2 Instance / Cloud9 for connecting to the DocumentDB Cluster and
 3. Connect to DocumentDB Cluster from EC2 / Cloud9:
     
     ```
-    mongo --ssl --host <Your_DocumentDB_Cluster_Endpoint>:27017 --sslCAFile global-bundle.pem --username testadmin --password testpassword
+    mongo --ssl --host <Your_DocumentDB_Cluster_Endpoint>:27017 --sslCAFile global-bundle.pem --username <your_username> --password  <your_password>
     ```
     Make sure to replace the DocumentDB Cluster Endpoint that you can find in the output of SAM template.
+    Also make sure to use the same Username and Password that you specified in SAM parameters for Secrets Manager.
 
     After entering the above command, if the command prompt becomes rs0:PRIMARY>, then you’re connected to your Amazon DocumentDB cluster.
 
     [AWS Documentation](https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html#docdb-connect-to-cluster)
 
-4. Activating Change Streams using below commands :
+4. Activating change streams using below commands :
     
-    Create a Database called **'docdbdemo'**
+    Create a database called **'docdbdemo'**
     ```
     use docdbdemo
     ```
@@ -111,7 +112,7 @@ You can use a EC2 Instance / Cloud9 for connecting to the DocumentDB Cluster and
     db.products.insert({"hello":"world"})
     ```
 
-    Activate Change Streams on the **'products'** collection of the **'docdbdemo'** database
+    Activate change streams on the **'products'** collection of the **'docdbdemo'** database
     ```
     db.adminCommand({modifyChangeStreams: 1,
         database: "docdbdemo",
@@ -120,7 +121,7 @@ You can use a EC2 Instance / Cloud9 for connecting to the DocumentDB Cluster and
     ```
     [AWS Documentation](https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html#docdb-activate-change-streams)
 
-5. Invoking the Lambda by Inserting, Updating and Deleting a record in **'products'** collection of the **'docdbdemo'** database
+5. Invoking the Lambda by inserting, updating and deleting a record in **'products'** collection of the **'docdbdemo'** database
 
     Inserting a record
     ```
@@ -154,6 +155,6 @@ You can use a EC2 Instance / Cloud9 for connecting to the DocumentDB Cluster and
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
