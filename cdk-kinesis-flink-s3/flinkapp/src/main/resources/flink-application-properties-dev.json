@@ -1,0 +1,10 @@
+[
+  {
+    "PropertyGroupId": "FlinkApplicationProperties",
+    "PropertyMap": {
+      "input.stream": "ExampleInputStream",
+      "stream.region": "us-east-1",
+      "s3.path": "s3://ka-app-code-abdkhaa/flink/msf/"
+    }
+  }
+]
