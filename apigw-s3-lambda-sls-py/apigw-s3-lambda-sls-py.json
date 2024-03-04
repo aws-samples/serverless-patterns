@@ -1,5 +1,5 @@
 {
-    "title": "Create a REST API as an Amazon S3 proxy in API Gateway",
+    "title": "Create a REST API as an Amazon S3 proxy in Amazon API Gateway",
     "description": "This pattern creates REST API via API Gateway, acting as an S3 proxy for write operations.",
     "language": "Python",
     "level": "200",
@@ -7,7 +7,7 @@
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This setup orchestrates the deployment of a REST API via API Gateway, acting as an S3 proxy for write operations. It includes API-Key Setup, basic Request Validator, Lambda invocation on S3 events, and enables CloudWatch logs and X-Ray tracing for API Gateway and Lambda using the Powertool for AWS Lambda developer toolkit."
+            "This setup orchestrates the deployment of a REST API using Amazon API Gateway, acting as an Amazon S3 proxy for write operations. It includes API-Key setup, basic request validator, AWS Lambda invocation on S3 events, and enables CloudWatch Logs and X-Ray tracing for API Gateway and Lambda using the Powertools for AWS Lambda developer toolkit."
         ]
     },
     "gitHub": {
@@ -23,10 +23,6 @@
             {
                 "text": "AWS CLI",
                 "link": "https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html"
-            },
-            {
-                "text": "Python 3",
-                "Link": "https://www.python.org/downloads/"
             },
             {
                 "text": "Serverless Framework",
