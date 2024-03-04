@@ -1,6 +1,6 @@
 # Receive email by Amazon SES and store in Amazon S3 bucket
 
-   This sample project demonstrates how to receive email using Amazon SES and store in Amazon S3 bucket. The email is processed by AWS Lambda based on S3 event.
+This shows how to receive email using Amazon SES and store in an Amazon S3 bucket. The email is processed by AWS Lambda based on S3 event notifications.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/ses-s3-lambda-sam
 
