@@ -14,7 +14,6 @@ on:
 jobs:
   copy:
     runs-on: ubuntu-latest
-    if: ${{ (github.actor == 'bls20aws') || (github.actor == 'julianwood') }}
     env:
       NODE_ENV: dev
       fileName: ${{ inputs.fileName }}
@@ -25,8 +24,8 @@ jobs:
         with:
           username: ${{ github.actor }}
           team: 'aws-serverless-da'
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check if user is a member of the team
+          GITHUB_TOKEN: ${{ secrets.GET_USER_TEAMS_MEMBERSHIP }}
+      - name: Copycat
         if: ${{ steps.checkUserMember.outputs.isTeamMember == 'true' }}
         uses: andstor/copycat-action@v3
         with:

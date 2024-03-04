@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:apigw-lambda-json-xml-vtl-transformation)
   A Lambda that is invoked by APIGateway Rest API. Response transformation from JSON TO XML In API Gateway
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst

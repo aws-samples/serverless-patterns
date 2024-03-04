@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: AWS Systems Manager Automation to AWS lambda
+Description: AWS Systems Manager Automation to AWS lambda (uksb-1tthgi812) (tag:systems-manager-automation-to-stepfunctions)
 
 Resources:
 

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: AWS AppConfig integration with Lambda extensions
+Description: AWS AppConfig integration with Lambda extensions (uksb-1tthgi812) (tag:appconfig-lambda-rust)
 
 Globals:
   Function:

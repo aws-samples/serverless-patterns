@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - This SAM template creates a Regional REST API with a mapping template in the integration request to pass to the lambda function.
+Description: Serverless patterns - This SAM template creates a Regional REST API with a mapping template in the integration request to pass to the lambda function. (uksb-1tthgi812) (tag:apigw-mappingtemplate-lambda-nodejs)
 
 Resources:
   #Lambda function returning request id

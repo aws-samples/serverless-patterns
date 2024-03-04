@@ -1,0 +1,22 @@
+type Event {
+	id: String!
+	source: String!
+	account: String!
+	time: String!
+	region: String!
+	detailType: String!
+	data: AWSJSON!
+}
+
+type Mutation {
+	publish(detailType: String!, id:String! data: String!, source: String!, account: String!, time: String!, region: String!): Event
+}
+
+type Query {
+	getEvent: Event
+}
+
+type Subscription {
+	subscribe(detailType: String, account: String, source: String, region: String): Event
+		@aws_subscribe(mutations: ["publish"])
+}

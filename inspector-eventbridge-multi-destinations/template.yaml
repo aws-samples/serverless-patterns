@@ -2,6 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 
 Description: >
+  (uksb-1tthgi812) (tag:inspector-eventbridge-multi-destinations)
   This pattern shows 
   1. Integration of Amazon Inspector2, Amazon EventBridge, AWS Lambda, AWS DynamoDB using the AWS SAM 
   2. Creating custom EventBridge rules to listen only for the needed events instead of all the events(noise)

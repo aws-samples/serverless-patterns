@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - AppSync to DynamoDB single-table - JS Resolvers
+Description: Serverless patterns - AppSync to DynamoDB single-table - JS Resolvers (uksb-1tthgi812) (tag:appsync-dynamodb-singletable-js-resolver)
 
 Resources:
   ###################################################

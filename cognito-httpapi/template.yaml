@@ -3,7 +3,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Cognito to API Gateway HTTP API (JWT)
+Description: Cognito to API Gateway HTTP API (JWT) (uksb-1tthgi812) (tag:cognito-httpapi)
     
 Parameters:
   Client:

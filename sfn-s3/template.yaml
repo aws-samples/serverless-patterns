@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Step Functions to S3
+Description: Serverless patterns - Step Functions to S3 (uksb-1tthgi812) (tag:sfn-s3)
 
 Resources:
   ## S3 bucket

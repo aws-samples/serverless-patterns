@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Lambda with Bedrock response streaming
+Description: Serverless patterns - Lambda with Bedrock response streaming (uksb-1tthgi812) (tag:lambda-bedrock-response-streaming)
 
 # Global values that are applied to all applicable resources in this template
 Globals:

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Amazon API Gateway REST API with method-level cache enabled
+Description: Serverless patterns - Amazon API Gateway REST API with method-level cache enabled (uksb-1tthgi812) (tag:apigw-method-cache)
 
 Globals:
   Function:

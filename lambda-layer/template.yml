@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:lambda-layer)
   Deploys a lambda function that has the PyMySQL layer and imports PyMySQL. This Lambda works.
   Deploys another lambda function that does not have the PyMySQL layer and imports PyMySQL. This Lambda produces an error.
 
