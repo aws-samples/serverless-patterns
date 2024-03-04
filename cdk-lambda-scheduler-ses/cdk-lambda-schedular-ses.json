@@ -1,0 +1,88 @@
+{
+    "title": "Amazon EventBridge Scheduler with Amazon SES",
+    "description": "A serverless event-driven pattern that creates Amazon EventBridge schedules dynamically to send email reminders using Amazon SES.",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates how to create an EventBridge scheduler that would send scheduled reminder email and would then be deleted. The pattern uses a Lambda function to create EventBridge scheduler."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-lambda-scheduler-ses",
+            "templateURL": "serverless-patterns/cdk-lambda-scheduler-ses",
+            "projectFolder": "cdk-lambda-scheduler-ses",
+            "templateFile": "lib/lambda-scheduler-ses-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Getting started with the AWS CDK",
+                "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
+            },
+            {
+                "text": "Amazon EventBridge Scheduler",
+                "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+            },
+            {
+                "text": "Verify an email address using Amazon SES",
+                "link": "https://docs.aws.amazon.com/ses/latest/dg/creating-identities.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Anirudh Sharma",
+            "image": "https://avatars.githubusercontent.com/u/144559992",
+            "bio": "Cloud Support Engineer 2 @AWS",
+            "linkedin": "anirudh-sharma-279248142"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "eventbridge-scheduler",
+            "label": "Amazon EventBridge Scheduler"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "ses",
+            "label": "Amazon SES"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    }
+}
