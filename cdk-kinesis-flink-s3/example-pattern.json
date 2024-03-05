@@ -1,0 +1,55 @@
+{
+    "title": "Apache Flink with Kinesis Data Stream Source and S3 Sink",
+    "description": "Create a Managed Service for Apache Flink application with an Amazon Kinesis Data Stream source and S3 sink.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to use Managed Service for Apache Flink to consume a Kinesis Data Stream and produce to an S3 sink.",
+        "Managed Service for Apache Flink provides the underlying infrastructure for your Apache Flink applications. It handles core capabilities like provisioning compute resources, parallel computation, automatic scaling, and application backups (implemented as checkpoints and snapshots)."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-kinesis-flink-s3",
+        "templateURL": "serverless-patterns/cdk-kinesis-flink-firehose",
+        "projectFolder": "cdk-kinesis-flink-firehose/lib",
+        "templateFile": "cdk-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+            "text": "Managed Service for Apache Flink",
+            "link": "https://docs.aws.amazon.com/managed-flink/latest/java/what-is.html"
+          },
+          {
+            "text": "Apache Flink",
+            "link": "https://nightlies.apache.org/flink/flink-docs-release-1.15/"
+          }
+      ]
+    },
+    "deploy": {
+      "text": [
+        ["cdk deploy"]
+      ]
+    },
+    "testing": {
+      "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    },
+    "cleanup": {
+      "text": [
+        "cdk destroy"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Abdul Ahad Khan",
+        "image": "",
+        "bio": "Abdul Ahad is a DevOps Engineer at AWS ProServe based out of the Mid-Atlantic.",
+        "linkedin": "linkedin.com/in/abdulahadk"
+      }
+    ]
+  }
