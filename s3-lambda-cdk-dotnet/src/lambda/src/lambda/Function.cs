@@ -19,7 +19,7 @@ namespace lambda
         {
             foreach (var record in evnt.Records)
             {
-                LambdaLogger.Log("----> File Name: " + record.S3.Object.Key + " Opration: " + record.EventName);
+                LambdaLogger.Log("----> File Name: " + record.S3.Object.Key + " Operation: " + record.EventName);
             }
         }
     }

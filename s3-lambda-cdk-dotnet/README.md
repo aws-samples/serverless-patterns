@@ -2,7 +2,7 @@
 
 This AWS CDK application demonstrates triggering a AWS Lambda function, when a file is uploaded in a S3 bucket.
 
-This pattern provides a solution for accessing the file information from AWS Lambda function, when a new file is uploaded in S3 bucket. An ideal use case for this is reading various file types e.g. image, csv, text, pdf files and extracting its metadata information and other file contents for futher processing or just passing this information to downstream systems.
+This pattern provides a solution for accessing the file information from AWS Lambda function, when a new file is uploaded to a S3 bucket. An ideal use case for this is reading various file types e.g. image, csv, text, pdf files and extracting its metadata information and other file contents for further processing or just passing this information to downstream systems.
 
 ## Architecture 
 ![architecture diagram](images/architecture.png)
@@ -40,8 +40,8 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 ## Testing
 
-1. After deployment, upload a sample file in S3 bucket created from the stack.
-2. Check the lambda logs in cloudwatch log groups. You should see the file name of file you uploaded, in the function logs.
+1. After deployment, upload a sample file to the S3 bucket that was created by the stack.
+2. Check the Lambda function logs in the CloudWatch log groups. You should see the file name of file you uploaded, in the function logs.
 
 
 ## Cleanup
