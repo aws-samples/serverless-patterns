@@ -1,6 +1,6 @@
 {
   "title": "Kinesis Stream to EventBridge using EventBridge Pipes",
-  "description": "This pattern creates an Amazon EventBridge Pipe which consumes messages from Amazon Kinesis Stream and places events on an Amazon EventBridge custom Bus.",
+  "description": "This pattern creates an EventBridge Pipe which consumes messages from Amazon Kinesis Stream and places events on an Amazon EventBridge custom Bus.",
   "language": "YAML",
   "level": "200",
   "framework": "SAM",
@@ -55,7 +55,7 @@
       "name": "Chaitanya Gummadi",
       "image": "https://gravatar.com/avatar/a9b30c6e727f613f3f44a44016e36998719404ea7451c750f402a21f2dd72937.jpg?size=256",
       "bio": "Chaitanya is a Sr. Cloud Support Engineer with Amazon Web Services ( AWS) based in Texas.",
-      "linkedin": "https://www.linkedin.com/in/cgummadi"
+      "linkedin": "cgummadi"
     }
   ]
 }
