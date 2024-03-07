@@ -13,4 +13,4 @@ def lambda_handler(event: SNSEvent, context: LambdaContext):
     for record in event.records:
         message = record.sns.message
         message_json = json.loads(message)
-        logger.info(f"Notification received for Foo message: {message_json}")
+        logger.info(f"Notification received for Bar message: {message_json}")

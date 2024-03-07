@@ -54,7 +54,7 @@ AWS costs incurred. No warranty is implied in this example.
 
 The high-level diagram below serves to visually represent this pattern.
 
-![apigw-sns-filter-policy-lambda-sls-py.png](./docs/apigw-sns-filter-policy-lambda-sls-py.png)
+![apigw-sns-filter-policy-lambda-sls-py.jpeg](./docs/apigw-sns-filter-policy-lambda-sls-py.jpeg)
 
 This pattern enables the ingestion of API Gateway payloads, which are then forwarded to AWS Simple Notification Service (SNS). 
 Subsequently, SNS triggers Lambda functions with a filter policy scoped on the MessageBody for processing. 
@@ -70,13 +70,13 @@ This setup can be tested using the [curl command](https://github.com/curl/curl/b
 In this case, the SNS Event `filterPolicy` triggers the Lambda function [process_foo_status.py](./functions/process_foo_status.py)
 
 ```commandline
-xh post https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/notify status=foo id:=12234
+xh post https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/notify-status status=foo id:=1234
 ```
 _Or_
 ```commandline
 
 curl --request POST \
-  --url https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/notify \
+  --url https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/notify-status \
   --data '{ "status": "foo", "id": 1234 }'
 ```
 Response:

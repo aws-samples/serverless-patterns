@@ -1,9 +1,9 @@
 {
-  "title": "This pattern creates REST API via API Gateway, acting as SNS proxy with SNS Filter Policy",
+  "title": "REST API via API Gateway, acting as SNS proxy with SNS Filter Policy",
   "description": "This pattern sets up a REST API via API Gateway as an SNS proxy, triggering Lambda functions with MessageBody filtering.",
   "language": "Python",
   "level": "200",
-  "framework": "Serverless",
+  "framework": "Serverless Framework",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sns-filter-policy-lambda-sls-py",
       "templateURL": "serverless-patterns/apigw-sns-filter-policy-lambda-sls-py",
       "projectFolder": "apigw-sns-filter-policy-lambda-sls-py",
-      "templateFile": "serverless.yaml"
+      "templateFile": "serverless.yml"
     }
   },
   "resources": {
