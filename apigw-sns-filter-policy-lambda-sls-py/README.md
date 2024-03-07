@@ -70,13 +70,13 @@ This setup can be tested using the [curl command](https://github.com/curl/curl/b
 In this case, the SNS Event `filterPolicy` triggers the Lambda function [process_foo_status.py](./functions/process_foo_status.py)
 
 ```commandline
-xh post https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/notify status=foo id:=12234
+xh post https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/notify-status status=foo id:=12234
 ```
 _Or_
 ```commandline
 
 curl --request POST \
-  --url https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/notify \
+  --url https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}/notify-status \
   --data '{ "status": "foo", "id": 1234 }'
 ```
 Response:
