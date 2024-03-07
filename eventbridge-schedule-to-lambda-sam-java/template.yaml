@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:eventbridge-schedule-to-lambda-sam-java)
   Eventbridge schedule that runs every 5 minutes, invoking a Lambda function
 
 Resources:

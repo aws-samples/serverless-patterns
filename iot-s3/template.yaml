@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 Transform: 'AWS::Serverless-2016-10-31'
 
-Description: To put IoT events to S3 Bucket using AWS IoT Topic rules.
+Description: To put IoT events to S3 Bucket using AWS IoT Topic rules. (uksb-1tthgi812) (tag:iot-s3)
 
 Resources:
 

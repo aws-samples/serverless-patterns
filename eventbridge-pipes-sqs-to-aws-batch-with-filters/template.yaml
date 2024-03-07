@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: SQS to AWS Batch Job Queue
+Description: SQS to AWS Batch Job Queue (uksb-1tthgi812) (tag:eventbridge-pipes-sqs-to-aws-batch-with-filters)
 
 Parameters:
   ServiceName:

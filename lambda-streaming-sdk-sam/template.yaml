@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
+Description: >
+  (uksb-1tthgi812) (tag:lambda-streaming-sdk-sam)
   lambda
 
 Transform:

@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+    (uksb-1tthgi812) (tag:sns-sqs-lambda-xray)
     X-ray trace for SNS-SQS-Lambda with Powertool
 
 Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy-globals.html

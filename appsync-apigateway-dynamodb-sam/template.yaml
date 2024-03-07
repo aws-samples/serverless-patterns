@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
-Description: Restaurants AppSync GraphQL API with REST API Gateway datasource 
+Description: Restaurants AppSync GraphQL API with REST API Gateway datasource  (uksb-1tthgi812) (tag:appsync-apigateway-dynamodb-sam)
 
 Resources:
 

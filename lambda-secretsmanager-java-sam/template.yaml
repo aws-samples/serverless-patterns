@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
-Description: Lambda function retrieving a secret from Secrets Manager using AWS SDK for Java
+Description: Lambda function retrieving a secret from Secrets Manager using AWS SDK for Java (uksb-1tthgi812) (tag:lambda-secretsmanager-java-sam)
 
 ##########################################################################
 #  Parameters & Globals                                                  #

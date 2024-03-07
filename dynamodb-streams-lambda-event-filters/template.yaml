@@ -1,7 +1,8 @@
 # SAM template for Lambda fn Event-filtering with DynamoDB Streams
 
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
+Description: >
+  (uksb-1tthgi812) (tag:dynamodb-streams-lambda-event-filters)
   SAM template for Lambda fn Event-filtering with DynamoDB Streams
 
 Transform:

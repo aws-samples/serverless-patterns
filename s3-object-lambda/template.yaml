@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: S3 Object Lambda
+Description: S3 Object Lambda (uksb-1tthgi812) (tag:s3-object-lambda)
 
 Resources:
   S3Bucket:

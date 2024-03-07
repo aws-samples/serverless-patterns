@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:stepfunctions-bedrock-sam)
   A Step Functions Express Workflow that invokes Amazon Bedrock syncronously for content generation
 
 Resources:
