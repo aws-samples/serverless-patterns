@@ -1,5 +1,5 @@
 {
-  "title": "Send email with pre-signed URL whenever a file is uploaded into S3 bucket",
+  "title": "Send email with pre-signed URL on file uploaded into S3 bucket",
   "description": "This sample project demonstrates how to send an email with pre-signed Amazon S3 bucket URL whenever a file is uploaded into the bucket.",
   "language": "Python",
   "level": "200",
