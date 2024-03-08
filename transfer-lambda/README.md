@@ -1,6 +1,6 @@
 # AWS Transfer Family SFTP Server to AWS Lambda
 
-This pattern in SAM offers an example to setup an AWS SFTP server using AWS Transfer Family for SFTP with a custom workflow step to an AWS Lambda Function. The template enables you to simply create a server, a custom workflow, set up user accounts, and an Amazon Simple Storage Service (Amazon S3) bucket. You have fine-grained control over user identity, permissions, and keys. You can create users within Transfer for SFTP. You can also use IAM policies to control the level of access granted to each user. When a user uploads a file to the SFTP server it triggers a custom document processing step.
+This pattern in SAM offers an example to setup an AWS SFTP server using AWS Transfer Family for SFTP with a custom workflow step to an AWS Lambda function. The template enables you to simply create an SFTP server, a custom workflow, set up user accounts, and an Amazon Simple Storage Service (Amazon S3) bucket. You have fine-grained control over user identity, permissions, and keys. You can create users within Transfer for SFTP. You can also use IAM policies to control the level of access granted to each user. When a user uploads a file to the SFTP server it triggers a custom document processing step.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/transfer-lambda. 
 
@@ -37,19 +37,19 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the public ssh key from your key_name.pub file into the SshKey parameter.
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-This pattern deploys an Amazon Simple Storage Service (S3) bucket, an SFTP Server using AWS Transfer for SFTP configured with service managed user with fine grained access to the S3 bucket, and an Transfer Family Workflow to an AWS Lambda Function. Once the user uploads a file through the SFTP server, the file will land in the users home directory within the S3 bucket. The AWS Tranfer Family workflow will invoke the lambda function upon successful file upload. The function extracts the information regarding the execution status, and then calls the SendWorkflowStepState API operation to return the status to the workflow for the step. Before your function calls the SendWorkflowStepState API operation, you can configure Lambda to take an action based on your workflow logic.
+This pattern deploys an Amazon Simple Storage Service (S3) bucket, an SFTP Server using AWS Transfer for SFTP configured with a service managed user with fine grained access to the S3 bucket, and an Transfer Family Workflow to an AWS Lambda function. Once the user uploads a file through the SFTP server, the file will land in the user's home directory within the S3 bucket. The AWS Tranfer Family workflow will invoke the lambda function upon successful file upload. The function extracts the information regarding the execution status, and then calls the SendWorkflowStepState API operation to return the status to the workflow for the step. Before your function calls the SendWorkflowStepState API operation, you can configure Lambda to take an action based on your workflow logic.
 
 ## Testing
 
 1. Navigate to the AWS Transfer family Console and click on servers
-1. Choose the newly created sftp server id, locate the server endpoint, copy it and save it for later use.
-1. Use the endpoint to test the sftp server with transferring a file using a client, the rest of this is assuming use of OPENSSH.
+1. Choose the newly created SFTP server id, locate the server endpoint, copy it and save it for later use.
+1. Use the endpoint to test the SFTP server with transferring a file using a client, the rest of this is assuming use of OPENSSH.
     Instructions for other SSH Clients can be found here:
     - [Transferring files over a server endpoint using a client](https://docs.aws.amazon.com/transfer/latest/userguide/transfer-file.html)
 1. Create a test file in your pattern directory called hello.txt, inside the file enter some text such as "Hello, World!" and save the file.
@@ -67,8 +67,8 @@ This pattern deploys an Amazon Simple Storage Service (S3) bucket, an SFTP Serve
     Uploading hello.txt to /my-bucket/home/sftp_user/hello.txt
     hello.txt 100% 127 0.1KB/s 00:00
     ```
-1. Navigate to Cloudwatch Console, click on Log Groups under the Logs drop down.
-1. Click on the log group named: /aws/lambda/{stack-name≈}-custom-workflow-step-lambda-function
+1. Navigate to the Cloudwatch Console, click on Log Groups under the Logs drop down.
+1. Click on the log group named: /aws/lambda/{stack-name}-custom-workflow-step-lambda-function
 1. Click on the latest log stream, observe the event sent from the custom workflow to the lambda function and the response from the SendWorkflowStepState API operation.
 
 ## Documentation
@@ -81,10 +81,10 @@ This pattern deploys an Amazon Simple Storage Service (S3) bucket, an SFTP Serve
 
 ## Cleanup
 
-1. Navigate to Cloudformation Console, Click on stacks and locate the stack was created with this pattern and select it.
+1. Navigate to the Cloudformation Console, click on stacks and locate the stack was created with this pattern and select it.
 1. Navigate to the Resources tab within your stack and copy the S3 Bucket Physical ID and use it in the following command in your terminal to empty the S3 Bucket:
     ```bash
-    aws s3 rm s3://sftp-server-192828077733-us-east-1-bucket  --recursive
+    aws s3 rm s3://s3-bucket --recursive
     ```
 1. Delete the stack
     ```bash
