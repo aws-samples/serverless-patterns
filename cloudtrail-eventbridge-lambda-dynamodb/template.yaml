@@ -1,22 +1,23 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless Webform Sample
+Description: Removes public route advertisements for CIDR ranges not permitted to be advertised.
 
 Parameters:
   NotificationEmail:
     Type: String
     Description: "Email where notifications should be sent when route advertisements have been blocked."
+    AllowedPattern: '[^@]+@[^@]+\.[^@]+'
 
 Resources:
   SubmitFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/function.py
-      Description: "Removes public route advertisements for networks not permitted to be advertised."
+      Description: "Removes public route advertisements for CIDR ranges not permitted to be advertised."
       Handler: function.lambda_handler
       PackageType: "Zip"
       Tracing: Active
-      Runtime: "python3.9"
+      Runtime: "python3.12"
       Environment:
         Variables:
           DynamoDBTable: !Ref DynamoDBTable

@@ -42,8 +42,3 @@ def lambda_handler(event, context):
                 Subject=subject
             )
             print(json.dumps(response))
-
-
-
-
-

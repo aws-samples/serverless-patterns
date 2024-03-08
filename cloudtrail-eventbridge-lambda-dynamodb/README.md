@@ -1,4 +1,4 @@
-# Automated Route Advertisement Removal
+# Automated BYOIP Route Advertisement Removal
 
 This pattern uses Amazon EventBridge to monitor for `AdvertiseByoipCidr` events and triggers an AWS Lambda Function to remove the route advertisement if the CIDR is not listed in an Amazon DynamoDB Table item configured by the end user.
 
@@ -15,11 +15,11 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
-    git clone https://gitlab.aws.dev/jrdwyer/automated-route-advertisement-removal.git
+    git clone https://github.com/aws-samples/serverless-patterns
     ```
 1. Change directory to the pattern directory:
     ```
-    cd automated-route-advertisement-removal
+    cd serverless-patterns/cloudtrail-eventbridge-lambda-dynamodb-sam
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the workflow as specified in the template.yaml file:
     ```
@@ -76,12 +76,20 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Event bridge will trigger a rule any time the `AdvertiseByoipCidr` API call is logged via CloudTrail.  The lambda will look at DynamoDB to determine if the BYOIP range is permitted to be publicly advertised and withdraw the advertisement if it is not permitted. 
+EventBridge will trigger a rule any time the `AdvertiseByoipCidr` API call is logged via CloudTrail.  The Lambda function will check items in a DynamoDB table to determine if the BYOIP range is permitted to be publicly advertised and withdraw the advertisement if it is not permitted. 
 
 
 ## Testing
 
 In IPAM, enable advertisement of a BYOIP space that is not permitted to be advertised via the list of allowed IP ranges in DynamoDB.  If working as expected, the advertisement should be withdrawn within a few seconds after the CIDR has been advertised.
+
+The following command can be used to advertise a CIDR that is not permitted to be advertised.
+
+```aws ec2 advertise-byoip-cidr --cidr <value>```
+
+After a few seconds, the following command should show a ```State``` of ```provisioned``` rather than ```advertised``` indicating that the advertisement has been removed.
+
+```aws ec2 describe-byoip-cidrs --max-results 10```
 
 
 ## Cleanup
