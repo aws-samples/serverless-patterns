@@ -35,7 +35,7 @@
   "deploy": {
     "text": [
       "See the GitHub repo for detailed deployment instructions.",
-      "bash build",
+      "bash build.sh",
       "sam deploy -g"
     ]
   },

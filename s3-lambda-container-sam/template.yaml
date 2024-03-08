@@ -6,7 +6,6 @@ Parameters:
   ContainerImageURI:
     Type: String
     Description: Docker image URI for the Lambda function 
-    # Default: 'public.ecr.aws/sam/emulation-python:3.9'
 
 Resources:
 
@@ -14,15 +13,11 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub 'sample-bucket-${AWS::AccountId}-${AWS::Region}'
-      # NotificationConfiguration:
-      #   LambdaConfigurations:
-      #     - Event: s3:ObjectCreated:*
-      #       Function: !GetAtt SampleFunction.Arn
+
   SampleFunction:
     Type: AWS::Serverless::Function 
     Properties:
       CodeUri: .
-      # CodeUri: !Ref ContainerImageURI
       ImageUri: !Ref ContainerImageURI
       PackageType: Image
       Environment:

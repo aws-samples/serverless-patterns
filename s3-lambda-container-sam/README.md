@@ -36,8 +36,8 @@ Important: this application uses various AWS services and there are costs associ
 4. Provide the following details. Please change the sample values according to your requirement:
    - Enter image name: sample-image
    - Enter repository name: sample-repo
-   - Enter AWS account ID: 123456789012
-   - Enter AWS Region: us-est-1 
+   - Enter AWS account ID: enter your AWS account Id.
+   - Enter AWS Region: us-east-1 
 
    After successful execution of the script, the script will output the image URI. Please make a note of the image URI which will be used in the next step. Sample output:
 
