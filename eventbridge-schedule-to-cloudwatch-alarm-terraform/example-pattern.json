@@ -1,40 +1,35 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
-  "language": "Python",
+  "title": "EventBridge Scheduler to CloudWatch Alarm",
+  "description": "Create two EventBridge Scheduler schedules to enable and disable the action of a CloudWatch alarm",
+  "language": "HCL",
   "level": "200",
-  "framework": "CDK",
+  "framework": "Terraform",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
+      "Two Amazon EventBridge Scheduler schedules will be used to enable and disable the action of a CloudWatch alarm.",
+      "This Terraform template creates a VPC, an EC2 instance and two schedules that invokes the enableAlarmActions and disableAlarmActions API regularly."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-cloudwatch-alarm-terraform",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-cloudwatch-alarm-terraform",
+      "projectFolder": "eventbridge-schedule-to-cloudwatch-alarm-terraform",
+      "templateFile": "main.tf"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
-      },
-      {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Using universal targets in EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-targets-universal.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "See the GitHub repo for detailed deployment instructions."
     ]
   },
   "testing": {
@@ -44,16 +39,15 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>terraform destroy</code>."
     ]
   },
   "authors": [
     {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "name": "Edwin So",
+      "image": "https://media.licdn.com/dms/image/C5603AQGXFWV-L0nYuw/profile-displayphoto-shrink_200_200/0/1596368326454?e=1715212800&v=beta&t=-Xc2wRWeM1TiNpldpkHC7RsgjjzJJ17U0np-VQs0ij0",
+      "bio": "Cloud Support Engineer @ AWS | CloudWatch SME",
+      "linkedin": "https://www.linkedin.com/in/edwin-so/"
     }
   ]
 }

@@ -1,8 +1,8 @@
 # AWS Service 1 to AWS Service 2
 
-This pattern << explain usage >>
+This pattern will create two EventBridge Scheduler schedules to enable and disable the action of a CloudWatch alarm in a specific period. This example will enable the alarm at 08:00 and disable it at 17:00 in the US/Eastern timezone.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-schedule-to-cloudwatch-alarm-terraform.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,39 +21,35 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd eventbridge-schedule-to-cloudwatch-alarm-terraform
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, initialize terraform to download and install the providers defined in the configuration: 
     ```
-    sam deploy --guided
+    terraform init
     ```
-1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
+1. From the commend line, apply the configuration in the main.tf file and follow the prompts: 
+    ```
+    terraform apply
+    ```
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-Explain how the service interaction works.
+Two Amazon EventBridge Scheduler schedules will be used to enable and disable the action of a CloudWatch alarm. The Terraform template creates a VPC, an EC2 instance and two schedules that invokes the enableAlarmActions and disableAlarmActions API regularly.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+1. After the deployment, review the schedule created in the Amazon EventBridge console under Scheduler > Schedules. 
+2. Navigate to the CloudWatch console to verify the alarm graph, a period with blue color under the graph is representing the action has been disabled.
+3. Navigate to the CloudTrail console to verify the enableAlarmActions and disableAlarmActions API calls.
 
 ## Cleanup
  
-1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+1. Delete all created resources and follow prompts:
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    terraform destroy
     ```
+
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
