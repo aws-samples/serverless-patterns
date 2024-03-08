@@ -1,3 +1,8 @@
+const {
+    BedrockRuntimeClient,
+    InvokeModelWithResponseStreamCommand,
+  } = require("@aws-sdk/client-bedrock-runtime");
+
 exports.handler = awslambda.streamifyResponse(
     async (event, responseStream, context) => {
         const lambdaRequestBody = JSON.parse(event.body);
