@@ -1,6 +1,7 @@
 import json
 import boto3
 import os
+import ipaddress
 
 ec2 = boto3.client('ec2')
 dynamodb = boto3.resource("dynamodb")
@@ -21,7 +22,7 @@ def lambda_handler(event, context):
         print (allowed_cidrs)
         try:
             for allowed_cidr in allowed_cidrs['Item']['CIDRs']:
-                if (allowed_cidr == cidr):
+                if (ipaddress.IPv6Network(cidr).overlaps(ipaddress.IPv6Network(allowed_cidr))):
                     allowed = True
                     print("CIDR is in allowed list, ignoring.")
         except: 

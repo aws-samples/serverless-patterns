@@ -7,9 +7,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use Amazon Event Bridge and AWS Lambda to respond to CloudTrail events.  In this example, the <code>AdvertiseByoipCidr</code> triggers a Lambda function to run and validate whether or not the address space is expected to be advertised by checking for the address space in a list of allowed CIDRs in a DynamoDB Table.",
+      "This sample project demonstrates how to use Amazon EventBridge and AWS Lambda to respond to AWS CloudTrail events. In this example, any <code>AdvertiseByoipCidr</code> call triggers a Lambda function to run and validate whether or not the address space is expected to be advertised by checking for the address space in a list of allowed CIDRs in a DynamoDB table.",
       "If the address space is not permitted to be advertised, the Lambda will publish a message to a SNS Topic to notify an administrator that an unexpected CIDR was advertised and will automatically remove the advertisement of the CIDR.",
-      "This pattern deploys an EventBridge Rule, a Lambda Function, a DynamoDB Table and a SNS Topic."
+      "This pattern deploys an EventBridge rule, a Lambda function, a DynamoDB table and a SNS topic."
     ]
   },
   "gitHub": {
@@ -28,11 +28,15 @@
       },
       {
         "text": "Amazon EventBridge",
-        "link": "https://aws.amazon.com/eventbridge/"
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
       },
       {
         "text": "AWS Lambda",
-        "link": "https://aws.amazon.com/lambda/"
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "Amazon VPC IP Address Manager (IPAM)",
+        "link": "https://docs.aws.amazon.com/vpc/latest/ipam/what-it-is-ipam.html"
       }
     ]
   },
@@ -55,7 +59,7 @@
     {
       "name": "John Dwyer",
       "image": "https://serverlessland.com/assets/images/resources/contributors/130080657.jpg",
-      "bio": "I am a WWPS Solutions Architect with AWS. I help customers build and architect serverless applications at scale..",
+      "bio": "I am a Senior Solutions Architect on the Worldwide Public Sector team at AWS. I help customers build and architect serverless applications at scale..",
       "linkedin": "jrd326"
     }
   ]

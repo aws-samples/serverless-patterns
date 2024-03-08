@@ -81,7 +81,7 @@ EventBridge will trigger a rule any time the `AdvertiseByoipCidr` API call is lo
 
 ## Testing
 
-In IPAM, enable advertisement of a BYOIP space that is not permitted to be advertised via the list of allowed IP ranges in DynamoDB.  If working as expected, the advertisement should be withdrawn within a few seconds after the CIDR has been advertised.
+In Amazon VPC IP Address Manager (IPAM), enable advertisement of a BYOIP space that is not permitted to be advertised via the list of allowed IP ranges in DynamoDB.  If working as expected, the advertisement should be withdrawn within a few seconds after the CIDR has been advertised.
 
 The following command can be used to advertise a CIDR that is not permitted to be advertised.
 
