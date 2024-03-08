@@ -67,3 +67,11 @@ Resources:
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${PutItemsFunction}
+
+Outputs:
+  PutItemsFunction:
+    Description: "PutItemsFunction Name"
+    Value: !Ref PutItemsFunction
+  API:
+    Description: "API Gateway endpoint URL for the API"
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod"
