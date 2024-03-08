@@ -70,7 +70,9 @@ exports.handler = awslambda.streamifyResponse(
             for await (const value of actualStream) {
                 const jsonString = new TextDecoder().decode(value.body); // body is a Uint8Array. jsonString->'{"bytes":"eyJjb21wbGV0aW9uIjoiIEkiLCJzdG9wX3JlYXNvbiI6bnVsbH0="}'
                 const base64encoded = JSON.parse(jsonString).bytes; // base64 encoded string. 
-                const decodedString = base64ToUtf8(base64encoded);
+                const decodedString = Buffer.from(base64encoded, "base64").toString(
+                    "utf-8"
+                  );
                 try {
                     const streamingCompletion = JSON.parse(decodedString).completion;
                     chunks.push(streamingCompletion)
