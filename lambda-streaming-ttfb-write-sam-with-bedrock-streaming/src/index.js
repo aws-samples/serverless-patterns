@@ -25,7 +25,7 @@ exports.handler = awslambda.streamifyResponse(
             contentType = 'application/json',
             accept = '*/*';
 
-        const formattedPrompt = f`Human: ${prompt}\n\nAssistant:`
+        const formattedPrompt = `Human: ${prompt}\n\nAssistant:`
 
         try {
             responseStream = awslambda.HttpResponseStream.from(responseStream, httpResponseMetadata);
