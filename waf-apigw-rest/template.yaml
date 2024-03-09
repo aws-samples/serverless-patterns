@@ -48,7 +48,7 @@ Resources:
   MyWAFAssociation:
     Type: AWS::WAFv2::WebACLAssociation
     Properties: 
-      ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${MyApi}/stages/Prod
+      ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${MyApi}/stages/${MyApi.Stage}
       WebACLArn: !GetAtt MyWAFACL.Arn
 
 # Lambda function as an example micro-service behind the API Gateway REST endpoint
