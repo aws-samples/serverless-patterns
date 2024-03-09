@@ -49,7 +49,7 @@ Amazon Bedrock users need to request access to models before they are available 
    bash create_lambda_layer.sh
    ```
 
-7. Provide a name for the Lambda layer. Such as: 
+7. Provide a name for the Lambda layer and the region. Such as: 
    ```bash
    Enter the name of the Layer: fpdf2_layer
    ```
@@ -110,7 +110,7 @@ Please refer to the architecture diagram below:
 ![End to End Architecture](images/architecture.png)
 
 * User uploads an architecture image file into the Amazon S3 input bucket.
-* Amazon S3 triggers the AWS Lambda function.
+* Amazon S3 triggers the AWS Lambda function when a new object is uploaded into the input S3 bucket.
 * The AWS Lambda function reads the image file and converts into Base 64 encoded format and calls Amazon Bedrock API for Anthropic Claude V3 Sonnect LLM with the encoded data and prompt to create a blog from it.
 * The Amazon Amazon Bedrock API for Anthropic Claude V3 Sonnect LLM generated the blog content and retuns the JSON response.
 * The AWS Lambda function creates a pdf file with the blog content and saves it into an Amazon S3 output bucket.
@@ -123,12 +123,7 @@ Please refer to the architecture diagram below:
    aws s3 cp sample-architecture.jpeg s3://{MyInputBucketName}/sample-architecture.jpeg --region {your-region}
    ```
 
-2. Run the `create_lambda_layer.sh`. You may have to change the file permission to make it executable.  This will create the lambda layer with necessary boto3 api for bedrock.
-   ```bash
-   bash delete_lambda_layer.sh
-   ```
-
-3. Log into [Amazon S3 Console](https://s3.console.aws.amazon.com/s3/buckets), within a few seconds, you should see a `draft-blog.pdf` file uploaded into the the `MyOutputBucketName` S3 bucket. Download the file from the bucket using the below command and validate the content.
+2. Log into [Amazon S3 Console](https://s3.console.aws.amazon.com/s3/buckets), within a few seconds, you should see a `draft-blog.pdf` file uploaded into the the `MyOutputBucketName` S3 bucket. Download the file from the bucket using the below command and validate the content.
    ```bash
    aws s3 cp s3://{MyOutputBucketName}/draft-blog.pdf ./draft-blog.pdf
    ```
