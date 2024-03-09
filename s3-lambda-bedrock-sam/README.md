@@ -113,7 +113,7 @@ Please refer to the architecture diagram below:
 * Amazon S3 triggers the AWS Lambda function.
 * The AWS Lambda function reads the image file and converts into Base 64 encoded format and calls Amazon Bedrock API for Anthropic Claude V3 Sonnect LLM with the encoded data and prompt to create a blog from it.
 * The Amazon Amazon Bedrock API for Anthropic Claude V3 Sonnect LLM generated the blog content and retuns the JSON response.
-* THe AWS Lambda function creates a pdf file with the blog content and saves it into an Amazon S3 output bucket.
+* The AWS Lambda function creates a pdf file with the blog content and saves it into an Amazon S3 output bucket.
 
 ## Testing
 
