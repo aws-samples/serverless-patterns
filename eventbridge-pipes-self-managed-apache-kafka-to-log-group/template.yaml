@@ -1,0 +1,353 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  This template is used to deploy a simple vpc that is partitioned
+  in a private and public network, with a configured NAT gateway for     
+  the private network and an internet gateway for the public
+  network. It will also deploy an EventBridge Pipe (utilizing the NAT Gateway) to poll
+  the events from the specified Self Managed Kafka Cluster IP via Port 9092.
+  https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html
+
+Parameters:
+  VpcCidrBlock:
+    Type: String
+    Default: 10.1.0.0/16
+    Description: CIDR Block for the Virtual Private Cloud
+  PublicSubnetCidrBlock:
+    Type: String
+    Default: 10.1.0.0/24
+    Description: CIDR Block for the Public Subnet Segment
+  PrivateSubnetCidrBlock:
+    Type: String
+    Default: 10.1.1.0/24
+    Description: CIDR Block for the Private Subnet Segment
+  KafkaClusterPrimaryIp:
+    Type: String
+    Description: Kafka Cluster Public IP
+  KafkaClusterSecondaryIp:
+    Type: String
+    Description: Kafka Cluster Public IP
+  TopicName:
+    Type: String
+    Description: Kafka Cluster Topic Name 
+
+Resources:
+
+# VPC. This is the main component of our template, within the VPC we will be defining the subnets and
+# connect to it all components required to create the stack.
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipes-VPC"]]
+          
+# Subnets Definition: in this section we define the two subnets, one public and one private
+# and also create an ElasticIP and a NAT gateway to attach it to the private network
+# so that the Pipe can poll the Kafka Cluster.
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet.html
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnetCidrBlock
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipes-Pub-SubNet"]]
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Retain
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnetCidrBlock
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipes-Priv-SubNet"]]
+          
+# Internet Gateway. This component provides internet connectivity to the internet both ways (in and out).
+# The gateway needs to be attached to a VPC. Therefore it is important to explicitly attach it to the
+# VPC otherwise it won't be connected.
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-internetgateway.html
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc-gateway-attachment.html
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: VPC
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipes-IGW"]]
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+      
+# ElasticIP definition, we don't need to add many attributes here, simply let Amazon do the
+# work for you, we will only need to reference the elastic IP in the gateway.
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-elasticip.html
+
+  ElasticIPAddress:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipes-NGW-EIP"]]
+          
+# NAT Gateway. This component requires two references an allocation fo the elastic IP address to
+# use and a designated subnet to be attached to.
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-natgateway.html
+
+  NatGateway:
+    DependsOn: PublicSubnet  
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: 
+        Fn::GetAtt: 
+        - ElasticIPAddress
+        - AllocationId
+      SubnetId: !Ref PublicSubnet
+      Tags: 
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipes-NGW"]]
+          
+# Routing Tables. The route tables are the logical components that enable the routing of traffic
+# within the network, subnets included.
+#
+# Used Definitions:
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route-table.html
+# https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html
+#
+# Public Route Table. This is route table contains the routes for the public subnet.
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref VPC
+      Tags: 
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipes-Pub-RTB"]]
+          
+# This route enables the in-out traffic from the VPC to the internet via the specified Internet Gateway. 
+
+  RouteTrafficToIGW:
+    Type: AWS::EC2::Route
+    DependsOn:
+      - InternetGateway
+      - AttachGateway
+    Properties: 
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+# Private Route Table. This is the route table that contains the routes for the private subnet.
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags: 
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipes-Priv-RTB"]]
+
+# This route enables the outgoing internet traffic from the private subnet to the Internet and
+# it is used for patches downloading and access to external services as needed.
+
+  RouteTrafficToNGW:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock:  0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+
+# Route Table Associations. The associations are necessary to map the route tables to subnets
+# so that traffic can be effectively routed through the components hosted in these networks
+# and desired network destinations.
+#
+# Definitions:
+# 
+# https://docs.amazonaws.cn/en_us/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet-route-table-assoc.html
+
+  PublicSubnetRouteTableAssociation:   
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+  PrivateSubnetRouteTableAssociation:   
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+      
+# Security Group definition. 
+# We define the rules with the minimum inbound/outbound rules
+# More info - https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html#pipes-kafka-vpc-config
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-securitygroup.html
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: VPC
+    DeletionPolicy: Retain
+    Properties:
+      GroupDescription: Allow EventBridge access to the Amazon Virtual Private Cloud (Amazon VPC) resources associated with your Apache Kafka brokers
+      SecurityGroupEgress: 
+      - IpProtocol: tcp
+        FromPort: 9092
+        ToPort: 9092
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      SecurityGroupIngress: 
+      - IpProtocol: tcp
+        FromPort: 9092
+        ToPort: 9092
+        CidrIp: 0.0.0.0/0
+      Tags: 
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipes-Security-Group"]]
+      VpcId: !Ref VPC
+  
+# CloudWatch Log Group definition. 
+# This Log Group is used as the target of the Pipe to receive and store polled events.
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html 
+
+  LogGroup:
+   Type: AWS::Logs::LogGroup
+   Properties:
+       Tags: 
+          - Key: Name
+            Value: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipes-Log-Group"]]
+          
+# EventBirdge Pipe IAM Role Policy definition
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-managedpolicy.html
+
+  PipePolicy:
+   Type: AWS::IAM::ManagedPolicy
+   DependsOn:
+   - LogGroup
+   Properties: 
+       ManagedPolicyName: !Join ['', [!Ref "AWS::StackName", "-LogsPipeTargetPolciyTemplate"]]
+       PolicyDocument:
+         Version: "2012-10-17"
+         Statement:
+           - Effect: Allow
+             Action:
+               - 'logs:CreateLogStream'
+               - 'logs:PutLogEvents'
+             Resource: !GetAtt 
+              - LogGroup
+              - Arn
+           - Effect: Allow
+             Action:
+              - 'ec2:DescribeNetworkInterfaces'
+              - 'ec2:DescribeSubnets'
+              - 'ec2:DescribeSecurityGroups'
+              - 'ec2:DescribeVpcs'
+             Resource: '*'
+           - Effect: Allow
+             Action:
+              - 'ec2:CreateNetworkInterface'
+              - 'ec2:DeleteNetworkInterface'
+             Resource: '*'
+             Condition:
+              StringEqualsIfExists:
+                'ec2:SubnetID':
+                  - !Ref PrivateSubnet 
+
+# EventBirdge Pipe IAM Role definition
+# IAM role used to allow Pipe Execution
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+
+  PipesIAMRole:
+   Type: AWS::IAM::Role
+   DependsOn:
+   - PipePolicy
+   Properties:
+     AssumeRolePolicyDocument:
+       Version: "2012-10-17"
+       Statement:
+         - Effect: Allow
+           Principal:
+             Service:
+               - pipes.amazonaws.com
+           Action:
+             - 'sts:AssumeRole'
+     Description: Role to provide pipes access to SMK and Logs
+     ManagedPolicyArns:
+      - !Ref PipePolicy      
+          
+# EventBirdge Pipe definition
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html
+  
+  Pipe:
+   Type: AWS::Pipes::Pipe
+   DependsOn:
+   - PrivateSubnet
+   - PipesIAMRole
+   - LogGroup
+   - SecurityGroup
+   Properties:
+    RoleArn:  !GetAtt 
+    - PipesIAMRole
+    - Arn
+    Name: !Join ['', [!Ref "AWS::StackName", "-EventBridge-Pipe"]]
+    Source: !Join ['', ["smk://", !Ref "KafkaClusterPrimaryIp", ":9092"]]
+    SourceParameters:
+     SelfManagedKafkaParameters:
+       AdditionalBootstrapServers:
+         - !Join ['', [!Ref "KafkaClusterSecondaryIp", ":9092"]]
+       TopicName: !Ref TopicName
+       StartingPosition: LATEST
+       Vpc:
+        SecurityGroup:
+         - !Ref SecurityGroup
+        Subnets:
+         - !Ref PrivateSubnet 
+    Target: !GetAtt 
+     - LogGroup
+     - Arn
+
+# Outputs define values exported by the template that can be used and captured
+# by other templates.
+#
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/outputs-section-structure.html
+
+Outputs:
+  VpcId:
+    Description: Unique identifier of the VPC 
+    Value: !Ref VPC
+  PublicSubnetId:
+    Description: Unique identifier of the Public Subnet segment of the VPC
+    Value: !Ref PublicSubnet
+  PrivateSubnetId:
+    Description: Unique identifier of the Private Subnet segment of the VPC
+    Value: !Ref PrivateSubnet
+  Pipe:
+    Description: Unique identifier of the EventBridge Pipe 
+    Value: !Ref Pipe
+  LogGroup:
+    Description: Unique identifier of the CloudWatch Log Group
+    Value: !Ref LogGroup
