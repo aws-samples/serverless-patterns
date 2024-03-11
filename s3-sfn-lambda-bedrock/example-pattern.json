@@ -1,0 +1,73 @@
+{
+    "title": "S3 to Step Functions to Lambda to Bedrock",
+    "description": "Create a Step Functions workflow to summarize S3 objects using Amazon Bedrock.",
+    "language": "Python",
+    "level": "300",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "Serverless Document Summarization with Bedrock",
+      "text": [
+        "This sample project demonstrates how to use an AWS Step Functions state machine to orchestrate S3 object summarization using Amazon Bedrock. The state machine is triggered by new file uploads to an S3 bucket and coordinates the execution of Lambda functions to process and summarize the documents.",
+        "The state machine first checks the file type (txt, pdf, or docx) and invokes the appropriate Lambda function to extract the text content. The extracted text is then passed to another Lambda function that leverages Amazon Bedrock's natural language processing capabilities to generate a concise summary.",
+        "The generated summary is stored in the original S3 bucket, providing users with a convenient way to access the key information from large documents without having to read through the entire content."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-bedrock-sam",
+        "templateURL": "serverless-patterns/s3-sfn-lambda-bedrock",
+        "projectFolder": "s3-sfn-lambda-bedrock",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Bedrock",
+          "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"
+        },
+        {
+          "text": "Amazon Bedrock - Inference parameters for foundation models",
+          "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters.html"
+        },
+        {
+          "text": "AWS Step Functions",
+          "link": "https://aws.amazon.com/step-functions/"
+        },
+        {
+          "text": "AWS Lambda",
+          "link": "https://aws.amazon.com/lambda/"
+        },
+        {
+          "text": "AWS Serverless Application Model (SAM)",
+          "link": "https://aws.amazon.com/serverless/sam/"
+        },
+        {
+          "text": "AWS Serverless Data Analytics Pipeline Reference Architecture",
+          "link": "https://aws.amazon.com/blogs/big-data/aws-serverless-data-analytics-pipeline-reference-architecture/"
+        },
+        {
+          "text": "AWS Serverless Data Analytics Pipeline Whitepaper",
+          "link": "https://docs.aws.amazon.com/whitepapers/latest/aws-serverless-data-analytics-pipeline/aws-serverless-data-analytics-pipeline.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "Deploy the stack: <code>sam build && sam deploy --guided</code>"
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Dave Horne",
+        "image": "https://media.licdn.com/dms/image/D4E03AQF8MofRpp10sw/profile-displayphoto-shrink_400_400/0/1670374747266?e=1715817600&v=beta&t=DpsC6xY9pF6DTItgjgkdKI5eXMCOnt2ZO7I9ftYnam4",
+        "bio": "Dave is a Sr. Solutions Architect supporting Federal System Integrators at AWS. He is based in Washington, DC and has 15 years of experience building, modernizing and integrating systems for Public Sector customers. Outside of work, Dave enjoys playing with his kids and hiking.",
+        "linkedin": "davidjhorne"
+      }
+    ]
+  }

@@ -1,0 +1,201 @@
+Transform: AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Step Functions workflow to summarize documents using Amazon Bedrock
+Parameters:
+  RawPrefix:
+    Type: String
+    Default: raw/
+  CleanedPrefix:
+    Type: String
+    Default: cleaned/
+  CuratedPrefix:
+    Type: String
+    Default: curated/
+  BedrockPrompt:
+    Type: String
+    Default: 'You are a business analyst.  Review the following content and produce a concise summary for an executive.  Also, generate tags that can be used to find the content in a search or word cloud: '
+Resources:
+  ContentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-contentbu-${AWS::AccountId}
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+  SummarizeContent:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionSubstitutions:
+        IngestTextFunction: !GetAtt IngestTextFunction.Arn
+        IngestPDFFunction: !GetAtt IngestPDFFunction.Arn
+        IngestDocFunction: !GetAtt IngestDocFunction.Arn
+        SummarizeTextFileFunction: !GetAtt SummarizeTextFileFunction.Arn
+      Logging:
+        Level: ALL
+        IncludeExecutionData: true
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+      Role: !GetAtt StateMachineRole.Arn
+      Tracing:
+        Enabled: true
+      Type: EXPRESS
+      Events:
+        RawFileTrigger:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: default
+            Pattern:
+              source:
+                - aws.s3
+              detail-type:
+                - Object Created
+              detail:
+                bucket:
+                  name:
+                    - !Ref ContentBucket
+                object:
+                  key:
+                    - prefix: !Ref RawPrefix
+      DefinitionUri: statemachine/statemachine.asl.json
+    DependsOn:
+      - IngestTextFunction
+      - IngestPDFFunction
+      - IngestDocFunction
+      - SummarizeTextFileFunction
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub
+        - /aws/vendedlogs/states/${AWS::StackName}-${ResourceId}-Logs
+        - ResourceId: StateMachineLG
+  StateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt IngestTextFunction.Arn
+                  - !GetAtt IngestPDFFunction.Arn
+                  - !GetAtt IngestDocFunction.Arn
+                  - !GetAtt SummarizeTextFileFunction.Arn
+        - PolicyName: CloudWatchLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogDelivery
+                  - logs:GetLogDelivery
+                  - logs:UpdateLogDelivery
+                  - logs:DeleteLogDelivery
+                  - logs:ListLogDeliveries
+                  - logs:PutResourcePolicy
+                  - logs:DescribeResourcePolicies
+                  - logs:DescribeLogGroups
+                Resource: '*'
+  IngestTextFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/ingest_text/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Timeout: 300
+      MemorySize: 128
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          NextPrefix: !Ref CleanedPrefix
+      Description: This Lambda function is responsible for ingesting text files from S3 into an Amazon S3 bucket. It takes the S3 object key and content type, and stores the content in an S3 bucket with a specified prefix in utf-8 encoding.
+  IngestPDFFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/ingest_pdf/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Timeout: 300
+      MemorySize: 128
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          NextPrefix: !Ref CleanedPrefix
+      Description: This Lambda function is responsible for ingesting PDF files from S3 into an Amazon S3 bucket. It takes the S3 object key and content type, and stores the content in an S3 bucket with a specified prefix.
+  IngestDocFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/ingest_doc/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Timeout: 300
+      MemorySize: 128
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          NextPrefix: !Ref CleanedPrefix
+      Description: This Lambda function is responsible for ingesting word documents from S3 into an Amazon S3 bucket. It takes the S3 object key and content type, and stores the content in an S3 bucket with a specified prefix.
+  SummarizeTextFileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/summarize_text/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Timeout: 900
+      MemorySize: 128
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          NextPrefix: !Ref CuratedPrefix
+          BedrockPrompt: !Ref BedrockPrompt
+      Description: This Lambda function is summarizes text files using the Amazon Bedrock AI service. It takes the text content from an S3 object and generates a concise summary. The summarized content is then stored in an S3 bucket with a specified prefix.
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CustomPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObjectAcl
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListAllMyBuckets
+                  - s3:ListBucketVersions
+                  - s3:GetObjectAttributes
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::${ContentBucket}/*
+                  - !Sub arn:aws:s3:::${ContentBucket}
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'

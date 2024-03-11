@@ -1,0 +1,56 @@
+{
+	"Comment": "A state machine that summarizes different types of files",
+	"StartAt": "CheckFileType",
+	"States": {
+		"CheckFileType": {
+			"Type": "Choice",
+			"Choices": [
+				{
+					"Variable": "$.detail.object.key",
+					"StringMatches": "*txt",
+					"Next": "IngestTextFile"
+				},
+				{
+					"Variable": "$.detail.object.key",
+					"StringMatches": "*pdf",
+					"Next": "IngestPDFFile"
+				},
+				{
+					"Variable": "$.detail.object.key",
+					"StringMatches": "*docx",
+					"Next": "IngestDocFile"
+				}
+			],
+			"Default": "UnsupportedFileType"
+		},
+		"IngestTextFile": {
+			"Type": "Task",
+			"Resource": "${IngestTextFunction}",
+			"Next": "SummarizeTextFile"
+		},
+		"IngestPDFFile": {
+			"Type": "Task",
+			"Resource": "${IngestPDFFunction}",
+			"Next": "SummarizeTextFile"
+		},
+		"IngestDocFile": {
+			"Type": "Task",
+			"Resource": "${IngestDocFunction}",
+			"Next": "SummarizeTextFile"
+		},
+		"UnsupportedFileType": {
+			"Type": "Fail",
+			"Error": "UnsupportedFileType",
+			"Cause": "Unsupported file type"
+		},
+		"SummarizeTextFile": {
+			"Type": "Task",
+			"Resource": "${SummarizeTextFileFunction}",
+			"Parameters": {
+				"SourceKey.$": "$.next_key",
+				"Bucket.$": "$.bucket"
+			},
+			"End": true
+		}
+	}
+}
