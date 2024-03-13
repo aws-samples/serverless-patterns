@@ -8,6 +8,7 @@ This pattern explains how to deploy an AWS SAM application that includes an API 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Go Installed](https://go.dev/)
 
     
 ## Deployment Instructions
@@ -20,11 +21,18 @@ This pattern explains how to deploy an AWS SAM application that includes an API 
    ```bash
    cd apigw-lambda-dynamodb-go-sam
    ```
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+
+3. From the command line, usa AWS SAM to build the artifacts before deploying to AWS:
+
+   ```bash
+   sam build
+   ```
+
+4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
    ```bash
    sam deploy --guided
    ```
-4. During the prompts:
+5. During the prompts:
 
    - Enter a stack name
    - Enter the desired AWS Region
@@ -32,11 +40,11 @@ This pattern explains how to deploy an AWS SAM application that includes an API 
 
    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-   When asked "`ContentGenerationLambdaFunction` has no authentication. Is this okay? [y/N]", answer explicitly with y for the purposes of this sample application. As a result, anyone will be able to call this example REST API without any form of authentication.
+   When asked "`PutItemsFunction` has no authentication. Is this okay? [y/N]", answer explicitly with y for the purposes of this sample application. As a result, anyone will be able to call this example REST API without any form of authentication.
 
    For production applications, you should [enable authentication for the API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html) using one of several available options and [follow the API Gateway security best practices](https://docs.aws.amazon.com/apigateway/latest/developerguide/security-best-practices.html).
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for next step as well as testing.
+6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for next step as well as testing.
 
 
 ## How it works
