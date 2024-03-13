@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sample SAM template that deploys an S3 bucket and Lambda function using a container image
+
+Parameters:
+  ContainerImageURI:
+    Type: String
+    Description: Docker image URI for the Lambda function 
+
+Resources:
+
+  SampleBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'sample-bucket-${AWS::AccountId}-${AWS::Region}'
+
+  SampleFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: .
+      ImageUri: !Ref ContainerImageURI
+      PackageType: Image
+      Environment:
+        Variables:
+          S3_BUCKET: !Sub 'sample-bucket-${AWS::AccountId}-${AWS::Region}'        
+      Architectures:
+        - x86_64
+      Events:
+        SampleBucket:
+          Type: S3
+          Properties:
+            Bucket: !Ref SampleBucket
+            Events: s3:ObjectCreated:*
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Sub 'sample-bucket-${AWS::AccountId}-${AWS::Region}'
+Outputs:
+  SampleBucketName:
+    Value: !Ref SampleBucket
+    Description: "SampleBucketName Name"
+  SampleFunction:
+    Value: !Ref SampleFunction
+    Description: "SampleFunction Name"    
