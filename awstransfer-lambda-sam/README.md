@@ -2,7 +2,7 @@
 
 This pattern in SAM offers an example to setup an AWS SFTP server using AWS Transfer Family for SFTP with a custom workflow step to an AWS Lambda function. The template enables you to simply create an SFTP server, a custom workflow, set up user accounts, and an Amazon Simple Storage Service (Amazon S3) bucket. You have fine-grained control over user identity, permissions, and keys. You can create users within Transfer for SFTP. You can also use IAM policies to control the level of access granted to each user. When a user uploads a file to the SFTP server it triggers a custom document processing step.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/transfer-lambda. 
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/awstransfer-lambda-sam. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd transfer-lambda
+    cd awstransfer-lambda-sam
     ```
 1. Create SSH Key for you sftp server user in your pattern directory: 
     * [SSH Key Generation](https://docs.aws.amazon.com/transfer/latest/userguide/key-management.html#sshkeygen)

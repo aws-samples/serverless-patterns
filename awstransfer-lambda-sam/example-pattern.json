@@ -1,20 +1,20 @@
 {
   "title": "AWS Transfer Family SFTP Server to AWS Lambda",
-  "description": "This pattern in SAM offers an example to setup an AWS SFTP server using AWS Transfer Family for SFTP with a custom workflow step to an AWS Lambda Function.",
+  "description": "This SAM template is an example to setup an AWS SFTP server using AWS Transfer Family for SFTP with a workflow step to an AWS Lambda Function.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "Create a AWS Transfer Family SFTP Server to custom workflow step Lambda function.",
     "text": [
-      "This pattern deploy an AWS Transfer Family SFTP Server with custom workflow step that is integrated with an AWS Lambda function"
+      "This pattern deploys an SFTP Server integrated with a Lambda function."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/transfer-lambda",
-      "templateURL": "serverless-patterns/transfer-lambda",
-      "projectFolder": "transfer-lambda",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/awstransfer-lambda-sam",
+      "templateURL": "serverless-patterns/awstransfer-lambda-sam",
+      "projectFolder": "awstransfer-lambda-sam",
       "templateFile": "template.yaml"
     }
   },
