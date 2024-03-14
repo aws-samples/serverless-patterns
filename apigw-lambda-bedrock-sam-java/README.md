@@ -28,7 +28,7 @@ Amazon Bedrock users need to request access to the Amazon Bedrock model before t
 
 2. Change directory to the pattern directory:
    ```bash
-   cd serverless-patterns/apigw-lambda-bedrock-sam-java-sam
+   cd serverless-patterns/apigw-lambda-bedrock-sam-java
    ```
 
 3. From the command line, execute the below command to build the Java based AWS Lambda funtion using Maven. This will create `MyBedrockInvokerFunction.zip` file under the `target` folder.

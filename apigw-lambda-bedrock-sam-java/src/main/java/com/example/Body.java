@@ -5,11 +5,8 @@ import org.json.JSONObject;
 import java.text.MessageFormat;
 
 
-// record Body(String prompt, double temperature, int top_k, double top_p, int max_tokens_to_sample,
-//             String[] stop_sequences, String anthropic_version) {
     record Body(String prompt, double temperature, int top_k, double top_p, int max_tokens) {
 
-    // public static final String PROMPT_TEMPLATE = "Human: {0} \\n\\nAssistant:";
     public static final String PROMPT_TEMPLATE = "\\n\n[INST] {0} \\n\\n[/INST]";
 
     Body(String promptContent) {
@@ -27,8 +24,6 @@ import java.text.MessageFormat;
         jsonObject.put("top_k", top_k);
         jsonObject.put("top_p", top_p);
         jsonObject.put("max_tokens", max_tokens);
-        // jsonObject.put("stop_sequences", stop_sequences);
-        // jsonObject.put("anthropic_version", anthropic_version);
 
         return jsonObject.toString();
     }

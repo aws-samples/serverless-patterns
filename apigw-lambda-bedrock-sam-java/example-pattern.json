@@ -18,7 +18,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-sam-java",
       "templateURL": "serverless-patterns/apigw-lambda-bedrock-sam-java",
       "projectFolder": "apigw-lambda-bedrock-sam-java",
-      "templateFile": "apigw-lambda-bedrock-sam-java/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -47,7 +47,6 @@
   "cleanup": {
     "text": [
       "Delete the stack: <code>sam delete</code>."
-     
     ]
   },
   "authors": [
@@ -55,7 +54,7 @@
       "name": "Biswanath Mukherjee",
       "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
-      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+      "linkedin": "biswanathmukherjee"
     }
   ]
 }
