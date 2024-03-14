@@ -1,4 +1,4 @@
-module apigw-lambda-dynamodb-sam-go
+module apigw-lambda-dynamodb-go-sam
 
 go 1.22.0
 
