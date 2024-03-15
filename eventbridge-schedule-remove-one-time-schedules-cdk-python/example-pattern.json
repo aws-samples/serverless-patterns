@@ -14,8 +14,8 @@
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-remove-onetime-schedule-to-sns-cdk-python",
-            "templateURL": "serverless-patterns/eventbridge-schedule-remove-one-time-schedule-to-sns-cdk-python",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-remove-one-time-schedules-cdk-python",
+            "templateURL": "serverless-patterns/eventbridge-schedule-remove-one-time-schedules-cdk-python",
             "projectFolder": "eventbridge-schedule-remove-one-time-schedules-cdk-python",
             "templateFile": "eventbridge_schedule_remove_onetime_schedules_cdk_python/eventbridge_schedule_remove_onetime_schedules_cdk_python_stack.py"
         }
