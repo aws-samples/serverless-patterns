@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: This SAM template is used to generate clinical notes from patient-clinician conversations using AWS HealthScribe API.
+Resources:
+  GenerateClinicalNotesAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+  TranscribeNotesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub transcribe-notes-${AWS::AccountId}-${AWS::Region}
+  ClinicalNotesGenerationLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: healthscribe_integration.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - arm64
+      Timeout: 60
+      Role: !GetAtt LambdaTranscribeExecutionRole.Arn
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref TranscribeNotesBucket
+          TRANSCRIBE_SERVICE_ROLE: !GetAtt AmazonTranscribeServiceRole.Arn
+      Events:
+        GenerateContent:
+          Type: Api
+          Properties:
+            Path: /generate_clinical_notes
+            Method: post
+            RestApiId: !Ref GenerateClinicalNotesAPI
+  LambdaTranscribeExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: TranscribeAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - transcribe:StartMedicalScribeJob
+                Resource: !Sub arn:aws:transcribe:${AWS::Region}:${AWS::AccountId}:*
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: arn:aws:s3:::*transcribe*
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: !GetAtt AmazonTranscribeServiceRole.Arn
+  AmazonTranscribeServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - transcribe.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: S3AccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:PutObject
+                Resource:
+                  - !GetAtt TranscribeNotesBucket.Arn
+                  - !Join
+                    - ''
+                    - - !GetAtt TranscribeNotesBucket.Arn
+                      - /*
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource: !Sub arn:aws:kms::${AWS::AccountId}:key/*
+                Condition:
+                  StringLike:
+                    kms:ViaService: s3.*.amazonaws.com
+Outputs:
+  ClinicalNotesGenerationLambdaFunction:
+    Description: ClinicalNotesGenerationLambdaFunction Name
+    Value: !Ref ClinicalNotesGenerationLambdaFunction
+  GenerateClinicalNotesAPI:
+    Description: API Gateway endpoint URL for the dev stage of the Generate Content API
+    Value: !Sub https://${GenerateClinicalNotesAPI}.execute-api.${AWS::Region}.amazonaws.com/dev/generate_clinical_notes/
+  TranscribeNotesBucket:
+    Description: S3 Bucket for storing transcribe notes
+    Value: !Ref TranscribeNotesBucket
