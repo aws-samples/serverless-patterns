@@ -41,7 +41,7 @@ Resources:
       Steps:
           - Type: CUSTOM
             CustomStepDetails:
-              Name: !Sub ${AWS::StackName}-CustomWorkflowStep
+              Name: !Sub CustomWorkflowStep
               Target:
                 Fn::GetAtt: CustomWorkflowLambda.Arn
 
