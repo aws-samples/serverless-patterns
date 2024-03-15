@@ -12,7 +12,7 @@
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/wbattou/serverless-patterns/tree/main/apigw-edge-custom-domain",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-edge-custom-domain",
             "templateURL": "serverless-patterns/apigw-edge-custom-domain",
             "projectFolder": "apigw-edge-custom-domain",
             "templateFile": "template.yaml"
