@@ -1,5 +1,5 @@
-# Edge-optimized AWS API Gateway with custom domain name
-This pattern deploys an Edge-optimized API Gateway with a single method (/hello) in your preferred region with an AWS Certificate Manager certificate in us-east-1 (which is mandatory for Edge-optimized API Gateways).
+# Edge-optimized Amazon API Gateway with custom domain name
+This pattern deploys an Edge-optimized Amazon API Gateway with a single method (/hello) in your preferred region with an AWS Certificate Manager certificate in us-east-1 (which is mandatory for Edge-optimized API Gateways).
 
 ## Requirements
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
@@ -36,16 +36,16 @@ This pattern deploys an Edge-optimized API Gateway with a single method (/hello)
 ## How it works
 <img width="1273" alt="image" src="assets/architecture.png">
 
-In this pattern we use CloudFormation custom resources, which allow us to implement custom provisioning logic using Lambda functions. For more information, please refer to this [workshop](https://mng.workshop.aws/cloudformation/customresource.html).
+This pattern uses CloudFormation custom resources to implement custom provisioning logic using Lambda functions. For more information, please refer to this [workshop](https://mng.workshop.aws/cloudformation/customresource.html).
 
-1. As you can see in the diagram above, the first step is to create the "certificate.yaml" file.
+1. Create the "certificate.yaml" file.
 
-To create an ACM certificate on AWS with DNS as `DomainValidationOptions`, we need to provide the `DomainName` and the `HostedZoneId`. CloudFormation does not get the `HostedZoneId` dynamically for now. A custom resource is used to get these values dynamically instead of hardcoding them.
+To create an ACM certificate on AWS with DNS as `DomainValidationOptions`, provide the `DomainName` and the `HostedZoneId`. CloudFormation does not dynamically retrieve the `HostedZoneId`. A custom resource is used to get these values dynamically instead of hardcoding them.
 To get the ARN of this certificate from the other stack I store it in a ParameterStore.
 
 2. Deploy the main stack with the template named "template.yaml".
 
-Now we need to deploy the main stack, our EDGE API Gateway. We need to get the certificate we created in Step 1 and the HostedZoneId for our domain. To do this we will create a second custom resource.
+To deploy the main stack, the EDGE API Gateway, get the certificate created in Step 1 and the HostedZoneId for the domain. This creates a second custom resource.
 
 ## Testing
 This is a sample 'hello world' API, you can test it with the following command.
