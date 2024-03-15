@@ -1,13 +1,13 @@
 {
-  "title": "Edge API Gateway with a custom domain",
-  "description": "Edge API Gateway Custom Domain with SAM: certificate in us-east-1 when using another region",
+  "title": "Edge Amazon API Gateway with a custom domain",
+  "description": "Edge Amazon API Gateway custom domain with AWS SAM: certificate in us-east-1 when using another region",
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-	"To deploy an Edge API Gateway, it's mandatory to generate a certificate in us-east-1. The problem with CloudFormation is that resources in one stack are deployed in a single region. We are not able to set another region for a specific resource."
+	"To deploy an Edge API Gateway, it's mandatory to generate a certificate in us-east-1. Resources in one stack are deployed in a single region. You are not able to set another Region for a specific resource."
     ]
   },
   "gitHub": {
