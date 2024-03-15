@@ -1,18 +1,18 @@
 {
-  "title": "Send email with pre-signed URL on file upload into S3 bucket",
-  "description": "This sample project demonstrates how to send an email with pre-signed Amazon S3 bucket URL whenever a file is uploaded into the bucket.",
-  "language": "Python",
-  "level": "200",
-  "framework": "SAM",
-  "introBox": {
-    "headline": "How it works",
-    "text": [
-      "User uploads a file into the Amazon S3 bucket.",
-      "Amazon S3 triggers the AWS Lambda function.",
-      "The AWS Lambda function creates a pre-signed URL with validity of one hour for the uploaded file and calls Amazon SES API.",
-      "TThe Amazon SES sends the notification email."
-    ]
-  },
+    "title": "Send email with pre-signed URL on file upload into S3 bucket",
+    "description": "This sample project demonstrates how to send an email with pre-signed Amazon S3 bucket URL whenever a file is uploaded into the bucket.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "User uploads a file into the Amazon S3 bucket.",
+            "Amazon S3 triggers the AWS Lambda function.",
+            "The AWS Lambda function creates a pre-signed URL with validity of one hour for the uploaded file and calls Amazon SES API.",
+            "TThe Amazon SES sends the notification email."
+        ]
+    },
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-ses-sam",
