@@ -68,7 +68,7 @@ The AWS Lambdaambda function will get the Amazon S3 bucket name and object key f
 
 ### Making changes
 
-You can customize the AWS Lambda Functions by editing the code at `./src/lambda_function.ps`. To deploy changes, use the `cdk deploy` command.
+You can customize the AWS Lambda Functions by editing the code at `./src/lambda_function.py`. To deploy changes, use the `cdk deploy` command.
 
 ## Cleanup
  
