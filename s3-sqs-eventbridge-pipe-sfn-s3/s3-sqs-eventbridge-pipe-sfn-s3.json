@@ -1,18 +1,18 @@
 {
-  "title": "Copy an object between two S3 buckets using S3 Event Notification to SQS to EventBridge Pipes to Step Function",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "title": "S3 to EventBridge Pipes to SQS to Step Function to S3",
+  "description": "Copy and manipulate an object between S3 buckets using SQS, EventBridge Pipe and Step Function",
   "language": "",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to copy an object between two S3 buckets and manipulate it in transit.",
+      "This sample project demonstrates how to copy an object with JSON encoded content between two S3 buckets and manipulate it in transit.",
       "When an object is created in the source S3 bucket, an S3 Event Notification is fires and enqueued onto an SQS Queue.",
-      "The EventBridge service polls the SQS Queue and invokes an EventBridge pipe.",
+      "The EventBridge service polls the SQS Queue and invokes an EventBridge Pipe.",
       "The EventBridge Pipe then executes an AWS Step Functions Express Workflow state machine.",
       "This copies the file from the source S3 Bucket to the destination S3 Bucket.",
-      "In a real world scenario the state machine would be modified to manipulate the file as desired"
+      "In a real world scenario the state machine would be modified to manipulate the JSON object as desired"
     ]
   },
   "gitHub": {
@@ -55,7 +55,7 @@
       "name": "Dan Straw",
       "image": "https://avatars.githubusercontent.com/u/271028",
       "bio": "Senior Solutions Architect at AWS",
-      "linkedin": "https://www.linkedin.com/in/danstraw/"
+      "linkedin": "danstraw"
     }
   ]
 }
