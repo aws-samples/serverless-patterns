@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
-Transform: 'AWS::Serverless-2016-10-31'
-Description: An Amazon REST API gateway with request validator to validate querystring, header, and body, and integrated with a AWS Lambda function.
+Description: >
+  An Amazon REST API gateway with request validator to validate querystring, header, and body, and integrated with a AWS Lambda function. 
+  (uksb-1tthgi812) (tag:apigw-lambda-request-validator)
 
 # Global values that are applied to all applicable resources in this template
 Globals:

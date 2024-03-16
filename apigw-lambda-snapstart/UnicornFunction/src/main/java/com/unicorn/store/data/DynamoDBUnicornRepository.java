@@ -12,38 +12,34 @@ import com.unicorn.store.model.Unicorn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Expression;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.model.UpdateItemEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 @Repository
 public class DynamoDBUnicornRepository implements UnicornRepository {
 
     private static final Logger logger = LogManager.getLogger();
 
-    private final DynamoDbAsyncTable<Unicorn> unicornDynamoDbAsyncTable;
+    private final DynamoDbTable<Unicorn> unicornDynamoDbTable;
 
-    public DynamoDBUnicornRepository(DynamoDbAsyncTable<Unicorn> unicornDynamoDbAsyncTable) {
-        this.unicornDynamoDbAsyncTable = unicornDynamoDbAsyncTable;
+    public DynamoDBUnicornRepository(DynamoDbTable<Unicorn> unicornDynamoDbTable) {
+        this.unicornDynamoDbTable = unicornDynamoDbTable;
     }
 
     @Override
     public Unicorn save(Unicorn unicorn) {
         logger.info("Saving unicorn with id {} to DynamoDB", unicorn.getId());
         try {
-            unicornDynamoDbAsyncTable.putItem(unicorn).get();
+            unicornDynamoDbTable.putItem(unicorn);
             logger.info("Unicorn with id {} saved successfully", unicorn.getId());
             return unicorn;
-        } catch (ExecutionException e) {
-            logger.error("Unicorn with id {} could not be saved to DynamoDB", unicorn.getId(), e);
-            throw new ResourceSaveException(e.getMessage());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        } catch (DynamoDbException e) {
             logger.error("Unicorn with id {} could not be saved to DynamoDB", unicorn.getId(), e);
             throw new ResourceSaveException(e.getMessage());
         }
@@ -52,18 +48,14 @@ public class DynamoDBUnicornRepository implements UnicornRepository {
     @Override
     public Optional<Unicorn> findById(String unicornId) {
         try {
-            Unicorn unicorn = unicornDynamoDbAsyncTable.getItem(Key.builder().partitionValue(unicornId).build()).get();
+            Unicorn unicorn = unicornDynamoDbTable.getItem(Key.builder().partitionValue(unicornId).build());
             if (unicorn == null) {
                 logger.info("Unicorn with id {} not found in DynamoDB", unicornId);
                 return Optional.empty();
             }
             logger.info("Unicorn with id {} found in DynamoDB", unicornId);
             return Optional.of(unicorn);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.error("Unicorn with id {} could not be retrieved from DynamoDB", unicornId, e);
-            throw new ResourceRetrievalException(e.getMessage());
-        } catch (ExecutionException e) {
+        } catch (DynamoDbException e) {
             logger.error("Unicorn with id {} could not be retrieved from DynamoDB", unicornId, e);
             throw new ResourceRetrievalException(e.getMessage());
         }
@@ -72,13 +64,9 @@ public class DynamoDBUnicornRepository implements UnicornRepository {
     @Override
     public void deleteById(String unicornId) {
         try {
-            unicornDynamoDbAsyncTable.deleteItem(Key.builder().partitionValue(unicornId).build()).get();
+            unicornDynamoDbTable.deleteItem(Key.builder().partitionValue(unicornId).build());
             logger.info("Unicorn with id {} deleted successfully", unicornId);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.error("Unicorn with id {} could not be deleted from DynamoDB", unicornId, e);
-            throw new ResourceDeletionException(e.getMessage());
-        } catch (ExecutionException e) {
+        } catch (DynamoDbException e) {
             logger.error("Unicorn with id {} could not be deleted from DynamoDB", unicornId, e);
             throw new ResourceDeletionException(e.getMessage());
         }
@@ -91,18 +79,14 @@ public class DynamoDBUnicornRepository implements UnicornRepository {
                 .conditionExpression(Expression.builder().expression("attribute_exists(id)").build())
                 .build();
         try {
-            unicornDynamoDbAsyncTable.updateItem(updateItemEnhancedRequest).get();
+            unicornDynamoDbTable.updateItem(updateItemEnhancedRequest);
             logger.info("Unicorn with id {} updated successfully", unicorn.getId());
             return unicorn;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        } catch (ConditionalCheckFailedException e) {
             logger.error("Unicorn with id {} could not be updated in DynamoDB", unicorn.getId(), e);
-            throw new ResourceUpdateException(e.getMessage());
-        } catch (ExecutionException e) {
+            throw new ResourceNotFoundException(String.format("Unicorn with id %s not found", unicorn.getId()));
+        } catch (DynamoDbException e) {
             logger.error("Unicorn with id {} could not be updated in DynamoDB", unicorn.getId(), e);
-            if (e.getCause() instanceof ConditionalCheckFailedException) {
-                throw new ResourceNotFoundException(String.format("Unicorn with id %s not found", unicorn.getId()));
-            }
             throw new ResourceUpdateException(e.getMessage());
         }
     }

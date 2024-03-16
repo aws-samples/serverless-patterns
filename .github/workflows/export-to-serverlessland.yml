@@ -1,0 +1,32 @@
+# Manual trigger that will Copy pattern to SLand
+name: Manual Copy to SLand
+
+on:
+  workflow_dispatch:
+    inputs:
+      fileName:
+        description: "new pattern filename"
+        required: true
+      dirName:
+        description: "new pattern dir"
+        required: true
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    if: ${{ (github.actor == 'bls20aws') || (github.actor == 'singledigit')  || (github.actor == 'boyney123') || (github.actor == 'mavi888') || (github.actor == 'julianwood') }}
+    env:
+      NODE_ENV: dev
+      fileName: ${{ inputs.fileName }}
+    steps:
+      - name: Copycat
+        uses: andstor/copycat-action@v3
+        with:
+          personal_token: ${{ secrets.patterns_pat }}
+          dst_path: /submissions/patterns/
+          dst_owner: bls20AWS
+          dst_repo_name: serverless-land
+          dst_branch: master
+          src_branch: main
+          file_filter: "*.json"
+          src_path: /${{ inputs.dirName }}/${{ inputs.fileName }}

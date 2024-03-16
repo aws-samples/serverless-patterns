@@ -1,12 +1,12 @@
-import { dirname, join } from 'path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as cdk from 'aws-cdk-lib';
 import { Architecture, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
-import { HttpApi, HttpMethod} from '@aws-cdk/aws-apigatewayv2-alpha';
-import { HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
+import { HttpApi, HttpMethod} from 'aws-cdk-lib/aws-apigatewayv2';
+import { HttpLambdaIntegration} from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

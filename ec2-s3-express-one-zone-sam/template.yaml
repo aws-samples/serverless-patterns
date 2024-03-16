@@ -1,0 +1,185 @@
+AWSTemplateFormatVersion: '2010-09-09' 
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template that creates an EC2 Instance, an Amazon S3 Express One Zone directory bucket and required IAM Role to access the bucket from the instance
+
+# Get the required input parameters
+Parameters:
+  AvailabilityZoneName:
+    Type: String
+    Description: Please provide availability Zone Name (e.g. us-east-1a)
+  AvailabilityZoneId:
+    Type: String
+    Description: Please enter the corresponding availability Zone Id (e.g. use1-az6) for your account
+  ImageId:
+    Type: String
+    Description: Please enter the AMI Id for your account
+
+ 
+Resources:
+  # Create VPC and related resources 
+  VPC: 
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: !Sub "${AvailabilityZoneName}"
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  Route:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation  
+    Properties:
+      SubnetId: !Ref Subnet
+      RouteTableId: !Ref RouteTable
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP traffic
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - CidrIp: 0.0.0.0/0 
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+      SecurityGroupEgress:
+        - IpProtocol: all
+          CidrIp: 0.0.0.0/0
+          
+
+
+  # Create EC2 Instance Profile, Role  
+  EC2InstanceProfile: 
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      Path: /
+      Roles: 
+        - !Ref EC2InstanceRole
+
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: logs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource:
+                  - 'arn:aws:logs:*:*:*'
+        - PolicyName: AllowAccessRegionalEndpointAPIs
+          PolicyDocument: 
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3express:DeleteBucket"
+                  - "s3express:DeleteBucketPolicy"
+                  - "s3express:CreateBucket"
+                  - "s3express:PutBucketPolicy"
+                  - "s3express:GetBucketPolicy"
+                  - "s3express:ListAllMyDirectoryBuckets"
+                Resource:
+                  - !GetAtt BucketExpressOneZone.Arn
+        - PolicyName: AllowCreateSession
+          PolicyDocument: 
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3express:CreateSession"
+                Resource:
+                  - !GetAtt BucketExpressOneZone.Arn
+                  # - "*"
+                  # - !Ref EC2Instance
+
+# create key-pair
+  EC2KeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: ec2-keypair
+      KeyType: rsa
+      Tags:
+        - Key: Name
+          Value: ec2-keypair
+  # Create EC2 Instance
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Sub "${ImageId}"
+      InstanceType: t2.micro
+      KeyName: !Ref EC2KeyPair
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      NetworkInterfaces:
+        - DeviceIndex: "0"
+          AssociatePublicIpAddress: true
+          DeleteOnTermination: true
+          SubnetId: !Ref Subnet
+          GroupSet:
+            - !Ref SecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "EC2-Instance-${AvailabilityZoneName}"
+
+
+  # Create an Amazon S3 Express One Zone storage class bucket
+  BucketExpressOneZone:
+    Type: AWS::S3Express::DirectoryBucket
+    Properties:
+      # BucketName: input-bucket-express-one-zone
+      DataRedundancy: SingleAvailabilityZone
+      LocationName: !Sub "${AvailabilityZoneId}"
+
+
+# Output EC2 ARN, Bucket names
+Outputs:
+  EC2InstanceId:
+    Value: !Ref EC2Instance
+  BucketExpressOneZoneName:
+    Value: !Ref BucketExpressOneZone

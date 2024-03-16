@@ -4,6 +4,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >
+  (uksb-1tthgi812) (tag:apigw-websocket-api-sns)
   Serverless patterns - This template will help you to deploy API Gateway WebSocket API which validates input and invokes SNS topic
 
 Parameters:

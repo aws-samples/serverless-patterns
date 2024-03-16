@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An AWS Lambda function and an AWS Systems Manager Parameter Store parameter.
+Description: An AWS Lambda function and an AWS Systems Manager Parameter Store parameter. (uksb-1tthgi812) (tag:lambda-ssm-parameter-java)
 
 Parameters:
   SSMParameterName:

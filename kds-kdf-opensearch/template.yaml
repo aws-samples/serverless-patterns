@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: SAM application to implement a data pipeline using Kinesis Data Streams to Kinesis Data Firehose to OpenSearch
+Description: SAM application to implement a data pipeline using Kinesis Data Streams to Kinesis Data Firehose to OpenSearch (uksb-1tthgi812) (tag:kds-kdf-opensearch)
 
 Parameters:
   AdminUserArn:

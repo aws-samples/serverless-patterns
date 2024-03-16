@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Canary example for API Gateway rest api
+Description: Canary example for API Gateway rest api (uksb-1tthgi812) (tag:apigw-ddb-openapi-crud)
 
 Resources:
   CrudAPI:

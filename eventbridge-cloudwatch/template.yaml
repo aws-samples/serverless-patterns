@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Sample template to deliver events from Amazon EventBridge to CloudWatch Logs
+Description: Sample template to deliver events from Amazon EventBridge to CloudWatch Logs (uksb-1tthgi812) (tag:eventbridge-cloudwatch)
 
 Resources:
   TestEventBus:

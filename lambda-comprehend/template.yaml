@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: An AWS Lambda function that calls Amazon Comprehend for sentiment analysis
+Description: An AWS Lambda function that calls Amazon Comprehend for sentiment analysis (uksb-1tthgi812) (tag:lambda-comprehend)
 
 Resources:
   ComprehendLambdaFunction:

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Cognito User Pool
+Description: Serverless patterns - Cognito User Pool (uksb-1tthgi812) (tag:cognito-user-pool)
 
 Parameters:
   Email:

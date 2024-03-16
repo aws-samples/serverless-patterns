@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:sfn-lambda-dynamodb)
   Invoke a StepFunction state machine from a DynamoDB streams via Lambda function
 Resources:
 ##########################################################################

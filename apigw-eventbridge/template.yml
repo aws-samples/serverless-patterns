@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless pattern API Gateway to EventBridge
+Description: Serverless pattern API Gateway to EventBridge (uksb-1tthgi812) (tag:apigw-eventbridge)
 
 Parameters:
   Stage:

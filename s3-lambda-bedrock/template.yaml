@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: A rest endpoint hosted by an API Gateway which invokes Kinesis data stream, consumed by lambda function and persisted in a dynamoDB table.
+Description: A rest endpoint hosted by an API Gateway which invokes Kinesis data stream, consumed by lambda function and persisted in a dynamoDB table. (uksb-1tthgi812) (tag:s3-lambda-bedrock)
 
 Parameters:
   ContentBucketName:

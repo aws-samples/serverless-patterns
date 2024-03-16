@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - AWS WAF to Amazon API Gateway REST
+Description: Serverless patterns - AWS WAF to Amazon API Gateway REST (uksb-1tthgi812) (tag:apigw-cloudwatch)
 
 Resources:
   # Log group
