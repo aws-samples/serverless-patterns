@@ -50,13 +50,13 @@ Resources:
   CrossAcctIAMRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CrossAcctIAMRole
+      RoleName: !Sub CrossAcctIAMRole-${AWS::StackName}
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
-              AWS: !Sub "arn:aws:iam::${SourceAWSAcctId}:role/SnapshotLambdaRole"
+              AWS: !Sub "arn:aws:iam::${SourceAWSAcctId}:root"
             Action: sts:AssumeRole
       Path: /
       Policies:
@@ -120,7 +120,7 @@ Resources:
   CopySnapshotAndUpdateVolumeLambda:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: CopySnapshotAndUpdateVolumeLambda
+      FunctionName: !Sub CopySnapshotAndUpdateVolumeLambda-${AWS::StackName}
       Description: Lambda function that will make CopySnapshotAndUpdateVolume API call.
       Environment:
         Variables:
@@ -148,3 +148,4 @@ Outputs:
   LambdaExecutionRole:
     Description: IAM role used by target Lambda function
     Value: !GetAtt CopySnapshotAndUpdateVolumeLambdaRole.Arn
+

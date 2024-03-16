@@ -1,31 +1,31 @@
 {
   "title": "Replicate FSx-OpenZFS volumes across file systems",
-  "description": "Periodic FSx-OpenZFS volume replication across file systems using Amazon EventBridge Scheduler and AWS Lambda",
+  "description": "Periodic FSx-OpenZFS volume replication across file systems across AWS regions and accounts using Amazon EventBridge Scheduler and AWS Lambda",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The AWS SAM template deploys an Amazon EventBridge Scheduler to trigger an AWS Lambda function based on a user schedule to copy the snapshot of the volume and copy them to the target FSx system. The template contains a sample Lambda function that receives the user input for source and target VolumeId. The Lambda function creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region. Notify users using a SNS topic for any errors and snapshot creation details.",
+      "The AWS SAM template deploys an Amazon EventBridge Scheduler to trigger an AWS Lambda function based on a user schedule to copy the snapshot of the volume and copy them to the target FSx system available in different AWS account and/or region. The template contains a sample Lambda function that creates a snapshot of the source FSx VolumeID. Once the snapshot becomes available, it invokes another Lambda function in the destination AWS account or region, which will initiate the replication by calling copy_snapshot_and_update_volume API call. This solution will also notify users using a SNS topic for any errors and snapshot creation details.",
       "This pattern sets up the following resources:",
-      "An Amazon EventBridge Scheduler that triggers a Lambda function based on the schedule defined by the customer to take snapshots of the provided FSx VolumeID.",
+      "An Amazon EventBridge Scheduler that triggers a Lambda function based on the schedule defined by the customer to take snapshots of the provided FSx Source VolumeID.",
       "An SNS topic that notifies for any failures while creating snapshots.",
       "The function also deletes the older snapshots.",
-      "A sample Lambda functions that creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region."
+      "A sample Lambda functions that creates snapshots of the source FSx VolumeID and replicates them by invoking another Lambda function, which calls copy_snapshot_and_update_volume API to the target VolumeId in the destination AWS account or region."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-fsx-openzfs-periodic-replication",
-      "templateURL": "serverless-patterns/eventbridge-lambda-fsx-openzfs-periodic-replication",
-      "projectFolder": "eventbridge-lambda-fsx-openzfs-periodic-replication",
-      "templateFile": "template.yaml"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-fsx-openzfs-cross-account-region-periodic-replication",
+      "templateURL": "serverless-patterns/eventbridge-lambda-fsx-openzfs-cross-account-region-periodic-replication",
+      "projectFolder": "eventbridge-lambda-fsx-openzfs-cross-account-region-periodic-replication",
+      "templateFile": "source-template.yaml"
     }
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM CAPABILITY_NAMED_IAM -t source-template.yaml"
     ]
   },
   "testing": {
@@ -35,7 +35,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "Delete the stack: <code>sam delete --stack-name <stackname></code>."
     ]
   },
   "authors": [

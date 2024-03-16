@@ -69,6 +69,11 @@ Parameters:
     Description: Destination region
     Type: String
 
+  # target account/region stack name
+  TargetStackName:
+    Description: Name of the Target region/account stack
+    Type: String
+
 Resources:
   #
   # SNS topic to notify
@@ -88,7 +93,7 @@ Resources:
   SnapshotLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: SnapshotLambdaRole
+      RoleName: !Sub SnapshotLambdaRole-${AWS::StackName}
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -121,11 +126,11 @@ Resources:
               - Effect: Allow
                 Action:
                   - lambda:InvokeFunction
-                Resource: !Sub "arn:aws:lambda:${DestinationRegion}:${DestinationAWSAcctId}:function:CopySnapshotAndUpdateVolumeLambda"
+                Resource: !Sub "arn:aws:lambda:${DestinationRegion}:${DestinationAWSAcctId}:function:CopySnapshotAndUpdateVolumeLambda-${TargetStackName}"
               - Effect: Allow
                 Action:
                   - sts:AssumeRole
-                Resource: !Sub "arn:aws:iam::${DestinationAWSAcctId}:role/CrossAcctIAMRole"
+                Resource: !Sub "arn:aws:iam::${DestinationAWSAcctId}:role/CrossAcctIAMRole-${TargetStackName}"
               - Effect: Allow
                 Action:
                   - sns:Publish
@@ -146,8 +151,8 @@ Resources:
           SNAPSHOT_NAME: !Ref SnapshotName
           SNAPSHOT_TAG_VALUE: !Sub ${AWS::StackName}_${SourceVolumeID}
           SNAPSHOT_RETAIN_DAYS: !Ref RetainDays
-          DEST_LAMBDA_ARN: !Sub "arn:aws:lambda:${DestinationRegion}:${DestinationAWSAcctId}:function:CopySnapshotAndUpdateVolumeLambda"
-          DEST_IAM_ROLE: !Sub "arn:aws:iam::${DestinationAWSAcctId}:role/CrossAcctIAMRole"
+          DEST_LAMBDA_ARN: !Sub "arn:aws:lambda:${DestinationRegion}:${DestinationAWSAcctId}:function:CopySnapshotAndUpdateVolumeLambda-${TargetStackName}"
+          DEST_IAM_ROLE: !Sub "arn:aws:iam::${DestinationAWSAcctId}:role/CrossAcctIAMRole-${TargetStackName}"
           DEST_LAMBDA_REGION: !Ref DestinationRegion
       Handler: PeriodicReplication.lambda_handler
       Role: !GetAtt SnapshotLambdaRole.Arn
@@ -214,3 +219,4 @@ Outputs:
   LambdaFunction:
     Description: Lambda Function
     Value: !GetAtt SnapshotLambda.Arn
+
