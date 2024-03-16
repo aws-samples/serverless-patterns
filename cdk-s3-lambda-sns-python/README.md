@@ -1,4 +1,4 @@
-# Amazon S3 -> AWS Lambda -> Amazon SNS\
+# Amazon S3 to AWS Lambda to publishes Amazon SNS notification\
 
 This pattern creates a Amazon S3 bucket, a Lambda function, and an Amazon SNS topic.
 The Lambda function is triggered by S3 'OBJECT_CREATED' events. The Lambda function can optionally apply business logic to the S3 object. After processing, the Lambda function publishes an SNS notification of the new object.
