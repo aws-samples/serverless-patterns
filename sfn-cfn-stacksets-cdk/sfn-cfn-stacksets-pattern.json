@@ -1,0 +1,59 @@
+{
+  "title": "Step Functions to CloudFormation StackSets",
+  "description": "Create a Step Functions workflow to create/delete Cloudformation StackSets in Root Organization unit's linked accounts.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK application deploys a Step Functions workflow that takes in a user input, and creates/deletes the StackSets instances in all the linked AWS Accountes for the root Organizational Unit (OU). Additionally, this worflow also creates/deletes the StackSet itself in the management account.",
+      "There are two main flows - to create a StackSet or to delete a StackSet. Each flow also creates or deletes the StackSet instances, checks the progress of stackset instance operations and retries until stackset instances are created/deleted successfully. ",
+      "The Step Function workflow requires specific input parameters when triggerring the execution, as described in the README."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-cfn-stacksets-cdk",
+      "templateURL": "serverless-patterns/sfn-cfn-stacksets-cdk",
+      "projectFolder": "sfn-cfn-stacksets-cdk",
+      "templateFile": "sfn_cfn_stacksets_pattern/sfn_cfn_stacksets_pattern_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Step Functions AWS SDK Integrations",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      },
+      {
+        "text": "AWS Cloudformation StackSets - Deploy Stacks in Multiple Accounts & Regions",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/what-is-cfnstacksets.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Akshay Singhal",
+      "image": "img/akshay-profile-pic.jpg",
+      "bio": "Akshay Singhal is a Sr. Technical Account Manager (TAM) for AWS Enterprise Support focussing on the Security ISV (Independent Software Vendors) segment. He provides technical guidance for customers to implement AWS solutions, with expertise spanning serverless architectures & cost optimization. Outside of work, Akshay enjoys traveling, Formula 1, making short movies, and exploring new cuisines.",
+      "linkedin": "https://www.linkedin.com/in/singhalakshay/",
+      "twitter": "@_sin_ak"
+    }
+  ]
+}
