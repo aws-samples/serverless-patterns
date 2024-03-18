@@ -12,7 +12,8 @@ from aws_cdk import (
     aws_iam as iam,
     aws_logs as logs,
     Duration,
-    CfnParameter
+    CfnParameter,
+    CfnOutput
 )
 
 from constructs import Construct
@@ -101,8 +102,10 @@ class Auth0IntegrationStack(Stack):
         #CloudWatch Log Group as target for EventBridge Rule
         auth0_failed_login_events_rule.add_target(targets.CloudWatchLogGroup(log_group_failed_logins))
 
+        # print the IAM role arn for this service account
+        CfnOutput(self, "Auth0ProcessFailedLoginLambdaOutput", value=auth0_process_failed_login_lambda.function_name)
+
 app = cdk.App()
 Auth0IntegrationStack(app, "Auth0IntegrationStack")
-
 
 app.synth()

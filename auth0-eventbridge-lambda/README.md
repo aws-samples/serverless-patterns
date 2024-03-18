@@ -31,11 +31,16 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy --parameters auth0EventBusName=SAAS_EVENT_BUS_NAME_HERE
     ```
 
-5. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
+4. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing. This stack will output the name of the Lambda function deployed for testing to the CLI. See the example below. 
+
+```
+Outputs:
+Auth0IntegrationStack.Auth0ProcessFailedLoginLambdaOutput = Auth0IntegrationStack-Auth0ProcessFailedLoginLambd....
+```
 
 ## How it works
 
-This service interaction uses an existing Auth0 SaaS integration in the customer's AWS account. If you do not have the Auth0 SaaS integration set up in your AWS account, please set it up before deploying this pattern. See [Auth0's Log documentation](https://auth0.com/docs/deploy-monitor/logs) for available events. 
+This service interaction uses an existing Auth0 SaaS integration in the customer's AWS account. If you do not have the Auth0 SaaS integration set up in your AWS account, please set it up before deploying this pattern. View the [integration on Auth0's marketplace](https://marketplace.auth0.com/integrations/amazon-log-streaming). See [Auth0's Log documentation](https://auth0.com/docs/deploy-monitor/logs) for available events. 
 
 This pattern demonstrates how to:
 1. Write EventBridge rules that match Auth0's event pattern
