@@ -104,6 +104,6 @@ You should see a green box appear that says "Sample event matched the event patt
     ```
 
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
