@@ -71,7 +71,11 @@ The command should have create a response.json file in your directory. If you op
 
 You cannot put events on the Auth0 SaaS event bus, only Auth0 can publish events to this event bus. To test that the EventBridge rules deployed by this pattern were successfully deployed, follow these instructions: 
 
-1. Navigate to the Amazon EventBridge console. Select "Rules." Select the SaaS event bus associated with your Auth0 partner event source. Select the "Auth0IntegrationStack-Auth0FailedLoginEventsRule54D..."
+1. Navigate to the Amazon EventBridge console. Select "Rules". 
+
+2. From the Event bus list, choose the SaaS event bus associated with your Auth0 partner event source. 
+
+3. From the Rules list, select the "Auth0IntegrationStack-Auth0FailedLoginEventsRule54D..." 
 
 ![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/EBconsole-rules.png)
 
