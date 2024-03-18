@@ -87,7 +87,7 @@ You cannot put events on the Auth0 SaaS event bus, only Auth0 can publish events
 
 ![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/SampleEvent.png)
 
-4. Scroll down to "Event pattern." Select "Test Pattern." 
+6. Scroll down to "Event pattern." Choose "Test Pattern." 
 
 ![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/TestEvent.png)
 
