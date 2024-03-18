@@ -83,7 +83,7 @@ You cannot put events on the Auth0 SaaS event bus, only Auth0 can publish events
 
 ![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/BuildEvent.png)
 
-3. Scroll down to "Sample event - optional." Select "Enter my own," and delete the pre-populated event. Copy the contents of event.json into the event editor. 
+5. Scroll down to "Sample event - optional." Select "Enter my own," and delete the pre-populated event. Copy the contents of event.json into the event editor. 
 
 ![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/SampleEvent.png)
 
