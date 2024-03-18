@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: An Amazon REST API gateway integrated with a AWS Lambda function that calls AWS Translate service to translate given text, then call AWS Polly service to convert the text into speech and save audio file to s3.
+Description: An Amazon REST API gateway integrated with a AWS Lambda function that calls AWS Translate service to translate given text, then call AWS Polly service to convert the text into speech and save audio file to s3. (uksb-1tthgi812) (tag:apigw-lambda-translate-polly-s3)
 
 Parameters:
   s3BucketName:

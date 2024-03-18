@@ -33,6 +33,7 @@ Parameters:
     Type: String
     Default: 'websocket_connections'
     Description: >
+      (uksb-1tthgi812) (tag:apigw-websocket-api-lambda)
       (Required) The suffix of the name of the Amazon DynamoDB table where connection identifiers 
       will be stored. The table name will be prefixed by the Stack Name.
     MinLength: 3

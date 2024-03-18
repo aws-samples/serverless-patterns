@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: This templates creates a Lambda function running with an ECR Image. The ECR image needs to be entered in the parameters
+Description: This templates creates a Lambda function running with an ECR Image. The ECR image needs to be entered in the parameters (uksb-1tthgi812) (tag:lambda-ecr)
 
 Parameters:
   EcrUri:

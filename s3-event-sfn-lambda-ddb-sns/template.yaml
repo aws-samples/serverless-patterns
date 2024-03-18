@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Object upload to S3 triggers a state machine which uses Lambda function to put records to DynamoDB post which a notification would be sent to user via SNS.
+Description: Serverless patterns - Object upload to S3 triggers a state machine which uses Lambda function to put records to DynamoDB post which a notification would be sent to user via SNS. (uksb-1tthgi812) (tag:s3-event-sfn-lambda-ddb-sns)
 
 Resources:
 #=====

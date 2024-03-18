@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An Amazon API Gateway HTTP API and an AWS Lambda function.
+Description: An Amazon API Gateway HTTP API and an AWS Lambda function. (uksb-1tthgi812) (tag:apigw-http-api-lambda)
 
 # Global values that are applied to all applicable resources in this template
 Globals:

@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SQS with DLQ and Lambda event source 
+
+Resources:
+  ## Define the SQS Queues ##
+  MyOriginalQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: MyOriginalQueue.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      VisibilityTimeout: 30
+      MessageRetentionPeriod: 1209600
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt MyDeadLetterQueue.Arn
+        maxReceiveCount: 1
+
+  MyDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: MyDeadLetterQueue.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      MessageRetentionPeriod: 1209600
+      RedriveAllowPolicy:
+        redrivePermission: "allowAll"
+
+  MyReProcessQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: MyReProcessQueue.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      VisibilityTimeout: 30
+      MessageRetentionPeriod: 1209600
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt MyDeadLetterQueue.Arn
+        maxReceiveCount: 1
+
+
+  ## Define the Lambda Functions ##
+  MyOriginalQueueFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: originalmessage/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      FunctionName: MyOriginalQueueFunction
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt MyOriginalQueue.QueueName
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref MyOriginalQueue              
+      Events:
+        SqsEvent:
+          Type: SQS 
+          Properties:
+            Queue: !GetAtt MyOriginalQueue.Arn
+            BatchSize: 10
+
+  ReProcessQueueFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: redrivenmessage/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      FunctionName: ReProcessQueueFunction
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt MyReProcessQueue.QueueName
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref MyReProcessQueue  
+      Events:
+        SqsEvent:
+          Type: SQS 
+          Properties:
+            Queue: !GetAtt MyReProcessQueue.Arn
+            BatchSize: 10
+
+Outputs:
+  MyOriginalQueueUrl:
+    Description: "MyOriginalQueue URL"
+    Value: !Ref MyOriginalQueue
+  MyDeadLetterQueueArn:
+    Description: "MyDeadLetterQueue ARN"
+    Value: !GetAtt MyDeadLetterQueue.Arn
+  MyReProcessQueueArn:
+    Description: "MyReProcessQueue ARN"
+    Value: !GetAtt MyReProcessQueue.Arn

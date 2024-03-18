@@ -4,7 +4,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Introduction to serverless for developers:part3 GitHub to Slack
+Description: Introduction to serverless for developers:part3 GitHub to Slack (uksb-1tthgi812) (tag:eventbridge-schedule-stepfunctions-sam)
   
 ##########################################################################
 #  Parameters & Globals                                                  #

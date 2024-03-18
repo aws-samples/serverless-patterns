@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: '2010-09-09' 
+Transform: AWS::Serverless-2016-10-31
+Description: This is part 1 of a 2 part template to demonstrate how AWS B2B Data Interchange can transform EDI Files into JSON as per the transformation logic. This is part 1 of the template.
+
+# Get the required input parameters
+Parameters:
+  BusinessName:
+    Type: String
+    Description: Please enter the business name
+  Email:
+    Type: String
+    Description: Please enter email id
+    AllowedPattern: ^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$
+    ConstraintDescription: You should enter a valid email
+  Phone:
+    Type: String
+    Description: Please enter phone number
+
+Resources:
+  # Create profile for Business Partner using resoure type AWS::B2BI::Profile
+  MyProfile: 
+    Type: AWS::B2BI::Profile
+    Properties: 
+      BusinessName: !Sub "${BusinessName}"
+      Email: !Sub "${Email}"
+      Logging: ENABLED
+      Name: MyProfile
+      Phone: !Sub "${Phone}"
+
+  # Create a transformer using resource type AWS::B2BI::Transformer
+  MyTransformer: 
+    Type: AWS::B2BI::Transformer
+    Properties:
+      EdiType: 
+          X12Details: 
+            TransactionSet: X12_214
+            Version: VERSION_4010
+      FileFormat: JSON
+      MappingTemplate: |
+        {
+          "ReferenceID":functional_groups.transactions[0].segments[0].B10_01,
+          "ShipmentID":functional_groups.transactions[0].segments[0].B10_02,
+          "BillOfLandingNumber":functional_groups.transactions[0].segments[1].L11_01,
+          "From":functional_groups.transactions[0].segments[4].'0100_loop'[2].* ~> $join(","),
+          "To":functional_groups.transactions[0].segments[4].'0100_loop'[4].* ~> $join(","),
+          "ShipmentStatusCode":functional_groups.transactions[0].**.AT7_01
+        }
+      Name: MyTransformer
+      Status: active
+
+  # Create a input bucket for EDI file
+  EDI214InputBucket: 
+    Type: AWS::S3::Bucket
+    Properties: 
+      BucketName: !Sub "edi-214-input-${AWS::AccountId}-${AWS::Region}"
+      NotificationConfiguration: 
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+      
+  # Create bucket policy to allow read operations from AWS B2B Data Interchange
+  EDI214InputBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref EDI214InputBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: B2BIEdiCapabilityInputPolicy
+            Effect: Allow
+            Principal:
+              Service: b2bi.amazonaws.com
+            Action: 
+            - s3:GetObject
+            - s3:GetObjectAttributes
+            Resource: !Join 
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref EDI214InputBucket
+                - /*
+            Condition:
+              StringEquals:
+                aws:SourceAccount:
+                  Ref: AWS::AccountId  
+
+  # Create output bucket for EDI file
+  EDI214OutputBucket: 
+    Type: AWS::S3::Bucket
+    Properties: 
+      BucketName: !Sub "edi-214-output-${AWS::AccountId}-${AWS::Region}"
+
+  # Create bucket policy to allow write operations from AWS B2B Data Interchange
+  EDI214OutputBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref EDI214OutputBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: B2BIEdiCapabilityOutputPolicy
+            Effect: Allow
+            Principal:
+              Service: b2bi.amazonaws.com
+            Action: 
+            - s3:PutObject
+            - s3:AbortMultipartUpload
+            Resource: !Join 
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref EDI214OutputBucket
+                - /*
+            Condition:
+              StringEquals:
+                aws:SourceAccount:
+                  Ref: AWS::AccountId  
+
+# Output the bucket names, transformer Id, Profile Id
+Outputs:
+  EDI214InputBucketName:
+    Value: !Ref EDI214InputBucket
+  EDI214OutputBucketName:
+    Value: !Ref EDI214OutputBucket
+  MyTransformerId:
+    Value: !Ref MyTransformer
+  MyProfileId:
+    Value: !Ref MyProfile

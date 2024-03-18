@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An Application Load Balancer and an AWS Lambda function.
+Description: An Application Load Balancer and an AWS Lambda function. (uksb-1tthgi812) (tag:alb-lambda-rust)
 
 Parameters:
   VpcId:

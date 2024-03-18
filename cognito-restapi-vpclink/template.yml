@@ -8,7 +8,8 @@
 
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: >-
+Description: >
+  (uksb-1tthgi812) (tag:cognito-restapi-vpclink)
   Serverless pattern - API Gateway private REST API to private resource using VPC link.
   This pattern shows how to add Cognito authentication to private resources using API Gateway private REST API and VPC link.
 

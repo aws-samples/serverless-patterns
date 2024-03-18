@@ -4,6 +4,7 @@ Parameters:
   PinpointAppId:
     Type: String
     Description: Pinpoint application id through which you wish to send SMS
+Description: (uksb-1tthgi812) (tag:apigw-lambda-pinpoint)
 Resources:
   Api:
     Type: AWS::Serverless::Api

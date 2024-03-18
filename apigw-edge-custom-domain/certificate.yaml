@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  api-gateway-custom-domain
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  ACMCertificate:
+    Type: String
+    Default: "/api-gateway-custom-domain/CertArn"
+  Domain:
+    Type: String
+    Default: "dev.sample.com"
+  SubDomain:
+    Type: String
+    Default: "sample-api"
+
+Resources:
+#Get the HostedZoneId with a custom Resource from the Domain Name
+  GetZoneIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sam-custom-resources/GetZoneId
+      Handler: GetZoneId.handler
+      Runtime: python3.11
+      Policies:
+        - AmazonRoute53ReadOnlyAccess
+  GetZoneId:
+    Type: Custom::GetZoneId
+    Properties:
+      ServiceToken: !GetAtt GetZoneIdFunction.Arn
+      DomainName: !Ref Domain
+      Region: !Ref "AWS::Region"
+#Create certificate (mandatory in us-east-1)
+  Certificate:
+    Type: "AWS::CertificateManager::Certificate"
+    Properties:
+      DomainName: !Sub "${SubDomain}.${Domain}"
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Sub "${SubDomain}.${Domain}"
+          HostedZoneId: !GetAtt GetZoneId.HostedZoneId
+  CertificateARN:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Ref ACMCertificate
+      Type: "String"
+      Value: !Ref Certificate
+

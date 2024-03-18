@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Lambda with an alias "dev" associated with the latest version
+Description: Serverless patterns - Lambda with an alias "dev" associated with the latest version (uksb-1tthgi812) (tag:lambda-version-alias)
 
 
 Resources:

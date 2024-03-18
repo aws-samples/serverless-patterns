@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - REST API Gateway to Amazon SES
+Description: Serverless patterns - REST API Gateway to Amazon SES (uksb-1tthgi812) (tag:apigw-ses-transformation)
 Parameters:
   StageName:
     Type: String

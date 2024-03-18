@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: An AWS Lambda function that detects the Dominant Language in the provided input text using Amazon Comprehend.
+Description: An AWS Lambda function that detects the Dominant Language in the provided input text using Amazon Comprehend. (uksb-1tthgi812) (tag:lambda-comprehend-language-sam)
 Resources:
   DetectLanguageLambdaFunction:
     Type: AWS::Serverless::Function
