@@ -1,0 +1,53 @@
+{
+	"title": "Kinesis Data Analytics Writing Stream Data to Amazon S3 Bucket as a Sink",
+	"description": "Transform incoming stream data and deliver the transformed data to S3 destination as a Sink",
+	"language": "",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"In this project, you create an Amazon Kinesis Data Analytics for Apache Flink application that has a Kinesis data stream as a source and an Amazon S3 bucket as a sink.",
+			"Kinesis Data Analytics provides the underlying infrastructure for your Apache Flink applications. It handles core capabilities like provisioning compute resources, parallel computation, automatic scaling, and application backups (implemented as checkpoints and snapshots)."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/firehose-dataanalytics-flink-s3-sink",
+			"templateURL": "serverless-patterns/firehose-dataanalytics-flink-s3-sink",
+			"projectFolder": "firehose-dataanalytics-flink-s3-sink",
+			"templateFile": "firehose-dataanalytics-flink-s3-sink/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "Amazon Kinesis Data Analytics for Apache Flink",
+				"link": "https://docs.aws.amazon.com/kinesisanalytics/latest/java/what-is.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform plan",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the README in the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+		"name": "Naresh Rajaram",
+		"image": "",
+		"bio": "Cloud Infrastructure Architect, AWS",
+		"linkedin": "https://www.linkedin.com/in/naresh-rajaram-25bb106/"
+	}]
+}

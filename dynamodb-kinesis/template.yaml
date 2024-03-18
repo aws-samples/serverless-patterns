@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: AWS DynamoDB to AWS Kinesis Data Stream
+Description: AWS DynamoDB to AWS Kinesis Data Stream (uksb-1tthgi812) (tag:dynamodb-kinesis)
 Resources:
   #Kinesis Data Stream
   KinesisStream:

@@ -1,0 +1,54 @@
+{
+  "title": "KinesisDataFirehose with AWS Lambda for Transformation",
+  "description": "Create a Kinesis DataFirehose and Java Lambda function to transform the stream of data",
+  "language": "Java",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use AWS Lambda (Java runtime) to transform the stream of data from a Kinesis DataFirehose with error handling and retries using Java",
+      "This example uses AWS CDK constructs"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-firehose-s3-transform-java",
+      "templateURL": "serverless-patterns/cdk-firehose-s3-transform-java",
+      "projectFolder": "cdk-firehose-s3-transform-java",
+      "templateFile": "infrastructure/src/main/java/com/myorg/CdkFirehoseLambdaS3JavaStack.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS CDK Construct for KinesisDataFirehose Data Transformation using Lambda",
+        "link": "https://constructs.dev/packages/@aws-cdk/aws-kinesisfirehose-alpha/v/2.101.1-alpha.0?lang=java"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shiva Mahalingam",
+      "image": "",
+      "bio": "Solutions Architect @ AWS",
+      "linkedin": "shivamahalingam",
+      "twitter": ""
+    }
+  ]
+}

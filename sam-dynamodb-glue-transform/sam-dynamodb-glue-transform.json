@@ -1,0 +1,76 @@
+{
+    "title": "Serverless ETL Pattern with AWS Glue and DynamoDB ",
+    "description": "Deploy Glue scripts with AWS SAM in this streamlined serverless pattern",
+    "language": "YAML",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This AWS serverless pattern utilizes the Serverless Applicton Model (SAM) to deploy Glue scripts seamlessly, offering an efficient solution for managing multiple transformations.",
+            "Users can focus on crafting their Glue scripts without worrying about the underlying infrastructure. This pattern will automatically configure and deploy the correct resources and permissions tailored to the user-specified data,",
+            "such as the DynamoDB table where transformations will be performed and the associated script name. This approach provides users with a streamlined process to deploy their Glue scripts"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sam-dynamodb-glue-transform",
+            "templateURL": "serverless-patterns/sam-dynamodb-glue-transform",
+            "projectFolder": "sam-dynamodb-glue-transform/src",
+            "templateFile": "template.yml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS Serverless Application Model",
+                "link": "https://aws.amazon.com/serverless/sam/"
+            },
+            {
+                "text": "AWS Glue",
+                "link": "https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Mia Alarcon Chong",
+            "image": "",
+            "bio": "AWS Cloud Application Developer",
+            "linkedin": "mialarcon"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "glue",
+            "label": "AWS Glue"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 50,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        }
+    }
+  }

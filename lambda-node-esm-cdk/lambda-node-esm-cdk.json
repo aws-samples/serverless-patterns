@@ -1,0 +1,58 @@
+{
+    "title": "Lambda function for Node.js using TypeScript with ESM and ESBuild configured",
+    "description": "Create a Lambda function for Node.js with ESM modules configured and ESBuild bundle set up in the CDK configuration",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to use ES modules with a Lambda function using TypeScript, ESBuild and CDK.",
+        "This template has already the bundle properly configured in CDK to leverage ES modules in Node.js for leveraging dynamic imports or top-level await for instance."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-node-esm-cdk",
+        "templateURL": "serverless-patterns/lambda-node-esm-cdk",
+        "projectFolder": "lambda-node-esm-cdk",
+        "templateFile": "cdk/node-esm-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Working with the AWS CDK in TypeScript",
+          "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html"
+        },
+        {
+          "text": "Using Node.js ES modules and top-level await in AWS Lambda",
+          "link": "https://aws.amazon.com/blogs/compute/using-node-js-es-modules-and-top-level-await-in-aws-lambda/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Luca Mezzalira",
+        "image": "https://avatars.githubusercontent.com/u/210272?v=4",
+        "bio": "Luca Mezzalira is Principal Serverless Specialist Solutions Architect at AWS, an international speaker, and a published author. Over the past 20 years, he’s mastered software architectures from frontend to the cloud, providing the right solution for the context of the job at hand.",
+        "linkedin": "lucamezzalira",
+        "twitter": "lucamezzalira"
+      }
+    ]
+  }

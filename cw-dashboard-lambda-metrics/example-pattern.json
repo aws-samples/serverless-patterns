@@ -1,0 +1,60 @@
+{
+  "title": "Amazon CloudWatch Dashboard Monitoring with Lambda PowerTools",
+  "description": "The CDK Stack deploys CloudWatch Dashboard with AWS Lambda Metrics.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Lambda Function is instrumented with Lambda Insights and leverage Powertool for custom metrics reporting."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cw-dashboard-lambda-metrics",
+      "templateURL": "serverless-patterns/cw-dashboard-lambda-metrics",
+      "projectFolder": "cw-dashboard-lambda-metrics",
+      "templateFile": "lambda_monitoring/lambda_monitoring_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Amazon CloudWatch Dashboards",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sakthivel Chellapparimanam",
+      "bio": "AWS - Cloud Application Architect",
+      "linkedin": "srcsakthivel"
+    },
+    {
+      "name": "Rachel Hanspal",
+      "bio": "AWS - Associate Cloud Applications Developer",
+      "linkedin": "rachel-hanspal"
+    }
+  ]
+}

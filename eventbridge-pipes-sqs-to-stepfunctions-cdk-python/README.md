@@ -54,7 +54,7 @@ Send SQS message that will trigger step function execution as below:
 ```sh
  aws sqs send-message \
  --queue-url=SQS_URL \
- --message-body '{"orderId":"125a2e1e-d420-482e-8008-5a606f4b2076, "customerId": "a48516db-66aa-4dbc-bb66-a7f058c5ec24", "type": "NEW"}'
+ --message-body '{"orderId":"125a2e1e-d420-482e-8008-5a606f4b2076", "customerId": "a48516db-66aa-4dbc-bb66-a7f058c5ec24", "type": "NEW"}'
 ```
 
 ## Delete stack

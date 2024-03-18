@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Amazon API Gateway REST API with HTTP integration
+Description: Serverless patterns - Amazon API Gateway REST API with HTTP integration (uksb-1tthgi812) (tag:apigw-rest-api-http-integration)
 
 Parameters:
   GetHttpUrl:

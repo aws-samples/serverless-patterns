@@ -1,0 +1,53 @@
+{
+  "title": "EventBridge to AppSync (real-time)",
+  "description": "Create real time subscriptions from EventBridge to AppSync",
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern configures AppSync as an EventBridge target allowing consumers subscribe to real-time updates using AppSync",
+      "Events published on the event bus are forwared to the Mutation on the AppSync GraphQL schema. Consumers of the API can subscribe in real time.",
+      "Using the GraphQL subscriptions you can listen for changes based on account, region, detail-type or source"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-to-appsync-sam",
+      "templateURL": "serverless-patterns/eventbridge-to-appsync-sam",
+      "projectFolder": "eventbridge-to-appsync-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AppSync target for Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/target-appsync.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "bio": "Developer Advocate @ AWS",
+      "twitter": "boyney123"
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+openapi: "3.0.1"
+info:
+  title: "reminders-api"
+  version: "2023-11-09T13:43:51Z"
+paths:
+  /reminders/{id}:
+    get:
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        credentials:
+          Fn::GetAtt: [APIGatewayDynamoDBRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/GetItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$')) \n{\n    \"id\"\
+                : \"$inputRoot.Item.id.S\",\n    \"description\": \"$inputRoot.Item.description.S\"\
+                ,\n    \"datetime\": \"$inputRoot.Item.datetime.S\",\n    \"email\"\
+                : \"$inputRoot.Item.email.S\"\n}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{\n    \"TableName\": \"${RemindersTable}\",\n    \"Key\": {\n\
+            \      \"id\": {\n        \"S\": \"$input.params().path.id\"\n      }\n\
+            \    }\n}"}
+        passthroughBehavior: "when_no_match"
+        type: "aws"
+    put:
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/reminder"
+        required: true
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-request-validator: "Validate body"
+      x-amazon-apigateway-integration:
+        credentials:
+          Fn::GetAtt: [APIGatewayDynamoDBRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$')) \n{\n\"message\"\
+                : \"Reminder updated successfully\",\n\"data\": {\n    \"id\": \"\
+                $inputRoot.Attributes.id.S\",\n    \"description\": \"$inputRoot.Attributes.description.S\"\
+                ,\n    \"datetime\": \"$inputRoot.Attributes.datetime.S\"\n    }\n\
+                }"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{ \n    \"TableName\": \"${RemindersTable}\",\n    \"Key\": {\n\
+            \        \"id\": {\n            \"S\": \"$input.params().path.id\"\n \
+            \       }\n    },\n    \"UpdateExpression\": \"set description = :description,\
+            \ #date = :date, #email= :email\",\n    \"ExpressionAttributeValues\"\
+            : {\n        \":description\": {\"S\": \"$input.path(\"$.description\"\
+            )\"},\n        \":date\": {\"S\": \"$input.path(\"$.datetime\")\"},\n\
+            \        \":email\": {\"S\": \"$input.path(\"$.email\")\"}\n        },\n\
+            \    \"ExpressionAttributeNames\": {\n      \"#date\": \"datetime\",\n\
+            \      \"#email\": \"email\"\n      },\n     \"ReturnValues\": \"ALL_NEW\"\
+            \n}"}
+        passthroughBehavior: "when_no_match"
+        type: "aws"
+    delete:
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        credentials:
+          Fn::GetAtt: [APIGatewayDynamoDBRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/DeleteItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$')) \n{\n\"message\"\
+                : \"Reminder deleted successfully\",\n\"data\": {\n    \"id\": \"\
+                $inputRoot.Attributes.id.S\",\n    \"description\": \"$inputRoot.Attributes.description.S\"\
+                ,\n    \"datetime\": \"$inputRoot.Attributes.datetime.S\",\n    \"\
+                email\": \"$inputRoot.Attributes.email.S\"\n    }\n}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{ \n    \"TableName\": \"${RemindersTable}\",\n    \"Key\":{\n\
+            \        \"id\":{\n            \"S\": \"$input.params().path.id\"\n  \
+            \       }\n    },\n    \"ReturnValues\": \"ALL_OLD\"\n}"}
+        passthroughBehavior: "when_no_match"
+        type: "aws"
+  /reminders:
+    get:
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        credentials:
+          Fn::GetAtt: [APIGatewayDynamoDBRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/Scan"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$'))\n[\n#foreach($elem\
+                \ in $inputRoot.Items) \n    {\n    \"id\": \"$elem.id.S\",\n    \"\
+                description\": \"$elem.description.S\",\n    \"datetime\": \"$elem.datetime.S\"\
+                ,\n    \"email\": \"$elem.email.S\"\n    }#if($foreach.hasNext),#end\n\
+                \    \n#end\n]"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{ \n    \"TableName\": \"${RemindersTable}\"\n}"}
+        passthroughBehavior: "when_no_match"
+        type: "aws"
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/reminder"
+        required: true
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-request-validator: "Validate body"
+      x-amazon-apigateway-integration:
+        credentials:
+          Fn::GetAtt: [APIGatewayDynamoDBRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$')) \n{\n\"message\"\
+                : \"Reminder created successfully\",\n\"data\": {\n    \"id\": \"\
+                $inputRoot.Attributes.id.S\",\n    \"description\": \"$inputRoot.Attributes.description.S\"\
+                ,\n    \"datetime\": \"$inputRoot.Attributes.datetime.S\",\n    \"\
+                email\": \"$inputRoot.Attributes.email.S\"\n    }\n}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{ \n    \"TableName\": \"${RemindersTable}\",\n    \"Key\": {\n\
+            \        \"id\": {\n            \"S\": \"$context.requestId\"\n      \
+            \  }\n    },\n    \"UpdateExpression\": \"set description = :description,\
+            \ #date = :date, #email = :email\",\n    \"ExpressionAttributeValues\"\
+            : {\n        \":description\": {\"S\": \"$input.path(\"$.description\"\
+            )\"},\n        \":date\": {\"S\": \"$input.path(\"$.datetime\")\"},\n\
+            \        \":email\": {\"S\": \"$input.path(\"$.email\")\"}\n        },\n\
+            \    \"ExpressionAttributeNames\": {\n      \"#date\": \"datetime\",\n\
+            \      \"#email\": \"email\"\n      },\n     \"ReturnValues\": \"ALL_NEW\"\
+            \n}"}
+        passthroughBehavior: "when_no_match"
+        type: "aws"
+components:
+  schemas:
+    Empty:
+      title: "Empty Schema"
+      type: "object"
+    reminder:
+      required:
+      - "datetime"
+      - "description"
+      - "email"
+      type: "object"
+      properties:
+        description:
+          type: "string"
+        datetime:
+          type: "string"
+          format: "date-time"
+        email:
+          type: "string"
+          format: "email"
+x-amazon-apigateway-gateway-responses:
+  BAD_REQUEST_BODY:
+    statusCode: 400
+    responseTemplates:
+      application/json: "{\n\"Invalid Request Body\": \"$context.error.validationErrorString\"\
+        \n}"
+x-amazon-apigateway-request-validators:
+  Validate body:
+    validateRequestParameters: false
+    validateRequestBody: true

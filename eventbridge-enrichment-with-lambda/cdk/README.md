@@ -34,7 +34,11 @@ This enrichment pattern allows producers to remain small in contract (schema), b
 ## Deploying and testing this pattern
 Clone the project an run:
 
-`npm run build && cdk deploy`
+   ```bash
+   npm run build
+   cdk deploy
+   ```
+
 
 Once deployed then trigger the `producer` lambda function. This should producer the enriched event, get consumed by the enricher and publish more events downstream.
 

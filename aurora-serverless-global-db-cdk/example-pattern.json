@@ -1,0 +1,57 @@
+{
+  "title": "Amazon Aurora Serverless Primary to Secondary Global Database",
+  "description": "Create an Aurora Serverless Global database to replicate across regions",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The pattern provisions an Amazon Aurora serverless v2 global database enabling data replication from the primary to secondary region. The regional primary cluster contains a serverless db instance and supports both writes and reads. The regional secondary cluster contains a serverless db instance and supports only reads. In the unlikely event of a regional degradation or outage, the secondary region can be promoted to read and write capabilities in less than 1 minute",
+      "Also the pattern adopts the multiple stack capability of CDK to provision the resources across the primary and secondary regions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/aurora-serverless-global-db-cdk",
+      "templateURL": "serverless-patterns/aurora-serverless-global-db-cdk",
+      "projectFolder": "aurora-serverless-global-db-cdk",
+      "templateFile": "aurora-serverless-global-db-cdk/lib/aurora-regional-cluster-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Aurora Serverless V2",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html"
+      },
+      {
+        "text": "Amazon Aurora Global Database",
+        "link": "https://aws.amazon.com/rds/aurora/global-database/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy --all</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nihilson Gnanadason",
+      "image": "https://drive.google.com/file/d/1m82LvtdoipI9nI_q2G6qoRGpZ36JNzHU/view?usp=sharing",
+      "bio": "Nihilson is a Sr.Solutions Architect at AWS working with ISVs in the UK to build, run, and scale their software products on AWS.",
+      "linkedin": "https://www.linkedin.com/in/nihilson/"
+    }
+  ]
+}

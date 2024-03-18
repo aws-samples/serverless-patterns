@@ -1,0 +1,70 @@
+Transform: AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Sample SAM Template for querying Amazon S3 Express One Zone directory bucket using Amazon Athena
+
+# Get the required input parameters
+Parameters:
+  AvailabilityZoneId:
+    Type: String
+    Description: Please enter the availability Zone Id (e.g. use1-az6) for your region
+
+Resources:
+
+  # Create an Amazon S3 Express One Zone storage class input bucket
+  MyInputBucketExpressOneZone:
+    Type: AWS::S3Express::DirectoryBucket
+    Properties:
+      DataRedundancy: SingleAvailabilityZone
+      LocationName: !Sub "${AvailabilityZoneId}"
+
+  # Create an Amazon S3 Express One Zone storage class output bucket
+  MyOutputBucketExpressOneZone:
+    Type: AWS::S3Express::DirectoryBucket
+    Properties:
+      DataRedundancy: SingleAvailabilityZone
+      LocationName: !Sub "${AvailabilityZoneId}"
+
+  # Create an AWS Glue database and table for Amazon Athen to query the Amazon S3 Express One Zone storage class input bucket
+  MyDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref "AWS::AccountId"
+      DatabaseInput:
+        Name: mydatabase
+        Description: My database
+
+  MyTable:
+    Type: "AWS::Glue::Table"
+    Properties:
+      CatalogId: !Ref "AWS::AccountId"
+      DatabaseName: mydatabase
+      TableInput:
+        Name: mytable
+        TableType: EXTERNAL_TABLE
+        StorageDescriptor:
+          Location: !Sub "s3://${MyInputBucketExpressOneZone}/"
+          StoredAsSubDirectories: true
+          InputFormat: org.apache.hadoop.mapred.TextInputFormat
+          OutputFormat: IgnoreKeyTextOutputFormat
+          SerdeInfo:
+            SerializationLibrary: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+            Parameters:
+              field.delim: ","
+              serialization.format: ","
+          Columns:
+            - Name: id
+              Type: int
+            - Name: name
+              Type: string
+            - Name: age
+              Type: int
+            - Name: city
+              Type: string
+
+Outputs:
+  MyInputBucketExpressOneZone:
+    Description: "MyInputBucketExpressOneZone Name"
+    Value: !Ref MyInputBucketExpressOneZone
+  MyOutputBucketExpressOneZone:
+    Description: "MyOutputBucketExpressOneZone Name"
+    Value: !Ref MyOutputBucketExpressOneZone    

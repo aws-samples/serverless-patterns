@@ -6,7 +6,7 @@ This SAM template deploys an AWS Systems Manger Automation Document that consume
 
 This Systems Manager Automation Document used in this pattern contains one step that invokes the Step functions. However, you can use this in documents with multiple steps as well. To learn more about Systems Manger Documents, refer to https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-ssm-docs.html
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/ssm-stepfunction.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/systems-manager-automation-to-stepfunctions.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 Transform: 'AWS::Serverless-2016-10-31'
 
-Description: Different methods to put the IoT events to a DynamoDB table using AWS IoT Topic rules.
+Description: Different methods to put the IoT events to a DynamoDB table using AWS IoT Topic rules. (uksb-1tthgi812) (tag:iot-dynamodb)
 
 Resources:
 

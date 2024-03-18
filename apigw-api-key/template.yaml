@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Amazon API Gateway REST API with API Key
+Description: Serverless patterns - Amazon API Gateway REST API with API Key (uksb-1tthgi812) (tag:apigw-api-key)
 
 Globals:
   Function:

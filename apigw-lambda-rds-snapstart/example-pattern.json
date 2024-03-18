@@ -1,53 +1,47 @@
 {
-  "title": "Create a REST API with Amazon API Gateway, Amazon RDS and AWS Lambda with SnapStart",
-  "description": "A pattern to show how to use Lambda SnapStart with relational databases.",
+  "title": "Synchronous REST API with Lambda SnapStart",
+  "description": "This pattern demonstrates how to create a synchronous REST API using API Gateway, AWS Lambda and RDS.",
   "language": "Java",
-  "level": "300",
+  "level": "400",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "CDK creates all the infrastructure we need for the pattern, include the VPC, subnets, security groups,secrets and the DB.",
-      "The DB setup Lambda function is executed once to create the database table with a given structure.",
-      "This REST API is implemented with the Micronaut framework. Credentials for the DB are passed as environment variables to the application."
+      "This pattern is built using [Micronaut 3](https://micronaut.io) and uses [Lambda SnapStart](https://aws.amazon.com/blogs/compute/reducing-java-cold-starts-on-aws-lambda-functions-with-snapstart/) to improve startup performance."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-rds-snapstart",
-      "templateURL": "serverless-patterns/apigw-lambda-rds-snapstart",
-      "projectFolder": "apigw-lambda-rds-snapstart",
-      "templateFile": "do i need this?`"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-snapstart",
+      "templateURL": "serverless-patterns/apigw-lambda-snapstart",
+      "projectFolder": "apigw-lambda-snapstart",
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Lambda SnapStart Developer Guide",
+        "text": "Lambda Replatforming Guide",
+        "link": "https://serverlessland.com/content/service/lambda/paved-path/java-replatforming/introduction"
+      },
+      {
+        "text": "AWS Serverless Java Container",
+        "link": "https://github.com/awslabs/aws-serverless-java-container/"
+      },
+      {
+        "text": "Lambda SnapStart",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
-      },
-      {
-        "text": "re:Invent Video - AWS Lambda SnapStart (SVS320)",
-        "link": "https://www.youtube.com/watch?v=ZbnAithBNYY"
-      },
-      {
-        "text": "Micronaut",
-        "link": "https://micronaut.io/"
-      },
-      {
-        "text": "Micronaut CRaC Reference",
-        "link": "https://micronaut-projects.github.io/micronaut-crac/latest/guide/"
       }
     ]
   },
   "deploy": {
     "text": [
-      "cdk deploy --all"
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "testing": {
     "text": [
-      "See the README in the GitHub repo for detailed testing instructions."
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
@@ -58,10 +52,10 @@
   "authors": [
     {
       "name": "Mark Sailes",
-      "image": "https://avatars.githubusercontent.com/u/45629314",
-      "bio": "Senior Specialist SA, Serverless at AWS and Java fan.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/mark-sailes.jpg",
+      "bio": "Mark is a specialist solutions architect working at AWS. His primary focus is improving the developer experience of builders using Java on AWS Lambda.",
       "linkedin": "mark-sailes",
-      "twitter": "@MarkSailes3"
+      "twitter": "MarkSailes3"
     }
   ]
 }

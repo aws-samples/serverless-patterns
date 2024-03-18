@@ -1,0 +1,58 @@
+{
+  "title": "Amazon EC2 to Amazon S3 Express One Zone directory bucket",
+  "description": "SAM Template that creates an EC2 Instance, an Amazon S3 Express One Zone directory bucket and required IAM Role to access the bucket from the instance",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Both Amazon EC2 Instance and Amazon S3 Express One Zone directory bucket are provisioned within same availability zone.",
+      "Access to the directory bucket from the EC2 instance is provided through IAM Role associated with the instance profile."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ec2-s3-express-one-zone-sam",
+      "templateURL": "serverless-patterns/ec2-s3-express-one-zone-sam",
+      "projectFolder": "ec2-s3-express-one-zone-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon S3 User Guide",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-one-zone.html"
+      },
+      {
+        "text": "AWS CLI Command Refernece",
+        "link": "https://docs.aws.amazon.com/cli/latest/reference/s3api/put-object.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Amazon S3 bucket content: <code>aws s3 rm s3://{BucketExpressOneZoneName} --recursive</code> --region {my-region}",
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

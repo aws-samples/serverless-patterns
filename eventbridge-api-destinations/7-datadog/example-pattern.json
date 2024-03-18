@@ -1,0 +1,68 @@
+{
+    "title": "EventBridge API Destinations to Datadog",
+    "description": "Create an EventBridge rule and API destination to route events to Datadog",
+    "language": "YAML",
+    "level": "100",
+    "framework": "SAM",
+    "services": {
+        "from": "eventbridge",
+        "to": "eventbridge"
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an API Destination for the Datadog Send Logs API. Once deployed, the pattern allows a user to send events easily through EventBridge to Datadog logs. The pattern creates the following resources: EventBridge Bus, EventBridge Connection, EventBridge API Destination, EventBridge rule, IAM role, and SQS queue.",
+            "The EventBridge rule uses the API Destination and Connection as a target, SQS queue as a DLQ, and the IAM role as its role. To send events go to the bus and send sample events. To send a log enter “MyDataDogApp” for the source, the bus created by the pattern for the Event Bus Name, and any call that follows the format for the sending logs as the detail (https://docs.datadoghq.com/api/latest/logs/#send-logs).",
+            "The following information is needed to use the pattern: Datadog API key: To create the AUTH for the EventBridge Connection.",
+            "The IAM role created by the pattern only has the permission to allow InvokeApiDestination access to the EventBridge rule."
+        ]
+    },
+    "testing": {
+        "headline": "Testing",
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+            "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cd ./7-datadog",
+            "sam deploy --guided"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "projectFolder": "eventbridge-api-destinations",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations",
+            "templateURL": "serverless-patterns/eventbridge-api-destinations",
+            "templateFile": "7-datadog/DataDogApiDestination.yml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "Datadag: Add an API key or client token",
+                "link": "https://docs.datadoghq.com/account_management/api-app-keys/#add-an-api-key-or-client-token"
+            },
+            {
+                "text": "Datadog: Send logs",
+                "link": "https://docs.datadoghq.com/api/latest/logs/#send-logs"
+            },
+            {
+                "text": "Tutorial: Create a connection to Datadog as an API destination",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-tutorial-datadog.html"
+            },
+            {
+                "text": "Using API destinations with Amazon EventBridge",
+                "link": "https://aws.amazon.com/blogs/compute/using-api-destinations-with-amazon-eventbridge/"
+            }
+        ]
+    }
+}

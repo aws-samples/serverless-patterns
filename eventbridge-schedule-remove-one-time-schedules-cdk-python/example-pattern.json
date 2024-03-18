@@ -1,0 +1,58 @@
+{
+    "title": "Amazon EventBridge Scheduler remove One time Schedule",
+    "description": "Amazon EventBridge Scheduler job runs every five minutes to identify and delete one time Amazon EventBridge Scheduler jobs expired more than 7 days.",
+    "language": "Python",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Amazon EventBridge Scheduler job runs every five minutes and uses AWS Lambda to identify and delete one time Amazon EventBridge Scheduler jobs that are expired more than 7 days",
+            "Scheduler job sends a Amazon Simple Notification Service to send email notification once the activity is completed.",
+            "This pattern deploys AWS Lambda, Amazon EventBridge Scheduler(one recurring ,and two one-time jobs) and Amazon Simple Notification Service"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-remove-one-time-schedules-cdk-python",
+            "templateURL": "serverless-patterns/eventbridge-schedule-remove-one-time-schedules-cdk-python",
+            "projectFolder": "eventbridge-schedule-remove-one-time-schedules-cdk-python",
+            "templateFile": "eventbridge_schedule_remove_onetime_schedules_cdk_python/eventbridge_schedule_remove_onetime_schedules_cdk_python_stack.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Eventbridge Schedueler one time schedule",
+                "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html"
+            },
+            {
+                "text": "Amazon Eventbridge Scheduler - Scheduler to run and manage tasks ",
+                "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Manikandan Karimanal",
+            "image": "https://drive.google.com/file/d/16r4jGGMpPhu4Igez-lzstIe-L5nJVMxf/view",
+            "bio": "Solution Architect @AWS",
+            "linkedin": "manikandanks"
+        }
+    ]
+}

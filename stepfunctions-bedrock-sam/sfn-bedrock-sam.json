@@ -1,0 +1,80 @@
+{
+    "title": "AWS Step Functions to Amazon Bedrock Integration",
+    "description": "This SAM template deploys a Step Functions workflow that invokes Amazon Bedrock Anthropic Claude Model v2.1 to generate content for a given prompt.",
+    "language": "YAML",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Start the Express Workflow using the `start-sync-execution` api command with a prompt string in English for generating content as per the input payload.",
+            "The Express Workflow invokes Amazon Bedrock Anthropic Claude v2.1 Model with the prompt.",
+            "Amazon Bedrock returns the generated content as the given promptsentiment of the input text.",
+            "If the integration succeeds, the generated content is returned in Step Function execution results within an output object.",
+            "If the integration fails, the Step Functions workflow will retry up to 5 times before exiting with a status:FAILED response."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunctions-bedrock-sam",
+            "templateURL": "serverless-patterns/stepfunctions-bedrock-sam",
+            "projectFolder": "stepfunctions-bedrock-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS Step Functions launches optimized integration for Amazon Bedrock",
+                "link": "https://aws.amazon.com/about-aws/whats-new/2023/11/aws-step-functions-optimized-integration-bedrock/"
+            },
+            {
+                "text": "Build generative AI apps using AWS Step Functions and Amazon Bedrock",
+                "link": "https://aws.amazon.com/blogs/aws/build-generative-ai-apps-using-aws-step-functions-and-amazon-bedrock/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Biswanath Mukherjee",
+            "image": "https://d1rwvjey2iif32.cloudfront.net",
+            "bio": "I am a Sr. Solutions Architect working at AWS India.",
+            "linkedin": "biswanathmukherjee"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "sfn",
+            "label": "AWS Step Functions"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 50,
+            "service": "bedrock",
+            "label": "Amazon Bedrock"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        }
+    }
+}
+
+

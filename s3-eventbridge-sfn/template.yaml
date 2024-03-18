@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - S3 to EventBridge to Step Functions
+Description: Serverless patterns - S3 to EventBridge to Step Functions (uksb-1tthgi812) (tag:s3-eventbridge-sfn)
 
 Resources:
   # Creates an Amazon S3 bucket to which images will be uploaded to trigger our workflow.

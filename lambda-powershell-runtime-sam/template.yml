@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Demo to explore how the PowerShell custom runtime and a Lambda function work.
+Description: Demo to explore how the PowerShell custom runtime and a Lambda function work. (uksb-1tthgi812) (tag:lambda-powershell-runtime-sam)
 ##########################################################################
 #  Parameters & Globals                                                  #
 ##########################################################################

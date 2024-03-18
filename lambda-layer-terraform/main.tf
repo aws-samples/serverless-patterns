@@ -45,10 +45,7 @@ resource "aws_lambda_layer_version" "this" {
   layer_name          = "mysql-connector-python"
   compatible_runtimes = ["python3.8"]
 
-  # The filebase64sha256() function is available in Terraform 0.11.12 and later
-  # For Terraform 0.11.11 and earlier, use the base64sha256() function and the file() function:
-  # source_code_hash = "${base64sha256(file("lambda_function_payload.zip"))}"
-  source_code_hash = filebase64sha256(data.archive_file.layer_zip.output_path)
+  source_code_hash = data.archive_file.layer_zip.output_base64sha256
 }
 
 data "archive_file" "lambda_function" {
@@ -63,7 +60,7 @@ resource "aws_lambda_function" "with_layer" {
   role             = aws_iam_role.this.arn
   handler          = "app.lambda_handler"
   runtime          = "python3.8"
-  source_code_hash = filebase64sha256(data.archive_file.lambda_function.output_path)
+  source_code_hash = data.archive_file.lambda_function.output_base64sha256
 
   layers = [
     aws_lambda_layer_version.this.arn
@@ -76,5 +73,5 @@ resource "aws_lambda_function" "without_layer" {
   role             = aws_iam_role.this.arn
   handler          = "app.lambda_handler"
   runtime          = "python3.8"
-  source_code_hash = filebase64sha256(data.archive_file.lambda_function.output_path)
+  source_code_hash = data.archive_file.lambda_function.output_base64sha256
 }

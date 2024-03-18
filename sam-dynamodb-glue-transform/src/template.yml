@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    Glue transform template
+    
+Parameters:
+  WorkerType: 
+    Type: String
+    Default: 'G.2X'
+    Description: >
+        The type of predefined worker that is allocated when a job runs. Accepts a value of Standard, G.1X, or G.2X.
+  NumberOfWorkers: 
+    Type: Number
+    Default: 145
+    Description: >
+        The number of workers of a defined workerType that are allocated when a job runs.
+  JobName: 
+    Type: String
+    Description: >
+        Name of the Glue Job
+  TransformTaskName:
+    Type: String
+    Description: >
+      Name of the transform task file to import
+  S3BucketName:
+    Type: String
+    ConstraintDescription: '[a-z0-9\-]+'
+    Default: 'exportedtables'
+    Description: >
+      The bucket name for the exported tables.
+  SourceTableARN:
+    Type: String
+    Description: >
+      Source Dynamo DB table ARN
+
+Resources:
+    S3Bucket:
+      DeletionPolicy: Retain
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: !Ref S3BucketName
+
+    # Glue Job for initial load
+    ImportLoadJob:
+      Type: AWS::Glue::Job
+      Properties:
+        Role: !Ref GlueJobRole
+        Description: Job created with CloudFormation  
+        DefaultArguments:
+          "--WORKER_TYPE": !Ref WorkerType
+          "--NUM_WORKERS": !Ref NumberOfWorkers
+          "--BUCKET_NAME": !Ref S3BucketName
+          "--SOURCE_TABLE_ARN": !Ref SourceTableARN
+        Command:   
+          Name: glueetl
+          PythonVersion: 3
+          ScriptLocation: ""
+        NumberOfWorkers: !Ref NumberOfWorkers
+        WorkerType: !Ref WorkerType
+        GlueVersion: 4.0
+        ExecutionProperty:
+          MaxConcurrentRuns: 1
+        Name: !Ref JobName
+    
+    GlueJobRole:
+      Type: AWS::IAM::Role
+      Properties:
+        ManagedPolicyArns: 
+          - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service:
+                  - "glue.amazonaws.com"
+              Action:
+                - "sts:AssumeRole"
+        Path: "/"
+        Policies:
+          - PolicyName: "DynamoDB"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - dynamodb:BatchGetItem
+                    - dynamodb:DescribeTable
+                    - dynamodb:GetItem
+                    - dynamodb:Scan
+                    - dynamodb:Query
+                    - dynamodb:BatchWriteItem
+                    - dynamodb:PutItem
+                    - dynamodb:DeleteItem
+                    - dynamodb:UpdateItem
+                    - dynamodb:ExportTableToPointInTime
+                    - dynamodb:ListTables
+                  Resource:
+                    - !Ref SourceTableARN
+                - Effect: "Allow"
+                  Action:
+                    - dynamodb:DescribeExport
+                  Resource:
+                    - !Join
+                      - ''
+                      - - !Ref SourceTableARN
+                        - '*'
+
+          - PolicyName: "GlueS3BucketAccess"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - s3:Get*
+                    - s3:Put*
+                    - s3:Delete*
+                    - s3:List*
+                  Resource:
+                    - "arn:aws:s3:::aws-sam-cli-samclisourcebucket-*/*"
+                    - !Join
+                      - ''
+                      - - 'arn:aws:s3:::'
+                        - !Ref S3BucketName
+                        - '*'

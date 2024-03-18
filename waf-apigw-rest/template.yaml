@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - AWS WAF to Amazon API Gateway REST
+Description: Serverless patterns - AWS WAF to Amazon API Gateway REST (uksb-1tthgi812) (tag:waf-apigw-rest)
 
 Resources:
   # AWS WAF Access Control List limits each IP to 100 requestes per second
@@ -48,7 +48,7 @@ Resources:
   MyWAFAssociation:
     Type: AWS::WAFv2::WebACLAssociation
     Properties: 
-      ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${MyApi}/stages/Prod
+      ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${MyApi}/stages/${MyApi.Stage}
       WebACLArn: !GetAtt MyWAFACL.Arn
 
 # Lambda function as an example micro-service behind the API Gateway REST endpoint

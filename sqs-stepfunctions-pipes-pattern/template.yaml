@@ -1,6 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: A SAM template that integrates SQS with Step Functions through EventBridge Pipes. Messages are fetched from SQS and processed by a Step Function workflow. The template also creates a Lambda function and a DLQ for error handling.
+Description: >
+  A SAM template that integrates SQS with Step Functions through EventBridge Pipes. 
+  Messages are fetched from SQS and processed by a Step Function workflow. 
+  The template also creates a Lambda function and a DLQ for error handling. 
+  (uksb-1tthgi812) (tag:sqs-stepfunctions-pipes-pattern)
 
 Resources:
   MyQueue:

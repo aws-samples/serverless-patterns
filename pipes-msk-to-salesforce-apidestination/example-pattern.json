@@ -1,0 +1,72 @@
+{
+  "title": "MSK to Salesforce using EventBridge Pipes and API Destination",
+  "description": "Send events from MSK to Salesforce using EventBridge Pipes and API Destination",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to use EventBridge Pipes to send MSK payload data to Salesforce using API Destinations.", 
+      "The pattern uses an MSK cluster as a source to EventBridge Pipe, a Lambda function to base64 decode the payload and transform data to adhere to Salesforce schema, and an API Destination as a target to send the payload to Salesforce.",
+      "The use case shown here is to create Leads in Salesforce using the payload from MSK."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/pipes-msk-to-salesforce-apidestination",
+      "templateURL": "serverless-patterns/pipes-msk-to-salesforce-apidestination",
+      "projectFolder": "pipes-msk-to-salesforce-apidestination",
+      "templateFile": "pipes-msk-to-salesforce-apidestination/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipe documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "EventBridge Pipe re:Invent video",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "API Destinations documentation",
+        "link":"https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-destinations.html"
+      },
+      {
+        "text": "Subscribe to Platform Event with Salesforce Flows",
+        "link":"https://developer.salesforce.com/docs/atlas.en-us.platform_events.meta/platform_events/platform_events_subscribe_flow.htm"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: sam delete."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Aniket Bulbule",
+      "image": "https://drive.google.com/file/d/1g5X8juFALsl44ZACvcZSKGmCVUS4IKqi/view?usp=sharing",
+      "bio": "Partner Solutions Architect @AWS, Serverless & EDA Enthusiast",
+      "linkedin": "www.linkedin.com/in/aniket-bulbule"
+    },
+    {
+      "name": "Anup Rajpara",
+      "image": "https://drive.google.com/file/d/1MqpPNLCqbU4kvvtTspNXZBqD99aVIJI9/view?usp=sharing",
+      "bio":"Anup is passionate about serverless & event-driven architectures.",
+      "linkedin": "https://www.linkedin.com/in/anup-rajpara-developer/"
+    }
+  ]
+}
