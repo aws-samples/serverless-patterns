@@ -79,7 +79,7 @@ You cannot put events on the Auth0 SaaS event bus, only Auth0 can publish events
 
 ![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/EBconsole-rules.png)
 
-2. Select "Edit" to enter the rule editor. Click through to "Step 2. Build Event Pattern." 
+4. Choose "Edit" to enter the rule editor. Click through to "Step 2. Build Event Pattern." 
 
 ![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/BuildEvent.png)
 
