@@ -106,6 +106,8 @@ class Auth0IntegrationStack(Stack):
         CfnOutput(self, "Auth0ProcessFailedLoginLambdaOutput", value=auth0_process_failed_login_lambda.function_name)
 
 app = cdk.App()
-Auth0IntegrationStack(app, "Auth0IntegrationStack")
-
+description = (
+    "Auth0 EventBridge Integration (uksb-1tthgi812) (tag:auth0-eventbridge-lambda)"
+)
+Auth0IntegrationStack(app, "Auth0IntegrationStack", description=description)
 app.synth()
