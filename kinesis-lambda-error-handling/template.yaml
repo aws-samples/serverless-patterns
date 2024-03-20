@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: > 
+Description: >
+  (uksb-1tthgi812) (tag:kinesis-lambda-error-handling)
   AWS SAM Template for Serverless pattern 
   Kinesis DataStream triggers Lambda with error handling and invalid record is put into SQS for further analysis
   AWS Services used: AWS Lambda, SQS, Kineis, CloudWatch, IAM 

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Template to enrich Amazon EventBridge Pipes data using API destinations
+Description: Template to enrich Amazon EventBridge Pipes data using API destinations (uksb-1tthgi812) (tag:eventbridge-pipes-sqs-enrich-with-api-destination)
 Parameters:
   MyApiWithPathURL:
     Type: String

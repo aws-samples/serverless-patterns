@@ -1,7 +1,7 @@
 # This is the parent stack.
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: A Lambda Layer that retrieves configuration values from the SSM Parameter Store and a Lambda function, associated with the Lambda Layer, that returns the configuration values.
+Description: A Lambda Layer that retrieves configuration values from the SSM Parameter Store and a Lambda function, associated with the Lambda Layer, that returns the configuration values. (uksb-1tthgi812) (tag:lambda-layer-ssm-parameters)
 Parameters:
   AppName:
     Description: Name of application.

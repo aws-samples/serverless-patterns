@@ -1,0 +1,60 @@
+{
+    "title": "S3 - Lambda - Translate",
+    "description": "Perform document language translation using Translate through Lambda and S3",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This patterns shows CDK deployment on how to leverage Amazon Amazon S3, AWS Lambda, and Amazon Translate to perform language translation in a serverless fashion."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-translate-cdk-python",
+        "templateURL": "serverless-patterns/s3-lambda-translate-cdk-python",
+        "projectFolder": "s3-lambda-translate-cdk-python",
+        "templateFile": "app.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Translate",
+          "link": "https://docs.aws.amazon.com/translate/latest/dg/what-is.html"
+        },
+        {
+          "text": "Amazon Translate Document API",
+          "Link": "https://docs.aws.amazon.com/translate/latest/APIReference/API_TranslateDocument.html"
+        },
+        {
+          "text": "AWS Lambda",
+          "link": "https://aws.amazon.com/lambda/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Arjun Arippa",
+        "image": "https://github.com/awsarippa/amazon-textract-comprehend-pii-analysis/blob/main/image.png",
+        "bio": "Arjun Arippa is a Solutions Architect based in Bangalore, India. He works with some of the strategic and global customers in India, to build and architect their applications on AWS. Before joining AWS, Arjun spent over a decade working as a Software Developer. Reach out to him on LinkedIn",
+        "linkedin": "arjun-arippa"
+      }
+    ]
+  }

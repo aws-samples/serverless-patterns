@@ -1,0 +1,68 @@
+{
+  "title": "Amazon SQS Integration With Amazon Redshift using Amazon EventBridge Pipes",
+  "description": "How to send messages from Amazon SQS queue to Amazon Redshift cluster using Amazon EventBridge Pipes ",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The solution will create two Amazon SQS queues, Amazon Redshift Cluster, and an EventBridge Pipes to connect it all. EventBridge pipes consumer for messages source SQS queue",
+      "then transform the SQS message to create insert queries from data within message and insert data to Amazon Redshift cluster and add the SQS messages"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-redshift",
+      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-redshift",
+      "projectFolder": "eventbridge-pipes-sqs-to-redshift",
+      "templateFile": "eventbridge-pipes-sqs-to-redshift/amazon_sqs_integration_with_redshift.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Amazon EventBridge Pipes with SQS ",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-sqs.html"
+      },
+      {
+        "text": "Amazon Redshift Data API ",
+        "link": "https://docs.aws.amazon.com/redshift/latest/mgmt/data-api-calling-event-bridge.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },"deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rajat Palod",
+      "image": "https://i.postimg.cc/RFNfR83F/Rajat.jpg",
+      "bio": " Rajat is a Technical Account Manager at AWS and Serverless enthusiast.",
+      "linkedin": "rajatpalod"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Image Processing service - Find text in images
+Description: Image Processing service - Find text in images (uksb-1tthgi812) (tag:lambda-rekognition-rust)
 
 Globals:
   Function:

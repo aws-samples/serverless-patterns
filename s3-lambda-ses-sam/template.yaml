@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: This SAM Template sends an email with pre-signed S3 bucket URL whenever a file is uploaded into the bucket
+
+Parameters:
+  SenderEmailId:
+    Type: String
+    Description: Please enter the Email from which email will be sent
+
+  RecipientEmailId:
+    Type: String
+    Description: Please enter the Email to send notification to
+
+Resources:
+# Create an S3 Bucket to store emails
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
+
+# Create SES Email Identity
+  SESEmailSender:
+    Type: AWS::SES::EmailIdentity
+    Properties: 
+      EmailIdentity: !Ref SenderEmailId
+
+# Create Send Email Lambda function
+  SendEmailLambdaFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      CodeUri: src/
+      Environment:
+        Variables:
+          S3_BUCKET: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region} 
+          SENDER_EMAIL: !Ref SenderEmailId
+          RECIPIENT_EMAIL: !Ref RecipientEmailId
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
+        - SESCrudPolicy:
+            IdentityName: !Ref SESEmailSender
+      Events:
+        ObjectCreated:
+          Type: S3
+          Properties:
+            Bucket: !Ref MyBucket
+            Events: s3:ObjectCreated:*
+
+Outputs:
+  FunctionName:
+    Value: !Ref SendEmailLambdaFunction
+    Description: "SendEmailLambdaFunction Name"
+  MyBucketName:
+    Description: "My Bucket Name"  
+    Value: !Ref MyBucket

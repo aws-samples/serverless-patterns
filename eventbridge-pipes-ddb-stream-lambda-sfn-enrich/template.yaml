@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: EventBridge Pipe that connects DynamoDB Streams to Lambda with Enrichment
+Description: EventBridge Pipe that connects DynamoDB Streams to Lambda with Enrichment (uksb-1tthgi812) (tag:eventbridge-pipes-ddb-stream-lambda-sfn-enrich)
 
 Resources:
   # DynamoDB Table Creation with Stream Enabled

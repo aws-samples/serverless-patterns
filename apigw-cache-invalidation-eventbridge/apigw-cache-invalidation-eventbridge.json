@@ -1,0 +1,97 @@
+{
+    "title": "API Gateway to DynamoDB including cache invalidation",
+    "description": "Create a functionless cache invalidation process",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to use a functionless cache invalidation process when utilizing API Gateway and DynamoDB as a simple CRUD.",
+            "By introducing EventBridge to this architecture and enabling DynamoDB Streams, the MODIFY event fired into the Stream can be captured, processed and published to a custom EventBridge by EventBridge Pipes. ",
+            "Once the event is available on the custom EventBridge, a Rule can consume the event and target the API Gateway with a `Cache-Control: max-age=0` header and correct AWS IAM permissions `execute-api:InvalidateCache` using the ARN method for the Target.",
+            "Note: This application uses resources that are not eligible for the AWS Free Tier"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-cache-invalidation-eventbridge",
+            "templateURL": "serverless-patterns/apigw-cache-invalidation-eventbridge",
+            "projectFolder": "apigw-cache-invalidation-eventbridge",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Simple CRUD with API Gateway & DynamboDB",
+                "link": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-ddb-openapi-crud"
+            },
+            {
+                "text": "Cache invalidation with EventBridge & EventBridge Pipes",
+                "link": "https://aws.amazon.com/eventbridge/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "sam delete --stack-name STACK_NAME"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Mark White",
+            "image": "https://avatars.githubusercontent.com/u/8914061?v=4",
+            "bio": "Principal Engineer at Dunelm",
+            "linkedin": "mark--white"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 10,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway"
+        },
+        "icon2": {
+            "x": 35,
+            "y": 50,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "icon3": {
+            "x": 60,
+            "y": 50,
+            "service": "dynamodb-stream",
+            "label": "DynamoDB Streams"
+        },
+        "icon4": {
+            "x": 85,
+            "y": 50,
+            "service": "eventbridge",
+            "label": "Amazon EventBridge"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        }
+    }
+}

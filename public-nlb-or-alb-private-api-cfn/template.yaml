@@ -5,7 +5,9 @@
 
 Transform: AWS::Serverless-2016-10-31
 AWSTemplateFormatVersion: 2010-09-09
-Description: This cloudformation template is to deploy resources for invoking same/cross account private API via NLB and also attach custom domain to an API
+Description: >
+  This cloudformation template is to deploy resources for invoking same/cross account private API via NLB and also attach custom domain to an API 
+  (uksb-1tthgi812) (tag:public-nlb-or-alb-private-api-cfn)
 Parameters:
   Prefix:
     Description: Prefix to be added to all the resources name for tracking purpose

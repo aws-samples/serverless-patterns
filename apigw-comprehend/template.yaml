@@ -5,6 +5,7 @@ Parameters:
     Type: String
     Default: ComprehendApi
     Description: Name for the API Gateway
+Description: (uksb-1tthgi812) (tag:apigw-comprehend)
 Resources:
   ComprehendApi:
     Type: 'AWS::ApiGateway::RestApi'

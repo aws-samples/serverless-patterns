@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Eventbridge Appsync Subscription
+
+Resources:
+
+##########################################################################
+#   AppSync API                                                          #
+##########################################################################
+  AppSyncApi:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: EventBridgeAppsyncApi
+      SchemaUri: ./schema.graphql
+      ApiKeys:
+        TestApiKey:
+          Description: Test Api Key
+      Auth:
+        Type: API_KEY
+        Additional:
+          - Type: AWS_IAM
+      Functions:
+        onEbUpdateFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: None
+          InlineCode: |
+            export function request(_) { return {}; }
+            export function response(ctx) { return ctx.args; }
+      Resolvers:
+        Mutation:
+          onEbUpdate:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: "1.0.0"
+            Pipeline:
+            - onEbUpdateFunction
+
+
+##########################################################################
+#   Eventbridge                                                          #
+##########################################################################
+
+  EBRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !GetAtt EBBus.Name
+      EventPattern:
+        source:
+          - exists: true
+      Name: EventBridgeAppsyncEBRule
+      State: ENABLED
+      Targets:
+        - Id: EventBridgeAppsyncEBRuleTarget
+          Arn: !GetAtt AppSyncApi.GraphQLEndpointArn
+          RoleArn: !GetAtt EBExecutionRole.Arn
+          InputTransformer:
+            InputPathsMap:
+              message: $.detail.message
+            InputTemplate: '{"message": <message>}'
+          AppSyncParameters:
+            GraphQLOperation: >-
+              mutation
+              onEbUpdate($message:String!){onEbUpdate(message:$message){message}}
+
+  EBBus: 
+    Type: AWS::Events::EventBus
+    Properties: 
+        Name: "EventBridgeAppsyncEventBus"
+
+  EBExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: EBExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - 'appsync:GraphQL'
+                Resource:
+                  - !Sub 'arn:aws:appsync:${AWS::Region}:${AWS::AccountId}:apis/${AppSyncApi.ApiId}/types/Mutation/fields/onEbUpdate'

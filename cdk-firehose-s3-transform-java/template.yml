@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: AWS Serverless Spring Boot 2 API - org.example::cdk-firehose-s3-transform-java
+Description: AWS Serverless Spring Boot 2 API - org.example::cdk-firehose-s3-transform-java (uksb-1tthgi812) (tag:cdk-firehose-s3-transform-java)
 Globals:
   Api:
     EndpointConfiguration: REGIONAL

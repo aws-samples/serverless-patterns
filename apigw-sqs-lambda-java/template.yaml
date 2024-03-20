@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: A Lambda function triggered by an AWS API Gateway HTTP APIs call through an Amazon SQS Queue for buffering
+Description: A Lambda function triggered by an AWS API Gateway HTTP APIs call through an Amazon SQS Queue for buffering (uksb-1tthgi812) (tag:apigw-sqs-lambda-java)
 
 # Comment each resource section to explain usage
 Resources:

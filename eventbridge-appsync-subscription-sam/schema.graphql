@@ -1,0 +1,18 @@
+type Update @aws_iam {
+  message: String!
+}
+
+type Mutation {
+  onEbUpdate (
+    message: String!
+  ): Update @aws_iam
+}
+
+type Subscription {
+  onEbUpdate(message: String): Update
+  @aws_subscribe(mutations: ["onEbUpdate"])
+}
+
+# Any Query you need for your application
+type QueryOutput { output: String! }
+type Query { myQuery(input: String!): QueryOutput }

@@ -1,5 +1,5 @@
 Transform: AWS::Serverless-2016-10-31
-Description: A sample SAM template for deploying Lambda functions.
+Description: A sample SAM template for deploying Lambda functions. (uksb-1tthgi812) (tag:cloudtrail-lambda-slack-sam)
 
 Parameters:
   S3bucketname:

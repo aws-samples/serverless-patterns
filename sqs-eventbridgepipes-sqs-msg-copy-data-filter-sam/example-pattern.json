@@ -1,0 +1,55 @@
+{
+    "title": "Copying Amazon SQS messages between queues using Amazon EventBridge Pipes",
+    "description": "The pattern shows the filter capability of Amazon EventBridge Pipes while copying data from one Amazon SQS queue to another queue.",
+    "language": "YAML",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This template creates two Amazon SQS queues - source-queue and target-queue along with an Amazon EventBridge Pipe.",
+            "The Amazon EventBridge pipe copies messages from source-queue to target-queue only if message payload (JSON) contains color attribute having values red or blue.",
+            "Once the stack is deployed, use `send-messages-to-source-queue.sh` to send messages to the source-queue. This scripts sends four messages with different values for color attribute.",
+            "Validate received messages on `target-queue` using `receive-messages-from-target-queue.sh`. Only the messages with red and blue values for color attribute are available in `target-queue`."
+        ]
+    },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-sqs-with-data-filter",
+      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-sqs-with-data-filter",
+      "projectFolder": "eventbridge-pipes-sqs-to-sqs-with-data-filter",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Pipes filtering",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-filtering.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

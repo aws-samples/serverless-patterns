@@ -1,5 +1,5 @@
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless pattern API Gateway to EventBridge
+Description: Serverless pattern API Gateway to EventBridge (uksb-1tthgi812) (tag:apigw-rest-api-eventbridge-sqs-sam)
 
 Globals:
   Function:
