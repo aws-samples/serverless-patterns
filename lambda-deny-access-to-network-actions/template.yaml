@@ -1,0 +1,229 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Transform: AWS::Serverless-2016-10-31
+
+Description: >
+  In this pattern, we explore an approach to deny access to networking configuration
+  management operation from Lambda function code when the Lambda service requires
+  those permissions to connect to a customer-owned VPC.
+
+Parameters:
+  ProjectName:
+    Description: Project name
+    Type: String
+    Default: LambdaDenyNetworking
+
+Mappings:
+  SubnetConfig:
+    VPC:
+      CIDR: "10.0.0.0/16"
+    Private0:
+      CIDR: "10.0.0.0/24"
+    Private1:
+      CIDR: "10.0.1.0/24"
+
+  # This mapping accounts for the scenario when certain AZs
+  # are not available to use (this differs on a per account
+  # per customer basis).
+  AZRegions:
+    ap-northeast-1:
+      AZs: ["a", "b"]
+    ap-northeast-2:
+      AZs: ["a", "b"]
+    ap-south-1:
+      AZs: ["a", "b"]
+    ap-southeast-1:
+      AZs: ["a", "b"]
+    ap-southeast-2:
+      AZs: ["a", "b"]
+    ca-central-1:
+      AZs: ["a", "b"]
+    eu-central-1:
+      AZs: ["a", "b"]
+    eu-west-1:
+      AZs: ["a", "b"]
+    eu-west-2:
+      AZs: ["a", "b"]
+    sa-east-1:
+      AZs: ["a", "b"]
+    us-east-1:
+      AZs: ["a", "b"]
+    us-east-2:
+      AZs: ["a", "b"]
+    us-west-1:
+      AZs: ["a", "b"]
+    us-west-2:
+      AZs: ["a", "b"]
+
+Globals:
+  Function:
+    Architectures:
+      - arm64
+    MemorySize: 256
+    Runtime: nodejs20.x
+    Timeout: 30
+    Tracing: Active
+    VpcConfig:
+      SubnetIds:
+        - !Ref PrivateSubnet0
+        - !Ref PrivateSubnet1
+      SecurityGroupIds:
+        - !Ref ServiceSecurityGroup
+
+Resources:
+  TestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: test.handler
+      Policies: 
+        - VPCAccessPolicy:
+            {}
+      Environment:
+        Variables:
+          NetworkInterfaceId: "ENTER_MY_ENI_ID"
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Sourcemap: true
+        Target: ES2020
+        EntryPoints:
+          - functions/test.js
+
+  DenyNetworkActionsFromFunctionPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles:
+        - !Ref TestFunctionRole
+      PolicyName: DenyNetworkActionsFromFunctionPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Deny
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DeleteNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DetachNetworkInterface"
+            - "ec2:AssignPrivateIpAddresses"
+            - "ec2:UnassignPrivateIpAddresses"
+          Resource: "*"
+          Condition:
+            ArnEquals:
+              lambda:SourceFunctionArn:
+                - !GetAtt TestFunction.Arn
+            
+  ## Networking ##
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap [ SubnetConfig, VPC, CIDR ]
+      Tags:
+        - Key: "Network"
+          Value: "Private"
+        - Key: "Name"
+          Value: !Sub "${ProjectName}-VPC"
+
+  PrivateSubnet0:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Sub
+        - "${AWS::Region}${AZ}"
+        - AZ: !Select [ 0, !FindInMap [ "AZRegions", !Ref "AWS::Region", "AZs" ] ]
+      CidrBlock: !FindInMap [ SubnetConfig, Private0, CIDR ]
+      Tags:
+        - Key: Network
+          Value: Private
+        - Key: Name
+          Value: !Sub
+            - "${ProjectName}-VPC-private-${AZ}"
+            - AZ: !Select [ 0, !FindInMap [ "AZRegions", !Ref "AWS::Region", "AZs" ] ]
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Sub
+        - "${AWS::Region}${AZ}"
+        - AZ: !Select [ 1, !FindInMap [ "AZRegions", !Ref "AWS::Region", "AZs" ] ]
+      CidrBlock: !FindInMap [ SubnetConfig, Private1, CIDR ]
+      Tags:
+        - Key: Network
+          Value: Private
+        - Key: Name
+          Value: !Sub
+            - "${ProjectName}-VPC-private-${AZ}"
+            - AZ: !Select [ 1, !FindInMap [ "AZRegions", !Ref "AWS::Region", "AZs" ] ]
+
+  PrivateRouteTable0:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${ProjectName}-VPC-private-route-table"
+
+  PrivateSubnetRouteTableAssociation0:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet0
+      RouteTableId: !Ref PrivateRouteTable0
+
+  PrivateSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable0
+
+  VpcDefaultSGIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !GetAtt VPC.DefaultSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId: !GetAtt ServiceSecurityGroup.GroupId
+      ToPort: 65535
+      FromPort: 0
+
+  CloudWatchLogsInterfaceEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.logs"
+      PrivateDnsEnabled: true
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SubnetIds:
+        - !Ref PrivateSubnet0
+        - !Ref PrivateSubnet1
+  
+  EC2InterfaceEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ec2"
+      PrivateDnsEnabled: true
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SubnetIds:
+        - !Ref PrivateSubnet0
+        - !Ref PrivateSubnet1
+
+  # not sure why we need this one also....
+  EC2MessagesInterfaceEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ec2messages"
+      PrivateDnsEnabled: true
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SubnetIds:
+        - !Ref PrivateSubnet0
+        - !Ref PrivateSubnet1
+  
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Service / app access to MemoryDB cluster
+      VpcId: !Ref VPC

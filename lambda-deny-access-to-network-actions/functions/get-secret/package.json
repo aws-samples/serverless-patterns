@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@aws-sdk/client-ec2": "^3.535.0"
+  },
+  "name": "lambda-prevent-vpc-from-function",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "jkahn@",
+  "license": "MIT",
+  "description": ""
+}
