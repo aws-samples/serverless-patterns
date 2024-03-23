@@ -1,0 +1,66 @@
+{
+  "title": "Trigger MWAA DAG workflow via Amazon S3 event notification",
+  "description": "Trigger a DAG workflow hosted in MWAA (Managed Wokflow for Apache Airflow) using input request files uploaded in a source S3 bucket",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "services": {
+    "from": "s3",
+    "to": "lambda, mwaa"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This Terraform application deploys a MWAA (Managed Wokflow for Apache Airflow) instance with a `hello-world-dag` workflow, an input S3 bucket with event notifications to lambda. Lambda has been configured to trigger `hello-world-dag` workflow in MWAA for `input.json` file uploaded in the input S3 bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-mwaa-terraform",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/s3-lambda-mwaa-terraform/infra/main.tf",
+      "projectFolder": "s3-lambda-mwaa-terraform",
+      "templateFile": "infra/main.tf",
+      "readmeURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/s3-lambda-mwaa-terraform/README.md"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Invoking DAGs with a Lambda Function",
+        "link": "https://docs.aws.amazon.com/mwaa/latest/userguide/samples-lambda.html"
+      },
+      {
+        "text": "Airflow Core Concepts",
+        "link": "https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/index.html"
+      }
+    ]
+  },
+  "build": {
+    "text": []
+  },
+  "deploy": {
+    "text": [
+      "terraform -chdir=infra init",
+      "terraform -chdir=infra apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform -chdir=infra destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Damodar Shenvi Wagle",
+      "image": "https://drive.google.com/file/d/1o-NvTy-Ock12bKOLoMiwyolqizNNMhv8/view?usp=sharing",
+      "bio": "Damodar Shenvi Wagle is a Senior Cloud Application Architect at AWS Professional Services.",
+      "linkedin": "damodar-shenvi-wagle-72375548"
+    }
+  ]
+}
