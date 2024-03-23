@@ -1,0 +1,57 @@
+*.js
+!test/jest/*.js
+!src/backoffice/lib/layers/commonLayer/**/*.js
+!scripts/*.js
+!jest.config.js
+*.d.ts
+node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+# Out directory where JS files are created
+dist
+
+# Local VSCode IDE related files
+**/.vscode
+.DS_Store
+
+# Liniting
+!.eslintrc.js
+!.prettierrc.js
+.eslintcache
+
+# temporary files for debugging - except the ones that are used as templates
+ignoreMe*
+developer-*
+!developer-template-*
+~*
+
+# SAM-specific files and directories used for testing
+.aws-sam
+template.yaml
+
+# Script used for deployment from local machine
+local-deploy.sh
+
+# jest code coverage result folder
+coverage
+
+# Terraform files
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/terraform.txt
+**/environment/local.tfvars
+
+# .tfstate files
+**/.*.tfstate
+**/.*.tfstate.*
+
+# Terraform build folder
+**/builds/
+
+# Local configuration for S3 Backend.
+infra/local.conf
