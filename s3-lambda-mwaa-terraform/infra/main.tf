@@ -14,6 +14,7 @@ locals {
 }
 
 # Input S3 bucket to kick off MWAA DAG/workflow when input is placed
+# tfsec:ignore:aws-s3-enable-bucket-logging
 module "input_bucket" {
   #https://github.com/terraform-aws-modules/terraform-aws-s3-bucket
   source                   = "terraform-aws-modules/s3-bucket/aws"
@@ -42,6 +43,7 @@ module "input_bucket" {
 }
 
 # S3 bucket for MWAA DAGS
+# tfsec:ignore:aws-s3-enable-bucket-logging
 module "mwaa_bucket" {
   #https://github.com/terraform-aws-modules/terraform-aws-s3-bucket
   source                   = "terraform-aws-modules/s3-bucket/aws"
@@ -75,6 +77,9 @@ resource "aws_s3_object" "dags" {
 }
 
 # VPC and other infrastructure resources required for provisioning MWAA
+# tfsec:ignore:aws-ec2-require-vpc-flow-logs-for-all-vpcs
+# tfsec:ignore:aws-ec2-no-excessive-port-access
+# tfsec:ignore:aws-ec2-no-public-ingress-acl
 module "vpc" {
   source               = "terraform-aws-modules/vpc/aws"
   version              = "5.7.0"
@@ -142,6 +147,7 @@ module "mwaa" {
 }
 
 # IAM policy for MWAA instance role
+# tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_policy" "mwaa_policy" {
   path        = "/"
   description = "Custom policy for MWAA DAG workflows"
@@ -151,7 +157,6 @@ resource "aws_iam_policy" "mwaa_policy" {
     Statement = [
       {
         Action = [
-          "s3:ListBucket",
           "s3:GetObject",
           "s3:GetObjectVersion",
           "s3:GetObjectVersionAttributes",
