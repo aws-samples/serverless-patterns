@@ -1,6 +1,6 @@
-# AWS Lambda function that reads file information when file is uploaded in Amazon S3 bucket using CDK.
+# AWS Lambda function that reads file information when file is uploaded to Amazon S3 bucket using AWS CDK.
 
-This AWS CDK application demonstrates triggering a AWS Lambda function, when a file is uploaded in a S3 bucket.
+This AWS CDK application shows triggering a AWS Lambda function, when a file is uploaded in a S3 bucket.
 
 This pattern provides a solution for accessing the file information from AWS Lambda function, when a new file is uploaded to a S3 bucket. An ideal use case for this is reading various file types e.g. image, csv, text, pdf files and extracting its metadata information and other file contents for further processing or just passing this information to downstream systems.
 
