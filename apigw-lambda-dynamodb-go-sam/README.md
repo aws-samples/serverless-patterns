@@ -1,6 +1,6 @@
 # API Gateway REST API to AWS Lambda to Amazon DynamoDB
 
-This pattern explains how to deploy an AWS SAM application that includes an API Gateway, AWS Lambda Function, and writes items to an Amazon DynamoDB table. 
+This pattern explains how to deploy an AWS SAM application that includes an Amazon API Gateway, AWS Lambda Function, and writes items to an Amazon DynamoDB table. 
 
 ## Requirements
 
