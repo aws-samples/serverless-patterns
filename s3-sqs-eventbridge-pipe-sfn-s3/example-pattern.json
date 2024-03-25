@@ -1,6 +1,6 @@
 {
-    "title": "S3 to EventBridge Pipes to SQS to Step Function to S3",
-    "description": "Copy and manipulate an object between S3 buckets using SQS, EventBridge Pipe and Step Function",
+    "title": "Copying a file between Amazon S3 buckets via Amazon Eventbridge Pipes & AWS Step Functions",
+    "description": "Copy and manipulate an object between Amazon S3 buckets using Amazon SQS, Amazon EventBridge Pipes and AWS Step Functions",
     "language": "",
     "level": "200",
     "framework": "SAM",
@@ -57,53 +57,5 @@
             "bio": "Senior Solutions Architect at AWS",
             "linkedin": "danstraw"
         }
-    ],
-    "patternArch": {
-        "icon1": {
-            "x": 10,
-            "y": 50,
-            "service": "s3",
-            "label": "Amazon S3"
-        },
-        "icon2": {
-            "x": 30,
-            "y": 50,
-            "service": "sqs",
-            "label": "Amazon SQS"
-        },
-        "icon3": {
-            "x": 50,
-            "y": 50,
-            "service": "eventbridge-pipes",
-            "label": "EventBridge Pipes"
-        },
-        "icon4": {
-            "x": 70,
-            "y": 50,
-            "service": "sfn",
-            "label": "Step Functions"
-        },
-        "icon5": {
-            "x": 90,
-            "y": 50,
-            "service": "s3",
-            "label": "Amazon S3"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2"
-        },
-        "line2": {
-            "from": "icon2",
-            "to": "icon3"
-        },
-        "line3": {
-            "from": "icon3",
-            "to": "icon4"
-        },
-        "line4": {
-            "from": "icon4",
-            "to": "icon5"
-        }
-    }
+    ]
 }
