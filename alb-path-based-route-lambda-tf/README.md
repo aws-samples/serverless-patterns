@@ -24,9 +24,11 @@ Important: this application uses various AWS services and there are costs associ
     cd alb-path-based-route-lambda-tf
     ```
 3. From the command line, run:
-    ```
-    terraform init
-    ```
+   
+    Default region (us-east-1) | Specify region (eu-west-1 example)
+    ---------|----------
+    ```terraform init``` | ```terraform init -var region="eu-west-1"```
+
 4. From the command line, run:
     ```
     terraform plan
