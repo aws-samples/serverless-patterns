@@ -1,8 +1,6 @@
-# Copying a file from S3 to S3 via Eventbridge Pipes & Step Function
+# Copying a file between Amazon S3 buckets via Amazon Eventbridge Pipes & AWS Step Functions
 
-This pattern shows how to use S3 Event Notifications, queue them on SQS, and then use EventBridge Pipes to launch a 
-StepFunctions state machine and copy the file from the source S3 bucket to a destination.  Modifying the state machine 
-would allow manipulation of the file.
+This pattern shows how to use S3 Event Notifications, queue them on Amazon SQS, and then use Amazon EventBridge Pipes to launch an AWS StepFunctions state machine and copy the file from the source S3 bucket to a destination.  Modifying the state machine would allow manipulation of the file.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
