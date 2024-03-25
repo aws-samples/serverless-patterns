@@ -85,6 +85,6 @@ You can customize the AWS Lambda Functions by editing the code at `./src/lambda_
 You should expect to see a message confirming `DELETE_COMPLETE`.
 
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
