@@ -1,6 +1,6 @@
 # AWS Transfer Family SFTP Server to AWS Lambda
 
-This pattern in SAM offers an example to setup an AWS SFTP server using AWS Transfer Family for SFTP with a custom workflow step to an AWS Lambda function. The template enables you to simply create an SFTP server, a custom workflow, set up user accounts, and an Amazon Simple Storage Service (Amazon S3) bucket. You have fine-grained control over user identity, permissions, and keys. You can create users within Transfer for SFTP. You can also use IAM policies to control the level of access granted to each user. When a user uploads a file to the SFTP server it triggers a custom document processing step.
+This pattern shows how to setup an AWS SFTP server using AWS Transfer Family for SFTP with a custom workflow step to an AWS Lambda function using AWS SAM. The template allows you to create an SFTP server, a custom workflow, set up user accounts, and an Amazon Simple Storage Service (Amazon S3) bucket. You have fine-grained control over user identity, permissions, and keys. You can create users within Transfer for SFTP. You can also use IAM policies to control the level of access granted to each user. When a user uploads a file to the SFTP server it triggers a custom document processing step.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/awstransfer-lambda-sam. 
 
@@ -43,7 +43,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern deploys an Amazon Simple Storage Service (S3) bucket, an SFTP Server using AWS Transfer for SFTP configured with a service managed user with fine grained access to the S3 bucket, and an Transfer Family Workflow to an AWS Lambda function. Once the user uploads a file through the SFTP server, the file will land in the user's home directory within the S3 bucket. The AWS Tranfer Family workflow will invoke the lambda function upon successful file upload. The function extracts the information regarding the execution status, and then calls the SendWorkflowStepState API operation to return the status to the workflow for the step. Before your function calls the SendWorkflowStepState API operation, you can configure Lambda to take an action based on your workflow logic.
+This pattern deploys an Amazon Simple Storage Service (S3) bucket, an SFTP Server using AWS Transfer for SFTP configured with a service managed user with fine grained access to the S3 bucket, and a Transfer Family Workflow to an AWS Lambda function. Once the user uploads a file through the SFTP server, the file will land in the user's home directory within the S3 bucket. The AWS Transfer Family workflow invokes the Lambda function upon successful file upload. The function extracts the information regarding the execution status, and then calls the SendWorkflowStepState API operation to return the status to the workflow for the step. Before your function calls the SendWorkflowStepState API operation, you can configure Lambda to take an action based on your workflow logic.
 
 ## Testing
 
@@ -88,15 +88,8 @@ This pattern deploys an Amazon Simple Storage Service (S3) bucket, an SFTP Serve
     ```
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
-
-This pattern was contributed by Jack Jones.
-
 ----
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
