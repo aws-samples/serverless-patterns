@@ -19,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 2. Change directory to the pattern directory:
    ```bash
-   cd serverless-patterns/eventbridge-pipes-sqs-to-step-functions-cdk-dotnet/cdk
+   cd serverless-patterns/eventbridge-pipes-sqs-to-step-functions-cdk-java
    ```
 
 3. From the command line, configure AWS CDK:
