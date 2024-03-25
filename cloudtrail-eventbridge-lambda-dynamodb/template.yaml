@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Removes public route advertisements for CIDR ranges not permitted to be advertised.
+
+Parameters:
+  NotificationEmail:
+    Type: String
+    Description: "Email where notifications should be sent when route advertisements have been blocked."
+    AllowedPattern: '[^@]+@[^@]+\.[^@]+'
+
+Resources:
+  SubmitFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/function.py
+      Description: "Removes public route advertisements for CIDR ranges not permitted to be advertised."
+      Handler: function.lambda_handler
+      PackageType: "Zip"
+      Tracing: Active
+      Runtime: "python3.12"
+      Environment:
+        Variables:
+          DynamoDBTable: !Ref DynamoDBTable
+          SNSTopic: !Ref SNSTopic
+      Policies:
+        - DynamoDBReadPolicy: 
+            TableName: !Ref DynamoDBTable
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt SNSTopic.TopicName
+        - Version: '2012-10-17' 
+          Statement:
+            - Effect: Allow
+              Action:
+                - ec2:WithdrawByoipCidr
+              Resource: '*'
+      Events:
+        AdvertiseByoipEvent:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source: 
+                - aws.ec2
+              detail-type: 
+                - AWS API Call via CloudTrail
+              detail:
+                eventSource: 
+                  - ec2.amazonaws.com
+                eventName: 
+                  - AdvertiseByoipCidr
+
+  DynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+        
+
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint: !Ref NotificationEmail
+          Protocol: email
