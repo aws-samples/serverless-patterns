@@ -1,0 +1,38 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "3e7635711f47f256ccac1eba6b45dd948220756ec31acf3cdc66da20c2f5f62c"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.11"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {},
+    "develop": {
+        "aws-lambda-powertools": {
+            "hashes": [
+                "sha256:02fafbdaaa0a89faaf8c49777a22996aaba465a099d69b4f1fbfd8c3ae47fc41",
+                "sha256:cfcc41d7125b9527b8fd8c4e3e4b30b971f915c32ec0c6e39573fd9f298a63a8"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.8' and python_full_version < '4.0.0'",
+            "version": "==2.34.2"
+        },
+        "typing-extensions": {
+            "hashes": [
+                "sha256:69b1a937c3a517342112fb4c6df7e72fc39a38e7891a5730ed4985b5214b5475",
+                "sha256:b0abd7c89e8fb96f98db18d86106ff1d90ab692004eb746cf6eda2682f91b3cb"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==4.10.0"
+        }
+    }
+}

@@ -1,0 +1,228 @@
+service: sls-${self:custom.name}-apigw-sns-filter-sls-py
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  logs:
+    restApi:
+      role: !Ref ApiCWLRole.Arn
+  runtime: python3.11
+  memorySize: 128
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  deploymentBucket:
+    blockPublicAccess: true
+    maxPreviousDeploymentArtifacts: 3
+  apiGateway:
+    shouldStartNameWithService: true
+  tracing:
+    apiGateway: true
+package:
+  individually: true
+
+custom:
+  name: bb245
+  powertoolsArn: arn:aws:lambda:${self:provider.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:61
+  apiGatewayServiceProxies:
+    - sns:
+        path: /
+        method: post
+        topicName: !GetAtt [MainTopic, TopicName]
+        cors: false
+        private: false
+        response:
+          - statusCode: 200
+            selectionPattern: '2\d{2}'
+            responseParameters: {}
+            responseTemplates:
+              application/json: |-
+                { "message": "accepted" }
+
+functions:
+  process-foo-status:
+    handler: functions/process_foo_status.lambda_handler
+    role: ProcessFooBarStatusRole
+    environment:
+      POWERTOOLS_SERVICE_NAME: processFooService
+      POWERTOOLS_LOG_LEVEL: INFO
+      Tracing: Active
+    events:
+      - sns:
+          arn: !Ref MainTopic
+          topicName: mainTopic
+          filterPolicyScope: MessageBody
+          filterPolicy:
+            status:
+              - "foo"
+    layers:
+      - ${self:custom.powertoolsArn}
+
+  process-bar-status:
+    handler: functions/process_bar_status.lambda_handler
+    role: ProcessFooBarStatusRole
+    environment:
+      POWERTOOLS_SERVICE_NAME: processBarService
+      POWERTOOLS_LOG_LEVEL: INFO
+      Tracing: Active
+    events:
+      - sns:
+          arn: !Ref MainTopic
+          topicName: mainTopic
+          filterPolicyScope: MessageBody
+          filterPolicy:
+            status:
+              - "bar"
+    layers:
+      - ${self:custom.powertoolsArn}
+resources:
+  Resources:
+    ApiCWLRole:
+      Type: AWS::ApiGateway::Account
+      Properties:
+        CloudWatchRoleArn: !GetAtt [CloudWatchRole, Arn]
+
+    CloudWatchRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: Apigw-Cloudwatch-Role
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Action: 'sts:AssumeRole'
+              Effect: Allow
+              Principal:
+                Service: apigateway.amazonaws.com
+        Path: /
+        ManagedPolicyArns:
+          - 'arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'
+
+    ProcessFooBarStatusRole:
+      Type: AWS::IAM::Role
+      Properties:
+        Path: /
+        RoleName: Function-Role
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: Function-Role-Policy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                    - logs:TagResource
+                  Resource:
+                    - Fn::Join:
+                        - ':'
+                        - - 'arn:aws:logs'
+                          - Ref: 'AWS::Region'
+                          - Ref: 'AWS::AccountId'
+                          - 'log-group:/aws/lambda/*:*:*'
+                - Effect: Allow
+                  Action:
+                    - xray:PutTraceSegments
+                    - xray:PutTelemetryRecords
+                  Resource:
+                    - "*"
+                - Effect: Allow
+                  Action:
+                    - sns:Subscribe
+                  Resource:
+                    - !Ref MainTopic
+    MainTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: mainTopic
+
+    ApiGatewayRestMethodModel:
+      Type: AWS::ApiGateway::Model
+      Properties:
+        ContentType: application/json
+        RestApiId: { Ref: 'ApiGatewayRestApi' }
+        Schema:
+          $schema: "http://json-schema.org/draft-04/schema#"
+          type: object
+          properties:
+            id:
+              type: integer
+            status:
+              type: string
+              enum: ["foo", "bar"]
+          required:
+            - id
+            - status
+    ApiGatewayResource:
+      Type: 'AWS::ApiGateway::Resource'
+      Properties:
+        RestApiId: !Ref ApiGatewayRestApi
+        ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+        PathPart: notify-status
+
+    ApiGatewayRequestValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: ${self:service}-${self:provider.stage}-validator
+        RestApiId: { Ref: 'ApiGatewayRestApi' }
+        ValidateRequestBody: true
+
+    ApiGatewayMethodPost:
+      Type: AWS::ApiGateway::Method
+      Properties:
+        HttpMethod: 'POST'
+        RestApiId: { Ref: 'ApiGatewayRestApi' }
+        ResourceId: !GetAtt ApiGatewayResource.ResourceId
+        AuthorizationType: 'NONE'
+        RequestValidatorId: { Ref: 'ApiGatewayRequestValidator' }
+        RequestModels:
+          application/json: { Ref: 'ApiGatewayRestMethodModel' }
+        Integration:
+          Type: 'AWS'
+          Credentials: !GetAtt APIGatewayToSNSRole.Arn
+          Uri: !Sub "arn:aws:apigateway:${AWS::Region}:sns:path/${AWS::AccountId}/" # Constructing the SNS URI
+          IntegrationHttpMethod: 'POST'
+          ContentHandling: CONVERT_TO_TEXT
+          PassthroughBehavior: NEVER
+
+    APIGatewayToSNSRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:service}-${self:provider.stage}-Role
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: apigateway.amazonaws.com
+              Action: sts:AssumeRole
+        Description: !Sub Role for ${self:service}
+        Path: /
+        Policies:
+          - PolicyName: ${self:service}-role-policy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action: sns:Publish
+                  Resource:
+                    - !Ref MainTopic
+                - Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                    - logs:TagResource
+                  Resource:
+                    - '*'
+plugins:
+  - serverless-apigateway-service-proxy
+  - serverless-python-requirements
