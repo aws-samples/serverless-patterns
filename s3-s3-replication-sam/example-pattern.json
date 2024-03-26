@@ -7,10 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Data Redundancy and Durability: Safeguard against data loss with automatic and asynchronous replication of objects between S3 buckets.",      "Global Content Distribution: Reduce latency and enhance user experience by replicating frequently accessed data to various geographical locations.",
-      "Compliance and Data Retention: Address regulatory standards and compliance requirements by replicating data to separate regions.",
-      "Operational Efficiency: Asynchronous replication allows you to focus on other tasks while data is efficiently copied in the background.",
-      "Same-Region Replication (SRR): Ensure redundancy, compliance, or operational efficiency by copying data to a separate bucket within the same region."
+      "This pattern sets up S3 replication between two buckets. The replication configuration is set up in the source bucket, and the destination bucket is set up to receive the replicated objects. The replication configuration is set up to replicate all objects in the source bucket to the destination bucket."
     ]
   },
   "gitHub": {
@@ -29,7 +26,7 @@
       },
       {
         "text": "Cross Region Replication",
-        "link": "https://www.youtube.com/watch?v=_6admeBN-lI"
+        "link": "https://aws.amazon.com/about-aws/whats-new/2019/09/amazon-s3-introduces-same-region-replication/"
       }
     ]
   },
