@@ -1,6 +1,6 @@
 # Amazon S3 to AWS SQS
 
-Sends notifications from S3 to SQS when an object is created
+Java CDK example that Sends notifications from S3 to SQS when an object is created.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-sqs-cdk-java](https://serverlessland.com/patterns/s3-sqs-cdk-java)
 
