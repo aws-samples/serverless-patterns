@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'S3 bucket replication'
+
+Parameters:
+
+  BucketSourceName:
+    Description: "Bucket Source Name (must be unique)"
+    Type: String
+  
+  BucketReplicaName:
+    Description: "Bucket Replica Name (must be unique)"
+    Type: String
+
+Resources:
+
+  ReplicationRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 's3.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'ReplicationPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 's3:GetBucketVersioning'
+                  - 's3:ListBucket'
+                  - s3:GetReplicationConfiguration
+                  - s3:GetObjectVersionForReplication
+                  - s3:GetObjectVersionAcl
+                  - s3:GetObjectVersionTagging
+                  - s3:GetObjectRetention
+                  - s3:GetObjectLegalHold
+                Resource: 
+                  - !Sub "arn:aws:s3:::${BucketSource}"
+                  - !Sub "arn:aws:s3:::${BucketReplica}"
+              - Effect: 'Allow'
+                Action:
+                  - 's3:ReplicateObject'
+                  - 's3:ReplicateDelete'
+                  - 's3:ReplicateTags'
+                  - 's3:GetObjectVersionTagging'
+                  - 's3:ObjectOwnerOverrideToBucketOwner'
+                Resource: 
+                  - !Sub "arn:aws:s3:::${BucketSource}"
+                  - !Sub "arn:aws:s3:::${BucketReplica}"
+
+
+  BucketSource:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      VersioningConfiguration:
+        Status: 'Enabled'
+      ReplicationConfiguration:
+        Role: !GetAtt ReplicationRole.Arn
+        Rules:
+          - Destination:
+              Bucket: !GetAtt BucketReplica.Arn
+            Prefix: ''
+            Status: 'Enabled'
+      BucketName: !Ref BucketSourceName
+      
+  BucketReplica:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      VersioningConfiguration:
+        Status: 'Enabled'
+      BucketName: !Ref BucketReplicaName
+
+  BucketReplicaPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BucketReplica
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: "Object Level Permissions"
+            Effect: "Allow"
+            Principal:
+              AWS: !GetAtt ReplicationRole.Arn
+            Action:
+              - "s3:ReplicateObject"
+              - "s3:ReplicateDelete"
+            Resource: !Sub "arn:aws:s3:::${BucketReplica}/*"
+          - Sid: "Bucket Level Permissions"
+            Effect: "Allow"
+            Principal:
+              AWS: !GetAtt ReplicationRole.Arn
+            Action:
+              - "s3:List*"
+              - "s3:GetBucketVersioning"
+              - "s3:PutBucketVersioning"
+            Resource: !Sub "arn:aws:s3:::${BucketReplica}"
