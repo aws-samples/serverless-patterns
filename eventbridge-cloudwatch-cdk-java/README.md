@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
 
 2. Change the working directory to this pattern's directory
     ```
-    cd serverless-patterns/apigw-http-api-step-functions-express-java
+    cd serverless-patterns/eventbridge-cloudwatch-cdk-java
     ```
 
 3. From the command line, configure AWS CDK:
