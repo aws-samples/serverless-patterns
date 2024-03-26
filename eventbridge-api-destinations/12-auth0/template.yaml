@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create an API destination in EventBridge for Auth0 Signup API
+
+Parameters:
+  Auth0SignUpAPI:
+    Type: String
+    Default: 'https://<<ENTER ENVIRONMENT NAME HERE>>.us.auth0.com/dbconnections/signup'
+  ClientId:
+    NoEcho: true
+    Type: String
+    Default: ''
+
+Resources:
+  MyAuth0EventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "MyAuth0EventBus"
+
+  MyAuth0Connection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: BASIC
+      Description: 'Auth with client ID in secret body parameter'
+      AuthParameters:
+        BasicAuthParameters :
+          Username : "username" 
+          Password : "password" 
+        InvocationHttpParameters:
+          BodyParameters:
+            - Key: 'client_id'
+              Value: !Ref ClientId
+              IsValueSecret: true
+
+  SignUpAPIDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'SignUpAPIDestination'
+      ConnectionArn: !GetAtt MyAuth0Connection.Arn
+      InvocationEndpoint: !Ref Auth0SignUpAPI
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+
+  EventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt SignUpAPIDestination.Arn
+
+
+  MyDLQueue: 
+    Type: AWS::SQS::Queue
+
+  EventRuleCreateProduct: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      State: "ENABLED"
+      EventBusName: !Ref MyAuth0EventBus
+      EventPattern: 
+        source:
+          - "MyAuth0App"      
+      Targets: 
+        - Arn: !GetAtt SignUpAPIDestination.Arn
+          RoleArn: !GetAtt EventBridgeTargetRole.Arn
+          Id: "CreateProduct"
+          InputPath: $.detail
+          DeadLetterConfig:
+            Arn:  !GetAtt MyDLQueue.Arn
+
+Outputs:
+  MyAuth0EventBusName:
+    Description: Application EventBus Name
+    Value: !Ref MyAuth0EventBus
+
+  MyAuth0EventBusArn:
+    Description: Application EventBus ARN
+    Value: !GetAtt MyAuth0EventBus.Arn
+
+  MyAuth0ConnectionName:
+    Value: !Ref MyAuth0Connection
+  MyAuth0ConnectionArn:
+    Value: !GetAtt MyAuth0Connection.Arn        
+
+  SignUpAPIDestinationName:
+    Value: !Ref SignUpAPIDestination
+  SignUpAPIDestination:
+    Value: !GetAtt SignUpAPIDestination.Arn
+
+  EventBridgeTargetRoleArn:
+    Value: !GetAtt EventBridgeTargetRole.Arn
