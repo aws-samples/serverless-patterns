@@ -1,0 +1,15 @@
+requests_aws4auth-1.2.3.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+requests_aws4auth-1.2.3.dist-info/LICENSE,sha256=pbMpx9Os-ZCah3royRy9iL-e2UrjtB_dSNcPcduFDrQ,1082
+requests_aws4auth-1.2.3.dist-info/METADATA,sha256=nqSnOvdMaLi6Yvs7P4VfY_wceXtzkMgzCVLpYUZUvm4,18213
+requests_aws4auth-1.2.3.dist-info/RECORD,,
+requests_aws4auth-1.2.3.dist-info/REQUESTED,sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU,0
+requests_aws4auth-1.2.3.dist-info/WHEEL,sha256=a-zpFRIJzOq5QfuhBzbhiA1eHTzNCJn8OdRvhdNX0Rk,110
+requests_aws4auth-1.2.3.dist-info/top_level.txt,sha256=V51K8w0kWZWck06dvvntjIFHAzzxKs86IsO3NqcIzDk,18
+requests_aws4auth/__init__.py,sha256=Ct7Hva-tFG6sCeVmXqkCsXA9fIIUe_RL4m6d5tKT0r8,8452
+requests_aws4auth/__pycache__/__init__.cpython-310.pyc,,
+requests_aws4auth/__pycache__/aws4auth.cpython-310.pyc,,
+requests_aws4auth/__pycache__/aws4signingkey.cpython-310.pyc,,
+requests_aws4auth/__pycache__/exceptions.cpython-310.pyc,,
+requests_aws4auth/aws4auth.py,sha256=uGS_oeZ0TpTvynNAcFVeFGiWlEz8Ncnketcir2CSfh8,33951
+requests_aws4auth/aws4signingkey.py,sha256=8ooNvrKCk-pjitb_0VLvtNBQgusQV1yvFwywIOTh1Xs,5437
+requests_aws4auth/exceptions.py,sha256=j5slGw2ugxqGfeq6zbXiQshOaP0qf3KZlvtRy-AzoPw,408
