@@ -1,0 +1,301 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  TemplateId: "cloudwatch-to-opensearch-testing"
+
+Parameters:
+  KinesisFirehoseDeliveryStreamArn:
+    Type: "String"
+    Default: ""
+    Description: "The Kinesis Firehose Arn"
+  CloudWatchLogsToKinesisRoleArn:
+    Type: "String"
+    Default: ""
+    Description: "The IAM Role Arn for CloudWatch Logs to Kinesis"
+Resources:
+
+  TestLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws/lambda/cloudwatch-to-opensearch-testing-2"
+      RetentionInDays: 7
+
+  TestLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      DestinationArn: !Ref 'KinesisFirehoseDeliveryStreamArn' 
+      FilterName: "ALL"
+      FilterPattern: ""
+      LogGroupName: !Ref 'TestLogGroup'
+      RoleArn: !Ref 'CloudWatchLogsToKinesisRoleArn'
+      Distribution: ByLogStream
+
+  TestLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "TestLambdaPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource:
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*"
+      RoleName: "TestLambdaRole"
+
+  TestLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Architectures:
+        - "x86_64"
+      MemorySize: 128
+      EphemeralStorage:
+        Size: 512
+      LoggingConfig:
+        LogGroup: !Ref 'TestLogGroup'
+        LogFormat: "Text"
+      Description: "A test Lambda to simulate logging of data including JSON documents that contain various fake customer data."
+      TracingConfig:
+        Mode: "PassThrough"
+      Timeout: 30
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: "Auto"
+      FunctionName: "cloudwatch-oss-test"
+      Role: !GetAtt 'TestLambdaRole.Arn'
+      Handler: "index.lambda_handler"
+      Runtime: "python3.12"
+      Tags:
+          - Key: "source"
+            Value: "aws-samples"  
+          - Key: "solution"
+            Value: "cloudwatch-to-opensearch"
+      Code:
+        ZipFile: |
+          # Copyright 2023, Amazon.com, Inc. or its affiliates. All Rights Reserved.
+          #
+          # Licensed under the Amazon Software License (the "License").
+          # You may not use this file except in compliance with the License.
+          # A copy of the License is located at
+          #
+          #  http://aws.amazon.com/asl/
+          #
+          # or in the "license" file accompanying this file. This file is distributed
+          # on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+          # express or implied. See the License for the specific language governing
+          # permissions and limitations under the License.
+          import json
+          import random
+          import uuid
+          from datetime import datetime
+
+          def lambda_handler(event, context):
+              
+              # data setup
+              status = ["completed", "in process", "cancelled"]
+              transaction = ["withdrawal", "deposit"]
+              customers = [ 
+                  {
+                      "id": "8d7a9f6b-9c2e-4a3f-b7d3-5e8c1e9d2a1c",
+                      "customer_number": "54321-0010",
+                      "firstName": "Samantha",
+                      "lastName": "Rodriguez",
+                      "middleName": "L.",
+                      "dateOfBirth": "1985-03-15",
+                      "ssn": "987-65-4321",
+                      "address": [
+                          {
+                              "street": "456 Oak Ave.",
+                              "city": "Miami",
+                              "state": "FL",
+                              "zipcode": "33101"
+                          }
+                      ],
+                      "phone": "+1305-555-1234",
+                      "email": "samantha.rodriguez@example.com"
+                  },
+                  
+                  {
+                      "id": "f9e7c3b1-d8e2-4b9f-a6c4-2f1e3d5b6a7c",
+                      "customer_number": "67890-0009",
+                      "firstName": "Michael",
+                      "lastName": "Johnson",
+                      "middleName": "D.",
+                      "dateOfBirth": "1992-11-22",
+                      "ssn": "456-78-9012",
+                      "address": [
+                          {
+                              "street": "789 Maple Ln.",
+                              "city": "Chicago",
+                              "state": "IL",
+                              "zipcode": "60601"
+                          }
+                      ],
+                      "phone": "+1312-555-5678",
+                      "email": "michael.johnson@example.com"
+                  },
+                  
+                  {
+                      "id": "2b4a6d8e-f1c9-4e7f-b3d2-8a5c7b6d9e0f",
+                      "customer_number": "13579-0008",
+                      "firstName": "Emily",
+                      "lastName": "Davis",
+                      "middleName": "R.",
+                      "dateOfBirth": "1978-06-30",
+                      "ssn": "789-01-2345",
+                      "address": [
+                          {
+                              "street": "246 Pine St.",
+                              "city": "Seattle",
+                              "state": "WA",
+                              "zipcode": "98101"
+                          }
+                      ],
+                      "phone": "+1206-555-9012",
+                      "email": "emily.davis@example.com"
+                  },
+                  
+                  {
+                      "id": "2a3b4c5d-6e7f-8a9b-0c1d-2e3f4a5b6c7d",
+                      "customer_number": "79135-0002",
+                      "firstName": "Isabella",
+                      "lastName": "Anderson",
+                      "middleName": "M.",
+                      "dateOfBirth": "1980-04-20",
+                      "ssn": "012-34-5678",
+                      "address": [
+                          {
+                              "street": "492 Maple Ave.",
+                              "city": "Boston",
+                              "state": "MA",
+                              "zipcode": "02101"
+                          }
+                      ],
+                      "phone": "+1617-555-4567",
+                      "email": "isabella.anderson@example.com"
+                  }
+              ]
+              
+              
+              accounts = [
+                  {
+                      "id": "08ed8d06-d338-4aa2-869b-90937f5d0342",
+                      "account_id": "56781534-e095-4897-95ed-76af722f4ce6",
+                      "account_number": "234911015",
+                      "type": "checking",
+                      "status": "open",
+                      "createdAt": "2023-03-26T15:11:00.232Z",
+                      "updatedAt": "2023-03-26T15:11:00.232Z",
+                      "balance": 2500,
+                      "name": "Samantha's Everyday Account",
+                      "description": "My main checking account for bills and daily expenses."
+                  }, 
+                  {
+                      "id": "f1e5c6d2-98a3-4537-b345-7d89acd34b21",
+                      "account_id": "8765ab32-1234-5678-9abc-def012345678", 
+                      "account_number": "987654321",
+                      "type": "savings",
+                      "status": "open",
+                      "createdAt": "2022-11-05T09:22:15.769Z",
+                      "updatedAt": "2022-11-05T09:22:15.769Z",
+                      "balance": 15000,
+                      "name": "MJ Nest Egg",
+                      "description": "Saving up for a rainy day and future plans. Every penny counts!"
+                  },
+                  
+                  {
+                      "id": "4ac72390-d8e7-4616-9c7e-b2a0f6bf3d9a",
+                      "account_id": "fedcba09-8765-4321-0987-654321fedcba",
+                      "account_number": "112233445",
+                      "type": "checking", 
+                      "status": "open",
+                      "createdAt": "2023-03-26T15:11:00.232Z",
+                      "updatedAt": "2023-03-26T15:11:00.232Z",
+                      "balance": 850,
+                      "name": "Emily's Fun Money",
+                      "description": "For shopping, dining out, and little treats."
+                  },
+                  
+                  {
+                      "id": "4a5b6c7d-8e9f-0a1b-2c3d-4e5f6a7b8c9d",
+                      "account_id": "0c1d2e3f-4a5b-6c7d-8e9f-0a1b2c3d4e5f", 
+                      "account_number": "335577991",
+                      "type": "checking",
+                      "status": "open",
+                      "createdAt": "2023-03-26T15:11:00.232Z",
+                      "updatedAt": "2023-03-26T15:11:00.232Z",
+                      "balance": 1200,
+                      "name": "Isabella's Bill Pay",
+                      "description": "My main account for paying rent, utilities, etc."
+                  }
+              ]
+              
+              # log unstructured text data
+              print("### Starting Test Transaction ###")
+              
+              # log lambda event
+              print("lambda event:")
+              print(json.dumps(event))
+              
+              # log a fake transaction involving fake customer data
+              print("Starting Transaction...")
+              print("This is a Pseudo-Transaction to get a customer profile")
+              
+              # Get a random customer between 0 and 3 (4 customers)
+              random_value = random.randint(0, 3)
+              print("random value = {}".format(random_value))
+              
+              # log customer/account information
+              print("### customer information ###")
+              print(json.dumps(customers[random_value]))
+              print("### account information ###")
+              print(json.dumps(accounts[random_value]))
+              
+              # log transaction
+
+              # Generate a random UUID
+              random_uuid = str(uuid.uuid4())
+              random_txn = random.randint(0, 1)
+              random_status = random.randint(0, 2)
+              random_amount = round(random.uniform(10, 1000), 2)
+              if random_status == 0:  
+                  if random_txn > 0:
+                      balance = accounts[random_value]["balance"] + random_amount
+                  else:
+                      balance = accounts[random_value]["balance"] - random_amount
+              else:
+                  balance = accounts[random_value]["balance"]
+              # Get the current date and time
+              current_datetime = datetime.now()
+
+              transaction = {
+                  "transation_time": str(current_datetime),
+                  "customer_id": customers[random_value]["id"], 
+                  "account_id": accounts[random_value]["id"],
+                  "transaction_id": random_uuid, 
+                  "transaction_type": transaction[random_txn], 
+                  "account_number": accounts[random_value]["account_number"], 
+                  "status": status[random_status], 
+                  "memo": "{} transaction status is {}. new balance is new balance is ${:.2f}".format(transaction[random_txn], status[random_status], balance)
+                  }
+                  
+              print(json.dumps(transaction))
+              print("### Finished Test Transaction ###")
+              
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps('Test Complete!')
+              }
+
