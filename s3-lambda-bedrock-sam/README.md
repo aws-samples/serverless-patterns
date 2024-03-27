@@ -37,7 +37,7 @@ Amazon Bedrock users need to request access to models before they are available 
 4. During the prompts:
 
    - Enter a stack name. 
-   - Enter the desired AWS Region.
+   - Enter the supported AWS Region where you have enabled Amazon Bedrock access.
    - Leave rest of the options as default.
 
    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
