@@ -1,0 +1,93 @@
+{
+  "title": "Generate blog content from image using Amazon Bedrock Claude v3 sonnet LLM",
+  "description": "This sample project uses Amazon Bedrock Claude V3 sonnet LLM to create a draft blog from an image uploaded into Amazon S3 bucket.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+      "headline": "How it works",
+      "text": [
+          "User uploads an architecture image file into the Amazon S3 input bucket.",
+          "Amazon S3 triggers the AWS Lambda function.",
+          "The AWS Lambda function reads the image file and converts into Base 64 encoded format and calls Amazon Bedrock API for Anthropic Claude V3 Sonnect LLM with the encoded data and prompt to create a blog from it.",
+          "The Amazon Amazon Bedrock API for Anthropic Claude V3 Sonnect LLM generated the blog content and retuns the JSON response.",
+          "THe AWS Lambda function creates a pdf file with the blog content and saves it into an Amazon S3 output bucket."
+      ]
+  },
+  "gitHub": {
+      "template": {
+          "repoURL": "https://serverlessland.com/patterns/s3-lambda-bedrock-sam",
+          "templateURL": "serverless-patterns/s3-lambda-bedrock-sam",
+          "projectFolder": "s3-lambda-bedrock-sam",
+          "templateFile": "template.yaml"
+      }
+  },
+  "resources": {
+      "bullets": [
+          {
+              "text": "Anthropic Claude Messages API",
+              "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages.html"
+          },
+          {
+              "text": "AWS Blog - Anthropic’s Claude 3 Sonnet foundation model",
+              "link": "https://aws.amazon.com/blogs/aws/anthropics-claude-3-sonnet-foundation-model-is-now-available-in-amazon-bedrock/"
+          }
+      ]
+  },
+  "deploy": {
+      "text": [
+          "See the GitHub repo for detailed deployment instructions.",
+          "sam deploy -g",
+          "bash create_lambda_layer.sh"
+      ]
+  },
+  "testing": {
+      "text": [
+          "See the GitHub repo for detailed testing instructions."
+      ]
+  },
+  "cleanup": {
+      "text": [
+          "Delete the Amazon S3 input bucket content: <code>aws s3 rm s3://{MyInputBucketName} --recursive --region {your-region}</code>",
+          "Delete the Amazon S3 output bucket content: <code>aws s3 rm s3://{MyOutputBucketName} --recursive --region {your-region}</code>",
+          "Delete the AWS Lambda layer: <code>bash delete_lambda_layer.sh</code>",
+          "Delete the resources deployed to your AWS account via AWS SAM: <code>sam delete</code>"
+      ]
+  },
+  "authors": [
+      {
+          "name": "Biswanath Mukherjee",
+          "image": "https://d1rwvjey2iif32.cloudfront.net",
+          "bio": "I am a Sr. Solutions Architect working at AWS India.",
+          "linkedin": "biswanathmukherjee"
+      }
+  ],
+  "patternArch": {
+      "icon1": {
+          "x": 20,
+          "y": 50,
+          "service": "s3",
+          "label": "Amazon S3"
+      },
+      "icon2": {
+          "x": 50,
+          "y": 50,
+          "service": "lambda",
+          "label": "AWS Lambda"
+      },
+      "icon3": {
+          "x": 80,
+          "y": 50,
+          "service": "bedrock",
+          "label": "Amazon Bedrock"
+      },
+      "line1": {
+          "from": "icon1",
+          "to": "icon2"
+      },
+      "line2": {
+          "from": "icon2",
+          "to": "icon3"
+      }
+  }
+}
