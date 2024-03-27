@@ -1,6 +1,6 @@
 {
-  "title": "Amazon MQ broker as a producer for a Amazon EventBridge Message Bus using Amazon EventBridge Pipes",
-  "description": "This pattern showcases the use of Amazon EventBridge Pipes to forward events to an Amazon EventBridge custom Message Bus. Using this pattern, events placed on a queue on an Amazon MQ (ActiveMQ) broker are consumed by Amazon EventBridge Pipes which performs a basic transformation and places events on a Amazon EventBridge custom Message Bus. A rule defined on the Amazon EventBridge custom Message Bus writes events received to an Amazon CloudWatch Log Group.",
+  "title": "Amazon MQ to Amazon EventBridge Message Bus using Amazon EventBridge Pipes",
+  "description": "This pattern uses Amazon EventBridge Pipes to forward events produced in Amazon MQ to an Amazon EventBridge custom Message Bus",
   "language": "YAML",
   "level": "200",
   "framework": "Serverless Framework",
@@ -54,7 +54,7 @@
       "name": "Adrian Begg",
       "image": "https://gravatar.com/avatar/f17ca29ef28efd2863147f957426dd88a45a8e497b1a1732aab9673359b1f299.jpg?size=256",
       "bio": "Adrian is a Snr. Specialist Solutions Architect with Amazon Web Services (AWS) based in Germany with a focus on Migration & Modernization.",
-      "linkedin": "https://www.linkedin.com/in/adrian-begg"
+      "linkedin": "adrian-begg"
     }
   ]
 }

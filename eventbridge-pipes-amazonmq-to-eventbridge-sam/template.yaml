@@ -11,7 +11,7 @@ Parameters:
     Description: 'Enter the Amazon Virtual Private Cloud (VPC) ID to host the Amazon MQ instance.'
   MQSubnetId:  
     Type: String
-    Description: 'Enter the Subnet Id to host the Amazon MQ instance. This subnet requires a route to the Public Internet'
+    Description: 'Enter the Subnet Id to host the Amazon MQ instance. This subnet requires a route to the Public Internet. See: https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-mq.html#pipes-mq-vpc-config for details on network requirements.'
   MQQueueName:
     Type: String
     Default: 'app-events'
