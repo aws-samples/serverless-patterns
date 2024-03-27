@@ -7,7 +7,7 @@
 
 This document describes the process to deploy this solution architecture within your own AWS account.  The automation  provided is a CloudFormation YAML template that is divided into two parts:
 
-[Image: CloudWatch to OpenSearch Serverless Architecture - CloudFormation.png]
+[Image: cloudformation_architecture.png]
 1. **Backend Template:** provides the core services to ingest CloudWatch Logs, transform them to JSON objects for OpenSearch, store the logs in an S3 archive, and load into an OpenSearch Serverless Collection
 2. **Frontend Template:** provides an example of how to configure CloudWatch Log Groups with a CloudWatch Subscription to emit logs to Kinesis Data Fireose.  Also includes a test application that generates variety of fake data in JSON format to be able to analyze in OpenSearch Serverless.
 
