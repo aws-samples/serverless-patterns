@@ -1,6 +1,6 @@
-# AWS DynamoDB Streams to Event Bridge using Input Transformer.
+# AWS DynamoDB Streams to Event Bridge using Input Transformer  to unmarshall.
 
-This pattern takes a change data capture event from DynamoDB, removes the data type descriptors and sends the simplified event to an EventBridge bus.
+This pattern takes a change data capture event from DynamoDB, removes the data type descriptors and sends the simplified ('unmarshalled') event to an EventBridge bus.
 
 The key components of this architecture are DynamoDB as source and EventBridge as target, connected by a pipe.
 
