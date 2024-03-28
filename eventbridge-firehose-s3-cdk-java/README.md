@@ -32,6 +32,16 @@ Important: this application uses various AWS services and there are costs associ
 1. Note the S3BucketName in the deployment output. Use this S3 bucket for the testing
 
 ## How it works
+The stack sets up the following components:
+
+1. **EventBridge Bus:** An event bus named "EventBridgeBus" for receiving events.
+2. **EventBridge Rule:** A rule named "EventBridgeRule" that listens for events with the detail type "SaveToS3" on the "EventBridgeBus."
+3. **S3 Bucket:** An S3 bucket with versioning enabled and public access blocked for secure data storage.
+4. **Kinesis Data Firehose Delivery Stream:** A Kinesis Data Firehose delivery stream named "DeliveryStream" that delivers data to the S3 bucket. It performs the following data processing operations:
+   - **Dynamic Partitioning:** Partitions the data in the S3 bucket based on the "DEPARTMENT" field in the event data.
+   - **MetadataExtraction:** Extracts and transforms the "DEPARTMENT" field using a JQ-1.6 query.
+   - **AppendDelimiterToRecord:** Appends a newline character (`\n`) to each record.
+5. **IAM Role:** An IAM role named "FirehoseDeliveryStreamRole" with permissions for Kinesis Data Firehose to write data to the S3 bucket.
 
 When a user sends a message to the EventBridge bus, the message gets routed to the EventBridge rule based on the "DetailType". Then, the EventBridge rule sends the "Detail" field value from the message to the rule target Firehose delivery stream. Once the message reaches the Firehose delivery stream, the JsonParsingEngine processes the message to read the "Department" field value, which is used for the S3 prefix. After message processing, the message gets delivered to the targeted S3 bucket by following the calculated S3 prefix based on the "Department" field value.
 ## Testing
