@@ -1,6 +1,6 @@
 # Amazon EventBridge to Amazon Firehose Delivery Stream to Amazon S3 using Java CDK
 
-This pattern creates EventBridge, Firehose Delivery Stream, and S3 bucket. Apply Firehose DynamicPartitioningConfiguration to parse the input message to extract department value to use it to create S3 partition.
+This pattern creates an event-driven data pipeline using AWS services such as Amazon EventBridge, Amazon Kinesis Data Firehose, and Amazon S3. It is implemented using the AWS Cloud Development Kit (CDK) V2 in Java.
 
 ![Architecture](EventBridge-Firehose-S3.png)
 
@@ -33,8 +33,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-When user send message to EventBridge bus, message will get routed to EventBridge rule based on "DetailType". Then EventBridge rule send "Detail" field value from message to rule target Firehose delivery stream. Once message reach at Firehose delivery stream, message will get process by JsonParsingEngine to read "Department" field value, this value used for S3 prefix. After message processing, message will get delivred to targeted S3 bucket by following calculated S3 prefix based on "Department" field value.
-
+When a user sends a message to the EventBridge bus, the message gets routed to the EventBridge rule based on the "DetailType". Then, the EventBridge rule sends the "Detail" field value from the message to the rule target Firehose delivery stream. Once the message reaches the Firehose delivery stream, the JsonParsingEngine processes the message to read the "Department" field value, which is used for the S3 prefix. After message processing, the message gets delivered to the targeted S3 bucket by following the calculated S3 prefix based on the "Department" field value.
 ## Testing
 
 1. Send message to EventBridge by using command at project root level - 
