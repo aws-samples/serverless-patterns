@@ -46,11 +46,20 @@ By orchestrating these components, we can build a flexible, resilient pipeline t
 
 1. The transformation Lambda function used by Kiensis Data Firehose 
 2. A sample OpenSearch Ingestion configuration for ingesting data from S3
+3. A set of CloudFormation templates to automate deployment of this complete solution
 
 
 ## Deployment Instructions
 
-The following steps explain how to implement this architecture:
+To deploy this entire solution, use the templates and instructions provided in the ![cloudformation](cloudformation) section.  
+This will instantiate all components, including a sample OpenSearch Serverless Collection.  The frontend template will represent
+what is needed to configure an application and it's CloudWatch Log Group to ingest data into OpenSearch.  You may optionally
+modify the backend template to use an existing collection.
+
+
+## Build Instructions
+
+The following steps explain how to implement this architecture from the ground up:
 
 ### 1. Create S3 bucket
 
