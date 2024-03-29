@@ -95,7 +95,7 @@ Response
 4. You should be presented with the following screen.  Chose to **Create index pattern**.
  ![step4](images/iac2.PNG)
 
-5. For index pattern, enter “cloudwatch_logs*” and go to **Next Step.**
+5. For index pattern, enter “**cloudwatch_logs***” and go to **Next Step.**
   ![step5](images/iac3.PNG)
 
 6. Choose the **@timestamp** field for the Time field.  This corresponds to the ingestion timestamp added during OpenSearch Ingestion.  Choose **Create index pattern**.  Note that you will be presented with all the objects found in the index, including those customer, account, and transaction fields.
