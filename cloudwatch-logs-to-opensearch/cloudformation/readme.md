@@ -23,7 +23,7 @@ Follow these installation steps to build this solution architecture in your own 
 
 ![Backend Template](cloudwatch-to-opensearch-backend-v4.yml)
 
-![Frontend Template](cloudwatch-to-opensearch-frontend-v2.yml)
+![Frontend Template](cloudwatch-to-opensearch-frontend-v1.yml)
 
 
 
