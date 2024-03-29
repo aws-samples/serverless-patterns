@@ -79,7 +79,7 @@ Response
 
 ```
 
-6. After a minute, check the **S3 bucket** created (named **clooudwatch-logs-to-osis**-<random value>).  There should be a folder structure in the bucket based on the time of the logs.  Follow it down to see the processed log file.  
+6. After a minute, check the **S3 bucket** created (named **cloudwatch-logs-to-osis**-<random value>).  There should be a folder structure in the bucket based on the time of the logs.  Follow it down to see the processed log file.  
 7. Run the test multiple times to get log data generated for ingestion into OpenSearch.  Each run will generate pseudo-random data based on four fictional customers.
 
 
