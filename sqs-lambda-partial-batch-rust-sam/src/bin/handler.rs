@@ -29,7 +29,7 @@ pub async fn function_handler(event: LambdaEvent<SqsEvent>) -> Result<Value, Err
 
         tasks.push(tokio::spawn(async move {
             if let Some(body) = &record.body {
-                let request = serde_json::from_str::<MyStruct>(&body);
+                let request = serde_json::from_str::<MyStruct>(body);
                 if let Ok(request) = request {
                     do_something(&request).await.map_or_else(
                         |_e| {
@@ -59,9 +59,9 @@ pub async fn function_handler(event: LambdaEvent<SqsEvent>) -> Result<Value, Err
             .clone()
             .into_iter()
             .map(|message_id| {
-                return ItemIdentifier {
+                ItemIdentifier {
                     item_identifier: message_id,
-                };
+                }
             })
             .collect(),
     };
