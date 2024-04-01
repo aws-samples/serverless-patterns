@@ -28,11 +28,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     dotnet build
     ```
-4. Return one level back to the path `textract-lambda-cdk-dotnet/cdk`
-    ```
-    cd..
-    ```
-5. Deploy the stack to your default AWS account and region.
+4. Deploy the stack to your default AWS account and region.
     ```
     cdk deploy
     ```
@@ -40,9 +36,11 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 When images are inserted into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Textract service, which extracts text from the image and stores it in the S3 bucket.
 
+![pattern](images/pattern.png)
+
 ## Testing
 
-After deployment, add an image to the `input/` folder of Amazon S3 bucket. After few seconds, check the `Output/` folder of S3 bucket for extracted text.
+After deployment, add an image to the `input/` folder of Amazon S3 bucket. After few seconds, check the `output/` folder of S3 bucket for extracted text.
 
 ## Cleanup
 Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
