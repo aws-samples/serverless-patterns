@@ -36,6 +36,8 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 When images are inserted into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Textract service, which extracts text from the image and stores it in the S3 bucket.
 
+![pattern](Images/pattern.png)
+
 ## Testing
 
 After deployment, add an image to the `input/` folder of Amazon S3 bucket. After few seconds, check the `output/` folder of S3 bucket for extracted text.
