@@ -1,5 +1,5 @@
 use lambda_http::{
-    http::StatusCode, run, service_fn, Error, IntoResponse, Request, RequestExt, Response,
+    http::StatusCode, run, service_fn, Error, IntoResponse, Request, RequestPayloadExt, Response
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;

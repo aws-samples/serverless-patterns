@@ -9,13 +9,13 @@ name = "handler"
 path = "src/bin/handler.rs"
 
 [dependencies]
-aws_lambda_events = { version = "0.7", default-features = false, features = ["dynamodb"] }
-aws-types = "0.54"
-aws-config = "0.54"
-aws-sdk-eventbridge = "0.24"
-lambda_runtime = "0.7"
+aws_lambda_events = { version = "0.15", default-features = false, features = ["dynamodb"] }
+aws-types = "1"
+aws-config = {version = "1", features = ["behavior-version-latest"] }
+aws-sdk-eventbridge = "1"
+lambda_runtime = "0.11"
 serde_json = "1"
 serde = {version = "1.0", features = ["derive"] }
 tokio = { version = "1", features = ["macros"] }
 tracing-subscriber = { version = "0.3", features = ["fmt", "json"] }
-typed-builder = "0.12"
+typed-builder = "0.18"
