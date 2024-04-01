@@ -1,4 +1,4 @@
-use aws_sdk_rekognition::model::Image;
+use aws_sdk_rekognition::types::Image;
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use serde::{Deserialize, Serialize};
 
@@ -25,7 +25,7 @@ pub async fn function_handler(
 ) -> Result<(), Error> {
     println!("{:?}", event);
 
-    let s3_object = aws_sdk_rekognition::model::S3Object::builder()
+    let s3_object = aws_sdk_rekognition::types::S3Object::builder()
         .bucket(event.payload.bucket.name)
         .name(event.payload.object.key)
         .build();
@@ -34,11 +34,13 @@ pub async fn function_handler(
 
     let result = client.detect_text().image(params).send().await?;
 
-    if let Some(text_detections) = result.text_detections() {
-        for text_detection in text_detections.into_iter().filter(|x| x.parent_id == None) {
-            println!("{:?}", text_detection);
-        }
-    } else {
+    let text_detections = result.text_detections();
+
+    for text_detection in text_detections.iter().filter(|x| x.parent_id.is_none()) {
+        println!("{:?}", text_detection);
+    }
+
+    if text_detections.is_empty() {
         println!("No text detected");
     }
 

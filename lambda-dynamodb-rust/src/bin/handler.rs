@@ -1,4 +1,4 @@
-use aws_sdk_dynamodb::model::AttributeValue;
+use aws_sdk_dynamodb::types::AttributeValue;
 use chrono::Utc;
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use serde_json::Value;
@@ -32,7 +32,7 @@ pub async fn function_handler(
         .put_item()
         .table_name(table)
         .item("ID", AttributeValue::S(Utc::now().timestamp().to_string()))
-        .item("metadata", AttributeValue::S(metadata.into()))
+        .item("metadata", AttributeValue::S(metadata))
         .send()
         .await?;
 
