@@ -1,0 +1,47 @@
+{
+  "title": "Amazon S3 to AWS SQS",
+  "description": "This pattern is a Java CDK example that Sends notifications from S3 to SQS when an object is created..",
+  "language": "Java",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["This CDK stack creates an S3 bucket, allows you to upload objects to that bucket, and will send notifications from S3 to SQS when an object is created in that bucket."]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-sqs-cdk-java",
+      "projectFolder": "s3-sqs-cdk-java",
+      "templateFile": "src/main/java/com/myorg/S3ToSqsStack.java",
+      "templateURL": "serverless-patterns/s3-sqs-cdk-java"
+    }
+  },
+  "resources": {
+    "bullets": [
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Matt Ridehalgh",
+      "image": "https://avatars.githubusercontent.com/u/9155962",
+      "bio": "Matt Ridehalgh is a Solutions Architect at AWS.",
+      "linkedin": "matthew-ridehalgh",
+      "twitter": "mrideh"
+    }
+  ]
+}
