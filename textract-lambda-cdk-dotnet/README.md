@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change the working directory to this pattern's directory
     ```
-    cd textract-lambda-cdk-dotnet/cdk/
+    cd textract-lambda-cdk-dotnet/Cdk/
     ```
 3. Build the application
     ```
@@ -34,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 
 ## How it works
-When images are inserted into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Textract service, which extracts text from the image and stores it in the S3 bucket.
+When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Textract service, which extracts text from the image and stores it in the S3 bucket.
 
 ![pattern](Images/pattern.png)
 

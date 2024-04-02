@@ -4,6 +4,8 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.Textract;
 using Amazon.Textract.Model;
+using System.Text.Json.Serialization;
+using Amazon.S3.Util;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -31,8 +33,8 @@ public class Function
             try
             {
                 var bucketName = s3Event.Bucket.Name;
-                var objectKey = s3Event.Object.Key;
-                context.Logger.LogInformation($"Document ready to process. BucketName : {s3Event.Bucket.Name} ObjectKey {s3Event.Object.Key}");
+                var objectKey = System.Web.HttpUtility.UrlDecode(s3Event.Object.Key);
+                context.Logger.LogInformation($"Document ready to process. BucketName : {bucketName} ObjectKey {objectKey}");
                 var response = await _textractClient.DetectDocumentTextAsync(new DetectDocumentTextRequest
                 {
                     Document = new Document
