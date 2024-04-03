@@ -1,4 +1,4 @@
-# SQS to Step Functions Workflow using EventBridge Pipes
+# Amazon SQS to AWS Step Functions Workflow using Amazon EventBridge Pipes
 
 This pattern demonstrates sending SQS messages directly to a Step Functions workflow using EventBridge Pipes.
 
