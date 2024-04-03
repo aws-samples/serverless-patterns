@@ -1,4 +1,4 @@
-# SQS to EventBridge Bus using EventBridge Pipes
+# Amazon SQS to Amazon EventBridge Bus using Amazon EventBridge Pipes
 
 This pattern demonstrates sending SQS messages directly to EventBridge bus using EventBridge Pipes.
 
@@ -11,8 +11,8 @@ Important: this application uses various AWS services and there are costs associ
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-
+- [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) installed and configured
+  
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
