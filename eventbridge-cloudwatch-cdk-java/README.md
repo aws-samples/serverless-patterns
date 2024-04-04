@@ -41,7 +41,7 @@ Important: this application uses various AWS services and there are costs associ
 
 The CDK stack deploys the resources and the IAM permissions required to run the application.
 
-The EventBridge rule filters the events based upon the defined criteria. When matching events are sent to EventBridge that trigger the rule, they are published to the CloudWatch Logs Group.
+The EventBridge rule filters the events based upon the defined criteria. Matched events are published to the CloudWatch Logs log group.
 
 ## Testing
 
