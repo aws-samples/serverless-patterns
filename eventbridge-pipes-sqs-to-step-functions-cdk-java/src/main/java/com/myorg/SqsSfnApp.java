@@ -7,7 +7,7 @@ public class SqsSfnApp {
     public static void main(final String[] args) {
         App app = new App();
 
-        new SqsSfnStack(app, "SqsSfnStack", StackProps.builder()
+        new SqsSfnStack(app, "SqsSfnStack", StackProps.builder().description("(uksb-1tthgi812) (tag:eventbridge-pipes-sqs-sfn-cdk-java")
                 // If you don't specify 'env', this stack will be environment-agnostic.
                 // Account/Region-dependent features and context lookups will not work,
                 // but a single synthesized template can be deployed anywhere.
