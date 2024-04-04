@@ -37,7 +37,7 @@ Important: this application uses various AWS services and there are costs associ
    ```bash
    cdk deploy
    ```
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+5. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
