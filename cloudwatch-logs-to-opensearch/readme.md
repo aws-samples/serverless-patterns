@@ -33,8 +33,8 @@ The architecture diagram below illustrates how these services work together:
 
 ![Architecture diagram](architecture.png)
 
-1. CloudWatch Logs sends log data to Kinesis Data Firehose  
-2. Kinesis Data Firehose buffers the data, triggers Lambda to transform the log data, and delivers it to S3
+1. CloudWatch Logs sends log data to Amazon Data Firehose  
+2. Amazon Data Firehose buffers the data, triggers Lambda to transform the log data, and delivers it to S3
 3. S3 notifications are sent to SQS when new log files are added  
 4. SQS triggers OpenSearch Ingestion to ingest new data
 5. OpenSearch Ingestion pulls transformed logs from S3 and loads into OpenSearch
@@ -63,7 +63,7 @@ The following steps explain how to implement this architecture from the ground u
 
 ### 1. Create S3 bucket
 
-Create an S3 bucket to serve as intermediate storage for the log files. Kinesis Data Firehose will deliver logs here before they are processed and loaded into OpenSearch.
+Create an S3 bucket to serve as intermediate storage for the log files. Amazon Data Firehose will deliver logs here before they are processed and loaded into OpenSearch.
 
 ### 2. Create SQS queue
 
@@ -79,19 +79,19 @@ Deploy the Lambda function that will process and transform the log files into op
 
 ### 5. Create IAM roles  
 
-Create IAM roles and policies to allow access between the services. For example, Kinesis Data Firehose will need access to write to S3.
+Create IAM roles and policies to allow access between the services. For example, Amazon Data Firehose will need access to write to S3.
 
 ### 6. Configure OpenSearch Ingestion  
 
 Create an OpenSearch Ingestion pipeline that is triggered by the SQS queue and pulls log files from S3 to ingest into OpenSearch.
 
-### 7. Create Kinesis Data Firehose stream
+### 7. Create Amazon Data Firehose stream
 
-Create a Kinesis Data Firehose stream to receive log data from CloudWatch Logs and buffer/deliver it to the S3 bucket.
+Create a Amazon Data Firehose stream to receive log data from CloudWatch Logs and buffer/deliver it to the S3 bucket.
 
 ### 8. Create CloudWatch Logs subscription
 
-Create a CloudWatch Logs subscription to send log data to the Kinesis Data Firehose stream. Apply filters as needed.
+Create a CloudWatch Logs subscription to send log data to the Amazon Data Firehose stream. Apply filters as needed.
 
 ### 9. Monitor pipeline 
 
@@ -103,9 +103,9 @@ This implements the architecture in an automated, scalable serverless pipeline.
 
 Here are the key points on how the service interactions work in this architecture:
 
-- CloudWatch Logs collects and streams the log data. Subscription filters route specific log streams to Kinesis Data Firehose.
+- CloudWatch Logs collects and streams the log data. Subscription filters route specific log streams to Amazon Data Firehose.
 
-- Kinesis Data Firehose buffers the incoming log streams and delivers them to S3. This handles reliable delivery at scale.
+- Amazon Data Firehose buffers the incoming log streams and delivers them to S3. This handles reliable delivery at scale.
 
 - A Lambda function is configured in the Firehose delivery stream to transform the log records into the JSON format required by OpenSearch. 
 
