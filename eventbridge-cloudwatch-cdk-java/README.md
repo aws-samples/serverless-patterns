@@ -53,7 +53,7 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a test event to EventBrid
 aws events put-events --entries file://event.json
 ```
 
-2. Check the CloudWatch Logs, referencing the log group name from the Outputs section of the deployed Stack, to see an event matching this example:
+2. Check CloudWatch Logs, referencing the log group name from the stack's Outputs section, to see an event matching this example:
 ```json
 {
     "Version": "0",
