@@ -1,5 +1,5 @@
 {
-  "title": "API Gateway to Step Functions",
+  "title": "API Gateway HTTP API to Step Functions",
   "description": "Create an API Gateway HTTP APIs endpoint that starts a Step Functions synchronous Express Workflow.",
   "language": "Java",
   "level": "300",
@@ -7,14 +7,14 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern explains how to deploy a CDK application with Amazon API Gateway that invokes a syncronous Step Functions workflow."
+      "This pattern explains how to deploy a CDK application with Amazon API Gateway that invokes a synchronous Step Functions workflow."
     ]
   },
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-step-functions-express-java",
       "projectFolder": "apigw-http-api-step-functions-express-java",
-      "templateFile": "apigw-http-api-step-functions-express-java/src/main/java/com/myorg/HttpApiGatewayStepFunctionsStack.java",
+      "templateFile": "src/main/java/com/myorg/HttpApiGatewayStepFunctionsStack.java",
       "templateURL": "serverless-patterns/apigw-http-api-step-functions-express-java"
     }
   },
