@@ -15,17 +15,17 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Key Components 
 
-- **CloudWatch Logs** - collects and stores log data
+- **Amazon CloudWatch Logs** - collects and stores log data
 
-- **Kinesis Data Firehose** - buffers and delivers streaming log data 
+- **Amazon Data Firehose** - buffers and delivers streaming log data 
 
-- **S3** - provides temporary storage for log files
+- **Amazon S3** - provides temporary storage for log files
 
-- **SQS** - queues notifications when new log files are ready  
+- **Amazon SQS** - queues notifications when new log files are ready  
 
-- **Lambda** - transforms log data into optimal JSON format for OpenSearch
+- **AWS Lambda** - transforms log data into optimal JSON format for OpenSearch
 
-- **OpenSearch Ingestion** - managed service to pull log files from S3 and ingest into OpenSearch
+- **Amazon OpenSearch Ingestion** - managed service to pull log files from S3 and ingest into OpenSearch
 
 ## Architecture
 
