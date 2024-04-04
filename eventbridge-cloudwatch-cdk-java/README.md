@@ -1,6 +1,6 @@
 # Amazon EventBridge to Amazon CloudWatch
 
-This project contains a sample AWS CDK template to create an EventBridge Rule, as well as, a CloudWatch Logs Group. The EventBridge Rule publishes matched events to CloudWatch Logs. In this example, the rule filters for specific attributes in the event before sending to the CloudWatch Logs target.
+This project contains a sample AWS CDK template to create an EventBridge Rule and a CloudWatch Logs log group. The EventBridge Rule publishes matched events to the log group. In this example, the rule filters for specific attributes in the event before sending to the target.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-cloudwatch-cdk-java.
 
