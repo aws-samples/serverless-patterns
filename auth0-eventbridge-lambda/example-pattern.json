@@ -1,0 +1,67 @@
+{
+  "title": "Auth0 EvenBridge SaaS Integration to AWS Lambda",
+  "description": "Use the Amazon EventBridge Auth0 SaaS integration to process failed login attempts with AWS Lambda, and notify users with Amazon SES.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use the Auth0 Amazon EventBridge SaaS integration and AWS Lambda to process events from Auth0. This pattern is leveraging the Auth0 Amazon EventBridge SaaS integration to send login events from the customer's Auth0 account to their AWS account, via an Amazon EventBridge Partner event bus.",
+      "Once the Auth0 events are in the customer's account, an Amazon EventBridge rule routes suspicious login events to a downstream Lambda function. The lambda function processes the suspicious login event, and depending on customer needs, can transform the event, archive it, or even send notification emails to customers using Amazon SES.",
+      "Amazon CloudWatch Log Groups are provisioned for debugging and auditing.",
+      "This pattern deploys two EventBridge Rules, one Lambda function, and two CloudWatch Log Groups."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/auth0-eventbridge-lambda",
+      "templateURL": "serverless-patterns/auth0-eventbridge-lambda",
+      "projectFolder": "auth0-eventbridge-lambda",
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge SaaS Integrations",
+        "link": "https://aws.amazon.com/eventbridge/integrations/"
+      },
+      {
+        "text": "AmazonEventBridge SaaS Integrations Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html"
+      },
+      {
+        "text": "Auth0's Amazon EventBridge SaaS Integration",
+        "link":"https://marketplace.auth0.com/integrations/amazon-log-streaming"
+      },
+      {
+        "text": "Get More out of your Auth0 Logs with Amazon EventBridge",
+        "link": "https://auth0.com/blog/get-more-out-of-your-auth0-logs-with-amazon-eventbridge/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Maya Flores",
+      "image": "https://media.licdn.com/dms/image/D5603AQHuz3YPHpqv3A/profile-displayphoto-shrink_400_400/0/1687994880319?e=1715817600&v=beta&t=k1halGP4aj9_qepchczV4aoHU3H9IckjzoFK8iAa5kg",
+      "bio": "Partner Solutions Architect @ AWS. Serverless enthusiast.",
+      "linkedin": "maya-m-flores"
+    }
+  ]
+}

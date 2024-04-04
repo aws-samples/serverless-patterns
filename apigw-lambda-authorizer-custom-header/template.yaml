@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Serverless Pattern - Amazon API Gateway using Lambda Authorizer and Mapping Template to inject customer HTTP headers
+Description: Serverless Pattern - Amazon API Gateway using Lambda Authorizer and Mapping Template to inject customer HTTP headers (uksb-1tthgi812) (tag:apigw-lambda-authorizer-custom-header)
 Transform: AWS::Serverless-2016-10-31
 Globals:
   Function:

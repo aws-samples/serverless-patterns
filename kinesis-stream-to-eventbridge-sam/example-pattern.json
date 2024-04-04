@@ -1,0 +1,61 @@
+{
+  "title": "Kinesis Stream to EventBridge using EventBridge Pipes",
+  "description": "This pattern creates an EventBridge Pipe which consumes messages from Amazon Kinesis Stream and places events on an Amazon EventBridge custom Bus.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an EventBridge Pipe to connect Kinesis Stream with EventBridge custom Bus." ,
+      "This pattern deploys one Kinesis Stream, EventBridge Pipe, EventBridge custom Bus and an IAM role used by the Pipe."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-stream-to-eventbridge-sam",
+      "templateURL": "serverless-patterns/kinesis-stream-to-eventbridge-sam",
+      "projectFolder": "kinesis-stream-to-eventbridge-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes with Kinesis stream as a source",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kinesis.html"
+      },
+      {
+        "text": "CloudFormation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Deploy the stack : <code>sam deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Chaitanya Gummadi",
+      "image": "https://gravatar.com/avatar/a9b30c6e727f613f3f44a44016e36998719404ea7451c750f402a21f2dd72937.jpg?size=256",
+      "bio": "Chaitanya is a Sr. Cloud Support Engineer with Amazon Web Services ( AWS) based in Texas.",
+      "linkedin": "cgummadi"
+    }
+  ]
+}

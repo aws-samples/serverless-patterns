@@ -208,7 +208,7 @@ resource "aws_lb_listener_rule" "example_rule2" {
 # Create the Lambda Function
 resource "aws_lambda_function" "lambda_function1" {
   function_name = "lambdaFunction-service1"
-  runtime       = "nodejs14.x"
+  runtime       = "nodejs20.x"
   handler       = "index.handler"
   filename      = "Lambda1.zip"
   role          = aws_iam_role.lambda_role.arn
@@ -221,7 +221,7 @@ resource "aws_lambda_function" "lambda_function1" {
 # Create the Lambda Function
 resource "aws_lambda_function" "lambda_function2" {
   function_name = "lambdaFunction-service2"
-  runtime       = "nodejs14.x"
+  runtime       = "nodejs20.x"
   handler       = "index.handler"
   filename      = "Lambda2.zip"
   role          = aws_iam_role.lambda_role.arn

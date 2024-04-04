@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  api-gateway-custom-domain
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  ApiName:
+    Type: String
+    Default: "sample-api"
+  Stage:
+    Type: String
+    Default: "v1"
+  Env:
+    Type: String
+    Description: Environment in which the application will be deployed.
+    Default: "dev"
+  Domain:
+    Type: String
+    Default: "dev.sample.com"
+  ACMCertificate:
+    Type: String
+    Default: "/api-gateway-custom-domain/CertArn"
+  ACMRegion:
+    Type: String
+    Default: "us-east-1"
+  HostedZoneId:
+    Type: String
+    Default: none
+
+Resources:
+  SSMGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sam-custom-resources/GetSSMCertificate
+      Handler: GetSSMCertificate.handler
+      Runtime: python3.11
+      Policies:
+        - AmazonSSMReadOnlyAccess
+        - AmazonRoute53ReadOnlyAccess
+#Get Certificate ARN from parameter store in us-east-1 with a custom resource
+#Get HostedZoneId from DomainName with a custom resource
+  GetSSMParameters:
+    Type: Custom::GetSSMParameters
+    Properties:
+      ServiceToken: !GetAtt SSMGetFunction.Arn
+      Region: !Ref "AWS::Region"
+      Certificate: !Ref ACMCertificate
+      ACMRegion: !Ref ACMRegion
+      DomainName: !Ref Domain
+
+#API Gateway
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${Env}-${ApiName}"
+      StageName: !Ref Stage
+      OpenApiVersion: '2.0'
+      Domain:
+        DomainName: !Sub "${ApiName}.${Domain}"
+        CertificateArn: !GetAtt GetSSMParameters.ACMCertificate
+        EndpointConfiguration: EDGE
+        Route53:
+          HostedZoneId: !GetAtt GetSSMParameters.HostedZoneId
+
+#Lambdas
+  SampleLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Env}-${ApiName}"
+      CodeUri: sample-app/hello_world
+      Handler: app.handler
+      Runtime: python3.11
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /hello
+            Method: GET
+      Architectures:
+        - arm64
+    DependsOn: GetSSMParameters

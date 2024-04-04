@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: REST API with CloudWatch execution and access logs enabled.
+Description: REST API with CloudWatch execution and access logs enabled. (uksb-1tthgi812) (tag:apigw-execution-access-logs)
 
 Globals:
   Api:

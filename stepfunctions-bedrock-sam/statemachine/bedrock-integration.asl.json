@@ -1,0 +1,28 @@
+{
+  "Comment": "This state machine demonstrates the integration with Amazon Bedrock Anthropic Claude v2.1 Model",
+  "StartAt": "Bedrock InvokeModel",
+  "States": {
+    "Bedrock InvokeModel": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrock:invokeModel",
+      "Parameters": {
+        "ModelId": "${ModelId}",
+        "Body": {
+          "prompt.$": "$.prompt",
+          "max_tokens_to_sample": 200
+        }
+      },
+        "Retry": [
+          {
+              "ErrorEquals": [
+                  "States.TaskFailed"
+              ],
+              "IntervalSeconds": 20,
+              "MaxAttempts": 5,
+              "BackoffRate": 10
+          }
+      ],
+      "End": true
+    }
+  }
+}

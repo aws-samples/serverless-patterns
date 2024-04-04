@@ -1,4 +1,4 @@
-use aws_sdk_s3::types::ByteStream;
+use aws_sdk_s3::primitives::ByteStream;
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use serde_json::Value;
 

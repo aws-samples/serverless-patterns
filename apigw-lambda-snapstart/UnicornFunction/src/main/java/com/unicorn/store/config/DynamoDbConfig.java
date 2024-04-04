@@ -7,33 +7,33 @@ import com.unicorn.store.model.Unicorn;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.core.SdkSystemSetting;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-import software.amazon.awssdk.http.crt.AwsCrtAsyncHttpClient;
+import software.amazon.awssdk.http.crt.AwsCrtHttpClient;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 @Configuration
 public class DynamoDbConfig {
 
     @Bean
-    public DynamoDbAsyncClient dynamoDbAsyncClient() {
-        return DynamoDbAsyncClient.builder()
+    public DynamoDbClient dynamoDbClient() {
+        return DynamoDbClient.builder()
                 .region(Region.of(System.getenv(SdkSystemSetting.AWS_REGION.environmentVariable())))
-                .httpClientBuilder(AwsCrtAsyncHttpClient.builder())
+                .httpClientBuilder(AwsCrtHttpClient.builder())
                 .build();
     }
 
     @Bean
-    public DynamoDbEnhancedAsyncClient dynamoDbEnhancedClient(DynamoDbAsyncClient dynamoDbAsyncClient) {
-        return DynamoDbEnhancedAsyncClient.builder()
-                .dynamoDbClient(dynamoDbAsyncClient)
+    public DynamoDbEnhancedClient dynamoDbEnhancedClient(DynamoDbClient dynamoDbClient) {
+        return DynamoDbEnhancedClient.builder()
+                .dynamoDbClient(dynamoDbClient)
                 .build();
     }
 
     @Bean
-    public DynamoDbAsyncTable<Unicorn> unicornDynamoDbAsyncTable(DynamoDbEnhancedAsyncClient dynamoDbEnhancedClient) {
+    public DynamoDbTable<Unicorn> unicornDynamoDbTable(DynamoDbEnhancedClient dynamoDbEnhancedClient) {
         return dynamoDbEnhancedClient.table(System.getenv("UNICORN_TABLE_NAME"), TableSchema.fromClass(Unicorn.class));
     }
 }

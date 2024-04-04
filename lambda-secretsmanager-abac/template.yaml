@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 Transform: AWS::Serverless-2016-10-31
 
-Description: Sample Lambda function that uses attribute-based access control for access to Secrets Manager
+Description: Sample Lambda function that uses attribute-based access control for access to Secrets Manager (uksb-1tthgi812) (tag:lambda-secretsmanager-abac)
 
 Parameters:
   SecretName:

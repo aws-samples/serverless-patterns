@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT-0
 
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Kinesis event filtering for Lambda demo stack
+Description: Kinesis event filtering for Lambda demo stack (uksb-1tthgi812) (tag:lambda-esm-kinesis-filters-sam)
 
 Transform: AWS::Serverless-2016-10-31
 

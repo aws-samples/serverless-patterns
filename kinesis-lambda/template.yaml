@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: AWS Kinesis Data Stream to AWS Lambda
+Description: AWS Kinesis Data Stream to AWS Lambda (uksb-1tthgi812) (tag:kinesis-lambda)
 
 Resources:
   # Define an AWS Kinesis Data Stream

@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
-Description: Serverless Reminders Application with Event Bridge Scheduler
+Description: Serverless Reminders Application with Event Bridge Scheduler (uksb-1tthgi812) (tag:apigw-dynamodb-lambda-scheduler-ses-auto-deletion-sam)
 
 Parameters:
   SenderEmailAddress:

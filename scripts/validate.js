@@ -23,8 +23,8 @@ const customValidate = async (patternFile) => {
 
   const { gitHub: { template: { repoURL, templateURL, projectFolder, templateFile } = {} } = {} } = patternFile;
 
-  if(templateFile.includes(projectFolder)){
-    errors.push(new ValidationError('Please remove the projectFolder value from the templateFile', null, null, 'gitHub.template.templateURL'))
+  if (templateFile.includes(projectFolder)) {
+    errors.push(new ValidationError('Please remove the projectFolder value from the templateFile', null, null, 'gitHub.template.templateURL'));
   }
 
   // Check to make sure there is a validate path to this file.
@@ -111,8 +111,8 @@ const main = async () => {
 
     const mergedErrors = [...result.errors, ...resultsWithCustomValidation];
 
-    console.log('Result errors', result.errors)
-    console.log('Custom errors', resultsWithCustomValidation)
+    console.log('Result errors', result.errors);
+    console.log('Custom errors', resultsWithCustomValidation);
 
     if (mergedErrors.length > 0) {
       const errors = buildErrors(mergedErrors);
@@ -153,12 +153,38 @@ const main = async () => {
       console.info('Errors found: Added comments back to the pull request requesting changes');
     } else {
       if (githubAutomation) {
-        await octokit.rest.issues.addLabels({
-          owner,
-          repo,
-          issue_number: process.env.PR_NUMBER,
-          labels: ['valid-example-pattern-file'],
-        });
+        try {
+          await octokit.rest.issues.addLabels({
+            owner,
+            repo,
+            issue_number: process.env.PR_NUMBER,
+            labels: ['valid-example-pattern-file'],
+          });
+
+          const pullRequestInfo = await octokit.rest.pulls.get({
+            owner,
+            repo,
+            pull_number: process.env.PR_NUMBER,
+          });
+
+          const forkOwner = pullRequestInfo.data.head.repo.full_name;
+          const forkRepo = pullRequestInfo.data.head.ref;
+          const forkURL = `https://github.com/${forkOwner}/tree/${forkRepo}`;
+
+          await octokit.rest.issues.createComment({
+            owner,
+            repo,
+            issue_number: process.env.PR_NUMBER,
+            body:
+              `Valid pattern file found. \n\n` +
+              `Reviewer you can view the [pattern file here](https://beta.serverlessland.com/patterns/sandbox?repo=${encodeURIComponent(forkURL)}&pattern=${encodeURIComponent(JSON.stringify(parsedJSON))}) \n\n`,
+          });
+        } catch (error) {
+
+          console.info(`Failed generating preview. Error - ${JSON.stringify(error)}`)
+
+        }
+
 
         try {
           // try and remove labels if they are there, will error if not, but that's OK.

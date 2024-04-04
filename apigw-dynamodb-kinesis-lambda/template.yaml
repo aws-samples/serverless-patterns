@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: An Amazon API Gateway REST API that integrates with an Amazon DynamoDB table.
+Description: An Amazon API Gateway REST API that integrates with an Amazon DynamoDB table. (uksb-1tthgi812) (tag:apigw-dynamodb-kinesis-lambda)
 Parameters:
   AppName:
     Type: String

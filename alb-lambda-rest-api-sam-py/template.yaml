@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Lambda REST API and Amazon ALB with Listener Rules (uksb-1tthgi812) (tag:alb-lambda-rest-api-sam-py)
+Parameters:
+  VPCId:
+    Type: String
+    Default: VPC_ID
+  Subnets:
+    Type: String
+    Default: subnet-1,subnet-2,subnet-3
+  AppName:
+    Type: String
+    Default: alb-lambda-rest-api-sam-py
+  AlbLambdaRestApiSamPyFunctionRulePath:
+    Type: String
+    Default: /hello
+  AlbLambdaRestApiSamPyFunctionPriority:
+    Type: Number
+    Default: 10
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Tracing: Active
+    Environment:
+      Variables:
+        POWERTOOLS_SERVICE_NAME: alb-lambda-rest-api-sam-py
+        POWERTOOLS_LOG_LEVEL: INFO
+  Api:
+    TracingEnabled: true
+Resources:
+  AlbLambdaRestApiSamPyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src.app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Policies:
+        - AWSLambdaBasicExecutionRole
+
+  AlbLambdaRestApiSamPyFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt AlbLambdaRestApiSamPyFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com
+
+  AlbLambdaRestApiSamPyFunctionLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub ${AppName}-alb
+      Type: application
+      Scheme: internet-facing
+      Subnets:
+        Fn::Split:
+          - ","
+          - !Ref Subnets
+      SecurityGroups: [ !Ref AlbLambdaRestApiSamPyFunctionSecurityGroup ]
+      Tags:
+        - Key: name
+          Value: !Ref AWS::StackName
+
+  AlbLambdaRestApiSamPyFunctionTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: AlbLambdaRestApiSamPyFunctionPermission
+    Properties:
+      Name: !Sub ${AppName}-tg
+      HealthCheckEnabled: false
+      TargetType: lambda
+      Targets:
+        - Id: !GetAtt AlbLambdaRestApiSamPyFunction.Arn
+      Tags:
+        - Key: name
+          Value: !Ref AWS::StackName
+
+  HttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            ContentType: text/plain
+            MessageBody: 404 Error!!! Page Not Found
+            StatusCode: 404
+      LoadBalancerArn: !Ref AlbLambdaRestApiSamPyFunctionLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  AlbLambdaRestApiSamPyFunctionHttpListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - TargetGroupArn: !Ref AlbLambdaRestApiSamPyFunctionTargetGroup
+          Type: forward
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - !Ref AlbLambdaRestApiSamPyFunctionRulePath
+      ListenerArn: !Ref HttpListener
+      Priority: !Ref AlbLambdaRestApiSamPyFunctionPriority
+
+  AlbLambdaRestApiSamPyFunctionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Ref AWS::StackName
+      GroupDescription: Allow http on port 80
+      VpcId: !Ref VPCId
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: name
+          Value: !Ref AWS::StackName
+
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+
+Outputs:
+  AlbLambdaRestApiSamPyFunction:
+    Description: ALB Lambda SAM Python Sample Lambda Function ARN
+    Value: !GetAtt AlbLambdaRestApiSamPyFunction.Arn
+  AlbLambdaRestApiSamPyFunctionIamRole:
+    Description: Implicit IAM Role created for ALB Lambda SAM Python Sample Lambda function
+    Value: !GetAtt AlbLambdaRestApiSamPyFunctionRole.Arn
+  DNSName:
+    Value: !GetAtt AlbLambdaRestApiSamPyFunctionLoadBalancer.DNSName

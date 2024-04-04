@@ -1,0 +1,225 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Template for a Lambda function with DocumentDB Event Source Mapping'
+
+# Paramters input
+Parameters: 
+  DBClusterName: 
+    Default: "MyCluster"
+    Description : "Cluster name"
+    Type: "String"
+    MinLength: "1"
+    MaxLength: "64"
+    AllowedPattern : "[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*"
+    ConstraintDescription : "Must begin with a letter and contain only alphanumeric characters."
+
+  DBInstanceName: 
+    Default: "MyInstance"
+    Description : "Instance name"
+    Type: "String"
+    MinLength: "1"
+    MaxLength: "64"
+    AllowedPattern : "[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*"
+    ConstraintDescription : "Must begin with a letter and contain only alphanumeric characters."
+
+  DBInstanceClass:
+    Description : "Instance class. Please refer to: https://docs.aws.amazon.com/documentdb/latest/developerguide/db-instance-classes.html#db-instance-classes-by-region"
+    Type: "String"
+    Default: "db.t3.medium"
+    AllowedValues:
+      - db.t3.medium
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+      - db.r5.12xlarge
+      - db.r5.24xlarge                             
+    ConstraintDescription : "Instance type must be of the ones supported for the region. Please refer to: https://docs.aws.amazon.com/documentdb/latest/developerguide/db-instance-classes.html#db-instance-classes-by-region"  
+  
+  VPCId: 
+    Description : "VPC ID where you want the resources to be created"
+    Type: "String"
+
+  SubnetId1: 
+    Description : "Private Subnet ID of the mentioned VPC"
+    Type: "String"
+
+  SubnetId2: 
+    Description : "Private Subnet ID of the mentioned VPC"
+    Type: "String"
+
+  SecretUserName:
+    Description : "Username for the Secrets Manager and DocDB Cluster. Should not contain 'admin'"
+    Type: "String"
+    AllowedPattern : "[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*"
+
+  SecretPassword:
+    Description : "Password for the Secrets Manager and DocDB Cluster"
+    Type: "String"
+    AllowedPattern : "[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*"
+
+
+Resources:
+
+# Creating a Security Group for DocumentDB
+  DocDBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Connectivity to DocDB
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 27017
+          ToPort: 27017
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 27017
+          ToPort: 27017
+          CidrIp: 0.0.0.0/0
+
+# Creating a Security Group for Lambda Function
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Connectivity to Lambda
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 27017
+          ToPort: 27017
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+# Creating a Subnet Group for DocumentDB
+  DocDBSubnetGroup: 
+      Type: "AWS::DocDB::DBSubnetGroup"
+      Properties: 
+         DBSubnetGroupDescription: "Subnet Group for DocumentDB"
+         SubnetIds: 
+            - !Ref SubnetId1
+            - !Ref SubnetId2
+
+# Creating a Lambda Function
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: DocDBLambda
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaVPCAccessExecutionRole
+        - Version: '2012-10-17' 
+          Statement:
+            - Sid: LambdaDocDBESMAccess
+              Effect: Allow
+              Action:
+                - rds:DescribeDBClusters
+                - rds:DescribeDBClusterParameters
+                - rds:DescribeDBSubnetGroups
+                - kms:Decrypt
+              Resource: !Sub arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBCluster}
+            - Sid: LambdaDocDBESMGetSecretValueAccess
+              Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Ref DocDBLambdaSecret
+      CodeUri: src/
+      Description: Trigger Lambda from Document DB
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+      Events:
+        LambdaESM:
+          Type: DocumentDB
+          Properties:
+              DatabaseName: "docdbdemo"
+              FullDocument: "UpdateLookup"
+              CollectionName: "products"
+              Cluster: !Sub arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:cluster:${DBCluster}
+              BatchSize: 1
+              Enabled: True
+              SourceAccessConfigurations:
+                - Type: BASIC_AUTH
+                  URI: !Ref DocDBLambdaSecret
+
+# Creating a Secret in Secrets Manager with username as 'testadmin' and password as 'testpassword'
+  DocDBLambdaSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: SecretForDocDBLambda
+      Description: This secret dynamically accepts username and password which is used to connect to DynamoDB.
+      SecretString: !Join
+          - ''
+          - - '{"username":"'
+            - !Ref SecretUserName
+            - '","password":"'
+            - !Ref SecretPassword
+            - '"}'
+
+# Creating a DocumentDB Cluster
+  DBCluster:
+    Type: AWS::DocDB::DBCluster
+    DeletionPolicy: Delete
+    Properties:
+      DBClusterIdentifier: !Ref DBClusterName
+      MasterUsername: 
+        Fn::Sub: "{{resolve:secretsmanager:${DocDBLambdaSecret}::username}}"
+      MasterUserPassword: 
+        Fn::Sub: "{{resolve:secretsmanager:${DocDBLambdaSecret}::password}}"
+      EngineVersion: 5.0.0
+      DBSubnetGroupName: !Ref DocDBSubnetGroup
+      VpcSecurityGroupIds:
+        - !Ref DocDBSecurityGroup
+
+# Creating a DocumentDB Instance
+  DBInstance:
+    Type: "AWS::DocDB::DBInstance"
+    Properties:
+      DBClusterIdentifier: !Ref DBCluster
+      DBInstanceIdentifier: !Ref DBInstanceName
+      DBInstanceClass: !Ref DBInstanceClass
+    DependsOn: DBCluster
+
+# Associating Secret with DocumentDB
+  SecretDocDBClusterAttachment:
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId:
+        Ref: DocDBLambdaSecret
+      TargetId:
+        Ref: DBCluster
+      TargetType: AWS::DocDB::DBCluster            
+ 
+# Printing the outputs
+Outputs:
+  ClusterId:
+    Description : "Cluster name"
+    Value: !Ref DBCluster
+  ClusterEndpoint:
+    Description : "Cluster Endpoint"
+    Value: !GetAtt DBCluster.Endpoint
+  ClusterPort:
+    Description : "Cluster Port"
+    Value: !GetAtt DBCluster.Port
+  SecretName:
+    Description : "Secret Name"
+    Value: !Ref DocDBLambdaSecret
+  LambdaFunctionName:
+    Description : "Lambda Function Name"
+    Value: !Ref MyLambdaFunction
+  LambdaLogGroup:
+    Description : "Lambda Log Group"
+    Value: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/DocDBLambda

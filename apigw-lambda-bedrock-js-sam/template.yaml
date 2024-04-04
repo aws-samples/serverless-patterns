@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: This SAM template generating content using Amazon Bedrock API. This can be extended to use different supported models.
+Description: This SAM template generating content using Amazon Bedrock API. This can be extended to use different supported models. (uksb-1tthgi812) (tag:apigw-lambda-bedrock-js-sam)
 
 Globals:
   Function:

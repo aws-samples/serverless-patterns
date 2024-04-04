@@ -19,6 +19,6 @@ pub async fn function_handler(event: Request) -> Result<impl IntoResponse, Error
         event
             .query_string_parameters()
             .first("name")
-            .unwrap_or_else(|| "stranger")
+            .unwrap_or("stranger")
     ))
 }

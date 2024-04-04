@@ -19,6 +19,7 @@ Parameters:
   ApiSecondaryDomainName:
     Type: String
 
+Description: (uksb-1tthgi812) (tag:route53-failover)
 Resources:
 ##########################################################################
 #  Health Check                                                          #

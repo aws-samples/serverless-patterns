@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
-Description: A CloudFormation Custom Resource and a Lambda function to create an S3 object.
+Description: A CloudFormation Custom Resource and a Lambda function to create an S3 object. (uksb-1tthgi812) (tag:cfn-custom-resource-s3-create)
 
 # Global values that are applied to all applicable resources in this template
 Globals:

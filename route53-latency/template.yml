@@ -23,6 +23,7 @@ Parameters:
   ApiIrelandEndpoint:
     Type: String
 
+Description: (uksb-1tthgi812) (tag:route53-latency)
 Resources:
 ##########################################################################
 #  Health Check                                                          #

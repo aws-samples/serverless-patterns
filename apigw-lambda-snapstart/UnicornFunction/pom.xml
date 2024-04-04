@@ -19,7 +19,7 @@
         <powertools.version>1.16.0</powertools.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <aws.sdk.version>2.20.99</aws.sdk.version>
+        <aws.sdk.version>2.22.0</aws.sdk.version>
     </properties>
 
     <dependencyManagement>

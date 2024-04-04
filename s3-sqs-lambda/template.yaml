@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Image resizing service through SQS
+Description: Image resizing service through SQS (uksb-1tthgi812) (tag:s3-sqs-lambda)
 
 Parameters:
   SourceBucketName:

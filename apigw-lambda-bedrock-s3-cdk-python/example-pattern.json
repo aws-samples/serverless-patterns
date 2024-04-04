@@ -1,0 +1,59 @@
+{
+    "title": "API Gateway - Lambda - Bedrock - S3",
+    "description": "Generate images using Amazon Bedrock from a lambda function fronted with an API Gateway and save to S3",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This project aims to build an integration between API Gateway, AWS Lambda, Amazon Bedrock and Amazon S3",
+        "The core functionality revolves around exposing an API endpoint via API Gateway that accepts a user-defined prompt.",
+        "When a prompt is received, the API Gateway triggers an AWS Lambda function. This Lambda function is responsible for invoking a diffusion image generation model (Stable Diffusion XL 1.0) hosted on Amazon Bedrock, generating an image and saving it to Amazon S3.",
+        "To ensure compatibility with Bedrock, a Lambda Layer is utilized, it contains the latest version of the Boto3 library, as only the most recent Boto3 version includes a client for Amazon Bedrock."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-s3-cdk-python",
+        "templateURL": "serverless-patterns/apigw-lambda-bedrock-s3-cdk-python",
+        "projectFolder": "apigw-lambda-bedrock-cdk-s3-python",
+        "templateFile": "apigw_lambda_bedrock/apigw_lambda_bedrock_s3_stack.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Bedrock API Reference",
+          "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html"
+        },
+        {
+          "text": "Packaging custom boto3 version as a layer",
+          "link": "https://repost.aws/knowledge-center/lambda-python-runtime-errors"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Chris Peter Francis",
+        "image": "https://media.licdn.com/dms/image/D5603AQGGYm9ThR6SgQ/profile-displayphoto-shrink_200_200/0/1700525446438?e=2147483647&v=beta&t=rMJ0cbtr5wNNQivHb10Cp4IdHoMXbQ_hbI8L_W8gLtU",
+        "bio": "Chris Peter Francis is a Solutions Architect based out of Austin, Texas. He helps mature AI transformation across the energy and utilties sectors.",
+        "linkedin": "chrispeterfrancis"
+      }
+    ]
+  }

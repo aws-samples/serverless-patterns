@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: An example Lambda function using the Secrets Manager Lambda Extension
+Description: An example Lambda function using the Secrets Manager Lambda Extension (uksb-1tthgi812) (tag:lambda-secrets-manager-extension-python)
 
 #When you "sam build" it will ask you to provide a name for your secret. The default is "MySecret"
 Parameters:

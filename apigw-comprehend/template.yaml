@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  RestApiName:
+    Type: String
+    Default: ComprehendApi
+    Description: Name for the API Gateway
+Description: (uksb-1tthgi812) (tag:apigw-comprehend)
+Resources:
+  ComprehendApi:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: !Ref RestApiName
+      FailOnWarnings: 'true'
+      Description: API Gateway for Comprehend
+  ComprehendResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: !Ref ComprehendApi
+      ParentId: !GetAtt ComprehendApi.RootResourceId
+      PathPart: detectSentiment
+  ComprehendMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref ComprehendResource
+      RestApiId: !Ref ComprehendApi
+      Integration:
+        Credentials: !GetAtt ApiGatewayComprehendRole.Arn
+        IntegrationHttpMethod: POST
+        IntegrationResponses: 
+          - StatusCode: 200
+        Type: AWS
+        Uri: !Sub >-
+          arn:aws:apigateway:${AWS::Region}:comprehend:action/DetectSentiment
+        RequestParameters: 
+          integration.request.header.Content-Type: "'application/x-amz-json-1.1'"
+          integration.request.header.X-Amz-Target: "'Comprehend_20171127.DetectSentiment'"
+      MethodResponses:
+        - StatusCode: 200
+  ApiGatewayComprehendRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/ComprehendReadOnly
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - apigateway.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+  ComprehendAPIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - "ComprehendMethod"
+    Properties:
+      Description: 'Create a new deployment.'
+      RestApiId: !Ref ComprehendApi
+  ComprehendAPIStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref ComprehendAPIDeployment
+      RestApiId: !Ref ComprehendApi
+      StageName: 'prod'
+Outputs:
+  ComprehendApiEndpoint:
+    Description: API endpoint URL
+    Value: !Sub >-
+      https://${ComprehendApi}.execute-api.${AWS::Region}.amazonaws.com/prod/detectSentiment

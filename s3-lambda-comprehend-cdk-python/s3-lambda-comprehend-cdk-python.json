@@ -1,0 +1,97 @@
+{
+    "title": "S3 - Lambda - Comprehend Batch sentiment analysis CDK",
+    "description": "Perform batch sentiment analysis using Comprehend through Lambda and S3",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This patterns shows CDK deployment on how to leverage Amazon S3, AWS Lambda, Amazon DynamoDB, and Amazon Comprehend to perform Batch Sentiment Analysis in a serverless fashion."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-comprehend-cdk-python",
+            "templateURL": "serverless-patterns/s3-lambda-comprehend-cdk-python",
+            "projectFolder": "s3-lambda-comprehend-cdk-python",
+            "templateFile": "app.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon Comprehend Sentiment Analysis",
+                "link": "https://docs.aws.amazon.com/comprehend/latest/dg/how-sentiment.html"
+            },
+            {
+                "text": "Amazon Comprehend Features",
+                "Link": "https://aws.amazon.com/comprehend/features/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Arjun Arippa",
+            "image": "https://github.com/awsarippa/amazon-textract-comprehend-pii-analysis/blob/main/image.png",
+            "bio": "Arjun Arippa is a Solutions Architect based in Bangalore, India. He works with some of the strategic and global customers in India, to build and architect their applications on AWS. Before joining AWS, Arjun spent over a decade working as a Software Developer. Reach out to him on LinkedIn",
+            "linkedin": "arjun-arippa"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 45,
+            "service": "s3",
+            "label": "S3"
+        },
+        "icon2": {
+            "x": 42,
+            "y": 45,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon4": {
+            "x": 85,
+            "y": 25,
+            "service": "comprehend",
+            "label": "Amazon Comprehend"
+        },
+        "icon3": {
+            "x": 85,
+            "y": 70,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Notification"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": "Store results"
+        },
+        "line3": {
+            "from": "icon2",
+            "to": "icon4",
+            "label": "Sentiment Analysis"
+        }
+    }
+}

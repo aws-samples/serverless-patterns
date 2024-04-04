@@ -1,0 +1,73 @@
+{
+    "title": "Edge Amazon API Gateway with a custom domain",
+    "description": "Edge Amazon API Gateway custom domain with AWS SAM: certificate in us-east-1 when using another Region",
+    "language": "Python",
+    "level": "300",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "To deploy an Edge-optimized API Gateway, it's mandatory to generate a certificate in us-east-1. Resources in one stack are deployed in a single region, you are not able to set another region for a specific resource."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-edge-custom-domain",
+            "templateURL": "serverless-patterns/apigw-edge-custom-domain",
+            "projectFolder": "apigw-edge-custom-domain",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Edge-optimized custom domain names",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html#edge-optimized-custom-domain-names"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete --stack-name sample-api --region eu-west-1</code>",
+            "Delete the stack cert: <code>sam delete --stack-name cert-sample-api --region us-east-1</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Walid BATTOU",
+            "image": "https://media.licdn.com/dms/image/D4E03AQEgGopOyoGq6g/profile-displayphoto-shrink_400_400/0/1667492195366?e=1713398400&v=beta&t=_vCLuCfSnKwVC0Gg_VncMZOoy8kXsJFuHM_nSQCufD0",
+            "bio": "I am an AWS Solution Architect, FinOps, Linux and open-source Enthusiast.",
+            "linkedin": "walidbattou",
+            "twitter": "WBattou"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "internet",
+            "label": "Client"
+        },
+        "icon2": {
+            "x": 70,
+            "y": 50,
+            "service": "apigw",
+            "label": "Edge-optimized API Gateway"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "via custom domain name"
+        }
+    }
+}
