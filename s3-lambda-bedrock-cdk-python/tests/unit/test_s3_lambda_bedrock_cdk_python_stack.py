@@ -10,6 +10,4 @@ def test_sqs_queue_created():
     stack = S3LambdaBedrockCdkPythonStack(app, "s3-lambda-bedrock-cdk-python")
     template = assertions.Template.from_stack(stack)
 
-#     template.has_resource_properties("AWS::SQS::Queue", {
-#         "VisibilityTimeout": 300
-#     })
+
