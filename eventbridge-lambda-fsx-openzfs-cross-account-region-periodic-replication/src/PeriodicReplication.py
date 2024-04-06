@@ -99,7 +99,13 @@ def lambda_handler(event, context):
             copy_snapshot = True
             break
 
-    if copy_snapshot:
+    if not copy_snapshot:
+        print ("ERROR - The snapshot does not transition to AVAILABLE state for some reason - Snapshot ID : " + src_snapshot["SnapshotId"])
+        msg = "ERROR - The snapshot does not transition to AVAILABLE state for some reason !!\n\n"
+        msg += "Snapshot ID : " + src_snapshot["SnapshotId"] + "\n"
+        msg += "Snapshot Name : " + src_snapshot["Name"] + "\n"
+        send_sns_notification (msg, 'Error Notification: CreateSnapshot')
+    else:
         try:
             print ("Assuming role in target ...")
             sts_connection = boto3.client('sts')
