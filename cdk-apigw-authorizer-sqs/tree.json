@@ -1,0 +1,1063 @@
+{
+  "version": "tree-0.1",
+  "tree": {
+    "id": "App",
+    "path": "",
+    "children": {
+      "Tree": {
+        "id": "Tree",
+        "path": "Tree",
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Construct",
+          "version": "1.198.1"
+        }
+      },
+      "ApigwSqsStack": {
+        "id": "ApigwSqsStack",
+        "path": "ApigwSqsStack",
+        "children": {
+          "storagequeue": {
+            "id": "storagequeue",
+            "path": "ApigwSqsStack/storagequeue",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.198.1"
+            }
+          },
+          "awsregion": {
+            "id": "awsregion",
+            "path": "ApigwSqsStack/awsregion",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.198.1"
+            }
+          },
+          "authorizerneeded": {
+            "id": "authorizerneeded",
+            "path": "ApigwSqsStack/authorizerneeded",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.198.1"
+            }
+          },
+          "storagesqs": {
+            "id": "storagesqs",
+            "path": "ApigwSqsStack/storagesqs",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ApigwSqsStack/storagesqs/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::SQS::Queue",
+                  "aws:cdk:cloudformation:props": {
+                    "kmsMasterKeyId": "alias/aws/sqs",
+                    "queueName": {
+                      "Ref": "storagequeue"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-sqs.CfnQueue",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-sqs.Queue",
+              "version": "1.198.1"
+            }
+          },
+          "sqs-policy-for-apigw": {
+            "id": "sqs-policy-for-apigw",
+            "path": "ApigwSqsStack/sqs-policy-for-apigw",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ApigwSqsStack/sqs-policy-for-apigw/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sqs:SendMessage",
+                          "Effect": "Allow",
+                          "Resource": {
+                            "Fn::GetAtt": [
+                              "storagesqs804AFF47",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "sqspolicyforapigw2BC99F9A",
+                    "roles": [
+                      {
+                        "Ref": "apigwroleDF16DA28"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.CfnPolicy",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-iam.Policy",
+              "version": "1.198.1"
+            }
+          },
+          "apigw_role": {
+            "id": "apigw_role",
+            "path": "ApigwSqsStack/apigw_role",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ApigwSqsStack/apigw_role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": [
+                              "apigateway.amazonaws.com",
+                              "lambda.amazonaws.com"
+                            ]
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "description": "This is the role for apigateway to access SQS queue."
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.CfnRole",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-iam.Role",
+              "version": "1.198.1"
+            }
+          },
+          "sqsapi-noauth": {
+            "id": "sqsapi-noauth",
+            "path": "ApigwSqsStack/sqsapi-noauth",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ApigwSqsStack/sqsapi-noauth/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::RestApi",
+                  "aws:cdk:cloudformation:props": {
+                    "description": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "This api will insert data into SQS ",
+                          {
+                            "Fn::GetAtt": [
+                              "storagesqs804AFF47",
+                              "QueueName"
+                            ]
+                          }
+                        ]
+                      ]
+                    },
+                    "endpointConfiguration": {
+                      "types": [
+                        "REGIONAL"
+                      ]
+                    },
+                    "name": "sqsapi-noauth"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.CfnRestApi",
+                  "version": "1.198.1"
+                }
+              },
+              "CloudWatchRole": {
+                "id": "CloudWatchRole",
+                "path": "ApigwSqsStack/sqsapi-noauth/CloudWatchRole",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ApigwSqsStack/sqsapi-noauth/CloudWatchRole/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "apigateway.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+                              ]
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-iam.CfnRole",
+                      "version": "1.198.1"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.Role",
+                  "version": "1.198.1"
+                }
+              },
+              "Account": {
+                "id": "Account",
+                "path": "ApigwSqsStack/sqsapi-noauth/Account",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Account",
+                  "aws:cdk:cloudformation:props": {
+                    "cloudWatchRoleArn": {
+                      "Fn::GetAtt": [
+                        "sqsapinoauthCloudWatchRole2009BB0A",
+                        "Arn"
+                      ]
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.CfnAccount",
+                  "version": "1.198.1"
+                }
+              },
+              "Deployment": {
+                "id": "Deployment",
+                "path": "ApigwSqsStack/sqsapi-noauth/Deployment",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ApigwSqsStack/sqsapi-noauth/Deployment/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGateway::Deployment",
+                      "aws:cdk:cloudformation:props": {
+                        "restApiId": {
+                          "Ref": "sqsapinoauthCEE24C1E"
+                        },
+                        "description": "Automatically created by the RestApi construct"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-apigateway.CfnDeployment",
+                      "version": "1.198.1"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.Deployment",
+                  "version": "1.198.1"
+                }
+              },
+              "DeploymentStage.prod": {
+                "id": "DeploymentStage.prod",
+                "path": "ApigwSqsStack/sqsapi-noauth/DeploymentStage.prod",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ApigwSqsStack/sqsapi-noauth/DeploymentStage.prod/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGateway::Stage",
+                      "aws:cdk:cloudformation:props": {
+                        "restApiId": {
+                          "Ref": "sqsapinoauthCEE24C1E"
+                        },
+                        "deploymentId": {
+                          "Ref": "sqsapinoauthDeploymentFB2E2940e78b54332b9b1d7e93a5431dd3fd4ffd"
+                        },
+                        "stageName": "prod"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-apigateway.CfnStage",
+                      "version": "1.198.1"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.Stage",
+                  "version": "1.198.1"
+                }
+              },
+              "Endpoint": {
+                "id": "Endpoint",
+                "path": "ApigwSqsStack/sqsapi-noauth/Endpoint",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnOutput",
+                  "version": "1.198.1"
+                }
+              },
+              "Default": {
+                "id": "Default",
+                "path": "ApigwSqsStack/sqsapi-noauth/Default",
+                "children": {
+                  "sqs": {
+                    "id": "sqs",
+                    "path": "ApigwSqsStack/sqsapi-noauth/Default/sqs",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "ApigwSqsStack/sqsapi-noauth/Default/sqs/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::Resource",
+                          "aws:cdk:cloudformation:props": {
+                            "parentId": {
+                              "Fn::GetAtt": [
+                                "sqsapinoauthCEE24C1E",
+                                "RootResourceId"
+                              ]
+                            },
+                            "pathPart": "sqs",
+                            "restApiId": {
+                              "Ref": "sqsapinoauthCEE24C1E"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/aws-apigateway.CfnResource",
+                          "version": "1.198.1"
+                        }
+                      },
+                      "POST": {
+                        "id": "POST",
+                        "path": "ApigwSqsStack/sqsapi-noauth/Default/sqs/POST",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "ApigwSqsStack/sqsapi-noauth/Default/sqs/POST/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                              "aws:cdk:cloudformation:props": {
+                                "httpMethod": "POST",
+                                "resourceId": {
+                                  "Ref": "sqsapinoauthsqs760F7132"
+                                },
+                                "restApiId": {
+                                  "Ref": "sqsapinoauthCEE24C1E"
+                                },
+                                "authorizationType": "NONE",
+                                "integration": {
+                                  "type": "AWS",
+                                  "uri": {
+                                    "Fn::Join": [
+                                      "",
+                                      [
+                                        "arn:",
+                                        {
+                                          "Ref": "AWS::Partition"
+                                        },
+                                        ":apigateway:",
+                                        {
+                                          "Ref": "awsregion"
+                                        },
+                                        ":sqs:path/",
+                                        {
+                                          "Fn::GetAtt": [
+                                            "storagesqs804AFF47",
+                                            "QueueName"
+                                          ]
+                                        }
+                                      ]
+                                    ]
+                                  },
+                                  "integrationHttpMethod": "POST",
+                                  "requestParameters": {
+                                    "integration.request.header.Content-Type": "'application/x-www-form-urlencoded'"
+                                  },
+                                  "requestTemplates": {
+                                    "application/json": "Action=SendMessage&MessageBody=$input.body"
+                                  },
+                                  "passthroughBehavior": "NEVER",
+                                  "integrationResponses": [
+                                    {
+                                      "statusCode": "200"
+                                    }
+                                  ],
+                                  "credentials": {
+                                    "Fn::GetAtt": [
+                                      "apigwroleDF16DA28",
+                                      "Arn"
+                                    ]
+                                  }
+                                },
+                                "methodResponses": [
+                                  {
+                                    "statusCode": "200"
+                                  }
+                                ]
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "@aws-cdk/aws-apigateway.CfnMethod",
+                              "version": "1.198.1"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/aws-apigateway.Method",
+                          "version": "1.198.1"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-apigateway.Resource",
+                      "version": "1.198.1"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.ResourceBase",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-apigateway.RestApi",
+              "version": "1.198.1"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "ApigwSqsStack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "ApigwSqsStack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.198.1"
+                }
+              },
+              "Condition": {
+                "id": "Condition",
+                "path": "ApigwSqsStack/CDKMetadata/Condition",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnCondition",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.198.1"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Stack",
+          "version": "1.198.1"
+        }
+      },
+      "ApigwSqsAuthStack": {
+        "id": "ApigwSqsAuthStack",
+        "path": "ApigwSqsAuthStack",
+        "children": {
+          "storagequeue": {
+            "id": "storagequeue",
+            "path": "ApigwSqsAuthStack/storagequeue",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.198.1"
+            }
+          },
+          "awsregion": {
+            "id": "awsregion",
+            "path": "ApigwSqsAuthStack/awsregion",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.198.1"
+            }
+          },
+          "authorizerneeded": {
+            "id": "authorizerneeded",
+            "path": "ApigwSqsAuthStack/authorizerneeded",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.198.1"
+            }
+          },
+          "lambdaauthorizerarn": {
+            "id": "lambdaauthorizerarn",
+            "path": "ApigwSqsAuthStack/lambdaauthorizerarn",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.198.1"
+            }
+          },
+          "authorizerneededcond": {
+            "id": "authorizerneededcond",
+            "path": "ApigwSqsAuthStack/authorizerneededcond",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnCondition",
+              "version": "1.198.1"
+            }
+          },
+          "authorizernotneededcond": {
+            "id": "authorizernotneededcond",
+            "path": "ApigwSqsAuthStack/authorizernotneededcond",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnCondition",
+              "version": "1.198.1"
+            }
+          },
+          "Function": {
+            "id": "Function",
+            "path": "ApigwSqsAuthStack/Function",
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-lambda.FunctionBase",
+              "version": "1.198.1"
+            }
+          },
+          "storagesqs": {
+            "id": "storagesqs",
+            "path": "ApigwSqsAuthStack/storagesqs",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ApigwSqsAuthStack/storagesqs/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::SQS::Queue",
+                  "aws:cdk:cloudformation:props": {
+                    "kmsMasterKeyId": "alias/aws/sqs",
+                    "queueName": {
+                      "Ref": "storagequeue"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-sqs.CfnQueue",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-sqs.Queue",
+              "version": "1.198.1"
+            }
+          },
+          "sqs-policy-for-apigw": {
+            "id": "sqs-policy-for-apigw",
+            "path": "ApigwSqsAuthStack/sqs-policy-for-apigw",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ApigwSqsAuthStack/sqs-policy-for-apigw/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sqs:SendMessage",
+                          "Effect": "Allow",
+                          "Resource": {
+                            "Fn::GetAtt": [
+                              "storagesqs804AFF47",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "sqspolicyforapigw2BC99F9A",
+                    "roles": [
+                      {
+                        "Ref": "apigwroleDF16DA28"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.CfnPolicy",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-iam.Policy",
+              "version": "1.198.1"
+            }
+          },
+          "apigw_role": {
+            "id": "apigw_role",
+            "path": "ApigwSqsAuthStack/apigw_role",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ApigwSqsAuthStack/apigw_role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": [
+                              "apigateway.amazonaws.com",
+                              "lambda.amazonaws.com"
+                            ]
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "description": "This is the role for apigateway to access SQS queue."
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.CfnRole",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-iam.Role",
+              "version": "1.198.1"
+            }
+          },
+          "sqsRequestAuthorizer": {
+            "id": "sqsRequestAuthorizer",
+            "path": "ApigwSqsAuthStack/sqsRequestAuthorizer",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ApigwSqsAuthStack/sqsRequestAuthorizer/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Authorizer",
+                  "aws:cdk:cloudformation:props": {
+                    "name": "SQSRequestAuthorizer",
+                    "restApiId": {
+                      "Ref": "sqsapiwithauth84D3EF87"
+                    },
+                    "type": "TOKEN",
+                    "authorizerUri": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:",
+                          {
+                            "Fn::Select": [
+                              1,
+                              {
+                                "Fn::Split": [
+                                  ":",
+                                  {
+                                    "Ref": "lambdaauthorizerarn"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          ":apigateway:",
+                          {
+                            "Fn::Select": [
+                              3,
+                              {
+                                "Fn::Split": [
+                                  ":",
+                                  {
+                                    "Ref": "lambdaauthorizerarn"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          ":lambda:path/2015-03-31/functions/",
+                          {
+                            "Ref": "lambdaauthorizerarn"
+                          },
+                          "/invocations"
+                        ]
+                      ]
+                    },
+                    "identitySource": "method.request.header.Authorization"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.CfnAuthorizer",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-apigateway.TokenAuthorizer",
+              "version": "1.198.1"
+            }
+          },
+          "sqsapi-withauth": {
+            "id": "sqsapi-withauth",
+            "path": "ApigwSqsAuthStack/sqsapi-withauth",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ApigwSqsAuthStack/sqsapi-withauth/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::RestApi",
+                  "aws:cdk:cloudformation:props": {
+                    "description": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "This api will insert data into SQS ",
+                          {
+                            "Fn::GetAtt": [
+                              "storagesqs804AFF47",
+                              "QueueName"
+                            ]
+                          }
+                        ]
+                      ]
+                    },
+                    "endpointConfiguration": {
+                      "types": [
+                        "REGIONAL"
+                      ]
+                    },
+                    "name": "sqsapi-withauth"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.CfnRestApi",
+                  "version": "1.198.1"
+                }
+              },
+              "CloudWatchRole": {
+                "id": "CloudWatchRole",
+                "path": "ApigwSqsAuthStack/sqsapi-withauth/CloudWatchRole",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ApigwSqsAuthStack/sqsapi-withauth/CloudWatchRole/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "apigateway.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+                              ]
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-iam.CfnRole",
+                      "version": "1.198.1"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.Role",
+                  "version": "1.198.1"
+                }
+              },
+              "Account": {
+                "id": "Account",
+                "path": "ApigwSqsAuthStack/sqsapi-withauth/Account",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Account",
+                  "aws:cdk:cloudformation:props": {
+                    "cloudWatchRoleArn": {
+                      "Fn::GetAtt": [
+                        "sqsapiwithauthCloudWatchRoleDC16617B",
+                        "Arn"
+                      ]
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.CfnAccount",
+                  "version": "1.198.1"
+                }
+              },
+              "Deployment": {
+                "id": "Deployment",
+                "path": "ApigwSqsAuthStack/sqsapi-withauth/Deployment",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ApigwSqsAuthStack/sqsapi-withauth/Deployment/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGateway::Deployment",
+                      "aws:cdk:cloudformation:props": {
+                        "restApiId": {
+                          "Ref": "sqsapiwithauth84D3EF87"
+                        },
+                        "description": "Automatically created by the RestApi construct"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-apigateway.CfnDeployment",
+                      "version": "1.198.1"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.Deployment",
+                  "version": "1.198.1"
+                }
+              },
+              "DeploymentStage.prod": {
+                "id": "DeploymentStage.prod",
+                "path": "ApigwSqsAuthStack/sqsapi-withauth/DeploymentStage.prod",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ApigwSqsAuthStack/sqsapi-withauth/DeploymentStage.prod/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGateway::Stage",
+                      "aws:cdk:cloudformation:props": {
+                        "restApiId": {
+                          "Ref": "sqsapiwithauth84D3EF87"
+                        },
+                        "deploymentId": {
+                          "Ref": "sqsapiwithauthDeployment04E00C9Eb4b3e148fdc1f6b32349a088a3461630"
+                        },
+                        "stageName": "prod"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-apigateway.CfnStage",
+                      "version": "1.198.1"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.Stage",
+                  "version": "1.198.1"
+                }
+              },
+              "Endpoint": {
+                "id": "Endpoint",
+                "path": "ApigwSqsAuthStack/sqsapi-withauth/Endpoint",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnOutput",
+                  "version": "1.198.1"
+                }
+              },
+              "Default": {
+                "id": "Default",
+                "path": "ApigwSqsAuthStack/sqsapi-withauth/Default",
+                "children": {
+                  "sqs": {
+                    "id": "sqs",
+                    "path": "ApigwSqsAuthStack/sqsapi-withauth/Default/sqs",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "ApigwSqsAuthStack/sqsapi-withauth/Default/sqs/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::Resource",
+                          "aws:cdk:cloudformation:props": {
+                            "parentId": {
+                              "Fn::GetAtt": [
+                                "sqsapiwithauth84D3EF87",
+                                "RootResourceId"
+                              ]
+                            },
+                            "pathPart": "sqs",
+                            "restApiId": {
+                              "Ref": "sqsapiwithauth84D3EF87"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/aws-apigateway.CfnResource",
+                          "version": "1.198.1"
+                        }
+                      },
+                      "POST": {
+                        "id": "POST",
+                        "path": "ApigwSqsAuthStack/sqsapi-withauth/Default/sqs/POST",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "ApigwSqsAuthStack/sqsapi-withauth/Default/sqs/POST/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                              "aws:cdk:cloudformation:props": {
+                                "httpMethod": "POST",
+                                "resourceId": {
+                                  "Ref": "sqsapiwithauthsqsBBDF005E"
+                                },
+                                "restApiId": {
+                                  "Ref": "sqsapiwithauth84D3EF87"
+                                },
+                                "authorizationType": "CUSTOM",
+                                "authorizerId": {
+                                  "Ref": "sqsRequestAuthorizer131B6CB7"
+                                },
+                                "integration": {
+                                  "type": "AWS",
+                                  "uri": {
+                                    "Fn::Join": [
+                                      "",
+                                      [
+                                        "arn:",
+                                        {
+                                          "Ref": "AWS::Partition"
+                                        },
+                                        ":apigateway:",
+                                        {
+                                          "Ref": "awsregion"
+                                        },
+                                        ":sqs:path/",
+                                        {
+                                          "Fn::GetAtt": [
+                                            "storagesqs804AFF47",
+                                            "QueueName"
+                                          ]
+                                        }
+                                      ]
+                                    ]
+                                  },
+                                  "integrationHttpMethod": "POST",
+                                  "requestParameters": {
+                                    "integration.request.header.Content-Type": "'application/x-www-form-urlencoded'"
+                                  },
+                                  "requestTemplates": {
+                                    "application/json": "Action=SendMessage&MessageBody=$input.body"
+                                  },
+                                  "passthroughBehavior": "NEVER",
+                                  "integrationResponses": [
+                                    {
+                                      "statusCode": "200"
+                                    }
+                                  ],
+                                  "credentials": {
+                                    "Fn::GetAtt": [
+                                      "apigwroleDF16DA28",
+                                      "Arn"
+                                    ]
+                                  }
+                                },
+                                "methodResponses": [
+                                  {
+                                    "statusCode": "200"
+                                  }
+                                ]
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "@aws-cdk/aws-apigateway.CfnMethod",
+                              "version": "1.198.1"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/aws-apigateway.Method",
+                          "version": "1.198.1"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-apigateway.Resource",
+                      "version": "1.198.1"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigateway.ResourceBase",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-apigateway.RestApi",
+              "version": "1.198.1"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "ApigwSqsAuthStack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "ApigwSqsAuthStack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.198.1"
+                }
+              },
+              "Condition": {
+                "id": "Condition",
+                "path": "ApigwSqsAuthStack/CDKMetadata/Condition",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnCondition",
+                  "version": "1.198.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.198.1"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Stack",
+          "version": "1.198.1"
+        }
+      }
+    },
+    "constructInfo": {
+      "fqn": "@aws-cdk/core.App",
+      "version": "1.198.1"
+    }
+  }
+}

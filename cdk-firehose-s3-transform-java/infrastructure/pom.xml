@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+        <groupId>cdk-sample</groupId>
+        <artifactId>infrastructure</artifactId>
+        <version>1.0-SNAPSHOT</version>
+
+    <name>infrastructure</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/auth -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>auth</artifactId>
+            <version>2.21.15</version>
+        </dependency>
+
+
+        <!-- https://mvnrepository.com/artifact/software.amazon.awscdk/kinesisfirehose-alpha -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>kinesisfirehose-alpha</artifactId>
+            <version>2.104.0-alpha.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/software.amazon.awscdk/kinesisfirehose-destinations-alpha -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>kinesisfirehose-destinations-alpha</artifactId>
+            <version>2.104.0-alpha.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-iam -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-iam</artifactId>
+            <version>1.12.498</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/iam-policy-builder -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>iam-policy-builder</artifactId>
+            <version>2.21.15</version>
+        </dependency>
+
+
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>17</release>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.myorg.CdkFirehoseLambdaS3JavaApp</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

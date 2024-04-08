@@ -1,0 +1,77 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${AWS::StackName}
+        - ResourceName: Api
+      StageName: Prod
+      DefinitionBody:
+        openapi: '3.0'
+        info: {}
+        paths:
+          /:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PutItemsFunction.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      Cors:
+        MaxAge: 5
+  Users:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+  PutItemsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: PutItemsFunction
+      CodeUri: cmd/functions/PutItemsFunction
+      Handler: bootstrap
+      Runtime: provided.al2023
+      MemorySize: 128
+      Timeout: 30
+      Tracing: Active
+      Events:
+        ApiPOST:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+            RestApiId: !Ref Api
+      Environment:
+        Variables:
+          USERS_TABLE_NAME: !Ref Users
+          USERS_TABLE_ARN: !GetAtt Users.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Users
+  PutItemsFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${PutItemsFunction}
+
+Outputs:
+  PutItemsFunction:
+    Description: "PutItemsFunction Name"
+    Value: !Ref PutItemsFunction
+  API:
+    Description: "API Gateway endpoint URL for the API"
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod"

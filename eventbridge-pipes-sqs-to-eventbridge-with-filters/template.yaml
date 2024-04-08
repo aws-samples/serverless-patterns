@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: SQS to EventBridge
+Description: SQS to EventBridge (uksb-1tthgi812) (tag:eventbridge-pipes-sqs-to-eventbridge-with-filters)
 
 Resources:
   Source:
@@ -27,6 +27,19 @@ Resources:
             Action:
               - sts:AssumeRole
       Policies:
+        - PolicyName: CloudWatch
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:PutLogEvents'
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:DescribeLogStreams'
+                  - 'logs:DescribeLogGroups'
+                  - 'cloudwatch:PutMetricData'
+                Resource: '*'
         - PolicyName: SourcePolicy
           PolicyDocument:
             Version: 2012-10-17

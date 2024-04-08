@@ -1,0 +1,94 @@
+{
+    "shipments": [
+      {
+        "id": "shp_101",
+        "customerId": "cust_123",
+        "orderId": "ord_456",
+        "carrier": "Fedex",
+        "trackingNumber": "123456789",
+        "shipDate": "2023-02-15T09:30:00Z",
+        "estimatedArrival": "2023-02-20T17:00:00Z",
+        "origin": {
+          "address": {
+            "street1": "123 Main St",
+            "city": "Atlanta",
+            "state": "GA",
+            "zip": "30301"
+          }
+        },
+        "destination": {
+          "address": {
+            "street1": "456 Oak Rd", 
+            "city": "Austin",
+            "state": "TX",
+            "zip": "73301"
+          }
+        },
+        "parcel": {
+          "dimensions": {
+            "length": 20,
+            "width": 15,
+            "height": 10
+          },
+          "weight": 30,
+          "items": [
+            {
+              "sku": "abc123",
+              "description": "T-shirt",
+              "quantity": 2
+            },
+            {
+              "sku": "def456",  
+              "description": "Book",
+              "quantity": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "shp_102",
+        "customerId": "cust_234",
+        "orderId": "ord_567",
+        "carrier": "UPS",
+        "trackingNumber": "987654321",
+        "shipDate": "2023-02-20T11:00:00Z",
+        "estimatedArrival": "2023-02-25T10:30:00Z",
+        "origin": {
+          "address": {
+            "street1": "789 Elm St", 
+            "city": "Miami",
+            "state": "FL",
+            "zip": "33101"
+          }
+        },
+        "destination": {
+          "address": {
+            "street1": "159 Maple Ave",
+            "city": "Seattle",
+            "state": "WA",
+            "zip": "98101"
+          }
+        },
+        "parcel": {
+          "dimensions": {
+            "length": 30,
+            "width": 20,
+            "height": 15
+          },
+          "weight": 20,
+          "items": [
+            {
+              "sku": "ghi789",
+              "description": "Jeans",
+              "quantity": 1  
+            },
+            {
+              "sku": "jkl012",
+              "description": "Toys",
+              "quantity": 5
+            }
+          ]
+        }
+      }
+    ]
+  }

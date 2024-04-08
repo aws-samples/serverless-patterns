@@ -1,0 +1,84 @@
+{
+    "title": "Receive email with Amazon SES and process using an AWS Lambda function",
+    "description": "This shows how to receive email with Amazon SES and process them using AWS Lambda.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "User sends email to the configured domain in Amazon SES.",
+            "Amazon SES receives the email and then applies the rule set to trigger an AWS Lambda function.",
+            "The AWS Lambda function processes the information from the SES event."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ses-lambda-sam",
+            "templateURL": "serverless-patterns/ses-lambda-sam",
+            "projectFolder": "ses-lambda-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Email receiving with Amazon SES",
+                "link": "https://docs.aws.amazon.com/ses/latest/dg/receiving-email.html"
+            },
+            {
+                "text": "Using AWS Lambda with Amazon SES",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-ses.html"
+            },
+            {
+                "text": "Manage Incoming Emails at Scale with Amazon SES",
+                "link": "https://aws.amazon.com/blogs/messaging-and-targeting/manage-incoming-emails-with-ses/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "See the GitHub repo for detailed deployment instructions.",
+            "sam deploy -g",
+            "aws ses set-active-receipt-rule-set  --rule-set-name {EmailReceiptRuleSet} --region {your-region}"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Disable the Amazon SES rule set using the following CLI command: <code>aws ses set-active-receipt-rule-set --region {your-region}</code>",
+            "Delete the resources deployed to your AWS account via AWS SAM: <code>sam delete</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Biswanath Mukherjee",
+            "image": "https://d1rwvjey2iif32.cloudfront.net",
+            "bio": "I am a Sr. Solutions Architect working at AWS India.",
+            "linkedin": "biswanathmukherjee"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "ses",
+            "label": "Amazon SES"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "triggered by received email"
+        }
+    }
+}

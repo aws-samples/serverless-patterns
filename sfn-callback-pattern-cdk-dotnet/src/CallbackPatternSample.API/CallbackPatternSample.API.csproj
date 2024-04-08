@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <AWSProjectType>Lambda</AWSProjectType>
+    <!-- This property makes the build directory similar to a publish directory and helps the AWS .NET Lambda Mock Test Tool find project dependencies. -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- Generate ready to run images during publishing to improve cold start time. -->
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="7.2.0" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.9.20" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.176" />
+    <PackageReference Include="AWSXRayRecorder.Handlers.AwsSdk" Version="2.10.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CallbackPatternSample.Models\CallbackPatternSample.Models.csproj" />
+  </ItemGroup>
+</Project>

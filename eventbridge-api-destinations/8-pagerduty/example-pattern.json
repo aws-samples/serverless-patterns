@@ -1,0 +1,51 @@
+{
+    "title": "EventBridge API Destinations to PagerDuty",
+    "description": "Create an EventBridge rule and API destination to route events to PagerDuty",
+    "language": "YAML",
+    "level": "100",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an API Destionation for PagerDuty EventsV2 API. This allows a user to forward EventBridge events to PagerDuty and trigger alarms/pages.",
+            "The pattern creates a sample EventBus, EventBridge API Connection, EventBridge API Destination, EventBridge Rule, and IAM Role.",
+            "To deploy the pattern you need a PagerDuty API Key and Integration Key. Directions to create those can be found here: https://support.pagerduty.com/docs/services-and-integrations & here https://support.pagerduty.com/docs/api-access-keys#section-generating-a-general-access-rest-api-key",
+            "The EventBridge Rule matches any events with \"PagerDutyDemo\" as the source. Then forwards the event to the API Destination triggering the alert in PagerDuty.",
+            "The pattern includes a sample event you can send via CLI: aws events put-events --entries file://testEvent.json"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+            "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cd ./8-pagerduty",
+            "sam deploy --guided"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "projectFolder": "eventbridge-api-destinations",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations",
+            "templateURL": "serverless-patterns/eventbridge-api-destinations",
+            "templateFile": "8-pagerduty/template.yaml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "Using API destinations with Amazon EventBridge",
+                "link": "https://aws.amazon.com/blogs/compute/using-api-destinations-with-amazon-eventbridge/"
+            }
+        ]
+    }
+}

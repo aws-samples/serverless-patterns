@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon QLDB
+Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon QLDB (uksb-1tthgi812) (tag:apigw-lambda-qldb)
 
 # Comment on each global 
 Globals:

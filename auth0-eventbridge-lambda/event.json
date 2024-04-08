@@ -1,0 +1,33 @@
+{
+  "version": "0",
+  "id": "6f560900-5e58-4dff-bc32-eebf092d59b4",
+  "detail-type": ["Auth0 log"],
+  "source": "aws.partner/auth0.com/........",
+  "account": "123456789",
+  "resources": [""],
+  "time": "2024-01-02T12:47:58Z",
+  "region": "us-east-1",
+  "detail": {
+      "date": "2020-10-27T19:39:54.699Z",
+      "type": "limit_wc",
+      "description": "An IP address is blocked because it reached the maximum failed login attempts into a single account.",
+      "connection": "Username-Password-Authentication",
+      "connection_id": "con_ABC123",
+      "client_id": "ABCDEFG123456789",
+      "client_name": "All Applications",
+      "ip": "99.xxx.xxx.xxx",
+      "user_agent": "Chrome 86.0.4240 / Mac OS X 10.15.6",
+      "details": {
+        "error": {
+          "message": "Blocked Account - Failed Logins"
+        }
+      },
+      "user_id": "auth0|ABC123",
+      "user_name": "test@test.com",
+      "strategy": "auth0",
+      "strategy_type": "database",
+      "log_id": "123456789",
+      "_id": "123456789",
+      "isMobile": false
+  }
+}

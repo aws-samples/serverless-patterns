@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: A demonstration of how to start query execution and fetch the result from an Athena table using an AWS Lambda function.
+Description: A demonstration of how to start query execution and fetch the result from an Athena table using an AWS Lambda function. (uksb-1tthgi812) (tag:lambda-athena-sam)
 Parameters:
   AthenaWorkGroupName:
     Type: String

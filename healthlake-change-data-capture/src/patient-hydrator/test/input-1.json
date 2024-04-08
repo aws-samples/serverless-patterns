@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "source": "CloudTrail",
+  "eventType": "HealthLakeCDC",
+  "correlationId": "2IESSIOExwC6ByAILZ1pnhfxx21",
+  "details": {
+    "eventID": "31feacd9-6646-4c4f-934b-83b0f6cf6188",
+    "eventName": "UpdateResource",
+    "eventSource": "healthlake.amazonaws.com",
+    "eventTime": "2022-11-29T18:07:16Z",
+    "eventType": "AwsApiCall",
+    "eventVersion": "1.08",
+    "requestID": "e70389e9-d359-4e95-b701-ba93603eb5b5",
+    "requestParameters": {
+      "datastoreId": "095d2262da454bb7347488c930e009eb",
+      "resourceType": "Patient"
+    },
+    "responseElements": {
+      "statusCode": 200
+    }
+  }
+}

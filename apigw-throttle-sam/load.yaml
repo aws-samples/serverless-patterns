@@ -1,0 +1,21 @@
+config:
+  target: # <your api endpoint>
+  phases:
+    - duration: 10
+      arrivalRate: 5
+      name: Warm up
+    - duration: 10
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 100
+      name: Sustained load
+scenarios:
+  - name: "Send get and post request"
+    flow:
+      - get:
+          url: "/"
+      - post:
+          url: "/"
+

@@ -1,0 +1,3 @@
+Patient ID: 123456
+Visit Date: 2023-05-10
+Note: Patient complains of increased thirst and frequent urination. Blood tests confirm high blood sugar levels. Diagnosed with type 2 diabetes. Prescribed Metformin and lifestyle changes. Follow-up in one month.

@@ -1,0 +1,616 @@
+{
+  "version": "21.0.0",
+  "artifacts": {
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    },
+    "ApigwSqsStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "ApigwSqsStack.template.json",
+        "validateOnSynth": false
+      },
+      "metadata": {
+        "/ApigwSqsStack/storagequeue": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "storagequeue",
+            "trace": [
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/awsregion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "awsregion",
+            "trace": [
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/authorizerneeded": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authorizerneeded",
+            "trace": [
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/storagesqs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "storagesqs804AFF47",
+            "trace": [
+              "new Queue (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-sqs/lib/queue.js:88:23)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/sqs-policy-for-apigw/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqspolicyforapigw2BC99F9A",
+            "trace": [
+              "new Policy (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-iam/lib/policy.js:57:26)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/apigw_role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "apigwroleDF16DA28",
+            "trace": [
+              "new Role (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-iam/lib/role.js:63:22)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/sqsapi-noauth/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapinoauthCEE24C1E",
+            "trace": [
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:446:26)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/sqsapi-noauth/CloudWatchRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapinoauthCloudWatchRole2009BB0A",
+            "trace": [
+              "new Role (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-iam/lib/role.js:63:22)",
+              "RestApi._configureCloudWatchRole (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:270:22)",
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:463:18)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/sqsapi-noauth/Account": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapinoauthAccount8E5ACE46",
+            "trace": [
+              "RestApi._configureCloudWatchRole (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:274:34)",
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:463:18)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/sqsapi-noauth/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapinoauthDeploymentFB2E2940e78b54332b9b1d7e93a5431dd3fd4ffd",
+            "trace": [
+              "new Deployment (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/deployment.js:53:25)",
+              "RestApi._configureDeployment (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:317:38)",
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:465:14)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/sqsapi-noauth/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapinoauthDeploymentStageprodB4D5687B",
+            "trace": [
+              "new Stage (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/stage.js:63:26)",
+              "RestApi._configureDeployment (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:325:36)",
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:465:14)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/sqsapi-noauth/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapinoauthEndpointB1F40CDE",
+            "trace": [
+              "RestApi._configureDeployment (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:329:13)",
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:465:14)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/sqsapi-noauth/Default/sqs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapinoauthsqs760F7132",
+            "trace": [
+              "new Resource (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/resource.js:234:26)",
+              "RootResource.addResource (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/resource.js:27:16)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:105",
+              "Kernel._ensureSync (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:10358:28)",
+              "Kernel.invoke (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:34)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/sqsapi-noauth/Default/sqs/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapinoauthsqsPOSTF615182B",
+            "trace": [
+              "new Method (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/method.js:61:26)",
+              "Resource.addMethod (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/resource.js:40:16)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:105",
+              "Kernel._ensureSync (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:10358:28)",
+              "Kernel.invoke (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:34)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata",
+            "trace": [
+              "new MetadataResource (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/metadata-resource.js:22:30)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:139:9",
+              "visit (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:200:9)",
+              "visit (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:197:9)",
+              "injectMetadataResources (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:128:5)",
+              "Object.synthesize (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:17:5)",
+              "App.synth (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/stage.js:104:41)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:105",
+              "Kernel._ensureSync (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:10358:28)",
+              "Kernel.invoke (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:34)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable",
+            "trace": [
+              "new MetadataResource (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/metadata-resource.js:30:35)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:139:9",
+              "visit (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:200:9)",
+              "visit (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:197:9)",
+              "injectMetadataResources (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:128:5)",
+              "Object.synthesize (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:17:5)",
+              "App.synth (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/stage.js:104:41)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:105",
+              "Kernel._ensureSync (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:10358:28)",
+              "Kernel.invoke (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:34)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ]
+      },
+      "displayName": "ApigwSqsStack"
+    },
+    "ApigwSqsAuthStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "ApigwSqsAuthStack.template.json",
+        "validateOnSynth": false
+      },
+      "metadata": {
+        "/ApigwSqsAuthStack/storagequeue": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "storagequeue",
+            "trace": [
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/awsregion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "awsregion",
+            "trace": [
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/authorizerneeded": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authorizerneeded",
+            "trace": [
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/lambdaauthorizerarn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "lambdaauthorizerarn",
+            "trace": [
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/authorizerneededcond": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authorizerneededcond",
+            "trace": [
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/authorizernotneededcond": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authorizernotneededcond",
+            "trace": [
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/storagesqs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "storagesqs804AFF47",
+            "trace": [
+              "new Queue (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-sqs/lib/queue.js:88:23)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/sqs-policy-for-apigw/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqspolicyforapigw2BC99F9A",
+            "trace": [
+              "new Policy (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-iam/lib/policy.js:57:26)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/apigw_role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "apigwroleDF16DA28",
+            "trace": [
+              "new Role (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-iam/lib/role.js:63:22)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/sqsRequestAuthorizer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsRequestAuthorizer131B6CB7",
+            "trace": [
+              "new TokenAuthorizer (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/authorizers/lambda.js:86:26)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/sqsapi-withauth/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapiwithauth84D3EF87",
+            "trace": [
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:446:26)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/sqsapi-withauth/CloudWatchRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapiwithauthCloudWatchRoleDC16617B",
+            "trace": [
+              "new Role (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-iam/lib/role.js:63:22)",
+              "RestApi._configureCloudWatchRole (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:270:22)",
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:463:18)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/sqsapi-withauth/Account": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapiwithauthAccountA0937716",
+            "trace": [
+              "RestApi._configureCloudWatchRole (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:274:34)",
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:463:18)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/sqsapi-withauth/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapiwithauthDeployment04E00C9Eb4b3e148fdc1f6b32349a088a3461630",
+            "trace": [
+              "new Deployment (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/deployment.js:53:25)",
+              "RestApi._configureDeployment (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:317:38)",
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:465:14)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/sqsapi-withauth/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapiwithauthDeploymentStageprod61A798C8",
+            "trace": [
+              "new Stage (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/stage.js:63:26)",
+              "RestApi._configureDeployment (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:325:36)",
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:465:14)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/sqsapi-withauth/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapiwithauthEndpointECB718C2",
+            "trace": [
+              "RestApi._configureDeployment (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:329:13)",
+              "new RestApi (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/restapi.js:465:14)",
+              "Kernel._create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9964:29)",
+              "Kernel.create (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9693:29)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/sqsapi-withauth/Default/sqs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapiwithauthsqsBBDF005E",
+            "trace": [
+              "new Resource (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/resource.js:234:26)",
+              "RootResource.addResource (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/resource.js:27:16)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:105",
+              "Kernel._ensureSync (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:10358:28)",
+              "Kernel.invoke (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:34)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/sqsapi-withauth/Default/sqs/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sqsapiwithauthsqsPOST8F0B2592",
+            "trace": [
+              "new Method (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/method.js:61:26)",
+              "Resource.addMethod (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/aws-apigateway/lib/resource.js:40:16)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:105",
+              "Kernel._ensureSync (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:10358:28)",
+              "Kernel.invoke (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:34)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata",
+            "trace": [
+              "new MetadataResource (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/metadata-resource.js:22:30)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:139:9",
+              "visit (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:200:9)",
+              "visit (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:197:9)",
+              "injectMetadataResources (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:128:5)",
+              "Object.synthesize (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:17:5)",
+              "App.synth (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/stage.js:104:41)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:105",
+              "Kernel._ensureSync (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:10358:28)",
+              "Kernel.invoke (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:34)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ],
+        "/ApigwSqsAuthStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable",
+            "trace": [
+              "new MetadataResource (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/metadata-resource.js:30:35)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:139:9",
+              "visit (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:200:9)",
+              "visit (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:197:9)",
+              "injectMetadataResources (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:128:5)",
+              "Object.synthesize (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/private/synthesis.js:17:5)",
+              "App.synth (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/jsii-kernel-bqa3L2/node_modules/@aws-cdk/core/lib/stage.js:104:41)",
+              "/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:105",
+              "Kernel._ensureSync (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:10358:28)",
+              "Kernel.invoke (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:9769:34)",
+              "KernelHost.processRequest (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11544:36)",
+              "KernelHost.run (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11504:22)",
+              "Immediate._onImmediate (/private/var/folders/lc/qk79j9nn3nzcd0j_c50plj_m0000gr/T/tmptycx1p3v/lib/program.js:11505:46)",
+              "processImmediate (node:internal/timers:466:21)"
+            ]
+          }
+        ]
+      },
+      "displayName": "ApigwSqsAuthStack"
+    }
+  }
+}

@@ -3,78 +3,92 @@
 
 package com.unicorn.store.data;
 
+import com.unicorn.store.exceptions.ResourceDeletionException;
+import com.unicorn.store.exceptions.ResourceNotFoundException;
+import com.unicorn.store.exceptions.ResourceRetrievalException;
+import com.unicorn.store.exceptions.ResourceSaveException;
+import com.unicorn.store.exceptions.ResourceUpdateException;
 import com.unicorn.store.model.Unicorn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import software.amazon.awssdk.core.SdkSystemSetting;
-import software.amazon.awssdk.http.crt.AwsCrtAsyncHttpClient;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
-import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
-import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
-import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.Expression;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.enhanced.dynamodb.model.UpdateItemEnhancedRequest;
+import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
-@Service
+@Repository
 public class DynamoDBUnicornRepository implements UnicornRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(DynamoDBUnicornRepository.class);
-    private static final String PRODUCT_TABLE_NAME = System.getenv("PRODUCT_TABLE_NAME");
+    private static final Logger logger = LogManager.getLogger();
 
-    private final DynamoDbAsyncClient dynamoDbClient = DynamoDbAsyncClient.builder()
-            .region(Region.of(System.getenv(SdkSystemSetting.AWS_REGION.environmentVariable())))
-            .httpClientBuilder(AwsCrtAsyncHttpClient.builder())
-            .build();
+    private final DynamoDbTable<Unicorn> unicornDynamoDbTable;
+
+    public DynamoDBUnicornRepository(DynamoDbTable<Unicorn> unicornDynamoDbTable) {
+        this.unicornDynamoDbTable = unicornDynamoDbTable;
+    }
 
     @Override
     public Unicorn save(Unicorn unicorn) {
-        String unicornId = UUID.randomUUID().toString();
-        unicorn.setId(unicornId);
-
+        logger.info("Saving unicorn with id {} to DynamoDB", unicorn.getId());
         try {
-            dynamoDbClient.putItem(PutItemRequest.builder()
-                            .tableName(PRODUCT_TABLE_NAME)
-                            .item(UnicornMapper.unicornToDynamoDB(unicorn))
-                            .build())
-                    .get();
-        } catch (InterruptedException | ExecutionException e) {
-            logger.error("putItem failed with message {}", e.getMessage());
+            unicornDynamoDbTable.putItem(unicorn);
+            logger.info("Unicorn with id {} saved successfully", unicorn.getId());
+            return unicorn;
+        } catch (DynamoDbException e) {
+            logger.error("Unicorn with id {} could not be saved to DynamoDB", unicorn.getId(), e);
+            throw new ResourceSaveException(e.getMessage());
         }
-
-        return unicorn;
     }
 
     @Override
     public Optional<Unicorn> findById(String unicornId) {
         try {
-            GetItemResponse getItemResponse = dynamoDbClient.getItem(GetItemRequest.builder()
-                            .key(Map.of("PK", AttributeValue.builder().s(unicornId).build()))
-                            .tableName(PRODUCT_TABLE_NAME)
-                            .build())
-                    .get();
-            if (getItemResponse.hasItem()) {
-                return Optional.of(UnicornMapper.unicornFromDynamoDB(getItemResponse.item()));
-            } else {
+            Unicorn unicorn = unicornDynamoDbTable.getItem(Key.builder().partitionValue(unicornId).build());
+            if (unicorn == null) {
+                logger.info("Unicorn with id {} not found in DynamoDB", unicornId);
                 return Optional.empty();
             }
-        } catch (InterruptedException | ExecutionException e) {
-            logger.error("getItem failed with message {}", e.getMessage());
-            return Optional.empty();
+            logger.info("Unicorn with id {} found in DynamoDB", unicornId);
+            return Optional.of(unicorn);
+        } catch (DynamoDbException e) {
+            logger.error("Unicorn with id {} could not be retrieved from DynamoDB", unicornId, e);
+            throw new ResourceRetrievalException(e.getMessage());
         }
     }
 
     @Override
-    public void delete(Unicorn unicorn) {
-        dynamoDbClient.deleteItem(DeleteItemRequest.builder()
-                .key(Map.of("PK", AttributeValue.builder().s(unicorn.getId()).build()))
-                .tableName(PRODUCT_TABLE_NAME)
-                .build());
+    public void deleteById(String unicornId) {
+        try {
+            unicornDynamoDbTable.deleteItem(Key.builder().partitionValue(unicornId).build());
+            logger.info("Unicorn with id {} deleted successfully", unicornId);
+        } catch (DynamoDbException e) {
+            logger.error("Unicorn with id {} could not be deleted from DynamoDB", unicornId, e);
+            throw new ResourceDeletionException(e.getMessage());
+        }
     }
+
+    @Override
+    public Unicorn update(Unicorn unicorn) {
+        UpdateItemEnhancedRequest<Unicorn> updateItemEnhancedRequest = UpdateItemEnhancedRequest.builder(Unicorn.class)
+                .item(unicorn)
+                .conditionExpression(Expression.builder().expression("attribute_exists(id)").build())
+                .build();
+        try {
+            unicornDynamoDbTable.updateItem(updateItemEnhancedRequest);
+            logger.info("Unicorn with id {} updated successfully", unicorn.getId());
+            return unicorn;
+        } catch (ConditionalCheckFailedException e) {
+            logger.error("Unicorn with id {} could not be updated in DynamoDB", unicorn.getId(), e);
+            throw new ResourceNotFoundException(String.format("Unicorn with id %s not found", unicorn.getId()));
+        } catch (DynamoDbException e) {
+            logger.error("Unicorn with id {} could not be updated in DynamoDB", unicorn.getId(), e);
+            throw new ResourceUpdateException(e.getMessage());
+        }
+    }
+
 }

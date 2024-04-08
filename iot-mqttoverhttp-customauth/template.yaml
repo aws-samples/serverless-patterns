@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless Pattern - IoT rule with custom lambda authorizer forwarding events to SQS for post iot event processing
+Description: Serverless Pattern - IoT rule with custom lambda authorizer forwarding events to SQS for post iot event processing (uksb-1tthgi812) (tag:iot-mqttoverhttp-customauth)
 Parameters:
   VPC:
     Type: AWS::EC2::VPC::Id

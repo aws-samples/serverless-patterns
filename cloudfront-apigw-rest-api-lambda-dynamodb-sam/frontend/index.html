@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sample Webform</title>
+</head>
+<body>
+<form id="sample-form" method="post">
+	<fieldset>
+	    <legend>Contact Details</legend>
+        <p>
+    		<label>Name: <input name="name" /></label>
+    	</p>
+
+        <p>
+    		<label>Phone: <input type="tel" name="phone" /></label>
+    	</p>
+
+        <p>
+    		<label>Email: <input type="email" name="email" /></label>
+    	</p>
+
+        <p>
+    		<label>Date of Birth: <input type="date" name="birthDate"></label>
+    	</p>
+        
+        <p>
+    		<label>
+    		Address :
+    		<br />
+    		<textarea name="address" cols="30" rows="3"></textarea>
+    		</label>
+    	</p>
+
+        <p>
+    		<button type="submit">Submit</button>
+    	</p>
+	</fieldset>
+</form>
+</body>
+<script type = "text/javascript">  
+var form = document.getElementById('sample-form');
+form.onsubmit = function(event){
+        var xhr = new XMLHttpRequest();
+        var formData = new FormData(form);
+        //open the request
+        xhr.open('POST','/submit');
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        //send the form data
+        xhr.send(JSON.stringify(Object.fromEntries(formData)));
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                form.reset(); //reset form after AJAX success or do something else
+            }
+        }
+        //Fail the onsubmit to avoid page refresh.
+        return false; 
+    }
+
+</script> 
+</html>

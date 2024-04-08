@@ -1,0 +1,7 @@
+{
+    "params":{
+        "aws_region_name":"<aws_region_name>",
+        "storage_sqs_queue_name":"<user_friendly-SQS_Queue_name>",
+        "authorizer_lambda_arn":"<arn:aws:lambda:<aws_region>:<aws_account>:function:<lambda_function_name>"
+    }
+}

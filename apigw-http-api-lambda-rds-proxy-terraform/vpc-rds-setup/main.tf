@@ -197,7 +197,7 @@ resource "random_password" "db_password" {
 resource "aws_rds_cluster" "aurora_mysql" {
   cluster_identifier      = "aurora-cluster-demo"
   engine                  = "aurora-mysql"
-  engine_version          = "5.7.mysql_aurora.2.10.2"
+  engine_version          = "5.7.mysql_aurora.2.11.2"
   availability_zones      = ["us-east-1a", "us-east-1b", "us-east-1c"]
   db_subnet_group_name    = aws_db_subnet_group.default.id
   database_name           = "mydb"

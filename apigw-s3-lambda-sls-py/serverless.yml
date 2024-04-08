@@ -1,0 +1,310 @@
+service: sls-${self:custom.name}-sfp
+
+provider:
+  name: aws
+  runtime: python3.11
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  deploymentBucket:
+    blockPublicAccess: true
+    maxPreviousDeploymentArtifacts: 3
+  tracing:
+    apiGateway: true
+
+custom:
+  name: bb245
+  bucket_name: bb245-sfp
+
+functions:
+  ProcessS3Data:
+    handler: process_s3_data.lambda_handler
+    role: ProcessS3DataIamRole
+    memorySize: 256
+    environment:
+      POWERTOOLS_SERVICE_NAME: processS3Order
+      POWERTOOLS_LOG_LEVEL: INFO
+      Tracing: Active
+    layers:
+      -  'arn:aws:lambda:${self:provider.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:61'
+    events:
+      - s3:
+          bucket: !Ref S3Bucket
+          event: s3:ObjectCreated:*
+          existing: true
+resources:
+  Resources:
+    ApiCWLRoleArn:
+      Type: AWS::ApiGateway::Account
+      Properties:
+        CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
+    CloudWatchRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+        Path: /
+        ManagedPolicyArns:
+          - 'arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'
+    IAMRoleForAPIGateway:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:service}-${self:provider.stage}-Role
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: apigateway.amazonaws.com
+              Action: sts:AssumeRole
+        Description: Role for ${self:service}
+        Path: /
+        Policies:
+          - PolicyName: ${self:service}-role-policy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action: s3:PutObject
+                  Resource:
+                    Fn::Join:
+                      - ""
+                      - - "arn:aws:s3:::"
+                        - "Ref": "S3Bucket"
+                        - "/*"
+    ProcessS3DataIamRole:
+      Type: AWS::IAM::Role
+      Properties:
+        Path: /ProcessS3DataIamRole/
+        RoleName: Process-S3-Data-Role
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: Process-S3-Data-Role-Policy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                    - logs:TagResource
+                  Resource:
+                    - 'Fn::Join':
+                        - ':'
+                        - - 'arn:aws:logs'
+                          - Ref: 'AWS::Region'
+                          - Ref: 'AWS::AccountId'
+                          - 'log-group:/aws/lambda/*:*:*'
+                - Effect: Allow
+                  Action:
+                    - xray:PutTraceSegments
+                    - xray:PutTelemetryRecords
+                  Resource:
+                    - "*"
+                - Effect: "Allow"
+                  Action:
+                    - s3:GetObject
+                  Resource:
+                    Fn::Join:
+                      - ""
+                      - - "arn:aws:s3:::"
+                        - "Ref": "S3Bucket"
+                        - "/*"
+    RestAPI:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Name: ${self:service}-${self:provider.stage}
+        ApiKeySourceType: HEADER
+        EndpointConfiguration:
+          Types:
+            - REGIONAL
+    RestAPIResource:
+      Type: AWS::ApiGateway::Resource
+      Properties:
+        ParentId: !GetAtt RestAPI.RootResourceId
+        PathPart: api
+        RestApiId: !Ref RestAPI
+    RestAPIObjectPathResource:
+      Type: AWS::ApiGateway::Resource
+      Properties:
+        ParentId: !Ref RestAPIResource
+        PathPart: '{order_object_path+}'
+        RestApiId: !Ref RestAPI
+    RequestBodyModelId:
+      Type: 'AWS::ApiGateway::Model'
+      Properties:
+        RestApiId: !Ref RestAPI
+        ContentType: application/json
+        Schema:
+          $schema: 'http://json-schema.org/draft-04/schema#'
+          title: RequestBodyModelId
+          properties:
+            orderId:
+              type: integer
+    RequestBodyModel:
+      Type: 'AWS::ApiGateway::Model'
+      Properties:
+        RestApiId: !Ref RestAPI
+        ContentType: application/json
+        Schema:
+          $schema: 'http://json-schema.org/draft-04/schema#'
+          title: RequestBodyModel
+          required:
+            - orderDate
+            - orderPaymentAmount
+            - orderPaymentCurrency
+            - customerId
+          type: object
+          properties:
+            orderId:
+              "$ref": !Sub
+                - 'https://apigateway.amazonaws.com/restapis/${Api}/models/${RequestBodyModelId}'
+                - Api: !Ref RestAPI
+                  RequestBodyModelId: !Ref RequestBodyModelId
+            orderDate:
+              type: string
+            orderPaymentAmount:
+              type: number
+              minimum: 0
+              maximum: 99999
+            orderPaymentCurrency:
+              type: string
+              enum:
+                - "USD"
+                - "EUR"
+                - "INR"
+            customerId:
+              type: integer
+              minLength: 3
+              maxLength: 7
+    PUTRequestValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: body-only
+        RestApiId: !Ref RestAPI
+        ValidateRequestBody: True
+        ValidateRequestParameters: False
+    RestAPIPutMethod:
+      Type: AWS::ApiGateway::Method
+      Properties:
+        ApiKeyRequired: true
+        HttpMethod: PUT
+        AuthorizationType: NONE
+        RequestValidatorId: !Ref PUTRequestValidator
+        RequestModels:
+          application/json: !Ref RequestBodyModel
+        Integration:
+          TimeoutInMillis: 7000
+          Type: AWS
+          IntegrationHttpMethod: PUT
+          Uri: arn:aws:apigateway:${self:provider.region}:s3:path/${stageVariables.bucket_name}/{order_object_path}
+          Credentials: !GetAtt IAMRoleForAPIGateway.Arn
+          RequestParameters:
+            integration.request.path.order_object_path: 'method.request.path.order_object_path'
+          IntegrationResponses:
+            - StatusCode: 200
+            - StatusCode: 400
+              SelectionPattern: 4\d{2}
+            - StatusCode: 500
+              SelectionPattern: 5\d{2}
+          PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestParameters:
+          method.request.path.order_object_path: true
+          method.request.header.Content-Type: true
+        OperationName: write-order-data-to-s3
+        ResourceId: !Ref RestAPIObjectPathResource
+        RestApiId: !Ref RestAPI
+        MethodResponses:
+          - StatusCode: 200
+            ResponseModels:
+              application/json: 'Empty'
+          - StatusCode: 400
+            ResponseModels:
+              application/json: 'Error'
+          - StatusCode: 500
+            ResponseModels:
+              application/json: 'Error'
+    RestAPIDeployment:
+      Type: AWS::ApiGateway::Deployment
+      Properties:
+        RestApiId: !Ref RestAPI
+      DependsOn:
+        - RestAPIPutMethod
+        - RequestBodyModel
+    RestAPIStage:
+      Type: AWS::ApiGateway::Stage
+      DependsOn: ApiCWLRoleArn
+      Properties:
+        DeploymentId: !Ref RestAPIDeployment
+        Description: ${self:provider.stage} stage
+        RestApiId: !Ref RestAPI
+        StageName: ${opt:stage, 'dev'}
+        Variables:
+          bucket_name: ${self:custom.bucket_name}
+        MethodSettings:
+          - ResourcePath: "/*"
+            HttpMethod: "*"
+            LoggingLevel: INFO
+            MetricsEnabled: true
+    UsagePlan:
+      Type: AWS::ApiGateway::UsagePlan
+      DependsOn:
+        - RestAPIStage
+      Properties:
+        ApiStages:
+          - ApiId: !Ref RestAPI
+            Stage: ${opt:stage, 'dev'}
+            Throttle:
+              "/api/{order_object_path+}/PUT":
+                RateLimit: 50.0
+                BurstLimit: 100
+        Quota:
+          Limit: 1000
+          Period: MONTH
+        Throttle:
+          RateLimit: 100.0
+          BurstLimit: 200
+        UsagePlanName: "sls-spf-plan"
+    ApiKey:
+      Type: AWS::ApiGateway::ApiKey
+      Properties:
+        Description: API Key
+        Name: 'apigwToS3Key'
+        Enabled: True
+    UsagePlanKey:
+      Type: AWS::ApiGateway::UsagePlanKey
+      Properties:
+        KeyId: !Ref ApiKey
+        KeyType: API_KEY
+        UsagePlanId: !Ref UsagePlan
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      DeletionPolicy: Retain
+      UpdateReplacePolicy: Retain
+      Properties:
+        BucketName: ${self:custom.bucket_name}
+        VersioningConfiguration:
+          Status: Suspended
+        AccessControl: Private
+
+  Outputs:
+    S3BucketName:
+      Value: !Ref S3Bucket
+    ApiRootUrl:
+      Value: !Sub 'https://${RestAPI}.execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}/api/{order_object_path+}'
+    ApiGKeyId:
+      Value: !Ref ApiKey
+plugins:
+  - serverless-python-requirements

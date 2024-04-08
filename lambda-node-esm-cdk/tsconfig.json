@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "nodenext",
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "moduleResolution": "nodenext",
+    "declaration": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": false,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "resolveJsonModule": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "types": ["node"]
+  },
+  "exclude": [
+    "node_modules",
+    "cdk.out"
+  ]
+}

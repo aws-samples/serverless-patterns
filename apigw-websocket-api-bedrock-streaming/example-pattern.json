@@ -1,0 +1,57 @@
+{
+    "title": "WebSocket API to Lambda to Bedrock with streaming response",
+    "description": "Creates an API Gateway WebSocket API and Lambda functions that provides a streaming response from the LLMs in Amazon Bedrock.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to use WebSocket API as a front door to Lambda functions that perform inference on Amazon Bedrock LLMs using the [InvokeModelWithResponseStream](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModelWithResponseStream.html) API, where the LLM responses are returned in a stream.",
+        "With WebSocket API, developers of interactive LLM chatbot interfaces can provide a better user experience by displaying the LLM responses as they are generated (which at times can be long), rather than relying on the synchronous [InvokeModel](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html) API request.",
+        "This pattern deploys one API Gateway WebSocket API, four Lambda functions, and one DynamoDB table."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-bedrock-streaming",
+        "templateURL": "serverless-patterns/apigw-websocket-api-bedrock-streaming",
+        "projectFolder": "apigw-websocket-api-bedrock-streaming",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Working with WebSocket APIs",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html"
+        },
+        {
+          "text": "Amazon Bedrock",
+          "link": "https://aws.amazon.com/bedrock/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Windrich",
+        "bio": "I am a Solutions Architect in AWS who works with customers in industries such as finance and transport, to help accelerate their cloud adoption journey. He is especially interested in Serverless technologies and how customers can leverage them to bring values to their business.",
+        "linkedin": "windrich"
+      }
+    ]
+  }

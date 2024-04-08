@@ -1,0 +1,66 @@
+openapi: "3.0.1"
+info:
+  title: "sf-crud"
+  version: "1.0"
+paths:
+  /:
+    x-amazon-apigateway-any-method:
+      responses:
+        "400":
+          description: "400 response"
+          content: {}
+        "200":
+          description: "200 response"
+          content: {}
+      x-amazon-apigateway-integration:
+        credentials:
+          Fn::GetAtt: [ ApiRole, Arn ]
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-west-2:states:action/StartSyncExecution"
+        responses:
+          "200":
+            statusCode: "200"
+            responseTemplates:
+              application/json: >
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.output
+          "400":
+            statusCode: "400"
+        requestTemplates:
+          application/json: {"Fn::Sub": "#set($body= $input.json('$'))#set($inputRoot='{\"data\" :'+$body+',\"httpMethod\" :\"'+$context.httpMethod+'\"}')#set($apiData=$util.escapeJavaScript($inputRoot))#set($apiData=$apiData.replaceAll(\"\\\\'\",\"'\")){\"input\" :\"$apiData\",\"stateMachineArn\": \"${StateMachine}\"}"}
+        passthroughBehavior: "never"
+        type: "aws"
+  /{id}:
+    x-amazon-apigateway-any-method:
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "400 response"
+          content: {}
+        "200":
+          description: "200 response"
+          content: {}
+      x-amazon-apigateway-integration:
+        credentials:
+          Fn::GetAtt: [ ApiRole, Arn ]
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-west-2:states:action/StartSyncExecution"
+        responses:
+          "200":
+            statusCode: "200"
+            responseTemplates:
+              application/json: >
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.output
+          "400":
+            statusCode: "400"
+        requestTemplates:
+          application/json: {"Fn::Sub": "#set($body= $input.json('$'))#set($inputRoot='{\"data\" :'+$body+',\"httpMethod\" :\"'+$context.httpMethod+'\"}')#set($apiData=$util.escapeJavaScript($inputRoot))#set($apiData=$apiData.replaceAll(\"\\\\'\",\"'\")){\"input\" :\"$apiData\",\"stateMachineArn\": \"${StateMachine}\"}"}
+        passthroughBehavior: "never"
+        type: "aws"
+components: {}

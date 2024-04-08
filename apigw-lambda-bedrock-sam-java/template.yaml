@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: This template exposes API to invoke Amazon Bedrock Mistral LLM using Java based AWS Lambda
+
+Globals:
+  Function:
+    Runtime: java17
+    MemorySize: 3008
+    Timeout: 120
+
+  Api:
+    OpenApiVersion: '3.0.1'
+
+Resources:
+  #Create API Gateway
+  MyAPIGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Name: my-api-gateway
+
+  #Create Lambda Function
+  MyBedrockInvokerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: MyBedrockInvokerFunction
+      Handler: com.example.MyBedrockInvokerFunction::handleRequest
+      CodeUri: target/MyBedrockInvokerFunction.zip
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: 
+                - "bedrock:InvokeModel"
+              Resource:
+                - !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/*     
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /invoke
+            Method: POST
+            RestApiId: !Ref MyAPIGateway
+
+Outputs:
+  APIGatewayEndpoint:
+    Description: API Gateway Endpoint
+    Value:
+      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/invoke

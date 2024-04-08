@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:sfn-lambda)
   A Step Functions Express Workflow triggered syncronously by an API Gatewat HTTP APIs integration
 
 Resources:
@@ -32,7 +33,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 3
       Policies: 
         - CloudWatchPutMetricPolicy: {}

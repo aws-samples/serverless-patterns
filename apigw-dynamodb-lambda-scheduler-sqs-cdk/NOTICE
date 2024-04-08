@@ -1,0 +1,25 @@
+Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+SPDX-License-Identifier: MIT-0
+
+**********************
+THIRD PARTY COMPONENTS
+**********************
+This software includes third party software subject to the following copyrights:
+
+@types/jest under the Massachusetts Institute of Technology (MIT) license
+@types/node under the Massachusetts Institute of Technology (MIT) license
+@types/deep-diff under the Massachusetts Institute of Technology (MIT) license
+@typescript-eslint/eslint-plugin under the Massachusetts Institute of Technology (MIT) license
+@typescript-eslint/parser under the BSD-2-Clause license
+eslint under the Massachusetts Institute of Technology (MIT) license
+eslint-config-standard under the Massachusetts Institute of Technology (MIT) license
+eslint-plugin-import under the Massachusetts Institute of Technology (MIT) license
+eslint-plugin-jest under the Massachusetts Institute of Technology (MIT) license
+eslint-plugin-node under the Massachusetts Institute of Technology (MIT) license
+eslint-plugin-promise under the ISC license
+jest under the Massachusetts Institute of Technology (MIT) license
+prettier under the Massachusetts Institute of Technology (MIT) license
+ts-jest under the Massachusetts Institute of Technology (MIT) license
+ts-node under the Massachusetts Institute of Technology (MIT) license
+typescript under the Apache License Version 2.0
+source-map-support under the Massachusetts Institute of Technology (MIT) license

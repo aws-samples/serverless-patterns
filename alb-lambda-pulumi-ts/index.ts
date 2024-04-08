@@ -1,4 +1,3 @@
-import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import * as lambda from "./lambda";
@@ -59,6 +58,6 @@ const lambdaPermission = new aws.lambda.Permission("permission", {
 const targetGroupAttachment = new aws.lb.TargetGroupAttachment("targetGroupAttachment", {
     targetGroupArn: targetGroup.arn,
     targetId: lambdaFunction.arn
-});
+}, {dependsOn: [lambdaPermission]});
 
 export const url = loadBalancer.dnsName;

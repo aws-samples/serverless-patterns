@@ -4,6 +4,8 @@
 package com.unicorn.store;
 
 import com.unicorn.store.controller.UnicornController;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.crac.Context;
 import org.crac.Core;
 import org.crac.Resource;
@@ -11,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class UnicornPrimingResource implements Resource {
+
+    private static final Logger logger = LogManager.getLogger();
 
     private final UnicornController unicornController;
 
@@ -21,9 +25,9 @@ public class UnicornPrimingResource implements Resource {
 
     @Override
     public void beforeCheckpoint(Context<? extends Resource> context) {
-        System.out.println("beforeCheckpoint hook");
+        logger.info("beforeCheckpoint hook");
         try {
-            unicornController.getUnicorn("123");
+            unicornController.retrieveUnicorn("123");
         } catch (RuntimeException e) {
             // expected exception when unicorn doesn't exist.
         }
@@ -31,6 +35,6 @@ public class UnicornPrimingResource implements Resource {
 
     @Override
     public void afterRestore(Context<? extends Resource> context) {
-        System.out.println("afterRestore hook");
+        logger.debug("afterRestore hook");
     }
 }

@@ -1,0 +1,66 @@
+{
+  "title": "Amazon S3 to Amazon EventBridge to Amazon SNS",
+  "description": "Publish events directly from S3 to EventBridge and send notifications to SNS when an object is created.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use Amazon SNS to deliver notifications to subscribers for objects uploaded to an S3 bucket.",
+      "This pattern uses AWS CDK to setup an S3 bucket that publishes events to Amazon EventBridge. When an object is uploaded to the bucket, an EventBridge rule triggers and a SNS notification is sent to subscribers.",
+      "This pattern deploys one S3 Bucket, SNS Topic, EventBridge rule and a Lambda function which is used internally by CDK to apply configuration notifications on the bucket"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-sns-cdk",
+      "templateURL": "serverless-patterns/s3-eventbridge-sns-cdk",
+      "projectFolder": "s3-eventbridge-sns-cdk",
+      "templateFile": "/src/lib/s3-eventbridge-sns-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting started with the AWS CDK",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
+      },
+      {
+        "text": "Setup SNS topic",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-create-topic.html"
+      },
+      {
+        "text": "Use Amazon S3 Event Notifications with Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/aws/new-use-amazon-s3-event-notifications-with-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rajesh Raghu",
+      "image": "https://drive.google.com/file/d/1J0G40015K4sX4EzGQ7-OfGYqXT19O0DP/view?usp=sharing",
+      "bio": "Cloud Support Engineer @ AWS",
+      "linkedin": "rajesh-raghu-97a321b4"
+    }
+  ]
+}

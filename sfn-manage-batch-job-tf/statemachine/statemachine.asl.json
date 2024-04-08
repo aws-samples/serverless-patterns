@@ -1,0 +1,49 @@
+{
+  "Comment": "An example of a workflow which sends an SNS notification when a Batch job succeeds or fails.",
+  "StartAt": "Submit Batch Job",
+  "TimeoutSeconds": 3600,
+  "States": {
+    "Submit Batch Job": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::batch:submitJob.sync",
+      "Parameters": {
+        "JobName": "BatchJobNotification",
+        "JobQueue": "${batch_job_queue}",
+        "JobDefinition": "${batch_job_definition}"
+      },
+      "Next": "Notify Success",
+      "Retry": [
+          {
+            "ErrorEquals": [ "States.ALL" ],
+            "IntervalSeconds": 30,
+            "MaxAttempts": 2,
+            "BackoffRate": 1.5
+          }
+      ],
+      "Catch": [
+          {
+            "ErrorEquals": [ "States.ALL" ],
+            "Next": "Notify Failure"
+          }
+      ]
+    },
+    "Notify Success": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": "Batch job submitted through Step Functions succeeded",
+        "TopicArn": "${sns_topic}"
+      },
+      "End": true
+    },
+    "Notify Failure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": "Batch job submitted through Step Functions failed",
+        "TopicArn": "${sns_topic}"
+      },
+      "End": true
+    }
+  }
+}

@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Service to Service description
+
+# Comment on each global 
+Globals:
+
+
+# Comment each resource section to explain usage
+Resources:
+
+
+# List all common outputs for usage
+Outputs:
+
+

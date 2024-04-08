@@ -1,0 +1,17 @@
+{
+    "name": "sqs-lambda-ddb-sam-ts",
+    "version": "1.0.0",
+    "description": "Demo code for SQS to Lambda to DynamoDB table",
+    "private": true,
+    "license": "MIT",
+    "type": "module",
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.119",
+        "@types/node": "^20.6.0",
+        "typescript": "^5.2.2"
+    },
+    "dependencies": {
+        "@aws-sdk/client-dynamodb": "^3.409.0",
+        "@aws-sdk/util-dynamodb": "^3.409.0"
+    }
+}

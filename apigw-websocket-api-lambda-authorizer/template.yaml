@@ -1,0 +1,275 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Application to demonstrates Cognito authentication with Amazon API Gateway WebSocket API. (uksb-1tthgi812) (tag:apigw-websocket-api-lambda-authorizer)
+Parameters:
+  ConnectionMappingTableName:
+    Type: String
+    Default: SimpleChatConnections
+    Description: The name of the new DynamoDB to store connection identifiers for
+      each connected clients. Minimum 3 characters.
+    MinLength: '3'
+    MaxLength: '50'
+    AllowedPattern: ^[A-Za-z_]+$
+Resources:
+
+ # API Gateway Websocket API, Deployment & Stage
+  SimpleChatWebSocketApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: SimpleChatWebSocket
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: $request.body.message
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - ConnectRoute
+      - SendMessageRoute
+      - DisconnectRoute
+    Properties:
+      ApiId: !Ref 'SimpleChatWebSocketApi'
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref 'SimpleChatWebSocketApi'
+      DeploymentId: !Ref 'Deployment'
+      StageName: Prod
+
+ # Lambda functions for OnConnect, OnDisconnect, SendMessage
+  OnConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: WebSocketAPI::WebSocketAPI.Functions::OnConnectHandler
+      Runtime: dotnet6
+      CodeUri: './src/WebSocketAPI'
+      MemorySize: 256
+      Timeout: 30
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref 'ConnectionMappingTableName'
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref 'ConnectionMappingTableName'
+  OnDisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: WebSocketAPI::WebSocketAPI.Functions::OnDisconnectHandler
+      Runtime: dotnet6
+      CodeUri: './src/WebSocketAPI'
+      MemorySize: 256
+      Timeout: 30
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref 'ConnectionMappingTableName'
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref 'ConnectionMappingTableName'
+  SendMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: WebSocketAPI::WebSocketAPI.Functions::SendMessageHandler
+      Runtime: dotnet6
+      CodeUri: './src/WebSocketAPI'
+      MemorySize: 256
+      Timeout: 30
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref 'ConnectionMappingTableName'
+        - Statement:
+            Effect: Allow
+            Action: execute-api:ManageConnections
+            Resource: !Sub 
+            - arn:aws:execute-api:${region}:${accountId}:*/@connections/*
+            - region: !Ref 'AWS::Region'
+              accountId: !Ref 'AWS::AccountId'
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref 'ConnectionMappingTableName'
+
+# Websocket API routes and integrations
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref 'SimpleChatWebSocketApi'
+      RouteKey: $connect
+      AuthorizationType: CUSTOM
+      AuthorizerId: !Ref 'LambdaAuthorizer'
+      OperationName: ConnectRoute
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref 'ConnectInteg'
+  ConnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref 'SimpleChatWebSocketApi'
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub
+        - arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${function}/invocations
+        - region: !Ref 'AWS::Region'
+          function: !GetAtt 'OnConnectFunction.Arn'
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref 'SimpleChatWebSocketApi'
+      RouteKey: $disconnect
+      AuthorizationType: NONE
+      OperationName: ConnectRoute
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref 'DisconnectInteg'
+  DisconnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref 'SimpleChatWebSocketApi'
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub
+        - arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${function}/invocations
+        - region: !Ref 'AWS::Region'
+          function: !GetAtt 'OnDisconnectFunction.Arn'
+  SendMessageRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref 'SimpleChatWebSocketApi'
+      RouteKey: sendmessage
+      AuthorizationType: NONE
+      OperationName: ConnectRoute
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref 'SendMessageInteg'
+  SendMessageInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref 'SimpleChatWebSocketApi'
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub
+        - arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${function}/invocations
+        - region: !Ref 'AWS::Region'
+          function: !GetAtt 'SendMessageFunction.Arn'
+
+# Grant API Gateway permissions to invoke these functions
+  OnConnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - OnConnectFunction
+      - SimpleChatWebSocketApi
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref 'OnConnectFunction'
+      Principal: apigateway.amazonaws.com
+  OnDisconnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - OnDisconnectFunction
+      - SimpleChatWebSocketApi
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref 'OnDisconnectFunction'
+      Principal: apigateway.amazonaws.com
+  SendMessagePermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - SendMessageFunction
+      - SimpleChatWebSocketApi
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref 'SendMessageFunction'
+      Principal: apigateway.amazonaws.com
+ 
+ # DynamoDB table for storing connection identifiers
+  ConnectionMappingTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref 'ConnectionMappingTableName'
+      AttributeDefinitions:
+        - AttributeName: connectionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: connectionId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+# Cognito User Pool for authentication
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: demo-userpool
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+
+# Cognito User Pool Client
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      SupportedIdentityProviders:
+        - COGNITO
+      ClientName: demo-userpool-client
+      UserPoolId: !Ref 'CognitoUserPool'
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_ADMIN_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+  
+  # Lambda function working as authorizer
+  LambdaAuthorizerHandler:
+    Type: AWS::Serverless::Function
+    Metadata:
+      Tool: Amazon.Lambda.Annotations
+    Properties:
+      Runtime: dotnet6
+      CodeUri: ./src/LambdaAuthorizer
+      MemorySize: 1024
+      Timeout: 30
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      PackageType: Zip
+      Handler: LambdaAuthorizer::LambdaAuthorizer.Function::LambdaAuthorizerHandler
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_ID: !Ref 'CognitoUserPool'
+          COGNITO_USER_POOL_CLIENT_ID: !Ref 'CognitoUserPoolClient'
+  
+  # Grant API Gateway permissions to invoke this function
+  LambdaAuthorizerPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - LambdaAuthorizerHandler
+      - SimpleChatWebSocketApi
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref 'LambdaAuthorizerHandler'
+      Principal: apigateway.amazonaws.com
+
+  # Authorizer for API Gateway (WebSocket API)
+  LambdaAuthorizer:
+    Type: AWS::ApiGatewayV2::Authorizer
+    Properties:
+      Name: LambdaAuthorizer
+      ApiId: !Ref 'SimpleChatWebSocketApi'
+      AuthorizerType: REQUEST
+      AuthorizerUri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaAuthorizerHandler.Arn}/invocations'
+      IdentitySource:
+        - route.request.querystring.ID_Token
+
+Outputs:
+  WebSocketURI:
+    Value: !Join
+      - ''
+      - - wss://
+        - !Ref 'SimpleChatWebSocketApi'
+        - .execute-api.
+        - !Ref 'AWS::Region'
+        - .amazonaws.com/
+        - !Ref 'Stage'
+    Description: The WSS Protocol URI to connect to
+  UserpoolId:
+    Value: !Ref CognitoUserPool
+    Description: Cognito UserPool Id
+  ClientId:
+    Value: !Ref CognitoUserPoolClient
+    Description: Cognito UserPool ClientId
+

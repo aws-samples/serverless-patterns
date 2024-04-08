@@ -1,0 +1,8 @@
+{
+    "name": "lambda-esm-ddb-filter",
+    "version": "1.0.0",
+    "description": "Demo code for Amazon DynamoDB Stream event filtering",
+    "private": true,
+    "license": "MIT",
+    "type": "module"
+}

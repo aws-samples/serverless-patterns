@@ -1,19 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AWSProjectType>Lambda</AWSProjectType>
     <!-- This property makes the build directory similar to a publish directory and helps the AWS .NET Lambda Mock Test Tool find project dependencies. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- Generate ready to run images during publishing to improve cold start time. -->
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="2.4.0" />
+    <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="2.6.0" />
     <PackageReference Include="Amazon.Lambda.Core" Version="2.1.0" />
-    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.2.0" />
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.2.12" />
+    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.3.1" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.105.3" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="output.zip" />
     <None Remove="Readme.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\..\README.md">
+      <Link>README.md</Link>
+    </Content>
   </ItemGroup>
 </Project>

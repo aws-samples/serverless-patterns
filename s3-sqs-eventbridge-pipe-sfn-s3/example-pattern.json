@@ -1,0 +1,61 @@
+{
+    "title": "Copying a file between Amazon S3 buckets via Amazon Eventbridge Pipes & AWS Step Functions",
+    "description": "Copy and manipulate an object between Amazon S3 buckets using Amazon SQS, Amazon EventBridge Pipes and AWS Step Functions",
+    "language": "",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to copy an object with JSON encoded content between two S3 buckets and manipulate it in transit.",
+            "When an object is created in the source S3 bucket, an S3 Event Notification is fires and enqueued onto an SQS Queue.",
+            "The EventBridge service polls the SQS Queue and invokes an EventBridge Pipe.",
+            "The EventBridge Pipe then executes an AWS Step Functions Express Workflow state machine.",
+            "This copies the file from the source S3 Bucket to the destination S3 Bucket.",
+            "In a real world scenario the state machine would be modified to manipulate the JSON object as desired"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-sqs-eventbridge-pipe-sfn-s3",
+            "templateURL": "serverless-patterns/s3-sqs-eventbridge-pipe-sfn-s3",
+            "projectFolder": "s3-sqs-eventbridge-pipe-sfn-s3",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Configuring an S3 bucket for notifications",
+                "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/ways-to-add-notification-config-to-bucket.html"
+            },
+            {
+                "text": "Amazon Simple Queue Service as an EventBridge Pipe source",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-sqs.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Dan Straw",
+            "image": "https://avatars.githubusercontent.com/u/271028",
+            "bio": "Senior Solutions Architect at AWS",
+            "linkedin": "danstraw"
+        }
+    ]
+}

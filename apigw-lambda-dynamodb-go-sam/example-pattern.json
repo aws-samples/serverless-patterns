@@ -1,0 +1,45 @@
+{
+    "title": "API Gateway to AWS Lambda to Amazon DynamoDB with Go and AWS SAM",
+    "description": "Use AWS SAM to deploy a REST API connected to AWS Lambda, that puts items in Amazon DynamoDB.",
+    "language": "Go",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": ["This pattern explains how to deploy an AWS SAM application that includes an API Gateway, AWS Lambda Function, written in Go, and writes items to an Amazon DynamoDB table."]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://serverlessland.com/patterns/",
+        "templateURL": "serverless-patterns/apigw-lambda-dynamodb-sam-go",
+        "projectFolder": "apigw-lambda-dynamodb-sam-go",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+            "text": "Amazon DynamoDB",
+            "link": "https://docs.aws.amazon.com/dynamodb"  
+        }
+      ]
+    },
+    "deploy": {
+      "text": ["sam deploy --guided"]
+    },
+    "testing": {
+      "text": ["See the README in the Github repo for detailed testing instructions."]
+    },
+    "cleanup": {
+      "text": ["Delete the stack: <code>sam delete</code>."]
+    },
+    "authors": [
+      {
+        "name": "Micah Walter",
+        "image": "https://share.micawal.people.aws.dev/profile/micahwalter-profile.jpg",
+        "bio": "Sr. Solutions Architect @ AWS. Serverless enthusiast.",
+        "linkedin": "https://www.linkedin.com/in/micahwalter"
+      }
+    ]
+  }
+  
