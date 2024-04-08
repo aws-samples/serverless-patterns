@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Template to connect Kinesis streams together with filtering
+Description: Template to connect Kinesis streams together with filtering (uksb-1tthgi812) (tag:eventbridge-pipes-kinesis-to-kinesis-with-filtering)
 
 Resources:
   #Kinesis Data Stream

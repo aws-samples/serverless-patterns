@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: aws-decouple-messaging-pattern
+Description: aws-decouple-messaging-pattern (uksb-1tthgi812) (tag:lambda-sqs-lambda-sam-java)
 
 Globals:
   Function:

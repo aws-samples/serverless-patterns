@@ -1,0 +1,30 @@
+openapi: "3.0.1"
+info:
+  title: "HttpApi"
+paths:
+  /:
+    post:
+      responses:
+        default:
+          description: "Response for POST /"
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        integrationSubtype: "SQS-SendMessage"
+        credentials:
+          Fn::GetAtt: [MyAPiRole, Arn]
+        connectionType: "INTERNET"
+        payloadFormatVersion: "1.0"
+        requestParameters:
+          MessageBody: "$request.body"
+          MessageGroupId: "$request.body.messagegroup"
+          QueueUrl:
+            Ref: MySQSQueue
+
+x-amazon-apigateway-cors:
+  allowMethods:
+    - "*"
+  maxAge: 0
+  allowCredentials: false
+  allowOrigins:
+    - "*"
+x-amazon-apigateway-importexport-version: "1.0"

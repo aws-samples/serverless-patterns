@@ -1,0 +1,62 @@
+{
+  "title": "Eventbridge rule to Appsync target",
+  "description": "Listen to Eventbridge events from an Appsync subscription",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to create an Appsync API that allows you to listen to events going into an Eventbridge event bus.",
+      "This pattern is especially useful if you want your frontend users to be aware of changes happening in your backend. Those events coming in your event bus can either be pushed as custom events or can come from AWS services."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-appsync-subscription-sam",
+      "templateURL": "serverless-patterns/eventbridge-appsync-subscription-sam",
+      "projectFolder": "eventbridge-appsync-subscription-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS AppSync",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "Amazon Eventbridge",
+        "link": "https://aws.amazon.com/eventbridge/"
+      },
+      {
+        "text": "Appsync as Eventbridge target",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2024/01/amazon-eventbridge-appsync-target-buses/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alexis Philippart de Foy",
+      "image": "https://media.licdn.com/dms/image/C4D03AQFyN5GLrFk-0g/profile-displayphoto-shrink_400_400/0/1586853008714?e=1710979200&v=beta&t=Cwsaq7BQtFlztLuWDJAnE4VBTIJCWXOAwJ0bvsAhDmc",
+      "bio": " I am a Startup Solutions Architect, Serverless enthusiast and former Startup Founder.",
+      "linkedin": "apdf",
+      "twitter": "@aphilippartd"
+    }
+  ]
+}

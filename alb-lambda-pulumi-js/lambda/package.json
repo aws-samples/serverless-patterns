@@ -1,0 +1,8 @@
+{
+    "name": "lambda",
+    "version": "1.0.0",
+    "description": "Lambdas to consume via ALB",
+    "private": true,
+    "license": "MIT",
+    "dependencies": {}
+}

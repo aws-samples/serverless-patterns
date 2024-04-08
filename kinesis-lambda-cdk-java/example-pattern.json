@@ -1,0 +1,57 @@
+{
+  "title": "Amazon Kinesis Data Streams to AWS Lambda using CDK for Java",
+  "description": "Create a serverless app using Amazon Kinesis Data Streams and AWS Lambda.",
+  "language": "Java",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon Kinesis Data Stream that integrates with AWS Lambda using the AWS CDK in Java.",
+      "In this example, the Kinesis data stream is used as an event source for the AWS Lambda (Java) function which processes the data from the stream and catches any failures."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-lambda-cdk-java",
+      "templateURL": "patterns/kinesis-lambda-cdk-java",
+      "projectFolder": "kinesis-lambda-cdk-java",
+      "templateFile": "kinesis-lambda-cdk-java/src/main/java/com.myorg/MyServerlessApplicationStack.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using AWS Lambda with Amazon Kinesis",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+      },
+      {
+        "text": "Working with the AWS CDK in Java",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-java.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Lefteris Karageorgiou",
+      "image": "https://media.licdn.com/dms/image/C4D03AQHjv8OCPlhz6w/profile-displayphoto-shrink_400_400/0/1517428865562?e=1698278400&v=beta&t=2572XBtbjoiroPWBk6K6mv3gXdMoD6IR9dwXMk83DtA",
+      "bio": "Solutions Architect @ AWS",
+      "linkedin": "https://www.linkedin.com/in/lefteris-karageorgiou-ba1ab926/"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - API Gateway to Private HTTP Endpoint via VPC Link
+Description: Serverless patterns - API Gateway to Private HTTP Endpoint via VPC Link (uksb-1tthgi812) (tag:apigw-vpclink-pvt-alb)
 
 # Parameters to input VPC id and private subnet ids where the ECS cluster and Application Load Balancer will be created.
 Parameters:

@@ -1,0 +1,8 @@
+{
+    "name": "lambda-esm-filter-kinesis",
+    "version": "1.0.0",
+    "description": "Demo code for Kinesis event filtering",
+    "private": true,
+    "license": "MIT",
+    "type": "module"
+}

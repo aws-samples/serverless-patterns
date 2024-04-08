@@ -1,0 +1,3 @@
+Text embeddings represent meaningful vector representations of unstructured text such as documents, paragraphs, and sentences. You input a body of text and the output is a (1 x n) vector. You can use embedding vectors for a wide variety of applications.
+Bedrock supports one model for text embeddings, the Titan Embeddings G1 - Text model (amazon.titan-embed-text-v1). This model supports text retrieval, semantic similarity, and clustering. The maximum input text is 8K tokens and the maximum output vector length is 1536.
+To use a text embeddings model, use the InvokeModel API operation with amazon.titan-embed-text-v1 as the modelId and retrieve the embedding object in the response.

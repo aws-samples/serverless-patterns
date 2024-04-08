@@ -48,10 +48,7 @@ public class TicketPublisher implements RequestHandler<APIGatewayProxyRequestEve
 
     private String publishEvent(TicketCreated ticketCreated) throws JsonProcessingException {
 
-        Region region = Region.EU_CENTRAL_1;
-        EventBridgeClient eventBrClient = EventBridgeClient.builder()
-                .region(region)
-                .build();
+        EventBridgeClient eventBrClient = EventBridgeClient.builder().build();
 
         String event = mapper.writeValueAsString(ticketCreated);
 

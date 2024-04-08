@@ -1,0 +1,109 @@
+{
+    "title": "API Gateway with Cognito to Lambda to Amazon Bedrock",
+    "description": "Create an AWS CDK Python application for Bedrock API with Cognito user management, domain restriction, API request throttling, and quota limits.",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to create an API Gateway with AWS CDK, backed by a Cognito user pool for user management.",
+            "Users can register and log in via an endpoint. Registration can be restricted to a specific domain, such as '@example.com'. The application supports request throttling and quota limits to the API.",
+            "Configuration for domain restriction, request throttling, and quota management can be done using CDK context variables."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-bedrock-cognito-cdk",
+            "templateURL": "serverless-patterns/apigw-bedrock-cognito-cdk",
+            "projectFolder": "apigw-bedrock-cognito-cdk",
+            "templateFile": "app.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon API Gateway - REST API",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+            },
+            {
+                "text": "Amazon Bedrock",
+                "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"
+            },
+            {
+                "text": "Amazon Bedrock - Inference parameters for foundation models",
+                "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters.html"
+            },
+            {
+                "text": "AWS CDK v2 - Python",
+                "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-python.html"
+            },
+            {
+                "text": "Amazon Cognito - User Pools",
+                "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "Deploy the stack: <code>cdk deploy</code>",
+            "Deploy the stack with context variables: <code>cdk deploy --context ORGANIZATION_DOMAIN=@example.com --context API_THROTTLE_RATE_LIMIT=1 --context API_THROTTLE_BURST_LIMIT=2 --context API_QUOTA_LIMIT=25 --contect API_QUOTA_LIMIT=DAY</code>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Run end-to-end tests: <code>pytest</code>"
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Inthuson Anandakumar",
+            "image": "https://avatars.githubusercontent.com/u/8601106?v=4",
+            "bio": "Inthuson Anandakumar Technical Account Manager at AWS based out of London. Inthu currently works with strategic financial services customers for AWS, helping them architect, build, and optimize cloud applications. With a background in software development and solution architecture, he thrives on crafting innovative solutions and enjoys sharing his discoveries with customers across a wide array of sectors.",
+            "linkedin": "inthuson"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 10,
+            "y": 50,
+            "service": "cognito",
+            "label": "Amazon Cognito"
+        },
+        "icon2": {
+            "x": 38,
+            "y": 50,
+            "service": "apigw",
+            "label": "Amazon API Gateway"
+        },
+        "icon3": {
+            "x": 66,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon4": {
+            "x": 90,
+            "y": 50,
+            "service": "bedrock",
+            "label": "Amazon Bedrock"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        }
+    }
+}

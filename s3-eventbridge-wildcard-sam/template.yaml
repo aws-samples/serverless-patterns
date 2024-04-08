@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  MyS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub serverlessland-${AWS::StackName}
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  MyQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: MyQueue
+
+  MyEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: !Sub Wildcard filter pattern on object create events on bucket s3://${MyS3Bucket}
+      EventPattern:
+        source:
+          - aws.s3
+        detail-type:
+          - Object Created
+        detail:
+          bucket:
+            name:
+              - !Ref MyS3Bucket
+          object:
+            key:
+              - wildcard: "*/XYZ/*.csv"
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt MyQueue.Arn
+          Id: MyQueueTarget
+  MyQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref MyQueue
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt MyQueue.Arn
+            Condition:
+              ArnEquals:
+                'aws:SourceArn': !GetAtt MyEventRule.Arn
+Outputs:
+  S3Bucket:
+    Value: !Ref MyS3Bucket
+    Description: The S3 Bucket
+  SQSQueueURL:
+    Value: !Ref MyQueue
+    Description: The SQS Queue URL
+  EventBridgeRule:
+    Value: !Ref MyEventRule
+    Description: The EventBridge Rule Name

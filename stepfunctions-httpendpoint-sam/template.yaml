@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  (uksb-1tthgi812) (tag:stepfunctions-httpendpoint-sam)
+  A Step Functions Workflow that demonstrates direct integration with third-party HTTP API
+
+Resources:
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+
+  StateMachineHTTPEndpoint:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      DefinitionUri: statemachine/httpendpoint-integration.asl.json
+      DefinitionSubstitutions:
+        ConnectionArn: !GetAtt EventBridgeConnection.Arn
+      Role: !GetAtt StatesExecutionRole.Arn
+      Type: STANDARD
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+        IncludeExecutionData: false
+        Level: 'ALL'
+
+##########################################################################
+#  STEP FUNCTION LOG GROUP                                               #
+##########################################################################
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", StateMachineHTTPEndpoint]]
+       
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+  StatesExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: CWLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogDelivery"
+                  - "logs:CreateLogStream"
+                  - "logs:GetLogDelivery"
+                  - "logs:UpdateLogDelivery"
+                  - "logs:DeleteLogDelivery"
+                  - "logs:ListLogDeliveries"
+                  - "logs:PutLogEvents"
+                  - "logs:PutResourcePolicy"
+                  - "logs:DescribeResourcePolicies"
+                  - "logs:DescribeLogGroups"
+                Resource: "*"
+        - PolicyName: StatesExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "events:RetrieveConnectionCredentials"
+                Resource:
+                  - !GetAtt EventBridgeConnection.Arn
+              - Effect: Allow
+                Action:
+                  - "secretsmanager:GetSecretValue"
+                  - "secretsmanager:DescribeSecret"
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:events!connection/*"
+              - Effect: Allow
+                Action:
+                  - "states:InvokeHTTPEndpoint"
+                Resource:
+                  - !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*"           
+
+##########################################################################
+#  EventBridge Connection                                                                                                           #
+##########################################################################
+  EventBridgeConnection:
+    Type: "AWS::Events::Connection"
+    Properties:
+      AuthorizationType: BASIC
+      AuthParameters:
+        BasicAuthParameters:
+          Password: "<PASSWORD_UPDATE_ME>"
+          Username: "<USER_UPDATE_ME>"
+
+##########################################################################
+#   Outputs                                                              #
+##########################################################################
+Outputs:
+  StateMachineHTTPEndpointArn:
+    Value: !Ref StateMachineHTTPEndpoint
+    Description: StateMachineHTTPEndpoint Arn
+

@@ -1,0 +1,58 @@
+{
+  "title": "API Gateway HTTP API to SQS to Lambda (Python)",
+  "description": "This sample project demonstrates how to crate an Amazon API Gateway HTTP API that integrates with an Amazon SQS queue.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "Create an Amazon API Gateway HTTP API that integrates with an Amazon SQS queue.",
+    "text": ["This pattern deploys an Amazon API Gateway HTTP API with a SQS queue which acts as a buffer to alleviate traffic spikes which is further integrated to Lambda"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/blob/main/api-sqs-lambda-python",
+      "templateURL": "serverless-patterns/api-sqs-lambda-python",
+      "projectFolder": "api-sqs-lambda-python",
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      },
+      {
+        "text": "Working with AWS Lambda proxy integrations for HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
+      },
+      {
+        "text": "Using Amazon SQS dead-letter queues to replay messages",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Aditya Pandita",
+      "image": "https://drive.corp.amazon.com/documents/aadianil@/profile.png",
+      "bio": "A Serverless Cloud Engineer and technical writer, dedicated to crafting efficient and scalable solutions using AWS services. My expertise in serverless architecture empowers me to create innovative and cost-effective cloud solutions. I enjoy sharing my knowledge with the serverless community through articles and patterns, helping others explore the vast potential of serverless computing. ",
+      "linkedin": "https://www.linkedin.com/in/adityapandita97/"
+    }
+  ]
+}

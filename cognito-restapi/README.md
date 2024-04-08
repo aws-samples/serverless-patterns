@@ -6,7 +6,7 @@ It assumes that the Cognito User Pool already exists and takes the Cognito User 
 
 Note: when deploying this pattern, *CAPABILITY_IAM* is required.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/cognito-restapi](https://serverlessland.com/patterns/cognito-restapi)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-cognito-authorizer-sam-nodejs](https://serverlessland.com/patterns/apigw-cognito-authorizer-sam-nodejs)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -43,7 +43,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-The stack will output the **api endpoint**. Use *curl* to make an HTTP request to the API Gateway endpoint that includes a Header with the authorization toekn to test the Cognito User Pools Authorizer.
+The stack will output the **api endpoint**. Use *curl* to make an HTTP request to the API Gateway endpoint that includes a Header with the authorization token to test the Cognito User Pools Authorizer.
    
 ```
 curl -i https://{apiId}.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: {tokenProvidedByCognito}"

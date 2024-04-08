@@ -1,0 +1,30 @@
+{
+    "Comment": "A a state machine to demonstrate HTTP Endpoint direct integration",
+    "StartAt": "Get Customers",
+    "States": {
+      "Get Customers": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::http:invoke",
+        "Parameters": {
+          "ApiEndpoint": "https://api.stripe.com/v1/customers",
+          "Method": "GET",
+          "Authentication": {
+            "ConnectionArn": "${ConnectionArn}"
+          }
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "BackoffRate": 2,
+            "IntervalSeconds": 1,
+            "MaxAttempts": 3,
+            "JitterStrategy": "FULL"
+          }
+        ],
+        "End": true,
+        "OutputPath": "$.ResponseBody"
+      }
+    }
+  }

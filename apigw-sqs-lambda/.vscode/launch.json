@@ -3,25 +3,25 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
-            "name": "lambda-nodejs12.x:HelloWorldFunction (nodejs12.x)",
+            "name": "lambda-nodejs16.x:HelloWorldFunction (nodejs16.x)",
             "invokeTarget": {
                 "target": "template",
-                "templatePath": "${workspaceFolder}/lambda-nodejs12.x/template.yaml",
+                "templatePath": "${workspaceFolder}/lambda-nodejs16.x/template.yaml",
                 "logicalId": "HelloWorldFunction"
             },
             "lambda": {
                 "payload": {},
                 "environmentVariables": {},
-                "runtime": "nodejs12.x"
+                "runtime": "nodejs16.x"
             }
         },
         {
             "type": "aws-sam",
             "request": "direct-invoke",
-            "name": "API lambda-nodejs12.x:HelloWorldFunction (nodejs12.x)",
+            "name": "API lambda-nodejs16.x:HelloWorldFunction (nodejs16.x)",
             "invokeTarget": {
                 "target": "api",
-                "templatePath": "${workspaceFolder}/lambda-nodejs12.x/template.yaml",
+                "templatePath": "${workspaceFolder}/lambda-nodejs16.x/template.yaml",
                 "logicalId": "HelloWorldFunction"
             },
             "api": {
@@ -32,7 +32,7 @@
                 }
             },
             "lambda": {
-                "runtime": "nodejs12.x"
+                "runtime": "nodejs16.x"
             }
         },
         {

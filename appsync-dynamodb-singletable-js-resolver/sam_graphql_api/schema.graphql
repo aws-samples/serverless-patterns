@@ -1,0 +1,36 @@
+type Parent{
+  PK: String!
+  SK: String!
+  children: [Child]
+  data: String!
+  type: String!
+}
+
+type Child {
+  PK: String!
+  SK: String!
+  data: String!
+  type: String!
+  parentPK: String!
+  parentSK: String!
+}
+
+type Mutation {
+  createParentItem(
+    PK: ID!,
+    SK: String!,
+    data: String!
+  ): Parent
+
+  createChildItem(
+    PK: ID!,
+    SK: String!,
+    data: String!,
+    parentPK: String!
+    parentSK: String!
+  ): Child
+}
+
+type Query{
+  getParentWithChildren(PK: ID!, SK: ID!): Parent
+}

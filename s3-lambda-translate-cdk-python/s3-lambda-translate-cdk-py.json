@@ -1,0 +1,88 @@
+{
+    "title": "Amazon Translate with Amazon S3 and AWS Lambda",
+    "description": "Perform document language translation using Translate with Lambda and S3",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern uses AWS Cloud Development Kit (AWS CDK) to deploy Amazon S3, AWS Lambda, and Amazon Translate to perform document language translation."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-translate-cdk-python",
+            "templateURL": "serverless-patterns/s3-lambda-translate-cdk-python",
+            "projectFolder": "s3-lambda-translate-cdk-python",
+            "templateFile": "app.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon Translate",
+                "link": "https://docs.aws.amazon.com/translate/latest/dg/what-is.html"
+            },
+            {
+                "text": "Amazon Translate Document API",
+                "link": "https://docs.aws.amazon.com/translate/latest/APIReference/API_TranslateDocument.html"
+            },
+            {
+                "text": "AWS Lambda",
+                "link": "https://aws.amazon.com/lambda/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Arjun Arippa",
+            "image": "https://github.com/awsarippa/amazon-textract-comprehend-pii-analysis/blob/main/image.png",
+            "bio": "Arjun Arippa is a Solutions Architect based in Bangalore, India. He works with some of the strategic and global customers in India, to build and architect their applications on AWS. Before joining AWS, Arjun spent over a decade working as a Software Developer. Reach out to him on LinkedIn",
+            "linkedin": "arjun-arippa"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "translate",
+            "label": "Amazon Translate"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    }
+}

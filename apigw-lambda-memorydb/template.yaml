@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:apigw-lambda-memorydb)
   lambda-memorydb
   Sample SAM Template which creates MemoryDB cluster along with the VPC, Subnets, Security Groups and a Java Lambda function which can access the memory db cluster
 

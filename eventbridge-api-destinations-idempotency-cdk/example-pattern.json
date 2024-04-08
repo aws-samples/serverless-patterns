@@ -1,0 +1,66 @@
+{
+  "title": "Idempotent HTTP requests with Amazon EventBridge API Destinations",
+  "description": "Create an EventBridge event bus and API Destination to reliably send events to HTTP APIs.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern describes how to use EventBridge API Destinations with the IETF HTTP Idempotency-Key header to invoke HTTP APIs supporting idempotent API operations.",
+      "Using API destinations, you can route events between AWS services, integrated software as a service (SaaS) applications, and your applications outside of AWS by using API calls."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations-idempotency-cdk",
+      "templateURL": "serverless-patterns/eventbridge-api-destinations-idempotency-cdk",
+      "projectFolder": "eventbridge-api-destinations-idempotency-cdk",
+      "templateFile": "src/lib/eb-api-destination-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "The Idempotency-Key HTTP Header Field",
+        "link": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/"
+      },
+      {
+        "text": "Amazon EventBridge - A Serverless Event Bus",
+        "link": "https://aws.amazon.com/eventbridge"
+      },
+      {
+        "text": "Amazon EventBridge - User Guide",
+        "link": "https://docs.aws.amazon.com/eventbridge/"
+      },
+      {
+        "text": "Amazon EventBridge - API Destinations",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-destinations.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Deploy the stack: <code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Michael Gasch",
+      "image": "https://serverlessland.com/assets/images/resources/Michael%20Gasch.jpeg",
+      "bio": "Senior Product Manager Technical for Amazon EventBridge.",
+      "linkedin": "michael-gasch-10603298",
+      "twitter": "embano1"
+    }
+  ]
+}

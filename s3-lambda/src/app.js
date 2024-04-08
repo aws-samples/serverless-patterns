@@ -2,9 +2,8 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-const AWS = require('aws-sdk')
-AWS.config.update({ region: process.env.AWS_REGION })
-const s3 = new AWS.S3()
+const { GetObjectCommand, PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
+const s3 = new S3Client({ region: process.env.AWS_REGION });
 
 const gm = require('gm')
 const NEW_SIZE_PX = 480
@@ -17,23 +16,25 @@ exports.handler = async (event) => {
     // console.log(JSON.stringify(event, null, 2))
     const Key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "))
 
+
     // Read the object from S3
-    const s3Object = await s3.getObject({
+    const commandGet = new GetObjectCommand({
         Bucket: event.Records[0].s3.bucket.name,
         Key
-    }).promise()
+      });
+    const s3Object = await s3.send(commandGet);
 
     // Resize the image
     const data = await resizeImage(s3Object.Body)
     
-    // Write to S3    
-    const result = await s3.putObject({
+    // Write to S3
+    const commandPut = new PutObjectCommand({
         Bucket: process.env.DESTINATION_BUCKETNAME,
         Key,
         ContentType: 'image/jpeg',
         Body: data,
-        ACL: 'public-read'
-    }).promise()
+      });
+    const result = await s3.send(commandPut);
     console.log('Write result: ', result)
 }
 

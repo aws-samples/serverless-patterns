@@ -43,7 +43,7 @@ export class AmazonS3UploadApiPatternsStack extends cdk.Stack {
     });
 
     const authFunction = new NodejsFunction(this, "authFunction", {
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_18_X,
       handler: "handler",
       entry: "./authorizer/app.js",
       timeout: cdk.Duration.seconds(5),

@@ -1,0 +1,61 @@
+{
+  "title": "Amazon Kinesis Data Streams to Amazon OpenSeach via Amazon Kinesis Data Firehose",
+  "description": "This sample project demonstrates how to send data received by Kinesis Data Streams to Amazon OpenSearch via Kinesis Data Firehose.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This SAM template creates a Kinesis Data Stream, Kinesis Data Firehose and Amazon OpenSearch Serverless collection. Kinesis Data Firehose is configured with Kinesis Data Stream as source and Amazon OpenSearch as destination. When a message is pushed to Kinesis Data Stream the same is replicated to OpenSearch suing Kinesis Data Firehose. If any messages that can not be processed by Kinesis Data Firehose the same is sent to S3 bucket.",
+      "Please refer to the architecture diagram for the event flow."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kds-kdf-opensearch",
+      "templateURL": "serverless-patterns/kds-kdf-opensearch",
+      "projectFolder": "kds-kdf-opensearch",
+      "templateFile": "kds-kdf-opensearch/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Kinesis Data Stream to Amazon Kinesis Data Firehose integration",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/writing-with-kinesis-streams.html"
+      },
+      {
+        "text": "Kinesis Data Firehose with OpenSearch Destination",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/create-destination.html#create-destination-elasticsearch"
+      },
+      {
+        "text": "OpenSeach Dashboard",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/dashboards.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+    }
+  ]
+}

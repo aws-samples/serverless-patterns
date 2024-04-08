@@ -1,0 +1,8 @@
+[
+  {
+    "Source": "app.orders",
+    "DetailType": "OrderPlaced",
+    "Detail": "{ \"orderId\": \"123\", \"value\": \"10\" }",
+    "EventBusName": "EventBridgeAppSyncDemoBus"
+  }
+]

@@ -1,0 +1,66 @@
+{
+    "title": "EventBridge API Destinations configuration",
+    "description": "Create an EventBridge rule and API destination to route events to an external API",
+    "language": "Node.js",
+    "level": "100",
+    "framework": "SAM",
+    "services": {
+        "from": "eventbridge",
+        "to": "eventbridge"
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern configures an EventRule rule that routes to an API Destinations target. It configures a Connection, which contains the authorization for the API endpoint, and the API, which contains the URL, http method, and other configuration information.",
+            "There are two examples in this repo - the first integrates with Webhook.site, an API debugging tool. The second integrates with Slack. See the GitHub repo for more information on deploying the Slack integration."
+        ],
+        "test": ""
+    },
+    "testing": {
+        "headline": "Testing",
+        "text": [
+            "1. From a command line in this directory, send a test event to EventBridge simulating a \"Payment failed\" event: <code>aws events put-events --entries file://testEvent.json</code>",
+            "2. In the Webhook.site example, the API call appears in the dashboard."
+        ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+            "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cd ./1-webhook-site",
+            "sam deploy --guided"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "projectFolder": "eventbridge-api-destinations",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations",
+            "templateURL": "serverless-patterns/eventbridge-api-destinations",
+            "templateFile": "1-webhook-site/template.yaml"
+        },
+        "payloads": [
+            {
+                "headline": "",
+                "payloadURL": ""
+            }
+        ]
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "Using API destinations with Amazon EventBridge",
+                "link": "https://aws.amazon.com/blogs/compute/using-api-destinations-with-amazon-eventbridge/"
+            },
+            {
+                "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+                "link": "https://serverlessland.com/learn/eventbridge"
+            }
+        ]
+    }
+}

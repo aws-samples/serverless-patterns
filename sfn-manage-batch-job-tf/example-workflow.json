@@ -1,0 +1,71 @@
+{
+  "title": "Manage a Batch Job",
+  "description": "This workflow use Step Functions to trigger a notification on success or failure of a batch job (AWS Batch, Amazon SNS)",
+  "language": "Python",
+  "simplicity": "1 - Fundamental",
+  "usecase": "",
+  "type": "Standard",
+  "diagram": "/resources/statemachine.png",
+  "videoId": "",
+  "level": "100",
+  "framework": "Terraform",
+  "services": [
+    "AWS Step Functions",
+    "AWS Batch job",
+    "SNS Topic"
+  ],
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+    "This sample project demonstrates how to submit an AWS Batch job, and then send an Amazon SNS notification based on whether that job succeeds or fails. Deploying this sample project creates an AWS Step Functions state machine, an AWS Batch job, and an Amazon SNS topic."
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/step-functions-workflows-collection/tree/main/sfn-manage-batch-job-tf/",
+      "templateDir": "sfn-manage-batch-job-tf",
+      "templateFile": "main.tf",
+      "ASL": "statemachine/statemachine.asl.json"
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "The AWS Step Functions Workshop",
+        "link": "https://catalog.workshops.aws/stepfunctions/en-US"
+      }
+    ]
+  },
+  "authors": [
+    {
+      "name": "Itziar Olivera Goicolea",
+      "bio": "Itziar is a Technical Account Manager at AWS from Iberia (EMEA).",
+      "linkedin": "itziar-olivera-goicolea-a36438174"
+    }
+  ]
+}

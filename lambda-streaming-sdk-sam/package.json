@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@aws-sdk/client-lambda": "^3.235.0"
+  }
+}

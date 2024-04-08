@@ -1,0 +1,86 @@
+{   
+    "Comment": "A Lambda workflow",
+    "StartAt": "Create Snapshot",
+    "States": {
+        "Create Snapshot": {
+            "Type": "Task",
+            "Resource": "${create_snapshot_lambda_arn}",
+            "ResultPath": "$.Snapshot",
+            "Next": "ConfigureCount"
+        },
+        "ConfigureCount": {
+            "Type":"Pass",
+            "Result": {
+                "count": 5,
+                "step": 1
+            },
+            "ResultPath":"$.iterator",
+            "Next":"Get Backup Status"
+        },
+        "Iterator": {
+            "Type": "Task",
+            "Resource": "${iterator_lambda_arn}",
+            "ResultPath": "$.iterator",
+            "Next": "IsCountReached"
+        },
+        "IsCountReached": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.iterator.continue",
+                    "BooleanEquals": true,
+                    "Next": "Wait for 60 Seconds"
+                },
+                {
+                    "Variable": "$.iterator.continue",
+                    "BooleanEquals": false,
+                    "Next": "TimedOut"
+                }
+            ],
+            "Default": "Failed"
+        },
+  
+        "Wait for 60 Seconds": {
+            "Type": "Wait",
+            "Seconds": 60,
+            "Next": "Get Backup Status"
+        },
+        "Get Backup Status": {
+            "Type": "Task",
+            "Resource": "${get_snapshot_status_lambda_arn}",
+            "InputPath": "$.Snapshot",
+            "ResultPath": "$.Status",
+            "Next": "Backup completed?"
+        },
+        
+        "Backup completed?": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.Status.Snapshot.Snapshot_Status",
+                    "StringEquals": "creating",
+                    "Next": "Iterator"
+                },
+                {
+                    "Variable": "$.Status.Snapshot.Snapshot_Status",
+                    "StringEquals": "available",
+                    "Next": "Success"
+                }
+              ],
+            "Default": "Failed"
+          
+        },
+        "Success": {
+            "Type": "Pass",
+            "End": true
+        },
+        "TimedOut": {
+            "Type": "Pass",
+            "End": true
+        },
+        "Failed": {
+            "Type": "Pass",
+            "End": true
+        }
+    }
+  }

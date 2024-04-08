@@ -1,0 +1,61 @@
+{
+    "title": "EventBridge API Destinations to Slack",
+    "description": "Create an EventBridge rule and API destination to route events to Slack",
+    "language": "YAML",
+    "level": "100",
+    "framework": "SAM",
+    "services": {
+        "from": "eventbridge",
+        "to": "eventbridge"
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an API Destination for Slack. To learn more, read the associated blog post at https://acloudguru.com/blog/engineering/how-to-integrate-your-workload-with-slack-using-amazon-eventbridge-api-destinations."
+        ]
+    },
+    "testing": {
+        "headline": "Testing",
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+            "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cd ./2-slack",
+            "sam deploy --guided"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "projectFolder": "eventbridge-api-destinations",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations",
+            "templateURL": "serverless-patterns/eventbridge-api-destinations",
+            "templateFile": "2-slack/template.yaml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "How to integrate your workload with Slack using Amazon EventBridge API Destinations",
+                "link": "https://acloudguru.com/blog/engineering/how-to-integrate-your-workload-with-slack-using-amazon-eventbridge-api-destinations"
+            },
+            {
+                "text": "Using API destinations with Amazon EventBridge",
+                "link": "https://aws.amazon.com/blogs/compute/using-api-destinations-with-amazon-eventbridge/"
+            },
+            {
+                "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+                "link": "https://serverlessland.com/learn/eventbridge"
+            }
+        ]
+    }
+}

@@ -1,0 +1,84 @@
+{
+    "title": "Amazon API Gateway REST API to AWS Lambda and Amazon SES",
+    "description": "This sample project demonstrates how to publish an email using SES by invoking a Lambda function via a REST API",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "Create an Amazon API Gateway REST API that invokes Lambda and SES.",
+        "text": [
+            "This pattern deploys an Amazon API Gateway REST API with Lambda function  and SES integration."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/blob/main/api-lambda-ses",
+            "templateURL": "serverless-patterns/api-lambda-ses",
+            "projectFolder": "api-lambda-ses",
+            "templateFile": "template.yml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Publishing Emails in Amazon SES.",
+                "link": "https://docs.aws.amazon.com/ses/latest/dg/getting-started.html"
+            },
+            {
+                "text": "Creating and verifying identities in Amazon SES.",
+                "link": "https://docs.aws.amazon.com/ses/latest/dg/creating-identities.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy --guided --parameter-overrides  SENDER=sender@email.com RECIPIENT=recipient@email.com"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Himanshu Goyal",
+            "image": "https://drive.google.com/file/d/1wXvafYjTDUxW55EX12XbVJBdR135obFP/view?usp=sharing",
+            "bio": "A Serverless Cloud Engineer and technical writer, dedicated to crafting efficient and scalable solutions using AWS services. My expertise in serverless architecture empowers me to create innovative and cost-effective cloud solutions. I enjoy sharing my knowledge with the serverless community through articles and patterns, helping others explore the vast potential of serverless computing. ",
+            "linkedin": "himanshugoyal20"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway REST API"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "ses",
+            "label": "Amazon SES"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    }
+}

@@ -1,0 +1,240 @@
+openapi: "3.0.1"
+info:
+  title: "Restaurants API for DynamoDB CRUD"
+  description: "Restaurants API"
+  version: "1.0"
+paths:
+  /restaurants/{restaurantid}:
+    get:
+      parameters:
+      - name: "restaurantid"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/restaurant"
+      security:
+      - sigv4: []
+      x-amazon-apigateway-request-validator: "Validate body"
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [APIGatewayDynamoDBRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/GetItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$')) \n{\n    \"restaurantId\"\
+                : \"$inputRoot.Item.restaurantId.S\",\n    \"name\": \"$inputRoot.Item.name.S\"\
+                ,\n    \"state\": \"$inputRoot.Item.state.S\",\n    \"zip\": \"$inputRoot.Item.zip.S\"\
+                ,\n    \"cuisine\": \"$inputRoot.Item.cuisine.S\"\n}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{\n    \"TableName\": \"${RestaurantTable}\",\n    \"Key\": {\n\
+            \      \"restaurantId\": {\n        \"S\": \"$input.params().path.restaurantid\"\
+            \n      }\n    }\n}"}
+        passthroughBehavior: "when_no_match"
+    put:
+      parameters:
+      - name: "restaurantid"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - sigv4: []
+      x-amazon-apigateway-request-validator: "Validate body"
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [APIGatewayDynamoDBRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$')) \n{\n\"message\"\
+                : \"Restaurant updated successfully\",\n\"data\": {\n    \"restaurantId\"\
+                : \"$inputRoot.Attributes.restaurantId.S\",\n    \"name\": \"$inputRoot.Attributes.name.S\"\
+                ,\n    \"state\": \"$inputRoot.Attributes.state.S\",\n    \"zip\"\
+                : \"$inputRoot.Attributes.zip.S\",\n    \"cuisine\": \"$inputRoot.Attributes.cuisine.S\"\
+                \n    }\n}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{ \n    \"TableName\": \"${RestaurantTable}\",\n    \"Key\":\
+            \ {\n        \"restaurantId\": {\n            \"S\": \"$input.params().path.restaurantid\"\
+            \n        }\n    },\n    \"UpdateExpression\": \"set #n = :n, #s = :s, zip = :zip, cuisine = :cuisine\",\n    \"ExpressionAttributeValues\"\
+            : {\n        \":n\": {\"S\": \"$input.path(\"$.name\")\"},\n        \":s\":\
+            \ {\"S\": \"$input.path(\"$.state\")\"},\n        \":zip\": {\"S\": \"\
+            $input.path(\"$.zip\")\"},\n        \":cuisine\": {\"S\": \"$input.path(\"\
+            $.cuisine\")\"}\n        },\n    \"ExpressionAttributeNames\": {\n   \
+            \   \"#n\": \"name\",\n      \"#s\": \"state\"\n    },\n     \"ReturnValues\"\
+            : \"ALL_NEW\"\n}"}
+        passthroughBehavior: "when_no_match"
+    delete:
+      parameters:
+      - name: "restaurantid"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - sigv4: []
+      x-amazon-apigateway-request-validator: "Validate body"
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [APIGatewayDynamoDBRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/DeleteItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$')) \n{\n\"message\"\
+                : \"Restaurant deleted successfully\",\n\"data\": {\n    \"restaurantId\"\
+                : \"$inputRoot.Attributes.restaurantId.S\",\n    \"name\": \"$inputRoot.Attributes.name.S\"\
+                ,\n    \"state\": \"$inputRoot.Attributes.state.S\",\n    \"zip\"\
+                : \"$inputRoot.Attributes.zip.S\",\n    \"cuisine\": \"$inputRoot.Attributes.cuisine.S\"\
+                \n    }\n}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{ \n    \"TableName\": \"${RestaurantTable}\",\n    \"Key\":{\n\
+            \        \"restaurantId\":{\n            \"S\": \"$input.params().path.restaurantid\"\
+            \n         }\n    },\n    \"ReturnValues\": \"ALL_OLD\"\n}"}
+        passthroughBehavior: "when_no_match"
+  /restaurants:
+    get:
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/restaurants"
+      security:
+      - sigv4: []
+      x-amazon-apigateway-request-validator: "Validate body"
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [APIGatewayDynamoDBRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/Scan"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$'))\n[\n#foreach($elem\
+                \ in $inputRoot.Items) \n    {\n    \"restaurantId\": \"$elem.restaurantId.S\"\
+                ,\n    \"name\": \"$elem.name.S\",\n    \"state\": \"$elem.state.S\"\
+                ,\n    \"zip\": \"$elem.zip.S\",\n    \"cuisine\": \"$elem.cuisine.S\"\
+                \n    }#if($foreach.hasNext),#end\n    \n#end\n]"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{ \n    \"TableName\": \"${RestaurantTable}\"\n}"}
+        passthroughBehavior: "when_no_templates"
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/restaurant"
+        required: true
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/restaurant"
+      security:
+      - sigv4: []
+      x-amazon-apigateway-request-validator: "Validate body"
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [APIGatewayDynamoDBRole, Arn]
+        httpMethod: "POST"
+        uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$')) \n{\n\"message\"\
+                : \"Restaurant added successfully\",\n\"data\": {\n    \"restaurantId\"\
+                : \"$inputRoot.Attributes.restaurantId.S\",\n    \"name\": \"$inputRoot.Attributes.name.S\"\
+                ,\n    \"state\": \"$inputRoot.Attributes.state.S\",\n    \"zip\"\
+                : \"$inputRoot.Attributes.zip.S\",\n    \"cuisine\": \"$inputRoot.Attributes.cuisine.S\"\
+                \n    }\n}"
+        requestTemplates:
+          application/json: {"Fn::Sub": "{ \n    \"TableName\": \"${RestaurantTable}\",\n    \"Key\":\
+            \ {\n        \"restaurantId\": {\n            \"S\": \"$input.path(\"\
+            $.restaurantId\")\"\n        }\n    },\n    \"UpdateExpression\": \"set\
+            \ #n = :n, #s = :s, zip = :zip, cuisine = :cuisine\"\
+            ,\n    \"ExpressionAttributeValues\": {\n        \":n\": {\"S\": \"$input.path(\"\
+            $.name\")\"},\n        \":s\": {\"S\": \"$input.path(\"$.state\")\"},\n      \
+            \  \":zip\": {\"S\": \"$input.path(\"$.zip\")\"},\n        \":cuisine\"\
+            : {\"S\": \"$input.path(\"$.cuisine\")\"}\n        },\n    \"ExpressionAttributeNames\"\
+            : {\n      \"#n\": \"name\",\n      \"#s\": \"state\"\n    },\n     \"\
+            ReturnValues\": \"ALL_NEW\"\n}"}
+        passthroughBehavior: "when_no_match"
+components:
+  schemas:
+    Empty:
+      title: "Empty Schema"
+      type: "object"
+    restaurant:
+      type: "object"
+      properties:
+        restaurantId:
+          type: "string"
+        name:
+          type: "string"
+        state:
+          type: "string"
+        zip:
+          type: "string"
+        cuisine:
+          type: "string"
+          enum:
+          - "Multi"
+          - "Indian"
+          - "Chinease"
+          - "Italian"
+          - "Thai"
+          - "American"
+          - "Continental"
+    restaurants:
+      type: "array"
+      items:
+        $ref: "#/components/schemas/restaurant"
+  securitySchemes:
+    sigv4:
+      type: "apiKey"
+      name: "Authorization"
+      in: "header"
+      x-amazon-apigateway-authtype: "awsSigv4"
+x-amazon-apigateway-request-validators:
+  Validate body:
+    validateRequestParameters: false
+    validateRequestBody: true

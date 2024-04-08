@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.294.0",
+    "@aws-sdk/client-scheduler": "^3.294.0",
+    "@aws-sdk/util-dynamodb": "^3.294.0"
+  }
+}

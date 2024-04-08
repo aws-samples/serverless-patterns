@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: sqs-lambda-dynamodb
+Description: sqs-lambda-dynamodb (uksb-1tthgi812) (tag:sqs-lambda-dynamodb-sam-java)
 
 Globals:
   Function:

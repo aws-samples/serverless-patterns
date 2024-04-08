@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Template to connect DynamoDB Stream to EventBridge
+Description: Template to connect DynamoDB Stream to EventBridge (uksb-1tthgi812) (tag:eventbridge-pipes-ddbstream-with-filters-to-eventbridge)
 
 Resources:
 
@@ -66,6 +66,14 @@ Resources:
                 Action:
                   - 'events:PutEvents'
                 Resource: !GetAtt ApplicationEventBus.Arn
+        - PolicyName: !Sub ${AWS::StackName}-dlq-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "SQS:SendMessage"
+                Resource: !GetAtt PipeDLQueue.Arn
 
   # EventBridge Pipe to listen to all created items in DDB table             
   OrderCreatedPipe:

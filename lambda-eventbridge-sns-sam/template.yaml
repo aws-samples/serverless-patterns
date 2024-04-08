@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Multiple EventBridge Buses filter/pipe to multiple SNS Topics.
+Description: Serverless patterns - Multiple EventBridge Buses filter/pipe to multiple SNS Topics. (uksb-1tthgi812) (tag:lambda-eventbridge-sns-sam)
 
 Resources:
   # Define 3 EventBridge Buses for 3 example organisations "banks" namely Bluebank, RedBank and GreenBank

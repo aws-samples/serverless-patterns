@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>What is Amazon S3? - Amazon Simple Storage Service</title><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="assets_root" content="/assets" /><meta name="target_state" content="Welcome" /><meta name="default_state" content="Welcome" /><link rel="icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="shortcut icon" type="image/ico" href="/assets/images/favicon.ico" /><link rel="canonical" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" /><meta name="description" content="Store data in the cloud and learn the core concepts of buckets and objects with the Amazon S3 web service." /><meta name="deployment_region" content="IAD" /><meta name="product" content="Amazon Simple Storage Service" /><meta name="guide" content="User Guide" /><meta name="abstract" content="Learn how to use Amazon Simple Storage Service (Amazon S3) to store and retrieve any amount of data from anywhere. This guide explains Amazon S3 concepts, such as buckets, objects, and related configurations, and includes code examples for common operations." /><meta name="guide-locale" content="en_us" /><meta name="tocs" content="toc-contents.json" /><link rel="canonical" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" /><link rel="alternative" href="https://docs.aws.amazon.com/id_id/AmazonS3/latest/userguide/Welcome.html" hreflang="id-id" /><link rel="alternative" href="https://docs.aws.amazon.com/id_id/AmazonS3/latest/userguide/Welcome.html" hreflang="id" /><link rel="alternative" href="https://docs.aws.amazon.com/de_de/AmazonS3/latest/userguide/Welcome.html" hreflang="de-de" /><link rel="alternative" href="https://docs.aws.amazon.com/de_de/AmazonS3/latest/userguide/Welcome.html" hreflang="de" /><link rel="alternative" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" hreflang="en-us" /><link rel="alternative" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" hreflang="en" /><link rel="alternative" href="https://docs.aws.amazon.com/es_es/AmazonS3/latest/userguide/Welcome.html" hreflang="es-es" /><link rel="alternative" href="https://docs.aws.amazon.com/es_es/AmazonS3/latest/userguide/Welcome.html" hreflang="es" /><link rel="alternative" href="https://docs.aws.amazon.com/fr_fr/AmazonS3/latest/userguide/Welcome.html" hreflang="fr-fr" /><link rel="alternative" href="https://docs.aws.amazon.com/fr_fr/AmazonS3/latest/userguide/Welcome.html" hreflang="fr" /><link rel="alternative" href="https://docs.aws.amazon.com/it_it/AmazonS3/latest/userguide/Welcome.html" hreflang="it-it" /><link rel="alternative" href="https://docs.aws.amazon.com/it_it/AmazonS3/latest/userguide/Welcome.html" hreflang="it" /><link rel="alternative" href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/Welcome.html" hreflang="ja-jp" /><link rel="alternative" href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/Welcome.html" hreflang="ja" /><link rel="alternative" href="https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/userguide/Welcome.html" hreflang="ko-kr" /><link rel="alternative" href="https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/userguide/Welcome.html" hreflang="ko" /><link rel="alternative" href="https://docs.aws.amazon.com/pt_br/AmazonS3/latest/userguide/Welcome.html" hreflang="pt-br" /><link rel="alternative" href="https://docs.aws.amazon.com/pt_br/AmazonS3/latest/userguide/Welcome.html" hreflang="pt" /><link rel="alternative" href="https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/Welcome.html" hreflang="zh-cn" /><link rel="alternative" href="https://docs.aws.amazon.com/zh_tw/AmazonS3/latest/userguide/Welcome.html" hreflang="zh-tw" /><link rel="alternative" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" hreflang="x-default" /><meta name="feedback-item" content="S3" /><meta name="this_doc_product" content="Amazon Simple Storage Service" /><meta name="this_doc_guide" content="User Guide" /><script defer="" src="/assets/r/vendor4.js?version=2021.12.02"></script><script defer="" src="/assets/r/vendor3.js?version=2021.12.02"></script><script defer="" src="/assets/r/vendor1.js?version=2021.12.02"></script><script defer="" src="/assets/r/awsdocs-common.js?version=2021.12.02"></script><script defer="" src="/assets/r/awsdocs-doc-page.js?version=2021.12.02"></script><link href="/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet" /><link href="/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet" /><link href="/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet" /><script async="" id="awsc-panorama-bundle" type="text/javascript" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'s3'}"></script><meta id="panorama-serviceSubSection" value="User Guide" /><meta id="panorama-serviceConsolePage" value="What is Amazon S3?" /></head><body class="awsdocs awsui"><div class="awsdocs-container"><awsdocs-header></awsdocs-header><awsui-app-layout id="app-layout" class="awsui-util-no-gutters" ng-controller="ContentController as $ctrl" header-selector="awsdocs-header" navigation-hide="false" navigation-width="$ctrl.navWidth" navigation-open="$ctrl.navOpen" navigation-change="$ctrl.onNavChange($event)" tools-hide="$ctrl.hideTools" tools-width="$ctrl.toolsWidth" tools-open="$ctrl.toolsOpen" tools-change="$ctrl.onToolsChange($event)"><div id="guide-toc" dom-region="navigation"><awsdocs-toc></awsdocs-toc></div><div id="main-column" dom-region="content" tabindex="-1"><awsdocs-view class="awsdocs-view"><div id="awsdocs-content"><head><title>What is Amazon S3? - Amazon Simple Storage Service</title><meta name="pdf" content="/pdfs/AmazonS3/latest/userguide/s3-userguide.pdf#Welcome" /><meta name="rss" content="s3-userguide-rss-updates.rss" /><meta name="forums" content="http://forums.aws.amazon.com/forum.jspa?forumID=24" /><meta name="feedback" content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=S3&amp;topic_url=http://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/Welcome.html" /><meta name="feedback-yes" content="feedbackyes.html?topic_url=http://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/Welcome.html" /><meta name="feedback-no" content="feedbackno.html?topic_url=http://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/Welcome.html" /><meta name="keywords" content="S3,Amazon S3,S3 User Guide,Amazon S3 User Guide,Amazon User Guide,s3 bucket,s3 object,cloud storage,data storage" /><script type="application/ld+json">
+{
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Amazon Simple Storage Service (S3)",
+        "item" : "https://docs.aws.amazon.com/s3/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "User Guide",
+        "item" : "https://docs.aws.amazon.com/AmazonS3/latest/userguide"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "What is Amazon S3?",
+        "item" : "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+      }
+    ]
+}
+</script></head><body><div id="main"><div style="display: none"><a href="/pdfs/AmazonS3/latest/userguide/s3-userguide.pdf#Welcome" target="_blank" rel="noopener noreferrer" title="Open PDF"></a></div><div id="breadcrumbs" class="breadcrumb"><a href="https://aws.amazon.com">AWS</a><a href="/index.html">Documentation</a><a href="/s3/index.html">Amazon Simple Storage Service (S3)</a><a href="Welcome.html">User Guide</a></div><div id="page-toc-src"><a href="#S3Features">Features of Amazon S3</a><a href="#CoreConcepts">How Amazon S3 works</a><a href="#ConsistencyModel">Amazon S3 data consistency model</a><a href="#RelatedAmazonWebServices">Related services </a><a href="#API">Accessing Amazon S3</a><a href="#PayingforStorage">Paying for Amazon S3</a><a href="#pci-dss-compliance">PCI DSS compliance</a></div><awsdocs-doc-page-banner></awsdocs-doc-page-banner><div id="main-content" class="awsui-util-container"><div id="main-col-body"><awsdocs-language-banner data-service="$ctrl.pageService"></awsdocs-language-banner><h1 class="topictitle" id="Welcome">What is Amazon S3?</h1><div class="awsdocs-page-header-container"><awsdocs-page-header></awsdocs-page-header><awsdocs-filter-selector id="awsdocs-filter-selector"></awsdocs-filter-selector></div><p>Amazon Simple Storage Service (Amazon S3) is an object storage service that offers industry-leading scalability,
+		data availability, security, and performance. Customers of all sizes and industries can use
+		Amazon S3 to store and protect any amount of data for a range of use cases, such as data lakes,
+		websites, mobile applications, backup and restore, archive, enterprise applications, IoT
+		devices, and big data analytics. Amazon S3 provides management features so that you can optimize,
+		organize, and configure access to your data to meet your specific business, organizational,
+		and compliance requirements.</p><div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>For more information about using the Amazon S3 Express One Zone storage class with directory buckets, see <a href="./s3-express-one-zone.html">What is S3 Express One Zone?</a> and <a href="./directory-buckets-overview.html">Directory
+            buckets</a>.</p></div></div><div class="highlights" id="inline-topiclist"><h6>Topics</h6><ul><li><a href="#S3Features">Features of Amazon S3</a></li><li><a href="#CoreConcepts">How Amazon S3 works</a></li><li><a href="#ConsistencyModel">Amazon S3 data consistency model</a></li><li><a href="#RelatedAmazonWebServices">Related services </a></li><li><a href="#API">Accessing Amazon S3</a></li><li><a href="#PayingforStorage">Paying for Amazon S3</a></li><li><a href="#pci-dss-compliance">PCI DSS compliance</a></li></ul></div>
+		<h2 id="S3Features">Features of Amazon S3</h2>
+		 
+			<h3 id="RRS">Storage classes</h3>
+			<p>Amazon S3 offers a range of storage classes designed for different use cases. For
+				example, you can store mission-critical production data in S3 Standard or S3 Express One Zone for frequent
+				access, save costs by storing infrequently accessed data in S3 Standard-IA or
+				S3 One Zone-IA, and archive data at the lowest costs in S3 Glacier Instant Retrieval,
+				S3 Glacier Flexible Retrieval, and S3 Glacier Deep Archive. </p>
+			<p>Amazon S3 Express One Zone is a high-performance, single-zone Amazon S3 storage class that is purpose-built
+				to deliver consistent, single-digit millisecond data access for your most
+				latency-sensitive applications. S3 Express One Zone is the lowest latency cloud object
+				storage class available today, with data access
+				speeds
+				up to 10x faster and with request costs
+				50
+				percent lower than S3 Standard. S3 Express One Zone is the first S3 storage class where you can select a single Availability Zone with 
+the option to co-locate your object storage with your compute resources, which provides the highest possible access speed.
+				Additionally, to further increase access speed and support hundreds of thousands of
+				requests per second, data is stored in a new bucket type: an
+				Amazon S3 directory bucket. For more information, see <a href="./s3-express-one-zone.html">What is S3 Express One Zone?</a> and <a href="./directory-buckets-overview.html">Directory
+            buckets</a>.</p>
+			<p>You can store data with changing or unknown access patterns in
+				S3 Intelligent-Tiering, which optimizes storage costs by automatically moving your
+				data between four access tiers when your access patterns change. These four access
+				tiers include two low-latency access tiers optimized for frequent and infrequent
+				access, and two opt-in archive access tiers designed for asynchronous access for
+				rarely accessed data.</p>
+			<p>For more information, see <a href="./storage-class-intro.html">Using Amazon S3 storage classes</a>. For more information about
+				S3 Glacier Flexible Retrieval, see the <a href="https://docs.aws.amazon.com/amazonglacier/latest/dev/introduction.html"><em>Amazon S3 Glacier Developer Guide</em></a>.</p>
+		 
+		 
+			<h3 id="features-storage-management">Storage management</h3>
+			<p>Amazon S3 has storage management features that you can use to manage costs, meet
+				regulatory requirements, reduce latency, and save multiple distinct copies of your
+				data for compliance requirements.</p>
+			<div class="itemizedlist">
+				 
+				 
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html">S3 Lifecycle</a> – Configure a lifecycle configuration to manage
+						your objects and store them cost effectively throughout their lifecycle. You
+						can transition objects to other S3 storage classes or expire objects that
+						reach the end of their lifetimes.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html">S3 Object Lock</a> – Prevent Amazon S3 objects from being
+						deleted or overwritten for a fixed amount of time or indefinitely. You can
+						use Object Lock to help meet regulatory requirements that require <em>write-once-read-many</em>
+						<em>(WORM)</em> storage or to simply add another
+						layer of protection against object changes and deletions.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html">S3 Replication</a>
+						– Replicate objects and their respective metadata and object tags to
+						one or more destination buckets in the same or different AWS Regions for
+						reduced latency, compliance, security, and other use cases. </p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/batch-ops.html">S3 Batch Operations</a> – Manage billions of objects at scale
+						with a single S3 API request or a few clicks in the Amazon S3 console. You can
+						use Batch Operations to perform operations such as <b>Copy</b>, <b>Invoke AWS Lambda
+							function</b>, and <b>Restore</b> on
+						millions or billions of objects.</p>
+				</li></ul></div>
+		 
+		 
+			<h3 id="features-access-management">Access management and security</h3>
+			<p>Amazon S3 provides features for auditing and managing access to your buckets and
+				objects. By default, S3 buckets and the objects in them are private. You have access
+				only to the S3 resources that you create. To grant granular resource permissions
+				that support your specific use case or to audit the permissions of your Amazon S3
+				resources, you can use the following features. </p>
+			<div class="itemizedlist">
+				 
+				 
+				 
+				 
+				 
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html">S3 Block Public Access</a> – Block public access to S3
+						buckets and objects. By default, Block Public Access settings are turned on
+						at the bucket level. We recommend that you keep all Block Public Access
+						settings enabled unless you know that you need to turn off one or more of
+						them for your specific use case. For more information, see <a href="./configuring-block-public-access-bucket.html">Configuring block public access
+				settings for your S3 buckets</a>.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-access-control.html">AWS Identity and Access Management (IAM)</a> – IAM is a web service that helps
+						you securely control access to AWS resources, including your Amazon S3
+						resources. With IAM, you can centrally manage permissions that control
+						which AWS resources users can access. You use IAM to control who is
+						authenticated (signed in) and authorized (has permissions) to use
+						resources.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html">Bucket
+							policies</a> – Use IAM-based policy language to configure
+						resource-based permissions for your S3 buckets and the objects in
+						them.</p>
+				</li><li class="listitem">
+					<p>
+						<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-points.html">Amazon S3 access points</a>
+						– Configure named network endpoints with dedicated access policies to
+						manage data access at scale for shared datasets in Amazon S3. </p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acls.html">Access control
+							lists (ACLs)</a> – Grant read and write permissions for
+						individual buckets and objects to authorized users. As a general rule, we
+						recommend using S3 resource-based policies (bucket policies and access point
+						policies) or IAM user policies for access control instead of ACLs.
+						Policies are a simplified and more flexible access control option. With
+						bucket policies and access point policies, you can define rules that apply
+						broadly across all requests to your Amazon S3 resources. For more information
+						about the specific cases when you'd use ACLs instead of resource-based
+						policies or IAM user policies, see <a href="./access-policy-alternatives-guidelines.html">Access policy guidelines</a>.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html">S3 Object Ownership</a> – Take ownership of every object
+						in your bucket, simplifying access management for data stored in Amazon S3.
+						S3 Object Ownership is an Amazon S3 bucket-level setting that you can use to
+						disable or enable ACLs. By default, ACLs are disabled. With ACLs disabled,
+						the bucket owner owns all the objects in the bucket and manages access to
+						data exclusively by using access-management policies.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-analyzer.html">IAM Access Analyzer for S3</a>
+						– Evaluate and monitor your S3 bucket access policies, ensuring that
+						the policies provide only the intended access to your S3 resources. </p>
+				</li></ul></div>
+		 
+		 
+			<h3 id="features-data-processing">Data processing</h3>
+			<p>To transform data and trigger workflows to automate a variety of other processing
+				activities at scale, you can use the following features.</p>
+			<div class="itemizedlist">
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/transforming-objects.html">S3 Object Lambda</a>
+						– Add your own code to S3 GET, HEAD, and LIST requests to modify and process data as
+						it is returned to an application. Filter rows, dynamically resize images,
+						redact confidential data, and much more.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html">Event
+							notifications</a> – Trigger workflows that use Amazon Simple Notification Service
+						(Amazon SNS), Amazon Simple Queue Service (Amazon SQS), and AWS Lambda when a change is made to your S3
+						resources.</p>
+				</li></ul></div>
+		 
+		 
+			<h3 id="features-storage-monitoring">Storage logging and monitoring</h3>
+			<p>Amazon S3 provides logging and monitoring tools that you can use to monitor and control
+				how your Amazon S3 resources are being used. For more information, see <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/monitoring-automated-manual.html">Monitoring
+					tools</a>.</p>
+			<div class="itemizedlist">
+				<h6>Automated monitoring tools</h6>
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html">Amazon CloudWatch
+							metrics for Amazon S3 </a> – Track the operational health of your
+						S3 resources and configure billing alerts when estimated charges reach a
+						user-defined threshold. </p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging.html">AWS CloudTrail</a>
+						– Record actions taken by a user, a role, or an AWS service in
+						Amazon S3. CloudTrail logs provide you with detailed API tracking for S3 bucket-level
+						and object-level operations.</p>
+				</li></ul></div>
+			<div class="itemizedlist">
+				<h6>Manual monitoring tools</h6>
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerLogs.html">Server access
+							logging</a> – Get detailed records for the requests that are
+						made to a bucket. You can use server access logs for many use cases, such as
+						conducting security and access audits, learning about your customer base,
+						and understanding your Amazon S3 bill.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor.html">AWS Trusted
+							Advisor</a> – Evaluate your account by using AWS best
+						practice checks to identify ways to optimize your AWS infrastructure,
+						improve security and performance, reduce costs, and monitor service quotas.
+						You can then follow the recommendations to optimize your services and
+						resources.</p>
+				</li></ul></div>
+		 
+		 
+			<h3 id="features-analytics-insights">Analytics and insights</h3>
+			<p>Amazon S3 offers features to help you gain visibility into your storage usage, which
+				empowers you to better understand, analyze, and optimize your storage at
+				scale.</p>
+
+			<div class="itemizedlist">
+				 
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage_lens.html">Amazon S3 Storage Lens</a>
+						– Understand, analyze, and optimize your storage. S3 Storage Lens provides
+						60+ usage and activity metrics and interactive dashboards to aggregate data
+						for your entire organization, specific accounts, AWS Regions, buckets, or
+						prefixes.</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/analytics-storage-class.html">Storage
+							Class Analysis</a> – Analyze storage access patterns to
+						decide when it's time to move data to a more cost-effective storage class.
+					</p>
+				</li><li class="listitem">
+					<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-inventory.html">S3 Inventory with
+							Inventory reports</a> – Audit and report on objects and their
+						corresponding metadata and configure other Amazon S3 features to take action in
+						Inventory reports. For example, you can report on the replication and
+						encryption status of your objects. For a list of all the metadata available
+						for each object in Inventory reports, see <a href="./storage-inventory.html#storage-inventory-contents">Amazon S3 Inventory list</a>.</p>
+				</li></ul></div>
+		 
+		 
+			<h3 id="features-strong-consistency">Strong consistency</h3>
+			<p>Amazon S3 provides strong read-after-write consistency for PUT and DELETE requests of
+				objects in your Amazon S3 bucket in all AWS Regions. This behavior applies to both
+				writes of new objects as well as PUT requests that overwrite existing objects and
+				DELETE requests. In addition, read operations on Amazon S3 Select, Amazon S3 access control
+				lists (ACLs), Amazon S3 Object Tags, and object metadata (for example, the HEAD object)
+				are strongly consistent. For more information, see <a href="#ConsistencyModel">Amazon S3 data consistency model</a>.</p>
+		 
+	 
+		<h2 id="CoreConcepts">How Amazon S3 works</h2>
+		<p>Amazon S3 is an object storage service that stores data as objects within buckets. An
+				<em>object</em> is a file and any metadata that describes
+			the file. A <em>bucket</em> is a container for objects. </p>
+		<p>To store your data in Amazon S3, you first create a bucket and specify a bucket name and
+			AWS Region. Then, you upload your data to that bucket as objects in Amazon S3. Each object
+			has a <em>key</em> (or <em>key
+				name</em>), which is the unique identifier for the object within the
+			bucket.</p>
+		<p>S3 provides features that you can configure to support your specific use case. For
+			example, you can use S3 Versioning to keep multiple versions of an object in the same
+			bucket, which allows you to restore objects that are accidentally deleted or
+			overwritten.</p>
+		<p>Buckets and the objects in them are private and can be accessed only if you explicitly
+			grant access permissions. You can use bucket policies, AWS Identity and Access Management (IAM) policies,
+			access control lists (ACLs), and S3 Access Points to manage access.</p>
+		<div class="highlights" id="inline-topiclist"><h6>Topics</h6><ul><li><a href="#BasicsBucket">Buckets</a></li><li><a href="#BasicsObjects">Objects</a></li><li><a href="#BasicsKeys">Keys</a></li><li><a href="#Versions">S3 Versioning</a></li><li><a href="#BasicsVersionID">Version ID</a></li><li><a href="#BucketPolicies">Bucket policy</a></li><li><a href="#BasicsAccessPoints">S3 Access Points</a></li><li><a href="#S3_ACLs">Access control lists (ACLs)</a></li><li><a href="#Regions">Regions</a></li></ul></div>
+		 
+			<h3 id="BasicsBucket">Buckets</h3>
+			<p>A bucket is a container for objects stored in Amazon S3. You can store any number of
+				objects in a bucket and can have up to 100 buckets in your account. To request an
+				increase, visit the <a href="https://console.aws.amazon.com/servicequotas/home/services/s3/quotas/" rel="noopener noreferrer" target="_blank"><span>Service Quotas
+				console</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>.</p>
+			<p>Every object is contained in a bucket. For example, if the object named
+					<code class="code">photos/puppy.jpg</code> is stored in the
+					<code class="code">DOC-EXAMPLE-BUCKET</code> bucket in the US West (Oregon)
+				Region, then it is addressable by using the URL
+					<code class="code">https://DOC-EXAMPLE-BUCKET.s3.us-west-2.amazonaws.com/photos/puppy.jpg</code>.
+				For more information, see <a href="./access-bucket-intro.html">Accessing a
+					Bucket</a>. </p>
+			<p>When you create a bucket, you enter a bucket name and choose the AWS Region
+				where the bucket will reside. After you create a bucket, you cannot change the name
+				of the bucket or its Region. Bucket names must follow the <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html">bucket naming rules</a>. You can also configure a bucket to use <a href="./Versioning.html">S3 Versioning</a> or other <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/managing-storage.html">storage management</a>
+				features.</p>
+			<p> Buckets also:</p>
+			<div class="itemizedlist">
+				 
+				 
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p>Organize the Amazon S3 namespace at the highest level.</p>
+				</li><li class="listitem">
+					<p>Identify the account responsible for storage and data transfer
+						charges.</p>
+				</li><li class="listitem">
+					<p>Provide access control options, such as bucket policies, access control
+						lists (ACLs), and S3 Access Points, that you can use to manage access to
+						your Amazon S3 resources.</p>
+				</li><li class="listitem">
+					<p>Serve as the unit of aggregation for usage reporting.</p>
+				</li></ul></div>
+			<p> For more information about buckets, see <a href="./UsingBucket.html">Buckets overview</a>. </p>
+		 
+		 
+			<h3 id="BasicsObjects">Objects</h3>
+			<p>Objects are the fundamental entities stored in Amazon S3. Objects consist of object
+				data and metadata. The metadata is a set of name-value pairs that describe the
+				object. These pairs include some default metadata, such as the date last modified,
+				and standard HTTP metadata, such as <code class="code">Content-Type</code>. You can also specify
+				custom metadata at the time that the object is stored.</p>
+			<p>An object is uniquely identified within a bucket by a <a href="#BasicsKeys">key (name)</a> and a <a href="#BasicsVersionID">version ID</a> (if
+				S3 Versioning is enabled on the bucket). For more information about objects, see
+					<a href="./UsingObjects.html">Amazon S3 objects overview</a>.</p>
+		 
+		 
+			<h3 id="BasicsKeys">Keys</h3>
+			<p>An <em>object key</em> (or <em>key
+					name</em>) is the unique identifier for an object within a bucket. Every
+				object in a bucket has exactly one key. The combination of a bucket, object key, and
+				optionally, version ID (if S3 Versioning is enabled for the bucket) uniquely identify
+				each object. So you can think of Amazon S3 as a basic data map between "bucket + key +
+				version" and the object itself. </p>
+			<p>Every object in Amazon S3 can be uniquely addressed through the combination of the web service
+				endpoint, bucket name, key, and optionally, a version. For example, in the URL
+					<code class="code">https://DOC-EXAMPLE-BUCKET.s3.us-west-2.amazonaws.com/photos/puppy.jpg</code>,
+					<code>DOC-EXAMPLE-BUCKET</code> is the name of the bucket
+				and <code>photos/puppy.jpg</code> is the key.</p>
+			<p>For more information about object keys, see <a href="./object-keys.html">Creating object key names</a>. </p>
+		 
+		 
+			<h3 id="Versions">S3 Versioning</h3>
+			<p>You can use S3 Versioning to keep multiple variants of an object in the same
+				bucket. With S3 Versioning, you can preserve, retrieve, and restore every version of
+				every object stored in your buckets. You can easily recover from both unintended
+				user actions and application failures.</p>
+			<p>For more information, see <a href="./Versioning.html">Using versioning in S3 buckets</a>.</p>
+		 
+		 
+			<h3 id="BasicsVersionID">Version ID</h3>
+			<p>When you enable S3 Versioning in a bucket, Amazon S3 generates a unique version ID for
+				each object added to the bucket. Objects that already existed in the bucket at the
+				time that you enable versioning have a version ID of <code class="code">null</code>. If you
+				modify these (or any other) objects with other operations, such as <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html">CopyObject</a> and <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html">PutObject</a>, the new objects
+				get a unique version ID.</p>
+			<p>For more information, see <a href="./Versioning.html">Using versioning in S3 buckets</a>.</p>
+		 
+		 
+			<h3 id="BucketPolicies">Bucket policy</h3>
+			<p>A bucket policy is a resource-based AWS Identity and Access Management (IAM) policy that you can use to
+				grant access permissions to your bucket and the objects in it. Only the bucket owner
+				can associate a policy with a bucket. The permissions attached to the bucket apply
+				to all of the objects in the bucket that are owned by the bucket owner. Bucket
+				policies are limited to 20 KB in size.</p>
+			<p>Bucket policies use JSON-based access policy language that is standard across
+				AWS. You can use bucket policies to add or deny permissions for the objects in a
+				bucket. Bucket policies allow or deny requests based on the elements in the policy,
+				including the requester, S3 actions, resources, and aspects or conditions of the
+				request (for example, the IP address used to make the request). For example, you can
+				create a bucket policy that grants cross-account permissions to upload objects to an
+				S3 bucket while ensuring that the bucket owner has full control of the uploaded
+				objects. For more information, see <a href="./example-bucket-policies.html">Bucket policy examples</a>.</p>
+			<p>In your bucket policy, you can use wildcard characters on Amazon Resource Names
+				(ARNs) and other values to grant permissions to a subset of objects. For example,
+				you can control access to groups of objects that begin with a common <a href="https://docs.aws.amazon.com/general/latest/gr/glos-chap.html#keyprefix">prefix</a> or end with a given extension, such as
+				<code class="code">.html</code>.</p>
+		 
+		 
+			<h3 id="BasicsAccessPoints">S3 Access Points</h3>
+			<p>Amazon S3 Access Points are named network endpoints with dedicated access policies that
+				describe how data can be accessed using that endpoint. Access Points are attached to
+				buckets that you can use to perform S3 object operations, such as GetObject and
+				PutObject. Access Points simplify managing data access at scale for shared datasets
+				in Amazon S3. </p>
+			<p>Each access point has its own access point policy. You can configure <a href="./access-control-block-public-access.html">Block Public Access</a> settings
+				for each access point. To restrict Amazon S3 data access to a private network, you can
+				also configure any access point to accept requests only from a virtual private cloud
+				(VPC).</p>
+			<p>For more information, see <a href="./access-points.html">Managing data access with Amazon S3 access points</a>. </p>
+		 
+		 
+			<h3 id="S3_ACLs">Access control lists (ACLs)</h3>
+			<p>You can use ACLs to grant read and write permissions to authorized users for
+				individual buckets and objects. Each bucket and object has an ACL attached to it as
+				a subresource. The ACL defines which AWS accounts or groups are granted access and
+				the type of access. ACLs are an access control mechanism that predates IAM. For
+				more information about ACLs, see <a href="./acl-overview.html">Access control list (ACL) overview</a>.</p>
+			<p>S3 Object Ownership is an Amazon S3 bucket-level setting that you can use to both control ownership of the objects that are 
+    uploaded to your bucket and to disable or enable ACLs. By default, Object Ownership is set to the Bucket owner enforced setting, 
+    and all ACLs are disabled. When ACLs are disabled, the bucket owner owns all the objects in the bucket and manages access to them 
+    exclusively by using access-management policies.</p>
+	<p> A majority of modern use cases in Amazon S3 no longer require the use of ACLs. We recommend that you keep ACLs disabled, except 
+	in unusual circumstances where you need to control access for each object individually. With ACLs disabled, you can use policies 
+	to control access to all objects in your bucket, regardless of who uploaded the objects to your bucket. 
+	For more information, see <a href="./about-object-ownership.html">Controlling ownership of objects and disabling ACLs
+			for your bucket</a>.</p>
+		 
+		 
+			<h3 id="Regions">Regions</h3>
+			<p>You can choose the geographical AWS Region where Amazon S3 stores the buckets that
+				you create. You might choose a Region to optimize latency, minimize costs, or
+				address regulatory requirements. Objects stored in an AWS Region never leave the
+				Region unless you explicitly transfer or replicate them to another Region. <span>For example, objects stored in the Europe (Ireland) Region
+					never leave it.</span>
+			</p>
+			<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>You can access Amazon S3 and its features only in the AWS Regions that are
+					enabled for your account. For more information about enabling a Region to create
+					and manage AWS resources, see <a href="https://docs.aws.amazon.com/general/latest/gr/rande-manage.html">Managing AWS Regions</a> in
+					the <em>AWS General Reference</em>.</p></div></div>
+			<p>For a list of Amazon S3 Regions and endpoints, see <a href="https://docs.aws.amazon.com/general/latest/gr/s3.html">Regions and endpoints</a> in the
+					<em>AWS General Reference</em>. </p>
+		 
+	 
+		<h2 id="ConsistencyModel">Amazon S3 data consistency model</h2>
+		<p>Amazon S3 provides strong read-after-write consistency for PUT and DELETE requests of
+			objects in your Amazon S3 bucket in all AWS Regions. This behavior applies to both writes
+			to new objects as well as PUT requests that overwrite existing objects and DELETE
+			requests. In addition, read operations on Amazon S3 Select, Amazon S3 access controls lists
+			(ACLs), Amazon S3 Object Tags, and object metadata (for example, the HEAD object) are
+			strongly consistent. </p>
+		<p>Updates to a single key are atomic. For example, if you make a PUT request to an
+			existing key from one thread and perform a GET request on the same key from a second
+			thread concurrently, you will get either the old data or the new data, but never partial
+			or corrupt data.</p>
+
+
+		<p>Amazon S3 achieves high availability by replicating data across multiple servers within
+			AWS data centers. If a PUT request is successful, your data is safely stored. Any read
+			(GET or LIST request) that is initiated following the receipt of a successful PUT
+			response will return the data written by the PUT request. Here are examples of this
+			behavior: </p>
+		<div class="itemizedlist">
+			 
+			 
+			 
+			 
+		<ul class="itemizedlist"><li class="listitem">
+				<p>A process writes a new object to Amazon S3 and immediately lists keys within its
+					bucket. The new object appears in the list.</p>
+			</li><li class="listitem">
+				<p>A process replaces an existing object and immediately tries to read it. Amazon S3
+					returns the new data. </p>
+			</li><li class="listitem">
+				<p>A process deletes an existing object and immediately tries to read it. Amazon S3
+					does not return any data because the object has been deleted. </p>
+			</li><li class="listitem">
+				<p>A process deletes an existing object and immediately lists keys within its
+					bucket. The object does not appear in the listing. </p>
+			</li></ul></div>
+		<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><div class="itemizedlist">
+				 
+				 
+			<ul class="itemizedlist"><li class="listitem">
+					<p>Amazon S3 does not support object locking for concurrent writers. If two PUT
+						requests are simultaneously made to the same key, the request with the
+						latest timestamp wins. If this is an issue, you must build an object-locking
+						mechanism into your application. </p>
+				</li><li class="listitem">
+					<p>Updates are key-based. There is no way to make atomic updates across keys.
+						For example, you cannot make the update of one key dependent on the update
+						of another key unless you design this functionality into your
+						application.</p>
+				</li></ul></div></div></div>
+		<p>Bucket configurations have an eventual consistency model. Specifically, this means
+			that:</p>
+		<div class="itemizedlist">
+			 
+			 
+
+		<ul class="itemizedlist"><li class="listitem">
+				<p>If you delete a bucket and immediately list all buckets, the deleted bucket
+					might still appear in the list.</p>
+			</li><li class="listitem">
+				<p>If you enable versioning on a bucket for the first time, it might take a short
+					amount of time for the change to be fully propagated. We recommend that you wait
+					for 15 minutes after enabling versioning before issuing write operations (PUT or
+					DELETE requests) on objects in the bucket.</p>
+			</li></ul></div>
+
+		 
+			<h3 id="ApplicationConcurrency">Concurrent applications</h3>
+			<p>This section provides examples of behavior to be expected from Amazon S3 when multiple
+				clients are writing to the same items.</p>
+			<p>In this example, both W1 (write 1) and W2 (write 2) finish before the start of R1
+				(read 1) and R2 (read 2). Because S3 is strongly consistent, R1 and R2 both return
+					<code class="code">color = ruby</code>. </p>
+			<div class="mediaobject">
+				 
+					<img src="/images/AmazonS3/latest/userguide/images/consistency1.png" class="aws-docs-img-whiteBg aws-docs-img-padding aws-docs-img-filter" />
+				 
+			</div>
+			<p>In the next example, W2 does not finish before the start of R1. Therefore, R1
+				might return <code class="code">color = ruby</code> or <code class="code">color = garnet</code>. However,
+				because W1 and W2 finish before the start of R2, R2 returns <code class="code">color =
+					garnet</code>. </p>
+			<div class="mediaobject">
+				 
+					<img src="/images/AmazonS3/latest/userguide/images/consistency2.png" class="aws-docs-img-whiteBg aws-docs-img-padding aws-docs-img-filter" />
+				 
+			</div>
+			<p>In the last example, W2 begins before W1 has received an acknowledgment.
+				Therefore, these writes are considered concurrent. Amazon S3 internally uses
+				last-writer-wins semantics to determine which write takes precedence. However, the
+				order in which Amazon S3 receives the requests and the order in which applications
+				receive acknowledgments cannot be predicted because of various factors, such as
+				network latency. For example, W2 might be initiated by an Amazon EC2 instance in the same
+				Region, while W1 might be initiated by a host that is farther away. The best way to
+				determine the final value is to perform a read after both writes have been
+				acknowledged. </p>
+			<div class="mediaobject">
+				 
+					<img src="/images/AmazonS3/latest/userguide/images/consistency3.png" class="aws-docs-img-whiteBg aws-docs-img-padding aws-docs-img-filter" />
+				 
+			</div>
+		 
+	 
+		<h2 id="RelatedAmazonWebServices">Related services </h2>
+
+		<p>After you load your data into Amazon S3, you can use it with other AWS services. The
+			following are the services that you might use most frequently:</p>
+		<div class="itemizedlist">
+			 
+			 
+			 
+			 
+		<ul class="itemizedlist"><li class="listitem">
+				<p><span class="topcom"><a href="https://aws.amazon.com/ec2/" rel="noopener noreferrer" target="_blank"><span>Amazon Elastic Compute Cloud
+							(Amazon EC2)</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a></span> – Provides secure and scalable computing
+					capacity in the AWS Cloud. Using Amazon EC2 eliminates your need to invest in
+					hardware upfront, so you can develop and deploy applications faster. You can
+					use Amazon EC2 to launch as many or as few virtual servers as you need, configure
+					security and networking, and manage storage.</p>
+			</li><li class="listitem">
+				<p><span class="topcom"><a href="https://aws.amazon.com/elasticmapreduce/" rel="noopener noreferrer" target="_blank"><span>Amazon EMR</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a></span> – Helps businesses, researchers, data
+					analysts, and developers easily and cost-effectively process vast amounts of
+					data. Amazon EMR uses a hosted Hadoop framework running on the web-scale
+					infrastructure of Amazon EC2 and Amazon S3. </p>
+			</li><li class="listitem">
+				<p><span class="topcom"><a href="http://aws.amazon.com/snow/" rel="noopener noreferrer" target="_blank"><span>AWS Snow
+							Family</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a></span> – Helps customers that need to run
+					operations in austere, non-data center environments, and in locations where
+					there's a lack of consistent network connectivity. You can use AWS Snow Family
+					devices to locally and cost-effectively access the storage and compute power of
+					the AWS Cloud in places where an internet connection might not be an option.
+				</p>
+			</li><li class="listitem">
+				<p><span class="topcom"><a href="http://aws.amazon.com/aws-transfer-family/" rel="noopener noreferrer" target="_blank"><span>AWS Transfer Family</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a></span> – Provides fully managed support for
+					file transfers directly into and out of Amazon S3 or Amazon Elastic File System (Amazon EFS) using Secure
+					Shell (SSH) File Transfer Protocol (SFTP), File Transfer Protocol over SSL
+					(FTPS), and File Transfer Protocol (FTP). </p>
+			</li></ul></div>
+	 
+		<h2 id="API">Accessing Amazon S3</h2>
+		<p>You can work with Amazon S3 in any of the following ways:</p>
+		 
+			<h3 id="access-aws-management-console">AWS Management Console</h3>
+			<p>The console is a web-based user interface for managing Amazon S3 and AWS resources.
+				If you've signed up for an AWS account, you can access the Amazon S3 console by signing
+				into the AWS Management Console and choosing <b>S3</b> from the AWS Management Console home
+				page.</p>
+		 
+		 
+			<h3 id="access-aws-cli">AWS Command Line Interface</h3>
+			<p>You can use the AWS command line tools to issue commands or build scripts at
+				your system's command line to perform AWS (including S3) tasks.</p>
+			<p>The <a href="http://aws.amazon.com/cli/" rel="noopener noreferrer" target="_blank"><span>AWS Command Line Interface (AWS CLI)</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a> provides commands
+				for a broad set of AWS services. The AWS CLI is supported on Windows, macOS, and
+				Linux. To get started, see the <a href="https://docs.aws.amazon.com/cli/latest/userguide/"><em>AWS Command Line Interface User Guide</em></a>. For more information about the commands for
+				Amazon S3, see <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/index.html" rel="noopener noreferrer" target="_blank"><span>s3api</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a> and <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3control/index.html" rel="noopener noreferrer" target="_blank"><span>s3control</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a> in the <em>AWS CLI Command Reference</em>.</p>
+		 
+		 
+			<h3 id="access-aws-sdks">AWS SDKs</h3>
+			<p>AWS provides SDKs (software development kits) that consist of libraries and sample code
+				for various programming languages and platforms (Java, Python, Ruby, .NET, iOS,
+				Android, and so on). The AWS SDKs provide a convenient way to create programmatic
+				access to S3 and AWS. Amazon S3 is a REST service. You can send requests to Amazon S3 using
+				the AWS SDK libraries, which wrap the underlying Amazon S3 REST API and simplify your
+				programming tasks. For example, the SDKs take care of tasks such as calculating
+				signatures, cryptographically signing requests, managing errors, and retrying
+				requests automatically. For information about the AWS SDKs, including how to
+				download and install them, see <a href="http://aws.amazon.com/tools/" rel="noopener noreferrer" target="_blank"><span>Tools for
+					AWS</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>.</p>
+			<p>Every interaction with Amazon S3 is either authenticated or anonymous. If you are using
+				the AWS SDKs, the libraries compute the signature for authentication from the keys
+				that you provide. For more information about how to make requests to Amazon S3, see <a href="./MakingRequests.html">Making requests</a>.</p>
+		 
+		 
+			<h3 id="UsingRESTAPI">Amazon S3 REST API</h3>
+			<p>The architecture of Amazon S3 is designed to be programming language-neutral, using
+				AWS-supported interfaces to store and retrieve objects. You can access S3 and
+				AWS programmatically by using the Amazon S3 REST API. The REST API is an HTTP interface
+				to Amazon S3. With the REST API, you use standard HTTP requests to create, fetch, and
+				delete buckets and objects.</p>
+			<p>To use the REST API, you can use any toolkit that supports HTTP. You can even use
+				a browser to fetch objects, as long as they are anonymously readable.</p>
+			<p>The REST API uses standard HTTP headers and status codes, so that standard
+				browsers and toolkits work as expected. In some areas, we have added functionality
+				to HTTP (for example, we added headers to support access control). In these cases,
+				we have done our best to add the new functionality in a way that matches the style
+				of standard HTTP usage.</p>
+			<p>If you make direct REST API calls in your application, you must write the code to
+				compute the signature and add it to the request. For more information about how to
+				make requests to Amazon S3, see <a href="./MakingRequests.html">Making requests</a>.</p>
+			<div class="awsdocs-note"><div class="awsdocs-note-title"><awsui-icon name="status-info" variant="link"></awsui-icon><h6>Note</h6></div><div class="awsdocs-note-text"><p>SOAP API support over HTTP is deprecated, but it is still available over
+					HTTPS. Newer Amazon S3 features are not supported for SOAP. We recommend that you use
+					either the REST API or the AWS SDKs.</p></div></div>
+		 
+	 
+		<h2 id="PayingforStorage">Paying for Amazon S3</h2>
+		<p>Pricing for Amazon S3 is designed so that you don't have to plan for the storage
+			requirements of your application. Most storage providers require you to purchase a
+			predetermined amount of storage and network transfer capacity. In this scenario, if you
+			exceed that capacity, your service is shut off or you are charged high overage fees. If
+			you do not exceed that capacity, you pay as though you used it all. </p>
+		<p>Amazon S3 charges you only for what you actually use, with no hidden fees and no overage
+			charges. This model gives you a variable-cost service that can grow with your business
+			while giving you the cost advantages of the AWS infrastructure. For more information,
+			see <a href="https://aws.amazon.com/s3/pricing/" rel="noopener noreferrer" target="_blank"><span>Amazon S3 Pricing</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>.</p>
+		<p>When you sign up for AWS, your AWS account is automatically signed up for all
+			services in AWS, including Amazon S3. However, you are charged only for the services that
+			you use. If you are a new Amazon S3 customer, you can get started with Amazon S3 for free. For
+			more information, see <a href="http://aws.amazon.com/free" rel="noopener noreferrer" target="_blank"><span>AWS free tier</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>. </p>
+		<p>To see your bill, go to the Billing and Cost Management Dashboard in the <a href="https://console.aws.amazon.com/billing/" rel="noopener noreferrer" target="_blank"><span>AWS Billing and Cost Management console</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>. To learn more about AWS account billing, see the <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-what-is.html"><em>AWS Billing User Guide</em></a>. If you have
+			questions concerning AWS billing and AWS accounts, contact <a href="http://aws.amazon.com/contact-us/" rel="noopener noreferrer" target="_blank"><span>AWS Support</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>.</p>
+	 
+		<h2 id="pci-dss-compliance">PCI DSS compliance</h2>
+		
+<p>Amazon S3 supports the processing, storage, and transmission 
+of credit card data by a merchant or service provider, and has been 
+validated as being compliant with Payment Card Industry (PCI) Data Security Standard (DSS). 
+For more information about PCI DSS, including how to request a copy of the AWS PCI Compliance Package, 
+see <a href="https://aws.amazon.com/compliance/pci-dss-level-1-faqs/" rel="noopener noreferrer" target="_blank"><span>PCI DSS Level 1</span><awsui-icon class="awsdocs-link-icon" name="external"></awsui-icon></a>.
+</p>
+
+	<awsdocs-copyright class="copyright-print"></awsdocs-copyright><awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}"></awsdocs-thumb-feedback></div><noscript><div><div><div><div id="js_error_message"><p><img src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png" alt="Warning" /> <strong>Javascript is disabled or is unavailable in your browser.</strong></p><p>To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.</p></div></div></div></div></noscript><div id="main-col-footer" class="awsui-util-font-size-0"><div id="doc-conventions"><a target="_top" href="/general/latest/gr/docconventions.html">Document Conventions</a></div><div class="prev-next"><div id="next" class="next-link" accesskey="n" href="./GetStartedWithS3.html">Getting started</div></div></div><awsdocs-page-utilities></awsdocs-page-utilities></div><div id="quick-feedback-yes" style="display: none;"><div class="title">Did this page help you? - Yes</div><div class="content"><p>Thanks for letting us know we're doing a good job!</p><p>If you've got a moment, please tell us what we did right so we can do more of it.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=S3&amp;topic_url=https://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/Welcome.html"></awsui-button></p></div></div><div id="quick-feedback-no" style="display: none;"><div class="title">Did this page help you? - No</div><div class="content"><p>Thanks for letting us know this page needs work. We're sorry we let you down.</p><p>If you've got a moment, please tell us how we can make the documentation better.</p><p><awsui-button id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback" click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=S3&amp;topic_url=https://docs.aws.amazon.com/en_us/AmazonS3/latest/userguide/Welcome.html"></awsui-button></p></div></div></div></body></div></awsdocs-view><div class="page-loading-indicator" id="page-loading-indicator"><awsui-spinner size="large"></awsui-spinner></div></div><div id="tools-panel" dom-region="tools"><awsdocs-tools-panel id="awsdocs-tools-panel"></awsdocs-tools-panel></div></awsui-app-layout><awsdocs-cookie-banner class="doc-cookie-banner"></awsdocs-cookie-banner></div></body></html>

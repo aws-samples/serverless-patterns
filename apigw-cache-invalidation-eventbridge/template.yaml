@@ -1,0 +1,306 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - API Gateway, DynamoDB & EventBridge Cache Invalidation
+
+Parameters:
+  DeployMetricsDashboard:
+    Description: Deploy Cloudwatch Metrics dashboard for visibility
+    Type: String
+    Default: "true"
+
+Conditions:
+  deployMetricsDashboard: !Equals [!Ref DeployMetricsDashboard, "true"]
+
+Resources:
+  PetTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+  PetTableRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "apigateway.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: DDBCrudPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              Action:
+                - dynamodb:DeleteItem
+                - dynamodb:UpdateItem
+                - dynamodb:CreateItem
+                - dynamodb:GetItem
+                - dynamodb:Scan
+                - dynamodb:Query
+              Effect: Allow
+              Resource: !GetAtt PetTable.Arn
+
+  PetEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "PetEventBus"
+
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: pipes.amazonaws.com
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-SourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action: dynamodb:ListStreams
+                Effect: Allow
+                Resource: "*"
+              - Action:
+                  - dynamodb:DescribeStream
+                  - dynamodb:GetRecords
+                  - dynamodb:GetShardIterator
+                Effect: Allow
+                Resource: !GetAtt PetTable.StreamArn
+              - Action: events:PutEvents
+                Effect: Allow
+                Resource: !GetAtt PetEventBus.Arn
+
+  PetModifyPipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Description: "Product Event Bus Modify Pipe for DynamoDB to EventBus"
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt PetTable.StreamArn
+      Target: !GetAtt PetEventBus.Arn
+      SourceParameters:
+        DynamoDBStreamParameters:
+          BatchSize: 1
+          StartingPosition: LATEST
+        FilterCriteria:
+          Filters:
+            - Pattern: '{"eventName":["MODIFY"]}'
+      TargetParameters:
+        EventBridgeEventBusParameters:
+          DetailType: PetUpdated
+          Source: com.acme.pet
+        InputTemplate: '{ "metadata":{ "service": "pet-service", "correlationId": "<$.eventID>" }, "data": { "id": <$.dynamodb.NewImage.id.S>}}'
+
+  CacheInvalidationTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: AllowAPIGatewayAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "execute-api:InvalidateCache"
+                  - "execute-api:Invoke"
+                Resource: !Sub
+                  - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIId}/Prod/GET/pets/*"
+                  - APIId: !Ref Api
+
+  CacheInvalidationRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Cache Invalidation Rule"
+      EventBusName: !GetAtt PetEventBus.Name
+      EventPattern:
+        source:
+          - com.acme.pet
+        detail-type:
+          - PetUpdated
+      Targets:
+        - Id: APIGatewayTarget
+          Arn: !Sub
+            - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIId}/Prod/GET/pets/*"
+            - APIId: !Ref Api
+          RoleArn: !GetAtt CacheInvalidationTargetRole.Arn
+          HttpParameters:
+            HeaderParameters:
+              Cache-Control: max-age=0
+            PathParameterValues:
+              - $.detail.data.id
+          DeadLetterConfig:
+            Arn: !GetAtt CacheInvalidationTargetDeadLetterQueue.Arn
+
+  CacheInvalidationTargetDeadLetterQueue:
+    Type: AWS::SQS::Queue
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      CacheClusterEnabled: true
+      CacheClusterSize: "0.5"
+      MethodSettings:
+        - HttpMethod: GET
+          CachingEnabled: true
+          CacheTtlInSeconds: 3600 # 1 hour
+          ResourcePath: "/pets/{id}"
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+      DefinitionBody:
+        "Fn::Transform":
+          Name: "AWS::Include"
+          Parameters:
+            Location: "./api.yaml"
+
+  APICacheInvalidationDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Condition: deployMetricsDashboard
+    Properties:
+      DashboardBody: !Sub
+        - |
+          {
+            "widgets": [
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 0,
+                    "x": 12,
+                    "type": "metric",
+                    "properties": {
+                        "metrics": [
+                            [ "AWS/ApiGateway", "CacheMissCount", "ApiName", "DynamoDB Crud API", { "region": "${AWS::Region}" } ],
+                            [ ".", "CacheHitCount", ".", ".", { "region": "${AWS::Region}" } ]
+                        ],
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "region": "${AWS::Region}",
+                        "period": 30,
+                        "stat": "Sum",
+                        "title": "Api Gateway - Cache Hit Rate"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 0,
+                    "x": 0,
+                    "type": "metric",
+                    "properties": {
+                        "metrics": [
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", { "region": "${AWS::Region}" } ]
+                        ],
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "region": "${AWS::Region}",
+                        "period": 300,
+                        "stat": "Average",
+                        "title": "Api Gateway - Request Count"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 18,
+                    "y": 6,
+                    "x": 0,
+                    "type": "log",
+                    "properties": {
+                        "query": "SOURCE 'API-Gateway-Execution-Logs_${Api}/Prod' | fields @timestamp, @message, @logStream, @log\n| sort @timestamp desc\n| limit 30",
+                        "region": "${AWS::Region}",
+                        "stacked": false,
+                        "title": "Log group: API-Gateway-Execution-Logs_${Api}/Prod",
+                        "view": "table"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 12,
+                    "x": 6,
+                    "type": "metric",
+                    "properties": {
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "metrics": [
+                            [ "AWS/Events", "TriggeredRules", "EventBusName", "PetEventBus", "RuleName", "cache-application-CacheInvalidationRule-rDVS3hZt2zRW", { "region": "${AWS::Region}" } ],
+                            [ ".", "MatchedEvents", ".", ".", ".", ".", { "region": "${AWS::Region}" } ],
+                            [ ".", "Invocations", ".", ".", ".", ".", { "region": "${AWS::Region}" } ]
+                        ],
+                        "region": "${AWS::Region}",
+                        "period": 300,
+                        "title": "EventBridge - Cache Invalidation Rule"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 12,
+                    "x": 0,
+                    "type": "metric",
+                    "properties": {
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "metrics": [
+                            [ "AWS/EventBridge/Pipes", "Invocations", "PipeName", "PetModifyPipe-pI4diXmDgwa7", { "region": "${AWS::Region}" } ]
+                        ],
+                        "region": "${AWS::Region}",
+                        "period": 300,
+                        "title": "EventBridge Pipe - Invocations"
+                    }
+                },
+                {
+                    "height": 6,
+                    "width": 6,
+                    "y": 0,
+                    "x": 6,
+                    "type": "metric",
+                    "properties": {
+                        "view": "timeSeries",
+                        "stacked": true,
+                        "metrics": [
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", "Resource", "/pets/{id}", "Stage", "Prod", "Method", "GET", { "region": "${AWS::Region}" } ],
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", "Resource", "/pets/{id}", "Stage", "Prod", "Method", "PUT", { "region": "${AWS::Region}" } ],
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", "Resource", "/pets/{id}", "Stage", "Prod", "Method", "DELETE", { "region": "${AWS::Region}" } ],
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", "Resource", "/pets", "Stage", "Prod", "Method", "POST", { "region": "${AWS::Region}" } ],
+                            [ "AWS/ApiGateway", "Count", "ApiName", "DynamoDB Crud API", "Resource", "/pets", "Stage", "Prod", "Method", "GET", { "region": "${AWS::Region}" } ]
+                        ],
+                        "region": "${AWS::Region}",
+                        "period": 300,
+                        "title": "API Gateway - Method distribution"
+                    }
+                }
+            ]
+          }
+        - Api: !Ref Api
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
+  CloudWatchDashboard:
+    Condition: deployMetricsDashboard
+    Description: "Cloudwatch Dashboard"
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards/dashboard/${APICacheInvalidationDashboard}"

@@ -1,0 +1,100 @@
+{
+    "title": "Amazon Cognito authentication with Amazon API Gateway Websockets",
+    "description": "How to integrate Cognito authentication with Amazon API Gateway WebSocket API.",
+    "language": ".NET",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates how to integrate Cognito authentication with Amazon API Gateway WebSocket API.",
+            "It includes the Lambda implementations for Lambda authorizer, Lambda functions for $connect, $disconnect and custom route, and AWS Serverless Application Model (SAM) code to deploy backend infrastructure."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-lambda-authorizer",
+            "projectFolder": "apigw-websocket-api-lambda-authorize",
+            "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-lambda-authorizer/README.md",
+            "templateURL": "apigw-websocket-api-lambda-authorizer",
+            "templateFile": "template.yaml"
+        }
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "sam delete"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ankush Jain",
+            "image": "https://avatars.githubusercontent.com/u/13661966",
+            "bio": "Application Development Consultant at AWS Professional Services.",
+            "linkedin": "ankush-jain-developer",
+            "twitter": "ankushjain358"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 20,
+            "service": "apigw",
+            "label": "API Gateway Websocket API"
+        },
+        "icon2": {
+            "x": 44,
+            "y": 70,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 50,
+            "y": 20,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon4": {
+            "x": 80,
+            "y": 20,
+            "service": "dynamodb",
+            "label": "DynamoDB"
+        },
+        "icon5": {
+            "x": 70,
+            "y": 70,
+            "service": "cognito",
+            "label": "Cognito"
+        },
+        "line1": {
+            "from": "icon2",
+            "to": "icon5",
+            "label": ""
+        },
+        "line2": {
+            "from": "icon1",
+            "to": "icon3",
+            "label": ""
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4",
+            "label": ""
+        },
+        "line4": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": ""
+        }
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "alb-lambda-serverless",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "serverless": "^3.33.0"
+  }
+}
