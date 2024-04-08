@@ -38,7 +38,7 @@ namespace Cdk
                 Description = "IAM Role for the Lambda function",
                 ManagedPolicies = new[]
                 {
-                        ManagedPolicy.FromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")
+                        ManagedPolicy.FromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
                         analyzeDocumentPolicy
                 }
             });
