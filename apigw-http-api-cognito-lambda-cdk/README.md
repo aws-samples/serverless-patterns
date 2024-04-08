@@ -39,7 +39,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates an Amazon API Gateway API HTTP API and two endpoints. The first endpoint is unprotected (no authentication/authorization) and integrate with a public Lambda function. The second endpoint is protected by a JWTAuthorizer that use Coginto as IDP and it integrates with a private Lambda function.
+This pattern creates an Amazon API Gateway API HTTP API and two endpoints. The first endpoint is unprotected (no authentication/authorization) and integrate with a publicly accessible Lambda function. The second endpoint is protected by a JWTAuthorizer that use Coginto as IDP and it integrates with a non-publicly accessible Lambda function.
 
 ## Testing
 
@@ -59,27 +59,27 @@ This pattern creates an Amazon API Gateway API HTTP API and two endpoints. The f
 **Public endpoint**
 To test the public endpoint, send a HTTP GET request command to the HTTP API public endpoint. Be sure to update the endpoint with outputs of your stack. The response payload should shows `Hello Public Space`.
 ```bash
-curl ${API_URL}/public 
+curl ${API_URL}/unprotected
 ```
 
 **Private endpoint**
 To test the private endpoint:
 1. First sign-up the fake user against Cognito. 
    ```bash
-    aws cognito-idp sign-up \                  
-    --client-id ${CLIENT_ID} \  
-    --username ${EMAIL} \             
+    aws cognito-idp sign-up \
+    --client-id ${CLIENT_ID} \
+    --username ${EMAIL} \        
     --password ${PASSWORD}
    ```
 2. Confirm the fake user to Cognito
    ```bash
-    aws cognito-idp admin-confirm-sign-up \                  
-    --user-pool-id ${POOL_ID} \ 
-    --username ${EMAIL}   
+    aws cognito-idp admin-confirm-sign-up \
+    --user-pool-id ${POOL_ID} \
+    --username ${EMAIL}
    ```
 4. Then you send the authentication data and Cognito will return the token. 
    ```bash
-   TOKEN=$(aws cognito-idp initiate-auth \                          
+   TOKEN=$(aws cognito-idp initiate-auth \
     --client-id ${CLIENT_ID} \
     --auth-flow USER_PASSWORD_AUTH \
     --auth-parameters USERNAME=${EMAIL},PASSWORD=${PASSWORD} \
@@ -88,9 +88,9 @@ To test the private endpoint:
    ```
 5. Send an HTTP GET request to the API Gateway with the JWT token, which will verify the token call the private Lambda function.
     ```bash
-    curl -H "Authorization: ${TOKEN}" ${API_URL}/private
+    curl -H "Authorization: ${TOKEN}" ${API_URL}/protected
     ```
-6. The result payload should display `Hello Private Space!`
+6. The result payload should display `Hello Protected Space!`
  
 
 ## Cleanup

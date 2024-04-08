@@ -4,6 +4,6 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
     return {
         statusCode: 200,
-        body: "Hello Private Space!",
+        body: "Hello Publicly Accessible Space!",
     };
 };

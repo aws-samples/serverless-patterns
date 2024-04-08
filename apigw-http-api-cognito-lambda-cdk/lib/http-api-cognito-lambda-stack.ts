@@ -24,17 +24,17 @@ export class HttpApiCognitoLambdaStack extends Stack {
       authFlows: { userPassword: true }
     })
 
-    // Public Lambda
-    const publicFn = new NodejsFunction(this, 'publicFn', {
+    // Publicly Accessible Lambda
+    const unprotectedFn = new NodejsFunction(this, 'unprotectedFn', {
       runtime: Runtime.NODEJS_20_X,
-      entry: path.join(__dirname, '/../resources/public-fn.ts'),
+      entry: path.join(__dirname, '/../resources/unprotected-fn.ts'),
       handler: 'handler'
     })
 
-    // Private Lambda
-    const privateFn = new NodejsFunction(this, 'privateFn', {
+    // Privatly Accessible Lambda
+    const protectedFn = new NodejsFunction(this, 'protectedFn', {
       runtime: Runtime.NODEJS_20_X,
-      entry: path.join(__dirname, '/../resources/private-fn.ts'),
+      entry: path.join(__dirname, '/../resources/protected-fn.ts'),
       handler: 'handler'
     })
 
@@ -48,15 +48,15 @@ export class HttpApiCognitoLambdaStack extends Stack {
         jwtAudience: [userPoolClient.userPoolClientId]
        })
     httpApi.addRoutes({
-      path:'/public',
+      path:'/unprotected',
       methods: [ HttpMethod.GET ],
-      integration: new HttpLambdaIntegration('publicIntegration', publicFn),
+      integration: new HttpLambdaIntegration('unprotectedIntegration', unprotectedFn),
       authorizer: undefined
     })
     httpApi.addRoutes({
-      path:'/private',
+      path:'/protected',
       methods: [ HttpMethod.GET ],
-      integration: new HttpLambdaIntegration('privateIntegration', privateFn),
+      integration: new HttpLambdaIntegration('protectedIntegration', protectedFn),
       authorizer: jwtAuthorizer
     })
 
