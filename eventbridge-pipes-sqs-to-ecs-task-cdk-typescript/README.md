@@ -17,7 +17,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
 ## Getting Started
-The entire solution is built using AWS Cloud Development Kit (CDK) in Typescript. The instructions below shows how solution works, deployment instructions, testing steps and cleanup.
+This pattern is built using the AWS Cloud Development Kit (CDK) in Typescript. The instructions below show how the pattern works, the deployment instructions, testing steps and cleanup.
 
 ### How it works
 The solution will create a Amazon SQS queue and a DLQ, Amazon Elastic Container Service Cluster and Task Definition, and an EventBridge Pipes to connect it all.
