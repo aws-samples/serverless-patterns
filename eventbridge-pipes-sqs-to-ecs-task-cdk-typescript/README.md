@@ -1,6 +1,6 @@
 # Amazon SQS Integration With Amazon Elastic Container Service Task using Amazon EventBridge Pipes 
 
-This pattern demonstrates how to invoke an Amazon Elastic Container Service Tasks based on selective messages from Amazon SQS queue using Amazon EventBridge Pipes.
+This pattern demonstrates how to invoke an Amazon Elastic Container Service (ECS) Tasks based on selective messages from an Amazon SQS queue using Amazon EventBridge Pipes.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/eventbridge-pipes-sqs-to-ecs-task-cdk-typescript
 
