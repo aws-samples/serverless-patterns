@@ -1,6 +1,6 @@
-# Extract text from image using Amazon Textract
+# Extract text from images using Amazon Textract
 
-This CDK application demonstrates how to extract text from image using Amazon Textract, AWS Lambda function and Amazon S3.
+This pattern shows demonstrates how to extract text from images using Amazon Textract, AWS Lambda function and Amazon S3.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/textract-lambda-cdk-dotnet.
 
@@ -49,6 +49,6 @@ cdk destroy
 ```
 
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

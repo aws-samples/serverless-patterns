@@ -13,28 +13,38 @@ namespace Cdk
         readonly string lambdaFunctionName = "textractLambdaFunction";
         internal CdkStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
-            //Create S3 bucket
             var bucket = new Bucket(this, "textract-bucket", new BucketProps
             {
                 BucketName = $"{this.Account}-textract-bucket"
             });
 
-            //Lambda Function IAM role
-            var lambdaIAMRole = new Role(this, "TextractLambdaRole", new RoleProps
+            var analyzeDocumentPolicy = new ManagedPolicy(this, "AnalyzeDocumentPolicy", new ManagedPolicyProps
             {
-                AssumedBy = new ServicePrincipal("lambda.amazonaws.com"),
-                Description = "IAM Role for the lambda function",
-                ManagedPolicies = new[]
+                ManagedPolicyName = "AnalyzeDocumentPolicy",
+                Statements = new[]
                 {
-                        ManagedPolicy.FromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
-                        ManagedPolicy.FromAwsManagedPolicyName("AmazonTextractFullAccess")
+                    new PolicyStatement(new PolicyStatementProps
+                    {
+                        Effect = Effect.ALLOW,
+                        Actions = new[] { "textract:AnalyzeDocument" },
+                        Resources = new[] { "*" }
+                    })
                 }
             });
 
-            //Grant S3 read & write access
+            var lambdaIAMRole = new Role(this, "TextractLambdaRole", new RoleProps
+            {
+                AssumedBy = new ServicePrincipal("lambda.amazonaws.com"),
+                Description = "IAM Role for the Lambda function",
+                ManagedPolicies = new[]
+                {
+                        ManagedPolicy.FromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")
+                        analyzeDocumentPolicy
+                }
+            });
+
             bucket.GrantReadWrite(lambdaIAMRole);
 
-            // CloudWatch Log Group
             _ = new LogGroup(this, "CloudWatchLogs", new LogGroupProps
             {
                 LogGroupName = $"/aws/lambda/{lambdaFunctionName}",
@@ -42,7 +52,6 @@ namespace Cdk
                 Retention = RetentionDays.ONE_DAY
             });
 
-            // Lambda Function Build Commands
             var buildOption = new BundlingOptions()
             {
                 Image = Runtime.DOTNET_8.BundlingImage,
@@ -57,7 +66,6 @@ namespace Cdk
                 }
             };
 
-            //Lambda function
             _ = new Function(this, "LambdaFunction", new FunctionProps
             {
                 FunctionName = lambdaFunctionName,
@@ -76,6 +84,7 @@ namespace Cdk
                     Filters = new[] { new NotificationKeyFilter { Prefix = "input/" } }
                 })}
             });
+
         }
     }
 }

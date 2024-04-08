@@ -1,13 +1,13 @@
 {
-    "title": "Extract text from image using Amazon Textract",
-    "description": "Create an AWS Lambda function that receives DynamoDB change items.",
+    "title": "Extract text from images using Amazon Textract",
+    "description": "This CDK application demonstrates how to use Amazon Textract service to extract text from images.",
     "language": ".NET",
     "level": "200",
     "framework": "CDK",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This CDK application demonstrates how to extract text from image using Amazon Textract, AWS Lambda function and Amazon S3.",
+        "This pattern shows how to extract text from images using Amazon Textract, AWS Lambda function and Amazon S3.",
         "When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Textract service, which extracts text from the image and stores it in the S3 bucket."
       ]
     },
@@ -19,6 +19,18 @@
         "templateURL": "serverless-patterns/textract-lambda-cdk-dotnet",
         "templateFile": "cdk/src/Cdk/CdkStack.cs"
       }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Using AWS Lambda with Amazon S3",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
+        },
+        {
+          "text": "Analyzing Document Text with Amazon Textract",
+          "link": "https://docs.aws.amazon.com/textract/latest/dg/analyzing-document-text.html"
+        }
+      ]
     },
     "deploy": {
       "text": [
