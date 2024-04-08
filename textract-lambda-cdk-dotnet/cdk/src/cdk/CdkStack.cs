@@ -18,15 +18,15 @@ namespace Cdk
                 BucketName = $"{this.Account}-textract-bucket"
             });
 
-            var analyzeDocumentPolicy = new ManagedPolicy(this, "AnalyzeDocumentPolicy", new ManagedPolicyProps
+            var detectDocumentPolicy = new ManagedPolicy(this, "DetectDocumentPolicy", new ManagedPolicyProps
             {
-                ManagedPolicyName = "AnalyzeDocumentPolicy",
+                ManagedPolicyName = "DetectDocumentPolicy",
                 Statements = new[]
                 {
                     new PolicyStatement(new PolicyStatementProps
                     {
                         Effect = Effect.ALLOW,
-                        Actions = new[] { "textract:AnalyzeDocument" },
+                        Actions = new[] { "textract:DetectDocumentText" },
                         Resources = new[] { "*" }
                     })
                 }
@@ -39,7 +39,7 @@ namespace Cdk
                 ManagedPolicies = new[]
                 {
                         ManagedPolicy.FromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
-                        analyzeDocumentPolicy
+                        detectDocumentPolicy
                 }
             });
 
