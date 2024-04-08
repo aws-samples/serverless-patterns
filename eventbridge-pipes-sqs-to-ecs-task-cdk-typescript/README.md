@@ -21,7 +21,7 @@ This pattern is built using the AWS Cloud Development Kit (CDK) in Typescript. T
 
 ### How it works
 The pattern creates an Amazon SQS queue and a DLQ, an Elastic Container Service cluster and task definition, and an EventBridge Pipe to connect it all.
-- EventBridge pipe polls for new messages from source queue. 
+- the EventBridge pipe polls for new messages from the source queue. 
 - EventBridge pipe filters the SQS message matching a specific pattern and then invokes a Amazon ECS Task with the message payload.
 
 For more informations: [Amazon EventBridge Pipes with SQS ](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-sqs.html) and  [Amazon Elastic Container Service Task](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html#pipes-targets-specifics-ecs-task)
