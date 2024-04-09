@@ -1,4 +1,4 @@
-# Authenticate API using Cognito User Pool client credentials flow
+# Use multiple AWS Lambda functions to manage an AWS CloudFormation custom resource
 
 This project contains a sample AWS CDK template for implementing an [AWS CloudFormation](https://aws.amazon.com/cloudformation/) custom resource that can take up to one hour to create or update.
 
@@ -38,13 +38,7 @@ Important: this application uses various AWS services and there are costs associ
    npm install
    ```
 
-1. Synthesize an AWS CloudFormation template for the app
-
-    ```sh
-   cdk synth
-   ```
-
-1. Deploy the stack to your default AWS account and region. The output of this command shows API endpoint.
+1. Deploy the stack to your default AWS account and region
 
    ```sh
    cdk deploy --require-approval never
@@ -64,8 +58,8 @@ cdk destroy -f
 
 ## References
 
-1. [Generate access token](https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html)
-2. [Understand AWS Cognito grants](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html)
+1. [Custom resources](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources.html)
+2. [Implementing long running deployments with AWS CloudFormation Custom Resources using AWS Step Functions](https://aws.amazon.com/blogs/devops/implementing-long-running-deployments-with-aws-cloudformation-custom-resources-using-aws-step-functions/)
 
 ----
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.

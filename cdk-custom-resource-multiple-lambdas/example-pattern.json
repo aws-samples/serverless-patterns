@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "AWS CloudFormation can wait for up to an hour for a custom resource to report its success or failure. However, AWS Lambda function execution is limited with just 15 minutes maximum.",
-      "This sample project demonstrates how to use multiple AWS Lambda functions to manage a custom resource, so that developers are not limited with 15 minutes Lambda execution timeout.",
+      "This sample project demonstrates how to use multiple AWS Lambda functions to manage a custom resource, so that developers are not limited by the 15 minutes Lambda execution timeout.",
       "This pattern deploys two Lambda Functions and an SQS queue. SQS queue is being used for illustrative purposes only - to demonstrate that a different process, other than the custom resource Lambda function, can be used to report the resource creation result."
     ]
   },
