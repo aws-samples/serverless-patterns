@@ -1,8 +1,8 @@
-# Extract text from images using Amazon Textract
+# Extract text from images using Amazon Bedrock
 
-This pattern shows demonstrates how to extract text from images using Amazon Textract, AWS Lambda function and Amazon S3.
+This pattern shows demonstrates how to extract text from images using Amazon Bedrock, AWS Lambda function and Amazon S3.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/textract-lambda-cdk-dotnet.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-lambda-cdk-dotnet.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change the working directory to this pattern's directory
     ```
-    cd textract-lambda-cdk-dotnet/Cdk/
+    cd bedrock-lambda-cdk-dotnet/Cdk/
     ```
 3. Build the application
     ```
@@ -34,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 
 ## How it works
-When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Textract service, which extracts text from the image and stores it in the S3 bucket.
+When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Bedrock service, which extracts text from the image and stores it in the S3 bucket.
 
 ![pattern](Images/pattern.png)
 

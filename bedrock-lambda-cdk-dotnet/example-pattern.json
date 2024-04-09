@@ -1,22 +1,22 @@
 {
-    "title": "Extract text from images using Amazon Textract",
-    "description": "This CDK application demonstrates how to use Amazon Textract service to extract text from images.",
+    "title": "Extract text from images using Amazon Bedrock",
+    "description": "This CDK application demonstrates how to use Amazon Bedrock service to extract text from images.",
     "language": ".NET",
     "level": "200",
     "framework": "CDK",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This pattern shows how to extract text from images using Amazon Textract, AWS Lambda function and Amazon S3.",
-        "When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Textract service, which extracts text from the image and stores it in the S3 bucket."
+        "This pattern shows how to extract text from images using Amazon Bedrock, AWS Lambda function and Amazon S3.",
+        "When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Bedrock service, which extracts text from the image and stores it in the S3 bucket."
       ]
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/textract-lambda-cdk-dotnet",
-        "projectFolder": "textract-lambda-cdk-dotnet",
-        "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/textract-lambda-cdk-dotnet/README.md",
-        "templateURL": "serverless-patterns/textract-lambda-cdk-dotnet",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-lambda-cdk-dotnet",
+        "projectFolder": "bedrock-lambda-cdk-dotnet",
+        "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-lambda-cdk-dotnet/README.md",
+        "templateURL": "serverless-patterns/bedrock-lambda-cdk-dotnet",
         "templateFile": "cdk/src/Cdk/CdkStack.cs"
       }
     },
@@ -27,8 +27,8 @@
           "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
         },
         {
-          "text": "Analyzing Document Text with Amazon Textract",
-          "link": "https://docs.aws.amazon.com/textract/latest/dg/analyzing-document-text.html"
+          "text": "Analyzing Document Text with Amazon Bedrock",
+          "link": "https://docs.aws.amazon.com/Bedrock/latest/dg/analyzing-document-text.html"
         }
       ]
     },
