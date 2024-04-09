@@ -1,7 +1,7 @@
 {
     "title": "Custom resource with multiple Lambda functions",
     "description": "This pattern demonstrates the use of multiple Lambda functions to manage a custom resource with CDK.",
-    "language": "Python",
+    "language": "TypeScript",
     "level": "200",
     "framework": "CDK",
     "introBox": {
