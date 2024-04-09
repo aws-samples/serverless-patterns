@@ -49,7 +49,7 @@ This pattern demonstrates how to:
 
 See the below architecture diagram from the data flow of this pattern. 
 
-![Architecture Diagram](/serverless-patterns/auth0-eventbridge-lambda/img/readme-arch-diagram.pngreadme-arch-diagram.png)
+![Architecture Diagram](./img/readme-arch-diagram.pngreadme-arch-diagram.png)
 
 ## Testing
 
@@ -82,23 +82,23 @@ You cannot put events on the Auth0 SaaS event bus, only Auth0 can publish events
 
 3. From the Rules list, select the "Auth0IntegrationStack-Auth0FailedLoginEventsRule54D..." 
 
-![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/EBconsole-rules.png)
+![EventBridge Console](./img/EBconsole-rules.png)
 
 4. Choose "Edit" to enter the rule editor. Click through to "Step 2. Build Event Pattern." 
 
-![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/BuildEvent.png)
+![EventBridge Console](./img/BuildEvent.png)
 
 5. Scroll down to "Sample event - optional." Select "Enter my own," and delete the pre-populated event. Copy the contents of event.json into the event editor. 
 
-![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/SampleEvent.png)
+![EventBridge Console](./img/SampleEvent.png)
 
 6. Scroll down to "Event pattern." Choose "Test Pattern." 
 
-![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/TestEvent.png)
+![EventBridge Console](./img/TestEvent.png)
 
 You should see a green box appear that says "Sample event matched the event pattern." This means that the rule will successfully route incoming events to the AWS Lambda function. 
 
-![EventBridge Console](/serverless-patterns/auth0-eventbridge-lambda/img/TestEventSuccessful.png)
+![EventBridge Console](./img/TestEventSuccessful.png)
 
 
 ## Cleanup
