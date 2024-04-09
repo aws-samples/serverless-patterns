@@ -1,9 +1,9 @@
-const AWS = require('aws-sdk');
+const { SQS } = require('@aws-sdk/client-sqs');
 const { v4: uuidv4 } = require('uuid');
 
-AWS.config.update({ region: 'YOUR_REGION' }); // Replace 'YOUR_REGION' with your AWS region (i.e. us-west-2)
-
-const sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
+const sqs = new SQS({
+    region: 'YOUR_REGION', // Replace 'YOUR_REGION' with your AWS region (i.e. us-west-2)
+});
 
 // Replace 'YOUR_SQS_QUEUE_URL' with your SQS queue URL
 // You can obtain this from the CloudFormation outputs of the stack
@@ -41,7 +41,7 @@ const pushBatchToSQS = async (n) => {
 
     // Try sending batch to SQS, catch any errors and log them to the console. 
     try {
-        await sqs.sendMessageBatch(params).promise();
+        await sqs.sendMessageBatch(params);
         console.log(`Batch of ${n} items pushed to SQS at ${new Date().toISOString()}`);
     } catch (error) {
         console.error('Error pushing batch to SQS:', error);

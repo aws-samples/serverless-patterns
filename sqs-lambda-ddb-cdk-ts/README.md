@@ -107,7 +107,7 @@ Look through the logs and you should notice that there are none or fewer Provisi
 8. For a visual representation, you can also look at CloudWatch metrics for **Write throttled requests(count)** in the monitoring tab of the DynamoDB Console. You should see a spike of write throttled requests and then it should decrease around the time you made the config change. It should look similar to the picture below.
 \
 \
-![alt text](./images/write_throttling_metrics.png)
+![graph showing spike in write throttling followed by slight decrease](./images/write_throttling_metrics.png)
 
 \
 \

@@ -9,7 +9,7 @@
     "text": [
       "This code demonstrates how an Amazon SQS queue can be used to buffer records for an Amazon DynamoDB table and mitigate the risk for a client of being throttled.",
       "The CDK code deploys Ingress and Dead-Letter SQS queues, AWS Lambda functions, destination DynamoDB tables and CloudWatch alarms.",
-      "AWS Lambda function uses NodeJS 18 runtime."
+      "AWS Lambda function uses NodeJS 20 runtime."
     ]
   },
   "gitHub": {
