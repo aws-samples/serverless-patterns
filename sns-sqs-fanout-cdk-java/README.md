@@ -1,14 +1,14 @@
-# Amazon SNS to Amazon SQS fanout pattern
+# Amazon SNS to Amazon SQS fanout with filtering
 
 This pattern demonstrates fanning out SNS messages to SQS with the CDK in Java.
 
 In this example, we create an SNS Topic named `my-topic`. We also create three SQS Queues named `queue1`, `queue2`, and `queue3`.
 
-Then, we subscribe each queue to the SNS Topic using `topic.addSubscription()`. For `queue1`, we simply subscribe it to the topic without any filters, so it will receive all messages published to the topic.
+Then, we subscribe each queue to the SNS topic using `topic.addSubscription()`. For `queue1`, we simply subscribe it to the topic without any filters, so it will receive all messages published to the topic.
 
 For `queue2`, we use a subscription filter to only receive messages with the attribute `event` set to `order_placed`. Similarly, for `queue3`, we use a subscription filter to only receive messages with the attribute `event` set to `order_shipped`.
 
-This demonstrates the fan-out pattern, where a single message published to the SNS Topic can be delivered to multiple SQS Queues based on the subscription filters. For example, if you publish a message with the attribute `{ "event": "order_placed" }`, it will be delivered to `queue1` and `queue2`. If you publish a message with the attribute `{ "event": "order_shipped" }`, it will be delivered to `queue1` and `queue3`.
+This demonstrates the fanout pattern, where a single message published to the SNS topic can be delivered to multiple SQS queues based on the subscription filters. For example, if you publish a message with the attribute `{ "event": "order_placed" }`, it will be delivered to `queue1` and `queue2`. If you publish a message with the attribute `{ "event": "order_shipped" }`, it will be delivered to `queue1` and `queue3`.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -67,6 +67,6 @@ cdk destroy
 
 ---
 
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
