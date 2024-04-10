@@ -23,12 +23,10 @@ public class SnsToSqsFanOutStack extends Stack {
     public SnsToSqsFanOutStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
 
-        // Create an SNS Topic
         Topic topic = Topic.Builder.create(this, "MyTopic")
                 .topicName("my-topic")
                 .build();
 
-        // Create SQS Queues
         Queue queue1 = Queue.Builder.create(this, "Queue1")
                 .queueName("queue1")
                 .build();
@@ -43,7 +41,6 @@ public class SnsToSqsFanOutStack extends Stack {
 
         filterByEventType("order_placed");
 
-        // Subscribe queues to the SNS Topic with subscription filters
         topic.addSubscription(new SqsSubscription(queue1));
         topic.addSubscription(new SqsSubscription(queue2, filterByEventType("order_placed")));
         topic.addSubscription(new SqsSubscription(queue3, filterByEventType("order_shipped")));
