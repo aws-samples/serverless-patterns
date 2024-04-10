@@ -1,22 +1,22 @@
 # AppSync Subscription Enhanced Filtering
 
-This project contains a sample AWS CDK template for implementing enhanced subscription filtering pattern for [AWS AppSync](https://aws.amazon.com/appsync/). Additionally, the project demonstrates using TypeScript for creating [AppSync JavaScript resolvers](https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-overview-js.html), so that developers can benefit from using the type definitions that are available in the [@aws-appsync/utils](https://www.npmjs.com/package/@aws-appsync/utils) module.
+This project contains a sample AWS CDK template for implementing an enhanced subscription filtering pattern for [AWS AppSync](https://aws.amazon.com/appsync/). Additionally, the project demonstrates using TypeScript for creating [AppSync JavaScript resolvers](https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-overview-js.html) so that developers can benefit from using the type definitions that are available in the [@aws-appsync/utils](https://www.npmjs.com/package/@aws-appsync/utils) module.
 
-This pattern illustrates how the current identity information can be used to send real-time notification messages to a specific user when using AWS AppSync subscriptions.
+This pattern illustrates how the current identity information can be used as a filter to send real-time notification messages to a specific user when using AWS AppSync subscriptions.
 
-The demo code uses IAM authorization and the currently connected user's `username` for filtering the real-time subscription messages. Additional support for other authorization providers can be added too, but it might require using different identity attributes.
+The demo code uses IAM authorization and the currently connected user's username to filter real-time subscription messages. Additional support for other authorization providers can be added but may require using different identity attributes.
 
 GraphQL schema defines the following:
 
-- `Query.identity` - this query returns the current user's IAM based identity details. This query can be used for testing purposes - the `username` property shows the expected `userId` for sending the responses.
-- `Mutation.sendResponse` - this mutation will trigger the `onResponseReceived` subscription. The `userId` property value will be used to determine if the response should be sent to the current user or not.
-- `Subscription.onResponseReceived` - real-time subscription that will send messages only if the `userId` field, that was provided when invoking the `sendResponse` mutation, matches the current user's `username` property on the IAM identity context.
+- `Query.identity` - this query returns the current user's IAM-based identity details. This query can be used for testing purposes - the `username` property shows the expected `userId` for sending the responses.
+- `Mutation.sendResponse` - this mutation will trigger the `onResponseReceived` subscription. The `userId` property value will be used to determine whether the response should be sent to the current user.
+- `Subscription.onResponseReceived` - real-time subscription that will send messages only if the `userId` field, which was provided when invoking the `sendResponse` mutation, matches the current user's `username` property on the IAM identity context.
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+Important: this application uses various AWS services, and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
-- [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+- [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Node and NPM](https://nodejs.org/en/download/) installed
@@ -52,7 +52,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ### Use AWS Console
 
-- Open [AWS Console](https://console.aws.amazon.com/appsync/) and switch to the region where you deployed the `DemoApi` instance to.
+- Open [AWS Console](https://console.aws.amazon.com/appsync/) and switch to the region where you deployed the `DemoApi` instance.
 - Click on the `DemoApi` instance name and navigate to the `Queries` tab in the left-side navigation bar.
 
 ### Get your current username
@@ -73,7 +73,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ### Subscribe to notifications
 
-- Open a new [AWS Console](https://console.aws.amazon.com/appsync/) window and navigate to the same Query Explorer for the `DemoApi` (you can just copy/paste the current Query Explorer URL in a new window)
+- Open a new [AWS Console](https://console.aws.amazon.com/appsync/) window and navigate to the same Query Explorer for the `DemoApi` (you can copy/paste the current Query Explorer URL in a new window)
 - Subscribe to the `onResponseReceived` subscription by selecting Subscription in the Query Explorer's drop-down list and running the following GraphQL statement:
 
     ```graphql
@@ -92,7 +92,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ### Submit mutations
 
-- Switch back to the first AWS Console window and run the mutation. Make sure to replace the placeholder with the value that you received when running the `identity` query!!!
+- Switch back to the first AWS Console window and run the mutation. Replace the placeholder with the value you received when running the `identity` query.
 
     ```graphql
     mutation MyMutation {
