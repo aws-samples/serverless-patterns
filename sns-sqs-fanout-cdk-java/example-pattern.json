@@ -1,6 +1,6 @@
 {
 	"title": "Fan-out pattern using SNS-SQS filters",
-	"description": "Creates SNS topic and Sqs queues with message body based and attribute based filter using configuration file (appSettings.json)",
+	"description": "Creates SNS topic and SQS queues with message body based and attribute based filter using configuration file (appSettings.json)",
 	"language": "Java",
 	"level": "200",
 	"framework": "CDK",
