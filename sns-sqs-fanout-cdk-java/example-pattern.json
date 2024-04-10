@@ -1,5 +1,5 @@
 {
-	"title": "Fan-out pattern using SNS-SQS filters",
+	"title": "SNS to SQS fanout with filtering",
 	"description": "Creates SNS topic and SQS queues with message body based and attribute based filter using configuration file (appSettings.json)",
 	"language": "Java",
 	"level": "200",
@@ -7,7 +7,7 @@
 	"introBox": {
 		"headline": "How it works",
 		"text": [
-			"This CDK application demonstrates how to create fan-out pattern using sns topic and sqs queues using subscription filters. ",
+			"This CDK application demonstrates how to create fanout pattern using a SNS topic and SQS queues with subscription filters.",
 			"Number of queues required and type of filter (Message attribute based or message body based) can be defined in appSettings.json (Sample json is provided, replace queue names and filter by conditions as needed)."
 		]
 	},
