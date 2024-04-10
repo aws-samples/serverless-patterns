@@ -70,7 +70,6 @@ export class EventbridgePipesSqsToEcsTaskCdkTypescriptStack extends cdk.Stack {
       image: ContainerImage.fromRegistry('public.ecr.aws/docker/library/alpine:edge'),
       logging: LogDriver.awsLogs({
         streamPrefix: '/ecstask',
-        // logRetention: RetentionDays.ONE_DAY,
         logGroup: sqsEventBridgePipeTargetLogGroup,
       }),
     });
@@ -83,20 +82,13 @@ export class EventbridgePipesSqsToEcsTaskCdkTypescriptStack extends cdk.Stack {
 
     // Give pipeRole permissions to consume from the SQS queue and run the ECS task
     sqsQueue.grantConsumeMessages(pipeRole);
-    // sqsEventBridgePipeTargetLogGroup.grantWrite(pipeRole);
     testfargateTaskDefinition.grantRun(pipeRole);
     eventBridgePipeTraceLogGroup.grantWrite(pipeRole);
 
-    // create a EventBridge pipe which consumes events from SQS with batch size 1 and delivers events to CloudWatch log group sqsEventBridgePipeTargetLogGroup
+    // create a EventBridge pipe which consumes events from SQS with batch size 1 and runs a ECS task for events which match the filter criteria
     const pipe = new pipes.CfnPipe(this, 'SQSEventBridgePipe', {
-      logConfiguration: {
-        level: 'TRACE',
-        cloudwatchLogsLogDestination: {
-          logGroupArn: eventBridgePipeTraceLogGroup.logGroupArn
-        }
-      },
       roleArn: pipeRole.roleArn,
-      description: 'SQS EventBridge Pipe',
+      description: 'SQS EventBridge Pipe to execute ECS tasks for matched events',
       name: 'SQSEventBridgePipe',
       source: sqsQueue.queueArn,
       sourceParameters: {
