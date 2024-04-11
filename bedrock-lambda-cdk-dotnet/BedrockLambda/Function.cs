@@ -5,9 +5,7 @@ using Amazon.Lambda.S3Events;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.Util;
-using System.IO;
 using System.Net;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
