@@ -4,6 +4,7 @@ using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.Lambda.EventSources;
 using Amazon.CDK.AWS.Logs;
 using Amazon.CDK.AWS.S3;
+using Amazon.CDK.AWS.SNS;
 using Constructs;
 
 namespace Cdk
@@ -79,15 +80,22 @@ namespace Cdk
                 {
                     Bundling = buildOption
                 }),
-                Events = new[] {new S3EventSource(bucket, new S3EventSourceProps
-                {
-                    Events = new[] { EventType.OBJECT_CREATED },
-                    Filters = [
-                        new NotificationKeyFilter { Prefix = "input/" },
-                        new NotificationKeyFilter { Suffix = ".jpg" },
-                        new NotificationKeyFilter { Suffix = ".png" }
-                    ]
-                })}
+                Events = [
+                    new S3EventSource(bucket, new S3EventSourceProps(){
+                        Events = [ EventType.OBJECT_CREATED ],
+                        Filters = [
+                            new NotificationKeyFilter { Prefix = "input/" },
+                            new NotificationKeyFilter { Suffix = ".jpg" }
+                            ]
+                    }),
+                    new S3EventSource(bucket, new S3EventSourceProps(){
+                        Events = [ EventType.OBJECT_CREATED ],
+                        Filters = [
+                            new NotificationKeyFilter { Prefix = "input/" },
+                            new NotificationKeyFilter { Suffix = ".png" }
+                            ]
+                    }),
+                ]
             });
         }
     }
