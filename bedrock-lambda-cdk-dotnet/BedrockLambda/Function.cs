@@ -17,9 +17,14 @@ public class Function
 {
     private static readonly AmazonBedrockRuntimeClient bedrockClient = new();
     private static readonly AmazonS3Client s3Client = new();
-    private const string claudeModelId = "anthropic.claude-3-sonnet-20240229-v1:0";
-    private const string prompt = "Read all the information present in this image. give me in the data only in json";
+    private static string claudeModelId = "anthropic.claude-3-haiku-20240307-v1:0";
+    private static string prompt = "Read all the information present in this image. give me in the data only in json";
 
+    public Function()
+    {
+        claudeModelId = Environment.GetEnvironmentVariable("CLAUDE_MODEL_ID") ?? claudeModelId;
+        prompt = Environment.GetEnvironmentVariable("PROMPT") ?? prompt;
+    }
     public async Task FunctionHandler(S3Event evnt, ILambdaContext context)
     {
         context.Logger.LogInformation("Lambda function started");
