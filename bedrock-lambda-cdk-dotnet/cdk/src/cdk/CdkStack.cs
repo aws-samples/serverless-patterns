@@ -10,7 +10,7 @@ namespace Cdk
 {
     public class CdkStack : Stack
     {
-        private readonly string lambdaFunctionName = "bedrockLambdaFunction";
+        private const string lambdaFunctionName = "bedrockLambdaFunction";
 
         internal CdkStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
@@ -82,7 +82,11 @@ namespace Cdk
                 Events = new[] {new S3EventSource(bucket, new S3EventSourceProps
                 {
                     Events = new[] { EventType.OBJECT_CREATED },
-                    Filters = new[] { new NotificationKeyFilter { Prefix = "input/" } }
+                    Filters = [
+                        new NotificationKeyFilter { Prefix = "input/" },
+                        new NotificationKeyFilter { Suffix = ".jpg" },
+                        new NotificationKeyFilter { Suffix = ".png" }
+                    ]
                 })}
             });
         }

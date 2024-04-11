@@ -40,12 +40,6 @@ public class Function
                 var bucketName = s3Event.Bucket.Name;
                 var objectKey = WebUtility.UrlDecode(s3Event.Object.Key);//Object key name are in URL-encoded format.
                 context.Logger.LogInformation($"Document ready to process. BucketName : {bucketName} ObjectKey {objectKey}");
-                // check if the object is not empty and validate
-                if (s3Event.Object.Size == 0)
-                {
-                    context.Logger.LogError($"Image {objectKey} in bucket {bucketName} is empty");
-                    return;
-                }
 
                 var imageBytes = await GetObjectAsync(bucketName, objectKey);
 
