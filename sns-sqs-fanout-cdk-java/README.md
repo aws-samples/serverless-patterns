@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
 
 3. From the command line, configure AWS CDK:
 
-The cdk bootstrap command only need to be run if the account and region hasn't been bootstrapped before. This sets up the necessary resources for deploying CDK apps in the specified AWS account and region.
+The cdk bootstrap command only needs to be run if the account and region hasn't been bootstrapped before. This sets up the necessary resources for deploying CDK apps in the specified AWS account and region.
    ```bash
    cdk bootstrap ACCOUNT-NUMBER/REGION # e.g.
    cdk bootstrap 1111111111/us-east-1
