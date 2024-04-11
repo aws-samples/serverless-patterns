@@ -6,7 +6,7 @@
         {
             using (stream)
             {
-                using (MemoryStream memStream = new MemoryStream())
+                using (var memStream = new MemoryStream())
                 {
                     await stream.CopyToAsync(memStream);
                     return memStream.ToArray();

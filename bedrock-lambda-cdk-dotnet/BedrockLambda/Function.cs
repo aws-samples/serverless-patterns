@@ -24,7 +24,6 @@ public class Function
 
     public async Task FunctionHandler(S3Event evnt, ILambdaContext context)
     {
-        context.Logger.LogInformation(JsonSerializer.Serialize(evnt));
         context.Logger.LogInformation("Lambda function started");
         var eventRecords = evnt.Records ?? new List<S3Event.S3EventNotificationRecord>();
 
@@ -41,21 +40,22 @@ public class Function
                 var bucketName = s3Event.Bucket.Name;
                 var objectKey = WebUtility.UrlDecode(s3Event.Object.Key);//Object key name are in URL-encoded format.
                 context.Logger.LogInformation($"Document ready to process. BucketName : {bucketName} ObjectKey {objectKey}");
-
-                var response = await s3Client.GetObjectAsync(bucketName, objectKey);
-                var imageBytes = await response.ResponseStream.ToByteArray();
-
-                var rawText = await SendRequestAsync(prompt, imageBytes);
-                context.Logger.LogInformation(rawText);
-                var outputKey = $"output/{objectKey.Split('/').Last()}_{Guid.NewGuid():N}.txt";
-                await s3Client.PutObjectAsync(new PutObjectRequest
+                // check if the object is not empty and validate
+                if (s3Event.Object.Size == 0)
                 {
-                    BucketName = bucketName,
-                    Key = outputKey,
-                    ContentBody = rawText
-                });
+                    context.Logger.LogError($"Image {objectKey} in bucket {bucketName} is empty");
+                    return;
+                }
+
+                var imageBytes = await GetObjectAsync(bucketName, objectKey);
+
+                var extractedText = await InvokeModelAsync(prompt, imageBytes);
+                context.Logger.LogInformation(extractedText);
+
+                await PutObjectAsync(bucketName, objectKey, extractedText);
 
                 context.Logger.LogInformation("Document extracted successfully!");
+
             }
             catch (Exception e)
             {
@@ -66,7 +66,24 @@ public class Function
         }
     }
 
-    private static async Task<string> SendRequestAsync(string prompt, byte[] imageBytes)
+    private static async Task<byte[]> GetObjectAsync(string bucketName, string objectKey) 
+    {
+        var response = await s3Client.GetObjectAsync(bucketName, objectKey);
+        return await response.ResponseStream.ToByteArray();
+    }
+
+    private static async Task PutObjectAsync(string bucketName, string objectKey, string text)
+    {
+        var outputKey = $"output/{objectKey.Split('/').Last()}_{Guid.NewGuid():N}.txt";
+        await s3Client.PutObjectAsync(new PutObjectRequest
+        {
+            BucketName = bucketName,
+            Key = outputKey,
+            ContentBody = text
+        });
+    }
+
+    private static async Task<string> InvokeModelAsync(string prompt, byte[] imageBytes)
     {
         var requestBody = new JsonObject
         {
@@ -107,11 +124,13 @@ public class Function
             Accept = "application/json"
         });
 
-        if (response is not null && response.HttpStatusCode == HttpStatusCode.OK)
+        if (response != null && response.HttpStatusCode == HttpStatusCode.OK)
         {
-            var contentJson = JsonNode.ParseAsync(response.Body).Result?["content"];
-            return contentJson?[0]?["text"]?.GetValue<string>();
+            var contentJson = await JsonNode.ParseAsync(response.Body);
+            var content = contentJson?["content"];
+            return content?[0]["text"]?.GetValue<string>();
         }
+
         throw new Exception("InvokeModelAsync failed with status code " + response?.HttpStatusCode);
     }
 }
