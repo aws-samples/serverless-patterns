@@ -22,26 +22,26 @@ namespace Cdk
             var invokeModelPolicy = new ManagedPolicy(this, "InvokeModelPolicy", new ManagedPolicyProps
             {
                 ManagedPolicyName = "InvokeModelPolicy",
-                Statements = new[]
-                {
+                Statements =
+                [
                     new PolicyStatement(new PolicyStatementProps
                     {
                         Effect = Effect.ALLOW,
-                        Actions = new[] { "bedrock:InvokeModel" },
-                        Resources = new[] { $"arn:aws:bedrock:{this.Region}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0" }
+                        Actions = [ "bedrock:InvokeModel" ],
+                        Resources = [ $"arn:aws:bedrock:{this.Region}::foundation-model/anthropic.claude-3-haiku-20240307-v1:0"]
                     })
-                }
+                ]
             });
 
             var lambdaIAMRole = new Role(this, "BedrockLambdaRole", new RoleProps
             {
                 AssumedBy = new ServicePrincipal("lambda.amazonaws.com"),
                 Description = "IAM Role for the Lambda function",
-                ManagedPolicies = new[]
-                {
+                ManagedPolicies =
+                [
                         ManagedPolicy.FromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
                         invokeModelPolicy
-                }
+                ]
             });
 
             bucket.GrantReadWrite(lambdaIAMRole);
@@ -58,13 +58,13 @@ namespace Cdk
                 Image = Runtime.DOTNET_8.BundlingImage,
                 User = "root",
                 OutputType = BundlingOutput.ARCHIVED,
-                Command = new string[]{
+                Command = [
                "/bin/sh",
                 "-c",
                 " dotnet tool install -g Amazon.Lambda.Tools"+
                 " && dotnet build"+
                 " && dotnet lambda package --output-package /asset-output/function.zip"
-                }
+                ]
             };
 
             _ = new Function(this, "BedrockFunction", new FunctionProps
