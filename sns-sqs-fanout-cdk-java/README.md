@@ -31,6 +31,8 @@ Important: this application uses various AWS services and there are costs associ
    ```
 
 3. From the command line, configure AWS CDK:
+
+The cdk bootstrap command only need to be run if the account and region hasn't been bootstrapped before. This sets up the necessary resources for deploying CDK apps in the specified AWS account and region.
    ```bash
    cdk bootstrap ACCOUNT-NUMBER/REGION # e.g.
    cdk bootstrap 1111111111/us-east-1
@@ -45,7 +47,7 @@ Important: this application uses various AWS services and there are costs associ
 
 After deploying the stack, you can publish messages to the SNS topic using the AWS CLI or any other tool of your choice. The messages will be delivered to the appropriate SQS queues based on the subscription filters.
 
-Example:
+### Example 1
 
 ```
 aws sns publish --topic-arn <YOUR_SNS_TOPIC_ARN> --message '{"event": "order_placed", "order_id": 123}'
@@ -53,11 +55,27 @@ aws sns publish --topic-arn <YOUR_SNS_TOPIC_ARN> --message '{"event": "order_pla
 
 This message will be delivered to `queue1` and `queue2`.
 
+You can verify that the messages were successfully received by the queues using the AWS Management Console or AWS CLI.
+
+```
+aws sqs receive-message --queue-url <QUEUE_1_URL> --max-number-of-messages=2
+aws sqs receive-message --queue-url <QUEUE_2_URL> --max-number-of-messages=2
+```
+
+### Example 2:
+
 ```
 aws sns publish --topic-arn <YOUR_SNS_TOPIC_ARN> --message '{"event": "order_shipped", "order_id": 456}'
 ```
 
 This message will be delivered to `queue1` and `queue3`.
+
+You can verify that the messages were successfully received by the queues using the AWS Management Console or AWS CLI.
+
+```
+aws sqs receive-message --queue-url <QUEUE_1_URL> --max-number-of-messages=2
+aws sqs receive-message --queue-url <QUEUE_3_URL> --max-number-of-messages=2
+```
 
 ## Delete stack
 
