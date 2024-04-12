@@ -1,6 +1,6 @@
 {
     "title": "API Gateway to Fargate Cluster through VPC Link and Network load balancer",
-    "description": "This pattern helps connect a public API Gateway endpoint to a private Network Load Balancer alongside an ECS Fargate cluster. It keeps the private subnet resources safe from exposure and only allows access through a VPC Link, ensuring security. The pattern will create API Gateway, VPC Link, private Network load balancer, VPC along with a private subnet and a ECS fargate cluster.",
+    "description": "This pattern connect a public API Gateway to a private Network Load Balancer to ECS Fargate cluster. It keeps the private subnet resources safe.",
     "language": "Python",
     "level": "200",
     "framework": "CDK",
