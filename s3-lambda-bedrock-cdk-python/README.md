@@ -62,8 +62,8 @@ Amazon Bedrock users need to request access to models before they are available 
 ## Testing
 
 1. Navigate to the S3 bucket containing key 's3-lambda-bedrock-cdk-python-bucket**' along with your stack name and a hash key
-2. Upload any object to the bucket
-3. Wait for the AWS Lambda function to invoke the Amazon Bedrock model to get the vecrot embeddings. The vector embeddings will be printed in the Amazon CloudWatch logs as shown below
+2. Upload any text file to the bucket
+3. Wait for the AWS Lambda function to invoke the Amazon Bedrock model to get the vector embeddings. The vector embeddings will be printed in the Amazon CloudWatch logs as shown below
 
 ![Email from SNS subscription](images/CloudWatch_Trace_Embedddings.png)
 
