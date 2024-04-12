@@ -5,6 +5,7 @@ using Amazon.CDK.AWS.Lambda.EventSources;
 using Amazon.CDK.AWS.Logs;
 using Amazon.CDK.AWS.S3;
 using Constructs;
+using XaasKit.CDK.AWS.Lambda.DotNet;
 
 namespace Cdk
 {
@@ -53,32 +54,21 @@ namespace Cdk
                 Retention = RetentionDays.ONE_DAY
             });
 
-            var buildOption = new BundlingOptions()
-            {
-                Image = Runtime.DOTNET_8.BundlingImage,
-                User = "root",
-                OutputType = BundlingOutput.ARCHIVED,
-                Command = [
-               "/bin/sh",
-                "-c",
-                " dotnet tool install -g Amazon.Lambda.Tools"+
-                " && dotnet build"+
-                " && dotnet lambda package --output-package /asset-output/function.zip"
-                ]
-            };
-
-            _ = new Function(this, "BedrockFunction", new FunctionProps
+            //XaasKit.CDK.AWS.Lambda.DotNet this CDK module are experimental and under active development.
+            //https://github.com/cdklabs/awscdk-lambda-dotnet
+            _ = new DotNetFunction(
+            this,
+            id,
+            new DotNetFunctionProps()
             {
                 FunctionName = lambdaFunctionName,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(30),
                 Runtime = Runtime.DOTNET_8,
                 Handler = "BedrockLambda::BedrockLambda.Function::FunctionHandler",
+                LogRetention = RetentionDays.ONE_DAY,
                 Role = lambdaIAMRole,
-                Code = Code.FromAsset("../BedrockLambda/", new Amazon.CDK.AWS.S3.Assets.AssetOptions
-                {
-                    Bundling = buildOption
-                }),
+                ProjectDir = "../BedrockLambda/",
                 Events = [
                     new S3EventSource(bucket, new S3EventSourceProps(){
                         Events = [ EventType.OBJECT_CREATED ],
