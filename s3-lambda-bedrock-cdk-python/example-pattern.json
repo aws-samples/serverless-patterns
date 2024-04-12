@@ -1,6 +1,6 @@
 {
     "title": "Generate vecrot embeddings using Amazon Bedrock, S3 and Lambda",
-    "description": "This pattern creates a Amazon S3 bucket, a Lambda function, which will be used to get vector embeddings for the document uploaded into Amazon S3 using Amazon Bedrock. The Lambda function is triggered by S3 'OBJECT_CREATED' events. The Lambda function can optionally apply business logic to the S3 object. After processing, the Lambda function invokes the embedding model form Amazon Bedrock to get the vector embeddings, which is useful for LLM RAG applications.",
+    "description": "This pattern facilitates the extraction of vector embeddings using Amazon Bedrock from input files uploaded to S3, triggered by a Lambda function. These vector embeddings are valuable for LLM TAG applications.",
     "language": "Python",
     "level": "200",
     "framework": "CDK",
