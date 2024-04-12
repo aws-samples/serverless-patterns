@@ -1,6 +1,6 @@
 # Event-Driven EDI to JSON Transformation using AWS B2B Data Interchange Status Updates
 
-This sample project demonstrates how AWS B2B Data Interchange can transform EDI Files into JSON as per the transformation logic. The transformation completion event is further processed using Amazon EventBridge Rule and SQS integration.
+This sample project demonstrates how AWS B2B Data Interchange can transform EDI Files into JSON as per the transformation logic. The transformation completion event is further processed using Amazon EventBridge Rule and Amazon SQS integration.
 
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-b2bi-eventbridge-sqs
@@ -60,7 +60,7 @@ Please refer to the architecture diagram below:
 
 1. Log into the [Amazon S3 console](https://s3.console.aws.amazon.com/s3/buckets) open `edi-214-input-{your-account}-{your-region}` bucket. Navigate to folder `input/tp-xxxxxxxxxxxx`. Upload the `sample-edi-214.edi` file into this folder.
 
-2. Now, after a few seconds, open `edi-214-output-{your-account}-{your-region}` bucket. Navigate to folder `input/tp-xxxxxxxxxxxx`.  Download the transformed JSON output file. The content of the downloaded JSON file should look like: 
+2. Now, after a few seconds, open `edi-214-output-{your-account}-{your-region}` bucket. Navigate to folder `output/tp-xxxxxxxxxxxx`.  Download the transformed JSON output file. The content of the downloaded JSON file should look like: 
    ```json
       {
       "ReferenceID": "MSKU0123456",
