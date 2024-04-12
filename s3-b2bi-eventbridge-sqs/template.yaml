@@ -100,7 +100,9 @@ Resources:
             Effect: Allow
             Principal:
               Service: b2bi.amazonaws.com
-            Action: 
+            Action:
+            - s3:GetObject
+            - s3:DeleteObject 
             - s3:PutObject
             - s3:AbortMultipartUpload
             Resource: !Join 
@@ -130,7 +132,7 @@ Resources:
             X12Details: 
               TransactionSet: X12_214
               Version: VERSION_4010
-      Name: EDI214-AWSNewBlog
+      Name: EDI214-MyTradingCapability
       Type: edi
 
   # Create a B2BI Partnership
