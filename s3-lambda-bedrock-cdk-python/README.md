@@ -1,4 +1,4 @@
-# S3 to Lambda to Bedrock Embeddings\
+# S3 to Lambda to Bedrock Embeddings
 
 This pattern creates a Amazon S3 bucket, a Lambda function, which will be used to get vector embeddings for the document uploaded into Amazon S3 using Amazon Bedrock.
 The Lambda function is triggered by S3 'OBJECT_CREATED' events. The Lambda function can optionally apply business logic to the S3 object. After processing, the Lambda function invokes the embedding model form Amazon Bedrock to get the vector embeddings, which is useful for LLM RAG use cases.
