@@ -108,11 +108,11 @@ Resources:
     Properties:
       Role: !GetAtt AuthorizerExecutionRole.Arn
       Handler: src/handlers/auth.authHandler
-      Runtime: nodejs18.x
+      Runtime: nodejs20.x
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 100
+      Timeout: 5
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
@@ -125,11 +125,11 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/get-by-id.getByIdHandler
-      Runtime: nodejs18.x
+      Runtime: nodejs20.x
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 100
+      Timeout: 5
       Description: A simple example includes a HTTP get method to get one item by id from a DynamoDB table.
       Environment:
         Variables:
@@ -150,11 +150,11 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/put-item.putItemHandler
-      Runtime: nodejs18.x
+      Runtime: nodejs20.x
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 100
+      Timeout: 5
       Description: A simple example includes a HTTP post method to add one item to a DynamoDB table.
       Environment:
         Variables:
@@ -193,3 +193,6 @@ Outputs:
   TestApiKeyOutput:
     Description: "API Key"
     Value: !Ref TestApiKey
+  DynamoDBTableName:
+    Description: "DynamoDB Table Name"
+    Value: !Ref ConfigTable

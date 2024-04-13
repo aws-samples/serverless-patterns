@@ -1,6 +1,6 @@
 {
-    "name": "delete-test-01",
-    "description": "delete-test-01-description",
+    "name": "serverless-multitenant-api",
+    "description": "serverless-multitenant-api",
     "version": "0.0.1",
     "private": true,
     "dependencies": {
