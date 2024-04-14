@@ -1,0 +1,57 @@
+{
+    "title": "CloudFront Distribution in front of S3 Static Website",
+    "description": "Create an Amazon S3 Static Website with a CloudFront Distribution in front of it.",
+    "language": "Go",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern shows how to Create an Amazon S3 Static Website with a CloudFront Distribution in front of it. Implemented in AWS CDK using the Go programming language.",
+        "This pattern deploys one CloudFront Distribution and an S3 Static Website."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudformation-s3-cdk-go",
+        "templateURL": "serverless-patterns/cloudformation-s3-cdk-go",
+        "projectFolder": ".",
+        "templateFile": "cloudformation-s3-cdk-go.go"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon S3 - Hosting a static website using Amazon S3",
+          "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html"
+        },
+        {
+          "text": "Amazon CloudFront - Getting started with a secure static website",
+          "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/getting-started-secure-static-website-cloudformation-template.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Patrick Gryczka",
+        "image": "https://www.gryczka.net/img/patryk.jpg",
+        "bio": "Patrick Gryczka is a Senior Solutions Architect at AWS specializing in Serverless technologies and the Sports industry.",
+        "linkedin": "https://www.linkedin.com/in/gryczka/"
+      }
+    ]
+  }
