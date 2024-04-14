@@ -1,6 +1,6 @@
 # Extract text from images using Amazon Bedrock
 
-This pattern shows demonstrates how to extract text from images using Amazon Bedrock, AWS Lambda function and Amazon S3.
+This pattern shows how to extract text from images using Amazon Bedrock.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-lambda-cdk-dotnet.
 
