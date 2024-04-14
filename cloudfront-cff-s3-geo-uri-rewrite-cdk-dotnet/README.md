@@ -2,7 +2,7 @@
 
 This pattern shows how to create a CloudFront Distribution with a CloudFront Function for Routing to Different Geo-Localized Content in an S3 Statically Hosted Website. Implemented in AWS CDK .NET.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cf-cff-s3-dotnet-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cloudfront-cff-s3-geo-uri-rewrite-cdk-dotnet
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     dotnet build src
     ```
-1. Deploy the stack to your default AWS account and region. The output of this command should give you output as ALB URL:
+1. Deploy the stack to your default AWS account and region. The output of this command should give you output as DistributionDomainName:
     ```
     cdk deploy
     ```
