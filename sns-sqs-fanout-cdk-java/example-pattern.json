@@ -21,6 +21,22 @@
 	},
 	"resources": {
 		"bullets": [
+			{
+				"text": "Fanout to Amazon SQS queues",
+                		"link": "https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html"
+            		},
+			{
+				"text": "Amazon SNS message filtering",
+                		"link": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html"
+            		},
+			{
+				"text": "Message driven",
+                		"link": "https://docs.aws.amazon.com/whitepapers/latest/reactive-systems-on-aws/message-driven.html"
+            		},
+			{
+				"text": "Introducing payload-based message filtering for Amazon SNS",
+                		"link": "https://aws.amazon.com/blogs/compute/introducing-payload-based-message-filtering-for-amazon-sns/"
+            		}
 		]
 	},
 	"deploy": {
