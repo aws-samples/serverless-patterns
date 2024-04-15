@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09' 
 Transform: AWS::Serverless-2016-10-31
-Description: This template to demonstrate how AWS B2B Data Interchange can transform EDI Files into JSON as per the transformation logic. This is part 1 of the template.
+Description: This template to demonstrate how AWS B2B Data Interchange can transform EDI Files into JSON as per the transformation logic. This is part 1 of the template.(uksb-1tthgi812) (tag:s3-b2bi-eventbridge-sqs)
 
 # Get the required input parameters
 Parameters:
