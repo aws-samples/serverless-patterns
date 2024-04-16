@@ -1,6 +1,0 @@
-cfnresponse
-crhelper
-requests_aws4auth
-requests
-opensearch-py
-PyPDF2

@@ -1,4 +1,4 @@
-#!/usr/local/opt/python@3.10/bin/python3.10
+#!/usr/local/anaconda3/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
