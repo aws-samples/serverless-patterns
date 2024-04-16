@@ -1,0 +1,58 @@
+{
+  "title": "Amazon DocumentDB to AWS Lambda Event Source Mapping",
+  "description": "Configure an AWS Lambda function to process events in an Amazon DocumentDB (with MongoDB compatibility) change stream by configuring an Amazon DocumentDB cluster as an event source",
+  "language": "NodeJs",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon DocumentDB Cluster along with an AWS Lambda Function in the supplied VPC configurations. An Event Source Mapping (ESM) is created that will help Lambda to process the events from a Change Stream in DocumentDB.",
+      "In this tutorial, we will be creating a database 'docdbdemo' and a collection 'products'. We will be tracking changes to this 'products' collection and activate Change Streams here.",
+      "Whenever a record in the 'products' collection updates, the Lambda will receive an event and invoke the Lambda function. This function will print the event received from ESM in its CloudWatch logs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/docdb-lambda-nodejs-sam",
+      "templateURL": "serverless-patterns/docdb-lambda-nodejs-sam",
+      "projectFolder": "docdb-lambda-nodejs-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Lambda with Amazon DocumentDB",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb.html"
+      },
+      {
+        "text": "AWS Tutorial for using AWS Lambda with Amazon DocumentDB Streams",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb-tutorial.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<coder>sam delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nikit Penkar",
+      "image": "https://media.licdn.com/dms/image/D4E03AQFv8ahAJUSi5Q/profile-displayphoto-shrink_800_800/0/1708789303405?e=1714003200&v=beta&t=pcXIUplkYFwkjKsyq_L6K-FHAcghpzDrnE2vXYvEuzs",
+      "bio": "Cloud Support Engineer at AWS",
+      "linkedin": "https://www.linkedin.com/in/nikit-penkar-6483b4162"
+    }
+  ]
+}
