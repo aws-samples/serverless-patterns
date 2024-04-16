@@ -36,6 +36,7 @@ Important: this application uses various AWS services and there are costs associ
 5. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
+    * For template parameters, accept the default values or provide your own values
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -60,7 +61,7 @@ Only PDF documents are currently supported
 2. Tail the Amazon CloudWatch log group for the Lambda function to follow the log outputs from the Lambda
 
     ```
-    aws logs tail /aws/lambda/<Lambda_Function_Name>
+    aws logs tail /aws/lambda/<DocumentIngestionLambdaFunctionName>
     ```
 
 ### Sample Output

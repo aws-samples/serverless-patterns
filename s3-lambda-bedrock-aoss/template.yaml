@@ -10,10 +10,12 @@ Parameters:
     Type: String
     Description: "The collection name to create for storing vector embeedings"
     ConstraintDescription: "Must be a valid name for Amazon OpenSearch Service Collection."
+    Default: "example_collection"
   AmazonOpenSearchIndexName:
     Type: String
     Description: "The index name to store vector embeedings"
     ConstraintDescription: "Must be a valid Amazon OpenSearch Service Vector Index."
+    Default: "example_index"
   BedrockModelRegion:
     Type: String
     Description: Select the Bedrock service region from available options. Please make sure the model is access granted in the selected region Bedrock service. If your AOS service is in a region that is different than the bedrock service region, you may expect cross-region latency.
@@ -23,6 +25,7 @@ Parameters:
       - eu-central-1
       - ap-northeast-1
       - ap-southeast-1
+    Default: us-west-2
 Resources:
   #create a CloudFormation AWS Lambda-backed custom resources
   LambdaInvokeIndexCreation:
@@ -221,3 +224,6 @@ Outputs:
   SourceBucketName:
     Value: !Ref SourceBucket
     Description: S3 Bucket for object storage
+  DocumentIngestionLambdaFunctionName:
+    Value: !Ref DocumentIngestionLambdaFunction
+    Description: Document Ingestion Lambda Function Name
