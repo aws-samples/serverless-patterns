@@ -54,7 +54,7 @@ Only PDF documents are currently supported
 1. Upload a pdf document to S3. You can provide your own or use the example.pdf provided in  ```examples``` folder
 
     ```
-    aws s3 cp examples/example.pdf s3://<Bucket_Name>
+    aws s3 cp examples/example.pdf s3://<SourceBucketName>
     ```
 
 2. Tail the Amazon CloudWatch log group for the Lambda function to follow the log outputs from the Lambda
