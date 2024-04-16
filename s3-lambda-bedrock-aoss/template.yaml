@@ -35,7 +35,6 @@ Resources:
   IndexCreationLambdaExecutionRole: 
     Type: AWS::IAM::Role
     Properties:
-      RoleName: "IndexCreationLambdaExecutionRole"
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -78,7 +77,6 @@ Resources:
   DocumentIngestionLambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: "DocumentIngestionLambdaExecutionRole"
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

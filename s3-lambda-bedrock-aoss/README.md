@@ -1,4 +1,4 @@
-# S3 to Lambda to OpenSearch Serverless with Bedrock Embeddings
+# S3 to Lambda to OpenSearch Serverless with Bedrock for Document Embeddings
 
 This patterns can be used to automatically create embeddings using Amazon Bedrock for documents uploaded to an Amazon S3 bucket and store the embeddings along with the document content in an Amazon OpenSearch Serverless index.
 
