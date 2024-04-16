@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd s3-lambda-bedrock-aoss
     ```
-3. From the command line, run `build-layer.sh` to build a Lambda layer with package dependencies:
+3. From the command line, run `build-layer.sh` that would download required dependencies used to create a Lambda Layer
     ```
     ./build-layer.sh
     ```
