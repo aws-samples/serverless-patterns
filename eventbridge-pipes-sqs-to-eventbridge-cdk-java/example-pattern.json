@@ -1,5 +1,5 @@
 {
-  "title": "SQS to EventBridge Bus using EventBridge Pipes",
+  "title": "Amazon SQS to Amazon EventBridge Bus using Amazon EventBridge Pipes",
   "description": "This pattern uses SQS and triggers EventBridge events directly with optional filtering supported.",
   "language": "Java",
   "level": "200",

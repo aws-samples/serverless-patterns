@@ -1,5 +1,5 @@
 {
-  "title": "REST API via API Gateway, acting as SNS proxy with SNS Filter Policy",
+  "title": "REST API via Amazon API Gateway, acting as Amazon SNS proxy with SNS Filter Policy",
   "description": "This pattern sets up a REST API via API Gateway as an SNS proxy, triggering Lambda functions with MessageBody filtering.",
   "language": "Python",
   "level": "200",

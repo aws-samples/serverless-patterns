@@ -1,6 +1,6 @@
 {
-  "title": "SQS to Step Function Workflow using EventBridge Pipes",
-  "description": "This pattern uses SQS and triggers a Step Function workflow directly with optional filtering supported.",
+  "title": "Amazon SQS to AWS Step Functions using Amazon EventBridge Pipes",
+  "description": "This pattern uses SQS and triggers a Step Functions workflow directly with optional filtering supported.",
   "language": "Java",
   "level": "200",
   "framework": "CDK",

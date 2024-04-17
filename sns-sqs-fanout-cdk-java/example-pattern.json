@@ -1,5 +1,5 @@
 {
-	"title": "SNS to SQS fanout with filtering",
+	"title": "Amazon SNS to Amazon SQS fanout with filtering",
 	"description": "Creates SNS topic and SQS queues with message body based and attribute based filter using configuration file (appSettings.json)",
 	"language": "Java",
 	"level": "200",
