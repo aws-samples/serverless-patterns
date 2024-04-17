@@ -1,0 +1,87 @@
+{
+    "title": "Custom resource with multiple Lambda functions",
+    "description": "This pattern demonstrates the use of multiple Lambda functions to manage a custom resource with CDK.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "AWS CloudFormation can wait for up to an hour for a custom resource to report its success or failure. However, AWS Lambda function execution is limited with just 15 minutes maximum.",
+            "This sample project demonstrates how to use multiple AWS Lambda functions to manage a custom resource, so that developers are not limited by the 15 minutes Lambda execution timeout.",
+            "This pattern deploys two Lambda Functions and an SQS queue. SQS queue is being used for illustrative purposes only - to demonstrate that a different process, other than the custom resource Lambda function, can be used to report the resource creation result."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-custom-resource-multiple-lambdas",
+            "templateURL": "serverless-patterns/cdk-custom-resource-multiple-lambdas",
+            "projectFolder": "cdk-custom-resource-multiple-lambdas",
+            "templateFile": "lib/demo-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Custom resources",
+                "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources.html"
+            },
+            {
+                "text": "Implementing long running deployments with AWS CloudFormation Custom Resources using AWS Step Functions",
+                "link": "https://aws.amazon.com/blogs/devops/implementing-long-running-deployments-with-aws-cloudformation-custom-resources-using-aws-step-functions/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy --require-approval never"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk delete -f</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Dmitry Gulin",
+            "bio": "Senior Modernization Architect, AWS.",
+            "linkedin": "dmitry-gulin"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "cloudformation",
+            "label": "CloudFormation"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "sqs",
+            "label": "SQS queue"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": ""
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": ""
+        }
+    }
+}
