@@ -19,7 +19,6 @@ public class S3UploadIntegrationTest {
         System.out.print("Enter the file name on S3 (key): ");
         String fileName = scanner.nextLine();
 
-
         String presignedUrl = getPresignedUrl(restApiUrl, fileName);
         if (presignedUrl == null) {
             System.out.println("Failed to retrieve pre-signed URL.");

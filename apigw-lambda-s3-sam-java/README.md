@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-- [Java 17 or above](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html) installed
+- [Java 21 or above](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/amazon-linux-install.html) installed
 - [Maven 3.8.6 or above](https://maven.apache.org/download.cgi) installed
 
 
