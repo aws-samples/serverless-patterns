@@ -15,7 +15,7 @@
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-cognito-lambda-cdk",
         "templateURL": "serverless-patterns/apigw-http-api-cognito-lambda-cdk",
         "projectFolder": "apigw-http-api-cognito-lambda-cdk",
-        "templateFile": ""
+        "templateFile": "lib/http-api-cognito-lambda-stack.ts"
       }
     },
     "resources": {
@@ -54,7 +54,7 @@
         "name": "Philippe Wanner",
         "image": "https://media.licdn.com/dms/image/C4E03AQEX8VlCZ5oP2A/profile-displayphoto-shrink_200_200/0/1658749477233?e=1718236800&v=beta&t=CiLmp0EgKzD9_ysQAug0Zw4AAwFU9bIdT8D2jDsw4X8",
         "bio": "Philippe is a Senior Specialist Solutions Architect at Amazon Web Services based in Zurich, Switzerland. His role is to spread the migration and modernization best practices for large organisations.",
-        "linkedin": "https://www.linkedin.com/in/philippe-wanner/",
+        "linkedin": "philippe-wanner",
         "twitter": ""
       }
     ]
