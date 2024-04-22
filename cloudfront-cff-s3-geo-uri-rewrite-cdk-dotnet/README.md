@@ -44,8 +44,6 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern shows how to create a CloudFront Distribution with a CloudFront Function for Routing to Different Geo-Localized Content in an S3 Statically Hosted Website. Implemented in AWS CDK .NET.
-
 CloudFront Distributions can be configured to forward the "CloudFront-Viewer-Country" header. CloudFront Functions allow for Javascript code to execute at CloudFront edge locations, and allow you to create URL routing and rewrite rules based on request headers.  In this pattern we use the "CloudFront-Viewer-Country" header to determine the location of the request and rewrite the URI to point to different content based on the location of the request.  Specifically in this example that means pointing to an index.html in a prefix that is applied based on the location.
 
 Read more about CloudFront Functions [here](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-functions.html).
