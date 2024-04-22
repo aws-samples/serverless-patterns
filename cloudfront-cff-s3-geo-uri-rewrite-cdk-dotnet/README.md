@@ -53,7 +53,7 @@ And about CloudFront Function Redirection Examples [here](https://docs.aws.amazo
 
 ## Testing
 
-In the  output, you can see `StaticSiteStack.DistributionDomainName`. When you access the url, you should see a Webpage that says "Welcome to Our Site"  Depending on your geo-location you will see 1 of 3 options:
+In the  output, you can see `StaticSiteStack.DistributionDomainName`. When you access the URL, you should see a webpage that says "Welcome to Our Site"  Depending on your geo-location you will see 1 of 3 options:
     - If you are in the US, you will see "Welcome to Our Site (US)"
     - If you are in Poland, you will see "Witamy na Naszej Stronie (PL)"
     - If you are in the rest of the world, you will see "Welcome to Our Site (International)"
