@@ -49,7 +49,3 @@ curl -X POST $URL \
 "pageCount": 180,
 "category": "Fiction"
 }'
-
-
-
-
