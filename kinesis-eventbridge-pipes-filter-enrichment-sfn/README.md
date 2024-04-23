@@ -44,25 +44,32 @@ This pattern shows how to build a pipeline that filters and enriches messages co
 
 Follow the steps below to test out the pattern:
 1. Grab the Amazon Kinesis Stream name from the SAM deployment outputs
-2. Run the following commands from your terminal
+2. Run the following command from your terminal
    ```curl
-    aws kinesis put-record --stream-name REPLACE_YOUR_STREAM_NAME --data '{ "message": "Hello World", "category": "PASS_FILTER" }' --partition-key MY_PARTITION_KEY
-    aws kinesis put-record --stream-name REPLACE_YOUR_STREAM_NAME --data '{ "message": "Bye World", "category": "NO_PASS_FILTER" }' --partition-key MY_PARTITION_KEY
+    aws kinesis put-records \
+    --stream-name sam-kinesis-pattern-testing-SourceStream-PyauFK64vCGM \
+    --records Data=$(echo -n '{ "message": "Hello World 1", "category": "PASS_FILTER" }' | base64),PartitionKey=MY_PARTITION_KEY Data=$(echo -n '{ "message": "Bye World", "category": "NO_PASS_FILTER" }' | base64),PartitionKey=MY_PARTITION_KEY Data=$(echo -n '{ "message": "Hello World 2", "category": "PASS_FILTER" }' | base64),PartitionKey=MY_PARTITION_KEY\
+    --cli-binary-format base64
    ```
 3. Visit the [AWS Step Functions console](https://console.aws.amazon.com/states/home?#/statemachines) in the region you deployed this sample in, locate the state machine containing `TargetSfn` in its name and click on it.
 4. You should see a successful execution, click on it.
    ![Step Functions Executions](images/1.png)
-5. Click on the `Execution Input and Output` tab, you should see an array with 1 message structured as follows:
+5. Click on the `Execution Input and Output` tab, you should see an array with 2 message structured as follows:
   ```json
   [
     {
-      "message": "Hello World",
+      "message": "Hello World 1",
+      "category": "PASS_FILTER",
+      "enrichedKey": "I have been enriched"
+    },
+    {
+      "message": "Hello World 2",
       "category": "PASS_FILTER",
       "enrichedKey": "I have been enriched"
     }
   ]
   ```
-  Notice the additional `enrichedKey` key that has been added in the enrichment step.
+  Notice the additional `enrichedKey` key that has been added in the enrichment step and that one of the three messages was dropped due to the filter.
   ![Step Functions Execution Result](images/2.png)
    
 
