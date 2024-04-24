@@ -18,7 +18,8 @@ public class Function
     private static readonly AmazonBedrockRuntimeClient bedrockClient = new();
     private static readonly AmazonS3Client s3Client = new();
     private static string claudeModelId = "anthropic.claude-3-haiku-20240307-v1:0";
-    private static string prompt = "Read all the information present in this image. give me in the data only in json";
+    private static string systemPrompt = "Your output should contain minimum or no explanation whatsoever.";
+    private static string prompt = "Read all the information present in the image, return information in JSON format.";
 
     public async Task FunctionHandler(S3Event evnt, ILambdaContext context)
     {
@@ -81,6 +82,7 @@ public class Function
         {
             ["anthropic_version"] = "bedrock-2023-05-31",
             ["max_tokens"] = 1000,
+            ["system"] = systemPrompt,
             ["messages"] = new JsonArray
             {
                 new JsonObject
