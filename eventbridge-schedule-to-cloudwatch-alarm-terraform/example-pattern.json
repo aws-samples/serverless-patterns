@@ -1,5 +1,5 @@
 {
-  "title": "EventBridge Scheduler to CloudWatch Alarm",
+  "title": "EventBridge Scheduler for CloudWatch Alarm",
   "description": "Create two EventBridge Scheduler schedules to enable and disable the action of a CloudWatch alarm",
   "language": "HCL",
   "level": "200",
@@ -47,7 +47,7 @@
       "name": "Edwin So",
       "image": "https://media.licdn.com/dms/image/C5603AQGXFWV-L0nYuw/profile-displayphoto-shrink_200_200/0/1596368326454?e=1715212800&v=beta&t=-Xc2wRWeM1TiNpldpkHC7RsgjjzJJ17U0np-VQs0ij0",
       "bio": "Cloud Support Engineer @ AWS | CloudWatch SME",
-      "linkedin": "https://www.linkedin.com/in/edwin-so/"
+      "linkedin": "edwin-so"
     }
   ]
 }

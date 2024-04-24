@@ -1,6 +1,6 @@
-# AWS Service 1 to AWS Service 2
+# EventBridge Scheduler for CloudWatch Alarm
 
-This pattern will create two EventBridge Scheduler schedules to enable and disable the action of a CloudWatch alarm in a specific period. This example will enable the alarm at 08:00 and disable it at 17:00 in the US/Eastern timezone.
+This pattern will create two Amazon EventBridge Scheduler schedules to enable and disable the action of a Amazon CloudWatch alarm in a specific period. This example will enable the alarm at 08:00 and disable it at 17:00 in the US/Eastern timezone.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-schedule-to-cloudwatch-alarm-terraform.
 
@@ -51,6 +51,6 @@ Two Amazon EventBridge Scheduler schedules will be used to enable and disable th
     ```
 
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
