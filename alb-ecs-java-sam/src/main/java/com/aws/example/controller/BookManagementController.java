@@ -47,116 +47,116 @@ import java.net.http.HttpRequest;
 public class BookManagementController {
 
 
-	final BookManagementService bookManagementService;
+    final BookManagementService bookManagementService;
 
-	final Environment environment;
+    final Environment environment;
 
-	@Value("${server.port}")
-	private String port;
+    @Value("${server.port}")
+    private String port;
 
-	@Value("${ecs.container.metadata.uri}")
-	private String metadataUri;
+    @Value("${ecs.container.metadata.uri}")
+    private String metadataUri;
 
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     BookManagementController(Environment environment, BookManagementService bookManagementService) {
         this.environment = environment;
         this.bookManagementService = bookManagementService;
     }
 
-	@PostMapping
-	public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookRequest requestModel) {
-		ModelMapper modelMapper = new ModelMapper();
-		BookDto bookDto = modelMapper.map(requestModel, BookDto.class);
+    @PostMapping
+    public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookRequest requestModel) {
+        ModelMapper modelMapper = new ModelMapper();
+        BookDto bookDto = modelMapper.map(requestModel, BookDto.class);
 
-		BookDto createdBookDetails = bookManagementService.createBook(bookDto);
-		log.info("From BookDto.getBookId" + createdBookDetails.getBookId());
-		BookResponse returnValue = modelMapper.map(createdBookDetails, BookResponse.class);
-		log.info("Book created with id: " + returnValue.getBookId());
+        BookDto createdBookDetails = bookManagementService.createBook(bookDto);
+        log.info("From BookDto.getBookId" + createdBookDetails.getBookId());
+        BookResponse returnValue = modelMapper.map(createdBookDetails, BookResponse.class);
+        log.info("Book created with id: " + returnValue.getBookId());
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
-	}
-
-
-	@GetMapping("/{bookId}")
-	public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") String bookId) {
-
-		BookDto bookDto = bookManagementService.getBookByBookId(bookId);
-
-		BookResponse returnValue = new ModelMapper().map(bookDto, BookResponse.class);
-
-		return ResponseEntity.status(HttpStatus.OK).body(returnValue);
-	}
+        return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
+    }
 
 
+    @GetMapping("/{bookId}")
+    public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") String bookId) {
 
-	@GetMapping()
-	public ResponseEntity<List<BookResponse>> getBooks() {
+        BookDto bookDto = bookManagementService.getBookByBookId(bookId);
 
-		List<BookDto> bookDtoList = bookManagementService.getBooks();
+        BookResponse returnValue = new ModelMapper().map(bookDto, BookResponse.class);
 
-		Type listType = new TypeToken<List<BookResponse>>() {
-		}.getType();
-
-		List<BookResponse> returnValue = new ModelMapper().map(bookDtoList, listType);
-		log.info("Total books in database table: " + returnValue.size());
-
-		return ResponseEntity.status(HttpStatus.OK).body(returnValue);
-	}
-
-	
-	@DeleteMapping("/{bookId}")
-	public ResponseEntity deleteBook(@PathVariable("bookId") String bookId) {
-
-		bookManagementService.deleteBook(bookId);
-
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-	}	
+        return ResponseEntity.status(HttpStatus.OK).body(returnValue);
+    }
 
 
 
-	@GetMapping("/ip")
-	public String getIp() {
-		String returnValue;
+    @GetMapping()
+    public ResponseEntity<List<BookResponse>> getBooks() {
 
-		try {
-			InetAddress ipAddr = InetAddress.getLocalHost();
-			returnValue = ipAddr.getHostAddress();
-		} catch (UnknownHostException ex) {
-			returnValue = ex.getLocalizedMessage();
-		}
+        List<BookDto> bookDtoList = bookManagementService.getBooks();
 
-		return returnValue;
-	}
+        Type listType = new TypeToken<List<BookResponse>>() {
+        }.getType();
 
-	@GetMapping("/container-ip")
-	public String getContainerPrivateIp() {
-		String privateIp;
-		HttpClient client = HttpClient.newHttpClient();
-		HttpRequest request = HttpRequest.newBuilder()
-										.uri(URI.create(metadataUri))
-										.build();
+        List<BookResponse> returnValue = new ModelMapper().map(bookDtoList, listType);
+        log.info("Total books in database table: " + returnValue.size());
 
-		HttpResponse<String> response;
-		try {
-			response = client.send(request, HttpResponse.BodyHandlers.ofString());
-			JsonNode json = new ObjectMapper().readTree(response.body());
+        return ResponseEntity.status(HttpStatus.OK).body(returnValue);
+    }
 
-			privateIp = json.get("Networks")
-								.get(0)
-								.get("IPv4Addresses")
-								.get(0)
-								.textValue();
-		
-		} catch (IOException e) {
-			privateIp = e.getLocalizedMessage();
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			privateIp = e.getLocalizedMessage();
-			e.printStackTrace();
-		}
+    
+    @DeleteMapping("/{bookId}")
+    public ResponseEntity deleteBook(@PathVariable("bookId") String bookId) {
 
-		return privateIp;
-	}
+        bookManagementService.deleteBook(bookId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }	
+
+
+
+    @GetMapping("/ip")
+    public String getIp() {
+        String returnValue;
+
+        try {
+            InetAddress ipAddr = InetAddress.getLocalHost();
+            returnValue = ipAddr.getHostAddress();
+        } catch (UnknownHostException ex) {
+            returnValue = ex.getLocalizedMessage();
+        }
+
+        return returnValue;
+    }
+
+    @GetMapping("/container-ip")
+    public String getContainerPrivateIp() {
+        String privateIp;
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                                        .uri(URI.create(metadataUri))
+                                        .build();
+
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JsonNode json = new ObjectMapper().readTree(response.body());
+
+            privateIp = json.get("Networks")
+                                .get(0)
+                                .get("IPv4Addresses")
+                                .get(0)
+                                .textValue();
+        
+        } catch (IOException e) {
+            privateIp = e.getLocalizedMessage();
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            privateIp = e.getLocalizedMessage();
+            e.printStackTrace();
+        }
+
+        return privateIp;
+    }
 
 }
