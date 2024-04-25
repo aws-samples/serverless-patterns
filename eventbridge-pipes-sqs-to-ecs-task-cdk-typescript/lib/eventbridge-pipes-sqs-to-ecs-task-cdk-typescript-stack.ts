@@ -19,10 +19,8 @@ export class EventbridgePipesSqsToEcsTaskCdkTypescriptStack extends cdk.Stack {
       queueName: 'sqs-dlq',
     });
 
-    // create a SQS queue
     const sqsQueue = new sqs.Queue(this, 'SQSQueue', {
       queueName: 'sqs-queue',
-      visibilityTimeout: cdk.Duration.seconds(300),
       retentionPeriod: cdk.Duration.minutes(15),
       deadLetterQueue: {
         queue: sqsDLQ,

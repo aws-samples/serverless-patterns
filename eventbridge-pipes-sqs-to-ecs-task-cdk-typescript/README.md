@@ -27,7 +27,7 @@ The pattern creates an Amazon SQS queue and a DLQ, an Elastic Container Service 
 For more informations: [Amazon EventBridge Pipes with SQS ](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-sqs.html) and  [Amazon Elastic Container Service Task](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html#pipes-targets-specifics-ecs-task)
 
 ### Architecture
-![Alt text](SQS_ECS_TASK_Pipe.jpg)
+![Alt Architechure Diagram Showing Pattern on how to invoke an Amazon Elastic Container Service (ECS) Tasks based on selective messages from an Amazon SQS queue using Amazon EventBridge Pipes](SQS_ECS_TASK_Pipe.jpg)
 
 ### Deployment Instructions
 
