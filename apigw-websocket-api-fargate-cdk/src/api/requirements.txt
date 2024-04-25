@@ -1,6 +1,6 @@
 fastapi==0.109.1
 requests==2.31.0
-pydantic==2.1.1
+pydantic==2.4.0
 pyhumps==3.8.0
 uvicorn==0.23.1
 python-ulid==1.1.0
