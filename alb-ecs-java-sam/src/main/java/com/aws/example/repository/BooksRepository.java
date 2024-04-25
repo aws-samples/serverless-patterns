@@ -12,4 +12,3 @@ public interface BooksRepository extends CrudRepository<BookEntity, Long>{
     BookEntity findBypageCount(int pageCount);
     BookEntity findByBookId(String bookId);
 }
-

@@ -2,7 +2,6 @@
 
 URL="http://localhost:8081/books"
 
-
 curl -X POST $URL \
 -H 'Content-Type: application/json' \
 -d '{

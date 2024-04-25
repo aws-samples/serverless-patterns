@@ -98,6 +98,4 @@ public class BookManagementServiceImpl implements BookManagementService {
 
 		return returnValue;
 	}
-
-
 }
