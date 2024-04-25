@@ -5,6 +5,7 @@ from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
 
 helper = CfnResource(json_logging=False, log_level='DEBUG', boto_level='CRITICAL', sleep_on_delete=120, ssl_verify=None)
 
+#No-op for update and delete
 @helper.update
 @helper.delete
 def no_op(event, context):
@@ -36,12 +37,12 @@ def get_aoss_index_name(resource_properties):
         raise Exception("AOSSIndexName not provided from resource properties")
     return resource_properties["AOSSIndexName"]
         
-#write a function to use the opensearch-py library to create an index within an opensearch collection
+#Function to use the opensearch-py library to create an index within an opensearch collection
 def create_aoss_index(index_name, aos_client):
     aos_client.indices.create(index=index_name)
     print(f"Created index {index_name}")
     
-
+#Handles create event of the CloudFormation resource
 @helper.create
 def create_index(event,context):
     resource_properties = event['ResourceProperties']

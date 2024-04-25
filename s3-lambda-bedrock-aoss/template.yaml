@@ -2,10 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Automating document vectorization using OpenSearch and Bedrock
 Parameters:
-#  AmazonOpenSearchHost:
-#    Type: String
-#    ConstraintDescription: "Must be a valid Amazon OpenSearch Service host."
-#    Description: "The host name of the Amazon OpenSearch Service. Example: example.us-east-1.es.amazonaws.com"
   AmazonOpenSearchCollectionName:
     Type: String
     Description: "The collection name to create for storing vector embeedings"

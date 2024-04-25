@@ -1,10 +1,10 @@
 # S3 to Lambda to OpenSearch Serverless with Bedrock for Document Embeddings
 
-This patterns can be used to automatically create embeddings using Amazon Bedrock for documents uploaded to an Amazon S3 bucket and store the embeddings along with the document content in an Amazon OpenSearch Serverless index.
+This pattern can be used to automatically create embeddings using Amazon Bedrock for documents uploaded to an Amazon S3 bucket and store the embeddings along with the document content in an Amazon OpenSearch Serverless index.
 
-This patterns is useful for RAG-based applications that use Amazon S3 as source for the knowledge base for their LLM models. The pattern helps to seamlessly create and store the embeddings for new documents once they are upload to S3.
+This pattern is useful for RAG-based applications that use Amazon S3 as source for the knowledge base for their LLM models. The pattern helps to seamlessly create and store the embeddings for new documents once they are upload to S3.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-lambda-bedrock-aoss
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

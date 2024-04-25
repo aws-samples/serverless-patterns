@@ -4,7 +4,6 @@ import os
 from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
 from PyPDF2 import PdfReader
 
-
 #copy an object from s3 to /tmp
 def copy_object_to_tmp(bucket, key):
     s3_client = boto3.client("s3")
@@ -14,7 +13,8 @@ def copy_object_to_tmp(bucket, key):
     print(f"Downloaded file to local path {local_path}")
     return local_path
 
-#create a list variable named pages, use PdfReader to extract pages, enumerating over the pages collecting the index and page. Then add an item to the pages list, each item to include a page number and the page text
+#create a list variable named pages, use PdfReader to extract pages, enumerating over the pages collecting the index and page. 
+# Then add an item to the pages list, each item to include a page number and the page text
 def extract_pages_from_pdf(local_path):
     reader = PdfReader(local_path, 'rb')
     pages = []
@@ -23,7 +23,7 @@ def extract_pages_from_pdf(local_path):
     print(f"Extracted {len(pages)} pages")
     return pages
 
-#with input as a page list containing page numbers and page text, write a function to embed the text and return the embedding, save the embedding, page number and page text to Amazon OpenSearch
+#Given a list of pages, create embeddings for each page and store the embedding to OpenSearch vector index
 def embed_and_store_pages(pages):
     responses=[]
     for page in pages:
@@ -33,7 +33,6 @@ def embed_and_store_pages(pages):
         print(f"Indexed content for page #{page[0]+1}")
         responses.append(response)
     return responses
-
 
 def create_embeddings(content, modelId="amazon.titan-embed-text-v1"):
     bedrock_client = boto3.client("bedrock-runtime", region_name=os.environ["BEDROCK_MODEL_REGION"])
@@ -47,8 +46,7 @@ def create_embeddings(content, modelId="amazon.titan-embed-text-v1"):
     embedding = response_body.get("embedding")
     return embedding
 
-
-#write a function to remove a prefix of https:// from the given string
+#function to remove a prefix of https:// from the given string if present
 def removePrefix(text, prefix):
     if text.startswith(prefix):
         return text[len(prefix):]
@@ -61,6 +59,7 @@ def get_aoss_client():
         boto3.session.Session().region_name,
         "aoss"
     )
+
     # create an opensearch client and use the request-signer
     return OpenSearch(
         hosts=[{'host': host, 'port': 443}],
@@ -69,7 +68,6 @@ def get_aoss_client():
         verify_certs=True,
         connection_class=RequestsHttpConnection
     )
-    
 
 def index_document_page(page_number, page_text, embedding):
     index = os.environ['AOSS_INDEX_NAME']
@@ -80,8 +78,6 @@ def index_document_page(page_number, page_text, embedding):
     )
 
 def lambda_handler(event, context):
-    
-    #call function to download s3 object
     bucket = event['detail']['bucket']['name']
     key = event['detail']['object']['key']
     print(f"Processing document key {key} from  Bucket {bucket}")
