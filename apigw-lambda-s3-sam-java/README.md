@@ -71,7 +71,10 @@ Here's a breakdown of the steps:
 
 ## Testing
 
-1. Run the following command from to run the test class to upload a file using Amazon S3 pre-signed URL:
+1. For testing this, you can use any file upto 5 GB in size. For example you can downlaod the [Amazon S3 user guide](https://s3.amazonaws.com/awsdocs/S3/latest/s3-gsg.pdf). 
+
+
+2. Run the following command from to run the test class to upload a file using Amazon S3 pre-signed URL:
 
    ```bash
    java -cp target/test-classes/ com.example.S3UploadIntegrationTest
@@ -80,8 +83,8 @@ Here's a breakdown of the steps:
 2. During the prompts:
 
    - Enter the REST API URL to get the pre-signed URL: from the `sam deploy` output
-   - Enter the file name on S3 (key): s3userguide.pdf
-   - Enter the path to the local file: s3userguide.pdf
+   - Enter the file name on S3 (key): s3-gsg.pdf
+   - Enter the path to the local file: s3-gsg.pdf
 
 If everything goes fine you should get a confirmation message:
    ```bash
