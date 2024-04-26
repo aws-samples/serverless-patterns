@@ -1,4 +1,4 @@
-# EventBridge Scheduler for CloudWatch Alarm
+# Amazon EventBridge Scheduler for Amazon CloudWatch Alarm
 
 This pattern will create two Amazon EventBridge Scheduler schedules to enable and disable the action of a Amazon CloudWatch alarm in a specific period. This example will enable the alarm at 08:00 and disable it at 17:00 in the US/Eastern timezone.
 
