@@ -1,4 +1,4 @@
-# Upload file upto 5GB to Amazon S3 bucket using presigned URL
+# Upload file up to 5GB to Amazon S3 bucket using presigned URL
 
 This sample project deploys an Amazon API Gateway REST API with an AWS Lambda integration. The Lambda function, written in Java, generates a presigned URL with write access to an Amazon S3 Bucket. The provided test class uploads a file into the S3 bucket using the presigned URL.
 
