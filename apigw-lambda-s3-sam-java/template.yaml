@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: This template exposes API to to retrieve Amazon S3 pre-signed URL to upload a file
+
+Globals:
+  Function:
+    Runtime: java21
+    MemorySize: 3008
+    Timeout: 120
+
+  Api:
+    OpenApiVersion: '3.0.1'
+
+Resources:
+  #Create API Gateway
+  MyAPIGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Name: my-api-gateway
+
+  #Create S3 bucket
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub my-s3-bucket-${AWS::AccountId}-${AWS::Region}
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      Tags:
+        - Key: Name
+          Value: MyS3Bucket
+  #Create Lambda Function
+  MyS3PreSignedURLGeneratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: MyS3PreSignedURLGeneratorFunction
+      Handler: com.example.MyS3PreSignedURLGeneratorFunction::handleRequest
+      CodeUri: target/MyS3PreSignedURLGeneratorFunction.zip
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref MyS3Bucket
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref MyS3Bucket
+        - S3WritePolicy:
+            BucketName: !Ref MyS3Bucket
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /invoke
+            Method: POST
+            RestApiId: !Ref MyAPIGateway
+
+Outputs:
+  APIGatewayEndpoint:
+    Description: API Gateway Endpoint
+    Value:
+      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/invoke
+  MyS3BucketName:
+    Description: S3 Bucket Name
+    Value: !Ref MyS3Bucket
