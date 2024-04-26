@@ -1,15 +1,15 @@
 {
-    "title": "Kinesis Data Stream to Step Functions through EventBridge Pipes",
-    "description": "Create an EventBridge Pipe to connect a Kinesis Data Stream and a Step Functions Workflow",
+    "title": "Amazon Kinesis Data Stream to AWS Step Functions through Amazon EventBridge Pipes",
+    "description": "Create an EventBridge Pipe to connect a Kinesis Data Stream and a Step Functions Workflow.",
     "language": "YAML",
     "level": "200",
     "framework": "SAM",
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This pattern shows how to build a pipeline that filters and enriches messages comming in an Amazon Kinesis Stream to an AWS Step Function Workflow.",
-            "It leverages EventBridge Pipes to connect the source stream and the target workflow.",
-            "On top of just connecting a source and a target, EventBridge Pipes allow to filter and enrich messages before they reach the target."
+            "This pattern shows how to build a pipeline that filters and enriches messages comming in an Amazon Kinesis Stream to an AWS Step Functions Workflow.",
+            "It uses EventBridge Pipes to connect the source stream and the target workflow.",
+            "In addition to connecting a source and a target, EventBridge Pipes allow you to filter and enrich messages before they reach the target."
         ]
     },
     "gitHub": {
