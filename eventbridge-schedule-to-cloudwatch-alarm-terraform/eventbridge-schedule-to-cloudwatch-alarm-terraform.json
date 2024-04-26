@@ -1,5 +1,5 @@
 {
-    "title": "EventBridge Scheduler for CloudWatch Alarm",
+    "title": "Amazon EventBridge Scheduler for Amazon CloudWatch Alarm",
     "description": "Create two Amazon EventBridge Scheduler schedules to enable and disable the action of a CloudWatch alarm",
     "language": "YAML",
     "level": "200",
