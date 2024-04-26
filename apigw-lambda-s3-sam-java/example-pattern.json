@@ -1,5 +1,5 @@
 {
-  "title": "Upload file upto 5GB to Amazon S3 bucket using presigned URL",
+  "title": "Upload file up to 5GB to Amazon S3 bucket using presigned URL",
   "description": "This project deploys Amazon API Gateway with AWS Lambda integration to showcase how to upload a file to Amazon S3 bucket using a presigned S3 URL.",
   "language": "Java",
   "level": "200",

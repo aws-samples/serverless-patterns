@@ -1,4 +1,4 @@
-# Deploying Spring Boot application on Amazon ECS/AWS Fargate with Applicatio Load Balancer
+# Deploying Spring Boot application on Amazon ECS/AWS Fargate with Application Load Balancer
 
 This sample project deploys a Java 21 Spring Boot application on Amazon ECS using AWS Fargate with Application Load Balancer to route traffic between two ECS Tasks.
 

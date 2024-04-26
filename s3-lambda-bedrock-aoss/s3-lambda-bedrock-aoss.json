@@ -1,6 +1,6 @@
 {
-    "title": "S3 to Lambda to Bedrock and OpenSearch Serverless",
-    "description": "Generate vector embeddings for the documents uploaded to S3 and store them to OpenSearch serverless vector collection",
+    "title": "Document embeddings for Amazon Bedrock using Amazon S3/AWS Lambda/Amazon OpenSearch Serverless",
+    "description": "Generate vector embeddings for the documents uploaded to S3 and store them in OpenSearch serverless vector collection",
     "language": "Python",
     "level": "200",
     "framework": "SAM",

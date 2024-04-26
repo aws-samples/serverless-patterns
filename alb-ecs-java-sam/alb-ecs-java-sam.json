@@ -1,5 +1,5 @@
 {
-  "title": "Deploying Spring-boot App on Amazon ECS Fargate with ALB configuration",
+  "title": "Deploying Spring Boot App on Amazon ECS/AWS Fargate with Application Load Balancer",
   "description": "This sample project deploys a Java 21 Spring Boot App on Amazon ECS Fargate with Application Load Balancer to route traffic between two ECS Tasks.",
   "language": "Java",
   "level": "200",
