@@ -1,6 +1,6 @@
-# Kinesis Data Stream to Step Functions through EventBridge Pipes
+# Amazon Kinesis Data Streams to AWS Step Functions through Amazon EventBridge Pipes
 
-Create an EventBridge Pipe to connect a Kinesis Data Stream and a Step Functions Workflow
+Create an EventBridge Pipe to connect a Kinesis Data Stream and a Step Functions Workflow.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/kinesis-eventbridge-pipes-filter-enrichment-sfn
 
