@@ -1,6 +1,6 @@
 # SFTP Server to Amazon S3
 
-This pattern shows how to use AWS Transfer Family SFTP connector to transfer files from SFTP server which can be running anywhere to Amazon S3. EventBridge is used to schedule periodic execution of the Step function. The Step functions orchastrates the workflow.  It invokes a Lambda function to retrieve the list of files created or updated after the last execution, followed by another Lambda function which creates file transfer jobs in SFTP connector. SFTP Connector transfers these files source SFTP server to S3. The status of each transfer job is pushed to DynamoDB using EventBridge. Retry mechanism for failed files is implemented using Lambda. 
+This pattern shows how to use AWS Transfer Family SFTP connector to transfer files from SFTP server to Amazon S3. EventBridge is used to schedule periodic execution of the Step functions. The Step functions orchastrates the workflow.  It invokes a Lambda function to retrieve the list of files created or updated after the previous execution of the workflow, followed by another Lambda function which creates file transfer jobs in SFTP connector. SFTP Connector transfers these files from source SFTP server to S3. The status of each transfer job is pushed to DynamoDB using EventBridge and Lambda function. Retry mechanism for failed files is implemented using Lambda. 
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sftp-connector-stepfunction
 
