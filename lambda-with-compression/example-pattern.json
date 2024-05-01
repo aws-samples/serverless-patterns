@@ -1,0 +1,53 @@
+{
+  "title": "Lambda with data compression",
+  "description": "Use data compression to send larger payloads and reduce data transfer costs",
+  "language": "JavaScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use data compression with AWS Lambda functions to reduce data transfer costs and send/receive payloads larger than 6MB"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-with-compression",
+      "templateURL": "serverless-patterns/lambda-with-compression",
+      "projectFolder": "lambda-with-compression",
+      "templateFile": "stack/lambda-with-compression-stack.js"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anton Aleksandrov",
+      "image": "https://serverlessland.com/assets/external/guides/building-serverless-applications-with-terraform/assets/authors/antonaws.png",
+      "bio": "Principal Solutions Architect, Serverless and Event-driven Architectures, AWS",
+      "linkedin": "antonal80",
+      "twitter": "antonal80"
+    }
+  ]
+}

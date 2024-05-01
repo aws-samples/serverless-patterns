@@ -1,0 +1,13 @@
+{
+    "name": "lambda-with-gzip",
+    "version": "0.0.1",
+    "main": "index.js",
+    "type": "module",
+    "author": "Anton Aleksandrov",
+    "license": "MIT",
+    "dependencies": {
+      "@aws-lambda-powertools/metrics": "^1.18.1",
+      "lorem-ipsum": "^2.0.8"
+    }
+  }
+  
