@@ -1,6 +1,6 @@
 {
     "title": "Extract text from images using Amazon Bedrock",
-    "description": "This CDK application demonstrates how to use Amazon Bedrock service to extract text from images.",
+    "description": "This pattern demonstrates how to use Amazon Bedrock to automatically extract text from images uploaded to Amazon S3.",
     "language": ".NET",
     "level": "200",
     "framework": "CDK",
