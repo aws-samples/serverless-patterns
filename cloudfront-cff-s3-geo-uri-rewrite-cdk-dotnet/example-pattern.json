@@ -1,6 +1,6 @@
 {
     "title": "CloudFront to CloudFront Functions with URI Rewrite to S3",
-    "description": "Create a Static Website fronted by CloudFront with CloudFront Functions automatically routing visitors to localized content using CloudFront's Geo Location Headers.",
+    "description": "Create a Static Website fronted by CloudFront with CloudFront Functions routing visitors to localized content using CloudFront's Geo Location Headers.",
     "language": ".NET",
     "level": "200",
     "framework": "CDK",
