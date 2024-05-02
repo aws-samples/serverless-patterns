@@ -34,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 
 ## How it works
-When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Bedrock service, which extracts text from the image and stores it in the S3 bucket.
+When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Bedrock, which extracts text from the image and stores it in the S3 bucket.
 
 ![pattern](Images/pattern.png)
 
