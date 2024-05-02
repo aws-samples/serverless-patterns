@@ -8,7 +8,7 @@
       "headline": "How it works",
       "text": [
         "This pattern shows how to extract text from images using Amazon Bedrock.",
-        "When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Bedrock service, which extracts text from the image and stores it in the S3 bucket."
+        "When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Bedrock, which extracts text from the image and stores it in the S3 bucket."
       ]
     },
     "gitHub": {
