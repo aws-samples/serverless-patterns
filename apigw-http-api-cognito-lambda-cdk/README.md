@@ -39,7 +39,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates an Amazon API Gateway API HTTP API and two endpoints. The first endpoint is unprotected (no authentication/authorization) and integrate with a publicly accessible Lambda function. The second endpoint is protected by a JWTAuthorizer that use Coginto as IDP and it integrates with a non-publicly accessible Lambda function.
+This pattern creates an Amazon API Gateway API HTTP API and two endpoints. The first endpoint is unprotected (no authentication/authorization) and integrate with a unprotected accessible Lambda function. The second endpoint is protected by a JWTAuthorizer that use Coginto as IDP and it integrates with a protected accessible Lambda function.
 
 ## Testing
 
@@ -52,23 +52,23 @@ This pattern creates an Amazon API Gateway API HTTP API and two endpoints. The f
    ```
 2. Set the variables for the fake user to be created
    ```bash
-     EMAIL="fake@example.com"                                         
+     EMAIL="fake@example.com"                                
      PASSWORD="S3cuRe#FaKE*"
    ```
 
-**Public endpoint**
-To test the public endpoint, send a HTTP GET request command to the HTTP API public endpoint. Be sure to update the endpoint with outputs of your stack. The response payload should shows `Hello Public Space`.
+**Unprotected endpoint**
+To test the unprotected endpoint, send a HTTP GET request command to the HTTP API unprotected endpoint. Be sure to update the endpoint with outputs of your stack. The response payload should shows `Hello Unprotected Space`.
 ```bash
 curl ${API_URL}/unprotected
 ```
 
-**Private endpoint**
-To test the private endpoint:
+**Protected endpoint**
+To test the protected endpoint:
 1. First sign-up the fake user against Cognito. 
    ```bash
     aws cognito-idp sign-up \
     --client-id ${CLIENT_ID} \
-    --username ${EMAIL} \        
+    --username ${EMAIL} \
     --password ${PASSWORD}
    ```
 2. Confirm the fake user to Cognito
@@ -86,7 +86,7 @@ To test the private endpoint:
     --query 'AuthenticationResult.AccessToken' \
     --output text)
    ```
-5. Send an HTTP GET request to the API Gateway with the JWT token, which will verify the token call the private Lambda function.
+5. Send an HTTP GET request to the API Gateway with the JWT token, which will verify the token call the protected Lambda function.
     ```bash
     curl -H "Authorization: ${TOKEN}" ${API_URL}/protected
     ```

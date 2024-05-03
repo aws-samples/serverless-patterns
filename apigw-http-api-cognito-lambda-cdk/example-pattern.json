@@ -7,7 +7,7 @@
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This pattern creates an Amazon API Gateway HTTP API with JWTAuthorizer and Cognito as user management. It integrates with one public Lambda and one protected Lambda.."
+        "This pattern creates an Amazon API Gateway HTTP API with JWTAuthorizer and Cognito as user management. It integrates with one unprotected Lambda and one protected Lambda.."
       ]
     },
     "gitHub": {
