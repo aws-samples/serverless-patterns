@@ -1,6 +1,6 @@
-# Conversation Summarization: Leveraging Amazon S3, SQS, Lambda, and Bedrock\
+# Summarization: Using Amazon S3, Amazon SQS, AWS Lambda, and Amazon Bedrock\
 
-This pattern creates an Amazon S3 bucket that sends 'OBJECT_CREATED' events to an SQS queue. These events are then processed by a Lambda function that utilizes Amazon Bedrock to extract the summary and sentiment of the input file. The summary is subsequently stored in a different S3 bucket for consumption. This setup is particularly useful for obtaining a summary of conversations between customers and support associates.
+This pattern creates an Amazon S3 bucket that sends 'OBJECT_CREATED' events to an Amazon SQS queue. An AWS Lambda function receives the messages from the queue and invokes Amazon Bedrock to extract a summary and sentiment from the file. The result is stored in a different S3 bucket for consumption. This setup is particularly useful for obtaining a summary of conversations between customers and support associates.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Python, pip, virtualenv](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html) installed
 
 ## Prerequisite
-Amazon Bedrock users need to request access to models before they are available for use. If you want to add additional models for text, chat, and image generation, you need to request access to models in Amazon Bedrock. Please refer to the link below for instruction:
+Amazon Bedrock users need to request access to models before they are available for use. If you want to add additional models for text, chat, and image generation, you need to request access to models in Amazon Bedrock. For this pattern need access to 'Titan Text G1 - Express' model. Please refer to the link below for instruction:
 [Model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
 ## Deployment Instructions
@@ -41,11 +41,11 @@ Amazon Bedrock users need to request access to models before they are available 
    ```
    pip install -r requirements.txt
    ```
-6. Review the CloudFormation template the cdk generates for you stack using the following AWS CDK CLI command:
+6. Generate the CloudFormation template with the following AWS CDK CLI command:
    ```
    cdk synth
    ```
-7. Run the command below to bootstrap your account CDK needs it to deploy
+7. If needed, bootstrap your account:
     ```
     cdk bootstrap
     ```
@@ -56,14 +56,14 @@ Amazon Bedrock users need to request access to models before they are available 
 
 ## How it works
 
-* Upload a support conversation history input file to the input S3 Bucket, triggering an 'OBJECT_CREATED' event notification to an SQS Queue. Upon receipt, the SQS Queue triggers a Lambda function which will fetch the content of the file using Bucket and Object key info in the event. The Lambda constructs a prompt containing the support conversation and invokes Amazon Titan Text Express from Bedrock to generate conversation summary and sentiment in JSON format. Finally, the Lambda uploads this summary to the summary S3 Bucket.
+* Upload a support conversation history input file to the input S3 Bucket, triggering an 'OBJECT_CREATED' event notification to an SQS Queue. A Lambda function receives the message from the queue and fetches the content  using the Bucket and Object key information in the event. The function constructs a prompt containing the support conversation and invokes Amazon Titan Text Express from Bedrock to generate a conversation summary and sentiment in JSON format. Finally, the Lambda function uploads the output to the summary S3 Bucket.
 
 
 ## Testing
 
-1. Navigate to the S3 bucket containing key 's3sqslambdabedrocks3cdkpythons-inputbucket**' along with your stack name and a hash key
+1. Navigate to the S3 bucket with a name containing 's3sqslambdabedrocks3cdkpythons-inputbucket**' along with your stack name and a hash key
 2. Upload input file containing conversation history to the bucket (sample input files are available under ./lambda folder)
-3. Wait for the AWS Lambda function to invoke the Amazon Bedrock model to get the sentiment and summary of the conversation. The Response will be uploaded to 's3sqslambdabedrocks3cdkpytho-summarybucket' using the same name of the input file uploaded earlier.
+3. Wait for Amazon Bedrock to produce the sentiment and summary of the conversation. The Response will be uploaded to 's3sqslambdabedrocks3cdkpytho-summarybucket' using the same name of the input file uploaded earlier.
 4. The response will look like the sample shown below:
 ```
 {
