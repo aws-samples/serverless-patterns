@@ -36,7 +36,7 @@ class S3SqsLambdaBedrockS3CdkPythonStack(Stack):
 
         queue = sqs.Queue(
             self, "S3EventQueue",
-            visibility_timeout=Duration.seconds(60),
+            visibility_timeout=Duration.seconds(360),
             dead_letter_queue=sqs.DeadLetterQueue (
                     max_receive_count= 3,
                     queue= dead_letter_queue,
