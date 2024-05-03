@@ -3,6 +3,9 @@ import os
 import boto3
 
 
+s3 = boto3.client('s3')
+s3_resource = boto3.resource('s3')
+
 def lambda_handler(event, context):
 
     print(event)
@@ -51,12 +54,10 @@ def lambda_handler(event, context):
     print(summary)
 
     #write summary to s3 bucket
-    s3 = boto3.resource('s3')
-
     # Get BUCKET_SUMMARY from environment variables
     bucket_summary = os.environ['BUCKET_SUMMARY']
 
-    s3.Object(bucket_summary, key).put(Body=summary)
+    s3_resource.Object(bucket_summary, key).put(Body=summary)
     print('Summary written to s3 bucket')
             
     return 'Successfully processed SQS messages'
@@ -64,6 +65,5 @@ def lambda_handler(event, context):
 
 #function to read from S3 bucket and key as input
 def read_s3_file(bucket, key):
-    s3 = boto3.client('s3')
     obj = s3.get_object(Bucket=bucket, Key=key)
     return obj['Body'].read().decode('utf-8')
