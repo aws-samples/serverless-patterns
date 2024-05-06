@@ -7,7 +7,8 @@ from s3_sqs_lambda_bedrock_s3_cdk_python.s3_sqs_lambda_bedrock_s3_cdk_python_sta
 
 
 app = cdk.App()
-S3SqsLambdaBedrockS3CdkPythonStack(app, "S3SqsLambdaBedrockS3CdkPythonStack",
+description = "Sample app (uksb-1tthgi812) (tag:s3_sqs_lambda_bedrock_s3_cdk_python)"
+S3SqsLambdaBedrockS3CdkPythonStack(app, "S3SqsLambdaBedrockS3CdkPythonStack",description=description
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
