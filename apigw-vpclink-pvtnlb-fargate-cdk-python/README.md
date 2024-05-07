@@ -53,7 +53,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-* Any object uploaded to the Amazon S3 bucket will trigger the S3 Create Object event and invoke the AWS Lambda function asynchronously, providing an event that includes comprehensive details about the object. Leveraging the object details within the event, Lambda proceeds to extract the content of the object. Subsequently, it initiates a call to the Amazon Bedrock Titan Embedding service to obtain the vector embeddings corresponding to the content of the object.
+* This pattern helps connect a public API Gateway endpoint to a private Network Load Balancer alongside an ECS Fargate cluster.
+  It keeps the private subnet resources safe from exposure and only allows access through a VPC Link, ensuring security. The pattern will create API Gateway, VPC Link, private Network load balancer, VPC along with a private subnet and a ECS fargate cluster.
 
 ## Testing
 
