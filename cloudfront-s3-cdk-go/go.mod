@@ -1,4 +1,4 @@
-module cloudformation-s3-cdk-go
+module cloudfront-s3-cdk-go
 
 go 1.18
 
