@@ -1,5 +1,5 @@
 {
-  "app": "go mod download && go run cloudformation-s3-cdk-go.go",
+  "app": "go mod download && go run cloudfront-s3-cdk-go.go",
   "watch": {
     "include": [
       "**"
