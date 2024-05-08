@@ -10,11 +10,11 @@ import (
 	"github.com/aws/jsii-runtime-go"
 )
 
-type CloudformationS3CdkGoStackProps struct {
+type CloudFrontS3CdkGoStackProps struct {
 	awscdk.StackProps
 }
 
-func NewCloudformationS3CdkGoStack(scope constructs.Construct, id string, props *CloudformationS3CdkGoStackProps) awscdk.Stack {
+func NewCloudFrontS3CdkGoStack(scope constructs.Construct, id string, props *CloudFrontS3CdkGoStackProps) awscdk.Stack {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
@@ -51,7 +51,7 @@ func main() {
 
 	app := awscdk.NewApp(nil)
 
-	NewCloudformationS3CdkGoStack(app, "CloudformationS3CdkGoStack", &CloudformationS3CdkGoStackProps{
+	NewCloudFrontS3CdkGoStack(app, "CloudFrontS3CdkGoStack", &CloudFrontS3CdkGoStackProps{
 		awscdk.StackProps{
 			Env: env(),
 		},
