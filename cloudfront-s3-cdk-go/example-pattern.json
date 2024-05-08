@@ -15,7 +15,6 @@
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-s3-cdk-go",
         "templateURL": "serverless-patterns/cloudfront-s3-cdk-go",
-        "projectFolder": ".",
         "templateFile": "cloudfront-s3-cdk-go.go"
       }
     },
