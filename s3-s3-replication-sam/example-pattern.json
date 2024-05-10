@@ -25,8 +25,8 @@
         "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html"
       },
       {
-        "text": "Cross Region Replication",
-        "link": "https://www.youtube.com/watch?v=_6admeBN-lI&themeRefresh=1"
+        "text": "Same Region Replication",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2019/09/amazon-s3-introduces-same-region-replication/"
       }
     ]
   },
