@@ -1,5 +1,5 @@
 {
-  "title": "Selective file transfer between SFTP server and S3 using AWS Transfer Family",
+  "title": "Selective file transfer between SFTP server & S3 using AWS Transfer Family",
   "description": "This pattern shows how to use AWS Transfer Family to list and transfer specific files between an SFTP server and Amazon S3 bucket.",
   "language": "YAML",
   "level": "200",
@@ -7,10 +7,10 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The remote SFTP server is simulated using AWS Transfer Family SFTP Server for this pattern. In real use case, this can be any remove SFTP server outside of AWS.",
-      "SFTP Connector is configured to comment the remote server with Amazon S3 bucket using SFTP protocol. The authentication is done using SSH Key based handshake.",
-      "Amazon S3 bucket file storage on AWS side.",
-      "User can list files on the remote server and selectively transfer file from the remote server to the Amazon S3 bucket using AWS Transfer Family API or CLI commands.",
+      "The remote SFTP server is simulated using AWS Transfer Family SFTP Server for this pattern. In real use case, this can be any remote SFTP server outside of AWS.",
+      "SFTP Connector is configured to connect the remote server with Amazon S3 bucket using SFTP protocol. The authentication is done using SSH Key based handshake.",
+      "Amazon S3 bucket is used for file storage on the AWS side.",
+      "User can list files on the remote server and selectively transfer files from the remote server to the Amazon S3 bucket using AWS Transfer Family API or CLI commands.",
       "User can also transfer files from Amazon S3 to the remote server using the AWS Transfer Family API or CLI commands."
     ]
   },
@@ -19,7 +19,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/awstransfer-s3-sam",
       "templateURL": "serverless-patterns/awstransfer-s3-sam",
       "projectFolder": "awstransfer-s3-sam",
-      "templateFile": "template1.yaml"
+      "templateFile": "template-sftp-server.yaml"
     }
   },
   "resources": {

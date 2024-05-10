@@ -118,9 +118,3 @@ Outputs:
   SFTPTransferConnector:
     Description: The SFTP Transfer Connector
     Value: !Ref SFTPTransferConnector
-              
-
-
-
-
-

@@ -1,6 +1,6 @@
 # Bidirectional selective file transfer between remote SFTP server and Amazon S3 using AWS Transfer Family Connector
 
-This pattern shows how to setup an AWS Transfer Family SFTP connector to list files from the remote server and transfer specific file to Amazon S3 bucket. You can also transfer specific file from Amazon S3 bucket to the remote SFTP Server.  
+This pattern shows how to setup an AWS Transfer Family SFTP connector to list files from the remote server and transfer specific files to Amazon S3 bucket. You can also transfer specific files from Amazon S3 bucket to the remote SFTP server.  
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/awstransfer-s3-sam. 
 
@@ -35,9 +35,9 @@ Important: this application uses various AWS services and there are costs associ
 
 4. During the prompts:
     * Enter a stack name
-    * Enter the desired AWS Region
+    * Enter the desired AWS Region (e.g. us-east-1)
 
-5. The deployment script deploys both `template1.yaml` and `template2.yaml`. Please make a note of the output both the deployments as they will be used during testing.
+5. The deployment script deploys both `template-sftp-server.yaml` and `template-sftp-connector.yaml`. Please make a note of the output both the deployments as they will be used during testing.
 
 
 ## How it works
@@ -47,9 +47,9 @@ Please refer to the architecture diagram below:
 ![End to End Architecture](images/architecture.png)
 
 * The remote SFTP server is simulated using AWS Transfer Family SFTP Server for this pattern. In real use case, this can be any remove SFTP server outside of AWS. 
-* SFTP Connector is configured to comment the remote server with Amazon S3 bucket using SFTP protocol. The authentication is done using SSH Key based handshake. 
-* Amazon S3 bucket file storage on AWS side. 
-* User can list files on the remote server and selectively transfer file from the remote server to the Amazon S3 bucket using AWS Transfer Family API or CLI commands. 
+* SFTP Connector is configured to connect to the remote server with Amazon S3 bucket using SFTP protocol. The authentication is done using SSH Key based handshake. 
+* Amazon S3 bucket is used for file storage on the AWS side.
+* User can list files on the remote server and selectively transfer files from the remote server to the Amazon S3 bucket using AWS Transfer Family API or CLI commands. 
 * User can also transfer files from Amazon S3 to the remote server using the AWS Transfer Family API or CLI commands. 
 
 ## Testing
@@ -86,7 +86,7 @@ Please refer to the architecture diagram below:
     aws transfer start-directory-listing --region {your-region} --connector-id {SFTPTransferConnector} --remote-directory-path /Remote --output-directory-path /{MyLocalS3Bucket}/FromRemoteSFTPServer
     ```
     
-    The command invokes async API. The outpul of the command will be as follows:
+    The command invokes an asynchronous API. The output of the command will be as follows:
     ```json
     {
     "ListingId": "273e5b33-xxxx-xxxx-xxxx-xxxxx9a507f53",
@@ -114,7 +114,7 @@ Please refer to the architecture diagram below:
     }
     ```
 
-7. Transfer one of the files from the remote SFTP server to Amazon S3 bucket using the following command:
+7. Transfer one of the files from the remote SFTP server to the Amazon S3 bucket using the following command:
     ```bash
     aws transfer start-file-transfer --region {your-region}  --connector-id {SFTPTransferConnector} --retrieve-file-paths /Remote/sample1.txt --local-directory-path /{MyLocalS3Bucket}/FromRemoteSFTPServer
     ```

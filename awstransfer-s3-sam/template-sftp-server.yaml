@@ -157,9 +157,3 @@ Outputs:
   TransferLoggingRoleArn:
     Description: The name of the Transfer Logging Role
     Value: !GetAtt TransferLoggingRole.Arn
-              
-
-
-
-
-

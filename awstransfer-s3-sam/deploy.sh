@@ -21,9 +21,9 @@ if [ -f "$USER_NAME.pub" ]; then
     # Store the content of the public key in a variable
     PUBLIC_KEY=$(cat "$USER_NAME.pub")
 
-    # Deploy template1.yaml
+    # Deploy template-sftp-server.yaml
     sam deploy \
-      --template-file template1.yaml \
+      --template-file template-sftp-server.yaml \
       --stack-name "$STACK_NAME-1" \
       --parameter-overrides "UserName=\"$USER_NAME\"" "SSHPublicKey=\"$PUBLIC_KEY\"" \
       --capabilities CAPABILITY_IAM \
@@ -76,9 +76,9 @@ if [ -f "$USER_NAME.pub" ]; then
     # AWS Documentation: https://docs.aws.amazon.com/transfer/latest/userguide/API_SftpConnectorConfig.html
     TRUSTED_HOST_KEY=$(ssh-keyscan $TRANSFER_SERVER_ENDPOINT)
 
-    # Deploy template2.yaml
+    # Deploy template-sftp-connector.yaml
     sam deploy \
-    --template-file template2.yaml \
+    --template-file template-sftp-connector.yaml \
     --stack-name "$STACK_NAME-2" \
     --parameter-overrides "TransferServerEndpoint=\"sftp://$TRANSFER_SERVER_ENDPOINT\"" "UserName=\"$USER_NAME\"" "TransferLoggingRoleArn=\"$TRANSFER_LOGGING_ROLE_ARN\"" "SSHPrivateKey=\"$FORMATTED_PK\"" "TrustedHostKeys=\"$TRUSTED_HOST_KEY\"" \
     --capabilities CAPABILITY_IAM \
