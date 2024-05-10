@@ -1,4 +1,4 @@
-# Extract text from images using Amazon Bedrock
+# Automatically extract text from uploaded images in Amazon S3 using Amazon Bedrock
 
 This pattern shows how to automatically extract text from images uploaded to Amazon S3 using Amazon Bedrock.
 
