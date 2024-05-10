@@ -46,7 +46,7 @@ Please refer to the architecture diagram below:
 
 ![End to End Architecture](images/architecture.png)
 
-* The remote SFTP server is simulated using AWS Transfer Family SFTP Server for this pattern. In real use case, this can be any remove SFTP server outside of AWS. 
+* The remote SFTP server is simulated using AWS Transfer Family SFTP Server for this pattern. In a real use case, this can be any remote SFTP server outside of AWS. 
 * SFTP Connector is configured to connect to the remote server with Amazon S3 bucket using SFTP protocol. The authentication is done using SSH Key based handshake. 
 * Amazon S3 bucket is used for file storage on the AWS side.
 * User can list files on the remote server and selectively transfer files from the remote server to the Amazon S3 bucket using AWS Transfer Family API or CLI commands. 
