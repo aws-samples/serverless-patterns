@@ -21,12 +21,8 @@
   "resources": {
     "bullets": [
       {
-        "text": "Replicating Objects",
-        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html"
-      },
-      {
         "text": "Same Region Replication",
-        "link": "https://aws.amazon.com/about-aws/whats-new/2019/09/amazon-s3-introduces-same-region-replication/"
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html#srr-scenario"
       }
     ]
   },
