@@ -18,7 +18,7 @@ Parameters:
     Description: Password for accessing RabbitMQ (min 12 char long)
 
 Resources:
-  # Create the Amazon MQ Broker with RabbitMW Engine
+  # Create the Amazon MQ Broker with RabbitMQ Engine
   MyMQBroker:
     Type: AWS::AmazonMQ::Broker
     Properties: 
