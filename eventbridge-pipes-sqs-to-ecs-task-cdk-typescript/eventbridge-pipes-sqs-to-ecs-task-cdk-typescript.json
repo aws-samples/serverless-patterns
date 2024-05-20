@@ -1,5 +1,5 @@
 {
-    "title": "Invoke ECS Task with SQS messages using EventBridge Pipes",
+    "title": "Invoke Amazon Elastic Container Service Task with Amazon SQS messages using EventBridge Pipes",
     "description": "Invoke Amazon ECS Fargate Tasks using Amazon SQS messages using Amazon EventBridge Pipes",
     "language": "TypeScript",
     "level": "200",
