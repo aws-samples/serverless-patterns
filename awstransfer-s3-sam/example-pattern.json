@@ -1,5 +1,5 @@
 {
-  "title": "Selective file transfer between SFTP server & S3 using AWS Transfer Family",
+  "title": "Selective file transfer between SFTP server & Amazon S3 using AWS Transfer Family",
   "description": "This pattern shows how to use AWS Transfer Family to list and transfer specific files between an SFTP server and Amazon S3 bucket.",
   "language": "YAML",
   "level": "200",
