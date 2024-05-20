@@ -1,8 +1,8 @@
-# API Gateway HTTP API to Step Functions Express Workflow
+# Amazon API Gateway HTTP API to AWS Step Functions Express Workflow
 
-This pattern explains how to deploy a CDK application with a Amazon API Gateway HTTP API that invokes a Step Function Express workflow.
+This pattern explains how to deploy a CDK application with a Amazon API Gateway HTTP API that invokes a Step Functions Express workflow.
 
-When an HTTP POST request is made to the Amazon API Gateway endpoint, the Step Function Express workflow is invoked and the results of the execution are returned in the HTTP response.
+When an HTTP POST request is made to the Amazon API Gateway endpoint, the Step Functions Express workflow is invoked and the results of the execution are returned in the HTTP response.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns](https://serverlessland.com/patterns)
 
