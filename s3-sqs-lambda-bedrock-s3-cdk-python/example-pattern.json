@@ -1,5 +1,5 @@
 {
-    "title": "Conversation Summarization: Leveraging Amazon S3, SQS, Lambda, and Bedrock",
+    "title": "GenAI conversation summarization using Amazon S3, Amazon SQS, AWS Lambda, and Amazon Bedrock",
     "description": "S3 sends PUT event to SQS, message is handled by Lambda with Bedrock extracts summary & sentiment then stores in S3. Ideal for conversation summaries.",
     "language": "Python",
     "level": "200",
