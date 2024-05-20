@@ -1,0 +1,48 @@
+{
+  "title": "Amazon API Gateway HTTP API to AWS Step Functions Express Workflow",
+  "description": "Create an API Gateway HTTP API endpoint that starts a Step Functions synchronous Express Workflow.",
+  "language": "Java",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern explains how to deploy a CDK application with Amazon API Gateway that invokes a synchronous Step Functions workflow."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-step-functions-express-java",
+      "projectFolder": "apigw-http-api-step-functions-express-java",
+      "templateFile": "src/main/java/com/myorg/HttpApiGatewayStepFunctionsStack.java",
+      "templateURL": "serverless-patterns/apigw-http-api-step-functions-express-java"
+    }
+  },
+  "resources": {
+    "bullets": []
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Matt Ridehalgh",
+      "image": "https://avatars.githubusercontent.com/u/9155962",
+      "bio": "Matt Ridehalgh is a Solutions Architect at AWS.",
+      "linkedin": "matthew-ridehalgh",
+      "twitter": "mrideh"
+    }
+  ]
+}
