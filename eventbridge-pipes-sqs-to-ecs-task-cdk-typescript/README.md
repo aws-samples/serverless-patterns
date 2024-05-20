@@ -1,4 +1,4 @@
-# Amazon SQS Integration With Amazon Elastic Container Service Task using Amazon EventBridge Pipes 
+# Amazon SQS integration With Amazon Elastic Container Service Task using Amazon EventBridge Pipes 
 
 This pattern demonstrates how to invoke an Amazon Elastic Container Service (ECS) Tasks based on selective messages from an Amazon SQS queue using Amazon EventBridge Pipes.
 
