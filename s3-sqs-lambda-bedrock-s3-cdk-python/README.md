@@ -1,4 +1,4 @@
-# Summarization: Using Amazon S3, Amazon SQS, AWS Lambda, and Amazon Bedrock\
+# GenAI summarization using Amazon S3, Amazon SQS, AWS Lambda, and Amazon Bedrock
 
 This pattern creates an Amazon S3 bucket that sends 'OBJECT_CREATED' events to an Amazon SQS queue. An AWS Lambda function receives the messages from the queue and invokes Amazon Bedrock to extract a summary and sentiment from the file. The result is stored in a different S3 bucket for consumption. This setup is particularly useful for obtaining a summary of conversations between customers and support associates.
 
