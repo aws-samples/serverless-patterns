@@ -1,5 +1,5 @@
 {
-  "title": "Conversation Summarization with Amazon S3, SQS, Bedrock, and AWS Lambda",
+  "title": "GenAI conversation summarization using Amazon S3, Amazon SQS, AWS Lambda, and Amazon Bedrock",
   "description": "Summarize a conversation transcription using Amazon S3 events, Amazon SQS, AWS Lambda and Amazon Bedrock. Ideal for conversation summaries.",
   "language": "Python",
   "level": "200",
