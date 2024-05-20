@@ -1,0 +1,159 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: AWS SAM template for creating an AWS Transfer Family SFTP Server.
+Parameters:
+  UserName:
+    Type: String
+    AllowedPattern: "^[a-zA-Z0-9_][a-zA-Z0-9_.@-]{1,98}[a-zA-Z0-9_@.-]$"
+    Description: Username for AWS Transfer Family service managed user
+  SSHPublicKey:
+    Type: String
+    AllowedPattern: ".+"
+    Description: SSH Key for AWS Transfer Family service managed user.
+
+
+Resources:
+# Create S3 bucket to store files uploaded to AWS Transfer Family server (simulated remote SFTP Server)
+  MySFTPServerS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}-sftp-server
+
+
+# Create Transfer Family server 
+  TransferServer:
+    Type: AWS::Transfer::Server
+    Properties:
+      EndpointType: PUBLIC
+      IdentityProviderType: SERVICE_MANAGED
+      LoggingRole:
+        Fn::GetAtt: TransferLoggingRole.Arn
+      SecurityPolicyName: TransferSecurityPolicy-2024-01
+
+
+
+# Create IAM role for Transfer Family CloudWatch logging  
+  TransferLoggingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: transfer.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-TransferLoggingPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+
+# Create an IAM role to allow Transfer Family to access S3
+  TransferS3AccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: transfer.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-TransferS3AccessPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetBucketLocation
+                  - s3:GetObjectTagging
+                  - s3:ListBucket
+                  - s3:*Object
+                  - s3:PutObjectTagging
+                Resource:
+                  - Fn::GetAtt: MySFTPServerS3Bucket.Arn
+                  - !Sub ${MySFTPServerS3Bucket.Arn}/*
+
+
+# Create Transfer Family Server User
+  TransferServerUser:
+    Type: AWS::Transfer::User
+    Properties:
+      Role:
+        Fn::GetAtt: TransferServerUserRole.Arn
+      ServerId:
+        Fn::GetAtt: TransferServer.ServerId
+      UserName: !Ref UserName
+      HomeDirectoryMappings:
+        - Entry: /
+          Target:
+            Fn::Sub: /${MySFTPServerS3Bucket}/${UserName}
+      HomeDirectoryType: LOGICAL
+      SshPublicKeys: 
+        - !Ref SSHPublicKey
+     
+
+#Create a IAM Role for Transfer Server User with access to their home directory
+  TransferServerUserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: transfer.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: TransferServerUserPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource:
+                  - Fn::GetAtt: MySFTPServerS3Bucket.Arn
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:DeleteObjectVersion
+                  - s3:GetObjectVersion
+                  - s3:GetObjectACL
+                  - s3:PutObjectACL
+                Resource:
+                  - Fn::Sub: ${MySFTPServerS3Bucket.Arn}/*
+
+Outputs:
+
+  TransferServerId:
+    Description: The ID of the Transfer Server
+    Value: !GetAtt TransferServer.ServerId
+
+  TransferServerEndpoint:
+    Description: The endpoint of the Transfer Server
+    Value: !Sub ${TransferServer.ServerId}.server.transfer.${AWS::Region}.amazonaws.com
+
+  TransferServerUser:
+    Description: The username of the Transfer Server User
+    Value: !Ref UserName
+
+  MySFTPServerS3Bucket:
+    Description: The name of the S3 Bucket
+    Value: !Ref MySFTPServerS3Bucket
+
+  TransferLoggingRoleArn:
+    Description: The name of the Transfer Logging Role
+    Value: !GetAtt TransferLoggingRole.Arn
