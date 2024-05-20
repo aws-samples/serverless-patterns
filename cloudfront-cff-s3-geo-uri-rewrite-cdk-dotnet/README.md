@@ -1,4 +1,4 @@
-# Amazon CloudFront Distribution and Function for geo-localized routing to Amazon S3
+# Amazon CloudFront Distribution and Function with URI Rewrite to S3
 
 This pattern shows how to create an Amazon CloudFront distribution with a CloudFront Function for routing to different geo-localized content in an S3 statically hosted website. Implemented in AWS CDK .NET.
 
