@@ -1,6 +1,6 @@
 {
-  "title": "API Gateway HTTP API to Step Functions",
-  "description": "Create an API Gateway HTTP APIs endpoint that starts a Step Functions synchronous Express Workflow.",
+  "title": "Amazon API Gateway HTTP API to AWS Step Functions Express Workflow",
+  "description": "Create an API Gateway HTTP API endpoint that starts a Step Functions synchronous Express Workflow.",
   "language": "Java",
   "level": "300",
   "framework": "CDK",
