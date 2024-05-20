@@ -1,4 +1,4 @@
-# AWS AppSync Subscription Enhanced Filtering
+# AWS AppSync subscription enhanced filtering
 
 This project contains a sample AWS CDK template for implementing an enhanced subscription filtering pattern for [AWS AppSync](https://aws.amazon.com/appsync/). Additionally, the project demonstrates using TypeScript for creating [AppSync JavaScript resolvers](https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-overview-js.html) so that developers can benefit from using the type definitions that are available in the [@aws-appsync/utils](https://www.npmjs.com/package/@aws-appsync/utils) module.
 
