@@ -1,6 +1,6 @@
-# Amazon API Gateway HTTP API with Cognito JWT and Lambda integration
+# Amazon API Gateway HTTP API with Cognito JWT and AWS Lambda integration
 
-This pattern create an Amazon Gateway API (v2) and two Lambda functions protected by JwtAuthorizer and Cognito for user management.
+This pattern creates an Amazon Gateway API (v2) and two Lambda functions protected by JwtAuthorizer and Cognito for user management.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-http-api-cognito-lambda-cdk](https://serverlessland.com/patterns/apigw-http-api-cognito-lambda-cdk)
 
