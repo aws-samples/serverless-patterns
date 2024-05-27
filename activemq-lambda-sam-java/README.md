@@ -59,7 +59,7 @@ Please refer to the architecture diagram below:
 
 Here's a breakdown of the steps:
 
-1. An **Amazon MQ**: ActiveMQ single-instance broker is provisioned. A test queue with name `MyTestQueue` is created. A message is pushed to the queue.
+1. **Amazon MQ**: An ActiveMQ single-instance broker is provisioned. A test queue with name `MyTestQueue` is created. A message is pushed to the queue.
 
 2. **AWS Lambda**: AWS Lambda has an event source mapping (ESM)  configured for `MyTestQueue` queue. The Lambda function is triggered by the new message on the Amazon MQ queue. The Lambda function processes the message and logs the decoded the message content. 
 
@@ -68,17 +68,17 @@ Here's a breakdown of the steps:
 
 1. Log into the ActiveMQ Web Console using the `username` and `password` provided at the time of deployment. The console URL is available in the`ActiveMQWebConsole` key of `sam deploy` output.
 
-2. Set the `Queue Name` field to `MyTestQueue` and click the `Create` button. The new queue should be added and shortly show in a table.
+2. Click on the `Queues` tab to open the list of queues.
 
-4. Click on the `Send To` link under `Operations` tab. 
+3. Click on the `Send To` link under `Operations` tab next to the `MyTestQueue` queue. 
 
-5. Enter a `Message Body` and click `Send` button.
+4. Enter a `Message Body` and click `Send` button.
 
-6. Execute the below command to tail logs of the AWS Lambda function. Please replace `MyMQMessageHandlerFunction` from the `sam deploy -g` output and also your region. 
+5. Execute the below command to tail logs of the AWS Lambda function. Please replace `MyMQMessageHandlerFunction` from the `sam deploy -g` output and also your region. 
    ```bash
    aws logs tail --follow /aws/lambda/{MyMQMessageHandlerFunction} --region {your-region}
    ```
-
+   
 6. Check the AWS Lambda console log. It should print the message from the Amazon MQ queue.
 
 7. Press `Ctrl + c` to stop tailing the logs.

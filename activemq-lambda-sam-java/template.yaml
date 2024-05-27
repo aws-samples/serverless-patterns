@@ -5,7 +5,7 @@ Description: Event driven Amazon MQ for ActiveMQ message processing using AWS La
 Globals:
   Function:
     Runtime: java21
-    MemorySize: 3008
+    MemorySize: 512
 
 Parameters:
   username:
@@ -83,7 +83,7 @@ Resources:
   # Create the Amazon MQ Broker with ActiveMQ Engine
   MyMQBroker:
     Type: AWS::AmazonMQ::Broker
-    Properties: 
+    Properties:
       AutoMinorVersionUpgrade: false
       BrokerName: myActiveMQBroker
       DeploymentMode: SINGLE_INSTANCE
@@ -112,7 +112,10 @@ Resources:
         - Version: '2012-10-17'
           Statement:
             - Effect: Allow
-              Resource: '*'
+              Resource:
+              - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:*/*
+              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:*/*
+              - !Sub arn:aws:mq:${AWS::Region}:${AWS::AccountId}::*/*
               Action:
               - mq:DescribeBroker
               - secretsmanager:GetSecretValue
@@ -144,7 +147,7 @@ Resources:
 Outputs:
   ActiveMQWebConsole:
     Description: The ActiveMQ web-console host
-    Value: !Sub 'https://${MyMQBroker}-1.mq.${AWS::Region}.amazonaws.com:8162'
+    Value: !Sub 'https://${MyMQBroker}-1.mq.${AWS::Region}.amazonaws.com:8162/admin/index.jsp'
   MyMQMessageHandlerFunction:
     Description: The name of the ActiveMQ message handler function
     Value: !Ref MyMQMessageHandlerFunction

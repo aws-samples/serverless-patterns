@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "An Amazon MQ for ActiveMQ single-instance brocker is provisioned. A test queue with name MyTestQueue is created. A message is pushed to the queue.",
+      "An Amazon MQ for ActiveMQ single-instance broker is provisioned. A test queue with name MyTestQueue is created. A message is pushed to the queue.",
       "AWS Lambda has an event source mapping configured for MyTestQueue queue. The Lambda function is triggered by the new message on the Amazon MQ queue. The Lambda function processes the message and logs the decoded the message content."
     ]
   },
