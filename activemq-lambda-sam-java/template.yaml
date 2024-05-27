@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: Event driven Amazon MQ ActiveMQ message processing using AWS Lambda (Java)
+Description: Event driven Amazon MQ for ActiveMQ message processing using AWS Lambda (Java)
 
 Globals:
   Function:
@@ -15,7 +15,7 @@ Parameters:
   password:
     Type: String
     AllowedPattern: "^(?=(.*\\p{Print}){4,})(?!.*[ ,:=])[\\p{Print}]{12,}$"
-    Description: Password for accessing ActiveMQ (min 12 char long)
+    Description: Password for accessing ActiveMQ (must be at least 12 characters long)
 
 Resources:
 

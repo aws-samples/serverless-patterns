@@ -1,14 +1,14 @@
 {
-  "title": "Event driven Amazon MQ ActiveMQ message processing using AWS Lambda (Java)",
-  "description": "This sample project demonstrates event driven message processing from an Amazon MQ ActiveMQ queue using an AWS Lambda function written in Java.",
+  "title": "Event driven Amazon MQ for ActiveMQ message processing using AWS Lambda",
+  "description": "This sample project demonstrates event driven message processing from an Amazon MQ for ActiveMQ queue using an AWS Lambda function written in Java.",
   "language": "Java",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Amazon MQ ActiveMQ single-instance brocker is provisioned. A test queue with name MyTestQueue is created. A message is pushed to the queue.",
-      "AWS Lambda has ESM mapping configured for MyTestQueue queue. The Lambda function is trigged by the new message on the Amazon MQ queue. The Lambda function processes the message and logs the decoded the message content."
+      "An Amazon MQ for ActiveMQ single-instance brocker is provisioned. A test queue with name MyTestQueue is created. A message is pushed to the queue.",
+      "AWS Lambda has an event source mapping configured for MyTestQueue queue. The Lambda function is triggered by the new message on the Amazon MQ queue. The Lambda function processes the message and logs the decoded the message content."
     ]
   },
   "gitHub": {

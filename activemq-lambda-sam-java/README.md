@@ -59,9 +59,9 @@ Please refer to the architecture diagram below:
 
 Here's a breakdown of the steps:
 
-1. **Amazon MQ**: ActiveMQ single-instance brocker is provisioned. A test queue with name `MyTestQueue` is created. A message is pushed to the queue.
+1. An **Amazon MQ**: ActiveMQ single-instance broker is provisioned. A test queue with name `MyTestQueue` is created. A message is pushed to the queue.
 
-2. **AWS Lambda**: AWS Lambda has ESM mapping configured for `MyTestQueue` queue. The Lambda function is trigged by the new message on the Amazon MQ queue. The Lambda function processes the message and logs the decoded the message content. 
+2. **AWS Lambda**: AWS Lambda has an event source mapping (ESM)  configured for `MyTestQueue` queue. The Lambda function is triggered by the new message on the Amazon MQ queue. The Lambda function processes the message and logs the decoded the message content. 
 
 
 ## Testing
@@ -81,7 +81,7 @@ Here's a breakdown of the steps:
 
 6. Check the AWS Lambda console log. It should print the message from the Amazon MQ queue.
 
-7. Press `Ctrl + c` to come out of the trail.
+7. Press `Ctrl + c` to stop tailing the logs.
 
 
 ## Cleanup
