@@ -1,5 +1,5 @@
 {
-  "title": "AWS S3 bucket replication",
+  "title": "Amazon S3 bucket replication",
   "description": "This pattern sets up replication between S3 buckets.",
   "language": "Python",
   "level": "200",

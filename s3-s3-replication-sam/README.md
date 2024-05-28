@@ -1,4 +1,4 @@
-# AWS S3 Bucket Replication
+# Amazon S3 Bucket Replication
 
 This pattern demonstrates how to replicate S3 bucket objects to multiple S3 buckets. Implemented with SAM.
 
