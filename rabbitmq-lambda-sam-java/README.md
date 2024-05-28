@@ -59,9 +59,9 @@ Please refer to the architecture diagram below:
 
 Here's a breakdown of the steps:
 
-1. **Amazon MQ**: RabbitMQ single-instance brocker is provisioned. A test queue with name `MyTestQueue` is created. A message is pushed to the queue.
+1. **Amazon MQ**: A RabbitMQ single-instance broker is provisioned. A test queue with name `MyTestQueue` is created. A message is pushed to the queue.
 
-2. **AWS Lambda**: AWS Lambda has ESM mapping configured for `MyTestQueue` queue. The Lambda function is trigged by the new message on the Amazon MQ queue. The Lambda function processes the message and logs the decoded the message content. 
+2. **AWS Lambda**: An AWS Lambda function with an event source mapping (ESM) configured for `MyTestQueue` queue is created. The Lambda function is triggered when a new message is added to the queue. The Lambda function processes the message and logs the decoded the message content. 
 
 
 ## Testing
@@ -76,14 +76,14 @@ Here's a breakdown of the steps:
 
 5. Enter a `Payload` and click `Publish message` button.
 
-6. Execute the below command to tail logs of the AWS Lambda function. Please replace `MyMQMessageHandlerFunction` from the `sam deploy -g` output and also your region. 
+6. Execute the below command to tail logs of the AWS Lambda function. Replace `MyMQMessageHandlerFunction` with the function name from output of the `sam deploy -g` command. Replace `your-region` with the region where you are deploying this pattern. 
    ```bash
    aws logs tail --follow /aws/lambda/{MyMQMessageHandlerFunction} --region {your-region}
    ```
 
-6. Check the AWS Lambda console log. It should print the message from the Amazon MQ queue.
+7. Check the AWS Lambda console log. It should print the message from the Amazon MQ queue.
 
-7. Press `Ctrl + c` to come out of the trail.
+8. Press `Ctrl + c` to stop tailing the logs.
 
 
 ## Cleanup
