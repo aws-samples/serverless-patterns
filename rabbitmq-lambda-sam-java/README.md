@@ -1,6 +1,6 @@
-# Event driven Amazon MQ RabbitMQ message processing using AWS Lambda (Java) 
+# Event driven Amazon MQ for RabbitMQ message processing using AWS Lambda (Java) 
 
-This sample project demonstrates event driven message processing from an Amazon MQ RabbitMQ queue using an AWS Lambda function written in Java. 
+This sample project demonstrates event driven message processing from an Amazon MQ for RabbitMQ queue using an AWS Lambda function written in Java. 
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/rabbitmq-lambda-sam-java
 
