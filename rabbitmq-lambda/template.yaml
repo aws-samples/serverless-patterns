@@ -23,7 +23,7 @@ Resources:
       CodeUri: src/
       Timeout: 3
       Handler: app.lambda_handler
-      Runtime: python3.7
+      Runtime: python3.12
       Policies:
         - Version: '2012-10-17'
           Statement:
