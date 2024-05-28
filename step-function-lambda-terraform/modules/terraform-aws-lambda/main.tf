@@ -45,7 +45,7 @@ resource "aws_lambda_function" "aws_lambda_example" {
   role          = aws_iam_role.example_lambda_role.arn
   handler       = local.handler_name
 
-  runtime = "python3.7"
+  runtime = "python3.12"
 
   environment {
     variables = {
