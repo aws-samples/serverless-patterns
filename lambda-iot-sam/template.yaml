@@ -2,7 +2,7 @@ Transform: AWS::Serverless-2016-10-31
 
 Globals:
   Function:
-    Runtime: nodejs16.x
+    Runtime: nodejs20.x
     Architectures: ["arm64"]
     Timeout: 29
     MemorySize: 1024
