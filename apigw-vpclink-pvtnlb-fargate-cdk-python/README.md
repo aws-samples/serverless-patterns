@@ -1,4 +1,4 @@
-# API Gateway to Fargate Cluster through VPC Link and Network load balancer\
+# Amazon API Gateway to AWS Fargate via VPC Link and Network load balancer
 
 This pattern helps connect a public API Gateway endpoint to a private Network Load Balancer alongside an ECS Fargate cluster. It keeps the private subnet resources safe from exposure and only allows access through a VPC Link, ensuring security. The pattern will create API Gateway, VPC Link, private Network load balancer, VPC along with a private subnet and a ECS fargate cluster.
 
