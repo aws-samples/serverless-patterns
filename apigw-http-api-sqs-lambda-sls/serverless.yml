@@ -8,7 +8,7 @@ provider:
   name: aws
 
   # common configuration for all Lambda functions in this stack
-  runtime: nodejs14.x
+  runtime: nodejs16.x
   architecture: arm64 # use Graviton for running all Lambda functions
 
   # use --region option value or the default - us-east-1

@@ -6,7 +6,7 @@ Description: An Amazon API Gateway HTTP API and an AWS Lambda function. (uksb-1t
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: nodejs14.x
+    Runtime: nodejs16.x
     MemorySize: 128
     Timeout: 15
 

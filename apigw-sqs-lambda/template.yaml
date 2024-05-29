@@ -38,7 +38,7 @@ Resources:
       Description: Lambda to be invoked by the SQS Queue
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
       Timeout: 3
       MemorySize: 128
       Events:
