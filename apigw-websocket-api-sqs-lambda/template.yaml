@@ -86,7 +86,8 @@ Resources:
           ApiGatewayEndpoint:
             Fn::Join:
               - ""
-              - - Ref: APIGWWebsocketSQSLambda
+              - - "https://"
+                - Ref: APIGWWebsocketSQSLambda
                 - .execute-api.
                 - Ref: AWS::Region
                 - "."

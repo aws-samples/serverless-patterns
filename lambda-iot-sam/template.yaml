@@ -84,7 +84,11 @@ Resources:
       Handler: handler.handler
       Environment:
         Variables:
-          IOT_DATA_ENDPOINT: !GetAtt IotEndpoint.IotEndpointAddress
+          IOT_DATA_ENDPOINT:
+            Fn::Join:
+              - ""
+              - - "https://"
+                - !GetAtt IotEndpoint.IotEndpointAddress
           IOT_TOPIC: !Ref IOTRealtime
       Policies:
         - Statement:
