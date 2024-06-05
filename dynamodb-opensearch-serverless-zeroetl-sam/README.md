@@ -43,7 +43,7 @@ DynamoDB table item-level modifications (inserts, updates, and deletes) are capt
 
 ## Testing
 
-1. Edit the data access policy (`DataAccessPolicyEditURL` from the stack outputs). In the **Select principals** section, add an [IAM role with permissions](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ac.html) to access the OpenSearch dashboard. Make sure you save the **Edit access policy** section, too! Wait 1 minute for the policy update to take effect.
+1. Edit the data access policy (`DataAccessPolicyEditURL` from the stack outputs). In the **Select principals** section, add an [IAM role with permissions](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ac.html) to access the OpenSearch dashboard. Make sure you save the **Edit access policy** section, too!
 
 1. Insert an item into the DynamoDB table (`InsertItemURL` from the stack outputs). Choose a random value for the uuid. You can insert additional attributes with random values if desired.
 
