@@ -180,14 +180,27 @@ Resources:
               dynamodb:
                 acknowledgments: true
                 tables:
+                  # REQUIRED: Supply the DynamoDB table ARN and whether export or stream processing is needed, or both
                   - table_arn: "${DynamoTable.Arn}"
+                    # Remove the stream block if only export is needed
                     stream:
                       start_position: "LATEST"
+                    # Remove the export block if only stream is needed
+                    export:
+                      # REQUIRED for export: Specify the name of an existing S3 bucket for DynamoDB to write export data files to
+                      s3_bucket: "${Bucket}"
+                      # Provide the region of the bucket.
+                      s3_region: "${AWS::Region}"
+                      # Optionally set the name of a prefix that DynamoDB export data files are written to in the bucket. This role should have a trust relationship with osis-pipelines.amazonaws.com
+                      s3_prefix: "ddb-to-opensearch-export/"
                 aws:
+                  # REQUIRED: Provide the role to assume that has the necessary permissions to DynamoDB, OpenSearch, and S3.
                   sts_role_arn: "${PipelineRole.Arn}"
+                  # Provide the region to use for aws credentials
                   region: "${AWS::Region}"
             sink:
               - opensearch:
+                  # REQUIRED: Provide an AWS OpenSearch endpoint
                   hosts:
                     [ 
                       "${OpenSearchServerless.CollectionEndpoint}"
@@ -199,14 +212,22 @@ Resources:
                   document_version: "${!getMetadata(\"document_version\")}"
                   document_version_type: "external"
                   aws:
+                    # REQUIRED: Provide a Role ARN with access to the domain or collection. This role should have a trust relationship with osis-pipelines.amazonaws.com
                     sts_role_arn: "${PipelineRole.Arn}"
+                    # Provide the region of the domain or collection.
                     region: "${AWS::Region}"
+                    # Enable the 'serverless' flag if the sink is an Amazon OpenSearch Serverless collection
                     serverless: true
+                  # Optional: Enable the S3 DLQ to capture any failed requests in an S3 bucket. Delete this entire block if you don't want a DLQ.. This is recommended as a best practice for all pipelines.
                   dlq:
                     s3:
+                      # Provide an S3 bucket
                       bucket: "${Bucket}"
+                      # Provide a key path prefix for the failed requests
                       key_path_prefix: "dynamopipeline/dlq"
+                      # Provide the region of the bucket.
                       region: "${AWS::Region}"
+                      # Provide a Role ARN with access to the bucket. This role should have a trust relationship with osis-pipelines.amazonaws.com
                       sts_role_arn: "${PipelineRole.Arn}"
 
 Outputs:
