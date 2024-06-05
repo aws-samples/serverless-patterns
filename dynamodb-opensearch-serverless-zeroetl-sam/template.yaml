@@ -183,10 +183,6 @@ Resources:
                   - table_arn: "${DynamoTable.Arn}"
                     stream:
                       start_position: "LATEST"
-                    export:
-                      s3_bucket: "${Bucket}"
-                      s3_region: "${AWS::Region}"
-                      s3_prefix: "ddb-to-opensearch-export/"
                 aws:
                   sts_role_arn: "${PipelineRole.Arn}"
                   region: "${AWS::Region}"
