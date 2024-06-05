@@ -1,0 +1,61 @@
+{
+  "title": "Stripe EvenBridge SaaS Integration to AWS Lambda",
+  "description": "Stripe Failed Payment Event Monitoring and Archiving Solution using AWS EventBridge and CDK",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project sets up an integration between Stripe, a popular online payment processing platform, and AWS services to effectively manage and respond to failed payment events. The core of the solution is a CDK (Cloud Development Kit) application that provisions the necessary infrastructure, including an EventBridge event bus, CloudWatch log groups, DynamoDB table and a Lambda function. The CDK application establishes an EventBridge rule that specifically captures payment_failed events from the Stripe Partner Event Source and directs them to the Lambda function. The Lambda function then extracts the relevant details from the Stripe event, such as the payment intent ID, customer email, payment method, and error message, and stores this information in a DynamoDB table for further analysis or processing. This pattern allows the system to proactively identify and respond to failed payment attempts, enabling businesses to take appropriate actions, such as notifying customers, retrying payments, or updating customer records. By leveraging the power of AWS services and the flexibility of the CDK framework, this solution provides a scalable and efficient way to integrate Stripe's payment processing capabilities with a robust event-driven architecture."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stripe-eventbridge-lambda",
+      "templateURL": "serverless-patterns/stripe-eventbridge-lambda",
+      "projectFolder": "stripe-eventbridge-lambda",
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge SaaS Integrations",
+        "link": "https://aws.amazon.com/eventbridge/integrations/"
+      },
+      {
+        "text": "AmazonEventBridge SaaS Integrations Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html"
+      },
+      {
+        "text": "Stripe's Amazon EventBridge SaaS Integration",
+        "link": "https://docs.stripe.com/event-destinations/eventbridge"
+      }
+      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mohamed Mohamud",
+      "image": "https://media.licdn.com/dms/image/C5603AQF0k1SsVlO5GQ/profile-displayphoto-shrink_400_400/0/1634687266785?e=1721260800&v=beta&t=W5HaXkh4Yzf3MjbYfNd29s8qR-pvDtKaDR0e3tGa-r8",
+      "bio": "Partner Solutions Architect @ AWS. Data Analytics + GEN AI Guru.",
+      "linkedin": "mohamed-mohamud-80370a149"
+    }
+  ]
+}

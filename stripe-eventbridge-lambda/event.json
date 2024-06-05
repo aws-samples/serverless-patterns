@@ -1,0 +1,167 @@
+{
+  "version": "0",
+  "id": "fbf2573e-ed83-d8c4-9d68-8cf7eee6aec9",
+  "source": "aws.partner/stripe.com",
+  "detail-type": "charge.failed",
+  "account": "12345678921",
+  "time": "2022-08-08T19:58:17Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "id": "xxx_3LUc5bBvzWSP8ADK1CqxxxFe",
+    "object": "event",
+    "api_version": "2020-08-27; orders_beta=v4",
+    "created": 1659988697,
+    "data": {
+      "object": {
+        "id": "ch_3LUc5bxxxWSP8ADK1aTUzxxx",
+        "object": "charge",
+        "amount": 100,
+        "amount_captured": 100,
+        "amount_refunded": 0,
+        "application": null,
+        "application_fee": null,
+        "application_fee_amount": null,
+        "balance_transaction": "xxx_xxxxxxxx",
+        "billing_details": {
+          "address": {
+            "city": null,
+            "country": null,
+            "line1": null,
+            "line2": null,
+            "postal_code": "12312",
+            "state": null
+          },
+          "email": null,
+          "name": null,
+          "phone": null
+        },
+        "calculated_statement_descriptor": "TESTING",
+        "captured": true,
+        "created": 1659988696,
+        "currency": "cad",
+        "customer": null,
+        "description": "Testing Webhook",
+        "destination": null,
+        "dispute": null,
+        "disputed": false,
+        "failure_balance_transaction": null,
+        "failure_code": null,
+        "failure_message": null,
+        "fraud_details": {},
+        "invoice": null,
+        "livemode": false,
+        "metadata": {},
+        "on_behalf_of": null,
+        "order": null,
+        "outcome": {
+          "network_status": "approved_by_network",
+          "reason": null,
+          "risk_level": "normal",
+          "risk_score": 22,
+          "seller_message": "Payment complete",
+          "type": "authorized"
+        },
+        "paid": true,
+        "payment_intent": "pi_3LUc5bBvzWSP8ADK1ukTWtYJ",
+        "payment_method": "src_1LUc5bBvzWSP8ADKM2UrIrI5",
+        "payment_method_details": {
+          "card": {
+            "brand": "mastercard",
+            "checks": {
+              "address_line1_check": null,
+              "address_postal_code_check": "pass",
+              "cvc_check": "pass"
+            },
+            "country": "US",
+            "exp_month": 4,
+            "exp_year": 2025,
+            "fingerprint": "xxxxxxxxx",
+            "funding": "credit",
+            "installments": null,
+            "last4": "4444",
+            "mandate": null,
+            "network": "mastercard",
+            "three_d_secure": null,
+            "wallet": null
+          },
+          "type": "card"
+        },
+        "receipt_email": null,
+        "receipt_number": null,
+        "receipt_url": "https://pay.stripe.com/receipts/xxxxxxxx/xxxxxxxx/xxxxxx",
+        "refunded": false,
+        "refunds": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "total_count": 0,
+          "url": "/v1/charges/xxxxxxxx/refunds"
+        },
+        "review": null,
+        "shipping": null,
+        "source": {
+          "id": "src_xxxxxxx",
+          "object": "source",
+          "amount": null,
+          "card": {
+            "exp_month": 4,
+            "exp_year": 2025,
+            "last4": "1111",
+            "country": "US",
+            "brand": "MasterCard",
+            "address_zip_check": "pass",
+            "cvc_check": "pass",
+            "funding": "credit",
+            "fingerprint": "xxxxxxxxx",
+            "three_d_secure": "optional",
+            "name": null,
+            "address_line1_check": null,
+            "tokenization_method": null,
+            "dynamic_last4": null
+          },
+          "client_secret": "src_client_secret_xxxxxxxxx",
+          "created": 1659988696,
+          "currency": null,
+          "flow": "none",
+          "livemode": false,
+          "metadata": {},
+          "owner": {
+            "address": {
+              "city": null,
+              "country": null,
+              "line1": null,
+              "line2": null,
+              "postal_code": "11111",
+              "state": null
+            },
+            "email": null,
+            "name": null,
+            "phone": null,
+            "verified_address": null,
+            "verified_email": null,
+            "verified_name": null,
+            "verified_phone": null
+          },
+          "statement_descriptor": null,
+          "status": "consumed",
+          "type": "card",
+          "usage": "reusable"
+        },
+        "source_transfer": null,
+        "statement_descriptor": "Testing",
+        "statement_descriptor_suffix": null,
+        "status": "succeeded",
+        "transfer_data": null,
+        "transfer_group": null
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 3,
+    "request": {
+      "id": "req_xxxxxxxxx",
+      "idempotency_key": "xxxxxx-e095-4b13-a5bc-xxxxxxxxx"
+    },
+    "type": "charge.succeeded"
+  }
+}
