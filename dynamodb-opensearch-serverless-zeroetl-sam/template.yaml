@@ -4,6 +4,9 @@ Transform: AWS::Serverless-2016-10-31
 Description: Serverless patterns - DynamoDB to OpenSearch Serverless with Zero-ETL. (tag:dynamodb-opensearch-serverless-zeroetl-sam)
 
 Parameters:
+    AccessARN:
+      Description: ARN of the role or user used to access console for this deployment.
+      Type: String
     DeploymentName:
       Description: Unique value used to name resources.
       Type: String
@@ -149,7 +152,7 @@ Resources:
       Policy: !Sub >-
         [{"Description":"Access for Admin","Rules":[{"ResourceType":"index","Resource":["index/${DeploymentName}/dynamo-index"],"Permission":["aoss:*"]},
         {"ResourceType":"collection","Resource":["collection/${DeploymentName}"],"Permission":["aoss:*"]}],
-        "Principal":["arn:aws:iam::${AWS::AccountId}:role/${DeploymentName}-pipeline"]}]
+        "Principal":["${AccessARN}","arn:aws:iam::${AWS::AccountId}:role/${DeploymentName}-pipeline"]}]
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html
   CloudWatchLogGroup:

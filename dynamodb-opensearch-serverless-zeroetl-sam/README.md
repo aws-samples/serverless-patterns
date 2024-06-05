@@ -27,9 +27,13 @@ Important: this application uses various AWS services and there are costs associ
     ```
     sam deploy --guided
     ```
+
+1. Identify the ARN of the role (or user) being used to access console for this deployment. If it does not have the `AdministratorAccess` AWS managed policy (or a similarly permissive equivalent), attach the `AmazonOpenSearchServiceFullAccess` AWS managed policy. Access for allowed principals can be edited later via the `DataAccessPolicyEditURL` from the stack outputs.
+
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
+    * Enter the ARN identified in the previous step in the AccessARN parameter
     * Enter the DeploymentName parameter
     * Allow SAM CLI to create IAM roles with the required permissions.
 
@@ -42,8 +46,6 @@ Important: this application uses various AWS services and there are costs associ
 DynamoDB table item-level modifications (inserts, updates, and deletes) are captured with a DynamoDB Stream. Using the DynamoDB Stream as its source, an OpenSearch Ingestion pipeline sinks the data to an OpenSearch Serverless collection.
 
 ## Testing
-
-1. Edit the data access policy (`DataAccessPolicyEditURL` from the stack outputs). In the **Select principals** section, add an [IAM role with permissions](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ac.html) to access the OpenSearch dashboard. Make sure you save the **Edit access policy** section, too!
 
 1. Insert an item into the DynamoDB table (`InsertItemURL` from the stack outputs). Choose a random value for the uuid. You can insert additional attributes with random values if desired.
 
