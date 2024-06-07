@@ -12,6 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/home.html) (AWS CDK) installed
+* [Python, pip, virtualenv](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html) installed
 
 ## Deployment Instructions
 
@@ -23,38 +24,64 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd s3-eventbridge-glue
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. Create a virtual environment:
     ```
-    sam deploy --guided
+    python3 -m venv .venv
     ```
-1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
-
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+1. Activate the virtual environment
+   ```
+   source .venv/bin/activate
+   ```
+   For a Windows platform, activate the virtualenv like this:
+   ```
+   .venv\Scripts\activate.bat
+1. Install the Python required dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+6. Review the CloudFormation template the cdk generates for you stack using the following AWS CDK CLI command:
+   ```
+   cdk synth
+   ```
+7. Run the command below to bootstrap your account CDK needs it to deploy
+    ```
+    cdk bootstrap
+    ```
+8. From the command line, use CDK to deploy the AWS resources for the pattern. You'll be prompted to approve security related changes during the deployment.
+    ```
+    cdk deploy
+    ```
 
 ## How it works
 
-Explain how the service interaction works.
+When you upload a .csv file to the Input S3 bucket, it matches with an Amazon EventBridge rule that triggers a State Machine. The State Machine is composed of two steps:
+
+1. Starts a AWS Glue Crawler to crawl the input bucket. This allows you to have the raw data (before transformation) inside the Data Catalog
+2. Start a AWS Glue ETL Job, that runs a simple transformation job and drops empty columns in the dataset
+
+The processed/transformed data is then added to the Data Catalog and to an S3 bucket to allow for further processing.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+1. Navigate to the S3 bucket containing 'input-bucket'
+2. Upload a .csv file to the bucket. A [sample file](./sample_data/loyalty_dataset.csv) can be found in this pattern.
+3. Wait for the State Machine to complete and you should be able to see 2 tables under the Glue Data Catalog, one containing the raw and the other the processed data.
 
 ## Cleanup
  
 1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    cdk destroy
     ```
+
+2. Confirm the stack has been deleted. Login to the AWS console and navigate to the AWS Cloudformation service page "CdkServerlessInfraStack" is deleted or run the below 
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'S3LambdaBedrockCdkPythonStack')].StackStatus"
+    ```
+
+You should expect to see a message confirming `DELETE_COMPLETE`.
+
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
