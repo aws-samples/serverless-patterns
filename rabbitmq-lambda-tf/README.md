@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. The command responds with the ARN of your new secret. 
 
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+1. Create a new directory, navigate to that directory in a terminal and clone the repository:
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
