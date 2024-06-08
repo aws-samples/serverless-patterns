@@ -1,51 +1,78 @@
-# AWS Service 1 to AWS Service 2
+# AWS Lambda to Amazon Kendra to Amazon Bedrock
 
-This pattern << explain usage >>
+This pattern contains a sample AWS SAM stack that utilizes an AWS Lambda function to retrieve documents from an Amazon Kendra index and pass it to Amazon Bedrock for a generated response.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+The pattern includes usage of Amazon Kendra Web Crawler data source connector. When selecting websites to index, you must adhere to the Amazon Acceptable Use Policy and all other Amazon terms. Remember that you must only use Amazon Kendra Web Crawler to index your own web pages, or web pages that you have authorization to index. To learn how to stop Amazon Kendra Web Crawler from indexing your website(s), please see Configuring the robots.txt file for Amazon Kendra Web Crawler. **Note:** Abusing Amazon Kendra Web Crawler to aggressively crawl websites or web pages you don't own is not considered acceptable use.
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
-
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Request Amazon Bedrock Model Access for Anthropic Claude models on Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)
 
 ## Deployment Instructions
-
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
+    ```
     git clone https://github.com/aws-samples/serverless-patterns
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd lambda-kendra-bedrock
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
     ```
 1. During the prompts:
+
     * Enter a stack name
     * Enter the desired AWS Region
+    * Enter one of the supported model IDs for Anthropic Claude on Bedrock from: 'anthropic.claude-instant-v1', 'anthropic.claude-3-sonnet-20240229-v1:0', 'anthropic.claude-3-haiku-20240307-v1:0', 'anthropic.claude-v2'
+    * Enter seed URLs for the Amazon Kendra web crawler (Upto 10 only) as a CommaDelimitedList. Eg., [https://example1.com, https://example2.com]
+    * Enter one of the supported web crawler modes: HOST_ONLY, SUBDOMAINS, EVERYTHING
+    * Enter Amazon Kendra edition: DEVELOPER_EDITION, ENTERPRISE_EDITION
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.*
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-## How it works
+# How it works
+Please refer to the architecture diagram below:
 
-Explain how the service interaction works.
+![End to End Architecture](images/architecture.png)
+
+Here's a breakdown of the steps:
+
+**AWS Lambda:** Two AWS Lambda functions are created. DataSourceSync Lambda function crawls and indexes the content. InvokeBedrockLambda AWS Lambda function that invokes the specified model by passing the retrieved content from Amazon Kendra as context to the generative AI model.
+
+**Amazon Kendra:** An Amazon Kendra index is created with a web crawler data source. When a the InvokeBedrockLambda function is called, documents are retrieved from the Amazon Kendra index.
+
+**Amazon Bedrock:** Documents retrieved from the Amazon Kendra index are sent to Amazon Bedrock which responds with a generated response.
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+CLI Lambda invoke with test event:
+
+```bash
+aws lambda invoke --function-name INVOKE_LAMBDA_FUNCTION_ARN --payload '{"question": "Value" }' output.txt
+```
+
+The output.txt will contain the response generated by Amazon Bedrock.
+
+Example JSON Lambda test event:
+
+```
+{
+    "question": "Value"
+}
+```
 
 ## Cleanup
- 
+
 1. Delete the stack
     ```bash
     aws cloudformation delete-stack --stack-name STACK_NAME
