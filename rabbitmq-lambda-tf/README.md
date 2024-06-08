@@ -1,6 +1,6 @@
 # Amazon MQ for RabbitMQ to AWS Lambda
 
-This pattern deploys a Lambda function, a RabbitMQ queue and the IAM permissions required to run the application. RabbitMQ invokes the Lambda function when new messages are available.
+This pattern deploys a Lambda function, an Amazon MQ for RabbitMQ queue and the IAM permissions required to run the application. RabbitMQ invokes the Lambda function when new messages are available.
 
 Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/rabbitmq-lambda-tf](https://serverlessland.com/patterns/rabbitmq-lambda-tf)
 
