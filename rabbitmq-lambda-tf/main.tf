@@ -1,15 +1,12 @@
 provider "aws" {
   region = "us-east-1" # Replace with your desired AWS region
 }
-
 data "aws_secretsmanager_secret" "mq_access" {
   name = "MQaccess"
 }
-
 data "aws_secretsmanager_secret_version" "mq_access_version" {
   secret_id = data.aws_secretsmanager_secret.mq_access.id
 }
-
 resource "aws_mq_broker" "mq_broker" {
   broker_name           = "myQueue"
   engine_type           = "RabbitMQ"
@@ -24,7 +21,6 @@ resource "aws_mq_broker" "mq_broker" {
     password = jsondecode(data.aws_secretsmanager_secret_version.mq_access_version.secret_string)["password"]
   }
 }
-
 resource "aws_lambda_function" "mq_consumer" {
   filename      = "src/app.zip"
   function_name = "MQConsumer"
@@ -32,19 +28,16 @@ resource "aws_lambda_function" "mq_consumer" {
   handler       = "app.lambda_handler"
   runtime       = "python3.12"
   timeout       = 3
-  
   environment {
     variables = {
       MQ_BROKER_ARN = aws_mq_broker.mq_broker.arn
     }
-  }
-  
+  } 
   # Policies
   depends_on = [
     aws_iam_role_policy.mq_consumer_policy
   ]
 }
-
 resource "aws_iam_role" "lambda_exec" {
   name = "mq_consumer_role"
   
@@ -61,11 +54,9 @@ resource "aws_iam_role" "lambda_exec" {
     ]
   })
 }
-
 resource "aws_iam_role_policy" "mq_consumer_policy" {
   name   = "mq_consumer_policy"
-  role   = aws_iam_role.lambda_exec.id
-  
+  role   = aws_iam_role.lambda_exec.id  
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -73,25 +64,26 @@ resource "aws_iam_role_policy" "mq_consumer_policy" {
         Effect   = "Allow",
         Action   = [
           "mq:DescribeBroker",
-          "secretsmanager:GetSecretValue",
-          "ec2:CreateNetworkInterface",
-          "ec2:DescribeNetworkInterfaces",
-          "ec2:DescribeVpcs",
-          "ec2:DeleteNetworkInterface",
-          "ec2:DescribeSubnets",
-          "ec2:DescribeSecurityGroups",
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        Resource = "*"
+        Resource = aws_mq_broker.mq_broker.arn
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
+          "secretsmanager:GetSecretValue"
+        ],
+        Resource = data.aws_secretsmanager_secret.mq_access.arn
       }
     ]
   })
 }
-
-
-
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role       = aws_iam_role.lambda_exec.name
+}
 # Lambda Event Source Mapping
 resource "aws_lambda_event_source_mapping" "mq_event_source_mapping" {
   event_source_arn = aws_mq_broker.mq_broker.arn
@@ -102,15 +94,10 @@ resource "aws_lambda_event_source_mapping" "mq_event_source_mapping" {
   }
   queues = ["myQueue"]
 }
-
-
-
-
 # Output resources
 output "mq_broker_arn" {
   value = aws_mq_broker.mq_broker.arn
 }
-
 output "lambda_function_arn" {
   value = aws_lambda_function.mq_consumer.arn
 }
