@@ -65,7 +65,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd rabbitmq-lambda-tf
     ```
-1. Delete all created resources by terraform
+1. Delete all created resources by Terraform
     ```bash
     terraform destroy
     ```
