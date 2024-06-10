@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Automatic Data Transformation and Catalog with Amazon S3 notifications and AWS Step functions
 
 This pattern creates a State Machine triggered by an S3 notification. The state machine triggers a glue crawler and a glue ETL job to transform and catalog csv data.
 
@@ -63,9 +63,9 @@ The processed/transformed data is then added to the Data Catalog and to an S3 bu
 
 ## Testing
 
-1. Navigate to the S3 bucket containing 'input-bucket'
+1. Navigate to the S3 bucket containing 'input-bucket' in the name
 2. Upload a .csv file to the bucket. A [sample file](./sample_data/loyalty_dataset.csv) can be found in this pattern.
-3. Wait for the State Machine to complete and you should be able to see 2 tables under the Glue Data Catalog, one containing the raw and the other the processed data.
+3. Wait for the AWS Step Functions State Machine to complete and you should be able to see 2 tables under the Glue Data Catalog, one containing the raw and the other the processed data.
 
 ## Cleanup
  
