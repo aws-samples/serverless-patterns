@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "@aws-sdk/client-sfn": "^3.449.0"
+    "@aws-sdk/client-sfn": "^3.449.0",
+    "aws-cdk": "^2.144.0",
+    "aws-cdk-lib": "^2.144.0"
   }
 }
