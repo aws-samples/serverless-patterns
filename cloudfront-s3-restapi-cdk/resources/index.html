@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Display JSON Data from API</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        .container {
+            margin: 20px;
+        }
+        .item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .item-title {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="jsonContainer"></div>
+
+    <script>
+        url = 'https://{{ webappDomainName }}/search/titles/results/?terms=oakland&format=json&page=5'
+        $(document).ready(function() {
+            function fetchAndDisplayData() {
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function(data) {
+                        var container = $('#jsonContainer');
+                        data.items.forEach(function(item) {
+                            var itemHtml = `
+                                <div class="item">
+                                    <div class="item-title">${item.title}</div>
+                                    <div><strong>Place of Publication:</strong> ${item.place_of_publication}</div>
+                                    <div><strong>Publisher:</strong> ${item.publisher}</div>
+                                    <div><strong>Start Year:</strong> ${item.start_year}</div>
+                                    <div><strong>End Year:</strong> ${item.end_year}</div>
+                                    <div><strong>Frequency:</strong> ${item.frequency}</div>
+                                    <div><strong>Language:</strong> ${item.language.join(', ')}</div>
+                                    <div><strong>URL:</strong> <a href="${item.url}" target="_blank">${item.url}</a></div>
+                                </div>
+                            `;
+                            container.append(itemHtml);
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error fetching data:', error);
+                    }
+                });
+            }
+
+            fetchAndDisplayData();
+        });
+    </script>
+</body>
+</html>
