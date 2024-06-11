@@ -23,6 +23,7 @@
   "dependencies": {
     "@bref.sh/constructs": "^1.0.2",
     "constructs": "^10.0.0",
+    "rimraf": "^5.0.7",
     "source-map-support": "^0.5.16"
   }
 }

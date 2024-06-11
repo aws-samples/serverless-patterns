@@ -5,6 +5,7 @@ import { packagePhpCode, PhpFunction } from "@bref.sh/constructs";
 import { FunctionUrlAuthType, LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 
 export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -27,14 +28,23 @@ export class CdkStack extends Stack {
     //   parameterName: `/${stackPrefix.toLowerCase()}/ssm/secure-string/params`,
     // });
 
+    const templatedSecret = new Secret(this, 'TemplatedSecret', {
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({ username: 'postgres' }),
+        generateStringKey: 'password',
+        excludeCharacters: '/@"',
+      },
+    });
+
     // The param path that will be used to retrieve value by the lambda
     const lambdaEnvironment = {
       THE_SSM_PARAM_PATH: paramTheSsmParam.parameterName,
       // AMADEUS_API_SECRET_PATH: paramAnSsmSecureStringParam.parameterName,
+      THE_SECRET_NAME: templatedSecret.secretName,
     };
 
     const functionName = `${id}-lambda`;
-    const flightFaresLambda = new PhpFunction(this, `${stackPrefix}${functionName}`, {
+    const theLambda = new PhpFunction(this, `${stackPrefix}${functionName}`, {
       handler: 'lambda.php',
       phpVersion: '8.3',
       runtime: Runtime.PROVIDED_AL2,
@@ -44,12 +54,12 @@ export class CdkStack extends Stack {
     });
 
     // Add extension layer
-    flightFaresLambda.addLayers(
+    theLambda.addLayers(
       LayerVersion.fromLayerVersionArn(this, 'ParameterStoreExtension', parameterStoreExtension.valueAsString)
     );
 
     // Set additional permissions for parameter store
-    flightFaresLambda.role?.attachInlinePolicy(
+    theLambda.role?.attachInlinePolicy(
       new Policy(this, 'additionalPermissionsForParameterStore', {
         statements: [
           new PolicyStatement({
@@ -63,7 +73,9 @@ export class CdkStack extends Stack {
       }),
     )
 
-    const fnUrl = flightFaresLambda.addFunctionUrl({ authType: FunctionUrlAuthType.NONE });
+    templatedSecret.grantRead(theLambda);
+
+    const fnUrl = theLambda.addFunctionUrl({ authType: FunctionUrlAuthType.NONE });
 
     new CfnOutput(this, 'LambdaUrl', { value: fnUrl.url });
   }

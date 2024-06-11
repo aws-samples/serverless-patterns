@@ -26,10 +26,35 @@ function getParam(string $parameterPath): string
     }
 }
 
+function getSecret(string $secretName): stdClass
+{
+    $url = "http://localhost:2773/secretsmanager/get?secretId={$secretName}";
+
+    try {
+        $client = new Client();
+
+        $response = $client->get($url, [
+            'headers' => [
+                'X-Aws-Parameters-Secrets-Token' => getenv('AWS_SESSION_TOKEN'),
+            ]
+        ]);
+
+        $data = json_decode($response->getBody());
+        return json_decode($data->SecretString);
+    } catch (\Exception $e) {
+        error_log('Error getting parameter => ' . print_r($e, true));
+    }
+}
+
 return function ($request, Context $context) {
+    $secret = getSecret(getenv('THE_SECRET_NAME'));
     $response = new JsonResponse([
         'status' => 'OK',
         getenv('THE_SSM_PARAM_PATH') => getParam(getenv('THE_SSM_PARAM_PATH')),
+        getenv('THE_SECRET_NAME') => [
+            'password' => $secret->password,
+            'username' => $secret->username,
+        ],
     ]);
 
     return (new HttpResponse($response->getContent(), $response->headers->all()))->toApiGatewayFormatV2();
