@@ -2,7 +2,7 @@
 
 This pattern creates a State Machine triggered by an S3 notification. The state machine triggers a glue crawler and a glue ETL job to transform and catalog csv data. It creates all the necessary permissions and roles, following the principle of least privilege. 
 
-Notes, this pattern does not integrate with environments where the Glue Data Catalog is **managed by AWS Lake Formation**. To make it work, you will need to give the right [permissions](https://repost.aws/knowledge-center/glue-insufficient-lakeformation-permissions) to the Glue Crawler and Glue Job roles.
+Note, this pattern does not integrate with environments where the Glue Data Catalog is **managed by AWS Lake Formation**. To make it work, you will need to give the right [permissions](https://repost.aws/knowledge-center/glue-insufficient-lakeformation-permissions) to the Glue Crawler and Glue Job roles.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
