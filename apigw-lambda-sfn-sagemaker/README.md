@@ -35,6 +35,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 ## How it works
 
+![architecture.png](architecture.png)
 - API Gateway Post method invokes a Lambda which uses python boto3 to call AWS SageMaker api to create a SageMaker domain. 
 - The Lambda function then invokes a Step Functions state machine to monitor the creation of the domain. 
 - The Step Functions state machine uses AWS SDK to get the status of the Domain creation and has a wait pattern to monitor the status until successful/failed creation. 

@@ -20,8 +20,7 @@ def lambda_handler(event, context):
     print("Received event: " + json.dumps(event, indent=2))
     event = event["body"]
     event = json.loads(event)
-    print(event)
-    
+
     if not validate_request(event):
         return {"statusCode": 400,
                 "body": json.dumps("Invalid request")}
