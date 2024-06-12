@@ -1,6 +1,6 @@
 # Kinesis Stream to Amazon Timestream with AWS EventBridge Pipes
 
-This pattern demostrates the process of ingesting data into Amazon Timestream from Kinesis Steams via EventBridge Pipes.
+This pattern demostrates the process of ingesting data into Amazon Timestream from Kinesis Streams via EventBridge Pipes.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-kinesis-to-timestream
 
