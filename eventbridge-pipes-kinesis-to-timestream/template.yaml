@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template to connect Kinesis streams to Timestream
+
+Resources:
+  # Kinesis Data Stream
+  Source:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: !Sub ${AWS::StackName}-source
+      RetentionPeriodHours: 168
+      ShardCount: 10
+  # DLQ for source
+  SourceQueueDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-dlq
+  # Target
+  TimestreamTargetDatabase:
+    Type: AWS::Timestream::Database
+    Properties:
+      DatabaseName: !Sub ${AWS::StackName}-db
+  TimestreamTargetTable:
+    Type: AWS::Timestream::Table
+    Properties:
+      DatabaseName: !Ref TimestreamTargetDatabase
+      TableName: !Sub ${AWS::StackName}-tbl
+      RetentionProperties:
+        MemoryStoreRetentionPeriodInHours: "168"
+        MagneticStoreRetentionPeriodInDays: "7"
+  # IAM Role for Pipe
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: SourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kinesis:DescribeStream
+                  - kinesis:DescribeStreamSummary
+                  - kinesis:GetRecords
+                  - kinesis:GetShardIterator
+                  - kinesis:ListStreams
+                  - kinesis:ListShards
+                Resource: !GetAtt Source.Arn
+        - PolicyName: TargetPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - timestream:WriteRecords
+                Resource: !GetAtt TimestreamTargetTable.Arn
+        - PolicyName: DescribeEndpointsPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - timestream:DescribeEndpoints
+                Resource: '*'
+        - PolicyName: SourceQueueDLQPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                Resource: !GetAtt SourceQueueDLQ.Arn
+  # Pipe connecting Kinesis to Timestream
+  TimestreamPipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: !Sub ${AWS::StackName}-pipe
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt Source.Arn
+      SourceParameters:
+        KinesisStreamParameters:
+          BatchSize: 10
+          DeadLetterConfig:
+            Arn: !GetAtt SourceQueueDLQ.Arn
+          MaximumBatchingWindowInSeconds: 5
+          MaximumRecordAgeInSeconds: 300
+          MaximumRetryAttempts: 10
+          StartingPosition: LATEST
+      Target: !GetAtt TimestreamTargetTable.Arn
+      TargetParameters:
+        TimestreamParameters:
+          DimensionMappings:
+            - DimensionName: dimension_1
+              DimensionValue: $.data.dimension_1
+              DimensionValueType: VARCHAR
+          SingleMeasureMappings:
+            - MeasureName: measure_1
+              MeasureValue: $.data.measure_1
+              MeasureValueType: DOUBLE
+          TimeFieldType: TIMESTAMP_FORMAT
+          TimeValue: $.data.time
+          TimestampFormat: yyyy-MM-dd HH:mm:ss.SSS
+          VersionValue: $.data.version
