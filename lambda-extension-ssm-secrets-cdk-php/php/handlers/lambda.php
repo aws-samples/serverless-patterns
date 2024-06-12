@@ -5,6 +5,8 @@ use Bref\Event\Http\HttpResponse;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+// Responsibilities are simplified into one file for demonstration purposes
+
 function getParam(string $parameterPath): string
 {
     // Set `withDecryption=true if you also want to retrieve SecureString SSMs
@@ -42,7 +44,7 @@ function getSecret(string $secretName): stdClass
         $data = json_decode($response->getBody());
         return json_decode($data->SecretString);
     } catch (\Exception $e) {
-        error_log('Error getting parameter => ' . print_r($e, true));
+        error_log('Error getting secretsmanager => ' . print_r($e, true));
     }
 }
 

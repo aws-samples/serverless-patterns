@@ -39,8 +39,9 @@ export class CdkStack extends Stack {
     // The param path that will be used to retrieve value by the lambda
     const lambdaEnvironment = {
       THE_SSM_PARAM_PATH: paramTheSsmParam.parameterName,
-      // AMADEUS_API_SECRET_PATH: paramAnSsmSecureStringParam.parameterName,
       THE_SECRET_NAME: templatedSecret.secretName,
+      // If you create the SecureString
+      // THE_SECURE_SSMPARAM_PATH: paramAnSsmSecureStringParam.parameterName,
     };
 
     const functionName = `${id}-lambda`;
@@ -66,6 +67,7 @@ export class CdkStack extends Stack {
             actions: ['ssm:GetParameter'],
             resources: [
               paramTheSsmParam.parameterArn,
+              // If you create the SecureString
               // paramAnSsmSecureStringParam.parameterArn,
             ],
           }),

@@ -11,7 +11,7 @@
         "php": ">=8.3",
         "ext-ctype": "*",
         "bref/bref": "^2",
-        "guzzlehttp/guzzle": "^7.8",
+        "guzzlehttp/guzzle": "^7",
         "symfony/http-foundation": "^7"
     },
     "config": {
