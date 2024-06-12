@@ -9,3 +9,6 @@ bash:
 
 deploy:
 	docker compose exec app sh -c 'npm run deploy'
+
+destroy:
+	docker compose exec app sh -c 'npm run destroy'
