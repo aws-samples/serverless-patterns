@@ -28,6 +28,11 @@ Resources:
       RetentionProperties:
         MemoryStoreRetentionPeriodInHours: "168"
         MagneticStoreRetentionPeriodInDays: "7"
+  # Cloudwatch log group for debugging
+  CloudwatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${AWS::StackName}-pipe-logs
   # IAM Role for Pipe
   PipeRole:
     Type: AWS::IAM::Role
@@ -79,6 +84,14 @@ Resources:
                 Action:
                   - sqs:SendMessage
                 Resource: !GetAtt SourceQueueDLQ.Arn
+        - PolicyName: CloudwatchLogPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:PutLogEvents
+                Resource: !GetAtt CloudwatchLogGroup.Arn
   # Pipe connecting Kinesis to Timestream
   TimestreamPipe:
     Type: AWS::Pipes::Pipe
@@ -110,3 +123,9 @@ Resources:
           TimeValue: $.data.time
           TimestampFormat: yyyy-MM-dd HH:mm:ss.SSS
           VersionValue: $.data.version
+      LogConfiguration:
+        CloudwatchLogsLogDestination:
+          LogGroupArn: !GetAtt CloudwatchLogGroup.Arn
+        Level: TRACE
+        IncludeExecutionData:  
+          - ALL
