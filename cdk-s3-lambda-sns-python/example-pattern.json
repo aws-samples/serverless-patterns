@@ -1,5 +1,5 @@
 {
-    "title": "Triggering Serverless Workflows with Amazon S3 and AWS Lambda - Adding Amazon SNS Notifications",
+    "title": "Triggering Serverless Workflows Amazon S3 to AWS Lambda to Amazon SNS",
     "description": "S3 upload events will trigger Lambda functions to process new objects. After processing the Lambda will publish an SNS notification.",
     "language": "Python",
     "level": "200",
