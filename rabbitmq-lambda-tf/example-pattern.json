@@ -1,7 +1,7 @@
 {
   "title": "Amazon MQ for RabbitMQ to AWS Lambda",
   "description": "Deploys a Lambda function, a RabbitMQ queue and the IAM permissions required to run the application. RabbitMQ invokes the Lambda function when new messages are available.",
-  "language": "YAML",
+  "language": "Python",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
