@@ -29,7 +29,7 @@ cd aws-cdk-large-deployments-to-s3
 ### Create Python virtual environment and install the dependencies
 
 ```bash
-python3.7 -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install pip-licenses
 pip-licenses --output NOTICE.txt

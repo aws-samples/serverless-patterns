@@ -62,7 +62,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Handler: index.handler
-            Runtime: python3.7
+            Runtime: python3.12
             InlineCode: | 
                 import json 
                 def handler(event, context): 

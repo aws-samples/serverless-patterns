@@ -28,7 +28,6 @@ Resources:
       LayerName: pymysql-layer
       ContentUri: dependencies/
       CompatibleRuntimes:
-        - python3.7
         - python3.8
 
   PyMySQLLayerLambdaFunction:

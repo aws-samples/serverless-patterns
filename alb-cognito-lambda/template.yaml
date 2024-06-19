@@ -64,7 +64,7 @@ Resources:
       FunctionName: "ALBLambda"
       Description: An Application Load Balancer Lambda Target that returns regional metrics
       Handler: index.lambda_handler
-      Runtime: python3.7
+      Runtime: python3.12
       Role: !GetAtt "MyLambdaFunctionPermission.Arn"
       Layers:
         - !Ref LambdaLayerARN
