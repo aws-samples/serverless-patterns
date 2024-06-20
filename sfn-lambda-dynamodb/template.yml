@@ -34,7 +34,7 @@ Resources:
         - CloudWatchLogsFullAccess
         - DynamoDBCrudPolicy:
             TableName: !Ref DynamoDBTable
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Timeout: 30
       Tracing: Active
     Type: AWS::Serverless::Function

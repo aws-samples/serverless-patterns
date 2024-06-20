@@ -6,7 +6,7 @@ Description: >
 
 Globals:
   Function:
-    Runtime: nodejs16.x
+    Runtime: nodejs20.x
     Timeout: 10  
     Environment:
         Variables:

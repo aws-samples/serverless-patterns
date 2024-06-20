@@ -8,7 +8,7 @@ Transform:
 
 Globals:
   Function:
-    Runtime: nodejs16.x
+    Runtime: nodejs20.x
     Timeout: 10
     MemorySize: 128
     Architectures:

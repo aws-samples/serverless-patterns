@@ -4,7 +4,7 @@ Description: Serverless patterns - Amazon API Gateway REST API with a Client Cer
 
 Globals:
   Function:
-    Runtime: nodejs16.x
+    Runtime: nodejs20.x
     CodeUri: src/
 
 Resources:

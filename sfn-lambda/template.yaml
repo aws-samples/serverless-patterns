@@ -33,7 +33,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Timeout: 3
       Policies: 
         - CloudWatchPutMetricPolicy: {}

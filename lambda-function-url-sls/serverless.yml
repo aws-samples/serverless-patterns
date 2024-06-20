@@ -4,7 +4,7 @@ frameworkVersion: '^3' # requires serverless 3.12 or later
 
 provider:
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs20.x
   architecture: arm64 
   stage: ${opt:stage, "dev"} # Default stage to "dev"
   region: ${opt:region, "us-east-1"} # Default region to "us-east-1"

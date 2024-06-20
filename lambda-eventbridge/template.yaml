@@ -16,7 +16,7 @@ Resources:
       CodeUri: src/
       Handler: app.handler
       Timeout: 3
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Policies:
         - EventBridgePutEventsPolicy:
             EventBusName: !Ref EventBusName

@@ -107,7 +107,7 @@ Resources:
                 }
             }
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Policies:
       - AWSLambdaBasicExecutionRole
 

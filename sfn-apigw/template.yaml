@@ -32,7 +32,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: app.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Events:
         Api:
           Type: Api
