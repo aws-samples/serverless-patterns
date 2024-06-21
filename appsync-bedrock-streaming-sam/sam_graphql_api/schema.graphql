@@ -1,0 +1,32 @@
+type Message @aws_iam @aws_api_key {
+  chatId: String
+  messageId: String
+  type: String
+  text: String
+  fullText: String
+}
+
+type Mutation {
+  onMessage (
+    chatId: String
+    messageId: String
+    type: String
+    text: String
+    fullText: String
+  ): Message @aws_iam @aws_api_key
+
+  sendMessage (
+    chatId: String!
+    prompt: String!
+  ): Boolean @aws_api_key
+}
+
+type Subscription {
+  onMessage(chatId: String!): Message
+  @aws_subscribe(mutations: ["onMessage"])
+  @aws_api_key
+}
+
+type Query {
+  getMessage(messageId: String!): Message
+}
