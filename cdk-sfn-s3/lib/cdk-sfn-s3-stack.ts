@@ -1,37 +1,50 @@
-import * as cdk from "@aws-cdk/core";
-import * as s3 from "@aws-cdk/aws-s3";
-import * as sfn from "@aws-cdk/aws-stepfunctions";
-import * as sfn_task from "@aws-cdk/aws-stepfunctions-tasks";
+import {
+  Stack,
+  StackProps,
+  RemovalPolicy,
+  Duration,
+  CfnOutput,
+} from "aws-cdk-lib";
+import { Bucket } from "aws-cdk-lib/aws-s3";
+import { StateMachine, DefinitionBody } from "aws-cdk-lib/aws-stepfunctions";
+import { CallAwsService } from "aws-cdk-lib/aws-stepfunctions-tasks";
+import { Construct } from "constructs";
 
-export class CdkSfnS3Stack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class CdkSfnS3Stack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-      //S3 Bucket Creation
-      const destinationBucket= new s3.Bucket(this, "DestinationBucket", {
-      bucketName: "my-sfn-bucket-target",
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      versioned: true
-   })
+    // Generate a unique ID for resource naming
+    const uniqueId = this.node.addr.substring(0, 8);
 
-   const invokeS3PutObject = new sfn_task.CallAwsService(this, 'SendCustomEvent', {
-     service: 's3',
-     action: 'putObject',
-     parameters: {
-       Body:'Hello World',
-       Bucket: destinationBucket.bucketName,
-       Key: 'filename.txt'
-     },
-     iamResources: [destinationBucket.arnForObjects('*')],
-   });
+    // Create S3 Bucket
+    const sfnDestinationBucket = new Bucket(this, "SfnDestinationBucket", {
+      bucketName: `sfn-destination-bucket-${uniqueId}`,
+      versioned: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+    });
 
-      //STATEMACHINE Creation
-      
-      const myStateMachine= new sfn.StateMachine(this, "MyS3StateMachine", {
-        definition:invokeS3PutObject,
-        timeout: cdk.Duration.minutes(5)
-      });
+    const sfnCallS3PutObject = new CallAwsService(this, "SfnCallS3PutObject", {
+      service: "s3",
+      action: "putObject",
+      parameters: {
+        Bucket: sfnDestinationBucket.bucketName,
+        Key: "filename.txt",
+        Body: "Hello World",
+      },
+      iamResources: [sfnDestinationBucket.arnForObjects("*")],
+    });
 
-      new cdk.CfnOutput(this, 'StateMachineARN', {value: myStateMachine.stateMachineArn})
+    // Create StateMachine
+    const sfnStateMachine = new StateMachine(this, "SfnStateMachine", {
+      stateMachineName: `sfn-state-machine-${uniqueId}`,
+      definitionBody: DefinitionBody.fromChainable(sfnCallS3PutObject),
+      timeout: Duration.seconds(30),
+    });
+
+    new CfnOutput(this, "StateMachineARN", {
+      value: sfnStateMachine.stateMachineArn,
+    });
   }
 }
