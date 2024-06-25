@@ -190,7 +190,7 @@ paths:
           application/json: 
             Fn::Sub: |-
               {
-                "TableName": "${CrudDDB},
+                "TableName": "${CrudDDB}",
                 "Key": {
                   "id": {
                     "S": "$context.requestId"
