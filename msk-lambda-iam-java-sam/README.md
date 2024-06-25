@@ -115,7 +115,7 @@ The code in this example prints out the fields in the Kafka message and also dec
     sam delete
     ```
 
-2. Also delete the resources created in step 5 of Requirements by deleting the corresponding [CloudFormation stack](https://console.aws.amazon.com/cloudformation/home?#/stacks).
+2. Delete the resources created in step 5 of Requirements by deleting the corresponding [CloudFormation stack](https://console.aws.amazon.com/cloudformation/home?#/stacks).
 ---
 
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
