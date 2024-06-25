@@ -46,29 +46,23 @@ Important: this application uses various AWS services and there are costs associ
 
    * **Stack Name**: Enter the stack name as `msk-lambda-iam-java` 
    * **AWS Region**: The AWS region you want to deploy your app to.
-   * **Parameter MSKClusterName**: The name of the MSKCluster created by following the **Requirements** section
-   * **Parameter MSKClusterId**: The unique ID of the MSKCluster, eg. a4e132c8-6ad0-4334-a313-123456789012-s2. The id can be found in the ARN of the MSK cluster.
+   * **Parameter MSKClusterName**: The name of the MSKCluster created by following the Step 5 of **Requirements** section
+   * **Parameter MSKClusterId**: The unique ID of the MSKCluster, eg. a4e132c8-6ad0-4334-a313-123456789012-s2. The cluster id can be found in the ARN of the MSK cluster.
    * **Parameter MSKTopic**: Enter `MSKTutorialTopicIAM` or the name of Kafka topic on which the lambda function will listen on
-     * **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
-     Accept the defaults for rest of the prompts
-  
-     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for next step as well as testing.
+   Accept the defaults for rest of the prompts. 
+
+   Once you have run `sam deploy --guided` once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 ## How it works
 
-Please refer to the architecture diagram below:
-
-![End to End Architecture](images/architecture.png)
-
-This pattern creates a Lambda function along with a Lambda Event Source Mapping(ESM) resource. This maps a Kafka topic on an MSK Cluster as a trigger to a Lambda function. The ESM takes care of polling the Kafka topic and then invokes the Lambda function with a batch of messages.
+This pattern creates a Lambda function along with a Lambda Event Source Mapping (ESM) resource. This maps a Kafka topic on an MSK Cluster as a trigger to a Lambda function. The ESM takes care of polling the Kafka topic and then invokes the Lambda function with a batch of messages.
 
 ## Testing
 
-Once the Lambda function is deployed, send some Kafka messages to the topic that you configured in the Lambda function trigger. You can do this by launching the [Cloud9 instance](https://console.aws.amazon.com/cloud9control/home) created as part of Step 5 of **Requirements** section.
+Once the Lambda function is deployed, send some messages to the topic that you configured in the Lambda function trigger. You can do this by launching the [Cloud9 instance](https://console.aws.amazon.com/cloud9control/home) created as part of Step 5 of **Requirements** section.
 
-Navigate to the Kafka directory:
+Open a terminal on the Cloud9 instance and navigate to the Kafka directory:
 
    ```shell
    ~/environment/kafka_2.13-3.7.0/
@@ -82,7 +76,7 @@ sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;
 sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler" > client.properties
 ```
 
-Send at least 10 messages (or wait for 300 seconds), you can find `broker-list` by navigating to your cluster listed in the [MSK Clusters](https://console.aws.amazon.com/msk/home?#/clusters) page and clicking on the "View client information" button:
+Send at least 10 messages (or wait for 300 seconds). You can find `broker-list` by navigating to your cluster listed in the [MSK Clusters](https://console.aws.amazon.com/msk/home?#/clusters) page and clicking on the "View client information" button:
 
 ```shell
 ./bin/kafka-console-producer.sh --broker-list [broker-list]  --topic MSKTutorialTopicIAM --producer.config bin/client.properties 
@@ -92,15 +86,12 @@ Send at least 10 messages (or wait for 300 seconds), you can find `broker-list` 
 ...
 
 ```
-Click ctrl+c to exit
 
 Check if the Lambda function was invoked in [Amazon CloudWatch logs](https://console.aws.amazon.com/cloudwatch/home?#logsV2:log-groups). You should see messages in the Log Group with the name of the deployed Lambda function.
 
 The Lambda code parses the Kafka messages and outputs the fields in the Kafka messages to CloudWatch logs.
 
-A single Lambda function receives a batch of messages. The messages are received as a map with each key being a combination of the topic and the partition, as a single batch can receive messages from multiple partitions.
-
-Each key has a list of messages. Each Kafka message has the following properties - `Topic`, `Partition`, `Offset`, `TimeStamp`, `TimeStampType`, `Key`, and `Value`.
+A single Lambda function receives a batch of messages. The messages are received as a map with each key being a combination of the topic and the partition, as a single batch can receive messages from multiple partitions. Each key has a list of messages. Each Kafka message has the following properties - `Topic`, `Partition`, `Offset`, `TimeStamp`, `TimeStampType`, `Key`, and `Value`.
 
 The `Key` and `Value` are base64 encoded and have to be decoded. A message can also have a list of headers, each header having a key and a value.
 
@@ -124,7 +115,7 @@ The code in this example prints out the fields in the Kafka message and also dec
     sam delete
     ```
 
-2. Also delete the resources created in step 5 of Requirements by deleting the corresponding CloudFormation template.
+2. Also delete the resources created in step 5 of Requirements by deleting the corresponding [CloudFormation stack](https://console.aws.amazon.com/cloudformation/home?#/stacks).
 ---
 
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
