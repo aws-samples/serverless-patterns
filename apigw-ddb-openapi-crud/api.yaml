@@ -119,7 +119,7 @@ paths:
                 }
         requestTemplates:
           application/json: 
-            Fn::Sub: |=
+            Fn::Sub: |-
               {
                 "TableName": "${CrudDDB}",
                 "Key": {
