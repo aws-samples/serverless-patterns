@@ -1,21 +1,25 @@
-# Event driven Amazon MQ ActiveMQ message processing using AWS Lambda (Java) 
+# Java AWS Lambda Kafka consumer with IAM auth, using AWS SAM
 
-This sample project demonstrates event driven message processing from an Amazon MQ ActiveMQ queue using an AWS Lambda function written in Java. 
+This pattern is an example of a Lambda function that consumes messages from an Amazon Managed Streaming for Kafka (Amazon MSK) topic, where the MSK Cluster has been configured to use IAM authentication. This pattern assumes you already have an MSK cluster with a topic configured, if you need a sample pattern to deploy an MSK cluster either in Provisioned or Serverless modes please see [here](https://github.com/aws-samples/serverless-patterns/tree/main/msk-cfn-sasl-lambda/create-cluster-cfn).
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/activemq-lambda-sam-java
+This project contains source code and supporting files for a serverless application that you can deploy with the AWS Serverless Application Model (AWS SAM) CLI. It includes the following files and folders.
+
+The application creates a Lambda function that listens to Kafka messages on a topic of an MSK Cluster. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
-- [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-- [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-- [Java 21 or above](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) installed
-- [Maven 3.9.6 or above](https://maven.apache.org/download.cgi) installed
-
-
+1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+2. [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+3. [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+4. [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+5. Complete the **Basic Set up** and **IAM** steps [here](https://github.com/aws-samples/serverless-patterns/tree/main/msk-cfn-sasl-lambda/create-cluster-cfn) to create the following resources:
+   1. An MSK Cluster 
+   2. A Kafka topic named `MSKTutorialTopicIAM`
+   3. A Cloud9 environment with Kafka CLI installed
+6. [Java 21 or above](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) installed
+7. [Maven 3.9.6 or above](https://maven.apache.org/download.cgi) installed
 
 ## Deployment Instructions
 
@@ -26,7 +30,7 @@ Important: this application uses various AWS services and there are costs associ
 
 2. Change directory to the pattern directory:
    ```bash
-   cd serverless-patterns/activemq-lambda-sam-java
+   cd serverless-patterns/msk-lambda-iam-java-sam
    ```
 
 3. From the command line, execute the below command to build the Java based AWS Lambda function.
@@ -38,18 +42,19 @@ Important: this application uses various AWS services and there are costs associ
    ```bash
    sam deploy --guided
    ```
-4. During the prompts:
+5. During the prompts:
 
-   - Enter a stack name
-   - Enter the desired AWS Region (e.g. us-east-1).
-   - Enter a username. User Name can't contain commas (,), colons (:), equals signs (=), or spaces.
-   - Enter a password. Password must be minimum 12 characters, at least 4 unique characters. Can't contain commas (,), colons (:), equals signs (=), spaces or non-printable ASCII characters.
-   - Allow SAM CLI to create IAM roles with the required permissions.
-   - Keep default values to the rest of the parameters.
+   * **Stack Name**: Enter the stack name as `msk-lambda-iam-java` 
+   * **AWS Region**: The AWS region you want to deploy your app to.
+   * **Parameter MSKClusterName**: The name of the MSKCluster created by following the **Requirements** section
+   * **Parameter MSKClusterId**: The unique ID of the MSKCluster, eg. a4e132c8-6ad0-4334-a313-123456789012-s2. The id can be found in the ARN of the MSK cluster.
+   * **Parameter MSKTopic**: Enter `MSKTutorialTopicIAM` or the name of Kafka topic on which the lambda function will listen on
+     * **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
+     Accept the defaults for rest of the prompts
+  
+     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-   Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for next step as well as testing.
+6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for next step as well as testing.
 
 ## How it works
 
@@ -57,42 +62,69 @@ Please refer to the architecture diagram below:
 
 ![End to End Architecture](images/architecture.png)
 
-Here's a breakdown of the steps:
-
-1. **Amazon MQ**: An ActiveMQ single-instance broker is provisioned. A test queue with name `MyTestQueue` is created. A message is pushed to the queue.
-
-2. **AWS Lambda**: AWS Lambda has an event source mapping (ESM)  configured for `MyTestQueue` queue. The Lambda function is triggered by the new message on the Amazon MQ queue. The Lambda function processes the message and logs the decoded the message content. 
-
+This pattern creates a Lambda function along with a Lambda Event Source Mapping(ESM) resource. This maps a Kafka topic on an MSK Cluster as a trigger to a Lambda function. The ESM takes care of polling the Kafka topic and then invokes the Lambda function with a batch of messages.
 
 ## Testing
 
-1. Log into the ActiveMQ Web Console using the `username` and `password` provided at the time of deployment. The console URL is available in the`ActiveMQWebConsole` key of `sam deploy` output.
+Once the Lambda function is deployed, send some Kafka messages to the topic that you configured in the Lambda function trigger. You can do this by launching the [Cloud9 instance](https://console.aws.amazon.com/cloud9control/home) created as part of Step 5 of **Requirements** section.
 
-2. Click on the `Queues` tab to open the list of queues.
+Navigate to the Kafka directory:
 
-3. Click on the `Send To` link under `Operations` tab next to the `MyTestQueue` queue. 
-
-4. Enter a `Message Body` and click `Send` button.
-
-5. Execute the below command to tail logs of the AWS Lambda function. Please replace `MyMQMessageHandlerFunction` from the `sam deploy -g` output and also your region. 
-   ```bash
-   aws logs tail --follow /aws/lambda/{MyMQMessageHandlerFunction} --region {your-region}
+   ```shell
+   ~/environment/kafka_2.13-3.7.0/
    ```
-   
-6. Check the AWS Lambda console log. It should print the message from the Amazon MQ queue.
+Create a `client.properties` file:
 
-7. Press `Ctrl + c` to stop tailing the logs.
+```shell
+echo "security.protocol=SASL_SSL
+sasl.mechanism=AWS_MSK_IAM
+sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;
+sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler" > client.properties
+```
+
+Send at least 10 messages (or wait for 300 seconds), you can find `broker-list` by navigating to your cluster listed in the [MSK Clusters](https://console.aws.amazon.com/msk/home?#/clusters) page and clicking on the "View client information" button:
+
+```shell
+./bin/kafka-console-producer.sh --broker-list [broker-list]  --topic MSKTutorialTopicIAM --producer.config bin/client.properties 
+>{"message":"interesset eros vel elit salutatus"}
+>{"message":"impetus deterruisset per aliquam luctus"}
+>{"message":"ridens vocibus feugait vitae cras"}
+...
+
+```
+Click ctrl+c to exit
+
+Check if the Lambda function was invoked in [Amazon CloudWatch logs](https://console.aws.amazon.com/cloudwatch/home?#logsV2:log-groups). You should see messages in the Log Group with the name of the deployed Lambda function.
+
+The Lambda code parses the Kafka messages and outputs the fields in the Kafka messages to CloudWatch logs.
+
+A single Lambda function receives a batch of messages. The messages are received as a map with each key being a combination of the topic and the partition, as a single batch can receive messages from multiple partitions.
+
+Each key has a list of messages. Each Kafka message has the following properties - `Topic`, `Partition`, `Offset`, `TimeStamp`, `TimeStampType`, `Key`, and `Value`.
+
+The `Key` and `Value` are base64 encoded and have to be decoded. A message can also have a list of headers, each header having a key and a value.
+
+The code in this example prints out the fields in the Kafka message and also decodes the key and the value and logs them to CloudWatch logs. The log entries should look like this:
+
+```shell
+[INFO] Topic: MSKTutorialTopicIAM
+[INFO] Partition: 0
+[INFO] Offset: 95
+[INFO] Timestamp: 1719328016122
+[INFO] TimestampType: CREATE_TIME
+[INFO] Record Value: {"message":"interesset eros vel elit salutatus"}
+```
 
 
 ## Cleanup
 
 1. To delete the resources deployed to your AWS account via AWS SAM, run the following command:
+    
+    ```bash
+    sam delete
+    ```
 
-```bash
-sam delete
-```
-
-
+2. Also delete the resources created in step 5 of Requirements by deleting the corresponding CloudFormation template.
 ---
 
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
