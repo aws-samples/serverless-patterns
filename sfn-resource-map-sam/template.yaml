@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  resource-map
+
+  Sample SAM Template for resource-map
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Parameters:
+  S3BucketName:
+    Type: String
+
+
+Resources:
+  ## S3 bucket
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName    
+  
+  ## Lambda function ListStateMachineDetails
+  ListStateMachineDetails:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ./lambda-functions/ListStateMachineDetails/
+      Handler: ListStateMachineDetails.lambda_handler
+      Runtime: python3.9
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          S3BucketName: !Ref S3BucketName
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSStepFunctionsFullAccess
+        - AmazonS3FullAccess
+        
+        
+  ## Lambda function ExecutionDetails
+  ExecutionDetails:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ./lambda-functions/ExecutionDetails
+      Handler: ExecutionDetails.lambda_handler
+      Runtime: python3.9
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          S3BucketName: !Ref S3BucketName
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSStepFunctionsFullAccess
+        - AmazonS3FullAccess
+        - CloudWatchFullAccess
+        
+  ##Step Functions state machine to call Lambda functions
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+     
+      # state machine definition
+      Definition:
+        Comment: A description of my state machine
+        StartAt: ListStateMachineDetails
+        States:
+          ListStateMachineDetails:
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            OutputPath: "$.Payload"
+            Parameters:
+              Payload.$: "$"
+              FunctionName: !Ref ListStateMachineDetails
+            Retry:
+            - ErrorEquals:
+              - Lambda.ServiceException
+              - Lambda.AWSLambdaException
+              - Lambda.SdkClientException
+              - Lambda.TooManyRequestsException
+              IntervalSeconds: 1
+              MaxAttempts: 3
+              BackoffRate: 2
+            Next: ExecutionDetails
+          ExecutionDetails:
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            OutputPath: "$.Payload"
+            Parameters:
+              Payload.$: "$"
+              FunctionName: !Ref ExecutionDetails
+            Retry:
+            - ErrorEquals:
+              - Lambda.ServiceException
+              - Lambda.AWSLambdaException
+              - Lambda.SdkClientException
+              - Lambda.TooManyRequestsException
+              IntervalSeconds: 1
+              MaxAttempts: 3
+              BackoffRate: 2
+            End: true
+
+      
+      Role: !GetAtt StateMachineExecutionRole.Arn
+      
+  StateMachineExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+       - PolicyName: Access
+         PolicyDocument:
+           Version: "2012-10-17"
+           Statement:
+             - Effect: Allow
+               Action:
+                 - "lambda:InvokeFunction"
+               Resource: "*"     
+    
