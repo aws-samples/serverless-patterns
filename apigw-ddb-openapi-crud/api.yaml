@@ -25,13 +25,23 @@ paths:
           default:
             statusCode: "200"
             responseTemplates:
-              application/json: "#set($inputRoot = $input.path('$')) {\n  \"id\":\
-                \ \"$inputRoot.Item.id.S\",\n  \"message\": \"$inputRoot.Item.message.S\"\
-                \n}\n"
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+                {
+                  "id": "$inputRoot.Item.id.S",
+                  "message": "$inputRoot.Item.message.S"
+                }
         requestTemplates:
-          application/json: {"Fn::Sub": "{\n  \"TableName\": \"${CrudDDB}\",\n\
-            \  \"Key\":{\n    \"id\": {\"S\": \"$input.params().path.id\"}\n  }\n\
-            }\n"}
+          application/json:
+            Fn::Sub: |-
+              {
+                "TableName": "${CrudDDB}",
+                "Key": {
+                  "id": {
+                    "S": "$input.params().path.id"
+                  }
+                }
+              }
         passthroughBehavior: "when_no_templates"
     put:
       parameters:
@@ -54,15 +64,33 @@ paths:
           default:
             statusCode: "200"
             responseTemplates:
-              application/json: "#set($inputRoot = $input.path('$'))\n{\n    \"id\"\
-                : \"$inputRoot.Attributes.id.S\",\n    \"message\": \"$inputRoot.Attributes.message.S\"\
-                \n}"
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+                {
+                  "id": "$inputRoot.Attributes.id.S",
+                  "message": "$inputRoot.Attributes.message.S"
+                }
         requestTemplates:
-          application/json: {"Fn::Sub": "{\n    \"TableName\": \"${CrudDDB}\"\
-            ,\n    \"Key\": {\"id\": {\"S\": \"$input.params().path.id\"}},\n    \"\
-            ExpressionAttributeNames\":{\"#m\":\"message\"},\n    \"ExpressionAttributeValues\"\
-            : {\":m\":{\"S\": $input.json('$.message')}},\n    \"UpdateExpression\"\
-            : \"SET #m = :m\",\n    \"ReturnValues\": \"ALL_NEW\"\n}"}
+          application/json: 
+            Fn::Sub: |-
+              {
+                "TableName": "${CrudDDB}",
+                "Key": {
+                  "id": {
+                    "S": "$input.params().path.id"
+                  }
+                },
+                "ExpressionAttributeNames": {
+                  "#m": "message"
+                },
+                "ExpressionAttributeValues": {
+                  ":m": {
+                    "S": $input.json('$.message')
+                  }
+                },
+                "UpdateExpression": "SET #m = :m",
+                "ReturnValues": "ALL_NEW"
+              }
         passthroughBehavior: "when_no_templates"
     delete:
       parameters:
@@ -85,10 +113,21 @@ paths:
           default:
             statusCode: "200"
             responseTemplates:
-              application/json: "{\"message\":\"item deleted\"}"
+              application/json: |-
+                {
+                  "message": "item deleted"
+                }
         requestTemplates:
-          application/json: {"Fn::Sub": "{\n    \"TableName\":\"${CrudDDB}\",\n\
-            \    \"Key\":{\"id\":{\"S\": \"$input.params().path.id\"}}\n}"}
+          application/json: 
+            Fn::Sub: |=
+              {
+                "TableName": "${CrudDDB}",
+                "Key": {
+                  id": {
+                    "S": "$input.params().path.id"
+                  }
+                }
+              }
         passthroughBehavior: "when_no_templates"
   /:
     get:
@@ -116,10 +155,15 @@ paths:
               method.response.header.Cache-Control: "'no-cache, no-store'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
-              application/json: "#set($inputRoot = $input.path('$'))\n$inputRoot.Items"
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.Items
         requestTemplates:
-          application/json: {"Fn::Sub": "{\n  \"TableName\": \"${CrudDDB}\"\n\
-            }\n"}
+          application/json:
+            Fn::Sub: |-
+              {
+                "TableName": "${CrudDDB}"
+              }
         passthroughBehavior: "when_no_templates"
     post:
       responses:
@@ -136,14 +180,32 @@ paths:
           default:
             statusCode: "200"
             responseTemplates:
-              application/json: "#set($inputRoot = $input.path('$'))\n{\n    \"id\"\
-                : \"$inputRoot.Attributes.id.S\",\n    \"message\": \"$inputRoot.Attributes.message.S\"\
-                \n}"
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+                {
+                  "id": "$inputRoot.Attributes.id.S",
+                  "message": "$inputRoot.Attributes.message.S"
+                }
         requestTemplates:
-          application/json: {"Fn::Sub": "{\n    \"TableName\": \"${CrudDDB}\"\
-            ,\n    \"Key\": {\"id\": {\"S\": \"$context.requestId\"}},\n    \"ExpressionAttributeNames\"\
-            :{\"#m\":\"message\"},\n    \"ExpressionAttributeValues\": {\":m\":{\"\
-            S\": $input.json('$.message')}},\n    \"UpdateExpression\": \"SET #m =\
-            \ :m\",\n    \"ReturnValues\": \"ALL_NEW\"\n}"}
+          application/json: 
+            Fn::Sub: |-
+              {
+                "TableName": "${CrudDDB},
+                "Key": {
+                  "id": {
+                    "S": "$context.requestId"
+                  }
+                },
+                "ExpressionAttributeNames": {
+                  "#m": "message"
+                },
+                "ExpressionAttributeValues": {
+                  ":m": {
+                    "S": $input.json('$.message')
+                  }
+                },
+                "UpdateExpression": "SET #m = :m",
+                "ReturnValues": "ALL_NEW"
+              }
         passthroughBehavior: "when_no_templates"
 components: {}
