@@ -67,7 +67,9 @@ The processed/transformed data is then added to the Data Catalog and to an S3 bu
 
 1. Navigate to the S3 bucket containing 'input-bucket' in the name
 2. Upload a .csv file to the bucket. A [sample file](./sample_data/sample_dataset.csv) can be found in this pattern.
-3. Wait for the AWS Step Functions State Machine to complete and you should be able to see 2 tables under the Glue Data Catalog, one containing the raw and the other the processed data.
+3. Wait for the AWS Step Functions State Machine to complete and you should be able to see 2 tables under the Glue Data Catalog, one containing the raw and the other the processed data, as shown below:
+
+![alt text](./images/GlueTables.png)
 
 ## Cleanup
  
