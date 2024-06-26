@@ -1,6 +1,6 @@
-# Access SSM Parameter Store value using AWS Lambada extension with CDK
+# Lambda extension to cache SSM and Secrets Values for PHP Lambda on CDK
 
-This pattern demonstrates how to access SSM Parameter Store and Secrets Manager values from a PHP Lambda using 
+This pattern demonstrates how to access and caches SSM Parameter Store and Secrets Manager values from a PHP Lambda using 
 Lambda extension.
 
 To know more about PHP Lambdas, visit https://bref.sh.
@@ -16,8 +16,8 @@ warranty is implied in this example.
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Docker](https://docs.docker.com/engine/install/) installed (which will install Node, NPM, CLI and CDK)
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
+* [Docker](https://docs.docker.com/engine/install/) installed (which will install PHP, composer, Node, NPM, CLI and CDK) -- this is optional if you have everything installed
 
 ## Deployment Instructions
 
@@ -30,13 +30,26 @@ warranty is implied in this example.
     cd lambda-extension-ssm-secrets-cdk-php
     ```
 1. Make sure you have already AWS variables set and run below command to install required dependancies:
-    ```
-    make up
-    ```
+   ```shell
+   # Using docker -- check run-docker.sh
+   make up
+   ```
+   or
+   ```shell
+   # Using local
+   npm ci
+   cd php && composer install --no-scripts && cd -
+   ```
 1. From the command line, run:
-    ```
-    make deploy
-    ```
+   ```shell
+   # Using docker
+   make deploy
+   ```
+   or
+   ```shell
+   # Using local
+   npm run deploy
+   ```
 1. Alternatively, you can jump into the container and deploy from inside:
    ```sh
    make bash
