@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 // Responsibilities are simplified into one file for demonstration purposes
+// We would have have those methods in a Service class
 
 function getParam(string $parameterPath): string
 {
