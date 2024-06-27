@@ -10,17 +10,9 @@ Parameters:
       - 'anthropic.claude-v2'
     Description: >-
       Enter the Model Id of the Anthropic LLM
-  SeedUrls:
-    Type: CommaDelimitedList
-    Description: List of seed URLs for the web crawler (Upto 10 only)
-  WebCrawlerMode:
+  S3DSBucketName:
     Type: String
-    Description: Web crawler mode (HOST_ONLY, SUBDOMAINS, EVERYTHING)
-    Default: HOST_ONLY
-    AllowedValues:
-      - HOST_ONLY
-      - SUBDOMAINS
-      - EVERYTHING
+    Description: Enter the S3 bucket name where the contents you want to be indexed are stored.
   KendraEdition:
     Type: String
     Description: Kendra edition (DEVELOPER_EDITION, ENTERPRISE_EDITION)
@@ -73,7 +65,7 @@ Resources:
       Edition: !Ref KendraEdition
       Name: !Sub ${AWS::StackName}-KendraIndex
       RoleArn: !GetAtt KendraIndexRole.Arn
-  # Create a role for the Kendra web crawler data source
+  # Create a role for the Kendra data source
   KendraDSRole:
     Type: AWS::IAM::Role
     Properties:
@@ -98,27 +90,20 @@ Resources:
                   - kendra:BatchDeleteDocument
           PolicyName: !Sub ${AWS::StackName}-DocsDSPolicy
       RoleName: !Sub ${AWS::StackName}-DocsDSRole
-  # Kendra web crawler data source
+  # Kendra S3 data source
   KendraDS:
     Type: AWS::Kendra::DataSource
     DependsOn:
       - KendraIndex
     Properties:
       DataSourceConfiguration:
-        WebCrawlerConfiguration:
-          CrawlDepth: 1
-          MaxContentSizePerPageInMegaBytes: 50
-          MaxLinksPerPage: 10
-          MaxUrlsPerMinuteCrawlRate: 300
-          Urls:
-            SeedUrlConfiguration:
-              SeedUrls: !Ref SeedUrls
-              WebCrawlerMode: !Ref WebCrawlerMode
+        S3Configuration:
+          BucketName: !Ref S3DSBucketName
       IndexId: !GetAtt KendraIndex.Id
-      Name: !Sub ${AWS::StackName}-KendraWebCrawlerDS
+      Name: !Sub ${AWS::StackName}-KendraS3DS
       RoleArn: !GetAtt KendraDSRole.Arn
-      Type: WEBCRAWLER
-  # Lambda function for initiating crawling and indexing content from the web crawler data source
+      Type: S3
+  # Lambda function for initiating crawling and indexing content from the S3 data source
   DataSourceSyncLambda:
     Type: AWS::Serverless::Function
     DependsOn:
@@ -223,8 +208,8 @@ Outputs:
   KendraIndexID:
     Description: Kendra index ID
     Value: !GetAtt KendraIndex.Id
-  KendraWebCrawlerDataSourceArn:
-    Description: Kendra WebCrawler data source ARN
+  KendraS3DataSourceArn:
+    Description: Kendra S3 data source ARN
     Value: !GetAtt KendraDS.Arn
   DataSourceSyncLambdaArn:
     Description: Data source sync lambda function ARN
