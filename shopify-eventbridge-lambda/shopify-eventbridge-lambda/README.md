@@ -49,7 +49,7 @@ This pattern demonstrates how to:
 
 See the below architecture diagram from the data flow of this pattern. 
 
-![Architecture Diagram](./img/readme-arch-diagram.pngreadme-arch-diagram.png)
+![Architecture Diagram](./img/readme-arch-diagram.png)
 
 ## Testing
 
