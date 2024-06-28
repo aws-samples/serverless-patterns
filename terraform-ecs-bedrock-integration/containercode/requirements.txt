@@ -1,0 +1,10 @@
+altair
+pandas
+streamlit
+pipenv==2023.11.15
+boto3==1.34.0
+langchain
+opensearch-py
+pypdf
+transformers
+langchain-community
