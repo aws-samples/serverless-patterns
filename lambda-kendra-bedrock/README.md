@@ -1,6 +1,6 @@
 # AWS Lambda to Amazon Kendra to Amazon Bedrock
 
-This pattern contains a sample AWS SAM stack that utilizes an AWS Lambda function to retrieve documents from an Amazon Kendra index and pass it to Amazon Bedrock for a generated response. The pattern includes usage of Amazon S3 data source connector. 
+This pattern contains a sample AWS SAM stack that utilizes an AWS Lambda function to retrieve documents from an Amazon Kendra index and then pass it to Amazon Bedrock to generate a response. The pattern includes usage of the Amazon S3 data source connector. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
