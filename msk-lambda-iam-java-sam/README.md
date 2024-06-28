@@ -76,13 +76,13 @@ sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;
 sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler" > client.properties
 ```
 
-Send at least 10 messages (or wait for 300 seconds). You can find `broker-list` by navigating to your cluster listed in the [MSK Clusters](https://console.aws.amazon.com/msk/home?#/clusters) page and clicking on the "View client information" button:
+Send at least 10 messages (or wait for 300 seconds). You can find `<<broker-list>>` by navigating to your cluster listed in the [MSK Clusters](https://console.aws.amazon.com/msk/home?#/clusters) page and clicking on the "View client information" button:
 
 ```shell
-./bin/kafka-console-producer.sh --broker-list [broker-list]  --topic MSKTutorialTopicIAM --producer.config bin/client.properties 
->{"message":"interesset eros vel elit salutatus"}
->{"message":"impetus deterruisset per aliquam luctus"}
->{"message":"ridens vocibus feugait vitae cras"}
+./bin/kafka-console-producer.sh --broker-list <<broker-list>>  --topic MSKTutorialTopicIAM  --property "parse.key=true" --property "key.separator=:" --producer.config bin/client.properties 
+>key1:{"message":"Message 1"}
+>key2:{"message":"Message 2"}
+>key3:{"message":"Message 3"}
 ...
 
 ```
@@ -103,7 +103,8 @@ The code in this example prints out the fields in the Kafka message and also dec
 [INFO] Offset: 95
 [INFO] Timestamp: 1719328016122
 [INFO] TimestampType: CREATE_TIME
-[INFO] Record Value: {"message":"interesset eros vel elit salutatus"}
+[INFO] Record Key: key1
+[INFO] Record Value: {"message":"Message 1"}
 ```
 
 
