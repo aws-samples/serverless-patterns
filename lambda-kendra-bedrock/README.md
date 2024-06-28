@@ -45,7 +45,7 @@ Please refer to the architecture diagram below:
 
 Here's a breakdown of the steps:
 
-**AWS Lambda:** Two AWS Lambda functions are created. DataSourceSync Lambda function crawls and indexes the content. InvokeBedrockLambda AWS Lambda function that invokes the specified model by passing the retrieved content from Amazon Kendra as context to the generative AI model.
+**AWS Lambda:** Two AWS Lambda functions are created. `DataSourceSync` crawls and indexes the content. `InvokeBedrockLambda` invokes the specified model by passing the retrieved content from Amazon Kendra as context to the generative AI model.
 
 **Amazon Kendra:** An Amazon Kendra index is created with a S3 data source connector. When a the InvokeBedrockLambda function is called, documents are retrieved from the Amazon Kendra index.
 
