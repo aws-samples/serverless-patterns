@@ -1,0 +1,62 @@
+{
+  "title": "Lambda extesion to retrieve SSM and Secrets Values from PHP Lambda on CDK",
+  "description": "The use of Lambda Extensions to retrieve SSM Parameter Store and Secrets Manager values for PHP Lambdas using CDK.",
+  "language": "PHP",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to add Lambda Extensions to retrieve SSM Parameter Store and Secrets Manager values for PHP Lambdas using CDK.",
+      "The PHP language usage on Serverless projects in AWS has been increasing. This pattern will be helpful for many developers migrating their projects to Serverless."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-extension-ssm-secrets-cdk-php",
+      "templateURL": "serverless-patterns/lambda-extension-ssm-secrets-cdk-php",
+      "projectFolder": "lambda-extension-ssm-secrets-cdk-php",
+      "templateFile": "cdk/cdk.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Parameter Store parameters in AWS Lambda functions",
+        "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html"
+      },
+      {
+        "text": "Using the AWS Parameter and Secrets Lambda extension to cache parameters and secrets",
+        "link": "https://aws.amazon.com/blogs/compute/using-the-aws-parameter-and-secrets-lambda-extension-to-cache-parameters-and-secrets/"
+      },
+      {
+        "text": "Bref",
+        "link": "https://bref.sh"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "make up deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "make destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rafael Bernard Araujo",
+      "image": "https://gravatar.com/userimage/1584074/8fb7c372d1085c0d5b7ee5cf76ec29c7.jpeg?size=256",
+      "bio": "I am Rafael, happily married to Tassia, father of the beloved Davi and a Brazilian Software Engineer and Architect living in New Zealand.",
+      "linkedin": "rafaelbernard",
+      "twitter": "rafaelbernard"
+    }
+  ]
+}
