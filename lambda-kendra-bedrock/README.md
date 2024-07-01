@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
-    sam deploy --guided
+    sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
     ```
 1. During the prompts:
 
@@ -34,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
     * Enter Amazon Kendra edition: DEVELOPER_EDITION, ENTERPRISE_EDITION
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.*
+    Once you have run `sam deploy --guided --capabilities CAPABILITY_NAMED_IAM` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.*
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
@@ -73,11 +73,7 @@ Example JSON Lambda test event:
 
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.

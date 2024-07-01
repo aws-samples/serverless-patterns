@@ -134,7 +134,9 @@ Resources:
           Action:
           - kendra:StartDataSourceSyncJob
           - kendra:StopDataSourceSyncJob
-          Resource: "*"
+          Resource:
+          - !Sub arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}
+          - !Sub arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}/*
       Environment:
         Variables:
           INDEX_ID:
@@ -145,11 +147,6 @@ Resources:
             Fn::GetAtt:
             - KendraDS
             - Id
-  DataSourceSyncLambdaLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${DataSourceSyncLambda}
   # Custom resource to initiates data source sync
   DataSourceSync:
     Type: 'Custom::DataSourceSync'
@@ -187,8 +184,11 @@ Resources:
           - Effect: Allow
             Action:
               - kendra:Retrieve
+            Resource: !Sub arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}
+          - Effect: Allow
+            Action:
               - bedrock:InvokeModel
-            Resource: "*"
+            Resource: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/${ModelId}
       Environment:
         Variables:
           INDEX_ID:
@@ -196,11 +196,6 @@ Resources:
             - KendraIndex
             - Id
           MODEL_ID: !Ref ModelId
-  InvokeBedrockLambdaLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${InvokeBedrockLambda}
 Outputs:
   KendraIndexRoleArn:
     Description: Kendra index role ARN
