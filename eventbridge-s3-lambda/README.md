@@ -58,7 +58,6 @@ Important: this application uses various AWS services and there are costs associ
     Go to SNS > Subsciptions > Select your Subscription and click on Delete
 
     https://docs.aws.amazon.com/sns/latest/dg/sns-delete-subscription-topic.html
-    https://repost.aws/knowledge-center/sns-cannot-delete-topic-subscription
 
 1. Change directory to the pattern directory:
     ```
