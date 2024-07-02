@@ -1,6 +1,6 @@
-# Lambda sending a notification when a new S3 bucket is created
+# AWS Lambda sending a notification when a new Amazon S3 bucket is created
 
-This pattern creates an automated monitoring system for S3 bucket create events. It defines an EventBridge rule that listens for S3 bucket creation events and triggers a Lambda function. The Lambda function processes the event details and sends a notification to an SNS topic, informing subscribers of the new bucket creation.
+This pattern creates an automated monitoring system for Amazon S3 bucket create events. It defines an Amazon EventBridge rule that listens for S3 bucket creation events and triggers an AWS Lambda function. The Lambda function processes the event details and sends a notification to an SNS topic, informing subscribers of the new bucket creation.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-s3-lambda
 
@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd eventbridge-s3-lambda
     ```
 1. From the command line, initialize terraform to to downloads and installs the providers defined in the configuration:
     ```
@@ -41,19 +41,25 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-1. After deploying the stack, create a Subscriber for your SNS topic (For ex, your email) and confirm the subscription.
+1. After deploying the stack, create a Subscriber for your Amazon SNS topic (For ex, your email) and confirm the subscription.
     https://docs.aws.amazon.com/sns/latest/dg/sns-create-subscribe-endpoint-to-topic.html
 
-1. You can create a new S3 bucket using the following CLI command
+1. Create a new S3 bucket using the following CLI command
     ```
     aws s3api create-bucket --bucket BUCKET_NAME --region REGION_NAME
     ```
     Note: Make sure that the region is same as the region in which you deployed the Terraform code.
 
-1. You will see that the Lambda function is invoked and a message is sent to the SNS Topic, which is then received by the subscriber.
+1. The event invokes the Lambda function and you will receive an email from the SNS Topic.
 
 ## Cleanup
- 
+
+1. Delete the SNS Subscription:
+    Go to SNS > Subsciptions > Select your Subscription and click on Delete
+
+    https://docs.aws.amazon.com/sns/latest/dg/sns-delete-subscription-topic.html
+    https://repost.aws/knowledge-center/sns-cannot-delete-topic-subscription
+
 1. Change directory to the pattern directory:
     ```
     cd serverless-patterns/eventbridge-s3-lambda
