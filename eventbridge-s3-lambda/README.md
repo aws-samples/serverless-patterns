@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd eventbridge-s3-lambda
     ```
-1. From the command line, initialize terraform to to downloads and installs the providers defined in the configuration:
+1. From the command line, initialize terraform to downloads and installs the providers defined in the configuration:
     ```
     terraform init
     ```
