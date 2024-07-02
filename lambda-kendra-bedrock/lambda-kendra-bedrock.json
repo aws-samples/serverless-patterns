@@ -1,0 +1,105 @@
+{
+    "title": "Integrate Amazon Kendra with Amazon Bedrock",
+    "description": "AWS Lambda function to retrieve documents from an Amazon Kendra index and pass it to Amazon Bedrock for a generated response.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "AWS Lambda: Two AWS Lambda functions are created. DataSourceSync crawls and indexes the content. InvokeBedrockLambda  invokes the specified model by passing the retrieved content from Amazon Kendra as context to the generative AI model.",
+            "Amazon Kendra: An Amazon Kendra index is created with an Amazon S3 data source and InvokeBedrockLambda retrieves the index documents.",
+            "Amazon Bedrock: Documents retrieved from the Amazon Kendra index are sent to Amazon Bedrock which responds with a generated response."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-kendra-bedrock",
+            "templateURL": "serverless-patterns/lambda-kendra-bedrock",
+            "projectFolder": "lambda-kendra-bedrock",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon Kendra - Enterprise Search Engine",
+                "link": "https://aws.amazon.com/kendra/"
+            },
+            {
+                "text": "Amazon Bedrock - Generative AI",
+                "link": "https://aws.amazon.com/bedrock/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Kruthi Jayasimha Rao",
+            "bio": "Kruthi is a Partner Solutions Architect specializing in AI and ML. She provides technical guidance to AWS Partners in following best practices to build secure, resilient, and highly available solutions in the AWS Cloud.",
+            "linkedin": "kruthi-jayasimha-rao-132a78167"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 10,
+            "y": 65,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "icon2": {
+            "x": 30,
+            "y": 65,
+            "service": "kendra",
+            "label": "Amazon Kendra"
+        },
+        "icon3": {
+            "x": 60,
+            "y": 25,
+            "service": "lambda",
+            "label": "Create index"
+        },
+        "icon4": {
+            "x": 60,
+            "y": 65,
+            "service": "lambda",
+            "label": "Invoke Bedrock"
+        },
+        "icon5": {
+            "x": 85,
+            "y": 65,
+            "service": "bedrock",
+            "label": "Generate response"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon2",
+            "to": "icon4"
+        },
+        "line4": {
+            "from": "icon4",
+            "to": "icon5"
+        }
+    }
+}
