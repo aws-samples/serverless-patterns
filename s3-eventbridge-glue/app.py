@@ -3,7 +3,7 @@ import os
 
 import aws_cdk as cdk
 
-from s3_eventbridge_gluecrawler.s3_eventbridge_gluecrawler_stack import S3EventbridgeGluecrawlerStack
+from s3_eventbridge_crawler.s3_eventbridge_crawler_stack import S3EventbridgeGluecrawlerStack
 
 
 app = cdk.App()
