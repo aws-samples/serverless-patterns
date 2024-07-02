@@ -36,9 +36,6 @@ Important: this application uses various AWS services and there are costs associ
     #var.region
     - Enter a value: {enter the region for deployment}
 
-    #var.prefix {enter any name to associate with resources}
-    - Enter a value:
-
 ## Testing
 
 1. After deploying the stack, create a Subscriber for your Amazon SNS topic (For ex, your email) and confirm the subscription.
