@@ -1,4 +1,5 @@
 Transform: AWS::Serverless-2016-10-31
+Description: Bedrock sample pattern (uksb-1tthgi812) (tag:lambda-kendra-bedrock)
 Parameters:
   ModelId:
     Type: String
