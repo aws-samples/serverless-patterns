@@ -37,9 +37,6 @@ Important: this application uses various AWS services and there are costs associ
     #var.region
     - Enter a value: {enter the region for deployment}
 
-    #var.prefix {enter any name to associate with resources}
-    - Enter a value:
-
 ## Testing
 
 1. You can start the execution of the Step Function using the following CLI command
