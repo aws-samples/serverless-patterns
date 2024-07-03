@@ -41,10 +41,12 @@ If false, the message is sent to the `downstream_queue` for processing. An entry
 
 ## Testing
 
-Edit lines 3 and 7 of `send_messages.sh` with the URL of your `primary_queue`. Run this script to send test messages to the queue.
-You shold observe messages with `test1`, `test2-first-message`, `test3` and `test4` in the `downstream_queue`.
-After around 60 second, there should be another messages in the `downstream_queue` with `test2-delayed-message-1` as MessageBody.
-After another 60 seconds, there should be another messages in the `downstream_queue` with `test2-delayed-message-2` as MessageBody.
+1. Edit lines 3 and 7 of `send_messages.sh` with the `DelayFifoQueue` URL from the output of the `cdk deploy`. Run this script to send test messages to the queue.
+2. Head to AWS console and go to SQS service. Click on Queues, and select the queue containing the text `DelayFifoQueueDownstream`.
+3. Click on `Send and receive messages` then `Poll for messages` to see current messages in the queue.
+4. You shold observe messages with `test1`, `test2-first-message`, `test3` and `test4` in the `downstream_queue`.
+5. After around 60 seconds poll again, there should be another messages in the `downstream_queue` with `test2-delayed-message-1` as MessageBody.
+6. After another 60 seconds poll again, there should be another messages in the `downstream_queue` with `test2-delayed-message-2` as MessageBody.
 
 ## Cleanup
  

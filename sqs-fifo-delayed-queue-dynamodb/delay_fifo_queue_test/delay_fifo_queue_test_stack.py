@@ -8,7 +8,8 @@ from aws_cdk import (
     aws_cloudwatch_actions as cloudwatch_actions,
     aws_dynamodb as dynamodb,
     aws_sns as sns,
-    aws_sns_subscriptions as subscriptions
+    aws_sns_subscriptions as subscriptions,
+    CfnOutput as cfnoutput 
 )
 from constructs import Construct
 
@@ -17,7 +18,7 @@ class DelayFifoQueueTestStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)    
         
-        #create a dead letter queue called primary_queue_dlq
+        # create a dead letter queue called primary_queue_dlq
         primary_queue_dlq = sqs.Queue(self, "DelayFifoQueueDlq",
                                       visibility_timeout=Duration.seconds(60),
                                       fifo=True,
@@ -42,7 +43,7 @@ class DelayFifoQueueTestStack(Stack):
                           content_based_deduplication=True
                           )
         
-        #create a dynamodb table to store customer id and created timestamp
+        # create a dynamodb table to store customer id and created timestamp
         customer_table = dynamodb.Table(self, "CustomerTable",
                                         table_name="DelayFifoQueueCustomerTable",
                                         partition_key=dynamodb.Attribute(name="customer_id", type=dynamodb.AttributeType.STRING),
@@ -59,11 +60,11 @@ class DelayFifoQueueTestStack(Stack):
                                                         "TABLE_NAME": customer_table.table_name
                                                     })
 
-        # #create an SNS topic to send notifications when primary_queue_dlq is not empty
+        # create an SNS topic to send notifications when primary_queue_dlq is not empty
         dlq_size_sns_topic = sns.Topic(self, "PrimaryQueueDqlSizeAlertTopic")
         dlq_size_sns_topic.add_subscription(subscriptions.EmailSubscription("notification_address@email.com"))
 
-        # #create a CloudWatch alarm if primary_queue_dlq is not empty
+        # create a CloudWatch alarm if primary_queue_dlq is not empty
         dlq_size_alarm = cloudwatch.Alarm(self, "PrimaryQueueDqlSizeAlert",
                                             metric=cloudwatch.Metric(metric_name="ApproximateNumberOfMessagesVisible",
                                                                     namespace="AWS/SQS",
@@ -85,13 +86,13 @@ class DelayFifoQueueTestStack(Stack):
         )
 
 
-        #create lambda execution role that has access to receive messages from primary_queue queue
+        # create lambda execution role that has access to receive messages from primary_queue queue
         process_queue_function.add_to_role_policy(iam.PolicyStatement(
             actions=["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl"],
             resources=[primary_queue.queue_arn]
         ))
 
-        #add to lambda execution role policy to send messages to the downstream_queue queue
+        # add to lambda execution role policy to send messages to the downstream_queue queue
         process_queue_function.add_to_role_policy(iam.PolicyStatement(
             actions=["sqs:SendMessage"],
             resources=[downstream_queue.queue_arn]
@@ -106,3 +107,5 @@ class DelayFifoQueueTestStack(Stack):
       
         # give permissions for the lambda function to read and write to the dynamodb table
         customer_table.grant_read_write_data(process_queue_function)
+
+        cfnoutput(self, "DelayFifoQueueURL", value=primary_queue.queue_url)
