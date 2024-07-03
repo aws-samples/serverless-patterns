@@ -1,6 +1,6 @@
-# SQS Queue to Amazon Timestream with AWS EventBridge Pipes
+# Amazon SQS queue to Amazon Timestream with AWS EventBridge Pipes
 
-This pattern demostrates the process of ingesting data into Amazon Timestream from SQS Queue via EventBridge Pipes.
+This pattern shows the process of ingesting data into Amazon Timestream from SQS Queue via EventBridge Pipes.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-sqs-to-timestream
 

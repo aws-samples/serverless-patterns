@@ -1,13 +1,13 @@
 {
-  "title": "SQS to Timestream using EventBridge Pipes",
-  "description": "This pattern demostrates the process of ingesting data into Amazon Timestream from SQS Queue via EventBridge Pipes.",
+  "title": "Amazon SQS to Amazon Timestream using Amazon EventBridge Pipes",
+  "description": "This pattern shows how to ingest data into Amazon Timestream from an SQS queue via EventBridge Pipes.",
   "language": "YAML",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This project demostrates how to send data to Amazon Timestream directly from SQS. This pattern uses EventBridge Pipes to connect SQS and Timestream together.",
+      "This project shows how to send data to Amazon Timestream directly from SQS. This pattern uses EventBridge Pipes to connect SQS and Timestream together.",
       "The pattern creates an Amazon SQS queue, a Timestream table, Cloudwatch LogGroup, IAM Policy and an EventBridge Pipe."
     ]
   },
@@ -22,7 +22,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Send SQS data to Timestream",
+        "text": "Send Amazon SQS data to Timestream",
         "link": "https://docs.aws.amazon.com/timestream/latest/developerguide/SQS.html"
       },
       {

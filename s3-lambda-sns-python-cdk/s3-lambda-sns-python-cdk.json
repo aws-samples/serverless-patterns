@@ -1,6 +1,6 @@
 {
-    "title": "Triggering Serverless Workflows Amazon S3 to AWS Lambda to Amazon SNS",
-    "description": "S3 upload events will trigger Lambda functions to process new objects. After processing the Lambda will publish an SNS notification.",
+    "title": "Amazon S3 to AWS Lambda to Amazon SNS",
+    "description": "S3 upload events trigger Lambda functions to process new objects. After processing the Lambda function publishes an SNS notification.",
     "language": "Python",
     "level": "200",
     "framework": "CDK",
@@ -14,9 +14,9 @@
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-s3-lambda-sns-python",
-            "templateURL": "serverless-patterns/cdk-s3-lambda-sns-python",
-            "projectFolder": "cdk-s3-lambda-sns-python",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-sns-python-cdk",
+            "templateURL": "serverless-patterns/s3-lambda-sns-python-cdk",
+            "projectFolder": "s3-lambda-sns-python-cdk",
             "templateFile": "src/cdk_s3_lambda_sns_python_stack.py"
         }
     },
