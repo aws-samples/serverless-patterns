@@ -1,6 +1,6 @@
 {
-    "title": "Automatic data transformation with S3, Glue and StepFunctions",
-    "description": "This pattern facilitates the transformation of data by using an event-driven architecture to trigger a data transformation job",
+    "title": "Automatic data transformation with Amazon S3, AWS Glue and AWS Step Functions",
+    "description": "This pattern helps transform data by using an event-driven architecture to trigger a data transformation job",
     "language": "Python",
     "level": "200",
     "framework": "CDK",
@@ -23,10 +23,6 @@
     },
     "resources": {
       "bullets": [
-        {
-            "text": "Getting started with the AWS CDK",
-            "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
-        },
         {
           "text": "Using an Amazon S3 trigger with Amazon EventBridge",
           "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html"

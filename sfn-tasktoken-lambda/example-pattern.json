@@ -1,6 +1,6 @@
 {
-  "title": "Step Function Wait for a Callback with the Task Token using Terraform",
-  "description": "Create a Step Functions workflow that waits for a task token to complete a task",
+  "title": "AWS Step Functions wait for task token using Terraform",
+  "description": "Create a Step Functions workflow that waits for a call back using a task token to complete a task",
   "language": "Python",
   "level": "200",
   "framework": "Terraform",

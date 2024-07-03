@@ -1,13 +1,13 @@
 {
     "title": "Amazon CloudFront Origin Access Control for AWS Lambda Function URL",
-    "description": "Shows how to protect AWS Lambda URL origins by using CloudFront Origin Access Control to only allow access from designated CloudFront distributions",
+    "description": "Shows how to protect AWS Lambda Function URL origins by using CloudFront Origin Access Control to only allow access from designated CloudFront distributions.",
     "language": "Node.js",
     "level": "300",
     "framework": "CDK",
     "introBox": {
         "headline": "How it works",
         "text": [
-            "Amazon CloudFront will use Origin Access Control (OAC) to authenticate access to Lambda Function URLS from their designated CloudFront distributions"
+            "Amazon CloudFront will use Origin Access Control (OAC) to authenticate access to Lambda Function URLs from their designated CloudFront distributions"
         ]
     },
     "gitHub": {
@@ -48,23 +48,5 @@
             "bio": "Senior Partner Solutions Architect, Serverless at Amazon Web Services (AWS)",
             "linkedin": "thiagopadua"
         }
-    ],
-    "patternArch": {
-        "icon1": {
-            "x": 20,
-            "y": 50,
-            "service": "cloudfront",
-            "label": "Amazon CloudFront"
-        },
-        "icon2": {
-            "x": 80,
-            "y": 50,
-            "service": "lambda",
-            "label": "AWS Lambda"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2"
-        }
-    }
+    ]
 }
