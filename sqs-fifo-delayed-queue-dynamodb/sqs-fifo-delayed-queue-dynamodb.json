@@ -1,6 +1,6 @@
 {
     "title": "Amazon SQS FIFO Queue with controlled delay",
-    "description": "Amazon SQS FIFO Queue with delay using AWS Lambda and AWS DynamoDB",
+    "description": "Amazon SQS FIFO Queue with delay using AWS Lambda and Amazon DynamoDB",
     "language": "Python",
     "level": "200",
     "framework": "CDK",
