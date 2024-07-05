@@ -1,0 +1,22 @@
+{
+  "name": "cdk-apigw-lambda-dynamodb",
+  "version": "0.1.0",
+  "bin": {
+    "cdk-apigw-lambda-dynamodb": "bin/cdk-apigw-lambda-dynamodb.js"
+  },
+  "scripts": {
+    "build": "echo \"The build step is not required when using JavaScript!\" && exit 0",
+    "cdk": "cdk",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "aws-cdk": "2.147.0",
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.609.0",
+    "@aws-sdk/lib-dynamodb": "^3.610.0",
+    "aws-cdk-lib": "2.147.0",
+    "constructs": "^10.0.0"
+  }
+}
