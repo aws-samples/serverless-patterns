@@ -37,7 +37,11 @@ Messages are tracked inside a DynamoDB table. When all messages with the same `C
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+1. Execute the bash
+   ```bash
+   $: ./msg/test.sh
+   ```
+2. Inspect the destination Queue, it should contains the messages, in the correct order
 
 ## Cleanup
  
@@ -46,6 +50,6 @@ Provide steps to trigger the integration and show what should be observed if suc
     $: cdk destroy
     ```
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

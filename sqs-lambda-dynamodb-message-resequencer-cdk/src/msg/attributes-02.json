@@ -1,0 +1,14 @@
+{
+    "CorrelationId": {
+        "DataType": "String",
+        "StringValue": "01"
+    },
+    "Order": {
+        "DataType": "String",
+        "StringValue": "2"
+    },
+    "Total": {
+        "DataType": "String",
+        "StringValue": "3"
+    }
+}
