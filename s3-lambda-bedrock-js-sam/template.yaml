@@ -73,4 +73,4 @@ Outputs:
     Value: !Ref DocumentBucket
   DocumentEmbeddingFunction:
     Value: !Ref DocumentEmbeddingFunction
-    Description: Lambda Function ARN for generating document embeddings
+    Description: Lambda Function name for generating document embeddings
