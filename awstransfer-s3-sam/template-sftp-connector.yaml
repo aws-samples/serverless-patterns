@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: AWS SAM template for creating an AWS Transfer Family SFTP Connector.
+Parameters:
+  TransferServerEndpoint:
+    Type: String
+    Description: The endpoint of the Transfer Server
+  UserName:
+    Type: String
+    AllowedPattern: "^[a-zA-Z0-9_][a-zA-Z0-9_.@-]{1,98}[a-zA-Z0-9_@.-]$"
+    Description: Username for AWS Transfer Family service managed user
+  TransferLoggingRoleArn:
+    Type: String
+    Description: The ARN of the IAM role to use for logging
+  SSHPrivateKey:
+    Type: String
+    Description: SSH Key for AWS Transfer Family service managed user
+  TrustedHostKeys:
+    Type: String
+    AllowedPattern: ".+"
+    Description: The Trusted Host Keys for the Transfer Server
+
+Resources:
+
+# Create S3 bucket to store files locally in AWS
+  MyLocalS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}-local
+
+# Create IAM role for Transfer Family CloudWatch logging  
+  TransferLoggingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: transfer.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-TransferLoggingPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+# Create an SFTP Transfer Connector
+  SFTPTransferConnector:
+    Type: AWS::Transfer::Connector
+    Properties:
+      Url: !Ref TransferServerEndpoint
+      AccessRole: !GetAtt TransferSFTPConnectorRole.Arn
+      LoggingRole: !Ref TransferLoggingRoleArn
+      SftpConfig:
+        TrustedHostKeys: 
+          - !Ref TrustedHostKeys
+        UserSecretId: !Ref MySecret
+
+#Create a IAM Role for Transfer Server User with access to their home directory
+  TransferSFTPConnectorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: transfer.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: TransferSFTPConnectorPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource:
+                  - Fn::GetAtt: MyLocalS3Bucket.Arn
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:DeleteObjectVersion
+                  - s3:GetObjectVersion
+                  - s3:GetObjectACL
+                  - s3:PutObjectACL
+                Resource:
+                  - Fn::Sub: ${MyLocalS3Bucket.Arn}/*
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Ref MySecret
+
+  # Create a secret to store the private key
+  MySecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: A secret to store the private key
+      SecretString: !Sub '{"Username": "${UserName}", "PrivateKey": "${SSHPrivateKey}"}'
+
+Outputs:
+
+  MyLocalS3Bucket:
+    Description: The name of the S3 Bucket
+    Value: !Ref MyLocalS3Bucket
+
+  SFTPTransferConnector:
+    Description: The SFTP Transfer Connector
+    Value: !Ref SFTPTransferConnector

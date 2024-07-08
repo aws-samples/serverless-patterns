@@ -1,0 +1,59 @@
+{
+    "title": "Automatically extract text from images in Amazon S3 using Amazon Bedrock",
+    "description": "This pattern demonstrates how to use Amazon Bedrock to automatically extract text from images uploaded to Amazon S3.",
+    "language": ".NET",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern shows how to extract text from images using Amazon Bedrock.",
+        "When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Bedrock, which extracts text from the image and stores it in the S3 bucket."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-lambda-cdk-dotnet",
+        "projectFolder": "bedrock-lambda-cdk-dotnet",
+        "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-lambda-cdk-dotnet/README.md",
+        "templateURL": "serverless-patterns/bedrock-lambda-cdk-dotnet",
+        "templateFile": "cdk/src/Cdk/CdkStack.cs"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Using AWS Lambda with Amazon S3",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
+        },
+        {
+          "text": "Anthropic's Claude on Amazon Bedrock",
+          "link": "https://aws.amazon.com/bedrock/claude/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Pankaj Rawat",
+        "image": "https://avatars.githubusercontent.com/u/21244341?s=96&v=4",
+        "bio": "Pankaj Rawat is a Lead Consultant at Amazon Web Services.",
+        "linkedin": "pankaj-rawat-14568765",
+        "twitter": "pankajrawat333"
+      }
+    ]
+  }

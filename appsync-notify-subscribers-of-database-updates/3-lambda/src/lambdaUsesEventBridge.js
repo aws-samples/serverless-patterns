@@ -1,7 +1,7 @@
 "use strict";
-const AWS = require("aws-sdk");
+const { EventBridge } = require("@aws-sdk/client-eventbridge");
 
-const eventbridge = new AWS.EventBridge();
+const eventbridge = new EventBridge();
 
 exports.handler = async (event) => {
     try {
@@ -19,7 +19,7 @@ exports.handler = async (event) => {
             }]
         };
         console.log("push data to EventBridge ", params);
-        const response = await eventbridge.putEvents(params).promise();
+        const response = await eventbridge.putEvents(params);
         console.log("response ", response);
 
     } catch (error) {

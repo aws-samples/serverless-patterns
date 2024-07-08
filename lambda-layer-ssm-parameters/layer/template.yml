@@ -15,10 +15,10 @@ Resources:
       CompatibleArchitectures:
         - arm64
       CompatibleRuntimes:
-        - nodejs14.x
+        - nodejs16.x
       RetentionPolicy: Delete
     Metadata:
-      BuildMethod: nodejs14.x
+      BuildMethod: nodejs16.x
       BuildArchitecture: arm64
 # Output from this nested stack is used by the parent stack to pass to another nested stack.
 Outputs:
