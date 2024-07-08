@@ -47,7 +47,7 @@ To test the system, we should first tail the logs of the Lambda function. Then, 
 
 1. Tail to the Lambda function log to get the logs
 ```
-aws logs tail "/aws/lambda/DocumentEmbeddingFunction" --follow --format json 
+aws logs tail "/aws/lambda/DocumentEmbedding" --follow --format json 
 ```
 1. Upload the sample file to S3 using below command. Please note the file needs to uploaded to a directory named "content". Refer below for example
 ```
