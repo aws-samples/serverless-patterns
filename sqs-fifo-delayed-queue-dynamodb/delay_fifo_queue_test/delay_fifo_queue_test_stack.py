@@ -50,7 +50,7 @@ class DelayFifoQueueTestStack(Stack):
                                         time_to_live_attribute="ttl"
                                         )
         
-        # create a lambda function to process messages from the queue
+        # create a Lambda function to process messages from the queue
         process_queue_function = lambda_.Function(self, "ProcessMessageLambda",
                                                     runtime=lambda_.Runtime.PYTHON_3_9,
                                                     code=lambda_.Code.from_asset("lambda"),
@@ -86,13 +86,13 @@ class DelayFifoQueueTestStack(Stack):
         )
 
 
-        # create lambda execution role that has access to receive messages from primary_queue queue
+        # create Lambda execution role that has access to receive messages from primary_queue queue
         process_queue_function.add_to_role_policy(iam.PolicyStatement(
             actions=["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl"],
             resources=[primary_queue.queue_arn]
         ))
 
-        # add to lambda execution role policy to send messages to the downstream_queue queue
+        # add to Lambda execution role policy to send messages to the downstream_queue queue
         process_queue_function.add_to_role_policy(iam.PolicyStatement(
             actions=["sqs:SendMessage"],
             resources=[downstream_queue.queue_arn]
@@ -105,7 +105,7 @@ class DelayFifoQueueTestStack(Stack):
                                     report_batch_item_failures=True
         )
       
-        # give permissions for the lambda function to read and write to the dynamodb table
+        # give permissions for the  function to read and write to the dynamodb table
         customer_table.grant_read_write_data(process_queue_function)
 
         cfnoutput(self, "DelayFifoQueueURL", value=primary_queue.queue_url)
