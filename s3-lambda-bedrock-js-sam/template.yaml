@@ -74,3 +74,6 @@ Outputs:
   DocumentEmbeddingFunction:
     Value: !Ref DocumentEmbeddingFunction
     Description: Lambda Function name for generating document embeddings
+  DocumentEmbeddingFunctionARN:
+    Value: !GetAtt DocumentEmbeddingFunction.Arn
+    Description: ARN of Lambda Function for generating document embeddings
