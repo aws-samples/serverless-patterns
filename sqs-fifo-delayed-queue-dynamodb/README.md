@@ -1,6 +1,6 @@
-# Amazon SQS FIFO Queue with delay using AWS Lambda and AWS DynamoDB
+# Amazon SQS FIFO queue with delay using AWS Lambda and Amazon DynamoDB
 
-This pattern allows introduction of a delay between processing of messages while maintaining order from individual client. Then sending it sequentially to the downstream for processing, to minimize the consequences of unordered events.
+This pattern shows how to introduce a delay between processing messages while maintaining order from an individual client. The message is sent sequentially to the downstream service for processing to minimize the consequences of unordered events.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sqs-fifo-delayed-queue-dynamodb
 
