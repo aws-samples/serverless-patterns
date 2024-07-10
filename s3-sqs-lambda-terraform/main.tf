@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "~> 5.57.0"
     }
   }
 
@@ -84,7 +84,7 @@ resource "aws_lambda_function" "MyHandlerFunction-Function" {
   function_name = "s3-sqs-lambda-tf-LambdaFunction"
   role          = aws_iam_role.MyHandlerFunction-Role.arn
   handler       = "app.handler"
-  runtime       = "nodejs16.x"
+  runtime       = "nodejs20.x"
 }
 
 # Create a zip file from the Lambda source code
@@ -169,5 +169,5 @@ output "SourceS3BucketName" {
 }
 output "LambdaFunctionArn" {
   value       = aws_lambda_function.MyHandlerFunction-Function.arn
-  description = "ResizerFunction function Arn"
+  description = "HandlerFunction function Arn"
 }
