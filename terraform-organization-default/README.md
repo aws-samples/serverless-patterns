@@ -1,7 +1,8 @@
 # Organization Resource Value Defaults
-
+![Concept](./Organization_default_values.png)
 This pattern fetches the the default recommened resource default values. The default values are either defined in the 'locals.tf' file or dynamically fetched from from AWS infra as per condition defined in the 'data.tf' file
 Hence this pattern helps as part of organization governance process to refer the recommened resource values.
+Users can customize the locals.tf and data.tf to suit to their requirements
 
 ## Getting started with Terraform Serverless Patterns
 
@@ -34,7 +35,7 @@ amis = {
   "amzn2" = "ami-01b799c439fd5516a"
 }
 ec2_user_ssh = "Test-key-value"
-kms_s3_server_side = "t-1:122233333448:key/dac5e760-5228-4480-bd89-ebf400ef88c3"
+kms_s3_server_side = "aaws:lkms:aus-east-1:856812069958:key/dac5e760-5228-4480-bd89-ebf400ef88c3"
 subnet_cidr_blocks = [
   "10.0.0.0/18"
 ]

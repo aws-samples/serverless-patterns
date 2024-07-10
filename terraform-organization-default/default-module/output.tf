@@ -18,3 +18,7 @@ output "kms_s3_server_side" {
 output "subnet_cidr_blocks" {
   value = [for s in data.aws_subnet.subnet : s.cidr_block]
 }
+
+output "public_subnet_cidr_blocks" {
+  value = local.public_subnet
+}

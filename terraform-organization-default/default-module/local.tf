@@ -10,5 +10,6 @@ locals {
     "us-east-1" = "arn:aws:secretsmanager:us-east-1:123456789123:secret:a-passwords-x"
     "us-east-2" = "arn:aws:secretsmanager:us-east-2:123456789123:secret:b-passwords-y"
   }
+  public_subnet = "172.10.20.30/16"
 }
 
