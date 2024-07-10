@@ -141,7 +141,7 @@ To run the unit tests
 python -m pytest tests/unit -vv
 ```
 
-### Trigger the Integration
+### Endpoint testing
 
 1. **Get all todos:**
 
@@ -172,14 +172,6 @@ python -m pytest tests/unit -vv
     ```bash
     curl -X DELETE https://<api-id>.execute-api.<region>.amazonaws.com/Prod/todos/<todo_id>
     ```
-
-### Observing Successful Results
-
-- **Get all todos:** Should return a list of todos.
-- **Get a specific todo:** Should return the details of the requested todo.
-- **Create a new todo:** Should return the details of the newly created todo.
-- **Update an existing todo:** Should return the details of the updated todo.
-- **Delete a todo:** Should return a 204 status code with no content.
 
 ## Cleanup
 
