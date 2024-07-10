@@ -94,6 +94,8 @@ app.enable_swagger(path="/swagger")
 
 To see the Swagger UI go to `https://<api-id>.execute-api.<region>.amazonaws.com/Prod/swagger`
 
+![alt text](images/swagger.png)
+
 ## Tracer
 
 Tracer is an opinionated thin wrapper for AWS X-Ray Python SDK.
