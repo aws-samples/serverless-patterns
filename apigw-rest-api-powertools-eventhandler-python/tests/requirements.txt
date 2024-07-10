@@ -1,0 +1,5 @@
+pytest
+boto3
+requests
+pydantic
+moto==4.2.14

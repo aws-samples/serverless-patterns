@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Todos API
+
+Resources:
+  TodosTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: N
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: TodosTable
+
+  TodosFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      MemorySize: 128
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        DynamoDBCrudPolicy:
+          TableName: !Ref TodosTable
+      Environment:
+        Variables:
+          LOG_LEVEL: INFO
+          TODOS_TABLE: !Ref TodosTable
+          POWERTOOLS_SERVICE_NAME: Todos
+          POWERTOOLS_LOG_LEVEL: INFO
+          POWERTOOLS_METRICS_NAMESPACE: Todos
+      Events:
+        GetAllTodos:
+          Type: Api
+          Properties:
+            Path: /todos
+            Method: GET
+        GetTodoById:
+          Type: Api
+          Properties:
+            Path: /todos/{todo_id}
+            Method: GET
+        CreateTodo:
+          Type: Api
+          Properties:
+            Path: /todos
+            Method: POST
+        UpdateTodo:
+          Type: Api
+          Properties:
+            Path: /todos/{todo_id}
+            Method: PUT
+        DeleteTodo:
+          Type: Api
+          Properties:
+            Path: /todos/{todo_id}
+            Method: DELETE
+        
+        # Swagger UI specific routes
+        SwaggerUI:
+            Type: Api
+            Properties:
+                Path: /swagger
+                Method: GET
+
+Outputs:
+  TodosApi:
+    Description: API Gateway endpoint URL for Prod stage
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/todos'
+    Export:
+      Name: TodosApi
