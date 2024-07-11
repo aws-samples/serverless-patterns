@@ -1,15 +1,15 @@
-from typing import Any, Dict, List, Union
 import os
+from typing import Any, Dict, List, Union
+from uuid import uuid4
+
 import boto3
+from aws_lambda_powertools import Logger, Metrics, Tracer
 from aws_lambda_powertools.event_handler import APIGatewayRestResolver
-from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.logging import correlation_paths
-from aws_lambda_powertools import Logger
-from aws_lambda_powertools import Tracer
-from aws_lambda_powertools import Metrics
 from aws_lambda_powertools.metrics import MetricUnit
-from pydantic import BaseModel, Field
+from aws_lambda_powertools.utilities.typing import LambdaContext
 from botocore.exceptions import ClientError
+from pydantic import BaseModel, Field
 
 app = APIGatewayRestResolver(enable_validation=True) 
 # Enable Swagger UI
@@ -28,7 +28,7 @@ def init_dynamodb():
         dynamo_table = dynamodb_resource.Table(table_name)
 
 class Todo(BaseModel):  
-    todo_id: int = Field(alias="id", default=None)
+    todo_id: str = Field(alias="id", default_factory=lambda: str(uuid4()))
     task: str
     completed: bool
 
@@ -49,7 +49,7 @@ def get_todos() -> Union[List[Todo], Dict[str, Any]]:
 
 @app.get("/todos/<todo_id>")
 @tracer.capture_method
-def get_todo(todo_id: int) -> Union[Todo, Dict[str, Any]]:
+def get_todo(todo_id: str) -> Union[Todo, Dict[str, Any]]:
     metrics.add_metric(name="Get Todo Invocation", unit=MetricUnit.Count, value=1)
     logger.info(f"Getting todo with id: {todo_id}")
     try:
@@ -72,11 +72,7 @@ def create_todo(new_todo: Todo) -> Union[Todo, Dict[str, Any]]:
     try:
         # Validate and parse the incoming todo data
         new_todo = Todo.parse_obj(new_todo)
-        # Assign a new unique id
-        # table = get_table_resource()
-        response = dynamo_table.scan()
-        items = response.get('Items', [])
-        new_todo.todo_id = max(item['id'] for item in items) + 1 if items else 1
+        # Insert the new todo into the DynamoDB table
         dynamo_table.put_item(Item=new_todo.dict(by_alias=True))
         logger.info("Todo created", extra=new_todo.dict())
         return new_todo, 201
@@ -88,38 +84,52 @@ def create_todo(new_todo: Todo) -> Union[Todo, Dict[str, Any]]:
 
 @app.put("/todos/<todo_id>")
 @tracer.capture_method
-def update_todo(todo_id: int, todo_toupdate: Todo) -> Union[Todo, Dict[str, Any]]:
+def update_todo(todo_id: str, todo_toupdate: Todo) -> Union[Todo, Dict[str, Any]]:
     metrics.add_metric(name="Update Todo Invocation", unit=MetricUnit.Count, value=1)
     logger.info(f"Updating todo id: {todo_id}")
     try:
-        # table = get_table_resource()
-        response = dynamo_table.get_item(Key={'id': todo_id})
-        item = response.get('Item')
-        if not item:
-            return {"error": "Todo not found"}, 404
-        todo = Todo.parse_obj(item)
-        todo.task = todo_toupdate.task
-        todo.completed = todo_toupdate.completed
-        dynamo_table.put_item(Item=todo.dict(by_alias=True))
-        return todo
+        update_expression = "set task = :task, completed = :completed"
+        expression_attribute_values = {
+            ":task": todo_toupdate.task,
+            ":completed": todo_toupdate.completed
+        }
+        response = dynamo_table.update_item(
+            Key={"id": todo_id},
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values,
+            ConditionExpression="attribute_exists(id)",
+            ReturnValues="ALL_NEW"
+        )
+        updated_todo_data = response["Attributes"]
+        updated_todo = Todo(
+            id=updated_todo_data["id"],
+            task=updated_todo_data["task"],
+            completed=updated_todo_data["completed"]
+        )
+        return updated_todo
     except ClientError as e:
+        if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+            return {"error": f"Todo with ID {todo_id} not found"}, 404
         logger.error(f"Failed to update todo: {e}")
         return {"error": "Failed to update todo"}, 500
 
 @app.delete("/todos/<todo_id>")
 @tracer.capture_method
-def delete_todo(todo_id: int):
+def delete_todo(todo_id: str):
     metrics.add_metric(name="Delete Todo Invocation", unit=MetricUnit.Count, value=1)
     logger.info(f"Deleting todo id: {todo_id}")
     try:
-        # table = get_table_resource()
-        response = dynamo_table.get_item(Key={'id': todo_id})
-        item = response.get('Item')
-        if not item:
-            return {"error": "Todo not found"}, 404
-        dynamo_table.delete_item(Key={'id': todo_id})
+        response = dynamo_table.delete_item(
+            Key={"id": todo_id},
+            ConditionExpression="attribute_exists(id)",
+            ReturnValues="ALL_OLD"
+        )
+        if "Attributes" not in response:
+            return {"error": f"Todo with ID {todo_id} not found"}, 404
         return {}, 204
     except ClientError as e:
+        if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+            return {"error": f"Todo with ID {todo_id} not found"}, 404
         logger.error(f"Failed to delete todo: {e}")
         return {"error": "Failed to delete todo"}, 500
 
@@ -129,6 +139,7 @@ def delete_todo(todo_id: int):
 # See: https://awslabs.github.io/aws-lambda-powertools-python/latest/core/tracer/
 @tracer.capture_lambda_handler
 # ensures metrics are flushed upon request completion/failure and capturing ColdStart metric
+@metrics.log_metrics(capture_cold_start_metric=True)
 def lambda_handler(event: dict, context: LambdaContext) -> dict:
     init_dynamodb()
     return app.resolve(event, context)
