@@ -174,7 +174,7 @@ output "source_queue_url" {
   description = "Source SQS Queue URL"
   value       = aws_sqs_queue.source_queue.id
 }
-output "sfn_log" {
-  description = "StepFunctions LogGroup Name"
-  value       = aws_cloudwatch_log_group.target_state_machine_log_group.name
+output "sfn_log_group_arn" {
+  description = "StepFunctions LogGroup ARN"
+  value       = aws_cloudwatch_log_group.target_state_machine_log_group.arn
 }

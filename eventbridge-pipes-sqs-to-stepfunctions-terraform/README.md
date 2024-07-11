@@ -38,10 +38,10 @@ Amazon EventBridge Pipes connects sources to targets. This Terraform stack creat
 
 ## Testing
 
-1. tarts a Live Tail streaming session for StepFunctions LogGroup 
+1. Starts a Live Tail streaming session for StepFunction LogGroup 
 
 ```
-aws logs start-live-tail --log-group-identifiers <LogGroup Name>
+aws logs start-live-tail --log-group-identifiers <StepFunction LogGroup ARN>
 ```
 
 2. Put a message into the queue
