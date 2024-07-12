@@ -1,6 +1,6 @@
-# AWS Amazon S3 Lambda with SQS queue
+# Amazon S3 to Amaozn SQS queue to AWS Lambda
 
-The terraform manifest deploys a Lambda function, an SQS queue, one S3 buckets and the IAM resources required to run the application. Create a Lambda function that is triggered on every new jpg image file stored on s3 Bucket using SQS as a notification target. The Lambda app acts as a Boilerplate code.
+The Terraform code deploys an AWS Lambda function, an Amazon SQS queue, one AWS S3 buckets and the AWS IAM resources required to run the application. The created Lambda function is triggered on every new `.jpg` image file uploaded to the S3 bucket using an SQS queue as a notification target. The Lambda function code contains only contains minimal code for demo purposes.
 
 Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/s3-sqs-lambda-terraform](https://serverlessland.com/patterns/s3-sqs-lambda-terraform)
 
@@ -41,11 +41,11 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 * Use the AWS CLI or AWS console to upload an image to the source S3 Bucket
-* If the object is a .jpg the code, a Lambda that is triggered using SQS as a notification target. 
+* If the object is a .jpg file, the Lambda function is triggered using SQS as a notification target.
 
 ## Testing
 
-Run the following S3 CLI command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the source S3 Bucket. This is provided in the stack outputs.
+Run the following AWS CLI command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the source S3 bucket. This is provided in the stack outputs.
 
 ```bash
 aws s3 cp './events/exampleImage.png'  s3://{SourceBucketName}
@@ -53,7 +53,7 @@ aws s3 cp './events/exampleImage.png'  s3://{SourceBucketName}
 
 ## Documentations and next step
 
-To create a full Step Functions workflow with the pattern created, you can find out example workflows at Step Functions Workflow: [serverlessland.com/workflows](https://serverlessland.com/workflows)
+To expand the Step Functions workflow that the pattern created, you can find out example workflows at Step Functions Workflow: [serverlessland.com/workflows](https://serverlessland.com/workflows)
 
 
 ## Cleanup
