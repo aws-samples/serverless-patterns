@@ -1,0 +1,59 @@
+{
+    "title": "Event handler for Amazon API Gateway REST and HTTP APIs using AWS Lambda and Powertools for AWS Lambda (Python)",
+    "description": "This pattern demonstrates a simple Todos API built using AWS Serverless Application Model (SAM), AWS Lambda, Amazon API Gateway, Powertools for AWS Lambda (Python) and Amazon DynamoDB. The API allows you to create, retrieve, update, and delete todo items.",
+    "language": "Python",
+    "level": "300",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Powertools for AWS Lambda (Python) Event handler is a lightweight router that reduces boilerplate for API Gateway REST/HTTP API, ALB and Lambda Function URLs",
+            "In this sample we are using Event Handler for routing our monolithic Todos function, all CRUD endpoints are defined in the same Lambda function",
+            "In this sample we also do Data validation, Swagger UI and Exception handling"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-powertools-eventhandler-python",
+            "templateURL": "serverless-patterns/apigw-rest-api-powertools-eventhandler-python",
+            "projectFolder": "apigw-rest-api-powertools-eventhandler-python",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Using Lambda with Powertools for AWS Lambda (Python) Event Handler",
+                "link": "https://docs.powertools.aws.dev/lambda/python/latest/core/event_handler/api_gateway/"
+            },
+            {
+                "text": "Powertools for AWS Lambda (Python)",
+                "link": "https://docs.powertools.aws.dev/lambda/python/latest/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Henrique Graca",
+            "image": "https://ca.slack-edge.com/E015GUGD2V6-U03HNG9AB1P-5f0da9326987-512",
+            "bio": "I am a Sr. Solutions Architect working at AWS",
+            "linkedin": "hjgraca"
+        }
+    ]
+}
