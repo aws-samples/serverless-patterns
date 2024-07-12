@@ -17,7 +17,7 @@ app.enable_swagger(path="/swagger")
 
 tracer = Tracer()
 logger = Logger()
-metrics = Metrics()
+metrics = Metrics(namespace=os.getenv("POWERTOOLS_METRICS_NAMESPACE", "ns"))
 dynamo_table = None
 
 def init_dynamodb():

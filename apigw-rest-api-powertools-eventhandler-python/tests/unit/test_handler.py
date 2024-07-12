@@ -21,11 +21,6 @@ todos = [
     {"id": UUID_3, "task": "Buy groceries", "completed": False}
 ]
 
-@pytest.fixture(scope="function", autouse=True)
-def set_env(monkeypatch):
-    os.environ["POWERTOOLS_METRICS_NAMESPACE"] = "Powertools"
-    monkeypatch.setenv("POWERTOOLS_METRICS_NAMESPACE", "Powertools")
-
 @pytest.fixture
 def lambda_context():
     class LambdaContext:
@@ -57,9 +52,7 @@ def dynamodb_mock():
         yield
         
 
-def test_get_todos(lambda_context, dynamodb_mock, monkeypatch):
-    
-    monkeypatch.setenv("POWERTOOLS_METRICS_NAMESPACE", "Powertools")
+def test_get_todos(lambda_context, dynamodb_mock):
     
     minimal_event = {
         "path": "/todos",
