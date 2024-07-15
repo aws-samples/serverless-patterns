@@ -1,0 +1,44 @@
+{
+  "title": "Amazon SQS FIFO queue with controlled delay",
+  "description": "Amazon SQS FIFO queue with delay using AWS Lambda and Amazon DynamoDB",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to introduce a delay between processing messages while maintaining order from an individual client. The message is sent sequentially to the downstream service for processing to minimize the consequences of unordered events."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-fifo-delayed-queue-dynamodb",
+      "templateURL": "serverless-patterns/sqs-fifo-delayed-queue-dynamodb",
+      "projectFolder": "sqs-fifo-delayed-queue-dynamodb",
+      "templateFile": "delay_fifo_queue_test/delay_fifo_queue_test_stack.py"
+    }
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shaun Guo",
+      "image": "https://media.licdn.com/dms/image/C5103AQG3KMyMdEIKpA/profile-displayphoto-shrink_800_800/0/1517283953925?e=1692835200&v=beta&t=AxJ9ST_8K_bw8nqTPDaJB2F5dnQspES9FuJ64DBScC8",
+      "bio": "Shaun is a Senior Technical Account Manager at Amazon Web Services based in Australia",
+      "linkedin": "shaun-guo"
+    }
+  ]
+}
