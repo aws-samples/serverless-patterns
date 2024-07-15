@@ -58,7 +58,7 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
     ```
 1. Change directory to the pattern directory:
     ```
-    cd evenbridge-bedrock-s3-aoss
+    cd eventbridge-bedrock-s3-aoss
     ```
 1. Create virtual environment for Python
     ```
