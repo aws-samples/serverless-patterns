@@ -1,5 +1,7 @@
 # Document embeddings for Amazon Bedrock using Amazon S3/AWS Lambda/Amazon OpenSearch Serverless
 
+![architecture](architecture/architecture.png)
+
 This pattern can be used to automatically create embeddings using Amazon Bedrock for documents uploaded to an Amazon S3 bucket and store the embeddings along with the document content in an Amazon OpenSearch Serverless index.
 
 This pattern is useful for RAG-based applications that use Amazon S3 as source for the knowledge base for their LLM models. The pattern helps to seamlessly create and store the embeddings for new documents once they are upload to S3.

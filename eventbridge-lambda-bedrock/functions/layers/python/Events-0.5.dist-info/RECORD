@@ -1,0 +1,15 @@
+Events-0.5.dist-info/AUTHORS,sha256=KrNix_TzJ5_bqpohnheSj_RtNdGNL5UUcSIcWjYFbWY,363
+Events-0.5.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+Events-0.5.dist-info/LICENSE,sha256=F75eab-KdESM-ikG-qm3n7AAqfBt7Re7mxUf9VOh8xM,1582
+Events-0.5.dist-info/METADATA,sha256=e0L-BkyHy_oNw2ICX5M51HJOLMFBJiuIXRqrSBG_Xps,3946
+Events-0.5.dist-info/RECORD,,
+Events-0.5.dist-info/WHEEL,sha256=pkctZYzUS4AYVn6dJ-7367OJZivF2e8RA9b_ZBjif18,92
+Events-0.5.dist-info/top_level.txt,sha256=NN1We94mMH6H4ZlvM9ciFeDVZzIic4v8JrqgZv3-rf0,7
+events/__init__.py,sha256=YID2JDUGaSVV7i5Z8z2xiSV9Nw-upHsQWQRCKEIOFBg,155
+events/__pycache__/__init__.cpython-311.pyc,,
+events/__pycache__/events.cpython-311.pyc,,
+events/events.py,sha256=khkrckY2l3mDm30KvyUdnMgdfLDvqZYurFFTBS-4B7U,3410
+events/tests/__init__.py,sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU,0
+events/tests/__pycache__/__init__.cpython-311.pyc,,
+events/tests/__pycache__/tests.cpython-311.pyc,,
+events/tests/tests.py,sha256=Z71_dVnKLGkZ03YKGvuMbxwK8KOtjo9Tuf3atUDvuH4,5207

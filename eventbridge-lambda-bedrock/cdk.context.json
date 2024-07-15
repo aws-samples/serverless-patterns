@@ -1,0 +1,15 @@
+{
+    "opensearch_serverless_params": {
+      "collection_name_prefix": "bedrock-kb", 
+      "index_name_prefix": "bedrock-rag-index"
+    },
+    "bedrock_knowledgebase_params": {
+        "s3_bucket_name_prefix":"bedrock-rag",
+        "embedding_model_id": "amazon.titan-embed-text-v2:0",
+        "vector_index_metadata_field":"text-metadata",
+        "vector_index_text_field":"text",
+        "vector_index_vector_field":"vector"
+    },
+    "admin_role_name":"Admin",
+    "stack_suffix": "jcrob6"
+}
