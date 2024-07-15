@@ -8,7 +8,7 @@
       "headline": "How it works",
       "text": [
         "This sample project demonstrates how to use the Adobe I/O Events Amazon EventBridge Integration and AWS Lambda to process/route events from Adobe. This pattern is leveraging the Adobe I/O Evenets Amazon EventBridge integration to send order events from the customer's Adobe account to their AWS account, via an Amazon EventBridge Partner event bus. Once the Adobe I/O events are in the customer's account, an Amazon EventBridge rule routes updated product events to a downstream Lambda function.",
-        "Amazon CloudWatch Log Groups are provisioned for debugging and auditing.",
+        "Amazon CloudWatch log groups are provisioned for debugging and auditing.",
         "This pattern deploys two EventBridge Rules, one Lambda function, and two CloudWatch Log Groups."
       ]
     },
