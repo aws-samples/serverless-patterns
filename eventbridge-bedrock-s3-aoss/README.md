@@ -128,12 +128,8 @@ The CDK creates resources to enable logging for an Amazon Bedrock knowledge base
 See [Knowledge bases logging](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-bases-logging.html) for more information.
 The following command tails the CloudWatch log to view KnowledgeBase events as they are logged.
 
-[!NOTE]  
-Substitute the knowledge_base_id found in the CDK Output section of the `cdk deploy` command output
-
 > [!NOTE]  
-> Substitute the knowledge_base_id found in the CDK Output section of the `cdk deploy` command output
-
+> Substitute the knowledge_base_id found in the CDK Output section of the `cdk deploy` command output of the `BedrockKnowledgebaseStack`
 
 
 ```
@@ -142,6 +138,9 @@ aws logs tail --follow --since 2m BedrockKnowledgeBase-<knowledge_base_id>
 
 ### View Ingestion Job timestamp and status
 Once you've verified that the EventBridge scheduler has invoked the StartIngestionJob, you can use the following command to check the status of ingestion job. The command outputs the most recently started ingestion job.
+
+> [!NOTE]  
+> Substitute the knowledge_base_id and data_source_id found in the CDK Output section of the `cdk deploy` command output of the `BedrockKnowledgebaseStack`
 
 ```
 aws bedrock-agent list-ingestion-jobs --knowledge-base-id <knowledge_base_id> --data-source-id <data_source_id> --query 'reverse(sort_by(ingestionJobSummaries,&startedAt))[:1].{startedAt:startedAt, updatedAt:updatedAt,ingestionJobId:ingestionJobId,status:status}'
