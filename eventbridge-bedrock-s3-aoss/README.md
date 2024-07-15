@@ -5,11 +5,12 @@ This pattern demonstrates an approach to automatically sync datasource associate
 
 After you create your knowledge base, you ingest your data source/sources into your knowledge base so that they're indexed and are able to be queried. Additionally each time you add, modify, or remove files from your data source, you must sync the data source so that it is re-indexed to the knowledge base. Syncing is incremental, so Amazon Bedrock only processes added, modified, or deleted documents since the last sync.
 
-Currently Amazon Bedrock doesn't provide an in-built feature to automatically periodically sync the datasource associated with a Knowledge Base. So customers who need to refresh their datasources periodically to ensure their knowledge base is up-to-date have to rely on bespoke solution to achieve it. This pattern shows one way of achieving it, using Amazon EventBridge Scheduler 
+At the time of writing, Knowledge Bases for Amazon Bedrock doesn't have a feature to automatically periodically sync the datasource associated with a Knowledge Base. So customers who need to refresh their datasources periodically to ensure their knowledge base is up-to-date have to rely on bespoke solution to achieve it. This pattern shows one way of achieving it, using Amazon EventBridge Scheduler 
 
 EventBridge Scheduler simplifies scheduling tasks by providing a centralized, serverless service that reliably executes schedules and invokes targets across various AWS services. In this particular pattern, we configure an EventBridge schedule that runs periodically (using a schedule expression). As part of the EventBridge schedule creation, we configure a target. A target is an API operation that EventBridge Scheduler invokes on your behalf whenever the schedule runs. In our case the target API would be the `StartIngestion` API operation on the Amazon Bedrock Agents service.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-lambda-bedrock
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-bedrock-s3-aoss
+
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -103,7 +104,7 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
     cdk deploy --all
     ```
 ## How it works
-CDK will create a Knowledge Base for Bedrock with a S3 Bucket as data source and an OpenSearch Serverless collection to store vector data. The stack also include an EventBridge scheduler that is configured to run every 5 mins and invoke the `StartIngestionJob` API on Amazon Bedrock Agents service. The Stack also includes the 
+CDK will create a Knowledge Base for Bedrock with a S3 Bucket as data source and an OpenSearch Serverless collection to store vector data. The stack also include an EventBridge scheduler that is configured to run every 5 mins and invoke the `StartIngestionJob` API on Amazon Bedrock Agents service. Amazon Bedrock supports a monitoring system to help you understand the execution of any data ingestion jobs. The Stack would create the neccessary CloudWatch log groups and CloudWatch delivery. You can gain visibility into the ingestion of your knowledge base resources with this logging system. Additionally, Amazon Bedrock is integrated with AWS CloudTrail, a service that provides a record of actions taken by a user, role, or an AWS service in Amazon Bedrock. CloudTrail captures all API calls for Amazon Bedrock as events.
 
 
 ## Testing
@@ -128,7 +129,12 @@ See [Knowledge bases logging](https://docs.aws.amazon.com/bedrock/latest/usergui
 The following command tails the CloudWatch log to view KnowledgeBase events as they are logged.
 
 [!NOTE]  
-Substitute the knowledge_base_id found in the CDK Output section when cdk deploy is run
+Substitute the knowledge_base_id found in the CDK Output section of the `cdk deploy` command output
+
+> [!NOTE]  
+> Substitute the knowledge_base_id found in the CDK Output section of the `cdk deploy` command output
+
+
 
 ```
 aws logs tail --follow --since 2m BedrockKnowledgeBase-<knowledge_base_id>
@@ -145,7 +151,7 @@ aws bedrock-agent list-ingestion-jobs --knowledge-base-id <knowledge_base_id> --
 
 ## Cleanup
  
-1. Run below script in the `eventbridge-lambda-bedrock` directory to delete AWS resources created by this sample stack.
+1. Run below script in the `eventbridge-bedrock-s3-aoss` directory to delete AWS resources created by this sample stack.
     ```bash
     cdk destroy --all
     ```
