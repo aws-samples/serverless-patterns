@@ -1,5 +1,5 @@
 {
-  "title": "EventBridge to Lambda to Bedrock",
+  "title": "# EventBridge to Amazon Bedrock to Amazon OpenSearch Serverless",
   "description": "Periodically sync Bedrock Knowledge Base",
   "language": "Python",
   "level": "200",
@@ -7,13 +7,14 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an EventBridge rule to trigger a Lambda function, which in turn triggers a sync operation on an Amazon Bedrock Knowledge Base"
+      "This sample project demonstrates how to use an EventBridge rule to periodically sync a Bedrock Knowledge Base data source to Amazon OpenSearch Serverless.",
+      "The sample project uses an EventBridge Scheduler that runs on a regular interval. The scheduler invokes has a universal target configured to trigger the StartIngestion API on Amazon Bedrock Agent service"
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-bedrock",
-      "templateURL": "serverless-patterns/eventbridge-lambda-bedrock",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-bedrock-s3-aoss",
+      "templateURL": "serverless-patterns/eventbridge-bedrock-s3-aoss",
       "projectFolder": "eventbridge-lambda-bedrock",
       "templateFile": "eventbridge-lambda-bedrock_stack.py"
     }
@@ -63,19 +64,25 @@
         "x": 10,
         "y": 50,
         "service": "evenbridge",
-        "label": "Amazon EventBridge"
+        "label": "Amazon EventBridge Scheduler"
     },
     "icon2": {
         "x": 35,
         "y": 50,
-        "service": "lambda",
-        "label": "AWS Lambda"
+        "service": "bedrock",
+        "label": "Amazon Bedrock"
     },
     "icon3": {
         "x": 60,
         "y": 50,
-        "service": "bedrock",
-        "label": "Amazon Bedrock"
+        "service": "aoss",
+        "label": "Amazon OpenSearch Serverless"
+    },
+    "icon4": {
+        "x": 75,
+        "y": 100,
+        "service": "s3",
+        "label": "Amazon S3"
     },
     "line1": {
         "from": "icon1",
@@ -84,6 +91,10 @@
     "line2": {
         "from": "icon2",
         "to": "icon3"
+    },
+    "line3": {
+        "from": "icon2",
+        "to": "icon4"
     }
   }
 }
