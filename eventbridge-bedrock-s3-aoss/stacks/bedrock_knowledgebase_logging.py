@@ -37,4 +37,3 @@ class KnowledgeBaseLoggingStack(Stack):
             delivery_destination_arn=cfn_delivery_destination.attr_arn,
             delivery_source_name=cfn_delivery_source.name,
         )
-        self.cloudwatch_log_tail_command = 

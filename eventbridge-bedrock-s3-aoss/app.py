@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 import os
-import random
-import string
 import aws_cdk as cdk
 from stacks.bedrock_knowledgebase_stack import BedrockKnowledgebaseStack
 from stacks.opensearch_serverless_stack import OpenSearchServerlessStack
