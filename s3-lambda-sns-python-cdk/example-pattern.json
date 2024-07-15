@@ -1,0 +1,58 @@
+{
+    "title": "Amazon S3 to AWS Lambda to Amazon SNS",
+    "description": "S3 upload events trigger Lambda functions to process new objects. After processing the Lambda function publishes an SNS notification.",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern creates a Amazon S3 bucket, a Lambda function, and an Amazon SNS topic. ", 
+        "The Lambda function is triggered by S3 'OBJECT_CREATED' events. The Lambda function can optionally apply business logic to the S3 object. After processing, the Lambda function publishes an SNS notification of the new object.",
+        "Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-sns-python-cdk",
+        "templateURL": "serverless-patterns/s3-lambda-sns-python-cdk",
+        "projectFolder": "s3-lambda-sns-python-cdk",
+        "templateFile": "src/s3-lambda-sns-python-cdk.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+            "text": "Getting started with the AWS CDK",
+            "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
+        },
+        {
+          "text": "Using an Amazon S3 trigger to invoke a Lambda function",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy --parameters Email=<EMAIL_ID_THAT_YOU_WANT_TO_SUSCRIBE_TO_SNS_TOPIC>"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+        {
+            "name": "Dinesh Balaaji Prabakaran",
+            "image": "https://avatars.githubusercontent.com/u/43818089?s=400&u=8a1e4fabab318016c485049108a2012b760e9ff7&v=4",
+            "bio": "I am a Senior Technical Account Manager with AWS, I specialize in architecting and developing serverless, event-driven solutions on AWS. AWS Storage Technical Field Community member.",
+            "linkedin": "pdineshbalaaji"
+        }
+    ]
+  }
