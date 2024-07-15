@@ -1,4 +1,4 @@
-# Adobe Amazon EventBridge Partner Integration to AWS Lambda
+# Send Adobe I/O Events to AWS Lambda through integration with Amazon EventBridge
 
 This pattern demonstrates how to use the Adobe I/O Events Amazon EventBridge Integration and AWS Lambda to process/route events from Adobe. This pattern is leveraging the Adobe I/O Evenets Amazon EventBridge integration to send order events from the customer's Adobe account to their AWS account, via an Amazon EventBridge Partner event bus. Once the Adobe I/O events are in the customer's account, an Amazon EventBridge rule routes updated product events to a downstream Lambda function. In production cases, the Lambda function could transform the event, send it to a downstream application, archive it in a warehouse service, or send a notification email to a customer using SES. Amazon CloudWatch Log Groups are provisioned for debugging and auditing. This pattern deploys two EventBridge rules, one Lambda function, and two CloudWatch Log Groups.
     
