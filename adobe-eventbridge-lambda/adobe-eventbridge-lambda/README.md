@@ -45,7 +45,7 @@ This service interaction uses an existing Adobe SaaS integration in the customer
 This pattern demonstrates how to:
 1. Write EventBridge rules that match Adobe's event pattern
 2. Send events from Adobe's EventBridge integration to Amazon CloudWatch for logging and debugging
-3. Transform Adobe I/O events using AWS Lambda and allows you to connect to other services going forward
+3. Transform Adobe I/O events using AWS Lambda and how to connect to other services 
 
 See the below architecture diagram from the data flow of this pattern. 
 
