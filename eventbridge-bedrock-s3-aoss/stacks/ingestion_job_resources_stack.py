@@ -84,7 +84,7 @@ class IngestionJobResourcesStack(Stack):
             flexible_time_window=scheduler.CfnSchedule.FlexibleTimeWindowProperty(
                 mode="OFF"
             ),
-            schedule_expression="rate(1 minutes)",
+            schedule_expression="rate(5 minutes)",
             schedule_expression_timezone="UTC+01:00",
             target=scheduler.CfnSchedule.TargetProperty(
                 arn="arn:aws:scheduler:::aws-sdk:bedrockagent:startIngestionJob",
