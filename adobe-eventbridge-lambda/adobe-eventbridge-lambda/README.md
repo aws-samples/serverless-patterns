@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (AWS CDK) installed
-* [Create an Adobe Developer Account](https://www.adobe.com/sign/developer-form.html) if you do not already have one and log in. 
+* [Create an Adobe Developer Account](https://www.adobe.com/sign/developer-form.html) if you do not already have one and log in. While the Adobe Developer Account is free, if you wanted to send custom events from Developer App Builder, it is free only for Adobe enterprise customers or partners who want to extend and integrate Adobe Experience Platform and Adobe Experience Cloud solutions. Currently, it is not available to individual developers who are not part of an Adobe enterprise or partner organization.
 * [Set up the Adobe Amazon EventBridge integration](https://developer.adobe.com/events/docs/guides/amazon_eventbridge/) if you have not already configured the integration.
 
 
