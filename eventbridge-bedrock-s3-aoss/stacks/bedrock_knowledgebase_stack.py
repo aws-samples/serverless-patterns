@@ -1,5 +1,6 @@
 import json
 from aws_cdk import (
+    CfnOutput,
     Stack,
     aws_bedrock as bedrock,
     aws_s3 as s3,
@@ -83,3 +84,6 @@ class BedrockKnowledgebaseStack(Stack):
         )
         self.knowledge_base_id = bedrock_knowledgebase.attr_knowledge_base_id
         self.knowledgebase_datasource_id = knowledgebase_datasource.attr_data_source_id
+        CfnOutput(
+            self, "knowledge_base_id", value=self.knowledge_base_id,export_name="knowledgeBaseId")
+        CfnOutput(self, "data_source_id", value=self.knowledgebase_datasource_id, export_name="DataSourceId")

@@ -93,13 +93,11 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
 
 1. Review the CloudFormation template CDK generates for the included stacks using the following AWS CDK CLI command:
 
-> [!NOTE]  
-> Substitute the stack_id with one from the list in output of the `cdk list` command
-
+    > [!NOTE]  
+    > Substitute the stack_id with one from the list in output of the `cdk list` command
     ```
     cdk synth <stack_id>
     ```
-
 1. From the command line, use AWS CDK to deploy the AWS resources.
     ```
     cdk deploy --all
@@ -130,11 +128,11 @@ See [Knowledge bases logging](https://docs.aws.amazon.com/bedrock/latest/usergui
 The following command tails the CloudWatch log to view KnowledgeBase events as they are logged.
 
 > [!NOTE]  
-> Substitute the knowledge_base_id found in the CDK Output section of the `cdk deploy` command output of the `BedrockKnowledgebaseStack`
+> Substitute the `knowledge_base_id` found in the CDK Output section of the `cdk deploy` command output of the `BedrockKnowledgebaseStack`
 
 
 ```
-aws logs tail --follow --since 2m BedrockKnowledgeBase-<knowledge_base_id>
+aws logs tail --follow --since 2m BedrockKnowledgeBase-`<knowledge_base_id>`
 ```
 
 ### View Ingestion Job timestamp and status
