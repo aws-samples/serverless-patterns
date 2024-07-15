@@ -48,7 +48,7 @@
     },
     "cleanup": {
         "text": [
-            "cdk destroy"
+            "<code>cdk destroy</code>"
         ]
     },
     "authors": [
