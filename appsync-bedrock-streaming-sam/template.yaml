@@ -42,7 +42,7 @@ Resources:
         Minify: false
   BedrockFunctionLogGroup:
     Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       LogGroupName: !Sub /aws/lambda/${BedrockFunction}
 

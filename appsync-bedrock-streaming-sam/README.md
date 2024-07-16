@@ -1,6 +1,6 @@
-# Amazon DynamoDB Streams to AppSync Subscription
+# Amazon DynamoDB Streams to AWS AppSync Subscription
 
-This pattern creates an AppSync API allowing you to listen to invoke Anthropic Claude V3 Haiku through a mutation and listen to the response being streamed through a subscription.
+This pattern creates an AppSync API allowing you to invoke an Amazon Bedrock model (here Anthropic Claude V3 Haiku) through a mutation and listen to the response being streamed through a subscription.
 
 Learn more about this pattern at ServerlessLand Patterns: https://serverlessland.com/patterns/appsync-bedrock-streaming-sam
 
@@ -38,14 +38,14 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This template creates an AWS AppSync API along with a AWS Lambda function. The API exposes a mutation that can be called and will trigger an async lambda function invocation (thus bypassing the 30s timeout of AppSync) that will call Anthropic Claude V3 Haiku through Amazon Bedrock and stream the response back to the end user through an AppSync subscription.
+This template creates an AWS AppSync API along with an AWS Lambda function. The API exposes a mutation that will asynchronously invoke a Lambda function, thus bypassing the 30s timeout of AppSync, to call Anthropic Claude V3 Haiku through Amazon Bedrock and stream the response back to the end user through an AppSync subscription.
 
 ## Testing
 
-The easiest way to test the AppSync API is with the AppSync console at https://console.aws.amazon.com/appsync/home#/apis (change to your appropriate region)
+The easiest way to test the AppSync API is with the [AppSync console](https://console.aws.amazon.com/appsync/home#/apis). Ensure you select the same region where you deployed this pattern.
 
-1. Click on the API you created (it should be named `BedrockAppSyncApi`) and visit the Queries tab
-2. Subscribe to `onMessage` as follows
+1. Select the API you created, named `BedrockAppSyncApi`, then choose the Queries from the navigation pane.
+2. Subscribe to `onMessage` as follows.
   ```graphql
   subscription MySubscription {
     onMessage (chatId: "test") {
@@ -55,8 +55,9 @@ The easiest way to test the AppSync API is with the AppSync console at https://c
     }
   }
   ```
-3. Open another Queries tab in another browser tab
-4. Run the `sendMessage` mutation as follows
+3. Choose Run.
+4. In another browser tab, open a second Queries page.
+5. Run the `sendMessage` mutation as follows
   ```graphql
   mutation MyMutation {
     sendMessage(
@@ -65,7 +66,8 @@ The easiest way to test the AppSync API is with the AppSync console at https://c
     )
   }
   ```
-5. In the subscription tab, you should see the response being streamed
+6. Choose Run.
+7. Switch back to your subscription tab and observe the streaming response.
   ![recording](recording.gif)
 
 ## Cleanup
