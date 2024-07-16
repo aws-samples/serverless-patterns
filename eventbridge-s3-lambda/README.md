@@ -1,6 +1,6 @@
 # AWS Lambda sending a notification when a new Amazon S3 bucket is created
 
-This pattern creates an automated monitoring system for Amazon S3 bucket create events. It defines an Amazon EventBridge rule that listens for S3 bucket creation events and triggers an AWS Lambda function. The Lambda function processes the event details and sends a notification to an SNS topic, informing subscribers of the new bucket creation.
+This pattern creates an automated monitoring system for Amazon S3 bucket create events. It defines an Amazon EventBridge rule that listens for S3 bucket creation events and invokes an AWS Lambda function. The Lambda function processes the event details and sends a notification to an Amazon SNS topic, informing subscribers of the new bucket creation.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-s3-lambda
 
