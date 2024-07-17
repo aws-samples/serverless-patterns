@@ -17,15 +17,11 @@ app.enable_swagger(path="/swagger")
 
 tracer = Tracer()
 logger = Logger()
-metrics = Metrics(namespace=os.getenv("POWERTOOLS_METRICS_NAMESPACE", "ns"))
-dynamo_table = None
+metrics = Metrics()
 
-def init_dynamodb():
-    global dynamo_table
-    if dynamo_table is None:
-        dynamodb_resource = boto3.resource("dynamodb")
-        table_name = os.getenv("TODOS_TABLE", "TABLE_NAME")
-        dynamo_table = dynamodb_resource.Table(table_name)
+dynamodb_resource = boto3.resource("dynamodb")
+table_name = os.getenv("TABLE_NAME", "TODOS")
+dynamo_table = dynamodb_resource.Table(table_name)
 
 class Todo(BaseModel):  
     todo_id: str = Field(alias="id", default_factory=lambda: str(uuid4()))
@@ -141,5 +137,4 @@ def delete_todo(todo_id: str):
 # ensures metrics are flushed upon request completion/failure and capturing ColdStart metric
 @metrics.log_metrics(capture_cold_start_metric=True)
 def lambda_handler(event: dict, context: LambdaContext) -> dict:
-    init_dynamodb()
     return app.resolve(event, context)

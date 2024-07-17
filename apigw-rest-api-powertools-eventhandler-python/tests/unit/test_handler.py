@@ -8,7 +8,7 @@ from moto import mock_dynamodb
 
 from src.app import lambda_handler
 
-TABLE_NAME = "TABLE_NAME"
+TABLE_NAME = "TODOS"
 
 # Define a static UUID
 UUID_1 = str(uuid4())
@@ -53,7 +53,7 @@ def dynamodb_mock():
         
 
 def test_get_todos(lambda_context, dynamodb_mock):
-    
+
     minimal_event = {
         "path": "/todos",
         "httpMethod": "GET",
