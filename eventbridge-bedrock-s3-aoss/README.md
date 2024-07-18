@@ -49,7 +49,7 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
    ![Model Access View](images/model-access-view.png)
     
 
-6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Save changes** to activate the models in your account. For this pattern, by default, we would only need Titan Text Embeddings V2  /  model id: amazon.titan-embed-text-v2:0.
+6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Next** to go to the Review screen and then **Submit** to enable the required models in your account. For this pattern, by default, we would only need Titan Text Embeddings V2  /  model id: amazon.titan-embed-text-v2:0.
 
 ## Deployment Instructions
 
