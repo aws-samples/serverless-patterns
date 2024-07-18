@@ -22,7 +22,8 @@ Important: this application uses various AWS services and there are costs associ
 * [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
-
+> [!Important]
+> This pattern uses Knowledge Bases for Amazon Bedrock and the Amazon Titan Text Embeddings V2. See [Supported regions and models for Knowledge bases for Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-supported.html) to select a region where Knowledge bases for Amazon Bedrock is supported
 
 ## Enable Model Access on Amazon Bedrock
 Knowledge bases for Amazon Bedrock use a foundation model to embed your data sources in a vector store. Before creating a knowledge base and selecting an embeddings model for the Knowledge Base, You must request access to the model. If you try to use the model (with the API or console) before you have requested access to it, you receive an error message. For more information, see [Model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
@@ -93,8 +94,8 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
 
 1. Review the CloudFormation template CDK generates for the included stacks using the following AWS CDK CLI command:
 
-    > [!NOTE]  
-    > Substitute the stack_id with one from the list in output of the `cdk list` command
+> [!NOTE]  
+> Substitute the stack_id with one from the list in output of the `cdk list` command
     ```
     cdk synth <stack_id>
     ```
@@ -104,9 +105,9 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
     ```
     Enter `y` if prompted `Do you wish to deploy these changes (y/n)?`
     
-    > [!NOTE]  
-    > You can optionally change the `collection_name`, `index_name`, `knowledge_base_name`, `kb_s3_datasource_name`
-    parameters in the `cdk.context.json`. The parameters are used to name the OpenSearch Serverless collection, index, the Amazon Bedrock Knowledge base and the associated S3 data source, respectively.
+> [!NOTE]  
+> You can optionally change the `collection_name`, `index_name`, `knowledge_base_name`, `kb_s3_datasource_name`
+parameters in the `cdk.context.json`. The parameters are used to name the OpenSearch Serverless collection, index, the Amazon Bedrock Knowledge base and the associated S3 data source, respectively.
 
 ## How it works
 CDK will create a Knowledge Base for Bedrock configure with S3 Bucket as data source and an OpenSearch Serverless collection to store vector data. A data source repository contains files or content with information that can be retrieved when your knowledge base is queried. The stack also include an EventBridge scheduler that is configured to run every 5 mins and invoke the `StartIngestionJob` API on Amazon Bedrock Agents service. Amazon Bedrock supports a monitoring system to help you understand the execution of any data ingestion jobs. The Stack would create the neccessary CloudWatch log groups and CloudWatch delivery. You can gain visibility into the ingestion of your knowledge base resources with this logging system. Additionally, Amazon Bedrock is integrated with AWS CloudTrail, a service that provides a record of actions taken by a user, role, or an AWS service in Amazon Bedrock. CloudTrail captures all API calls for Amazon Bedrock as events.
