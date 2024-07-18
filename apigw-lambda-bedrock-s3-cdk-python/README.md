@@ -66,7 +66,7 @@ You must request access to a model before you can use it. If you try to use the 
     ```
 1. Install the Python required dependencies:
     ```
-    pip install -r requirements.txt
+    pip install --target python -r requirements.txt
     ```
 1. Run the command below to bootstrap your account. CDK needs it to deploy
     ```

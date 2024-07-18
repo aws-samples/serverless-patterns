@@ -11,7 +11,7 @@ from constructs import Construct
 
 class KnowledgeBaseLoggingStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, stack_suffix,
+    def __init__(self, scope: Construct, construct_id: str,
                  knowledge_base_id,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -37,3 +37,5 @@ class KnowledgeBaseLoggingStack(Stack):
             delivery_destination_arn=cfn_delivery_destination.attr_arn,
             delivery_source_name=cfn_delivery_source.name,
         )
+        cfn_delivery.node.add_dependency(cfn_delivery_destination)
+        cfn_delivery.node.add_dependency(cfn_delivery_source)

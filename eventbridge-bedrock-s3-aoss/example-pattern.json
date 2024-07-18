@@ -16,7 +16,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-bedrock-s3-aoss",
       "templateURL": "serverless-patterns/eventbridge-bedrock-s3-aoss",
       "projectFolder": "eventbridge-bedrock-s3-aoss",
-      "templateFile": "app.py"0
+      "templateFile": "app.py"
     }
   },
   "resources": {

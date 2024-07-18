@@ -6,12 +6,12 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_opensearchserverless as aoss,
     aws_iam as iam,
+    aws_logs as logs,
 )
 from constructs import Construct
 
 class BedrockKnowledgebaseStack(Stack):
     def __init__(self, scope: Construct, construct_id: str,
-                 stack_suffix,
                  cfn_aoss_collection_arn,
                  index_name,
                  bedrock_kb_service_role_arn,
@@ -25,19 +25,21 @@ class BedrockKnowledgebaseStack(Stack):
         metadata_field = BEDROCK_KNOWLEDGEBASE_PARAMS['vector_index_metadata_field']
         text_field = BEDROCK_KNOWLEDGEBASE_PARAMS['vector_index_text_field']
         vector_field = BEDROCK_KNOWLEDGEBASE_PARAMS['vector_index_vector_field']
-        s3_bucket_name = f"{BEDROCK_KNOWLEDGEBASE_PARAMS['s3_bucket_name_prefix']}-{stack_suffix.lower()}"
+        knowledge_base_name = BEDROCK_KNOWLEDGEBASE_PARAMS['knowledge_base_name']
+        kb_s3_datasource_name = BEDROCK_KNOWLEDGEBASE_PARAMS['kb_s3_datasource_name']
+        kb_cw_log_group_name_prefix = BEDROCK_KNOWLEDGEBASE_PARAMS['kb_cw_log_group_name_prefix']
+        bedrock_kb_log_delivery_source = BEDROCK_KNOWLEDGEBASE_PARAMS['bedrock_kb_log_delivery_source']
 
         #Create an S3 bucket to store the data files needed for RAG Knowledge Base
         knowledgebase_datasource_bucket = s3.Bucket(
             self,
             "KBDataSourceS3Bucket",
-            bucket_name=s3_bucket_name,
             public_read_access=False
         )
-                                  
+            
         #Create the Bedrock Knowledge Base with the s3 bucket as knowledge base
         bedrock_knowledgebase = bedrock.CfnKnowledgeBase(self, "BedrockKB",
-            name=f"knowledge-base-{stack_suffix}",
+            name=knowledge_base_name,
             knowledge_base_configuration=bedrock.CfnKnowledgeBase.KnowledgeBaseConfigurationProperty(
                 type="VECTOR",
                 vector_knowledge_base_configuration=bedrock.CfnKnowledgeBase.VectorKnowledgeBaseConfigurationProperty(
@@ -61,9 +63,11 @@ class BedrockKnowledgebaseStack(Stack):
             description="RAG Knowledge Base for Amazon Bedrock"
         )
         
+        
+        knowledge_base_id = bedrock_knowledgebase.attr_knowledge_base_id
         #Add a KB datasource with S3 datasource configuration
         knowledgebase_datasource = bedrock.CfnDataSource(self, "BedrockKBDataSource",
-            name=f"bedrock_kb_datasource-{stack_suffix}",
+            name=kb_s3_datasource_name,
             description="Bedrock Knowledgebase DataSource Configuration",
             data_source_configuration=bedrock.CfnDataSource.DataSourceConfigurationProperty(
                 s3_configuration=bedrock.CfnDataSource.S3DataSourceConfigurationProperty(
@@ -80,10 +84,34 @@ class BedrockKnowledgebaseStack(Stack):
                     )
                 )
             ),
-            knowledge_base_id=bedrock_knowledgebase.attr_knowledge_base_id,
+            knowledge_base_id=knowledge_base_id,
         )
+        cfn_log_group = logs.CfnLogGroup(self, "BedrockKBLogGroup",
+            log_group_name=f"{kb_cw_log_group_name_prefix}-{knowledge_base_id}",
+            retention_in_days=14,
+        )
+
+        cfn_delivery_destination = logs.CfnDeliveryDestination(self, "BedrockKBDeliveryDestination",
+            name="BedrockKBDeliveryDestination",
+            destination_resource_arn=cfn_log_group.attr_arn
+        )
+        cfn_delivery_source = logs.CfnDeliverySource(self, "BedrockKBDeliverySource",
+            name=bedrock_kb_log_delivery_source,
+            log_type="APPLICATION_LOGS",
+            resource_arn=f"arn:aws:bedrock:{self.region}:{self.account}:knowledge-base/{knowledge_base_id}"
+        )
+        
+        cfn_delivery = logs.CfnDelivery(self, "BedrockKBDelivery",
+            delivery_destination_arn=cfn_delivery_destination.attr_arn,
+            delivery_source_name=cfn_delivery_source.name,
+        )
+        cfn_delivery.node.add_dependency(cfn_delivery_destination)
+        cfn_delivery.node.add_dependency(cfn_delivery_source)
+
         self.knowledge_base_id = bedrock_knowledgebase.attr_knowledge_base_id
         self.knowledgebase_datasource_id = knowledgebase_datasource.attr_data_source_id
+        self.bucket_name = knowledgebase_datasource_bucket.bucket_name
         CfnOutput(
             self, "knowledge_base_id", value=self.knowledge_base_id,export_name="knowledgeBaseId")
         CfnOutput(self, "data_source_id", value=self.knowledgebase_datasource_id, export_name="DataSourceId")
+        CfnOutput(self, "bucket_name", value=self.bucket_name, export_name="DataSourceBucketName")

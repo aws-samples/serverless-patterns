@@ -1,6 +1,7 @@
 import json
 from aws_cdk import (
     Duration,
+    Names,
     RemovalPolicy,
     Stack,
     aws_lambda as _lambda,
@@ -13,18 +14,15 @@ from constructs import Construct
 
 class OpenSearchServerlessStack(Stack):
     def __init__(self, scope: Construct, construct_id: str,
-            stack_suffix,
             bedrock_kb_service_role_arn,
             **kwargs) -> None:
 
         super().__init__(scope, construct_id, **kwargs)
-                
+
         #retrieve the context parameters that would be used in creating the resources
         OPENSEARCH_SERVERLESS_PARAMS = self.node.try_get_context('opensearch_serverless_params')
-        collection_name = f"{OPENSEARCH_SERVERLESS_PARAMS['collection_name_prefix']}-{stack_suffix}".lower()
-        index_name = f"{OPENSEARCH_SERVERLESS_PARAMS['index_name_prefix']}-{stack_suffix}".lower()
-        admin_role_name = self.node.try_get_context('admin_role_name')
-        admin_role_arn = f"arn:aws:iam::{self.account}:role/{admin_role_name}"
+        collection_name = OPENSEARCH_SERVERLESS_PARAMS['collection_name']
+        index_name = f"{OPENSEARCH_SERVERLESS_PARAMS['index_name']}"
 
         # Index Creation Lambda Role
         create_aoss_index_lambda_role = iam.Role(self, "create-index-lambda-role",
@@ -100,7 +98,6 @@ class OpenSearchServerlessStack(Stack):
                 "ResourceType": "index"
             }],
             "Principal": [
-                admin_role_arn,
                 create_aoss_index_lambda_role.role_arn,
                 bedrock_kb_service_role_arn
             ]
@@ -156,7 +153,8 @@ class OpenSearchServerlessStack(Stack):
             role=iam.Role.from_role_arn(self, "LambdaRole", create_aoss_index_lambda_role.role_arn),
             layers=[layer]
         ) 
-
+        create_aoss_index_function.node.add_dependency(layer)
+        
         #Create the Custom Resource Provider backed by Lambda Function
         crProvider = custom_resources.Provider(
             self, 'CreateAOSSIndexCustomResourceProvider',

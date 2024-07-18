@@ -8,17 +8,15 @@ from constructs import Construct
 
 class BedrockServiceRoleStack(Stack):
     def __init__(self, scope: Construct, construct_id: str,
-                 stack_suffix,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-
-        #setup variables for use in constructs
-        BEDROCK_KNOWLEDGEBASE_PARAMS = self.node.try_get_context('bedrock_knowledgebase_params')
-        s3_bucket_name = f"{BEDROCK_KNOWLEDGEBASE_PARAMS['s3_bucket_name_prefix']}-{stack_suffix.lower()}"
 
         #Create an IAM Service Role for Bedrock Knowledge Base
         bedrock_kb_service_role = iam.Role(self, "BedrockKBServiceRole",
             role_name="BedrockKBServiceRole",
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3ReadOnlyAccess"),
+            ],
             inline_policies={
                 "StartIngestionJob": iam.PolicyDocument(
                     statements=[
@@ -33,19 +31,6 @@ class BedrockServiceRoleStack(Stack):
                         iam.PolicyStatement(
                             actions=["bedrock:InvokeModel"],
                             resources=[f"arn:aws:bedrock:{self.region}::foundation-model/*"]
-                        )
-                    ]
-                ),
-                "S3DataSourceAccess": iam.PolicyDocument(
-                    statements=[
-                        iam.PolicyStatement(
-                            actions=["s3:GetObject", "s3:ListBucket"],
-                            resources=[f"arn:aws:s3:::{s3_bucket_name}", f"arn:aws:s3:::{s3_bucket_name}/*"],
-                            conditions={
-                                "StringEquals": {
-                                    "aws:PrincipalAcccount":self.account
-                                }
-                            }
                         )
                     ]
                 ),
