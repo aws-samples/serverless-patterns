@@ -8,15 +8,15 @@
     "headline": "How it works",
     "text": [
       "This sample project demonstrates how to use an EventBridge rule to periodically sync a Bedrock Knowledge Base data source to Amazon OpenSearch Serverless.",
-      "The sample project uses an EventBridge Scheduler that runs on a regular interval. The scheduler invokes has a universal target configured to trigger the StartIngestion API on Amazon Bedrock Agent service"
+      "The sample project uses an EventBridge Scheduler that runs on a regular interval. The scheduler has a universal target configured to trigger the StartIngestionJob API on Amazon Bedrock Agent service. The StartIngestionJob runs a job to sync the data source to the Knowledge Base"
     ]
   },
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-bedrock-s3-aoss",
       "templateURL": "serverless-patterns/eventbridge-bedrock-s3-aoss",
-      "projectFolder": "eventbridge-lambda-bedrock",
-      "templateFile": "eventbridge-lambda-bedrock_stack.py"
+      "projectFolder": "eventbridge-bedrock-s3-aoss",
+      "templateFile": "app.py"0
     }
   },
   "resources": {
@@ -37,7 +37,7 @@
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "cdk deploy --all"
     ]
   },
   "testing": {
@@ -47,7 +47,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>cdk destroy</code>."
     ]
   },
   "authors": [
