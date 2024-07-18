@@ -1,0 +1,22 @@
+I need to summarize a conversation. the transcript of the conversation is between the <data> XML like tags.
+
+<data>
+{{transcript}}
+</data>
+
+The summary must contain a one word sentiment analysis, and a list of issues, problems or causes of friction during the conversation. The output must be provided in JSON format shown below.
+
+Example output:
+{
+    "sentiment" :<sentiment>,
+    "issues" : [
+        {
+            "topic" :<topic>,
+            "summary" : <issue_summary>,
+        }
+    ]
+}
+
+Write the JSON output and nothing more.
+
+Here is the JSON output:

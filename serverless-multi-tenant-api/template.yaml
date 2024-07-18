@@ -1,0 +1,198 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >-
+  serverless-multi-tenant-api
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      ApiKeySourceType : HEADER
+      Auth:
+        ApiKeyRequired: true # sets for all methods
+        DefaultAuthorizer: MyLambdaRequestAuthorizer
+        Authorizers:
+          MyLambdaRequestAuthorizer:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt authFunction.Arn
+            Identity:
+                ReauthorizeEvery: 0
+                Headers:
+                  - x-api-key
+
+  # Create Usage Plan
+  UsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+        - ApiId: !Ref MyApi
+          Stage: !Ref MyApi.Stage
+      Description: Usage plan for API Gateway
+
+  # Create API Key
+  TestApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Enabled: true
+      StageKeys:
+        - RestApiId: !Ref MyApi
+          StageName: !Ref MyApi.Stage
+  
+  UsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref TestApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref UsagePlan
+
+  AuthorizerExecutionRole:
+    Type: AWS::IAM::Role     
+    Properties:
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy    
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:      
+        - PolicyName: authorizer-execution-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                Resource:
+                  - !GetAtt ConfigTable.Arn
+
+  AuthorizerAccessRole:
+    Type: AWS::IAM::Role
+    DependsOn: AuthorizerExecutionRole
+    Properties:
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !GetAtt 'AuthorizerExecutionRole.Arn'
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: authorizer-access-role-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem 
+                Resource:  
+                  - !GetAtt ItemTable.Arn
+
+  # This is a Lambda function config associated with the source code: auth.js
+  authFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Role: !GetAtt AuthorizerExecutionRole.Arn
+      Handler: src/handlers/auth.authHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 5
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          CONFIG_TABLE: !Ref ConfigTable
+          ITEM_TABLE_ARN: !GetAtt ItemTable.Arn
+          AUTHORIZER_ACCESS_ROLE_ARN: !GetAtt AuthorizerAccessRole.Arn
+
+  # This is a Lambda function config associated with the source code: get-by-id.js
+  getByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get-by-id.getByIdHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 5
+      Description: A simple example includes a HTTP get method to get one item by id from a DynamoDB table.
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ITEM_TABLE: !Ref ItemTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Auth:
+              ApiKeyRequired: true
+            Path: /{id}
+            Method: GET
+
+  # This is a Lambda function config associated with the source code: put-item.js
+  putItemFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/put-item.putItemHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 5
+      Description: A simple example includes a HTTP post method to add one item to a DynamoDB table.
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ITEM_TABLE: !Ref ItemTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Auth:
+              ApiKeyRequired: true
+            Path: /
+            Method: POST
+
+  # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
+  ItemTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: PK
+        Type: String
+
+  # DynamoDB table to store config: {id: &lt;ID&gt;}
+  ConfigTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: PK
+        Type: String
+
+Outputs:
+  WebEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  TestApiKeyOutput:
+    Description: "API Key"
+    Value: !Ref TestApiKey
+  DynamoDBTableName:
+    Description: "DynamoDB Table Name"
+    Value: !Ref ConfigTable

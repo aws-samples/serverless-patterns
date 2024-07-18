@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34714.143
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cdk", "src\cdk\Cdk.csproj", "{9BCA0860-6B12-4FC8-A33F-582675FCDF89}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedrockLambda", "..\BedrockLambda\BedrockLambda.csproj", "{BB6A0E67-7AB3-4DE6-B4A6-DE6AAB78ACD7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9BCA0860-6B12-4FC8-A33F-582675FCDF89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BCA0860-6B12-4FC8-A33F-582675FCDF89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BCA0860-6B12-4FC8-A33F-582675FCDF89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BCA0860-6B12-4FC8-A33F-582675FCDF89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB6A0E67-7AB3-4DE6-B4A6-DE6AAB78ACD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB6A0E67-7AB3-4DE6-B4A6-DE6AAB78ACD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB6A0E67-7AB3-4DE6-B4A6-DE6AAB78ACD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB6A0E67-7AB3-4DE6-B4A6-DE6AAB78ACD7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BA9DE9C3-6A01-4536-8CE5-9D6F8770730C}
+	EndGlobalSection
+EndGlobal

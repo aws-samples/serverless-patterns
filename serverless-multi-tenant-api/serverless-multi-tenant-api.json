@@ -1,0 +1,94 @@
+{
+    "title": "Multi-Tenant Serverless API",
+    "description": "Create a multi-tenant serverless API using API Gateway, Lambda, and DynamoDB with tenant based authorization .",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "In this project, requests are authorized using API keys mapped to tenants in DynamoDB. Access to data is restricted using dynamic IAM policies based on the tenant ID. "
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/serverless-multi-tenant-api",
+            "templateURL": "serverless-patterns/serverless-multi-tenant-api",
+            "projectFolder": "serverless-multi-tenant-api",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Use API Gateway Lambda authorizers",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
+            },
+            {
+                "text": "Call an API with API Gateway Lambda authorizers",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/call-api-with-api-gateway-lambda-authorization.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "npm install",
+            "sam build",
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Michael Ohde",
+            "image": "https://d2908q01vomqb2.cloudfront.net/7719a1c782a1ba91c031a682a0a2f8658209adbf/2023/09/02/ohd-profile.jpg",
+            "bio": "Michael Ohde is a Senior Solutions Architect from Long Beach, CA. As a Product Acceleration Solution Architect at  Amazon Web Services (AWS), he currently assists Independent Software Vendor (ISVs) in the GovTech and EdTech sectors, by building modern applications using practices like serverless, DevOps, and AI/ML.",
+            "linkedin": "ohde"
+        },
+        {
+            "name": "Swapnil Singh",
+            "image": "https://avatars.githubusercontent.com/u/97851237?s=400&u=72d77e6dcbe98da4d9629d6224ab014474d7c703&v=4",
+            "bio": "Swapnil Singh is a Solutions Architect at Amazon Web Services (AWS).",
+            "linkedin": "swapnilsingh"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway REST API"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda functions"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "dynamodb",
+            "label": "DynamoDB"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "with tenant id"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": ""
+        }
+    }
+}

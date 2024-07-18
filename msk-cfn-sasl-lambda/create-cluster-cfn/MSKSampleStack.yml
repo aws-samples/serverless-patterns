@@ -165,6 +165,7 @@ Resources:
     Properties: 
       AutomaticStopTimeMinutes: 30
       Description: "Cloud9 EC2 environment"
+      ImageId: "amazonlinux-2023-x86_64"
       InstanceType: t3.large
       Name: !Sub "${AWS::StackName}-Cloud9EC2Bastion"
       SubnetId: !Ref PublicSubnetOne

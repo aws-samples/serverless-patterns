@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: EventBridge Pipe that connects Kinesis Stream, filters and enriches the messages with a SFN workflow as target
+
+Resources:
+  SourceStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      StreamEncryption:
+        EncryptionType: KMS
+        KeyId: alias/aws/kinesis
+      StreamModeDetails:
+        StreamMode: ON_DEMAND
+  Pipe:
+    Type: AWS::Pipes::Pipe 
+    Properties:
+      RoleArn: !GetAtt PipeIamRole.Arn 
+      Source: !GetAtt SourceStream.Arn
+      SourceParameters:
+        KinesisStreamParameters:
+          BatchSize: 10
+          StartingPosition: LATEST
+        FilterCriteria:
+          Filters:
+            - Pattern: '{ "data": { "category": ["PASS_FILTER"] } }'
+      Enrichment: !GetAtt EnrichmentLambda.Arn
+      Target: !Ref TargetSfn
+  PipeIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: pipes.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "kinesis:DescribeStream"
+                  - "kinesis:GetRecords"
+                  - "kinesis:GetShardIterator"
+                  - "kinesis:ListStreams"
+                Resource: !GetAtt SourceStream.Arn
+        - PolicyName: TargetPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: states:StartSyncExecution
+                Resource: !Ref TargetSfn
+        - PolicyName: EnrichmentPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt EnrichmentLambda.Arn
+  EnrichmentLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: EnrichmentLambda
+      CodeUri: src/enricher
+      Handler: index.handler
+      Runtime: nodejs20.x
+      MemorySize: 128
+      Timeout: 30
+      Tracing: Active
+  EnrichmentLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${EnrichmentLambda}
+  TargetSfn:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        StartAt: Pass
+        States:
+          Pass:
+            Type: Pass
+            End: true
+      Logging:
+        Level: ALL
+        IncludeExecutionData: true
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt TargetSfnLogGroup.Arn
+      Policies:
+        - AWSXrayWriteOnlyAccess
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogDelivery
+                - logs:GetLogDelivery
+                - logs:UpdateLogDelivery
+                - logs:DeleteLogDelivery
+                - logs:ListLogDeliveries
+                - logs:PutResourcePolicy
+                - logs:DescribeResourcePolicies
+                - logs:DescribeLogGroups
+              Resource: '*'
+      Tracing:
+        Enabled: true
+      Type: EXPRESS
+      DefinitionSubstitutions: {}
+  TargetSfnLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub
+        - /aws/vendedlogs/states/${AWS::StackName}-${ResourceId}-Logs
+        - ResourceId: TargetSfn
+Outputs:
+  StreamName:
+    Value: !Ref SourceStream

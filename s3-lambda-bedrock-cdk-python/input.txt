@@ -1,0 +1,1 @@
+Sample input file for generating embedding from Bedrock model amazon.titan-embed-text-v1

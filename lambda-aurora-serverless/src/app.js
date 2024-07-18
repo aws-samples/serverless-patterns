@@ -1,5 +1,5 @@
-const AWS = require("aws-sdk");
-const rdsDataService = new AWS.RDSDataService();
+const { RDSData } = require("@aws-sdk/client-rds-data");
+const rdsDataService = new RDSData();
 
 async function RunCommand(sqlStatement, sqlValues){
   // Prepare the SQL parameters required for Data API
@@ -21,7 +21,7 @@ async function RunCommand(sqlStatement, sqlValues){
   console.log("SQL Parameters:\n", JSON.stringify(sqlParams));
 
   // Use the Data API ExecuteStatement operation to run the SQL command
-  const result = await rdsDataService.executeStatement(sqlParams).promise();
+  const result = await rdsDataService.executeStatement(sqlParams);
   //console.log("Result:\n", result);
   return result;
 }

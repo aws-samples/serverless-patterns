@@ -1,0 +1,153 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: Event driven Amazon MQ for ActiveMQ message processing using AWS Lambda (Java)
+
+Globals:
+  Function:
+    Runtime: java21
+    MemorySize: 512
+
+Parameters:
+  username:
+    Type: String
+    AllowedPattern: "^[a-zA-Z0-9_][a-zA-Z0-9_.@-]{1,98}[a-zA-Z0-9_@.-]$"
+    Description: Username for accessing ActiveMQ
+  password:
+    Type: String
+    AllowedPattern: "^(?=(.*\\p{Print}){4,})(?!.*[ ,:=])[\\p{Print}]{12,}$"
+    Description: Password for accessing ActiveMQ (must be at least 12 characters long)
+
+Resources:
+
+  # Create VPC and related resources 
+  VPC: 
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  Route:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation  
+    Properties:
+      SubnetId: !Ref Subnet
+      RouteTableId: !Ref RouteTable
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP traffic
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8162
+          ToPort: 8162
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 61617
+          ToPort: 61617
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: all
+          CidrIp: 0.0.0.0/0
+
+  # Create the Amazon MQ Broker with ActiveMQ Engine
+  MyMQBroker:
+    Type: AWS::AmazonMQ::Broker
+    Properties:
+      AutoMinorVersionUpgrade: false
+      BrokerName: myActiveMQBroker
+      DeploymentMode: SINGLE_INSTANCE
+      EngineType: ACTIVEMQ
+      EngineVersion: "5.17.6"
+      HostInstanceType: mq.t3.micro
+      PubliclyAccessible: true
+      SubnetIds:
+        - !Ref Subnet
+      SecurityGroups:
+        - !Ref SecurityGroup
+      
+      Users:
+        - Password:
+            Ref: password
+          Username:
+            Ref: username
+          ConsoleAccess: true
+  # Create the Lambda function to receive ActiveMQ messages
+  MyMQMessageHandlerFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: .
+      Handler: com.example.MyMQMessageHandlerFunction::handleRequest
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Resource:
+              - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:*/*
+              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:*/*
+              - !Sub arn:aws:mq:${AWS::Region}:${AWS::AccountId}::*/*
+              Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeVpcs
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            BatchSize: 10
+            Broker: !GetAtt MyMQBroker.Arn
+            Queues:
+              - MyTestQueue
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Ref MySecret
+
+  # A secret to store Amzon MQ Access credential
+  MySecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: A secret to store Amzon MQ Access credential
+      SecretString: !Sub '{"username": "${username}", "password": "${password}"}'
+
+Outputs:
+  ActiveMQWebConsole:
+    Description: The ActiveMQ web-console host
+    Value: !Sub 'https://${MyMQBroker}-1.mq.${AWS::Region}.amazonaws.com:8162/admin/index.jsp'
+  MyMQMessageHandlerFunction:
+    Description: The name of the ActiveMQ message handler function
+    Value: !Ref MyMQMessageHandlerFunction

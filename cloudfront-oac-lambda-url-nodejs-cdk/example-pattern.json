@@ -1,0 +1,52 @@
+{
+    "title": "Amazon CloudFront Origin Access Control for AWS Lambda Function URL",
+    "description": "Shows how to protect AWS Lambda Function URL origins by using CloudFront Origin Access Control to only allow access from designated CloudFront distributions.",
+    "language": "Node.js",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Amazon CloudFront will use Origin Access Control (OAC) to authenticate access to Lambda Function URLs from their designated CloudFront distributions"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-oac-lambda-url-nodejs-cdk",
+            "templateURL": "serverless-patterns/cloudfront-oac-lambda-url-nodejs-cdk",
+            "projectFolder": "cloudfront-oac-lambda-url-nodejs-cdk/lib",
+            "templateFile": "cloudfront-oac-lambda-url-nodejs-cdk-construct.js"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon CloudFront Origin Access Control (OAC) for Lambda function URL origins",
+                "link": "https://aws.amazon.com/about-aws/whats-new/2024/04/amazon-cloudfront-oac-lambda-function-url-origins/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "cdk destroy"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Thiago Pádua",
+            "image": "https://serverlessland.com/assets/images/resources/thiago-padua.jpeg",
+            "bio": "Senior Partner Solutions Architect, Serverless at Amazon Web Services (AWS)",
+            "linkedin": "thiagopadua"
+        }
+    ]
+}

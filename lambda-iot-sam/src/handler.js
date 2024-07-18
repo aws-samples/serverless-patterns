@@ -1,11 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
-const iotdata_1 = __importDefault(require("aws-sdk/clients/iotdata"));
-const iotdata = new iotdata_1.default({ endpoint: process.env.IOT_DATA_ENDPOINT });
+const client_iot_data_plane_1 = require("@aws-sdk/client-iot-data-plane");
+const iotdata = new client_iot_data_plane_1.IoTDataPlane({ endpoint: process.env.IOT_DATA_ENDPOINT });
 const handler = async (event) => {
     const params = {
         topic: `${process.env.IOT_TOPIC}`,
@@ -15,7 +12,7 @@ const handler = async (event) => {
             detail: "world"
         })
     };
-    await iotdata.publish(params).promise();
+    await iotdata.publish(params);
 };
 exports.handler = handler;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaGFuZGxlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImhhbmRsZXIudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQUEsc0VBQThDO0FBRTlDLE1BQU0sT0FBTyxHQUFHLElBQUksaUJBQU8sQ0FBQyxFQUFFLFFBQVEsRUFBRSxPQUFPLENBQUMsR0FBRyxDQUFDLGlCQUFpQixFQUFFLENBQUMsQ0FBQTtBQUVqRSxNQUFNLE9BQU8sR0FBUSxLQUFLLEVBQUUsS0FBVSxFQUFnQixFQUFFO0lBQzdELE1BQU0sTUFBTSxHQUFHO1FBQ2IsS0FBSyxFQUFFLEdBQUcsT0FBTyxDQUFDLEdBQUcsQ0FBQyxTQUFTLEVBQUU7UUFDakMsR0FBRyxFQUFFLENBQUM7UUFDTixPQUFPLEVBQUUsSUFBSSxDQUFDLFNBQVMsQ0FBQztZQUN0QixJQUFJLEVBQUUsT0FBTztZQUNiLE1BQU0sRUFBRSxPQUFPO1NBQ2hCLENBQUM7S0FDSCxDQUFDO0lBQ0YsTUFBTSxPQUFPLENBQUMsT0FBTyxDQUFDLE1BQU0sQ0FBQyxDQUFDLE9BQU8sRUFBRSxDQUFDO0FBQzFDLENBQUMsQ0FBQztBQVZXLFFBQUEsT0FBTyxXQVVsQiJ9
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaGFuZGxlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImhhbmRsZXIudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBQUEsMEVBQThEO0FBRTlELE1BQU0sT0FBTyxHQUFHLElBQUksb0NBQVksQ0FBQyxFQUFFLFFBQVEsRUFBRSxPQUFPLENBQUMsR0FBRyxDQUFDLGlCQUFpQixFQUFFLENBQUMsQ0FBQTtBQUV0RSxNQUFNLE9BQU8sR0FBUSxLQUFLLEVBQUUsS0FBVSxFQUFnQixFQUFFO0lBQzdELE1BQU0sTUFBTSxHQUFHO1FBQ2IsS0FBSyxFQUFFLEdBQUcsT0FBTyxDQUFDLEdBQUcsQ0FBQyxTQUFTLEVBQUU7UUFDakMsR0FBRyxFQUFFLENBQUM7UUFDTixPQUFPLEVBQUUsSUFBSSxDQUFDLFNBQVMsQ0FBQztZQUN0QixJQUFJLEVBQUUsT0FBTztZQUNiLE1BQU0sRUFBRSxPQUFPO1NBQ2hCLENBQUM7S0FDSCxDQUFDO0lBQ0YsTUFBTSxPQUFPLENBQUMsT0FBTyxDQUFDLE1BQU0sQ0FBQyxDQUFDO0FBQ2hDLENBQUMsQ0FBQztBQVZXLFFBQUEsT0FBTyxXQVVsQiJ9

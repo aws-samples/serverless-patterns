@@ -1,0 +1,1 @@
+This is a sample file 1. This file will be used to test transfer of file from remote SFTP server to Amazon S3 using AWS Transfer Family Connector.

@@ -2,7 +2,7 @@ Transform: AWS::Serverless-2016-10-31
 
 Globals:
   Function:
-    Runtime: nodejs16.x
+    Runtime: nodejs20.x
     Architectures: ["arm64"]
     Timeout: 29
     MemorySize: 1024
@@ -84,7 +84,11 @@ Resources:
       Handler: handler.handler
       Environment:
         Variables:
-          IOT_DATA_ENDPOINT: !GetAtt IotEndpoint.IotEndpointAddress
+          IOT_DATA_ENDPOINT:
+            Fn::Join:
+              - ""
+              - - "https://"
+                - !GetAtt IotEndpoint.IotEndpointAddress
           IOT_TOPIC: !Ref IOTRealtime
       Policies:
         - Statement:

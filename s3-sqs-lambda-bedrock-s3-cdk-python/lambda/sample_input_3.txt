@@ -1,0 +1,15 @@
+Customer: Hi, I need to book a room for next weekend urgently. My original plans fell through, and I'm feeling quite stressed about finding accommodation now.
+
+Agent: I'm really sorry to hear that you're feeling stressed, but don't worry, we'll do our best to help you out. Let's get started. When would you like to check-in and check-out?
+
+Customer: Thank you for understanding. I need the room from Friday to Sunday.
+
+Agent: Alright, let me check our availability for those dates. [after a brief pause] I'm sorry, but it looks like we only have a few rooms left for those dates. They're mostly our standard rooms. Would that be suitable for you?
+
+Customer: Standard rooms are fine, I suppose. As long as I have a place to stay, I'll manage.
+
+Agent: I understand your situation. Let me go ahead and reserve a standard room for you. [after a moment] Your room has been booked. Is there anything else I can assist you with to make your stay more comfortable?
+
+Customer: No, that's all for now. I appreciate your help.
+
+Agent: You're welcome. If you need anything else or have any concerns during your stay, feel free to contact our front desk. We hope your weekend goes smoothly despite the last-minute changes.

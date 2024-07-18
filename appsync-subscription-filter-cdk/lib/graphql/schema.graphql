@@ -1,0 +1,29 @@
+type Query @aws_iam {
+	identity: Identity!
+}
+
+type Mutation @aws_iam {
+    sendResponse(response: ResponseInput!): Response
+}
+
+type Subscription @aws_iam {
+    onResponseReceived: Response @aws_subscribe(mutations: ["sendResponse"])
+}
+
+type Identity {
+    accountId: String;
+    sourceIp: [String];
+    userArn: String;
+    username: String;
+}
+
+input ResponseInput {
+    userId: String!
+    message: String!
+}
+
+type Response {
+    id: String
+    userId: String
+    message: String
+}

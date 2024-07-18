@@ -1,0 +1,63 @@
+{
+  "title": "Selective file transfer between SFTP server & Amazon S3 using AWS Transfer Family",
+  "description": "This pattern shows how to use AWS Transfer Family to list and transfer specific files between an SFTP server and Amazon S3 bucket.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The remote SFTP server is simulated using AWS Transfer Family SFTP Server for this pattern. In a real use case, this can be any remote SFTP server outside of AWS.",
+      "SFTP Connector is configured to connect to the remote server with Amazon S3 bucket using SFTP protocol. The authentication is done using SSH Key based handshake.",
+      "Amazon S3 bucket is used for file storage on the AWS side.",
+      "User can list files on the remote server and selectively transfer files from the remote server to the Amazon S3 bucket using AWS Transfer Family API or CLI commands.",
+      "User can also transfer files from Amazon S3 to the remote server using the AWS Transfer Family API or CLI commands."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/awstransfer-s3-sam",
+      "templateURL": "serverless-patterns/awstransfer-s3-sam",
+      "projectFolder": "awstransfer-s3-sam",
+      "templateFile": "template-sftp-server.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting started with AWS Transfer Family server endpoints",
+        "link": "https://docs.aws.amazon.com/transfer/latest/userguide/getting-started.html"
+      },
+      {
+        "text": "Configure SFTP connectors",
+        "link": "https://docs.aws.amazon.com/transfer/latest/userguide/configure-sftp-connector.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions.",
+      "bash deploy.sh"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Amazon S3 input bucket content: <code>aws s3 rm s3://{MySFTPServerS3Bucket} --recursive --region {my-region}</code>",
+      "Delete the Amazon S3 output bucket content: <code>aws s3 rm s3://{MyLocalS3Bucket} --recursive --region {my-region}</code>",
+      "bash undeploy.sh"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

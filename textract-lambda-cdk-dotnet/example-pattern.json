@@ -1,0 +1,59 @@
+{
+    "title": "Extract text from images using Amazon Textract",
+    "description": "This CDK application demonstrates how to use Amazon Textract service to extract text from images.",
+    "language": ".NET",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern shows how to extract text from images using Amazon Textract, AWS Lambda function and Amazon S3.",
+        "When images are uploaded into the Amazon S3 bucket, notifications are sent to a Lambda function. The Lambda function utilizes that notification to identify the newly uploaded image and sends it to the Amazon Textract service, which extracts text from the image and stores it in the S3 bucket."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/textract-lambda-cdk-dotnet",
+        "projectFolder": "textract-lambda-cdk-dotnet",
+        "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/textract-lambda-cdk-dotnet/README.md",
+        "templateURL": "serverless-patterns/textract-lambda-cdk-dotnet",
+        "templateFile": "cdk/src/Cdk/CdkStack.cs"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Using AWS Lambda with Amazon S3",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
+        },
+        {
+          "text": "Analyzing Document Text with Amazon Textract",
+          "link": "https://docs.aws.amazon.com/textract/latest/dg/analyzing-document-text.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Pankaj Rawat",
+        "image": "https://avatars.githubusercontent.com/u/21244341?s=96&v=4",
+        "bio": "Pankaj Rawat is a Lead Consultant at Amazon Web Services.",
+        "linkedin": "pankaj-rawat-14568765",
+        "twitter": "pankajrawat333"
+      }
+    ]
+  }

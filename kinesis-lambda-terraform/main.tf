@@ -22,7 +22,7 @@ resource "aws_lambda_function" "sample_lambda" {
   function_name    = "sample-lambda"
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
-  runtime          = "nodejs14.x"  # Change to your preferred runtime
+  runtime          = "nodejs16.x"  # Change to your preferred runtime
 }
 resource "aws_iam_role" "lambda_role" {
   name = "lambda-role"
