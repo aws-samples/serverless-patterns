@@ -123,10 +123,12 @@ aws scheduler get-schedule --name BedrockKBDataSourceSyncSchedule --group Bedroc
 ```
 ### Upload Document(s) to S3 Bucket
 Upload a sample pdf document to S3 bucket that is configured as the KB Datasource. You can provide your own or use one of the pdfs provided in  ```examples``` folder. You can find the bucketname in the Outputs section of the CDK command output from the BedrockKBStack
+> [!NOTE]  
+> Substitute the `bucket_name` found in the CDK Output section of the `cdk deploy` command output of the `BedrockKBStack`
 
-    ```
-    aws s3 cp examples/2022-Shareholder-Letter.pdf s3://<BucketName>
-    ```
+```
+aws s3 cp examples/2022-Shareholder-Letter.pdf s3://<Bucket_Name>
+```
 
 
 ### View CloudTrail log for StartIngestionJob
