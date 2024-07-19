@@ -144,7 +144,7 @@ See [Knowledge bases logging](https://docs.aws.amazon.com/bedrock/latest/usergui
 The following command tails the CloudWatch log to view KnowledgeBase events as they are logged.
 
 > [!NOTE]  
-> Substitute the `knowledge_base_id` found in the CDK Output section of the `cdk deploy` command output of the `BedrockKnowledgebaseStack`
+> Substitute the `knowledge_base_id` found in the CDK Output section of the `cdk deploy` command output of the `BedrockKBStack`
 
 ```
 aws logs tail --follow --since 20m BedrockKnowledgeBase-`<knowledge_base_id>`
@@ -160,7 +160,7 @@ Sample Output
 You can also use the following command to check the status of ingestion job(s). The command outputs the most recent ingestion job.
 
 > [!NOTE]  
-> Substitute the knowledge_base_id and data_source_id found in the CDK Output section of the `cdk deploy` command output of the `BedrockKnowledgebaseStack`
+> Substitute the knowledge_base_id and data_source_id found in the CDK Output section of the `cdk deploy` command output of the `BedrockKBStack`
 
 ```
 aws bedrock-agent list-ingestion-jobs --knowledge-base-id <knowledge_base_id> --data-source-id <data_source_id> --query 'reverse(sort_by(ingestionJobSummaries,&startedAt))[:1].{startedAt:startedAt, updatedAt:updatedAt,ingestionJobId:ingestionJobId,status:status}'
