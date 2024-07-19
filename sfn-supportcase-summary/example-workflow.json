@@ -1,0 +1,71 @@
+{
+  "title": "Step Function to provide a summary and sentiment of an AWS Support case and any recordings involved ",
+  "description": "This sample project demonstrates how to use Step Functions to fetch the sentiment and summary of an AWS Support case alongside any meeting recordings pertaining to it.",
+  "language": "Python",
+  "type": "Standard",
+  "diagram": "/resources/stepfunctions.png",
+  "level": "100",
+  "framework": "SAM",
+  "services": [
+    "stepfunctions",
+    "lambda",
+    "bedrock",
+    "transcribe",
+    "sns"
+  ],
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "AWS Step Functions use a State machine, which you initially invoke with the attested payload. The statemachine invokes a AWS Lambda function which fetches the Support case details. Further, the next state makes use of Amazon Bedrock via a Lambda function to fetch the case summary and sentiment. Based on the input i.e., if there is no meeting recording, the summary and sentiment fetched will be sent to the user via SNS and also the S3 bucket is updated with the summary. ",
+      "However, if there is a meeting recording, the video is transcribed via AWS Transcribe and is then sent to Bedrock via Lambda function to fetch the summary and sentiment of it. Similar to the previous case summary, the video transcription, summary and sentiment fetched will be sent to the user via SNS and also the S3 bucket is updated with the summary."
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-supportcase-summary",
+      "templateDir": "sfn-supportcase-summary",
+      "templateFile": "template.yaml",
+      "ASL": "statemachine/statemachine.asl.json"
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "The AWS Step Functions Workshop",
+        "link": "https://catalog.workshops.aws/stepfunctions/en-US"
+      }
+    ]
+  },
+  "authors": [
+    {
+      "name": "D Surya Sai",
+      "image": "https://drive.google.com/file/d/1S4IlH6_RT_eKZSLQ785QrfGmzs8JXXOf/view?usp=drive_link",
+      "bio": "A Serverless Cloud Engineer and technical writer, who works on building efficient and scalable solutions using AWS services.",
+      "linkedin": "https://www.linkedin.com/in/d-surya-sai-64920416a"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "sam-app"
+resolve_s3 = true
+s3_prefix = "sam-app"
+region = "eu-central-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+parameter_overrides = "EmailAddressForSummary=\"dsiz@amazon.com\" SummaryInstructions=\"Your task is to create markdown-formatted list Key Stakeholders and highlight Key Discussion Points and list Decisions and outline Action Items and provide meeting notes and create a concise summary.\" BedrockModelId=\"anthropic.claude-3-sonnet-20240229-v1:0\""
+image_repositories = []

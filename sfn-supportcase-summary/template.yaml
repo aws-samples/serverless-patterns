@@ -1,0 +1,914 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: sfn-dynamodb-batchwriteitem - Sample SAM Template for sfn-dynamodb-batchwriteitem
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+#-----------------------------------------------------------
+# Metadata
+#-----------------------------------------------------------
+Metadata:
+  AWS::CloudFormation::Interface:
+
+    ParameterGroups:
+    - Label:
+        default: Configuration
+      Parameters:
+        - EmailAddressForSummary
+        - SummaryInstructions
+        - BedrockModelId
+
+    ParameterLabels:
+      EmailAddressForSummary:
+        default: Email Address Used to Send Summary
+
+      SummaryInstructions:
+        default: Summary Instructions
+
+      BedrockModelId:
+        default: Bedrock Model ID
+
+
+#---------------------------------------------------------------------
+# Parameters
+#---------------------------------------------------------------------
+Parameters:
+
+  EmailAddressForSummary:
+    Type: String
+    Description: The summary will be sent to this address.
+      You must acknowledge the confirmation email before receiving additional notifications.
+
+  SummaryInstructions:
+    Type: String
+    Description: These are the instructions given to the Bedrock model to generate the summary.
+    Default: Your task is to create markdown-formatted list Key Stakeholders and highlight Key Discussion Points and list Decisions and outline Action Items and provide meeting notes and create a concise summary.
+
+  BedrockModelId:
+    Type: String
+    Description: This is the ID of the model that will generate the summary.
+    Default: anthropic.claude-3-sonnet-20240229-v1:0
+    AllowedValues:
+      - anthropic.claude-3-sonnet-20240229-v1:0
+      - anthropic.claude-3-haiku-20240307-v1:0
+
+
+#---------------------------------------------------------------------
+# Resources
+#---------------------------------------------------------------------
+Resources:
+
+  #------------------------------------------------------------
+  # Asset bucket and policy
+  #------------------------------------------------------------
+  AssetBucket:
+    Type: AWS::S3::Bucket
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W35
+            reason: Access logging not required
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      # BucketName: The bucket name is not excplicit here; otherwise, CloudFormation
+      # stack deletions will fail if the bucket contains any contents.
+      VersioningConfiguration:
+        Status: Enabled
+      # Enable encryption
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: alias/aws/s3
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteRecordings
+            ExpirationInDays: 7
+            Prefix: recordings/
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 2
+          - Id: DeleteTranscriptions
+            ExpirationInDays: 7
+            Prefix: transcriptions/
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 2
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  AssetBucketCase:
+    Type: AWS::S3::Bucket
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W35
+            reason: Access logging not required
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      # BucketName: The bucket name is not excplicit here; otherwise, CloudFormation
+      # stack deletions will fail if the bucket contains any contents.
+      VersioningConfiguration:
+        Status: Enabled
+      # Enable encryption
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: alias/aws/s3
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteSummary
+            ExpirationInDays: 7
+            Prefix: summary/
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 2
+          - Id: DeleteDesc
+            ExpirationInDays: 7
+            Prefix: desc/
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 2
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  AssetBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AssetBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowSSLRequestsOnly
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !Sub '${AssetBucket.Arn}'
+              - !Sub '${AssetBucket.Arn}/*'
+            Condition:
+              Bool:
+                'aws:SecureTransport': 'false'
+
+  AssetBucketCasePolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AssetBucketCase
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowSSLRequestsOnly
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !Sub '${AssetBucketCase.Arn}'
+              - !Sub '${AssetBucketCase.Arn}/*'
+            Condition:
+              Bool:
+                'aws:SecureTransport': 'false'
+
+  #------------------------------------------------------------
+  # KMS key used to encrypt CloudWatch logs
+  #------------------------------------------------------------
+  CloudWatchLogsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: An example symmetric encryption KMS key
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: kms:*
+            Resource: '*'
+          - Sid: Allow CloudWatch use
+            Effect: Allow
+            Principal:
+              Service: !Sub logs.${AWS::Region}.amazonaws.com
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt
+              - kms:GenerateDataKey
+              - kms:DescribeKey
+            Resource: '*'
+ 
+
+  CloudWatchLogsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: alias/summary-generator-cloudwatch-logs-key
+      TargetKeyId: !Ref CloudWatchLogsKey
+
+  #---------------------------------------------------------------------
+  # Folder creation role, function, and log
+  #---------------------------------------------------------------------
+
+  # Prerequisites - Lambda Role
+  PerformPrerequisitesFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Sid: LambdaAccess
+          Effect: Allow
+          Principal:
+            Service:
+              - !Sub lambda.${AWS::Region}.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogGroup
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/summary-generator-perform-prerequisites
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/summary-generator-perform-prerequisites:log-stream:*
+        - PolicyName: S3Permissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                Resource:
+                  - !Sub ${AssetBucket.Arn}/*
+
+
+  # Create the Prerequisites
+  PerformPrerequisitesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: summary-generator-perform-prerequisites
+      Description: Performs prerequisities for the solution
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 300
+      Role: !GetAtt PerformPrerequisitesFunctionRole.Arn
+      Environment:
+        Variables:
+          ASSET_BUCKET_NAME: !Ref AssetBucket
+      CodeUri: functions/PerformPrerequisitesFunction
+
+  PerformPrerequisites:
+    Type: Custom::PerformPrerequisites
+    Properties:
+      ServiceToken: !GetAtt PerformPrerequisitesFunction.Arn
+
+
+  #----------------------------------------------------------
+  # SNS topic and policy for emailing summaries
+  #----------------------------------------------------------
+  SummaryDeliveryTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: Recording Summary
+      TopicName: summary-generator-notification
+      KmsMasterKeyId: alias/aws/sns
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref EmailAddressForSummary
+
+
+  SummaryDeliveryTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref SummaryDeliveryTopic
+      PolicyDocument:
+        Statement:
+          - Sid: Allow Services
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sns:Publish
+            Resource: !Ref SummaryDeliveryTopic
+
+
+  #---------------------------------------------------------------------
+  # Input preparation role, function, and log
+  #---------------------------------------------------------------------
+
+  # Prepare input - Lambda Role
+  PrepareInputFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Sid: LambdaAccess
+          Effect: Allow
+          Principal:
+            Service:
+              - !Sub lambda.${AWS::Region}.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogGroup
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/summary-generator-prepare-input
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/summary-generator-prepare-input:log-stream:*
+
+
+  # Prepare the input
+  PrepareInputFunction:
+    Type: AWS::Serverless::Function
+
+    Properties:
+      FunctionName: summary-generator-prepare-input
+      Description: Prepares the input for later Step Functions steps by getting basic file values
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt PrepareInputFunctionRole.Arn
+      CodeUri: functions/PrepareInputFunction
+
+  PrepareInputFunctionLogGroup:
+    DependsOn: PrepareInputFunction
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${PrepareInputFunction}
+      RetentionInDays: 30
+      KmsKeyId: !GetAtt CloudWatchLogsKey.Arn
+
+  #---------------------------------------------------------------------
+  # Format Transcription role, function, and log
+  #---------------------------------------------------------------------
+
+  # Format Transcription - Lambda Role
+  FormatTranscriptionFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Sid: LambdaAccess
+          Effect: Allow
+          Principal:
+            Service:
+              - !Sub lambda.${AWS::Region}.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogGroup
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/summary-generator-format-transcription
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/summary-generator-format-transcription:log-stream:*
+        - PolicyName: S3Permissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource:
+                  - !Sub ${AssetBucket.Arn}/*
+
+  # Format the transcription
+  FormatTranscriptionFunction:
+    Type: AWS::Serverless::Function
+
+    Properties:
+      FunctionName: summary-generator-format-transcription
+      Description: Formats the transcription produced by Transcribe using diarization for the recorded speakers
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt FormatTranscriptionFunctionRole.Arn
+      CodeUri: functions/FormatTranscriptionFunction
+
+
+  FormatTranscriptionFunctionLogGroup:
+    DependsOn: FormatTranscriptionFunction
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${FormatTranscriptionFunction}
+      RetentionInDays: 30
+      KmsKeyId: !GetAtt CloudWatchLogsKey.Arn
+
+
+  #---------------------------------------------------------------------
+  # Bedrock model invocation role, function, and log
+  #---------------------------------------------------------------------
+
+  # Invoke Bedrock model - Lambda Role
+  InvokeBedrockModelFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Sid: LambdaAccess
+          Effect: Allow
+          Principal:
+            Service:
+              - !Sub lambda.${AWS::Region}.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogGroup
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/summary-generator-invoke-bedrock-model
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/summary-generator-invoke-bedrock-model:log-stream:*
+        - PolicyName: S3Permissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource:
+                  - !Sub ${AssetBucket.Arn}/*
+        - PolicyName: BedrockPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource:
+                  - !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/${BedrockModelId}
+
+  # Invoke Bedrock model
+  InvokeBedrockModelFunction:
+    Type: AWS::Serverless::Function
+
+    Properties:
+      FunctionName: summary-generator-invoke-bedrock-model
+      Description: Invokes the Bedrock model to create a summary of the recording
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 300
+      Role: !GetAtt InvokeBedrockModelFunctionRole.Arn
+      Environment:
+        Variables:
+          SUMMARY_INSTRUCTIONS: !Ref SummaryInstructions
+          BEDROCK_MODEL_ID:  !Ref BedrockModelId
+      CodeUri: functions/InvokeBedrockModelFunction
+
+  InvokeBedrockModelFunctionLogGroup:
+    DependsOn: InvokeBedrockModelFunction
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${InvokeBedrockModelFunction}
+      RetentionInDays: 30
+      KmsKeyId: !GetAtt CloudWatchLogsKey.Arn
+
+
+  #---------------------------------------------------------------------
+  # Send recording summary role, function, and log
+  #---------------------------------------------------------------------
+
+  # Send recording summary - Lambda Role
+  SendRecordingSummaryFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Sid: LambdaAccess
+          Effect: Allow
+          Principal:
+            Service:
+              - !Sub lambda.${AWS::Region}.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogGroup
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/summary-generator-send-recording-summary
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/summary-generator-send-recording-summary:log-stream:*
+        - PolicyName: S3Permissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource:
+                  - !Sub ${AssetBucket.Arn}/*
+        - PolicyName: SnsPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource:
+                  - !Ref SummaryDeliveryTopic
+
+  # Publish the recording summary to SNS.
+  SendRecordingSummaryFunction:
+    Type: AWS::Serverless::Function
+
+    Properties:
+      FunctionName: summary-generator-send-recording-summary
+      Description: Sends the recording summary to the recipient(s)
+      Role: !GetAtt SendRecordingSummaryFunctionRole.Arn
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref SummaryDeliveryTopic
+      CodeUri: functions/SendRecordingSummaryFunction
+
+
+  SendRecordingSummaryFunctionLogGroup:
+    DependsOn: SendRecordingSummaryFunction
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${SendRecordingSummaryFunction}
+      RetentionInDays: 30
+      KmsKeyId: !GetAtt CloudWatchLogsKey.Arn
+
+
+  #---------------------------------------------------------------------
+  # Send CASE summary role, function, and log
+  #---------------------------------------------------------------------
+
+  # Send CASE summary - Lambda Role
+  SendCaseSummaryFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Sid: LambdaAccess
+          Effect: Allow
+          Principal:
+            Service:
+              - !Sub lambda.${AWS::Region}.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogGroup
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sendsummary
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sendsummary:log-stream:*
+        - PolicyName: S3Permissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource:
+                  - !Sub ${AssetBucketCase.Arn}/*
+        - PolicyName: SnsPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource:
+                  - !Ref SummaryDeliveryTopic
+
+  # Publish the recording summary to SNS.
+  SendSummary:
+    Type: AWS::Serverless::Function
+
+    Properties:
+      FunctionName: sendsummary
+      Description: Sends the recording summary to the recipient(s)
+      Role: !GetAtt SendCaseSummaryFunctionRole.Arn
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref SummaryDeliveryTopic
+      CodeUri: functions/sendsummary
+
+  SendSummaryFunctionLogGroup:
+    DependsOn: SendSummary
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${SendSummary}
+      RetentionInDays: 30
+      KmsKeyId: !GetAtt CloudWatchLogsKey.Arn
+
+#---------------------------------------------------------------------
+  # Describe Support case  role, function, and log
+#---------------------------------------------------------------------
+
+  # Send CASE summary - Lambda Role
+  DescribeSupportCaseFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Sid: LambdaAccess
+          Effect: Allow
+          Principal:
+            Service:
+              - !Sub lambda.${AWS::Region}.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogGroup
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/DescribeSupportCase
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/DescribeSupportCase:log-stream:*
+        - PolicyName: S3Permissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                Resource:
+                  - !Sub ${AssetBucketCase.Arn}/*
+        - PolicyName: SupportAPIPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - support:DescribeCases
+                Resource: '*'
+
+# Publish the recording summary to SNS.
+  DescribeSupportCase:
+    Type: AWS::Serverless::Function
+
+    Properties:
+      FunctionName: DescribeSupportCase
+      Description: Sends the recording summary to the recipient(s)
+      Role: !GetAtt DescribeSupportCaseFunctionRole.Arn
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 30
+      CodeUri: functions/DescribeSupportCase
+
+  DescribeSupportCaseLogGroup:
+    DependsOn: DescribeSupportCase
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${DescribeSupportCase}
+      RetentionInDays: 30
+      KmsKeyId: !GetAtt CloudWatchLogsKey.Arn
+
+
+#---------------------------------------------------------------------
+  # Function for sentiment and summary of Support case  role, function, and log
+#---------------------------------------------------------------------
+
+# Send CASE summary - Lambda Role
+  CheckFunctionFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Sid: LambdaAccess
+          Effect: Allow
+          Principal:
+            Service:
+              - !Sub lambda.${AWS::Region}.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogGroup
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/CheckFunction
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/CheckFunction:log-stream:*
+        - PolicyName: S3Permissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                Resource:
+                  - !Sub ${AssetBucketCase.Arn}/*
+        - PolicyName: SupportAPIPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource: '*'
+
+# Publish the recording summary to SNS.
+  CheckFunction:
+    Type: AWS::Serverless::Function
+
+    Properties:
+      FunctionName: CheckFunction
+      Description: Sends the recording summary to the recipient(s)
+      Role: !GetAtt CheckFunctionFunctionRole.Arn
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 30
+      CodeUri: functions/CheckFunction
+
+
+  CheckFunctionLogGroup:
+    DependsOn: CheckFunction
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${CheckFunction}
+      RetentionInDays: 30
+      KmsKeyId: !GetAtt CloudWatchLogsKey.Arn
+
+  #---------------------------------------------------------------------
+  # Step Functions role and state machine
+  #---------------------------------------------------------------------
+  SummaryGeneratorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Sid: LambdaAccess
+          Effect: Allow
+          Principal:
+            Service:
+              - !Sub states.${AWS::Region}.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ServicePermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !Sub ${PrepareInputFunction.Arn}:$LATEST
+                  - !Sub ${FormatTranscriptionFunction.Arn}:$LATEST
+                  - !Sub ${InvokeBedrockModelFunction.Arn}:$LATEST
+                  - !Sub ${SendRecordingSummaryFunction.Arn}:$LATEST
+                  - !Sub ${DescribeSupportCase.Arn}:$LATEST
+                  - !Sub ${SendSummary.Arn}:$LATEST
+                  - !Sub ${CheckFunction.Arn}:$LATEST
+                  
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource:
+                  - !Ref SummaryDeliveryTopic
+              - Effect: Allow
+                Action:
+                  - transcribe:GetTranscriptionJob
+                  - transcribe:StartTranscriptionJob
+                  - transcribe:TagResource
+                Resource:
+                  - !Sub arn:aws:transcribe:${AWS::Region}:${AWS::AccountId}:transcription-job/summary-generator-*
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource:
+                  - !Sub ${AssetBucket.Arn}/*
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                Resource:
+                  - !Sub ${AssetBucket.Arn}/*
+
+  SummaryGeneratorStateMachine:
+    Type: AWS::Serverless::StateMachine
+    DependsOn: PerformPrerequisites
+    Properties:
+      Name: summary-generator
+      Role: !GetAtt SummaryGeneratorRole.Arn
+      DefinitionSubstitutions:
+        DescribeSupportCase: !GetAtt DescribeSupportCase.Arn
+        CheckFunction: !GetAtt CheckFunction.Arn
+        SendSummary: !GetAtt SendSummary.Arn
+        PrepareInputFunction: !GetAtt PrepareInputFunction.Arn
+        SNS-ARN: !Ref SummaryDeliveryTopic
+        FormatTranscriptionFunction: !GetAtt FormatTranscriptionFunction.Arn
+        InvokeBedrockModelFunction: !GetAtt InvokeBedrockModelFunction.Arn
+        SendRecordingSummaryFunction: !GetAtt SendRecordingSummaryFunction.Arn
+      DefinitionUri: statemachine/statemachine.asl.json
+
+
+#-----------------------------------------------------------
+# Outputs
+#-----------------------------------------------------------
+Outputs:
+  AssetBucketName:
+    Description: Name of the S3 bucket you'll upload recordings to and where transcripts are stored
+    Value: !Ref AssetBucket
+
+  AssetBucketCaseName:
+    Description: Name of the S3 bucket you'll upload recordings to and where transcripts are stored
+    Value: !Ref AssetBucketCase
+
+  Statemachine:
+    Description: Name of the S3 bucket you'll upload recordings to and where transcripts are stored
+    Value: !Ref SummaryGeneratorStateMachine

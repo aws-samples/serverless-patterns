@@ -1,0 +1,17 @@
+{
+  "caseid": "12345678910",
+  "casedetail": {
+    "bucket": {
+      "name": "<AssetBucketCaseName>"
+    }
+  },
+  "detail": {
+    "bucket": {
+      "name": "<AssetBucketName>"
+    },
+    "object": {
+      "key": "recordings/sample-team-meeting-recording.mp4"
+    }
+  },
+  "videopresent":"True"
+}

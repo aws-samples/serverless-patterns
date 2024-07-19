@@ -1,0 +1,305 @@
+{
+  "Comment": "Transcribes recordings and generates summaries",
+  "StartAt": "GetCaseDetails",
+  "States": {
+    "GetCaseDetails": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${DescribeSupportCase}:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "GetCaseSentiment",
+      "ResultPath": "$.casebuck"
+    },
+    "GetCaseSentiment": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${CheckFunction}:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Choice",
+      "ResultPath": "$.summary"
+    },
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.videopresent",
+          "StringEquals": "True",
+          "Next": "Send Summary Case"
+        },
+        {
+          "Variable": "$.videopresent",
+          "StringEquals": "False",
+          "Next": "Send Summary Case -"
+        }
+      ],
+      "Default": "Send Summary Case -"
+    },
+    "Send Summary Case": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${SendSummary}:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Prepare Input",
+      "ResultPath": "$.data"
+    },
+    "Prepare Input": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${PrepareInputFunction}:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Start Transcription Job",
+      "ResultPath": "$.Source",
+      "ResultSelector": {
+        "Payload.$": "$.Payload"
+      }
+    },
+    "Start Transcription Job": {
+      "Type": "Task",
+      "Parameters": {
+        "Media": {
+          "MediaFileUri.$": "States.Format('s3://{}/{}', $.detail.bucket.name, $.detail.object.key)"
+        },
+        "TranscriptionJobName.$": "States.Format('summary-generator-{}', $.Source.Payload.SourceFileNameWithDate)",
+        "OutputBucketName.$": "$.detail.bucket.name",
+        "OutputKey.$": "States.Format('transcriptions/{}.json', $.Source.Payload.SourceFileName)",
+        "LanguageCode": "en-US",
+        "Settings": {
+          "ShowSpeakerLabels": true,
+          "MaxSpeakerLabels": 10
+        },
+        "Tags": [
+          {
+            "Key": "SourceBucketName",
+            "Value.$": "$.Source.Payload.SourceBucketName"
+          },
+          {
+            "Key": "SourceKeyName",
+            "Value.$": "$.Source.Payload.SourceKeyName"
+          },
+          {
+            "Key": "SourceFileName",
+            "Value.$": "$.Source.Payload.SourceFileName"
+          }
+        ]
+      },
+      "Resource": "arn:aws:states:::aws-sdk:transcribe:startTranscriptionJob",
+      "Next": "Wait for Transcription Job",
+      "ResultPath": "$.TranscriptionJob"
+    },
+    "Wait for Transcription Job": {
+      "Type": "Wait",
+      "Seconds": 20,
+      "Next": "Get Transcription Job Status"
+    },
+    "Get Transcription Job Status": {
+      "Type": "Task",
+      "Parameters": {
+        "TranscriptionJobName.$": "$.TranscriptionJob.TranscriptionJob.TranscriptionJobName"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:transcribe:getTranscriptionJob",
+      "Next": "Transcription Job Status",
+      "ResultPath": "$.TranscriptionJob"
+    },
+    "Transcription Job Status": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.TranscriptionJob.TranscriptionJob.TranscriptionJobStatus",
+          "StringEquals": "COMPLETED",
+          "Next": "Format Transcription"
+        },
+        {
+          "Variable": "$.TranscriptionJob.TranscriptionJob.TranscriptionJobStatus",
+          "StringEquals": "FAILED",
+          "Next": "Send Failure Message"
+        }
+      ],
+      "Default": "Wait for Transcription Job"
+    },
+    "Send Failure Message": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "${SNS-ARN}",
+        "Message": {
+          "Error.$": "$.RecordingSummary.Payload.Error",
+          "Link.$": "States.Format('https://us-east-1.console.aws.amazon.com/states/home?region=us-east-1#/v2/executions/details/{}', $$.Execution.Id)"
+        }
+      },
+      "Next": "Process Failed"
+    },
+    "Format Transcription": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${FormatTranscriptionFunction}:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "ResultPath": "$.FormatTranscription",
+      "ResultSelector": {
+        "BucketName.$": "$.Payload.bucket_name",
+        "SpeakerTranscriptionKeyName.$": "$.Payload.speaker_transcription_key_name"
+      },
+      "Next": "Invoke Bedrock Model"
+    },
+    "Invoke Bedrock Model": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${InvokeBedrockModelFunction}:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Bedrock Model Status",
+      "ResultPath": "$.RecordingSummary"
+    },
+    "Bedrock Model Status": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.RecordingSummary.Payload.status",
+          "StringMatches": "SUCCEEDED",
+          "Next": "Send Recording Summary"
+        }
+      ],
+      "Default": "Send Failure Message"
+    },
+    "Send Recording Summary": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${SendRecordingSummaryFunction}:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Success"
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "Process Failed": {
+      "Type": "Fail"
+    },
+    "Send Summary Case -": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${SendSummary}:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    }
+  }
+}
