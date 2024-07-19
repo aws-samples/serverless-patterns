@@ -91,14 +91,15 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
 
 1. Review the CloudFormation template CDK generates for the included stacks using the following AWS CDK CLI command:
 
+
 > [!NOTE]  
 > Substitute the stack_id with one from the list in output of the `cdk list` command
-    
     ```
     cdk synth <stack_id>
     ```
 
-1. From the command line, use AWS CDK to deploy the AWS resources.
+10. From the command line, use AWS CDK to deploy the AWS resources.
+
     ```
     cdk deploy --all
     ```
