@@ -25,9 +25,9 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd s3-lambda-bedrock-aoss
     ```
-3. From the command line, run `build-layer.sh` that would download required dependencies used to create a Lambda Layer
+3. Build the layers and prepare the application for deployment
     ```
-    ./build-layer.sh
+    sam build
     ```
 4. Use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
