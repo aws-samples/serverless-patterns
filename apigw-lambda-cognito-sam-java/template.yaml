@@ -5,8 +5,7 @@ Description: This template exposes API to create and confirm user in Amazon Cogn
 Globals:
   Function:
     Runtime: java21
-    MemorySize: 3008
-    Timeout: 120
+    Timeout: 29
     Environment: 
       Variables:
         MY_COGNITO_POOL_APP_CLIENT_ID: !Ref MyCognitoUserPoolClient

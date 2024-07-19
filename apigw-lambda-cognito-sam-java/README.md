@@ -74,10 +74,10 @@ Here's a breakdown of the steps:
 
 ## Testing
 
-1. You can use [curl](https://curl.se/) or any other tool of your choice to send a HTTP POST create user request to the API. Make sure to replace `Endpoint` with the corresponding values from your `sam deploy --guided` output. Also replace all other values. The `email` should be a valid email id.
+1. You can use [curl](https://curl.se/) or any other tool of your choice to send a HTTP POST create user request to the API. Make sure to replace `CreateUserAPIGatewayEndpoint` with the corresponding values from your `sam deploy --guided` output. Replace `YourFirstName`, `YourLastName`, `your-email` and `your-password` with your values. The `email` should be a valid email id.
 
    ```bash
-   curl -d '{"firstName": "{YourFirstName}", "lastName": "{YourLastName}", "email": "{your-email@mail.com}", "password": "{Y0urP#ssword}"}' -H 'Content-Type: application/json' {CreateUserAPIGatewayEndpoin}
+   curl -d '{"firstName": "{YourFirstName}", "lastName": "{YourLastName}", "email": "{your-email}", "password": "{your-password}"}' -H 'Content-Type: application/json' {CreateUserAPIGatewayEndpoint}
    ```
 
    The API returns a response as below: 
@@ -86,7 +86,7 @@ Here's a breakdown of the steps:
    {"isSuccessful":true,"statusCode":200,"cognitoUserId":"84c8xxxx-xxxx-xxxx-xxx-xxxxx9846de1","isConfirmed":false}
    ```
 
-2. You should get an email with a verification code in the provided email id. Use the varification code to invoke the confirm user POST API:
+2. You should receive an email with a verification code at your provided email id. Use the verification code to invoke the confirm user POST API:
    ```bash
    curl -d '{"email": "{your-email@mail.com}", "code": "{VerificationCode}"}' -H 'Content-Type: application/json' {ConfirmUserAPIGatewayEndpoint}
    ```
@@ -98,9 +98,8 @@ Here's a breakdown of the steps:
    ```
 
 3. Now, you can call the login POST API. This API will return the token:
-You should get an email with a verification code in the provided email id. Use the varification code to invoke the confirm user POST API:
    ```bash
-   curl -d '{"email": "{your-email@mail.com}", "password": "{Y0urP#ssword}"}' -H 'Content-Type: application/json' {LoginUserAPIGatewayEndpoint}
+   curl -d '{"email": "{your-email@mail.com}", "password": "{your-password}"}' -H 'Content-Type: application/json' {LoginUserAPIGatewayEndpoint}
    ```
 
    The API returns a response as below: 
