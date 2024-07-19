@@ -118,10 +118,8 @@ Upon deployment, the CDK stack will create a Knowledge Base for Bedrock configur
 ### Verify Event Scheduler is ENABLED
 The EventScheduler should be enabled by default when the stack creation is complete. You can verify this by running the below command. The expected output of the command is the text `ENABLED`. This means that the scheduler is enabled and is ready to run at the next schedule time. 
 
-> [!NOTE]  
-> Substitute the `Schedule_Name` and `Schedule_Group_Name` found in the CDK Output section of the `cdk deploy` command output of the `SchedulerStack`
 ```
-aws scheduler get-schedule --name <Schedule_Name> --group <Schedule_Group_Name> --query 'State' --output text
+aws scheduler get-schedule --name BedrockKBDataSourceSyncSchedule --group BedrockKBSyncScheduleGroup --query 'State' --output text
 ```
 ### Upload Document(s) to S3 Bucket
 Upload a sample pdf document to S3 bucket that is configured as the KB Datasource. You can provide your own or use one of the pdfs provided in  ```examples``` folder. You can find the bucketname in the Outputs section of the CDK command output from the BedrockKBStack
@@ -146,7 +144,7 @@ See [Knowledge bases logging](https://docs.aws.amazon.com/bedrock/latest/usergui
 The following command tails the CloudWatch log to view KnowledgeBase events as they are logged.
 
 > [!NOTE]  
-> Substitute the `knowledge_base_id` found in the CDK Output section of the `cdk deploy` command output of the `BedrockKBStack`
+> Substitute the `knowledge_base_id` found in the CDK Output section of the `cdk deploy` command output of the `BedrockKnowledgebaseStack`
 
 ```
 aws logs tail --follow --since 20m BedrockKnowledgeBase-`<knowledge_base_id>`
@@ -162,7 +160,7 @@ Sample Output
 You can also use the following command to check the status of ingestion job(s). The command outputs the most recent ingestion job.
 
 > [!NOTE]  
-> Substitute the knowledge_base_id and data_source_id found in the CDK Output section of the `cdk deploy` command output of the `BedrockKBStack`
+> Substitute the knowledge_base_id and data_source_id found in the CDK Output section of the `cdk deploy` command output of the `BedrockKnowledgebaseStack`
 
 ```
 aws bedrock-agent list-ingestion-jobs --knowledge-base-id <knowledge_base_id> --data-source-id <data_source_id> --query 'reverse(sort_by(ingestionJobSummaries,&startedAt))[:1].{startedAt:startedAt, updatedAt:updatedAt,ingestionJobId:ingestionJobId,status:status}'

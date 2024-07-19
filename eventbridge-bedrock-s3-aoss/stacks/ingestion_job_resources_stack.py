@@ -40,7 +40,7 @@ class IngestionJobResourcesStack(Stack):
         )
         
         cfn_schedule_group = scheduler.CfnScheduleGroup(self, 
-                                                        "BedrockKBSyncScheduleGroup"
+                                                        "BedrockKBSyncScheduleGroup",
                                                         name="BedrockKBSyncScheduleGroup")
         cfn_schedule = scheduler.CfnSchedule(self, "BedrockKBDataSourceSyncSchedule",
             name="BedrockKBDataSourceSyncSchedule",
