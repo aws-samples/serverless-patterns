@@ -49,7 +49,7 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
    ![Model Access View](images/model-access-view.png)
     
 
-6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Next** to go to the Review screen and then **Submit** to enable the required models in your account. For this pattern, by default, we would only need Titan Text Embeddings V2  /  model id: amazon.titan-embed-text-v2:0.
+6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Next** to go to the Review screen and then **Submit** to enable the required models in your account. For this pattern, by default, we would only need Titan Text Embeddings V2  /  model id: _amazon.titan-embed-text-v2:0_.
 
 ## Deployment Instructions
 
@@ -65,12 +65,9 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
     ```
     python3 -m venv .venv
     ```
-    For a Windows platform, activate the virtualenv like this:
-    ```
-    .venv\Scripts\activate.bat
-    ```
-    For a OSX / Linux platform, activate the virtualenv like this:
-    ```
+1.  Activate the virtualenv like this:
+    
+     ```
     source .venv/bin/activate
     ```
 1. Install the Python required dependencies:
@@ -96,9 +93,11 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
 
 > [!NOTE]  
 > Substitute the stack_id with one from the list in output of the `cdk list` command
+    
     ```
     cdk synth <stack_id>
     ```
+
 1. From the command line, use AWS CDK to deploy the AWS resources.
     ```
     cdk deploy --all
@@ -110,7 +109,7 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
 parameters in the `cdk.context.json`. The parameters are used to name the OpenSearch Serverless collection, index, the Amazon Bedrock Knowledge base and the associated S3 data source, respectively.
 
 ## How it works
-CDK will create a Knowledge Base for Bedrock configure with S3 Bucket as data source and an OpenSearch Serverless collection to store vector data. A data source repository contains files or content with information that can be retrieved when your knowledge base is queried. The stack also include an EventBridge scheduler that is configured to run every 5 mins and invoke the `StartIngestionJob` API on Amazon Bedrock Agents service. Amazon Bedrock supports a monitoring system to help you understand the execution of any data ingestion jobs. The Stack would create the neccessary CloudWatch log groups and CloudWatch delivery. You can gain visibility into the ingestion of your knowledge base resources with this logging system. Additionally, Amazon Bedrock is integrated with AWS CloudTrail, a service that provides a record of actions taken by a user, role, or an AWS service in Amazon Bedrock. CloudTrail captures all API calls for Amazon Bedrock as events.
+Upon deployment, the CDK stack will create a Knowledge Base for Bedrock configure with S3 Bucket as data source and an OpenSearch Serverless collection to store vector data. A data source repository contains files or content with information that can be retrieved when your knowledge base is queried. The stack also include an EventBridge scheduler that is configured to run every 5 mins and invoke the `StartIngestionJob` API on Amazon Bedrock Agents service. Amazon Bedrock supports a monitoring system to help you understand the execution of any data ingestion jobs. The Stack would create the neccessary CloudWatch log groups and CloudWatch delivery. You can gain visibility into the ingestion of your knowledge base resources with this logging system. Additionally, Amazon Bedrock is integrated with AWS CloudTrail, a service that provides a record of actions taken by a user, role, or an AWS service in Amazon Bedrock. CloudTrail captures all API calls for Amazon Bedrock as events.
 
 
 ## Testing
@@ -130,12 +129,12 @@ Upload a sample pdf document to S3 bucket that is configured as the KB Datasourc
 
 ### View CloudTrail log for StartIngestionJob
 1. In the CloudTrail console, click on Event history. Event history provides a viewable, searchable, downloadable, and immutable record of the past 90 days of management events. 
-![CloudTrail Event History](images/cloudtrail-eventhistorypng)
+![CloudTrail Event History](images/cloudtrail-eventhistory.png)
 
 1. Filter using the Event Name as StartIngestionJob as well as by date and time (for example, Last 20 minutes)
 ![StartIngestionJob Event](images/startingestionjob-event.png)
 
-1. In the Event Record, verify that the `sessionContext.sessionIssuer.userName` mentions `EventBridgeSchedulerRole` which is the role that was created by the CDK stack, and assigned to the EventBridge Schedule. Also the `userAgent` indicates `AmazonEventBridgeScheduler` as the agent through which the request was made. 
+1. In the Event Record, notice that the `sessionContext.sessionIssuer.userName` mentions `EventBridgeSchedulerRole` which is the role that was created by the CDK stack, and assigned to the EventBridge Schedule. Also the `userAgent` indicates `AmazonEventBridgeScheduler` as the agent through which the request was made. 
 
 ### Tail the CloudWatch Logs to look for Sync Events
 The CDK creates resources to enable logging for an Amazon Bedrock knowledge base using the CloudWatch contructs.
@@ -149,13 +148,14 @@ The following command tails the CloudWatch log to view KnowledgeBase events as t
 aws logs tail --follow --since 20m BedrockKnowledgeBase-`<knowledge_base_id>`
 ```
 
+The command should output cloudwatch log entries, for the various stages of the ingestion process (such as INGESTION_JOB_STARTED, CRAWLING_COMPLETED, EMBEDDING_STARTED and so on). The final log statement for a given ingestion job id should be the entry to indicate the COMPLETED status of the job as in the screenshot below. The log entry also outputs the resource stats include the number of documents ingested to the Knowledge Base.
+
 Sample Output
-Filtered log output show status logged when the job completes. Note the resource statistics of number of resources ingested showing the document count that was ingested into the knowledge base
 
 ![cloudwatch-log](images/cloudwatch-log.png)
 
 ### View Ingestion Job timestamp and status
-Once you've verified that the EventBridge scheduler has invoked the StartIngestionJob, you can use the following command to check the status of ingestion job. The command outputs the most recently started ingestion job.
+You can also use the following command to check the status of ingestion job(s). The command outputs the most recent ingestion job.
 
 > [!NOTE]  
 > Substitute the knowledge_base_id and data_source_id found in the CDK Output section of the `cdk deploy` command output of the `BedrockKnowledgebaseStack`
