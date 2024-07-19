@@ -39,8 +39,11 @@ class IngestionJobResourcesStack(Stack):
             )
         )
         
-        cfn_schedule_group = scheduler.CfnScheduleGroup(self, "BedrockKBSyncScheduleGroup")
+        cfn_schedule_group = scheduler.CfnScheduleGroup(self, 
+                                                        "BedrockKBSyncScheduleGroup"
+                                                        name="BedrockKBSyncScheduleGroup")
         cfn_schedule = scheduler.CfnSchedule(self, "BedrockKBDataSourceSyncSchedule",
+            name="BedrockKBDataSourceSyncSchedule",
             description="Schedule to Sync Bedrock Knowledge Base Data Source Periodically",
             group_name=cfn_schedule_group.name,
             flexible_time_window=scheduler.CfnSchedule.FlexibleTimeWindowProperty(
@@ -54,5 +57,3 @@ class IngestionJobResourcesStack(Stack):
                 input="{\"KnowledgeBaseId\":\""+knowledge_base_id+"\",\"DataSourceId\":\""+data_source_id+"\"}"
             )
         ) 
-        CfnOutput(self, "schedule_name", value=cfn_schedule.name, export_name="Schedule_Name")
-        CfnOutput(self, "schedule_group_name", value=cfn_schedule_group.name, export_name="Schedule_Group_Name")
