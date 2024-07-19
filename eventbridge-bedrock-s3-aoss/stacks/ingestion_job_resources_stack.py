@@ -1,4 +1,5 @@
 from aws_cdk import (
+    CfnOutput,
     Duration,
     Stack,
     aws_iam as iam,
@@ -53,3 +54,5 @@ class IngestionJobResourcesStack(Stack):
                 input="{\"KnowledgeBaseId\":\""+knowledge_base_id+"\",\"DataSourceId\":\""+data_source_id+"\"}"
             )
         ) 
+        CfnOutput(self, "schedule_name", value=cfn_schedule.name, export_name="Schedule_Name")
+        CfnOutput(self, "schedule_group_name", value=cfn_schedule_group.name, export_name="Schedule_Group_Name")
