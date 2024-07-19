@@ -5,7 +5,6 @@ from stacks.bedrock_knowledgebase_stack import BedrockKnowledgebaseStack
 from stacks.opensearch_serverless_stack import OpenSearchServerlessStack
 from stacks.ingestion_job_resources_stack import IngestionJobResourcesStack
 from stacks.bedrock_service_role_stack import BedrockServiceRoleStack
-from stacks.bedrock_knowledgebase_logging import KnowledgeBaseLoggingStack
 
 
 app = cdk.App()
