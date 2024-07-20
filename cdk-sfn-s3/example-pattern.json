@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-sfn-s3",
       "templateURL": "serverless-patterns/cdk-sfn-s3",
       "projectFolder": "cdk-sfn-s3",
-      "templateFile": "src/lib/cdk-sfn-s3-stack.ts"
+      "templateFile": "src/lib/sfn-s3-stack.ts"
     }
   },
   "resources": {

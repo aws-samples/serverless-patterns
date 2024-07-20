@@ -10,7 +10,7 @@ import { StateMachine, DefinitionBody } from "aws-cdk-lib/aws-stepfunctions";
 import { CallAwsService } from "aws-cdk-lib/aws-stepfunctions-tasks";
 import { Construct } from "constructs";
 
-export class CdkSfnS3Stack extends Stack {
+export class SfnS3Stack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 

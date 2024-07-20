@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import "source-map-support/register";
 import * as cdk from "aws-cdk-lib";
-import { CdkSfnS3Stack } from "../lib/cdk-sfn-s3-stack";
+import { SfnS3Stack } from "../lib/sfn-s3-stack";
 
 const app = new cdk.App();
-new CdkSfnS3Stack(app, "CdkSfnS3Stack", {
+new SfnS3Stack(app, "CdkSfnS3Stack", {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
