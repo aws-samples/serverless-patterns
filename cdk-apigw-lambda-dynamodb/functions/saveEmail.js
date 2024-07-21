@@ -3,7 +3,7 @@ const { DynamoDBDocumentClient, PutCommand } = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({region: "us-east-1"});
 const docClient = DynamoDBDocumentClient.from(client);
-const tableName = process.env.table_name // "CdkApigwLambdaDynamodbStack-CdkSampleTable3353A408-KTF8QLT0JK38"//
+const tableName = process.env.table_name;
 
 
 const generateUniqueId = (userId) => {
