@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Description: This pattern facilitates intelligent document processing by generating vector embeddings for text data uploaded to S3.
+
+Parameters:
+  DocumentBucketName:
+    Type: String
+
+Resources:
+  DocumentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DocumentBucketName
+
+  DocumentEmbeddingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: index.handler
+      FunctionName: DocumentEmbedding
+      Description: Lambda function to generate embeddings for uploaded documents
+      Runtime: nodejs18.x
+      Timeout: 10
+      MemorySize: 128
+      Role: !GetAtt DocumentEmbeddingFunctionExecutionRole.Arn
+      Events:
+        FileUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref DocumentBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: "content/"
+
+  DocumentEmbeddingFunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: CustomPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub "arn:aws:s3:::${DocumentBucketName}/*"
+                  - !Sub "arn:aws:s3:::${DocumentBucketName}"
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource: "*"
+
+Outputs:
+  DocumentBucket:
+    Description: S3 bucket for storing documents
+    Value: !Ref DocumentBucket
+  DocumentEmbeddingFunction:
+    Value: !Ref DocumentEmbeddingFunction
+    Description: Lambda Function name for generating document embeddings
+  DocumentEmbeddingFunctionARN:
+    Value: !GetAtt DocumentEmbeddingFunction.Arn
+    Description: ARN of Lambda Function for generating document embeddings
