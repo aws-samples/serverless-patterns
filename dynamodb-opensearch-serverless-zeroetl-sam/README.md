@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
-    sam deploy --guided
+    sam deploy --capabilities CAPABILITY_NAMED_IAM --guided
     ```
 
 1. Identify the ARN of the role (or user) being used to access console for this deployment. If it does not have the `AdministratorAccess` AWS managed policy (or a similarly permissive equivalent), attach the `AmazonOpenSearchServiceFullAccess` AWS managed policy. Access for allowed principals can be edited later via the `DataAccessPolicyEditURL` from the stack outputs.
