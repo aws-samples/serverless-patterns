@@ -1,0 +1,26 @@
+[
+    {
+        "Id": "55a2e759-1eff-40f2-9516-c7ce294bf802",
+        "MessageGroupId": "test1",
+        "MessageBody": "test1",
+        "MessageDeduplicationId": "b3c72a6b-67ec-447d-8aa3-22c7a180f330"
+    },
+    {
+        "Id": "7e49806e-1c6b-45e6-b324-ff83f377eb96",
+        "MessageGroupId": "test2",
+        "MessageBody": "test2-first-message",
+        "MessageDeduplicationId": "cbcdeee9-0a97-40d8-ad4a-89ea7ccc057e"
+    },
+    {
+        "Id": "bab33279-04d8-4c98-9288-385c7a461c36",
+        "MessageGroupId": "test2",
+        "MessageBody": "test2-delayed-message-1",
+        "MessageDeduplicationId": "e2b3bc2f-471c-4541-8cc4-35df50efb871"
+    },
+    {
+        "Id": "4e105af8-d149-4591-aa4d-c7252fd60fc7",
+        "MessageGroupId": "test3",
+        "MessageBody": "test3",
+        "MessageDeduplicationId": "208cf23b-ea37-4df3-8ba8-eb8d404bf90d"
+    }
+]

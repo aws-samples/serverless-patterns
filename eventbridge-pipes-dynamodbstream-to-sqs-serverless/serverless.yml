@@ -8,7 +8,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs20.x
   memorySize: 256
   timeout: 30
   # override the default stage (dev) to be `prod`, or you can use the `--stage` CLI option

@@ -27,7 +27,7 @@ Learn more about this pattern at Serverless Land Patterns: << Add the live URL h
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cdk-api-gateway-cors-whitelist
+    cd api-gateway-cors-whitelist-cdk
     ```
 3. Install the project dependencies
     ```

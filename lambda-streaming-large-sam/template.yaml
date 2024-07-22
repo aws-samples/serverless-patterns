@@ -7,7 +7,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Timeout: 30
       MemorySize: 256
       AutoPublishAlias: live

@@ -1,0 +1,197 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template that creates a S3 bucket, API Gateway HTTP API with S3 proxy integration, and a Lambda function that will be invoked when new objects are uploaded to the bucket.
+
+Resources:
+  # S3 bucket for uploaded files    
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "file-upload-bucket-${AWS::AccountId}"
+
+  # Lambda Destinations - SQS queue to capture failed S3 event messages
+  OnFailureSqsQueue:
+    Type: AWS::SQS::Queue
+
+  # CloudWatch log group for the S3FileProcessor Lambda function
+  S3FileProcessorLogGroup: 
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      LogGroupName: S3FileProcessor-loggroup
+      RetentionInDays: 7
+
+  # CloudWatch log group for the Lambda Authorizer function
+  S3LambdaAuthorizerLogGroup: 
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      LogGroupName: S3LambdaAuthorizer-loggroup
+      RetentionInDays: 7
+
+  # The Lambda Function that will be invoked asynchronously when new files are uploaded 
+  S3FileProcessor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: LambdaFileProcessor::LambdaFileProcessor.S3Function::FunctionHandler
+      Runtime: dotnet8
+      CodeUri: 'LambdaFileProcessor'
+      Description: Default function
+      MemorySize: 1024
+      Timeout: 10
+      LoggingConfig:
+        LogGroup: !Ref S3FileProcessorLogGroup
+      EventInvokeConfig:
+        DestinationConfig:
+          OnFailure:
+            Type: SQS
+            Destination: !GetAtt OnFailureSqsQueue.Arn
+      Environment:
+          Variables:
+            POWERTOOLS_SERVICE_NAME: lambda-file-processor-logging
+            POWERTOOLS_LOG_LEVEL: Debug
+            POWERTOOLS_LOGGER_LOG_EVENT: true
+            POWERTOOLS_LOGGER_CASE: PascalCase 
+      Policies:
+      - AmazonS3ObjectLambdaExecutionRolePolicy      
+      - AmazonS3ReadOnlyAccess
+      - SQSSendMessagePolicy:
+          QueueName:
+            !GetAtt OnFailureSqsQueue.QueueName
+      Events:
+        NewImagesBucket:
+          Type: S3
+          Properties:
+            Bucket: !Ref Bucket
+            Events:
+            - s3:ObjectCreated:*
+
+  # Lambda Authorizer used to authorized incoming HTTP requests to API Gateway
+  S3LambdaAuthorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: LambdaAuthorizer::LambdaAuthorizer.AuthorizerFunction::FunctionHandler
+      Runtime: dotnet8
+      CodeUri: 'LambdaAuthorizer'
+      Description: Lambda Authorizer
+      MemorySize: 1024
+      Timeout: 10
+      LoggingConfig:
+        LogGroup: !Ref S3LambdaAuthorizerLogGroup
+      Environment:
+        Variables:
+          POWERTOOLS_SERVICE_NAME: lambda-authorizer-logging
+          POWERTOOLS_LOG_LEVEL: Debug
+          POWERTOOLS_LOGGER_LOG_EVENT: true
+          POWERTOOLS_LOGGER_CASE: PascalCase 
+
+  # Amazon API Gateway with S3 proxy integration 
+  RestApi:
+     Type: AWS::Serverless::Api
+     Properties:
+        StageName: prod
+        MethodSettings:
+        - HttpMethod: '*'
+          LoggingLevel: INFO
+          ResourcePath: '/*'
+          MetricsEnabled: true
+          DataTraceEnabled: false
+          ThrottlingRateLimit: 50
+          ThrottlingBurstLimit: 25
+        Auth:
+          DefaultAuthorizer: MyLambdaAuthorizer
+          Authorizers:
+            MyLambdaAuthorizer:
+              FunctionArn: !GetAtt S3LambdaAuthorizer.Arn
+        DefinitionBody:
+            openapi: 3.0.0
+            info:
+              version: '2016-10-21T17:26:28Z'
+              title: !Sub ${AWS::StackName}-api
+            paths:
+              "/s3":
+                get:
+                  parameters:
+                  - name: key
+                    in: query
+                    required: false
+                    schema:
+                      type: string
+                  responses:
+                    '200':
+                      description: 200 response
+                      content:
+                        application/json:
+                          schema:
+                            "$ref": "#/components/schemas/Empty"
+                    '404':
+                      description: 404 response
+                    '500':
+                      description: 500 response
+                  x-amazon-apigateway-integration:
+                    credentials: arn:aws:iam::244642560723:role/test-api-s3-proxy-role
+                    responses:
+                      default:
+                        statusCode: '500'
+                      '404':
+                        statusCode: '404'
+                        responseTemplates:
+                          application/xml: "{\r\n\"error\":\"File not found\"\r\n}"
+                      2\d{2}:
+                        statusCode: '200'
+                    requestParameters:
+                      integration.request.path.key: method.request.querystring.key
+                    uri: arn:aws:apigateway:us-east-1:s3:path/{key}
+                    passthroughBehavior: WHEN_NO_TEMPLATES
+                    httpMethod: GET
+                    type: aws
+                put:
+                  parameters:
+                  - name: key
+                    in: query
+                    required: false
+                    schema:
+                      type: string
+                  responses:
+                    '200':
+                      description: 200 response
+                      content:
+                        application/json:
+                          schema:
+                            "$ref": "#/components/schemas/Empty"
+                        application/octet-stream:
+                          schema:
+                            "$ref": "#/components/schemas/Empty"
+                    '500':
+                      description: 500 response
+                  x-amazon-apigateway-integration:
+                    credentials: arn:aws:iam::244642560723:role/test-api-s3-proxy-role
+                    responses:
+                      default:
+                        statusCode: '500'
+                      2\d{2}:
+                        statusCode: '200'
+                    requestParameters:
+                      integration.request.path.key: method.request.querystring.key
+                    uri: arn:aws:apigateway:us-east-1:s3:path/{key}
+                    passthroughBehavior: WHEN_NO_TEMPLATES
+                    httpMethod: PUT
+                    type: aws
+                    contentHandling: CONVERT_TO_BINARY
+            x-amazon-apigateway-binary-media-types:
+            - application/octet-stream
+            - image/jpeg
+Outputs:
+  API:
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/
+    Description: API Gateway URL    
+  S3LambdaAuthorizerFunction:
+    Description: "Lambda authorizer Function used to protect API"
+    Value: !Ref S3LambdaAuthorizer
+  Bucket:
+    Value: !Ref Bucket
+    Description: Bucket that will invoke the Lambda function when new objects are created
+  S3FileProcessorFunction:
+    Description: "Lambda Function to process files"
+    Value: !Ref S3FileProcessor
+  OnFailureSqsQueue:
+    Description: "OnFailure Sqs Queue"
+    Value: !Ref OnFailureSqsQueue
