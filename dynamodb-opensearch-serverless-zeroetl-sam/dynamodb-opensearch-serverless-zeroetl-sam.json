@@ -1,0 +1,78 @@
+{
+    "title": "DynamoDB to OpenSearch Serverless with Zero-ETL",
+    "description": "Create a zero-ETL integration from Amazon DynamoDB to Amazon OpenSearch Serverless.",
+    "language": "YAML",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to deploy a zero-ETL integration from a DynamoDB table to an OpenSearch Serverless collection."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-opensearch-serverless-zeroetl-sam",
+            "templateURL": "serverless-patterns/dynamodb-opensearch-serverless-zeroetl-sam",
+            "projectFolder": "dynamodb-opensearch-serverless-zeroetl-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon DynamoDB zero-ETL integration with Amazon OpenSearch Service is now available",
+                "link": "https://aws.amazon.com/blogs/aws/amazon-dynamodb-zero-etl-integration-with-amazon-opensearch-service-is-now-generally-available/"
+            },
+            {
+                "text": "Amazon OpenSearch Service - Developer Guide - Tutorial: Ingesting data into a collection using Amazon OpenSearch Ingestion",
+                "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/osis-serverless-get-started.html"
+            },
+            {
+                "text": "Amazon DynamoDB - Developer Guide - DynamoDB zero-ETL integration with Amazon OpenSearch Service",
+                "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/OpenSearchIngestionForDynamoDB.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Nathan J. Lichtenstein",
+            "image": "https://serverlessland.com/assets/images/resources/contributors/ext-nathan-lichtenstein.png",
+            "bio": "Never satisfied with the status quo, Nathan joined AWS as a Senior Solutions Architect in 2022. Based in NYC he loves all things cloud and networking.",
+            "linkedin": "nathanjlichtenstein"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "icon2": {
+            "x": 75,
+            "y": 50,
+            "service": "opensearch",
+            "label": "Amazon OpenSearch Serverless"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        }
+    }
+}
