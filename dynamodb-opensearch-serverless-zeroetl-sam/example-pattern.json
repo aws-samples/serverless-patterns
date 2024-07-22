@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to deploy a zero-ETL integration from a DynamoDB table to an OpenSearch Serverless collection.",
+      "This sample project demonstrates how to deploy a zero-ETL integration from a DynamoDB table to an OpenSearch Serverless collection."
     ]
   },
   "gitHub": {
@@ -27,7 +27,7 @@
       {
         "text": "Amazon OpenSearch Service - Developer Guide - Tutorial: Ingesting data into a collection using Amazon OpenSearch Ingestion",
         "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/osis-serverless-get-started.html"
-      }
+      },
       {
         "text": "Amazon DynamoDB - Developer Guide - DynamoDB zero-ETL integration with Amazon OpenSearch Service",
         "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/OpenSearchIngestionForDynamoDB.html"
