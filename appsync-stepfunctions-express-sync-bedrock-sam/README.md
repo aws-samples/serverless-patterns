@@ -43,14 +43,24 @@ Important: this application uses various AWS services and there are costs associ
  
 
 ## Testing
+1.Within your AWS Console navigate to AppSync in the region you deployed this sample in.
 
-The stack will output the **api endpoint**. You can use *Postman* or *curl* to send a POST request to the API Gateway endpoint.
+2.Select the AppSyncApi
+
+3.On the left side select Queries
+
+4.Below the Run dropdown paste the following
+
+mutation MyMutation {
+  startWorkflow(prompt_one: "Write a 500 word blog post on The Beatles") {
+    input
+    output
+  }
+}
+
+5.Then Select Run and MyMutation
    
-```
-UPDATE With Instructions !!!!!!!!!!!!!!!!!!!!!!
-
-```
-After runnning the above command, API Gateway will invoke the State machine and return the complete results back to the client instead of just the State machine's execution Id. 
+After runnning the above command, AppSync will invoke the State machine and return the complete results as shown below
 
 ## Cleanup
  
