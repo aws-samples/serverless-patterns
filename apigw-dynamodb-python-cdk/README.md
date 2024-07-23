@@ -28,11 +28,11 @@ cd serverless-patterns/apigw-dynamodb-python-cdk
 ```
 3. To manually create a virtualenv on MacOS and Linux:
 ```
-$ python3 -m venv .venv
+python3 -m venv .venv
 ```
 4. After the init process completes and the virtualenv is created, you can use the following to activate virtualenv.
 ```
-$ source .venv/bin/activate
+source .venv/bin/activate
 ``` 
 6. After activating your virtual environment for the first time, install the app's standard dependencies:
 ```
