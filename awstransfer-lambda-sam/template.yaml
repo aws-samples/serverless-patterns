@@ -1,0 +1,244 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: AWS SAM template for an AWS Transfer Family SFTP Server with a custom workflow.
+Parameters:
+  UserName:
+    Type: String
+    Default: "testuser"
+    Description: Username for AWS Transfer Family service managed user
+  SshKey:
+    Type: String
+    Default: ""
+    Description: SSH Key for AWS Transfer Family service managed user.
+
+
+Resources:
+# Create S3 bucket to store files uploaded to AWS via Transfer Family
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}-bucket
+
+# Create lambda function for custom workflow step
+  CustomWorkflowLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Custom Workflow Step Lambda Function
+      FunctionName: !Sub ${AWS::StackName}-custom-workflow-step-lambda-function
+      Role: 
+        Fn::GetAtt: CustomWorkflowLambdaRole.Arn
+      Handler: workflow-lambda.lambda_handler
+      Runtime: python3.9
+      CodeUri: custom_workflow_lambda/
+      Timeout: 300
+      MemorySize: 128
+
+# Create Transfer Family Custom Workflow
+  CustomWorkflow:
+    Type: AWS::Transfer::Workflow
+    Properties:
+      Description: Custom Workflow for Transfer Family
+      Steps:
+          - Type: CUSTOM
+            CustomStepDetails:
+              Name: !Sub CustomWorkflowStep
+              Target:
+                Fn::GetAtt: CustomWorkflowLambda.Arn
+
+# Create Transfer Family server 
+  TransferServer:
+    Type: AWS::Transfer::Server
+    Properties:
+      EndpointType: PUBLIC
+      IdentityProviderType: SERVICE_MANAGED
+      LoggingRole:
+        Fn::GetAtt:  TransferLoggingRole.Arn
+      ProtocolDetails:
+        PassiveIp: 10.0.0.1
+      SecurityPolicyName: TransferSecurityPolicy-2020-06
+      WorkflowDetails:
+        OnUpload:
+          - 
+            ExecutionRole: 
+              Fn::GetAtt: TransferWorkflowRole.Arn
+            WorkflowId: 
+              Ref: CustomWorkflow
+
+
+# Create IAM role for Transfer Family Managed Workflow execution
+  TransferWorkflowRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: transfer.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-TransferWorkflowPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  Fn::GetAtt: CustomWorkflowLambda.Arn
+              - Effect: Allow
+                Action:
+                  - s3:GetBucketLocation
+                  - s3:GetObjectTagging
+                  - s3:ListBucket
+                  - s3:*Object
+                  - s3:PutObjectTagging
+                Resource:
+                  - Fn::GetAtt: S3Bucket.Arn
+
+# Create IAM role for Transfer Family CloudWatch logging  
+  TransferLoggingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: transfer.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-TransferLoggingPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+# Create IAM role for custom workflow step lambda function
+  CustomWorkflowLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: LambdaWorkflowExecutionPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetBucketLocation
+                  - s3:ListBucket
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:DeleteObjectVersion
+                Resource:
+                  - !Sub arn:aws:s3:::${S3Bucket}                
+                  - !Sub arn:aws:s3:::${S3Bucket}/*
+              - Effect: Allow
+                Action:
+                  - transfer:SendWorkflowStepState
+                Resource:
+                  - Fn::Sub: arn:${AWS::Partition}:transfer:${AWS::Region}:${AWS::AccountId}:workflow/*
+
+
+# Create an IAM role to allow Transfer Family to access S3
+  TransferS3AccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: transfer.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-TransferS3AccessPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetBucketLocation
+                  - s3:GetObjectTagging
+                  - s3:ListBucket
+                  - s3:*Object
+                  - s3:PutObjectTagging
+                Resource:
+                  - Fn::GetAtt: S3Bucket.Arn
+                  - !Sub ${S3Bucket.Arn}/*
+
+
+# Create Transfer Family Server User
+  TransferServerUser:
+    Type: AWS::Transfer::User
+    Properties:
+      Role:
+        Fn::GetAtt: TransferServerUserRole.Arn
+      ServerId:
+        Fn::GetAtt: TransferServer.ServerId
+      UserName: !Ref UserName
+      HomeDirectoryMappings:
+        - Entry: /
+          Target:
+            Fn::Sub: /${S3Bucket}/${UserName}
+      HomeDirectoryType: LOGICAL
+      SshPublicKeys: 
+        - !Ref SshKey
+     
+
+#Create a IAM Role for Transfer Server User with access to their home directory
+  TransferServerUserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: transfer.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: TransferServerUserPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource:
+                  - Fn::GetAtt: S3Bucket.Arn
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:DeleteObjectVersion
+                  - s3:GetObjectVersion
+                Resource:
+                  - Fn::Sub: ${S3Bucket.Arn}/*
+
+
+
+              
+
+
+
+
+

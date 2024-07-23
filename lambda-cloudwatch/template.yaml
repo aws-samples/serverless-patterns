@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:lambda-cloudwatch)
   lambda-cloudwatch
 
   Sample SAM Template for lambda-cloudwatch
@@ -16,7 +17,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambdaHandler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       # SAM Managed Policy for inserting custom CloudWatch Metrics
       Policies:
         - CloudWatchPutMetricPolicy: {}

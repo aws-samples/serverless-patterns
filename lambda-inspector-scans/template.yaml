@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Event driven vulnerabilities with Lambda and EventBridge using Amazon Inspector
+Description: Event driven vulnerabilities with Lambda and EventBridge using Amazon Inspector (uksb-1tthgi812) (tag:lambda-inspector-scans)
 
 Resources:
   # Consumer for the Inspector condition
@@ -10,7 +10,7 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-consumer
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       MemorySize: 128
       Timeout: 15
       Architectures:

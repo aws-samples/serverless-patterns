@@ -1,0 +1,12 @@
+{
+  "name": "eventbridge-pipes-dynamodbstream-to-sqs-serverless",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless": "^3.34.0"
+  },
+  "dependencies": {
+    "serverless-pipes": "^1.0.0"
+  }
+}

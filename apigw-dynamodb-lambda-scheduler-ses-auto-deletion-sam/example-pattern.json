@@ -1,0 +1,60 @@
+{
+    "title": "Amazon EventBridge Scheduler with Amazon SES",
+    "description": "A serverless event-driven pattern that creates Amazon EventBridge schedules dynamically to send email reminders using Amazon SES.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern deploys a serverless reminder application. When a user creates/updates/deletes a reminder using API Gateway, the data is updated in a DynamoDB Table, which triggers a Lambda Function. This creates a one-time EventBridge schedule with Amazon SES as the target. "
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-dynamodb-lambda-scheduler-ses-auto-deletion-sam",
+        "templateURL": "serverless-patterns/apigw-dynamodb-lambda-scheduler-ses-auto-deletion-sam",
+        "projectFolder": "apigw-dynamodb-lambda-scheduler-ses-auto-deletion-sam",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "EventBridge Schedulers",
+          "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+        },
+        {
+          "text": "Using Amazon API Gateway as a proxy for DynamoDB",
+          "link": "https://aws.amazon.com/blogs/compute/using-amazon-api-gateway-as-a-proxy-for-dynamodb/"
+        },
+        {
+          "text": "EventBridge Schedulers Universal Targets",
+          "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-targets-universal.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Damini Nixcy Mol Antony",
+        "image": "https://avatars.githubusercontent.com/u/39347789?v=4",
+        "bio": "Senior Cloud Support Engineer (Serverless) @AWS",
+        "linkedin": "damini-nixcy-mol"
+      }
+    ]
+  }

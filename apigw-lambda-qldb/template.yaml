@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon QLDB
+Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon QLDB (uksb-1tthgi812) (tag:apigw-lambda-qldb)
 
 # Comment on each global 
 Globals:
@@ -40,7 +40,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: create-person.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: 2012-10-17
@@ -68,7 +68,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: get-person.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       MemorySize: 512
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -95,7 +95,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: get-person-history.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       MemorySize: 512
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -122,7 +122,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: update-person.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       MemorySize: 512
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -151,7 +151,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: delete-person.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       MemorySize: 512
       Policies:
         - AWSLambdaBasicExecutionRole

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: lambda-dynamodb-ddbstream-lambda
+Description: lambda-dynamodb-ddbstream-lambda (uksb-1tthgi812) (tag:lambda-dynamodb-ddbstream-lambda-sam-java)
 
 Globals:
   Function:

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Image Processing service - Find text in images
+Description: Image Processing service - Find text in images (uksb-1tthgi812) (tag:lambda-rekognition)
 
 Parameters:
   BucketNameForImages:
@@ -77,7 +77,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs20.x
       Description: Lambda function that will recieve CloudWatch events and will trigger
         CodeBuild build job.
       FunctionName: 'TextRecognitionLambdaFunction'

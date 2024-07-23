@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: > 
+Description: >
+  (uksb-1tthgi812) (tag:apigw-websocket-api-sfn-sync)
   Serverless patterns - Amazon API Gateway WebSocket Endpoint to 
   AWS Step Functions Express, Synchronous invocation
 

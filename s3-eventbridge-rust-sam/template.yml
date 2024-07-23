@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: S3 bucket to EventBridge to Lambda - @jbesw
+Description: S3 bucket to EventBridge to Lambda - @jbesw (uksb-1tthgi812) (tag:s3-eventbridge-rust-sam)
 
 Globals:
   Function:

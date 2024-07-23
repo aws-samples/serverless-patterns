@@ -1,11 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: An Amazon API Gateway WebSocket API and SQS with a AWS Lambda function.
+Description: An Amazon API Gateway WebSocket API and SQS with a AWS Lambda function. (uksb-1tthgi812) (tag:apigw-websocket-api-sqs-lambda)
 
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: nodejs14.x
+    Runtime: nodejs20.x
     MemorySize: 128
     Timeout: 15
 
@@ -86,7 +86,8 @@ Resources:
           ApiGatewayEndpoint:
             Fn::Join:
               - ""
-              - - Ref: APIGWWebsocketSQSLambda
+              - - "https://"
+                - Ref: APIGWWebsocketSQSLambda
                 - .execute-api.
                 - Ref: AWS::Region
                 - "."
@@ -161,7 +162,7 @@ Resources:
       RequestParameters:
         integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
       RequestTemplates:
-        $default: Action=SendMessage&MessageGroupId=$input.path('$.MessageGroupId')&MessageDeduplicationId=$context.requestId&MessageAttribute.1.Name=connectionId&MessageAttribute.1.Value.StringValue=$context.connectionId&MessageAttribute.1.Value.DataType=String&MessageAttribute.2.Name=requestId&MessageAttribute.2.Value.StringValue=$context.requestId&MessageAttribute.2.Value.DataType=String&MessageBody=$input.json('$')
+        $default: Action=SendMessage&MessageGroupId=$input.path('$.MessageGroupId')&MessageDeduplicationId=$context.requestId&MessageAttribute.1.Name=connectionId&MessageAttribute.1.Value.StringValue=$context.connectionId&MessageAttribute.1.Value.DataType=String&MessageAttribute.2.Name=requestId&MessageAttribute.2.Value.StringValue=$context.requestId&MessageAttribute.2.Value.DataType=String&MessageBody=$util.urlEncode($input.json('$'))
       TemplateSelectionExpression: \$default
   SQSRoute:
     Type: AWS::ApiGatewayV2::Route

@@ -35,7 +35,7 @@ resource "aws_lambda_function" "lambda_function_create_person" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "create-person.handler"
   role             = aws_iam_role.lambda_iam_role_create_person.arn
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
   environment {
     variables = {
       LEDGER_NAME = aws_qldb_ledger.ledger.id
@@ -118,7 +118,7 @@ resource "aws_lambda_function" "lambda_function_get_person" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "get-person.handler"
   role             = aws_iam_role.lambda_iam_role_get_person.arn
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
   memory_size      = 512
   environment {
     variables = {
@@ -193,7 +193,7 @@ resource "aws_lambda_function" "lambda_function_get_person_history" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "get-person-history.handler"
   role             = aws_iam_role.lambda_iam_role_get_person_history.arn
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
   memory_size      = 512
   environment {
     variables = {
@@ -268,7 +268,7 @@ resource "aws_lambda_function" "lambda_function_update_person" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "update-person.handler"
   role             = aws_iam_role.lambda_iam_role_update_person.arn
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
   memory_size      = 512
   environment {
     variables = {
@@ -344,7 +344,7 @@ resource "aws_lambda_function" "lambda_function_delete_person" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "delete-person.handler"
   role             = aws_iam_role.lambda_iam_role_delete_person.arn
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
   memory_size      = 512
   environment {
     variables = {

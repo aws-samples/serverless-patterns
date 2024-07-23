@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:appconfig-feature-flag-sam)
   sam-appconfig
 
   Sample SAM Template for sam-appconfig
@@ -127,7 +128,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambdaHandler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Architectures:
         - x86_64
       

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: aws-publisher-subscriber-pattern
+Description: aws-publisher-subscriber-pattern (uksb-1tthgi812) (tag:lambda-sns-lambda-sam-java)
 
 Globals:
   Function:

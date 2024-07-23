@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Centralized API
+Description: Centralized API (uksb-1tthgi812) (tag:apigw-rest-apigw-rest)
 
 Parameters:
   ApiKeyValue:
@@ -74,7 +74,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       CodeUri: src
       Environment:
         Variables:
@@ -92,7 +92,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       CodeUri: src
       Environment:
         Variables:

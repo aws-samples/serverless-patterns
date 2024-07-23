@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Edge-Optimized Custom Domain Name that points to a REST API regional with Lambda proxy integration
+Description: Serverless patterns - Edge-Optimized Custom Domain Name that points to a REST API regional with Lambda proxy integration (uksb-1tthgi812) (tag:apigw-domain-edge-lambda)
  
  #Parameters for certificate and domain name
 Parameters:

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Image resizing service through SQS
+Description: Image resizing service through SQS (uksb-1tthgi812) (tag:s3-sqs-lambda)
 
 Parameters:
   SourceBucketName:
@@ -68,7 +68,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs20.x
       MemorySize: 2048
       Layers:
         - !Sub 'arn:aws:lambda:${AWS::Region}:175033217214:layer:graphicsmagick:2'

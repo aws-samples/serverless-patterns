@@ -1,0 +1,255 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Serverless patterns - Amazon MQ in a Private VPC to Amazon EventBridge Message Bus using Amazon EventBridge Pipes'
+
+Parameters:
+  MQSecretARN:
+    Type: String
+    Description: 'Enter the ARN of the AWS Secrets Manager secret holding a username and password for the Amazon MQ cluster.'
+  MQVpcId: 
+    Type: String
+    Description: 'Enter the Amazon Virtual Private Cloud (VPC) ID to host the Amazon MQ instance.'
+  MQSubnetId:  
+    Type: String
+    Description: 'Enter the Subnet Id to host the Amazon MQ instance. This subnet requires a route to the Public Internet. See: https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-mq.html#pipes-mq-vpc-config for details on network requirements.'
+  MQQueueName:
+    Type: String
+    Default: 'app-events'
+    Description: 'Enter the name of a queue in Amazon MQ cluster where events are published.'
+  MQEngineVersion:
+    Type: String
+    Default: '5.17.6'
+    Description: 'Enter a valid Active MQ Broker engine version for Amazon MQ. See https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/activemq-version-management.html for supported versions.'
+  MQPubliclyAccessible:
+    Type: String
+    AllowedValues: ['true','false']
+    Default: 'false'
+    Description: 'Default is false. If set to true deploys the Amazon MQ cluster with Public Access (not recommended)'
+  EventBridgeBusName:
+    Type: String
+    Default: 'MyPipesEventBus'
+    Description: 'The name of the Amazon EventBridge custom event bus to create and publish produced on the ActiveMQ Broker'
+  CloudWatchLogGroup:
+    Type: String
+    Default: '/aws/events/amazonmq-to-eventbridge'
+    Description: 'The name of the Amazon CloudWatch Log Group to write events processed by Amazon EventBridge'
+  
+Resources:
+  # A Security Group bound to the ENIs of the Amazon MQ Cluster
+  MQSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: 'Security Group for Amazon MQ Cluster'
+      GroupName: 'amazon-mq-pipes-sg'
+      SecurityGroupEgress: 
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 61617
+          ToPort: 61617
+          CidrIp: 0.0.0.0/0
+          Description : 'OpenWire/Java Message Service (JMS) protocol for publishing messages'
+        - IpProtocol: tcp
+          FromPort: 8162
+          ToPort: 8162
+          CidrIp: 0.0.0.0/0
+          Description : 'ActiveMQ Web Console for administering the cluster'
+      VpcId: !Ref MQVpcId
+
+  # Amazon MQ Broker (ActiveMQ) cluster which acts as the message producer for EventBridge Pipes
+  MQBroker:
+    Type: AWS::AmazonMQ::Broker
+    Properties: 
+      AutoMinorVersionUpgrade: false
+      BrokerName: ActiveMQSAM
+      DeploymentMode: SINGLE_INSTANCE
+      EngineType: ACTIVEMQ
+      EngineVersion: !Ref MQEngineVersion
+      HostInstanceType: mq.t3.micro
+      PubliclyAccessible: !Ref MQPubliclyAccessible
+      Users:
+        - Password: !Sub '{{resolve:secretsmanager:${MQSecretARN}:SecretString:password::}}'
+          Username: !Sub '{{resolve:secretsmanager:${MQSecretARN}:SecretString:username::}}'
+          ConsoleAccess: true
+      SubnetIds:
+           - !Ref MQSubnetId
+      SecurityGroups: [!Ref MQSecurityGroup]
+
+  # Amazon EventBridge Event Bus (Target) for messages
+  ApplicationEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Ref EventBridgeBusName 
+
+  # IAM Role used by the Amazon EventBridge Pipe to process messages
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: SourcePolicy-MQBroker
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'mq:DescribeBroker'
+                Resource: !GetAtt MQBroker.Arn
+        - PolicyName: SourcePolicy-SecretsManger
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'secretsmanager:GetSecretValue'
+                Resource: !Ref MQSecretARN
+        - PolicyName: SourcePolicy-PrivateVPC
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeVpcs
+                Resource: '*'
+        - PolicyName: SourcePolicy-CloudWatchLogs
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+        - PolicyName: TargetPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:PutEvents'
+                Resource: !GetAtt ApplicationEventBus.Arn
+
+  # EventBridge Pipe to consume messages from Amazon MQ (ActiveMQ) queue and publish to a Custom Event Bridge Message Bus          
+  Pipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: amazonmq-to-eventbridge
+      Description: 'Pipe to connect Amazon MQ to Amazon EventBridge event bus'
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt MQBroker.Arn
+      SourceParameters:
+        ActiveMQBrokerParameters:
+          BatchSize: 1
+          Credentials:
+            BasicAuth: !Ref MQSecretARN
+          QueueName: !Ref MQQueueName
+      Target: !GetAtt ApplicationEventBus.Arn
+      TargetParameters:
+        EventBridgeEventBusParameters:
+          DetailType: 'ApplicationStateChanged'
+          Source: 'myapp.monolith'
+        InputTemplate : !Sub >
+          {
+            "pipeArn": "<aws.pipes.pipe-arn>",
+            "pipeIngestionTime": "<aws.pipes.event.ingestion-time>",
+            "Payload": <aws.pipes.event.json>
+          }
+
+  # An EventBridge rule to write Amazon MQ events for "myapp.monolith" to a CloudWatch Log Group
+  LogsRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref ApplicationEventBus
+      EventPattern:
+        source: 
+          - 'myapp.monolith'
+      Targets:
+        - Arn: !GetAtt LogGroupForEvents.Arn
+          Id: LogTarget
+  
+  # Amazon CloudWatch Log Group to write events
+  LogGroupForEvents:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref CloudWatchLogGroup
+      
+  # Policy to allow The AmazonEventBridge Rule to write to the CloudWatch Log group
+  LogGroupForEventsPolicy:
+    Type: AWS::Logs::ResourcePolicy
+    Properties:
+      PolicyName: "EventBridgeLogPolicy"
+      PolicyDocument: !Sub >
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "EventBridgetoCWLogsCreateLogStreamPolicy",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "logs:CreateLogStream"
+              ],
+              "Resource": [
+                "${LogGroupForEvents.Arn}"
+              ]
+            },
+            {
+              "Sid": "EventBridgetoCWLogsPutLogEventsPolicy",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "logs:PutLogEvents"
+              ],
+              "Resource": [
+                "${LogGroupForEvents.Arn}"
+              ],
+              "Condition": {
+                "ArnEquals": {"AWS:SourceArn": "${LogsRule.Arn}"}
+              }
+            }
+          ]
+        }
+
+Outputs:
+  # Output for the AmazonMQ Cluster
+  MQBrokerManagementURI:
+    Description: 'The AmazonMQ Web-Console URI. Please note: If deploying with MQPubliclyAccessible set to false, this will only be accessible from within the VPC.'
+    Value: !Sub 'https://${MQBroker}-1.mq.${AWS::Region}.amazonaws.com:8162'
+  MQBrokerArn:
+    Description: 'The ARN of the AmazonMQ cluster'
+    Value: !GetAtt MQBroker.Arn
+  # Output for the Amazon EventBridge Pipe
+  PipeArn:
+    Description: 'The ARN of the Amazon EventBridge Pipe'
+    Value: !GetAtt Pipe.Arn
+  # Output for the Amazon EventBridge Custom Message Bus
+  EventBridgeBusArn:
+    Description: 'The ARN of the Amazon EventBridge Custom Message bus receiving events from Amazon MQ'
+    Value: !GetAtt ApplicationEventBus.Arn
+  # Output for the Amazon CloudWatch Log Group
+  CloudWatchLogsArn:
+    Description: 'The ARN of the Amazon CloudWatch Log Group to write events received on the Amazon EventBridge Custom Message bus.'
+    Value: !GetAtt LogGroupForEvents.Arn

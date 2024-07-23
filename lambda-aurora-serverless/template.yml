@@ -1,12 +1,12 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret
+Description: An AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret (uksb-1tthgi812) (tag:lambda-aurora-serverless)
 
 # Global values that are applied to all applicable resources in this template
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: nodejs14.x
+    Runtime: nodejs20.x
     MemorySize: 128
     Timeout: 30
 
@@ -50,8 +50,9 @@ Resources:
       MasterUsername: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:username}}'
       MasterUserPassword: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:password}}'
       DatabaseName: !Ref DatabaseName
-      Engine: aurora
+      Engine: aurora-mysql
       EngineMode: serverless
+      StorageEncrypted: true
       # Enable the Data API for Aurora Serverless
       EnableHttpEndpoint: true
       ScalingConfiguration:

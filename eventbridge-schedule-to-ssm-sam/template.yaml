@@ -3,7 +3,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - How to schedule a SSM State Manager Association execution with Eventbridge
+Description: Serverless patterns - How to schedule a SSM State Manager Association execution with Eventbridge (uksb-1tthgi812) (tag:eventbridge-schedule-to-ssm-sam)
 
 Parameters:
   #Pull the latest AMI IDs from Amazon's public SSM parameter store

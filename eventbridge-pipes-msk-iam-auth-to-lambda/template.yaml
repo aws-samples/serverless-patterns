@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:eventbridge-pipes-msk-iam-auth-to-lambda)
   Creates an EventBridge Pipes with MSK cluster source and Lambda function as destination. 
   The MSK cluster is deployed into private subnet.
 

@@ -32,7 +32,7 @@ resource "aws_lambda_function" "lambda_s3_handler" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "index.handler"
   role             = aws_iam_role.iam_for_lambda.arn
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
 }
 
 data "archive_file" "lambda_zip_file" {

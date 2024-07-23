@@ -20,7 +20,7 @@ resource "aws_lambda_function" "lambda_function" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "app.handler"
   role             = aws_iam_role.lambda_iam_role.arn
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
 }
 
 data "archive_file" "lambda_zip_file" {

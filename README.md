@@ -27,7 +27,11 @@ git clone https://github.com/aws-samples/serverless-patterns
 
 Each subdirectory contains additional installation and usage instructions.
 
+## Ownership
+
+This project is owned, managed, and maintained by the **AWS Serverless Developer Advocacy team**, consisting of James Beswick, Dave Boyne, Eric Johnson, Ben Smith, Marcia Villalba, and Julian Wood. To contact us, raise an issue on this repo.
+
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

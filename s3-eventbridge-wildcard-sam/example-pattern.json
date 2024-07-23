@@ -1,0 +1,65 @@
+{
+  "title": "S3 to SQS with EventBridge with wildcard pattern match rule",
+  "description": "The SAM template deploys an Amazon S3 bucket, an Amazon EventBridge rule with wildcard pattern match having target as an Amazon SQS queue.", 
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template creates an S3 bucket that publishes events to Amazon EventBridge, an EventBridge rule with wildcard filter to select only the desired events from dynamic subfolders in Amazon S3 bucket and also an Amazon SQS queue as the target.",
+      "Once the stack is deployed, we will use upload-to-s3.sh to create dynamic subfolders based on current date and timestamp within the S3 bucket and upload new files. ",
+      "This will trigger multiple events, however, only the events that will match the wildcard pattern as per the EventBridge rule, will be selected and a message will be sent to the SQS queue.",
+      "We will inspect the messages from the SQS queue to validate the same."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-wildcard-sam",
+      "templateURL": "serverless-patterns/s3-eventbridge-wildcard-sam",
+      "projectFolder": "s3-eventbridge-wildcard-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge User Guide",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns-content-based-filtering.html#eb-filtering-wildcard-matching"
+      },
+      {
+        "text": "Filtering events in Amazon EventBridge with wildcard pattern matching",
+        "link": "https://aws.amazon.com/blogs/compute/filtering-events-in-amazon-eventbridge-with-wildcard-pattern-matching/"
+      },
+      {
+        "text": "Amazon S3 Event Notifications with EventBridge",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the content of the Amazon S3 bucket",
+      "Delete the stack: <code>sam delete</code>.",
+      "See the GitHub repo for detailed instruction."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

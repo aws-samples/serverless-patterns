@@ -1,0 +1,93 @@
+{
+    "title": "Transform EDI to JSON using AWS B2B Data Interchange",
+    "description": "This sample project demonstrates how AWS B2B Data Interchange can transform EDI Files into JSON as per the transformation logic.",
+    "language": "YAML",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "An X12 EDI file is uploaded into the input Amazon S3 bucket.",
+            "File upload action triggers AWS B2B Data Interchange Transformers to transform the X12 EDI file into JSON format.",
+            "The transformed JSON file is uploaded into the output Amazon S3 bucket."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-b2bi-s3",
+            "templateURL": "serverless-patterns/s3-b2bi-s3",
+            "projectFolder": "s3-b2bi-s3",
+            "templateFile": "template-part1.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS B2B Data Interchange User Guide",
+                "link": "https://docs.aws.amazon.com/b2bi/latest/userguide/what-is-b2bi.html"
+            },
+            {
+                "text": "AWS Blog - Manage EDI at scale with new AWS B2B Data Interchange",
+                "link": "https://aws.amazon.com/blogs/aws/introducing-aws-b2b-data-interchange-simplified-connections-with-your-trading-partners/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "See the GitHub repo for detailed deployment instructions.",
+            "sam deploy -g -t template-part1.yaml",
+            "sam deploy -g -t template-part2.yaml"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the Amazon S3 input bucket content: <code>aws s3 rm s3://{EDI214InputBucketName} --recursive --region {my-region}</code>",
+            "Delete the Amazon S3 output bucket content: <code>aws s3 rm s3://{EDI214OutputBucketName} --recursive --region {my-region}</code>",
+            "Delete the stack1: <code>sam delete --stack-name {b2bi-stack2}</code>.",
+            "Delete the stack1: <code>sam delete --stack-name {b2bi-stack1}</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Biswanath Mukherjee",
+            "image": "https://d1rwvjey2iif32.cloudfront.net",
+            "bio": "I am a Sr. Solutions Architect working at AWS India.",
+            "linkedin": "biswanathmukherjee"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "s3",
+            "label": "Input bucket"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "internet",
+            "label": "B2B Data Interchange"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "s3",
+            "label": "Output bucket"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": ""
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": ""
+        }
+    }
+}

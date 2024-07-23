@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:lambda-pinpoint)
   lambda-pinpoint
 
   Sample SAM Template for lambda-pinpoint
@@ -15,7 +16,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       MemorySize: 128
       Timeout: 100
       Description: A simple example of sending an SMS with Pinpoint

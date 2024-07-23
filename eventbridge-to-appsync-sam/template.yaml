@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  (uksb-1tthgi812) (tag:eventbridge-to-appsync-sam)
+  Sample SAM template to connect AppSync as an EventBridge target
+
+Resources:
+  # EventBus Resource
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: EventBridgeAppSyncDemoBus
+
+  # AppSync API Resource
+  MyGraphQlApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: MyGraphQLApi
+      # AppSync targets only support AWS_IAM auth https://docs.aws.amazon.com/eventbridge/latest/userguide/target-appsync.html
+      AuthenticationType: AWS_IAM
+
+  # AppSync API GraphQL Schema
+  MyGraphQlApiSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt MyGraphQlApi.ApiId
+      DefinitionS3Location: './schema.graphql'
+
+  AppSyncNotesTableDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      Name: NoneDataSource
+      ApiId: !GetAtt MyGraphQlApi.ApiId
+      Description: "None"
+      Type: NONE
+
+  # Mutation resolver
+  AppSyncMutationResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: MyGraphQlApiSchema
+    Properties:
+      ApiId: !GetAtt MyGraphQlApi.ApiId
+      TypeName: Mutation
+      FieldName: publish
+      DataSourceName: !GetAtt AppSyncNotesTableDataSource.Name
+      # Map the request into the desired payload
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "payload": {
+              "id": "$context.arguments.id",
+              "source": "$context.arguments.source",
+              "account": "$context.arguments.account",
+              "time": "$context.arguments.time",
+              "region": "$context.arguments.region",
+              "detailType": "$context.arguments.detailType",
+              "data": "$context.arguments.data"
+          }
+        }
+      ResponseMappingTemplate: "$util.toJson($context.result)"    
+
+  # DLQ for the AppSync integration     
+  TargetDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: eventbridge-appsync-dlq
+
+  # EventBridge Rule with two targets: CloudWatch Logs and AppSync API
+  MyEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref EventBus
+      EventPattern:
+        # Listen to all events by this source, change this to what you want.
+        source:
+          - "app.orders"
+      Targets:
+        # First target is CloudWatch for logging
+        - Id: "Target1"
+          Arn: !GetAtt MyCloudWatchLogGroup.Arn
+        # Second target is AppSync  
+        - Id: "Target2"
+          Arn: !GetAtt MyGraphQlApi.GraphQLEndpointArn
+          RoleArn: !GetAtt MyInvocationRole.Arn
+          DeadLetterConfig:
+            Arn: !GetAtt TargetDLQ.Arn
+          InputTransformer:
+            ## Map the fields required for mutation
+            InputPathsMap:
+              id: "$.id"
+              source: "$.source"
+              account: "$.account"
+              time: "$.time"
+              region: "$.region"
+              data: "$"
+              detailType: "$.detail-type"
+            InputTemplate: "{\"data\": <data>, \"detailType\": <detailType>, \"id\": <id>, \"source\": <source>, \"account\": <account>, \"time\": <time>,\"region\": <region>}"
+          # Mutation opreation EventBridge will do on your behalf, mapping to the publish schema.  
+          AppSyncParameters:
+            GraphQLOperation: "mutation Publish($data:String!,$detailType:String!,$id:String!,$source:String!,$account:String!,$time:String!,$region:String!){publish(data:$data,detailType:$detailType,id:$id,source:$source,account:$account,time:$time,region:$region){data detailType id source account time region}}"
+
+
+  # CloudWatch Log Group as a target
+  MyCloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/events/my-custom-log-group
+
+  # IAM Role for invoking the AppSync API
+  MyInvocationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AppSyncInvokePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: appsync:GraphQL
+                Resource: !Sub "${MyGraphQlApi.Arn}/*"
+
+Outputs:
+  EventBusName:
+    Description: "Name of the event bus"
+    Value: !Ref EventBus
+  GraphQLApiUrl:
+    Description: "URL of the GraphQL API"
+    Value: !GetAtt MyGraphQlApi.GraphQLUrl

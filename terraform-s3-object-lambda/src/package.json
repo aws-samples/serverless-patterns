@@ -10,7 +10,7 @@
   "author": "Greg Davis",
   "license": "MIT-0",
   "dependencies": {
-    "axios": "^0.21.1",
-    "sharp": "^0.30.7"
+    "axios": "^1.6.0",
+    "sharp": ">=0.32.6"
   }
 }

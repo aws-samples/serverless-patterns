@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:sam-webapp-cognito)
   Serverless WebApp with S3, CloudFront, API Gateway, DynamoDB and Cognito.
 Resources:
 
@@ -178,7 +179,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Events:
         HttpApi:
           Type: HttpApi

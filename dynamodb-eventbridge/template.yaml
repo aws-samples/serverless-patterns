@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Streams DynamoDB table changes to EventBridge
+Description: Streams DynamoDB table changes to EventBridge (uksb-1tthgi812) (tag:dynamodb-eventbridge)
 Resources:
   #DynamoDB Streams specification
   MyDynamoStream:
@@ -23,7 +23,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: app.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       CodeUri: publish/
       Description: A Lambda function that forward changes on DynamoDB table to EventBridge bus.
       MemorySize: 128
@@ -47,7 +47,7 @@ Resources:
     Properties:
       CodeUri: subscribe/
       Handler: app.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       Description: A Lambda function that receive Insert events from the table.
       MemorySize: 128
       Timeout: 3
@@ -57,7 +57,7 @@ Resources:
     Properties:
       CodeUri: subscribe/
       Handler: app.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       Description: A Lambda function that receive Deletion events from the table.
       MemorySize: 128
       Timeout: 3

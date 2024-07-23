@@ -51,11 +51,38 @@ Important: This application uses various AWS services and there are costs associ
    ```
 
 ## Use Case
-You have a Lambda function that requires internet access to make API calls to 3rd party service but you need a dedicated IP to be whitelisted by the 3rd party vendors. 
+This solution will help you, if your use case tick the following bullet points: 
+- You are trying to connect to a 3rd party API
+- 3rd party API requires whitelisting a static IP of its clients
+- You want to use Lambda functions
+
+#### Current Industry Standard Solution
+Place your Lambda in *private* subnet. Place a NAT Solution (NAT Gateway/NAT Instance) in a *public* subnet and attach an AWS Elastic IP to the NAT Solution.
+
+This solution is actually great and offers HA (with NAT Gateways) and scalable. Exactly what you need for production environments
+
+Solution is explained in details [here](https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/generate-a-static-outbound-ip-address-using-a-lambda-function-amazon-vpc-and-a-serverless-architecture.html)
+###### *However...*
+
+NAT Gateways come at a cost (**~$33/month per gateway**). To make NAT Gateway Highly Available & Scalable you need to provision 1 NAT Gateway per subnet.
+So, if you have 3 subnets the cost will be:
+
+**3 * $33 = ~$100/month**
+Now this is nearly an unavoidable expense for your production environments, as scalability & HA are requirements.
+
+However, if you have 3 non-prod environments (DEV, QA, STAGE...) the cost of these environments will be **3 accounts * $100 = ~$300/month**. High Availability is not probably a requirement for these environments.
+
+So, This solution will help you save on NAT costs when scalability & HA are not required.
 
 ## How it works
 
-This pattern allows you to assign your Lambda function a static public IP address that you can use to interact with APIs that require whitelisted IPs without the need to provision a NAT Gateway. Therefore, this pattern will save almost **$33/month** in NAT Gateway costs.
+This pattern kick things off by provisioning an Elastic IP in your account. 
+As you may know, AWS manages the provisioning of ENIs for each Lambda provisioned within an AWS VPC. Using CDK code we won't have access to that ENI. However, once that ENI is provisioned it can be accessed. So the pattern will create a Custom Resource that taps into that ENI and make a CLI call (using the SDK) to attach it to the Elastic IP.
+
+Now that the lambda has an elastic IP associated to its network interface, you can copy that Elastic IP and whitelist it with your 3rd party vendors so the lambda can connect to it.
+
+#### Main Benefit:
+Saving on NAT Gateway costs **$33/month per subnet per environment-account** when the solution does not need to be very scalable or highly available
 
 ##### **NOTE:** This pattern is best suited for non-production environments since it is not multi-AZ nor highly scalable.
 
@@ -65,7 +92,22 @@ The following resources will be provisioned:
 - An Elastic IP to associate with the Lambda function
 - A custom resource with Lambda function to associate the Elastic IP with the test lambda's ENI
 
-Since AWS manages the provisioning of any Lambda ENI, we cannot access that ENI in CDK code. Therefore, to automate the process, we have to associate the Elastic IP with the ENI in a custom resource after the deployment occurs and the ENI is provisioned.
+
+
+##### **NOTE:** This pattern is best suited for non-production environments since it is not multi-AZ nor highly scalable.
+
+### Limitations To Be Aware Of
+
+- Elastic IPs: 5 per Region [VPC Quotes](https://docs.aws.amazon.com/vpc/latest/userguide/amazon-vpc-limits.html)
+- Network interfaces:  5,000 per Region
+- HENIs (Hyperplane ENIs) soft limit of 250 per VPC and the hard limit is 350 HENIs per VPC [link](https://aws.plainenglish.io/dealing-with-you-have-exceeded-the-maximum-limit-for-hyperplane-enis-for-your-account-223147e7ab64#b6c5)
+    - Hyperplane ENI is a special type of ENI used by AWS Lambda to cut off on the start up time of ENI provisioning and provide the capability of sharing the underlying network hardware for all Lambdas in *subnet+securityGroup* combination (for more [info](https://aws.amazon.com/blogs/compute/announcing-improved-vpc-networking-for-aws-lambda-functions/))
+    
+- There is a limit of 65K on connections for a single Hyperplane ENI. So, if group of Lambdas in the same Subnet+SecurityGroup combination create more than 65K connections at the same time, AWS will provision a new ENI for the connection number 65001 [Lambda ENI](https://docs.aws.amazon.com/lambda/latest/dg/foundation-networking.html#foundation-nw-eni-create)(Thanks to Yan Cui for pointing that out in the [comment on this video](https://www.youtube.com/watch?v=yV1TGDYR3qU&t=92s&ab_channel=YanCui))  
+
+### Pricing Notes
+You are still charged for data transfer expenses in and out of the ENI (~$0.09/GB in each direction) [data-transfer pricing](https://aws.amazon.com/ec2/pricing/on-demand/#Data_Transfer)
+
 
 ## Testing
 

@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:appsync-lambda-sfn-sam)
   appsync-lambda-stepfunctions-sam
 
   SAM Template for invoking a step functions from a lambda resolver using appsync

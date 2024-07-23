@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Amazon API Gateway REST API with Lambda Token Authorizer
+Description: Serverless patterns - Amazon API Gateway REST API with Lambda Token Authorizer (uksb-1tthgi812) (tag:apigw-lambda-authorizer)
 
 Globals:
   Function:
-    Runtime: nodejs14.x
+    Runtime: nodejs20.x
     CodeUri: src/
 
 Resources:

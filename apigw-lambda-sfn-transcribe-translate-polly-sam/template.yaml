@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
+Description: >
+  (uksb-1tthgi812) (tag:apigw-lambda-sfn-transcribe-translate-polly-sam)
   capstone
 
 Transform:
@@ -53,7 +54,7 @@ Resources:
     Properties:
       Handler: src/transcribeLaunch.handler
       FunctionName: "translator-dev-transcribeLaunch"
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -64,7 +65,7 @@ Resources:
     Properties:
       Handler: src/transcribeCheck.handler
       FunctionName: "translator-dev-transcribeCheck"
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -75,7 +76,7 @@ Resources:
     Properties:
       Handler: src/translate.handler
       FunctionName: "translator-dev-translate"
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -86,7 +87,7 @@ Resources:
     Properties:
       Handler: src/speech.handler
       FunctionName: "translator-dev-speech"
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -110,7 +111,7 @@ Resources:
   InvokerLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: "nodejs14.x"
+      Runtime: "nodejs16.x"
       FunctionName: "translator-dev-invokeTranslator"
       Timeout: 300
       MemorySize: 1024

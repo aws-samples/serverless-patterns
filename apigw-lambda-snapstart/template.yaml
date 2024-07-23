@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: AWS-SAM-APIGW-Lambda-SnapStart
+Description: AWS-SAM-APIGW-Lambda-SnapStart (uksb-1tthgi812) (tag:apigw-lambda-snapstart)
 
 Globals:
   Function:
@@ -18,11 +18,12 @@ Resources:
   UnicornStoreSpringFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: com.unicorn.store.StreamLambdaHandler
+      Handler: com.amazonaws.serverless.proxy.spring.SpringDelegatingLambdaContainerHandler
       CodeUri: UnicornFunction
       Tracing: Active
       Environment:
         Variables:
+          MAIN_CLASS: com.unicorn.store.StoreApplication
           AWS_SERVERLESS_JAVA_CONTAINER_INIT_GRACE_TIME: 500
           UNICORN_TABLE_NAME: !Ref UnicornTable
           POWERTOOLS_LOG_LEVEL: INFO

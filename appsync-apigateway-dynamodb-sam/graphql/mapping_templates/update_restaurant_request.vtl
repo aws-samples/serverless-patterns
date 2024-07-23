@@ -1,0 +1,11 @@
+{
+    "version": "2018-05-29",
+    "method": "PUT", 
+    "resourcePath": "/v1/restaurants/${ctx.args.input.restaurantId}",
+    "params":{
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": $util.toJson($ctx.args.input)
+    }
+}

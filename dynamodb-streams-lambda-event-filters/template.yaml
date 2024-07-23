@@ -1,7 +1,8 @@
 # SAM template for Lambda fn Event-filtering with DynamoDB Streams
 
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
+Description: >
+  (uksb-1tthgi812) (tag:dynamodb-streams-lambda-event-filters)
   SAM template for Lambda fn Event-filtering with DynamoDB Streams
 
 Transform:
@@ -13,7 +14,7 @@ Resources:
     Properties:
       CodeUri: src/handlers/
       Handler: dynamodb-insert-trigger.putItemTriggerHandler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -40,7 +41,7 @@ Resources:
     Properties:
       CodeUri: src/handlers/
       Handler: dynamodb-delete-trigger.deleteItemTriggerHandler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       Architectures:
         - x86_64
       MemorySize: 128

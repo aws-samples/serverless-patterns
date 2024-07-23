@@ -1,0 +1,56 @@
+{
+    "title": "Invoke Amazon Elastic Container Service Task with Amazon SQS messages using EventBridge Pipes",
+    "description": "Invoke ECS Fargate Tasks using SQS messages using EventBridge Pipes",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates how to invoke an Amazon Elastic Container Service Tasks based on selective messages from Amazon SQS queue using Amazon EventBridge Pipes."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-ecs-task-cdk-typescript",
+            "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-ecs-task-cdk-typescript",
+            "projectFolder": "eventbridge-pipes-sqs-to-ecs-task-cdk-typescript",
+            "templateFile": "lib/eventbridge-pipes-sqs-to-ecs-task-cdk-typescript-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Learn about EventBridge Pipes SQS source",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-sqs.html"
+            },
+            {
+                "text": "Learn about EventBridge Pipes Filtering",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-filtering.html"
+            },
+            {
+                "text": "Learn about EventBridge Pipes ECS Task Target",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html#pipes-targets-specifics-ecs-task"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>cdk destroy</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Viraj Padte",
+            "image": "https://avatars.githubusercontent.com/u/3850481?v=4",
+            "bio": "Senior Solutions Architect at AWS",
+            "linkedin": "viraj-padte",
+            "twitter": "virajpadte"
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Appsync DynamoDB Streams Subscription
+Description: Serverless patterns - Appsync DynamoDB Streams Subscription (uksb-1tthgi812) (tag:dynamodb-streams-appsync-subscription)
 
 Resources:
 ##########################################################################

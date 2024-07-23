@@ -1,12 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
+Description: (uksb-1tthgi812) (tag:lambda-streaming-ttfb-write-sam)
 Resources:
   StreamingFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Timeout: 30
       MemorySize: 512
       AutoPublishAlias: live

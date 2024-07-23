@@ -177,7 +177,7 @@ resource "aws_lb_target_group_attachment" "target_group_attachment" {
 # Create the Lambda Function
 resource "aws_lambda_function" "lambda_function" {
   function_name = "lambdaFunction"
-  runtime       = "nodejs14.x"
+  runtime       = "nodejs16.x"
   handler       = "index.handler"
   filename      = "lambda.zip"
   role          = aws_iam_role.lambda_role.arn

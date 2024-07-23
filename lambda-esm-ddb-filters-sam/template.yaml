@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT-0
 
 AWSTemplateFormatVersion: '2010-09-09'
-Description: DynamoDB Stream event filtering for Lambda demo stack
+Description: DynamoDB Stream event filtering for Lambda demo stack (uksb-1tthgi812) (tag:lambda-esm-ddb-filters-sam)
 
 Transform: AWS::Serverless-2016-10-31
 

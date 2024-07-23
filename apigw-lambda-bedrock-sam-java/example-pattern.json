@@ -1,0 +1,60 @@
+{
+  "title": "Invoking Amazon Bedrock Mistral 7B LLM using Java based AWS Lambda",
+  "description": "This project deploys an Amazon API Gateway REST API with an AWS Lambda, written in Java, to call Amazon Bedrock API for Mistral 7B Instruct V0.2.",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon API Gateway receives the HTTP POST request containing the prompt.",
+      "AWS Lambda is triggered by the API Gateway, this function forwards the prompt to Amazon Bedrock Java API. It uses Mistral 7B Instruct V0.2 model and sets other required parameters to fixed values for simplicity.",
+      "Based on the given prompt, using Mistral 7B Instruct V0.2 model, Amazon Bedrock generates the content and returns the response to the Lambda function.",
+      "The Lambda function processes the Bedrock API response and sends it back to the user via the API Gateway."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-sam-java",
+      "templateURL": "serverless-patterns/apigw-lambda-bedrock-sam-java",
+      "projectFolder": "apigw-lambda-bedrock-sam-java",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock Model Access",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html"
+      },
+      {
+        "text": "Mistral AI on Amazon Bedrock",
+        "link": "https://aws.amazon.com/bedrock/mistral/"
+      }      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "mvn clean package",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

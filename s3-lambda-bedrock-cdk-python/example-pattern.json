@@ -1,0 +1,62 @@
+{
+    "title": "Generate vector embeddings using Amazon Bedrock, Amazon S3 and AWS Lambda",
+    "description": "This pattern facilitates the extraction of vector embeddings using Amazon Bedrock from input files uploaded to S3, triggered by a Lambda function.",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern creates a Amazon S3 bucket, a Lambda function, which will be used to get vector embeddings for the document uploaded into Amazon S3 using Amazon Bedrock.",
+        "The Lambda function is triggered by S3 'OBJECT_CREATED' events. The Lambda function can optionally apply business logic to the S3 object. After processing, the Lambda function invokes the embedding model form Amazon Bedrock to get the vector embeddings, which is useful for LLM RAG applications.",
+        "Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-bedrock-cdk-python",
+        "templateURL": "serverless-patterns/s3-lambda-bedrock-cdk-python",
+        "projectFolder": "s3-lambda-bedrock-cdk-python",
+        "templateFile": "s3_lambda_bedrock_cdk_python/s3_lambda_bedrock_cdk_python_stack.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+            "text": "Getting started with the AWS CDK",
+            "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
+        },
+        {
+          "text": "Using an amazon S3 trigger to invoke a Lambda function",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+        },
+        {
+          "text": "Getting started with Amazon Titan Text Embeddings in Amazon Bedrock",
+          "link": "https://aws.amazon.com/blogs/machine-learning/getting-started-with-amazon-titan-text-embeddings/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+        {
+            "name": "Dinesh Balaaji Prabakaran",
+            "image": "https://avatars.githubusercontent.com/u/43818089?s=400&u=8a1e4fabab318016c485049108a2012b760e9ff7&v=4",
+            "bio": "I am a Senior Technical Account Manager with AWS, I specialize in architecting and developing serverless, event-driven solutions on AWS. AWS Storage Technical Field Community member.",
+            "linkedin": "pdineshbalaaji"
+        }
+    ]
+  }

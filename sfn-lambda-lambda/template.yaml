@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:sfn-lambda-lambda)
   A Step Functions Standard Workflow that triggers a Lambda function synchronously which in turn triggers another function asynchronously.
 Resources:
 ##########################################################################
@@ -32,7 +33,7 @@ Resources:
     Properties:
       CodeUri: firstfunction/
       Handler: first-function.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Timeout: 3
       Policies: 
         - CloudWatchPutMetricPolicy: {}
@@ -41,7 +42,7 @@ Resources:
     Properties:
       CodeUri: secondfunction/
       Handler: second-function.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Timeout: 3
       Policies: 
         - CloudWatchPutMetricPolicy: {}

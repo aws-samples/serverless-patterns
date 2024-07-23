@@ -1,0 +1,160 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template to receive email by Amazon SES and process by AWS Lambda
+
+Parameters:
+  DomainName:
+    Type: String
+    Description: Please enter the Amazon Route53 domain name (public hosted zone)
+
+  ResourceRecords:
+    Type: String
+    Description: Please enter the Email Receiving Endpoint for your region  
+
+
+Resources:
+# Create an S3 Bucket to store emails
+  EmailBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${DomainName}-email-bucket
+
+# Create S3 bucket policy to allow SES to access the bucket
+  EmailBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref EmailBucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:PutObject
+              - s3:*
+            Effect: Allow
+            Resource: !Join 
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref EmailBucket
+                - /*
+            Principal:
+              Service: ses.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              StringLike:
+                AWS:SourceArn: "arn:aws:ses:*"
+            Sid: AllowSESPuts
+
+# Email SES identity to receive emails
+  EmailIdentity:
+    Type: AWS::SES::EmailIdentity
+    DependsOn: 
+      - EmailBucketPolicy
+    Properties:
+      EmailIdentity: !Ref DomainName
+
+# Create SES Email Receipt RuleSet
+  EmailReceiptRuleSet:
+    Type: AWS::SES::ReceiptRuleSet
+    DependsOn: 
+      - EmailBucketPolicy
+    Properties:
+      RuleSetName: !Sub ${DomainName}-email-receipt-rule-set
+
+
+# Create SES Email Receipt Rule
+  EmailReceiptRule:
+    Type: AWS::SES::ReceiptRule
+    DependsOn: 
+      - EmailBucketPolicy
+    Properties:
+      RuleSetName: !Ref EmailReceiptRuleSet
+      Rule:
+        Name: !Sub ${DomainName}-email-receipt-rule
+        Enabled: true
+        ScanEnabled: true
+        Actions:
+          - S3Action:
+              BucketName: !Ref EmailBucket
+
+  ## Lambda function
+  EmailProcessingLambdaFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      CodeUri: src/
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Sub ${DomainName}-email-bucket           
+      Events:
+        FileUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref EmailBucket
+            Events: s3:ObjectCreated:*
+
+# Create SES Indentity verification CNAME records in Route53
+  EmailIdentityCNAMERecord1:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Join ['', [!Ref DomainName, .]]
+      Comment: "Identity CNAME record for email receiving"
+      Name: !GetAtt EmailIdentity.DkimDNSTokenName1
+      Type: CNAME
+      TTL: '600'
+      ResourceRecords:
+        - !GetAtt EmailIdentity.DkimDNSTokenValue1
+
+  EmailIdentityCNAMERecord2:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Join ['', [!Ref DomainName, .]]
+      Comment: "Identity CNAME record for email receiving"
+      Name: !GetAtt EmailIdentity.DkimDNSTokenName2
+      Type: CNAME
+      TTL: '600'
+      ResourceRecords:
+        - !GetAtt EmailIdentity.DkimDNSTokenValue2
+
+  EmailIdentityCNAMERecord3:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Join ['', [!Ref DomainName, .]]
+      Comment: "Identity CNAME record for email receiving"
+      Name: !GetAtt EmailIdentity.DkimDNSTokenName3
+      Type: CNAME
+      TTL: '600'
+      ResourceRecords:
+        - !GetAtt EmailIdentity.DkimDNSTokenValue3
+
+# Route53 MX record to route emails
+  Route53MXRecord:  
+    Type: AWS::Route53::RecordSet   
+    Properties:
+      HostedZoneName: !Join ['', [!Ref DomainName, .]]
+      Comment: "MX record for email receiving"
+      Name: !Ref DomainName
+      Type: MX
+      TTL: '600'
+      ResourceRecords:
+        - !Ref ResourceRecords
+
+Outputs:
+  FunctionName:
+    Value: !Ref EmailProcessingLambdaFunction
+    Description: "EmailProcessingLambdaFunction Name"
+  EmailReceiptRuleSet:
+    Description: "Email Receipt RuleSet"  
+    Value: !Ref EmailReceiptRuleSet
+  EmailBucketName:
+    Description: "Email Bucket Name"  
+    Value: !Ref EmailBucket
+  ReceivingEmailAddress:
+    Description: "Email address for receiving emails"  
+    Value: !Join ['', ['contact@',!Ref DomainName]] 
+  EmailIdentityCNAMERecord1Name:
+    Description: "EmailIdentity CNAME Record1 Name"
+    Value: !GetAtt EmailIdentity.DkimDNSTokenName1
+  EmailIdentityCNAMERecord1Value:
+    Description: "EmailIdentity CNAME Record1 Value"
+    Value: !GetAtt EmailIdentity.DkimDNSTokenValue1

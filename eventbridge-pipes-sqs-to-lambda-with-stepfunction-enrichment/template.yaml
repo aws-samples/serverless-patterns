@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: EventBridge Pipe that connects SQS to Lambda with Enrichment
+Description: EventBridge Pipe that connects SQS to Lambda with Enrichment (uksb-1tthgi812) (tag:eventbridge-pipes-sqs-to-lambda-with-stepfunction-enrichment)
 
 Resources:
   Source:
@@ -22,7 +22,7 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-target-lambda
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       MemorySize: 128
       Timeout: 15
       Architectures:

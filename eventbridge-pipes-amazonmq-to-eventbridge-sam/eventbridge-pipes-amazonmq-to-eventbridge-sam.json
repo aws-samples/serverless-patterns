@@ -1,0 +1,89 @@
+{
+  "title": "Amazon MQ to Amazon EventBridge Message Bus using Amazon EventBridge Pipes",
+  "description": "This pattern uses Amazon EventBridge Pipes to forward events produced in Amazon MQ to an Amazon EventBridge custom Message Bus",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+      "headline": "How it works",
+      "text": [
+          "Amazon MQ (ActiveMQ) queue is configured as a source for an Amazon EventBridge Pipe. The pipe consumes events placed on the queue and sends these to an Amazon EventBridge custom message bus. Amazon EventBridge Pipe performs a simple transformation of the event payload adding some meta data about the Pipe producing the event during processing. An Amazon EventBridge rule then processes any events produced by the Pipe to a CloudWatch Log Group configured to receive the events. The CloudWatch Log target on the Amazon EventBridge could be replaced with another target to build event-driven services with native AWS integrations reacting to events produced on a queue within an Amazon MQ."
+      ]
+  },
+  "gitHub": {
+      "template": {
+          "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-amazonmq-to-eventbridge-sam",
+          "templateURL": "serverless-patterns/eventbridge-pipes-amazonmq-to-eventbridge-sam",
+          "projectFolder": "eventbridge-pipes-amazonmq-to-eventbridge-sam",
+          "templateFile": "template.yaml"
+      }
+  },
+  "resources": {
+      "bullets": [
+          {
+              "text": "Amazon EventBridge Pipes Documentation",
+              "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
+          },
+          {
+              "text": "Amazon EventBridge Event Bus Documentation",
+              "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html"
+          },
+          {
+              "text": "Amazon MQ Documentation",
+              "link": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/welcome.html"
+          }
+      ]
+  },
+  "deploy": {
+      "text": [
+          "Deploy the stack : <code>sam deploy</code>"
+      ]
+  },
+  "testing": {
+      "text": [
+          "See the GitHub repo for detailed testing instructions."
+      ]
+  },
+  "cleanup": {
+      "text": [
+          "Delete the stack: <code>sam delete</code>."
+      ]
+  },
+  "authors": [
+      {
+          "name": "Adrian Begg",
+          "image": "https://gravatar.com/avatar/f17ca29ef28efd2863147f957426dd88a45a8e497b1a1732aab9673359b1f299.jpg?size=256",
+          "bio": "Adrian is a Snr. Specialist Solutions Architect with Amazon Web Services (AWS) based in Germany with a focus on Migration & Modernization.",
+          "linkedin": "adrian-begg"
+      }
+  ],
+  "patternArch": {
+      "icon1": {
+          "x": 20,
+          "y": 50,
+          "service": "mq",
+          "label": "Amazon MQ"
+      },
+      "icon2": {
+          "x": 50,
+          "y": 50,
+          "service": "eventbridge-pipes",
+          "label": "Amazon EventBridge Pipes"
+      },
+      "icon3": {
+          "x": 80,
+          "y": 50,
+          "service": "cloudwatch",
+          "label": "Amazon CloudWatch"
+      },
+      "line1": {
+          "from": "icon1",
+          "to": "icon2"
+      },
+      "line2": {
+          "from": "icon2",
+          "to": "icon3",
+          "label": "Cloudwatch Logs"
+      }
+  }
+}

@@ -1,0 +1,57 @@
+{
+    "title": "AWS Transfer Family SFTP Server to AWS Lambda",
+    "description": "Setup an AWS SFTP server using AWS Transfer Family for SFTP with a workflow step to an AWS Lambda Function using AWS SAM.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "Create a AWS Transfer Family SFTP Server to custom workflow step Lambda function.",
+        "text": [
+            "This pattern deploys an SFTP Server integrated with a Lambda function."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/awstransfer-lambda-sam",
+            "templateURL": "serverless-patterns/awstransfer-lambda-sam",
+            "projectFolder": "awstransfer-lambda-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Use custom file-processing steps with AWS Transfer Family",
+                "link": "https://docs.aws.amazon.com/transfer/latest/userguide/custom-step-details.html"
+            },
+            {
+                "text": "AWS Transfer Family",
+                "link": "https://aws.amazon.com/aws-transfer-family/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Empty the S3 Bucket: <code>aws s3 rm s3://s3-bucket  --recursive</code>.",
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Jack Jones",
+            "image": "https://avatars.githubusercontent.com/u/33759726?v=4",
+            "bio": "Jack Jones is a passionate Solution Architect who thrives on helping customers succeed. He works at Amazon Web Services, leveraging his expertise to architect optimized cloud solutions that solve complex business challenges. Jack finds fulfillment in collaborating with clients to understand their infrastructure needs to design robust, cost-effective cloud solutions.",
+            "linkedin": "jackdwaynejones"
+        }
+    ]
+}

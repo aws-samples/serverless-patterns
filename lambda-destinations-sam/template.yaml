@@ -1,13 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:lambda-destinations-sam)
   Lambda Destinations - OnSuccess to another Lambda, OnFailure to SQS DLQ
 
 Globals:
   Function:
     Timeout: 3
     MemorySize: 128
-    Runtime: nodejs16.x
+    Runtime: nodejs20.x
     Architectures:
         - x86_64
 

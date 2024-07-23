@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A demonstration of serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream (uksb-1tthgi812) (tag:lambda-kinesis-lambda-js)
+Parameters:
+  KinesisStreamName:
+    Type: String
+    Default: testDataStream
+    Description: Enter a name for the Kinesis Data Stream.
+
+Resources:
+  # Define an AWS Kinesis Data Stream
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: !Ref KinesisStreamName
+      ShardCount: 1
+
+  # Define a Lambda function as an application producer
+  ProducerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: producer/
+      Runtime: nodejs18.x
+      Handler: producer-function.lambda_handler
+      Environment:
+        Variables:
+          KINESIS_STREAM: !Ref KinesisStreamName
+      Policies:
+      - KinesisCrudPolicy:
+          StreamName: !Ref KinesisStreamName
+
+  # Define a Lambda function as an application consumer
+  ConsumerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: consumer/
+      Runtime: nodejs18.x
+      Handler: consumer-function.lambda_handler
+      Policies: 
+      - KinesisStreamReadPolicy:
+          StreamName: !Ref KinesisStreamName      
+      Events:
+        Stream:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream.Arn
+            StartingPosition: LATEST
+            BatchSize: 100
+            
+Outputs:
+  # Kinesis Data Stream name for data producers to use
+  KinesisStream:
+    Description: Kinesis Data Stream name
+    Value: !Ref KinesisStream
+  ProducerFunction:
+    Description: ProducerFunction ARN
+    Value: !Ref ProducerFunction
+  ConsumerFunction:
+    Description: ConsumerFunction ARN
+    Value: !Ref ConsumerFunction

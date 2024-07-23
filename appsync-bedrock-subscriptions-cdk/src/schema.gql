@@ -1,0 +1,28 @@
+schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
+}
+
+type Query {
+    ping: Boolean
+}
+
+type Mutation {
+    ask(chatId: String!, prompt: String!): ChatPayload
+    @aws_api_key
+
+    send(chatId: String!, data: String!): ChatPayload
+    @aws_iam
+}
+
+type Subscription {
+    chat(chatId: String!): ChatPayload
+    @aws_subscribe(mutations: ["send"])
+    @aws_api_key
+}
+
+type ChatPayload {
+    chatId: String
+    data: String
+}

@@ -1,0 +1,58 @@
+{
+    "title": "Amazon CloudFront Distribution and Function with URI Rewrite to S3",
+    "description": "Create a Static Website fronted by CloudFront with CloudFront Functions routing visitors to localized content using CloudFront's Geo Location Headers.",
+    "language": ".NET",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern shows how to create a CloudFront Distribution with a CloudFront Function for routing to different geo-localized content in an S3 statically hosted website. Implemented in AWS CDK .NET.",
+        "CloudFront Distributions can be configured to forward the 'CloudFront-Viewer-Country' header.  CloudFront Functions allow for Javascript code to execute at CloudFront edge locations, and allow you to create URL routing and rewrite rules based on request headers.  In this pattern we use the 'CloudFront-Viewer-Country' header to determine the location of the request and rewrite the URI to point to different content based on the location of the request.  Specifically in this example that means pointing to an index.html in a prefix that is applied based on the location.",
+        "This pattern deploys one CloudFront Distribution with a CloudFront Function and an S3 Static Website."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudformation-cff-s3-geo-url-rewrite-cdk-dotnet",
+        "templateURL": "serverless-patterns/cloudformation-cff-s3-geo-url-rewrite-cdk-dotnet",
+        "projectFolder": "src/StaticSiteCDK",
+        "templateFile": "StaticSite.cs"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "CloudFront Functions",
+          "link": "(https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-functions.html"
+        },
+        {
+          "text": "CloudFront Function Redirection Example",
+          "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/example-function-redirect-url.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Patrick Gryczka",
+        "image": "https://www.gryczka.net/img/patryk.jpg",
+        "bio": "Patrick Gryczka is a Senior Solutions Architect at AWS specializing in Serverless technologies and the Sports industry.",
+        "linkedin": "gryczka"
+      }
+    ]
+  }

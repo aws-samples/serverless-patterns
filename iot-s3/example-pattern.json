@@ -1,0 +1,61 @@
+{
+  "title": "AWS IoT Core to Amazon S3 SQS fanout pattern using SAM",
+  "description": "This SAM application demonstrates how to push events from IoT Core to Amazon Simple Storage (S3).",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When message events are sent to a subscribed IoT topic, this event is pushed to S3.",
+      "Please refer to the architecture diagram for the event flow."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-s3",
+      "templateURL": "serverless-patterns/iot-s3",
+      "projectFolder": "iot-s3",
+      "templateFile": "iot-s3/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS IoT SQL Reference",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-sql-reference.html?icmpid=docs_iot_console"
+      },
+      {
+        "text": "AWS IoT Rule Actions",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-rule-actions.html"
+      },
+      {
+        "text": "CloudFormation - AWS::IoT::TopicRule",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iot-topicrule.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+    }
+  ]
+}

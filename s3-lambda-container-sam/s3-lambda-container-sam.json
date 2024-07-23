@@ -1,0 +1,80 @@
+{
+    "title": "Deploy AWS Lambda functions with container image",
+    "description": "This sample project demonstrates how to deploy an AWS Lambda function with container image that gets triggered by Amazon S3 bucket create object event",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Upload a file into the Amazon S3 bucket.",
+            "The create object action in the S3 bucket triggers the AWS Lambda function.",
+            "The AWS Lambda function reads the content of the file uploaded into the S3 bucket."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-container-sam",
+            "templateURL": "serverless-patterns/s3-lambda-container-sam",
+            "projectFolder": "s3-lambda-container-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Working with Lambda container images",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/images-create.html"
+            },
+            {
+                "text": "Deploy Python Lambda functions with container images",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/python-image.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "See the GitHub repo for detailed deployment instructions.",
+            "bash build.sh",
+            "sam deploy -g"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the Amazon S3 email bucket content: <code>aws s3 rm s3://{SampleFunction} --recursive --region {your-region}</code>",
+            "Delete the resources deployed to your AWS account via AWS SAM: <code>sam delete</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Biswanath Mukherjee",
+            "image": "https://d1rwvjey2iif32.cloudfront.net",
+            "bio": "I am a Sr. Solutions Architect working at AWS India.",
+            "linkedin": "biswanathmukherjee"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Event Trigger"
+        }
+    }
+}
