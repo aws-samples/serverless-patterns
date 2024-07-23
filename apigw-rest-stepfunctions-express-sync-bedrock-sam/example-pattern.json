@@ -1,5 +1,5 @@
 {
-  "title": "Amazon API Gateway, Synchronous Express Workflow, Prompt Chain, Amazon Bedrock",
+  "title": "Amazon API Gateway, AWS StepFunctions Synchronous Express Workflow, Prompt Chain, Amazon Bedrock",
   "description": "Amazon API Gateway HTTP API, AWS StepFunctions (Synchronous Express Workflow), Intrinsic Functions, and Prompt Chaining with Amazon Bedrock.",
   "language": "",
   "level": "200",
