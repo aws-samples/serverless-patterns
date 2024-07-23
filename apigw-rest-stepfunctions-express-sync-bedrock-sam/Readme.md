@@ -26,16 +26,20 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd apigw-rest-stepfunctions-express-sync-bedrock-sam
     ```
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. From the command line, use AWS SAM build to prepare an application for subsequent steps in the developer workflow, such as local testing or deploying to the AWS Cloud:
     ```
-    sam deploy 
+    sam build
+    ```    
+4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
-4. During the prompts:
+    sam deploy --guided
+    ```
+5. During the prompts:
     * Enter a stack name
     * Select the desired AWS Region
     * Allow SAM to create roles with the required permissions if needed.
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
  
 
 ## Testing
