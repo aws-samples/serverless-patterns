@@ -54,7 +54,7 @@ During execution, the Task state calls the Bedrock API and the response goes int
   "result_one.$": "$.Body.generations[0].text"
 }
 ```
-A Pass state is then used to pass the data to the next state using an Intrinsic Function States.
+A Pass state is then used to pass the data to the next state using an Intrinsic Function (States.).
 ```asl
 {
   "convo_one.$": "States.Format('{}',$.result_one.result_one)"
