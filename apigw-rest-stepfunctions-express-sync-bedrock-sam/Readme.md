@@ -1,8 +1,7 @@
-# Amazon API Gateway HTTP API to invoke AWS Step Functions Express synchronous workflow using intrinsic functions & prompt chaining to Amazon Bedrock.
+# Amazon API Gateway HTTP API, AWS StepFunctions (Synchronous Express Workflow), Intrinsic Functions, and Prompt Chaining with Amazon Bedrock.
 
-The SAM template deploys an Amazon API Gateway HTTP API endpoint along with an Express State machine. This setup illustrates how we can invoke an Express State machine synchronously and using StepFunctions intrinsic functions to chain two prompts to invoke Amazon Bedrock. 
-Output is return back from the execution to the client (within 29 seconds) using HTTP API. 
-This no-code example demonstrates how results from the first prompt are then used to provide the second prompt with context. Chaining of these prompts augments the ability of the language model being used to deliver a highly-curated response.
+
+The AWS Serverless Application Model (SAM) template deploys an Amazon API Gateway HTTP API endpoint connected to an AWS Step Functions state machine. This example demonstrates how to invoke an Express state machine synchronously and utilize AWS Step Functions intrinsic functions to chain two prompts, which are then used to invoke the Amazon Bedrock language model. The output from the state machine execution is returned to the client within 29 seconds, using the HTTP API. This no-code example showcases how the results from the first prompt can be used to provide context for the second prompt, allowing the language model to deliver a highly-curated response. By chaining these prompts, the system can leverage the capabilities of the language model to generate more meaningful and contextual outputs.
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-rest-stepfunctions-express-sync-bedrock-sam)
 
@@ -14,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Manage Access to Amazon Bedrock Foundation Models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) at the time of writing this example uses the Amazon Bedrock foundation model cohere.command-text-v14
+* [NOTE! Manage Access to Amazon Bedrock Foundation Models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) at the time of writing, this example uses Amazon Bedrock foundation model cohere.command-text-v14
 
 
 ## Deployment Instructions
