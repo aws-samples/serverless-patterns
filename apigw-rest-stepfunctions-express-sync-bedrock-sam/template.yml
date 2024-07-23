@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: APIGW invokes StepFunction express synchronously, using intrinsic functions & prompt chaining & to invoke Bedrock API
+Description: Amazon API Gateway HTTP API, AWS StepFunctions (Synchronous Express Workflow), Intrinsic Functions, and Prompt Chaining with Amazon Bedrock.
 
 Resources:
 
