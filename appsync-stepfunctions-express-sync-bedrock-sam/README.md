@@ -43,13 +43,13 @@ Important: this application uses various AWS services and there are costs associ
  
 
 ## Testing
-1.Within your AWS Console navigate to AppSync in the region you deployed this sample in.
+1. Within your AWS Console navigate to AppSync in the region you deployed this sample in.
 
-2.Select the AppSyncApi
+2. Select the AppSyncApi
 
-3.On the left side select Queries
+3. On the left side select Queries
 
-4.Below the Run dropdown paste the following
+4. Below the Run dropdown paste the following
 
 mutation MyMutation {
   startWorkflow(prompt_one: "Write a 500 word blog post on The Beatles") {
@@ -59,8 +59,8 @@ mutation MyMutation {
 }
 
 5.Then Select Run and MyMutation
-   
 After runnning the above command, AppSync will invoke the State machine and return the complete results as shown below
+![run-1](images/image-1.png)
 
 ## Cleanup
  
