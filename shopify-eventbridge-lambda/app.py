@@ -23,11 +23,11 @@ class ShopifyIntegrationStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        #stack inputs
+        # Stack inputs
         SHOPIFY_PARTNER_EVENT_BUS = CfnParameter(self, id="shopifyEventBusName", type="String",
             description="The name of event bus the Shopify Partner EventSource is associated with.")
         
-        #turn partner event bus from string to IEventBus object
+        # Turn partner event bus from string to IEventBus object
         partner_event_bus = events.EventBus.from_event_bus_name(scope=self, id='partner-event-bus', event_bus_name=SHOPIFY_PARTNER_EVENT_BUS.value_as_string)
 
         # CloudWatch Logs Group that stores all events sent by Shopify for debugging or archive
@@ -63,29 +63,29 @@ class ShopifyIntegrationStack(Stack):
             timeout=Duration.seconds(15)
         )
 
-        #EventBridge Shopify all events rule
+        # EventBridge Shopify all events rule
         shopify_all_events_rule = events.Rule(
             self,
             id="ShopifyAllEventsRule",
             event_bus=partner_event_bus
         )
 
-        #add event pattern to rule
+        # Add event pattern to rule
         shopify_all_events_rule.add_event_pattern(
             source=events.Match.prefix('aws.partner/shopify.com'),
         )
 
-        #CloudWatch Log Group as target for EventBridge Rule
+        # CloudWatch Log Group as target for EventBridge Rule
         shopify_all_events_rule.add_target(targets.CloudWatchLogGroup(log_group))
 
-        #EventBridge Shopify product updated events
+        # EventBridge Shopify product updated events
         shopify_product_updated_rule = events.Rule(
             self,
-            id="ShopifySpecificEventsRule",
+            id="ShopifyProductUpdatedEventsRule",
             event_bus=partner_event_bus
         )
 
-        #Add rule to the event bus for specific events  
+        # Add rule to the event bus for specific events  
         shopify_product_updated_rule.add_event_pattern(
             source=events.Match.prefix('aws.partner/shopify.com/shop-event-bus'),
             detail_type=["shopifyWebhook"],
@@ -99,11 +99,11 @@ class ShopifyIntegrationStack(Stack):
         # Lambda as target for EventBridge Rule
         shopify_product_updated_rule.add_target(targets.LambdaFunction(shopify_process_product_updated_events_lambda))
 
-        #CloudWatch Log Group as target for EventBridge Rule
+        # CloudWatch Log Group as target for EventBridge Rule
         shopify_product_updated_rule.add_target(targets.CloudWatchLogGroup(log_group_product_updated))
 
         # Print the Lambda function name
-        CfnOutput(self, "ShopifyProcessSpecificEventsLambdaOutput", value=shopify_process_product_updated_events_lambda.function_name)
+        CfnOutput(self, "ShopifyProductUpdatedEventsLambdaOutput", value=shopify_process_product_updated_events_lambda.function_name)
 
 app = cdk.App()
 description = (

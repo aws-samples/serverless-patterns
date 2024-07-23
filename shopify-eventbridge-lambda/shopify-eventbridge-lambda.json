@@ -1,6 +1,6 @@
 {
     "title": "Shopify EventBridge Webhook Integration to AWS Lambda",
-    "description": "Use the Amazon EventBridge Shopify webhook integration to process updated product events with AWS Lambda, and notify users with Amazon SES or store the data elsewhere.",
+    "description": "Use EventBridge Shopify webhook to process product updates with Lambda, notify users via SES or store data elsewhere.",
     "language": "Python",
     "level": "200",
     "framework": "CDK",

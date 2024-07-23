@@ -80,7 +80,7 @@ You cannot put events on the Shopify event bus, only Shopify can publish events 
 
 2. From the Event bus list, choose the SaaS event bus associated with your Shopify partner event source. 
 
-3. From the Rules list, select the "ShopifyIntegrationStack-ShopifySpecficEventsRule54D..." 
+3. From the Rules list, select the "ShopifyIntegrationStack-ShopifyProductUpdatedEventsRule54D..." 
 
 ![EventBridge Console](./img/EBconsole-rules.png)
 
