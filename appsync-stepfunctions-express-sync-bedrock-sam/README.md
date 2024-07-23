@@ -40,7 +40,35 @@ Important: this application uses various AWS services and there are costs associ
     * Allow SAM to create roles with the required permissions if needed.
 
 6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
- 
+
+## How it Works
+In this example, the state machine is invoked with a JSON payload
+```asl
+{
+  "prompt_one": "Write a 500 word blog post on The Beatles"
+}
+```
+During execution, the Task state calls the Bedrock API and the response goes into the task result_one.
+```asl
+{
+  "result_one.$": "$.Body.generations[0].text"
+}
+```
+A Pass state is then used to pass the data to the next state using an Intrinsic Function States.
+```asl
+{
+  "convo_one.$": "States.Format('{}',$.result_one.result_one)"
+}
+```
+The second prompt is then executed with new instructions and the results from the first execution. This provides the prompt with more context
+```asl
+{
+  "prompt.$": "States.Format('{}\n{}','Human: Now write a short story based on the following. Assistant:', $.convo_one.convo_one)",
+  "max_tokens": 1000
+}
+```
+By default, the state then sends the task result as output.
+
 
 ## Testing
 1. Within your AWS Console navigate to AppSync in the region you deployed this sample in.
