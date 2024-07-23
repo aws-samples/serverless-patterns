@@ -1,6 +1,6 @@
 {
     "title": "Adobe I/O Events to AWS Lambda with Amazon EventBridge",
-    "description": "Leverage EventBridge Adobe I/O Events integration to process/route order events via AWS Lambda, notify users with SES, or store data in other services.",
+    "description": "Use EventBridge Adobe I/O Events Integration to process order events with AWS Lambda, send notifications via SES, or store data in other AWS services.",
     "language": "Python",
     "level": "200",
     "framework": "CDK",
