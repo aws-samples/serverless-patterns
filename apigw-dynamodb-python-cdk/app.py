@@ -39,6 +39,6 @@ usage_plans = {
 
 app.node.set_context("usage_plans", usage_plans)
 
-stack = ApigwDynamodbPythonStack(app, "CapstoneDynamodbPythonStack")
+stack = ApigwDynamodbPythonStack(app, "ApigwDynamodbPythonStack")
 
 app.synth()
