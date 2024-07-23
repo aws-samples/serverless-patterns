@@ -117,7 +117,7 @@ Resources:
 #   Outputs                                                              #
 ##########################################################################
 Outputs:
-  HelloWorldApi:
+  PromptChainApi:
     Description: "Sync WF API endpoint"
     Value: !Sub "https://${RestApiforSyncWF}.execute-api.${AWS::Region}.amazonaws.com/dev"
 

@@ -1,21 +1,10 @@
-***** APIGW invokes StepFunction express synchronously, using intrinsic functions & prompt chaining & to invoke Bedrock API
+# Amazon API Gateway HTTP API to invoke AWS Step Functions Express synchronous workflow using intrinsic functions & prompt chaining to Amazon Bedrock.
 
-sam build
-sam deploy --guided
-sam delete
+The SAM template deploys an Amazon API Gateway HTTP API endpoint along with an Express State machine. This setup illustrates how we can invoke an Express State machine synchronously and using StepFunctions intrinsic functions to chain two prompts to invoke Amazon Bedrock. 
+Output is return back from the execution to the client (within 29 seconds) using HTTP API. 
+This no-code example demonstrates how results from the first prompt are then used to provide the second prompt with context. Chaining of these prompts augments the ability of the language model being used to deliver a highly-curated response.
 
-{
-  "prompt_one": "Write a 500 word blog post on The Beatles"
-}
-
-
-
-***** Update the below
-# Integrate Express State Machine with Rest API using StartSyncExecution API call
-
-The SAM template deploys an Amazon API Gateway REST API endpoint along with an Express State machine. This setup illustrate how we can invoke an Express State machine and get the output back from the execution to the client (within 29 seconds) using a Rest API. 
-
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/step-function-sync-rest-api)
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-rest-stepfunctions-express-sync-bedrock-sam)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -25,6 +14,8 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Manage Access to Amazon Bedrock Foundation Models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) at the time of writing this example uses the Amazon Bedrock foundation model cohere.command-text-v14
+
 
 ## Deployment Instructions
 
@@ -34,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd step-function-sync-rest-api
+    cd apigw-rest-stepfunctions-express-sync-bedrock-sam
     ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -46,13 +37,15 @@ Important: this application uses various AWS services and there are costs associ
     * Allow SAM to create roles with the required permissions if needed.
 
 5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+ 
 
 ## Testing
 
 The stack will output the **api endpoint**. You can use *Postman* or *curl* to send a POST request to the API Gateway endpoint.
    
 ```
-curl -X POST 'https://abc.execute-api.ap-southeast-2.amazonaws.com/dev/'
+curl -H "Content-type: application/json" -X POST -d '{"prompt_one": "Write a 500 word blog post on The Beatles"}' <Your Sync WF API endpoint>
+
 ```
 After runnning the above command, API Gateway will invoke the State machine and return the complete results back to the client instead of just the State machine's execution Id. 
 
