@@ -1,6 +1,6 @@
 {
   "title": "Okta EventBridge Integration to AWS Lambda",
-  "description": "Use the Amazon EventBridge Okta integration to process unusual user login location events with AWS Lambda, and notify users with Amazon SES or store the data elsewhere.",
+  "description": "Use Amazon EventBridge Okta integration to process unusual login locations with Lambda, notify users via SES or store data elsewhere.",
   "language": "Python",
   "level": "200",
   "framework": "CDK",
