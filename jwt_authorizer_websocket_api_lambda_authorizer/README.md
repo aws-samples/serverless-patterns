@@ -1,4 +1,4 @@
-# Serverless JWT Authorizer for Websocket APIGW using Lambda Authorizer
+# Serverless JWT Authorizer for Websocket Amazon API Gateway with AWS Lambda Authorizer
 ![Concept](./images/flow.png)
 
 This serverless pattern allows users to Authenticate/Authorizer using Cognito Token via Lambda Authorizer for API Gateway websocket API. 
