@@ -1,4 +1,4 @@
-##Websocket API Gateway acknowledgement for $connect route.
+## Websocket API Gateway acknowledgement for $connect route.
 
 The SAM template deploys a websocket API Gateway and two Lambda functions required to run the application. This pattern deploys an Amazon API Gateway WebSocket API with a $connect route with a Lambda proxy integration which will invoke another Lambda function asynchronously and pass the Connection Id and the API Gateway stage URL to it. Then the Lambda function which got invoked asynchronously will check the validity of the connection. If the Connection Id is valid it will make an SDK API call to post a greeting to the client.
 
