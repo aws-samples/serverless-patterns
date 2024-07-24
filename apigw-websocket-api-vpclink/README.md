@@ -60,8 +60,6 @@ Once the application is deployed, retrieve the WebSocketURL value from CloudForm
 ```
 $ wscat -c <YOUR WEBSOCKET URL>
 connected (press CTRL+C to quit)
-> {"action":"post", "data":"hello world"}
-< hello world
 ```
 
 ## Cleanup
