@@ -1,7 +1,7 @@
 # Serverless JWT Authorizer for Websocket Amazon API Gateway with AWS Lambda Authorizer
 ![Concept](./images/flow.png)
 
-This serverless pattern allows users to Authenticate/Authorizer using Cognito Token via Lambda Authorizer for API Gateway websocket API. 
+This serverless pattern demonstrates how to authenticate and authorize users via a Lambda authorizer for an API Gateway WebSocket API using Amazon Cognito user pool tokens.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/jwt_authorizer_websocket_api_lambda_authorizer
 
