@@ -53,9 +53,9 @@
   "authors": [
     {
       "name": "Mike Hume",
-      "image": "./images/mh.png",
+      "image": "https://media.licdn.com/dms/image/D4E03AQEiUfmBiUOw_A/profile-displayphoto-shrink_200_200/0/1718324029612?e=1727308800&v=beta&t=ybhm76l-CP5xcUsHbdq2IaJOlfyycvQ6gNwuCSd3Z0w",
       "bio": "AWS Senior Solutions Architect & UKPS Serverless Lead.",
-      "linkedin": "https://www.linkedin.com/in/michael-hume-4663bb64/",
+      "linkedin": "michael-hume-4663bb64",
       "twitter": ""
     }
   ]
