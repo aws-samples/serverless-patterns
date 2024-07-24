@@ -1,0 +1,35 @@
+{
+    "name": "rafaelbernard/lambda-extension-ssm-secrets-cdk-php",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Rafael Araujo",
+            "email": "rafael@bernard-araujo.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.3",
+        "ext-ctype": "*",
+        "bref/bref": "^2",
+        "guzzlehttp/guzzle": "^7",
+        "symfony/http-foundation": "^7"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        },
+        "optimize-autoloader": true,
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*"
+    }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "lambda-extension-ssm-secrets-cdk-php",
+  "version": "0.1.0",
+  "bin": {
+    "cdk": "bin/cdk.js"
+  },
+  "scripts": {
+    "clean": "rimraf cdk.out lib",
+    "deploy": "npm run clean && npm run pac && cdk deploy",
+    "destroy": "npm run clean && cdk destroy '*'",
+    "diff": "npm run clean && cdk diff",
+    "synth": "npm run clean && cdk synth",
+    "cdk": "cdk",
+    "pac": "rimraf assets && mkdir -p assets/lambda && cd php/ && composer install --optimize-autoloader --no-dev && cd - && cp php/handlers/lambda.php assets/lambda && cp -r php/vendor assets/lambda && cd -"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "aws-cdk": "2.145.0",
+    "aws-cdk-lib": "2.145.0",
+    "ts-node": "^10",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@bref.sh/constructs": "^1.0.2",
+    "constructs": "^10.0.0",
+    "rimraf": "^5.0.7",
+    "source-map-support": "^0.5.16"
+  }
+}
