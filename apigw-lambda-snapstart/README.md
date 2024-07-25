@@ -74,12 +74,7 @@ To test the Lambda function you can POST a unicorn JSON payload to the '/unicorn
 ```bash
 curl --location --request POST $(aws cloudformation describe-stacks --stack-name unicorn-store --query "Stacks[0].Outputs[?OutputKey=='UnicornEndpoint'].OutputValue" --output text)'/unicorns' \
 --header 'Content-Type: application/json' \
---data-raw '{
-"name": "Something",
-"age": "Older",
-"type": "Animal",
-"size": "Very big"
-}' | jq
+--data-raw '{"name": "Something","age": "Older","type": "Animal","size": "Very big"}' | jq
 ```
 
 ## Measuring the results

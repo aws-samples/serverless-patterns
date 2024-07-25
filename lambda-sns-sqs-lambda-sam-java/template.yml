@@ -4,7 +4,7 @@ Description: aws-lambda-sns-sqs-lambda (uksb-1tthgi812) (tag:lambda-sns-sqs-lamb
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java21
     MemorySize: 512
     Timeout: 25
 
@@ -14,7 +14,7 @@ Resources:
     Properties:
       FunctionName: OrderProducer
       Handler: com.example.producer.OrderProducer::handleRequest
-      CodeUri: target/sourceCode.zip
+      CodeUri: OrderProducer/
       Policies:
         - Statement:
             - Effect: Allow
@@ -31,7 +31,7 @@ Resources:
     Properties:
       FunctionName: OrderConsumer
       Handler: com.example.consumer.OrderConsumer::handleRequest
-      CodeUri: target/sourceCode.zip
+      CodeUri: OrderProducer/
       Events:
         MySQSEvent:
           Type: SQS
@@ -64,7 +64,7 @@ Resources:
             Principal:
               Service: "sns.amazonaws.com"
             Resource: !GetAtt OrdersSqsQueue.Arn
-            Action: SQS:SendMessage
+            Action: sqs:SendMessage
             Condition:
               ArnEquals:
                 aws:SourceArn: !Ref OrderSNSTopic
