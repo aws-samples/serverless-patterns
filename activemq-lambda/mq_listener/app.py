@@ -9,6 +9,6 @@ def lambda_handler(event, context):
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "message": "Update update Invoke from MQ - Complete -",
+            "message": "Update Invoke from MQ - Complete -",
         }),
     }
