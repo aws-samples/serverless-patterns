@@ -11,7 +11,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+       - name: Validate
+        uses: cli/gh-action@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get the latest release tag
         id: get_latest_release
