@@ -18,32 +18,61 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-          echo "::set-output name=latest_release::$latest_release"
+          echo "Latest release tag: $latest_release"
+          echo "latest_release=${latest_release}" >> $GITHUB_ENV
+
+      - name: Fetch the latest release tag from remote
+        if: env.latest_release != ''
+        run: |
+          git fetch origin refs/tags/${{ env.latest_release }}:refs/tags/${{ env.latest_release }}
 
       - name: Get changed files since latest release
         id: get_changes
         run: |
           if [ -n "${{ env.latest_release }}" ]; then
-            git fetch origin ${{ env.latest_release }} --depth=1
+            git fetch origin refs/tags/${{ env.latest_release }}:refs/tags/${{ env.latest_release }}
             changed_files=$(git diff --name-only ${{ env.latest_release }} HEAD)
-            echo "changed_files=${changed_files}" >> $GITHUB_ENV
+            echo "Changed files since ${{ env.latest_release }}: $changed_files"
+            echo "$changed_files" > changed_files.txt
           else
-            echo "changed_files=" >> $GITHUB_ENV
-            echo "Tag ${{ env.latest_release }} not found in remote repository"
+            echo "No latest release found"
+            echo "" > changed_files.txt
           fi
-          
-      - name: Upload changed files to the release
-        if: steps.get_changes.outputs.changed_files != ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          latest_release=${{ steps.get_latest_release.outputs.latest_release }}
-          changed_files=${{ steps.get_changes.outputs.changed_files }}
 
-          for file in $changed_files; do
-            if [ -f "$file" ]; then
-              gh release upload $latest_release $file --clobber
-              echo "Uploaded $file to release $latest_release"
+      - name: Identify changed folders
+        id: identify_folders
+        run: |
+          if [ -s changed_files.txt ]; then
+            changed_folders=$(awk -F/ '{print $1}' changed_files.txt | sort | uniq)
+            echo "Changed folders: $changed_folders"
+            echo "$changed_folders" > changed_folders.txt
+          else
+            echo "No changed files to process"
+            echo "" > changed_folders.txt
+          fi
+
+      - name: Archive changed folders
+        run: |
+          while IFS= read -r folder; do
+            if [ -d "$folder" ]; then
+              tar -cvf "$folder.tar" "$folder"
+              echo "Created archive for $folder"
+            else
+              echo "Folder $folder not found"
             fi
-          done
+          done < changed_folders.txt
+
+      - name: Upload changed archives to the release
+        if: env.latest_release != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          while IFS= read -r folder; do
+            archive="$folder.tar"
+            if [ -f "$archive" ]; then
+              echo "Uploading $archive to release ${{ env.latest_release }}"
+              gh release upload ${{ env.latest_release }} "$archive" --clobber
+            else
+              echo "Archive $archive not found"
+            fi
+          done < changed_folders.txt
