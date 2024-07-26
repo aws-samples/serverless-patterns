@@ -22,7 +22,7 @@
     "resources": {
       "bullets": [
         {
-          "text": "Trigger Lambda with a REST API",
+          "text": "Invoke Lambda functions from a REST API",
           "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html"
         },
         {
