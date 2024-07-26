@@ -30,8 +30,9 @@ jobs:
         id: get_changes
         run: |
           if [ -n "${{ env.latest_release }}" ]; then
-            git fetch origin refs/tags/${{ env.latest_release }}:refs/tags/${{ env.latest_release }}
             changed_files=$(git diff --name-only ${{ env.latest_release }} HEAD)
+            echo "Changed files since ${{ env.latest_release }}: $changed_files"
+            echo "$changed_files" > changed_files.txt
             echo "Changed files since ${{ env.latest_release }}: $changed_files"
             echo "$changed_files" > changed_files.txt
           else
@@ -39,31 +40,14 @@ jobs:
             echo "" > changed_files.txt
           fi
 
-      - name: Identify changed folders
-        id: identify_folders
+      - name: Read changed files
+        id: read_changed_files
         run: |
-          if [ -s changed_files.txt ]; then
-            changed_folders=$(awk -F/ '{print $1}' changed_files.txt | sort | uniq)
-            echo "Changed folders: $changed_folders"
-            echo "$changed_folders" > changed_folders.txt
-          else
-            echo "No changed files to process"
-            echo "" > changed_folders.txt
-          fi
-
-      - name: Archive changed folders
-        run: |
-          while IFS= read -r folder; do
-            if [ -d "$folder" ]; then
-              tar -cvf "$folder.tar" "$folder"
-              echo "Created archive for $folder"
-            else
-              echo "Folder $folder not found"
-            fi
-          done < changed_folders.txt
-
-      - name: Upload changed archives to the release
-        if: env.latest_release != ''
+          changed_files=$(cat changed_files.txt)
+          echo "changed_files=${changed_files}" >> $GITHUB_ENV
+          
+      - name: Upload changed files to the release
+        if: steps.get_changes.outputs.changed_files != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
