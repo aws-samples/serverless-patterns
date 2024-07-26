@@ -8,7 +8,7 @@
       "headline": "How it works",
       "text": [
         "This sample project demonstrates how to trigger a simple Lambda function using a REST API.",
-        "This pattern deploys one Lambda Function, andn one API Gateway REST API."
+        "This pattern deploys one Lambda Function and one API Gateway REST API."
       ]
     },
     "gitHub": {
