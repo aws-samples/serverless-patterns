@@ -1,4 +1,4 @@
-# Amazon S3 to Amaozn SQS queue to AWS Lambda
+# Amazon S3 to Amazon SQS queue to AWS Lambda
 
 The Terraform code deploys an AWS Lambda function, an Amazon SQS queue, one AWS S3 buckets and the AWS IAM resources required to run the application. The created Lambda function is triggered on every new `.jpg` image file uploaded to the S3 bucket using an SQS queue as a notification target. The Lambda function code contains only contains minimal code for demo purposes.
 
