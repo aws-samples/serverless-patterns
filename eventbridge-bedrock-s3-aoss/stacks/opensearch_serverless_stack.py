@@ -137,7 +137,7 @@ class OpenSearchServerlessStack(Stack):
         # Create layer
         layer = _lambda.LayerVersion(self, 'lambda_layer',
             description='Dependencies for the lambda functions',
-            code= _lambda.Code.from_asset( 'functions/layers'), # required
+            code= _lambda.Code.from_asset( 'layers/'), # required
             compatible_runtimes=[
                 _lambda.Runtime.PYTHON_3_11
             ],

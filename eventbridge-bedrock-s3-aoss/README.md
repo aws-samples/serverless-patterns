@@ -77,7 +77,7 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
 1. Install dependencies to be used in Lambda Layer
     
     ```
-    pip install --target functions/layers/python -r functions/layers/requirements.txt
+    pip install --target layers/python -r layers/requirements.txt
     ```
 
 1. Run the command below to bootstrap your account. CDK needs it to deploy
