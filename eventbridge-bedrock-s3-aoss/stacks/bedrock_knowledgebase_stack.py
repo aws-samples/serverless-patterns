@@ -86,14 +86,31 @@ class BedrockKnowledgebaseStack(Stack):
             ),
             knowledge_base_id=knowledge_base_id,
         )
-        cfn_log_group = logs.CfnLogGroup(self, "BedrockKBLogGroup",
+        log_group = logs.LogGroup(self,
+            "BedrockKBLogGroup",
             log_group_name=f"{kb_cw_log_group_name_prefix}-{knowledge_base_id}",
-            retention_in_days=14,
+            retention=logs.RetentionDays.TWO_WEEKS
         )
-
+        log_group.add_to_resource_policy(
+            iam.PolicyStatement(
+                sid="AWSLogDeliveryWriteBedrockKB20240719",
+                effect=iam.Effect.ALLOW,
+                principals=[iam.ServicePrincipal('delivery.logs.amazonaws.com')],
+                actions=["logs:CreateLogStream", "logs:PutLogEvents"],
+                resources=[log_group.log_group_arn],
+                conditions={
+                    "StringEquals": {
+                        "aws:SourceAccount": self.account
+                    },
+                    "ArnLike": {
+                        "aws:SourceArn": f"arn:aws:bedrock:{self.region}:{self.account}:knowledge-base/*"
+                    }
+                }
+            )
+        )
         cfn_delivery_destination = logs.CfnDeliveryDestination(self, "BedrockKBDeliveryDestination",
             name="BedrockKBDeliveryDestination",
-            destination_resource_arn=cfn_log_group.attr_arn
+            destination_resource_arn=log_group.log_group_arn
         )
         cfn_delivery_source = logs.CfnDeliverySource(self, "BedrockKBDeliverySource",
             name=bedrock_kb_log_delivery_source,
