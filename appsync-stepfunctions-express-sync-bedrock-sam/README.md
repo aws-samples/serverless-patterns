@@ -41,6 +41,9 @@ Important: this application uses various AWS services and there are costs associ
 
 6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
+## Architecture
+![appsync-1](images/appsync.png)
+
 ## How it Works
 In this example, the state machine is invoked with a JSON payload
 ```asl
