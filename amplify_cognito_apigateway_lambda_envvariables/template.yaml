@@ -8,7 +8,6 @@ Description: >
   Environmental Variables on Lambda Function
 
 #################### PARAMETERS #############################
-
 Parameters:
 
   AmplifyFrontendRepository:
