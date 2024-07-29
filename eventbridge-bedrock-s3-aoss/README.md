@@ -93,7 +93,7 @@ Knowledge bases for Amazon Bedrock use a foundation model to embed your data sou
 
 
 > [!NOTE]  
-> Substitute the stack_id with one from the list in output of the `cdk list` command
+> Substitute the stack_id with one from the list in output from the `cdk list` command
     ```
     cdk synth <stack_id>
     ```
@@ -122,9 +122,9 @@ The EventScheduler should be enabled by default when the stack creation is compl
 aws scheduler get-schedule --name BedrockKBDataSourceSyncSchedule --group BedrockKBSyncScheduleGroup --query 'State' --output text
 ```
 ### Upload Document(s) to S3 Bucket
-Upload a sample pdf document to S3 bucket that is configured as the KB Datasource. You can provide your own or use one of the pdfs provided in  ```examples``` folder. You can find the bucketname in the Outputs section of the CDK command output from the BedrockKBStack
+Upload a sample pdf document to S3 bucket that is configured as the KB Datasource. You can provide your own or use one of the pdfs provided in  ```examples``` folder. You can find the bucketname in the Outputs section of the CDK command output of the BedrockKBStack
 > [!NOTE]  
-> Substitute the `bucket_name` found in the CDK Output section of the `cdk deploy` command output of the `BedrockKBStack`
+> Substitute the value from `BedrockKBStack.bucketname` found in the Outputs section of the `cdk deploy` command output of the `BedrockKBStack`
 
 ```
 aws s3 cp examples/2022-Shareholder-Letter.pdf s3://<BedrockKBStack.bucketname>
@@ -132,7 +132,7 @@ aws s3 cp examples/2022-Shareholder-Letter.pdf s3://<BedrockKBStack.bucketname>
 
 
 > [!Important]
-> Wait for sometime for the next scheduled run. The stack configures the scheduler to run 5 minutes by default. You can find this by running the below command
+> Wait for for the next scheduled run before running the below commands. By default, this stack configures a scheduler to run every 5 minutes. You can find the scheduler rate by running the below command. The expected output is `rate(5 minutes)`
 ```
 aws scheduler get-schedule --name BedrockKBDataSourceSyncSchedule --group BedrockKBSyncScheduleGroup --query 'ScheduleExpression' --output text
 ```
@@ -152,10 +152,10 @@ See [Knowledge bases logging](https://docs.aws.amazon.com/bedrock/latest/usergui
 The following command tails the CloudWatch log to view KnowledgeBase events as they are logged.
 
 > [!NOTE]  
-> Substitute the `knowledge_base_id` found in the CDK Output section of the `cdk deploy` command output of the `BedrockKBStack`
+> Substitute the `BedrockKBStack.knowledgebaseid` found in the CDK Output section of the `cdk deploy` command output of the `BedrockKBStack`
 
 ```
-aws logs tail --follow --since 20m BedrockKnowledgeBase-`<knowledge_base_id>`
+aws logs tail --follow --since 20m BedrockKnowledgeBase-`<BedrockKBStack.knowledgebaseid>`
 ```
 
 The command should output cloudwatch log entries, for the various stages of the ingestion process (such as INGESTION_JOB_STARTED, CRAWLING_COMPLETED, EMBEDDING_STARTED and so on). The final log statement for a given ingestion job id should be the entry to indicate the COMPLETED status of the job as in the screenshot below. The log entry also outputs the resource stats include the number of documents ingested to the Knowledge Base.
@@ -168,10 +168,10 @@ Sample Output
 You can also use the following command to check the status of ingestion job(s). The command outputs the most recent ingestion job.
 
 > [!NOTE]  
-> Substitute the knowledge_base_id and data_source_id found in the CDK Output section of the `cdk deploy` command output of the `BedrockKBStack`
+> Substitute the BedrockKBStack.knowledgebaseid and BedrockKBStack.datasourceid found in the  Output section of the `cdk deploy` command output of the `BedrockKBStack`
 
 ```
-aws bedrock-agent list-ingestion-jobs --knowledge-base-id <knowledge_base_id> --data-source-id <data_source_id> --query 'reverse(sort_by(ingestionJobSummaries,&startedAt))[:1].{startedAt:startedAt, updatedAt:updatedAt,ingestionJobId:ingestionJobId,status:status}'
+aws bedrock-agent list-ingestion-jobs --knowledge-base-id <BedrockKBStack.knowledgebaseid> --data-source-id <BedrockKBStack.datasourceid> --query 'reverse(sort_by(ingestionJobSummaries,&startedAt))[:1].{startedAt:startedAt, updatedAt:updatedAt,ingestionJobId:ingestionJobId,status:status}'
 ```
 Sample Output 
 
