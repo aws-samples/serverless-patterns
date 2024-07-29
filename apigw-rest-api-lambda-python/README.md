@@ -4,7 +4,6 @@ This project contains source code and supporting files for a serverless applicat
 
 - hello_world - Code for the application's Lambda function.
 - events - Invocation events that you can use to invoke the function.
-- tests - Unit tests for the application code. 
 - template.yaml - A template that defines the application's AWS resources.
 
 The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
@@ -102,18 +101,6 @@ $ sam logs -n HelloWorldFunction --stack-name "YOUR_STACK_NAME_HERE" --tail
 
 You can find more information and examples about filtering Lambda function logs in the [AWS SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).
 
-## Tests
-
-Tests are defined in the `tests` folder in this project. Use PIP to install the test dependencies and run tests.
-
-```bash
-$ pip install -r tests/requirements.txt --user
-# unit test
-$ python -m pytest tests/unit -v
-# integration test, requiring deploying the stack first.
-# Create the env variable AWS_SAM_STACK_NAME with the name of the stack we are testing
-$ AWS_SAM_STACK_NAME="YOUR_STACK_NAME_HERE" python -m pytest tests/integration -v
-```
 
 ## Cleanup
 
