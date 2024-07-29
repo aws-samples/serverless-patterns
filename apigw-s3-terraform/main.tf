@@ -199,6 +199,10 @@ resource "aws_api_gateway_stage" "MyAPIGatewayStage" {
     format          = "{\"requestId\":\"$context.requestId\",\"ip\": \"$context.identity.sourceIp\",\"caller\":\"$context.identity.caller\",\"user\":\"$context.identity.user\",\"requestTime\":\"$context.requestTime\",\"httpMethod\":\"$context.httpMethod\",\"resourcePath\":\"$context.resourcePath\",\"status\":\"$context.status\",\"protocol\":\"$context.protocol\",\"responseLength\":\"$context.responseLength\"}"
   }
   
+  depends_on = [
+    aws_cloudwatch_log_group.MyAPIGatewayLogGroup
+  ]
+  
 }
 
 # Creating Logas configuration on CloudWatch
@@ -313,7 +317,7 @@ resource "aws_api_gateway_integration" "MyAPIGatewayIntRootGet" {
   type        = "AWS"
   passthrough_behavior = "WHEN_NO_TEMPLATES"
   integration_http_method = "GET"
-  uri         = "arn:aws:apigateway:${data.aws_region.current.name}:s3:path/"
+  uri         = "arn:aws:apigateway:${data.aws_region.current.name}:s3:path/{key}"
   credentials = aws_iam_role.MyAPIGatewayS3Role.arn
 }
 
@@ -353,7 +357,7 @@ resource "aws_api_gateway_integration" "MyAPIGatewayIntFolderGet" {
   type        = "AWS"
   passthrough_behavior    = "WHEN_NO_TEMPLATES"
   integration_http_method = "GET"
-  uri         = "arn:aws:apigateway:${data.aws_region.current.name}:s3:path/{bucket}"
+  uri         = "arn:aws:apigateway:${data.aws_region.current.name}:s3:path/{bucket}/{key}"
   credentials = aws_iam_role.MyAPIGatewayS3Role.arn
   request_parameters = {
     "integration.request.path.bucket"   = "method.request.path.folder"
@@ -397,7 +401,7 @@ resource "aws_api_gateway_integration" "MyAPIGatewayIntFolderItemGet" {
   type        = "AWS"
   passthrough_behavior    = "WHEN_NO_TEMPLATES"
   integration_http_method = "GET"
-  uri         = "arn:aws:apigateway:${data.aws_region.current.name}:s3:path/{bucket}/{object}"
+  uri         = "arn:aws:apigateway:${data.aws_region.current.name}:s3:path/{bucket}/{object}/{key}"
   credentials = aws_iam_role.MyAPIGatewayS3Role.arn
   request_parameters = {
     "integration.request.path.bucket"   = "method.request.path.folder",
@@ -442,7 +446,7 @@ resource "aws_api_gateway_integration" "MyAPIGatewayIntFolderItemHead" {
   type        = "AWS"
   passthrough_behavior    = "WHEN_NO_TEMPLATES"
   integration_http_method = "HEAD"
-  uri         = "arn:aws:apigateway:${data.aws_region.current.name}:s3:path/{bucket}/{object}"
+  uri         = "arn:aws:apigateway:${data.aws_region.current.name}:s3:path/{bucket}/{object}/{key}"
   credentials = aws_iam_role.MyAPIGatewayS3Role.arn
   request_parameters = {
     "integration.request.path.bucket"   = "method.request.path.folder",
@@ -487,7 +491,7 @@ resource "aws_api_gateway_integration" "MyAPIGatewayIntFolderItemPut" {
   type        = "AWS"
   passthrough_behavior    = "WHEN_NO_TEMPLATES"
   integration_http_method = "PUT"
-  uri         = "arn:aws:apigateway:${data.aws_region.current.name}:s3:path/{bucket}/{object}"
+  uri         = "arn:aws:apigateway:${data.aws_region.current.name}:s3:path/{bucket}/{object}/{key}"
   credentials = aws_iam_role.MyAPIGatewayS3Role.arn
   request_parameters = {
     "integration.request.path.bucket"   = "method.request.path.folder",
@@ -547,4 +551,3 @@ output "InitialURL" {
   value = "${aws_api_gateway_deployment.MyAPIGatewayDeployment.invoke_url}${aws_api_gateway_stage.MyAPIGatewayStage.stage_name}/${aws_s3_bucket.MyS3Bucket.id}"
   description = "The Initial URL"
 }
-
