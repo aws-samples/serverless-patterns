@@ -11,8 +11,8 @@ EventBridge Scheduler simplifies scheduling tasks by providing a centralized, se
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-bedrock-s3-aoss
 
-
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+> [!Important]
+>This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
@@ -127,9 +127,15 @@ Upload a sample pdf document to S3 bucket that is configured as the KB Datasourc
 > Substitute the `bucket_name` found in the CDK Output section of the `cdk deploy` command output of the `BedrockKBStack`
 
 ```
-aws s3 cp examples/2022-Shareholder-Letter.pdf s3://<Bucket_Name>
+aws s3 cp examples/2022-Shareholder-Letter.pdf s3://<BedrockKBStack.bucketname>
 ```
 
+
+> [!Important]
+> Wait for sometime for the next scheduled run. The stack configures the scheduler to run 5 minutes by default. You can find this by running the below command
+```
+aws scheduler get-schedule --name BedrockKBDataSourceSyncSchedule --group BedrockKBSyncScheduleGroup --query 'ScheduleExpression' --output text
+```
 
 ### View CloudTrail log for StartIngestionJob
 1. In the CloudTrail console, click on Event history. Event history provides a viewable, searchable, downloadable, and immutable record of the past 90 days of management events. 
