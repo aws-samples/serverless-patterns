@@ -1,0 +1,59 @@
+{
+  "title": "Amazon EventBridge to Amazon Data Firehose to Amazon S3 using Java CDK",
+  "description": "Sets up EventBridge, Data Firehose, and a S3 bucket for event delivery with dynamic partitioning based on metadata.",
+  "language": "Java",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["When a user sends a message to the EventBridge bus, the message gets routed to the EventBridge rule based on the \"DetailType\". Then, the EventBridge rule sends the \"Detail\" field value from the message to the rule target Firehose delivery stream. Once the message reaches the Firehose delivery stream, the JsonParsingEngine processes the message to read the \"Department\" field value, which is used for the S3 prefix. After message processing, the message gets delivered to the targeted S3 bucket by following the calculated S3 prefix based on the \"Department\" field value."]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-firehose-s3-cdk-java",
+      "projectFolder": "eventbridge-firehose-s3-cdk-java",
+      "templateFile": "src/main/java/com/myorg/EventBridgeFirehoseS3Stack.java",
+      "templateURL": "serverless-patterns/eventbridge-firehose-s3-cdk-java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Kinesis Data Firehose Delivery Stream",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/basic-create.html"
+      },
+      {
+        "text": "Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-get-started.html"
+      },
+      {
+        "text": "Amazon S3",
+        "link": "https://aws.amazon.com/s3/?nc=sn&loc=0"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Matt Ridehalgh",
+      "image": "https://avatars.githubusercontent.com/u/9155962",
+      "bio": "Matt Ridehalgh is a Solutions Architect at AWS.",
+      "linkedin": "matthew-ridehalgh",
+      "twitter": "mrideh"
+    }
+  ]
+}

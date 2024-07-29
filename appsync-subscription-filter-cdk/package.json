@@ -1,0 +1,26 @@
+{
+  "name": "appsync-subscription-filter-cdk",
+  "version": "0.1.0",
+  "bin": {
+    "appsync-subscription-filter-cdk": "app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "20.12.6",
+    "@types/source-map-support": "^0.5.10",
+    "aws-cdk": "2.136.0",
+    "esbuild": "^0.20.2",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.4.4"
+  },
+  "dependencies": {
+    "@aws-appsync/utils": "^1.7.0",
+    "aws-cdk-lib": "2.136.0",
+    "constructs": "^10.3.0",
+    "source-map-support": "^0.5.21"
+  }
+}

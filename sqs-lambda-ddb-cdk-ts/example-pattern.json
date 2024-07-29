@@ -1,0 +1,56 @@
+{
+  "title": "Amazon SQS to AWS Lambda to Amazon DynamoDB with Amazon CloudWatch Alarms",
+  "description": "Preventing Amazon DynamoDB write throttling with an Amazon SQS queue-based buffer using CDK and monitoring with CloudWatch alarms.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This code demonstrates how an Amazon SQS queue can be used to buffer records for an Amazon DynamoDB table and mitigate the risk for a client of being throttled.",
+      "The CDK code deploys Ingress and Dead-Letter SQS queues, AWS Lambda functions, destination DynamoDB tables and CloudWatch alarms.",
+      "AWS Lambda function uses NodeJS 20 runtime."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-dynamodb-cloudwatch-cdk-ts",
+      "templateURL": "serverless-patterns/sqs-lambda-dynamodb-cloudwatch-cdk-ts",
+      "projectFolder": "sqs-lambda-dynamodb-cloudwatch-cdk-ts",
+      "templateFile": "lib/sqs-lambda-dynamo-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Troubleshooting throttling issues in Amazon DynamoDB",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TroubleshootingThrottling.html"
+      },
+      {
+        "text": "Configuring reserved concurrency",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["<code>cdk destroy</code>"]
+  },
+  "authors": [
+    {
+      "name": "Andrei Stan",
+      "bio": "Cloud Application Developer, AWS.",
+      "linkedin": "astan54321"
+    },
+    {
+      "name": "Willes Mendoza",
+      "bio": "Cloud Application Developer, AWS.",
+      "linkedin": "willesfmendoza"
+    }
+  ]
+}

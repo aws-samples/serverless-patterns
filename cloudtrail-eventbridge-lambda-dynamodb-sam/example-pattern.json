@@ -1,0 +1,66 @@
+{
+  "title": "Remove unexpected BYOIPV6 route advertisements using AWS Lambda and Amazon EventBridge",
+  "description": "Use EventBridge and Lambda to respond to <code>AdvertiseByoipCidr</code> events and validate if the address space should be advertised.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use Amazon EventBridge and AWS Lambda to respond to AWS CloudTrail events. In this example, any <code>AdvertiseByoipCidr</code> call triggers a Lambda function to run and validate whether or not the address space is expected to be advertised by checking for the address space in a list of allowed CIDRs in a DynamoDB table.",
+      "If the address space is not permitted to be advertised, the Lambda will publish a message to a SNS Topic to notify an administrator that an unexpected CIDR was advertised and will automatically remove the advertisement of the CIDR.",
+      "This pattern deploys an EventBridge rule, a Lambda function, a DynamoDB table and a SNS topic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudtrail-eventbridge-lambda-dynamodb-sam",
+      "templateURL": "serverless-patterns/cloudtrail-eventbridge-lambda-dynamodb-sam",
+      "projectFolder": "cloudtrail-eventbridge-lambda-dynamodb-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Bring Your IPv6 Address Space to Amazon VPC IP Address Manager",
+        "link": "https://aws.amazon.com/blogs/networking-and-content-delivery/bring-your-ipv6-address-space-to-amazon-vpc-ip-address-manager-ipam/"
+      },
+      {
+        "text": "Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "Amazon VPC IP Address Manager (IPAM)",
+        "link": "https://docs.aws.amazon.com/vpc/latest/ipam/what-it-is-ipam.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "John Dwyer",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/130080657.jpg",
+      "bio": "I am a Senior Solutions Architect on the Worldwide Public Sector team at AWS. I help customers build and architect serverless applications at scale..",
+      "linkedin": "jrd326"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+    "title": "Document embeddings for Amazon Bedrock using Amazon S3/AWS Lambda/Amazon OpenSearch Serverless",
+    "description": "Generate vector embeddings for the documents uploaded to S3 and store them in OpenSearch serverless vector collection",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "When a new document is uploaded to S3, EventBridge receives an S3 Object Created event. An Event rule is configured to match the S3 Object Created and trigger a Lambda function. The Lambda function downloads the document, extracts content of each page in the document. The Lambda function code then iterates through the pages, invokes Amazon Titan Embeddings model to create embeddings for each page. The embeddings along with the page content are then stored in a vector index in a OpenSearch Serverless collection."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-bedrock-aoss",
+            "templateURL": "serverless-patterns/s3-lambda-bedrock-aoss",
+            "projectFolder": "s3-lambda-bedrock-aoss",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon Bedrock",
+                "link": "https://aws.amazon.com/blogs/aws/amazon-bedrock-is-now-generally-available-build-and-scale-generative-ai-applications-with-foundation-models/"
+            },
+            {
+                "text": "Vector Search Collection in Amazon OpenSearch Serverless",
+                "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-vector-search.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Raja Vaidyanathan",
+            "image": "https://avatars.githubusercontent.com/u/125882914?v=4",
+            "bio": "Solutions Architect @ AWS",
+            "linkedin": "rajav",
+            "twitter": "rajav"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 10,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "icon2": {
+            "x": 35,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 60,
+            "y": 50,
+            "service": "bedrock",
+            "label": "Amazon Bedrock"
+        },
+        "icon4": {
+            "x": 85,
+            "y": 50,
+            "service": "opensearch",
+            "label": "Amazon OpenSearch"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        }
+    }
+}

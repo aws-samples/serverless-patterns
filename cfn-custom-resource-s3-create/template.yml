@@ -6,7 +6,7 @@ Description: A CloudFormation Custom Resource and a Lambda function to create an
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: nodejs14.x
+    Runtime: nodejs20.x
     MemorySize: 128
     Timeout: 15
 

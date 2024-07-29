@@ -1,4 +1,4 @@
-use aws_sdk_eventbridge::model::PutEventsRequestEntry;
+use aws_sdk_eventbridge::types::PutEventsRequestEntry;
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

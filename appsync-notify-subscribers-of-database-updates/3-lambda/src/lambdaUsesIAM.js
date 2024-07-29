@@ -1,5 +1,4 @@
 require('isomorphic-fetch');
-const AWS = require('aws-sdk/global');
 const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
 const AWSAppSyncClient = require('aws-appsync').default;
 const gql = require('graphql-tag');
@@ -9,7 +8,11 @@ const config = {
     region: process.env.AWS_REGION,
     auth: {
         type: AUTH_TYPE.AWS_IAM,
-        credentials: AWS.config.credentials,
+        credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+            sessionToken: process.env.AWS_SESSION_TOKEN
+        },
     },
     disableOffline: true
 };

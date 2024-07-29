@@ -1,0 +1,67 @@
+{
+  "title": "Event-Driven EDI to JSON Transformation using AWS B2B Data Interchange Status Updates",
+  "description": "This project shows how to use AWS B2B Data Interchange to transform EDI files into JSON format. It also demonstrates tracking transformation completion via Amazon EventBridge rules that integrate with Amazon SQS queues.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An X12 EDI file is uploaded into the input Amazon S3 bucket.",
+      "File upload action triggers AWS B2B Data Interchange Transformers to transform the X12 EDI file into JSON format.",
+      "The transformed JSON file is uploaded into the output Amazon S3 bucket.",
+      "AWS B2B Data Interchange send the transformation completion event to Amazon EventBridge default bus.",
+      "Amazon EventBridge Rule selects the desired events and forward that to Amazon SQS."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-b2bi-eventbridge-sqs",
+      "templateURL": "serverless-patterns/s3-b2bi-eventbridge-sqs",
+      "projectFolder": "s3-b2bi-eventbridge-sqs",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS B2B Data Interchange User Guide",
+        "link": "https://docs.aws.amazon.com/b2bi/latest/userguide/what-is-b2bi.html"
+      },
+      {
+        "text": "AWS Blog - Manage EDI at scale with new AWS B2B Data Interchange",
+        "link": "https://aws.amazon.com/blogs/aws/introducing-aws-b2b-data-interchange-simplified-connections-with-your-trading-partners/"
+      },
+      {
+        "text": "Managing AWS B2B Data Interchange events using Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/b2bi/latest/userguide/eventbridge.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions.",
+      "sam deploy -g"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Amazon S3 input bucket content: <code>aws s3 rm s3://{EDI214InputBucketName} --recursive --region {my-region}</code>",
+      "Delete the Amazon S3 output bucket content: <code>aws s3 rm s3://{EDI214OutputBucketName} --recursive --region {my-region}</code>",
+      "sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+    "title": "AWS AppSync subscription enhanced filtering",
+    "description": "This pattern demonstrates the use of AWS AppSync subscriptions' enhanced filtering to send real-time notifications to a single user only.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "AWS AppSync real-time subscriptions support enhanced filtering functionality that can be used to limit the list of notification recipients.",
+            "This sample project demonstrates how to use AppSync enhanced filtering to send notifications to the currently logged user only if the userId property of the messages matches the current IAM user's username.",
+            "This pattern deploys a single AWS AppSync instance."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-subscription-filter-cdk",
+            "templateURL": "serverless-patterns/appsync-subscription-filter-cdk",
+            "projectFolder": "appsync-subscription-filter-cdk",
+            "templateFile": "app.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Enhanced subscription filtering",
+                "link": "https://docs.aws.amazon.com/appsync/latest/devguide/aws-appsync-real-time-enhanced-filtering.html"
+            },
+            {
+                "text": "AppSync JavaScript resolvers",
+                "link": "https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-overview-js.html"
+            },
+            {
+                "text": "JavaScript runtime features for resolvers and functions",
+                "link": "https://docs.aws.amazon.com/appsync/latest/devguide/resolver-util-reference-js.html"
+            },
+            {
+                "text": "Authorization use cases | Real-time data",
+                "link": "https://docs.aws.amazon.com/appsync/latest/devguide/security-authorization-use-cases.html#security-real-time-data"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy --require-approval never"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk delete -f</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Dmitry Gulin",
+            "bio": "Senior Modernization Architect, AWS.",
+            "linkedin": "dmitry-gulin"
+        }
+    ]
+}

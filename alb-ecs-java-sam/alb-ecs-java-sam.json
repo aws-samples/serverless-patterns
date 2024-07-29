@@ -1,0 +1,79 @@
+{
+  "title": "Deploying Spring Boot App on Amazon ECS/AWS Fargate with Application Load Balancer",
+  "description": "This sample project deploys a Java 21 Spring Boot App on Amazon ECS Fargate with Application Load Balancer to route traffic between two ECS Tasks.",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Amazon ECR The repository of the container image of the Spring Boot Application.",
+      "Application Load Balancer receives the HTTP request which routes the traffic to one of the Amazon ECS Tasks.",
+      "Amazon ECS Cluster is configured with one service having 2 Tasks. The 2 Tasks runs the Spring Boot application as container. The container image is retrieved from the Amazon Elastic Container Registry. The application uses in-memory database to store the data."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-ecs-java-sam",
+      "templateURL": "serverless-patterns/alb-ecs-java-sam",
+      "projectFolder": "alb-ecs-java-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Deploy Java microservices on Amazon ECS",
+        "link": "https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/deploy-java-microservices-on-amazon-ecs-using-amazon-ecr-and-aws-fargate.html"
+      },
+      {
+        "text": "Use an Application Load Balancer for Amazon ECS",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/alb.html"
+      }      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "mvn clean package",
+      "bash build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>.",
+      "Delete the ECR repository: <code>bash delete-ecr-repo.sh</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+        "x": 30,
+        "y": 50,
+        "service": "alb",
+        "label": "Application Load Balancer"
+    },
+    "icon2": {
+        "x": 70,
+        "y": 50,
+        "service": "fargate",
+        "label": "AWS Fargate"
+    },
+    "line1": {
+        "from": "icon1",
+        "to": "icon2"
+    }
+  }
+}

@@ -24,17 +24,20 @@ Important: this application uses various AWS services and there are costs associ
     cd alb-path-based-route-lambda-tf
     ```
 3. From the command line, run:
-    ```
-    terraform init
-    ```
+   
+    Default region (us-east-1) | Specify region (eu-west-1 example)
+    ---------|----------
+    ```terraform init``` | ```terraform init -var region="eu-west-1"```
+
 4. From the command line, run:
-    ```
-    terraform plan
-    ```
+    Default region (us-east-1) | Specify region (eu-west-1 example)
+    ---------|----------
+    ```terraform plan``` | ```terraform plan -var region="eu-west-1"```
 5. From the command line, run:
-    ```
-    terraform apply --auto-approve
-    ```
+
+    Default region (us-east-1) | Specify region (eu-west-1 example)
+    ---------|----------
+    ```terraform apply --auto-approve``` | ```terraform apply -var region="eu-west-1" --auto-approve```
 
 ## Testing
 
@@ -45,9 +48,9 @@ Important: this application uses various AWS services and there are costs associ
 ## Cleanup
  
 1. To delete the resources, run:
-    ```bash
-    terraform destroy --auto-approve
-    ```
+    Default region (us-east-1) | Specify region (eu-west-1 example)
+    ---------|----------
+    ```terraform destroy --auto-approve``` | ```terraform destroy -var region="eu-west-1" --auto-approve```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
