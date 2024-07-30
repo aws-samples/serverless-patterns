@@ -1,6 +1,6 @@
 # REST API as an Amazon S3 proxy in API Gateway
 
-This pattern in CDK offers a boilerplate to generate an Amazon API Gateway REST API endpoint to Amazon S3 with the following methods -
+This pattern in Terraform offers a boilerplate to generate an Amazon API Gateway REST API endpoint to Amazon S3 with the following methods -
 * Expose GET on the API's root resource to list all of the Amazon S3 buckets of a caller
 * Expose GET on a Folder resource to view a list of all of the objects in an Amazon S3 bucket
 * Expose GET on a Folder/Item resource to view or download an object from an Amazon S3 bucket
