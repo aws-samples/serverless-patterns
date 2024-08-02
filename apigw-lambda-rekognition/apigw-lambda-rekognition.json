@@ -1,0 +1,113 @@
+{
+    "title": "Image Moderation using Amazon API Gateway and AWS Lambda",
+    "description": "Securely upload images to Amazon S3 and detect inappropriate content with Amazon Rekognition",
+    "language": "YAML",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Using this sample pattern, users can securely upload images to an Amazon S3 bucket by requesting a pre-signed URL through Amazon API Gateway. This URL allows secure and temporary access for uploading files directly to S3.",
+            "Once an image is uploaded, an S3 event invokes an AWS Lambda function to analyze the content using the DetectModerationLabels API. If the image is identified as inappropriate, a notification is sent via Amazon SNS, ensuring automated content moderation and alerting."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-rekognition",
+            "templateURL": "serverless-patterns/apigw-lambda-rekognition",
+            "projectFolder": "apigw-lambda-rekognition",
+            "templateFile": "main.tf"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Uploading objects with presigned URLs",
+                "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html"
+            },
+            {
+                "text": "Moderating content",
+                "link": "https://docs.aws.amazon.com/rekognition/latest/dg/moderation.html"
+            },
+            {
+                "text": "DetectModerationLabels",
+                "link": "https://docs.aws.amazon.com/rekognition/latest/APIReference/API_DetectModerationLabels.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "terraform init",
+            "terraform apply"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "terraform destroy",
+            "terraform show"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Archana V",
+            "image": "https://media.licdn.com/dms/image/D5603AQF_QwVjCkS_UQ/profile-displayphoto-shrink_200_200/0/1670929520771?e=1724284800&v=beta&t=FFJJko4OO8h1tCFrxMyneTyRPAKmyEmIaDOYOeTaFEk",
+            "bio": "Cloud Support Engineer at AWS",
+            "linkedin": "archana-venkat-9b80b7184"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 10,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway"
+        },
+        "icon2": {
+            "x": 30,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "icon4": {
+            "x": 70,
+            "y": 50,
+            "service": "rekognition",
+            "label": "Amazon Rekognition"
+        },
+        "icon5": {
+            "x": 92,
+            "y": 50,
+            "service": "sns",
+            "label": "Amazon SNS"
+        },
+        "icon3": {
+            "x": 47,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        }
+        ,
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+        ,
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        },
+        "line4": {
+            "from": "icon4",
+            "to": "icon5"
+        }
+    }
+}
