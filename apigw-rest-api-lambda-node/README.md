@@ -58,7 +58,7 @@ Build your application with the `sam build --use-container` command.
 $ sam build --use-container
 ```
 
-The SAM CLI installs dependencies defined in `hello_world/requirements.txt`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+The SAM CLI installs dependencies defined in `hello_world/package.json`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
 Test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
 
