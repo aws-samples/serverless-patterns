@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Amazon API Gateway REST API to read files from folders & subfolder in S3 Bucket.
+
+Resources:
+
+  # REST API
+  AppApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: apigw-s3-integration
+      Description: API GW to read subfolders in S3 bucket
+
+  ResourceFolder:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref AppApi
+      ParentId: !GetAtt AppApi.RootResourceId
+      PathPart: '{folder}'
+
+  ResourceItem:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref AppApi
+      ParentId: !Ref ResourceFolder
+      PathPart: '{item+}'
+
+  ItemMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref AppApi
+      ResourceId: !Ref ResourceItem
+      HttpMethod: GET
+      AuthorizationType: NONE
+      RequestParameters:
+        method.request.path.item: true
+        method.request.path.folder: true
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: GET
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:s3:path/{bucket}/{key}
+        Credentials: !GetAtt ApiGatewayS3ReadOnlyRole.Arn
+        IntegrationResponses:
+        - StatusCode: 200
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestParameters:
+          integration.request.path.bucket: method.request.path.folder
+          integration.request.path.key: method.request.path.item
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+
+  Deployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+    - ItemMethodGet
+    Properties:
+      RestApiId: !Ref AppApi
+
+  Stage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref AppApi
+      DeploymentId: !Ref Deployment
+      StageName: dev
+
+  ApiGatewayS3ReadOnlyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonS3ReadOnlyAccess'
+
+Outputs:
+
+  ApiUrl:
+    Description: API Gateway endpoint URL for dev stage
+    Value: !Sub 'https://${AppApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/{folder}/{item+}'
