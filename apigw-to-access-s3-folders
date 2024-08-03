@@ -1,0 +1,56 @@
+{
+  "title": "API Gateway - Workaround for directly reading Files, Folders, and Sub-folders in AWS S3",
+  "description": "Read files in Folders & Subfolder of S3 bucket using API Gateway",
+  "language": "Python",
+  "level": "200",
+  "framework": "YAML",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The context and purpose of this workaround documentation is to provide a step-by-step guide and explanation for a specific approach to directly read files, folders, and sub-folders in an AWS S3 bucket using AWS API Gateway.",
+      "This would be helpful in reducing the latency of API requests, use API Gateway without a Lambda function to read Amazon S3 bucket resources. This method can also reduce costs and make your system easier to maintain and troubleshoot",
+      "Please make sure the API Gateway and S3 bucket are deployed in the same region."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-to-access-s3-folders",
+      "templateURL": "serverless-patterns/apigw-to-access-s3-folders",
+      "projectFolder": "apigw-to-access-s3-folders",
+      "templateFile": "apigw-to-access-s3-folders/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Create a REST API as an Amazon S3 proxy",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-s3.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Once the application is deployed, retrieve the API URL provided as output and open it in a browser page.",
+      "Replace the folder and item place holder with S3 bucket name and path to your file",
+      "Example: https://apigatewayid.execute-api.us-east-1.amazonaws.com/testbucket/folder1/folder2/index.html"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vamsi Pulikonda",
+      "image": "https://raw.githubusercontent.com/vamsipulikonda/my-photo/main/vamsi-photo.jpg",
+      "bio": "I am a cloud computing enthusiast working as a Cloud Engineer at Amazon Web Services.",
+      "Linkedin": "https://www.linkedin.com/in/vamsipulikonda/"
+    }
+  ]
+}
