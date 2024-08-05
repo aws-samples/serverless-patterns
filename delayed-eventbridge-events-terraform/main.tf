@@ -149,7 +149,6 @@ resource "aws_lambda_permission" "allow_eventbridge" {
 }
 
 # Function that listens to schedule directly onto EventBridge and "email a customer" as an example
-
 resource "aws_iam_role" "email_customer_function_role" {
   name = "delayed-eb-events-EmailCustomerFunctionRole"
   assume_role_policy = jsonencode({

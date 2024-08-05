@@ -51,7 +51,7 @@ Use the [AWS CLI](https://aws.amazon.com/cli/) to send a test event to EventBrid
     aws events put-events --entries "Source='myapp.users',DetailType='UserCreated',Detail='{\"id\": \"test-customer-id\", \"firstName\": \"FirstName\", \"lastName\": \"LastName\"}',EventBusName='<custom-event-bus-ARN>'"
     ```
 
-2. Check the CloudWatch metrics of `UserCreatedRule` and `UserCreated24HoursAgoRule` EventBridge rule and `SchedulesForUsers24HoursAfterCreation` EventBridge Scheduler Group. Also, check the CloudWatch Logs of Lambda Functions which are targets of corresponding `UserCreatedRule` and `UserCreated24HoursAgoRule` EventBridge rules.
+2. Check the CloudWatch metrics of `UserCreatedRule` and `UserCreated24HoursAgoRule` EventBridge rule and `SchedulesForUsers24HoursAfterCreation` EventBridge Scheduler Group. Also, check the CloudWatch Logs of Lambda Functions which are targets of corresponding `UserCreatedRule` and `UserCreated24HoursAgoRule` EventBridge rules within CloudWatch Logs Console or via `aws logs start-live-tail --log-group-identifiers <Lambda Function LogGroup ARN>` CLI command.
 
 ## Cleanup
  
