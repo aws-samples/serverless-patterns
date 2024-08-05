@@ -60,7 +60,7 @@ Here's a breakdown of the steps:
     ![Groups and Users Section](images/groups-users.png)
 1. Click on `Add groups and users` and select `Assign existing users and groups`. Click `Next`. 
 
-Note: If you have NOT already created a user in the Requirements section, then create one by choosing `Add and assign new users` instead and add the user. 
+    Note: If you have NOT already created a user in the Requirements section, then create one by choosing `Add and assign new users` instead and add the user. 
     ![Assign users](images/assign-users-groups.png)
 1. Add the name of the user and click on `Assign`.
     ![Assign user](images/assign-user.png)
