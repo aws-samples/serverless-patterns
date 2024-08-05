@@ -10,18 +10,9 @@ Resources:
   QBusinessApplication:
     Type: AWS::QBusiness::Application
     Properties:
-      DisplayName: MyQBusinessApp
+      DisplayName: !Sub MyQBusinessApp-${AWS::StackName}
       Description: Amazon Q Business Application
       IdentityCenterInstanceArn: !Ref IdentityCenterInstanceArn
-  QBusinessIndex:
-    DependsOn:
-      - QBusinessApplication
-    Type: AWS::QBusiness::Index
-    Properties:
-      DisplayName: MyQBusinessIndex
-      Description: My Amazon Q Business Index
-      ApplicationId: !Ref QBusinessApplication
-  
   QBusinessWebExperienceRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -36,13 +27,14 @@ Resources:
               - sts:AssumeRole
               - sts:SetContext
       Description: IAM role for Q Business Web Experience
-      RoleName: QBusinessWebExperienceRole
+      RoleName: !Sub QBusinessWebExperienceRole-${AWS::StackName}
       Policies:
         - PolicyName:  WebExperiencePolicyIdC
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Effect: Allow
+              - Sid: QBusinessConversationPermission
+                Effect: Allow
                 Action:
                   - qbusiness:Chat
                   - qbusiness:ChatSync
@@ -54,34 +46,55 @@ Resources:
                   - qbusiness:GetApplication
                   - qbusiness:ListPlugins
                   - qbusiness:GetChatControlsConfiguration
-                  - qbusiness:ListApplications
-                  - qbusiness:ListWebExperiences
-                  - qbusiness:CreateUser
-                  - qbusiness:GetDataSource
-                  - qbusiness:GetUser
-                  - qbusiness:GetIndex
                 Resource:
                   Fn::Sub:
                     - 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${ApplicationId}'
                     - ApplicationId: !GetAtt QBusinessApplication.ApplicationId
-              - Effect: Allow
+              - Sid: QBusinessKMSDecryptPermissions
+                Effect: Allow
                 Action: kms:Decrypt
-                Resource: 
-                  - !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*'
-              - Effect: Allow
+                Resource:
+                  Fn::Sub: 'arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/*'
+                Condition:
+                  StringLike:
+                    kms:ViaService:
+                      Fn::Sub: 'qbusiness.${AWS::Region}.amazonaws.com'
+              - Sid: QBusinessSetContextPermissions
+                Effect: Allow
                 Action: sts:SetContext
-                Resource: 
-                  - !Sub 'arn:aws:sts::${AWS::AccountId}:self'
-  
+                Resource: 'arn:aws:sts::*:self'
+                Condition:
+                  StringLike:
+                    aws:CalledViaLast: 'qbusiness.amazonaws.com'
+
   # Create a QBusiness Web Experience
   QBusinessWebExperience:
     Type: 'AWS::QBusiness::WebExperience'
     DependsOn:
       - QBusinessApplication
-      - QBusinessIndex
     Properties:
       ApplicationId: !Ref QBusinessApplication
       RoleArn: !GetAtt QBusinessWebExperienceRole.Arn
+  
+  QBusinessIndex:
+    DependsOn:
+      - QBusinessApplication
+      - QBusinessWebExperience
+    Type: AWS::QBusiness::Index
+    Properties:
+      DisplayName: MyQBusinessIndex
+      Description: My Amazon Q Business Index
+      ApplicationId: !Ref QBusinessApplication
+  
+  QBusinessRetriever:
+    Type: AWS::QBusiness::Retriever
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      Configuration: 
+        NativeIndexConfiguration:
+          IndexId: !GetAtt QBusinessIndex.IndexId
+      DisplayName: MyQBusinessRetriever
+      Type: 'NATIVE_INDEX'
 
   S3DataSourceRole:
     Type: AWS::IAM::Role
@@ -103,11 +116,18 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - s3:GetObject
-                - s3:ListBucket
+                  - s3:GetObject
+                Resource:
+                  - !Sub 'arn:aws:s3:::${S3DSBucketName}/*'
+                Condition:
+                  StringEquals:
+                    aws:ResourceAccount:
+                      - !Sub '${AWS::AccountId}'
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
                 Resource:
                   - !Sub 'arn:aws:s3:::${S3DSBucketName}'
-                  - !Sub 'arn:aws:s3:::${S3DSBucketName}/*'
                 Condition:
                   StringEquals:
                     aws:ResourceAccount:
@@ -126,7 +146,8 @@ Resources:
                   - qbusiness:UpdateUser
                   - qbusiness:ListGroups
                 Resource:
-                  - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}*'
+                  - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}'
+                  - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}/index/*'
 
   S3DataSource:
     DependsOn:
@@ -138,7 +159,7 @@ Resources:
       DisplayName: MyS3DataSource
       Description: S3 Data Source for Amazon Q Business
       RoleArn: !GetAtt S3DataSourceRole.Arn
-      Configuration:
+      Configuration: # S3 configuration schema https://docs.aws.amazon.com/amazonq/latest/business-use-dg/s3-api.html#s3-json
         connectionConfiguration:
           repositoryEndpointMetadata:
             BucketName: !Ref S3DSBucketName
