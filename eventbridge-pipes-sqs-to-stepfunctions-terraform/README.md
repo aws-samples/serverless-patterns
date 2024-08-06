@@ -1,6 +1,6 @@
-# SQS to Step Functions with EventBridge Pipes
+# Invoke AWS Step Functions state machine with Amazon with EventBridge Pipes
 
-This pattern shows how to use [EventBridge Pipes](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html) to launch a StepFunctions state machine with a message coming from SQS Queue. The pattern is deployed using Terraform.
+This pattern shows how to use [Amazon EventBridge Pipes](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html) to launch an AWS Step Functions state machine with a message coming from an Amazon SQS Queue. The pattern is deployed using Terraform.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-sqs-to-stepfunctions-terraform.
 
@@ -34,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Amazon EventBridge Pipes connects sources to targets. This Terraform stack creates an EventBridge Pipe which receives message from source SQS queue and sends it to the target AWS Step Functions state machine. 
+Amazon EventBridge Pipes connects sources to targets. This Terraform stack creates an EventBridge Pipe which receives message from the source SQS queue and sends it to the target AWS Step Functions state machine. 
 
 ## Testing
 
