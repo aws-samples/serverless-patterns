@@ -235,3 +235,6 @@ terraform.rc
 #Ignore Intellij files
 *.iml
 *.idea
+
+# This file gets generated as part of Maven shade plugin which can be ignored
+dependency-reduced-pom.xml
