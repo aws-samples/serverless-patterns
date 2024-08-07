@@ -1,5 +1,5 @@
 {
-  "title": "DynamoDB to OpenSearch Serverless with Zero-ETL",
+  "title": "Amazon DynamoDB to Amazon OpenSearch Service Serverless with Zero-ETL",
   "description": "Create a zero-ETL integration from Amazon DynamoDB to Amazon OpenSearch Serverless.",
   "language": "YAML",
   "level": "200",
@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to deploy a zero-ETL integration from a DynamoDB table to an OpenSearch Serverless collection."
+      "This sample project shows how to deploy a zero-ETL integration from a DynamoDB table to an OpenSearch Serverless collection."
     ]
   },
   "gitHub": {

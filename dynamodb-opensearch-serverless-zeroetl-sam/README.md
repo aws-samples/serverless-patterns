@@ -1,4 +1,4 @@
-# DynamoDB to OpenSearch Serverless with Zero-ETL
+# Amazon DynamoDB to Amazon OpenSearch Service Serverless with Zero-ETL
 
 This sample project demonstrates how to deploy a zero-ETL integration from a DynamoDB table to an OpenSearch Serverless collection.
 

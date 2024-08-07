@@ -58,33 +58,5 @@
           "bio": "AWS Partner Solutions Architect based in NYC. Huge advocate for serverless architectures!",
           "linkedin": "ragibmahsan"
         }
-    ],
-    "patternArch": {
-        "icon1": {
-            "x": 20,
-            "y": 50,
-            "service": "eventbridge",
-            "label": "EventBridge Partner event source"
-        },
-        "icon2": {
-            "x": 50,
-            "y": 50,
-            "service": "lambda",
-            "label": "AWS Lambda"
-        },
-        "icon3": {
-            "x": 80,
-            "y": 50,
-            "service": "cloudwatch",
-            "label": "Amazon CloudWatch Logs"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2"
-        },
-        "line2": {
-            "from": "icon2",
-            "to": "icon3"
-        }
-    }
+    ]
 }

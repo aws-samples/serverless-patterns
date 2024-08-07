@@ -1,6 +1,6 @@
 {
-  "title": "Content safety with Image Moderation using AWS API Gateway and AWS Lambda",
-  "description": "Create a Lambda function which will send a notification when an inappropriate image is uploaded in Amazon S3",
+  "title": "Content safety image moderation using Amazon S3 and AWS Lambda",
+  "description": "Securely upload images to Amazon S3 and detect inappropriate content with Amazon Rekognition",
   "language": "Python",
   "level": "200",
   "framework": "Terraform",

@@ -1,8 +1,8 @@
-# Content safety with Image Moderation using Amazon API Gateway and AWS Lambda
+# Content safety image moderation using Amazon S3 and AWS Lambda
 
 Using this sample pattern, users can securely upload images to an Amazon S3 bucket by requesting a pre-signed URL through Amazon API Gateway.  This URL allows secure and temporary access for uploading files directly to S3.
 
-Once an image is uploaded, an S3 event invokes another Lambda function to analyze the content using the DetectModerationLabels API. If the image is identified as inappropriate, a notification is sent via Amazon SNS, ensuring automated content moderation and alerting.
+Once an image is uploaded, an S3 event invokes another AWS Lambda function to analyze the content using the DetectModerationLabels API. If the image is identified as inappropriate, a notification is sent via Amazon SNS, ensuring automated content moderation and alerting.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-rekognition
 
@@ -64,7 +64,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Cleanup
  
 1. Delete the SNS Subscription:
-    Go to SNS > Subsciptions > Select your Subscription and choose Delete
+    Go to SNS > Subscriptions > Select your Subscription and choose Delete
 
     https://docs.aws.amazon.com/sns/latest/dg/sns-delete-subscription-topic.html
 
