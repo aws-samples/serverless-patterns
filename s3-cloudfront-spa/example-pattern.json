@@ -1,0 +1,74 @@
+
+{
+  "title": "AWS CloudFront and S3 for Single Page Application Hosting",
+  "description": "This sample project demonstrates how to use AWS CloudFront and S3 to host a single-page application (SPA). The pattern creates a CloudFront distribution that serves the SPA content from an S3 bucket configured for static website hosting.",
+  "level": "200",
+  "framework": "terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys the following resources:",
+      "- An AWS CloudFront distribution with the following configurations:",
+      "- Enabled and IPv6 enabled",
+      "- Default root object set to `index.html`",
+      "- Allows all HTTP methods for caching",
+      "- Redirects HTTP to HTTPS",
+      "- Sets custom error responses for 404 and 403 errors to serve `index.html`",
+      "- Uses an S3 bucket as the origin",
+
+      "- An S3 bucket to host the SPA content with the following configurations:",
+      "- Public access blocked",
+      "- Bucket ownership controls set to `BucketOwnerPreferred`",
+      "- Access control list (ACL) set to `private`",
+      "- Configured for static website hosting with `index.html` as the index document and `error.html` as the error document",
+      "- A bucket policy that allows CloudFront to access the bucket objects",
+
+      "The pattern ensures that the SPA content is served securely through CloudFront, while the S3 bucket hosting the content is private and accessible only through CloudFront."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-cloudfront-spa",
+      "templateURL": "serverless-patterns/s3-cloudfront-spa",
+      "projectFolder": "s3-cloudfront-spa",
+      "templateFile": "template.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Update terraform backend for s3 state file location"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Go to S3",
+      "Upload front end content. Copy Index.html from current repository for testing",
+      "Go to AWS Console",
+      "Go to AWS Cloudfront",
+      "Go to Distributions",
+      "Select your distribution domain and browse it. e.g ***********.cloudfront.net/Index.html"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform apply -destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Junaid Ansari",
+      "image": "https://media.licdn.com/dms/image/v2/C4E03AQEekYWyjMINfg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1659715539214?e=1728518400&v=beta&t=HVpwkCvJ_QdUYDW2YXbCabZDcWKWv3VpTBKmnCS5uVg",
+      "bio": "Cloud Application Architect at AWS.",
+      "linkedin": "https://www.linkedin.com/in/junaid-ansari-2734a912/"
+    }
+  ]
+}
