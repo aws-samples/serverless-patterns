@@ -1,0 +1,259 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Parameters:
+  UserPoolId:
+    Type: String
+    Description: User Pool Id
+  
+  ClientId:
+    Type: String
+    NoEcho: true
+
+
+Resources:
+  SimpleChatWebSocket:
+    Type: AWS::ApiGatewayV2::Api
+    DependsOn: OnConnectFunction
+    Properties:
+      Name: !Sub ${AWS::StackName}-SimpleChatWebSocket
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+      ApiKeySelectionExpression: $request.header.x-api-key
+
+  LambdaAuthorizerAPIGW:
+    Type: AWS::ApiGatewayV2::Authorizer
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      AuthorizerType: REQUEST
+      AuthorizerUri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthorizerLambdaFunction.Arn}/invocations'
+      IdentitySource: 
+        - route.request.header.Authorization
+      Name: LambdaAuthorizer
+
+  
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      RouteKey: $connect
+      AuthorizationType: CUSTOM
+      AuthorizerId: !Ref LambdaAuthorizerAPIGW
+      OperationName: ConnectRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref ConnectInteg
+  ConnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      Description: Connect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnConnectFunction.Arn}/invocations'
+  
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      RouteKey: $disconnect
+      AuthorizationType: NONE
+      OperationName: DisconnectRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref DisconnectInteg
+  
+  DisconnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      Description: Disconnect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnDisconnectFunction.Arn}/invocations'
+  
+  SendRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      RouteKey: sendmessage
+      AuthorizationType: NONE
+      OperationName: SendRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref SendInteg
+  SendInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      Description: Send Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SendMessageFunction.Arn}/invocations'
+  
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - ConnectRoute
+      - SendRoute
+      - DisconnectRoute
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: prod
+      Description: Prod Stage
+      DeploymentId: !Ref Deployment
+      ApiId: !Ref SimpleChatWebSocket
+
+  APIGatewayLambdaInvokePermission5:
+    Type: AWS::Lambda::Permission
+    DependsOn: SimpleChatWebSocket
+    Properties:
+      FunctionName: !Ref OnConnectFunction   
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatWebSocket}/*'
+  
+  APIGatewayLambdaInvokePermission6:
+    Type: AWS::Lambda::Permission
+    DependsOn: SimpleChatWebSocket
+    Properties:
+      FunctionName: !Ref OnDisconnectFunction   
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatWebSocket}/*'
+
+  APIGatewayLambdaInvokePermission7:
+    Type: AWS::Lambda::Permission
+    DependsOn: SimpleChatWebSocket
+    Properties:
+      FunctionName: !Ref SendMessageFunction   
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatWebSocket}/*'
+  
+  APIGatewayLambdaInvokePermission8:
+    Type: AWS::Lambda::Permission
+    DependsOn: SimpleChatWebSocket
+    Properties:
+      FunctionName: !Ref AuthorizerLambdaFunction   
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatWebSocket}/*'
+   
+  OnConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/onConnect.zip
+      Description: AWS Lambda function
+      MemorySize: 256
+      Timeout: 5
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      PackageType: Zip
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+
+  OnDisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/onDisconnect.zip
+      Description: AWS Lambda function
+      MemorySize: 256
+      Timeout: 5
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      PackageType: Zip
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+
+  SendMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/sendMessage.zip
+      Description: AWS Lambda function
+      MemorySize: 256
+      Timeout: 5
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      PackageType: Zip
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+
+  AuthorizerLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/authLambda.zip
+      Description: AWS Lambda function
+      MemorySize: 256
+      Timeout: 5
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      Environment:
+        Variables:
+          clientId: !Ref ClientId
+          userPoolId: !Ref UserPoolId
+      Layers:
+        - !Ref MyLambdaLayer
+      PackageType: Zip
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+  
+  MyLambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: jwt-cognito-layer
+      Description: My jwt cognito Layer
+      ContentUri: src/nodejs.zip
+      CompatibleRuntimes:
+        - nodejs20.x
+
+Outputs:
+  ApiGwUrl:
+    Description: URL to call the websocket API, replace the xyz with cognito token.
+    Value: !Sub
+            - "wscat -c wss://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/prod -H Authorization:xyz"
+            - ApiId: !Ref SimpleChatWebSocket
