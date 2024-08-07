@@ -1,0 +1,16 @@
+{
+    "opensearch_serverless_params": {
+      "collection_name": "bedrock-kb", 
+      "index_name": "bedrock-kb-index"
+    },
+    "bedrock_knowledgebase_params": {
+        "knowledge_base_name": "rag-knowledge-base",
+        "kb_s3_datasource_name":"kb-s3-datasource",
+        "embedding_model_id": "amazon.titan-embed-text-v2:0",
+        "vector_index_metadata_field":"text-metadata",
+        "vector_index_text_field":"text",
+        "vector_index_vector_field":"vector",
+        "kb_cw_log_group_name_prefix":"BedrockKnowledgeBase",
+        "bedrock_kb_log_delivery_source":"bedrock_kb_log_delivery_source"
+    }
+}
