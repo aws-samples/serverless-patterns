@@ -1,0 +1,45 @@
+{
+  "title": "Amazon API Gateway GeoLocation REST API Disaster Recovery”,
+  "description": "The SAM template deploys a multi-region active-passive public API that proxies two independent multi-region active-passive Lambda function ”,
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-geo-location-failover",
+      "templateURL": "serverless-patterns/apigw-geo-location-failover",
+      "projectFolder": "apigw-geo-location-failover",
+      "templateFile": "template.yaml"
+    }
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Manasvi Jain",
+      "image": "https://avatars.githubusercontent.com/u/56217984?v=4",
+      "bio": "Cloud Engineer at AWS",
+      "linkedin": "https://www.linkedin.com/in/manasvi-jain-36b9941a3/"
+    },
+    {
+      "name": "Umang Aggarwal",
+      "image": "https://avatars.githubusercontent.com/Umang071",
+      "bio": "Cloud Engineer II @ AWS",
+      "linkedin": "https://www.linkedin.com/in/umangaggarwal"
+    }
+  ]
+}
+
