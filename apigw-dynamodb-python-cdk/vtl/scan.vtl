@@ -1,0 +1,15 @@
+#set($inputRoot = $input.path('$'))
+{
+  "statusCode": "200",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body":
+#foreach($elem in $inputRoot.Items)
+  {
+    "ID" : "$elem.ID.S",
+    "FirstName": "$elem.FirstName.S",
+    "Age" : "$elem.Age.N"
+  }#if($foreach.hasNext),#end
+#end
+}
