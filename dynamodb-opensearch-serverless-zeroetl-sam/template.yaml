@@ -1,0 +1,247 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - DynamoDB to OpenSearch Serverless with Zero-ETL. (tag:dynamodb-opensearch-serverless-zeroetl-sam)
+
+Parameters:
+    AccessARN:
+      Description: ARN of the role or user used to access console for this deployment.
+      Type: String
+    DeploymentName:
+      Description: Unique value used to name resources.
+      Default: demo-dynamodb-oss-ztl
+      Type: String
+      AllowedPattern: ^[a-z][a-z0-9-]{2,31}$
+
+Resources:
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+  PipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${DeploymentName}-pipeline"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - osis-pipelines.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: OpenSearchServerless
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                - "aoss:BatchGetCollection"
+                - "aoss:APIAccessAll"
+                Effect: Allow
+                Resource: !GetAtt OpenSearchServerless.Arn
+              - Action:
+                - "aoss:CreateSecurityPolicy"
+                - "aoss:GetSecurityPolicy"
+                - "aoss:UpdateSecurityPolicy"
+                Effect: Allow
+                Resource: "*"
+                Condition:
+                  StringEquals:
+                    "aoss:collection": !Ref DeploymentName
+        - PolicyName: DynamoDB
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                - "dynamodb:DescribeTable"
+                - "dynamodb:DescribeContinuousBackups"
+                - "dynamodb:ExportTableToPointInTime"
+                Effect: Allow
+                Resource: !GetAtt DynamoTable.Arn
+              - Action:
+                - "dynamodb:DescribeExport"
+                Effect: Allow
+                Resource: !Sub "${DynamoTable.Arn}/export/*"
+              - Action:
+                - "dynamodb:DescribeStream"
+                - "dynamodb:GetRecords"
+                - "dynamodb:GetShardIterator"
+                Effect: Allow
+                Resource: !Sub "${DynamoTable.Arn}/stream/*"
+        - PolicyName: S3
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                - "s3:GetObject"
+                - "s3:AbortMultipartUpload"
+                - "s3:PutObject"
+                - "s3:PutObjectAcl"
+                Effect: Allow
+                Resource: !Sub "${Bucket.Arn}/*"
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html#cfn-dynamodb-table-attributedefinitions
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: uuid
+          AttributeType: "S"
+      BillingMode: PAY_PER_REQUEST
+      TableName: !Ref DeploymentName
+      KeySchema:
+        - AttributeName: uuid
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-opensearchserverless-collection.html
+  OpenSearchServerless:
+    Type: AWS::OpenSearchServerless::Collection
+    DependsOn:
+      - EncryptionPolicy
+      - NetworkPolicy
+      - AccessPolicy
+    Properties:
+      Name: !Ref DeploymentName
+      Type: SEARCH
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-opensearchserverless-securitypolicy.html
+  EncryptionPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: !Ref DeploymentName
+      Type: encryption
+      Description: Encryption policy.
+      Policy: !Sub >-
+        {"Rules":[{"ResourceType":"collection","Resource":["collection/${DeploymentName}"]}],"AWSOwnedKey":true}
+  
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-opensearchserverless-securitypolicy.html
+  NetworkPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: !Ref DeploymentName
+      Type: network
+      Description: Network policy.
+      Policy: !Sub >-
+        [{"Rules":[{"ResourceType":"collection","Resource":["collection/${DeploymentName}"]}, {"ResourceType":"dashboard","Resource":["collection/${DeploymentName}"]}],"AllowFromPublic":true}]
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-opensearchserverless-accesspolicy.html
+  AccessPolicy:
+    Type: 'AWS::OpenSearchServerless::AccessPolicy'
+    Properties:
+      Name: !Ref DeploymentName
+      Type: data
+      Description: Access policy.
+      Policy: !Sub >-
+        [{"Description":"Access for Admin","Rules":[{"ResourceType":"index","Resource":["index/${DeploymentName}/dynamo-index"],"Permission":["aoss:*"]},
+        {"ResourceType":"collection","Resource":["collection/${DeploymentName}"],"Permission":["aoss:*"]}],
+        "Principal":["${AccessARN}","arn:aws:iam::${AWS::AccountId}:role/${DeploymentName}-pipeline"]}]
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html
+  CloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/vendedlogs/OpenSearchIngestion/${DeploymentName}/audit-logs"
+      RetentionInDays: 3
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-osis-pipeline.html
+  OpenSearchPipeline:
+    Type: AWS::OSIS::Pipeline
+    Properties:
+      PipelineName: !Ref DeploymentName
+      LogPublishingOptions:
+        CloudWatchLogDestination:
+          LogGroup: !Ref CloudWatchLogGroup
+        IsLoggingEnabled: true
+      MaxUnits: 1
+      MinUnits: 1
+      PipelineConfigurationBody: !Sub
+        |
+          version: "2"
+          dynamodb-pipeline:
+            source:
+              dynamodb:
+                acknowledgments: true
+                tables:
+                  # REQUIRED: Supply the DynamoDB table ARN and whether export or stream processing is needed, or both
+                  - table_arn: "${DynamoTable.Arn}"
+                    # Remove the stream block if only export is needed
+                    stream:
+                      start_position: "LATEST"
+                    # Remove the export block if only stream is needed
+                    export:
+                      # REQUIRED for export: Specify the name of an existing S3 bucket for DynamoDB to write export data files to
+                      s3_bucket: "${Bucket}"
+                      # Provide the region of the bucket.
+                      s3_region: "${AWS::Region}"
+                      # Optionally set the name of a prefix that DynamoDB export data files are written to in the bucket. This role should have a trust relationship with osis-pipelines.amazonaws.com
+                      s3_prefix: "ddb-to-opensearch-export/"
+                aws:
+                  # REQUIRED: Provide the role to assume that has the necessary permissions to DynamoDB, OpenSearch, and S3.
+                  sts_role_arn: "${PipelineRole.Arn}"
+                  # Provide the region to use for aws credentials
+                  region: "${AWS::Region}"
+            sink:
+              - opensearch:
+                  # REQUIRED: Provide an AWS OpenSearch endpoint
+                  hosts:
+                    [ 
+                      "${OpenSearchServerless.CollectionEndpoint}"
+                    ]
+                  index: "dynamo-index"
+                  index_type: custom
+                  document_id: "${!getMetadata(\"primary_key\")}"
+                  action: "${!getMetadata(\"opensearch_action\")}"
+                  document_version: "${!getMetadata(\"document_version\")}"
+                  document_version_type: "external"
+                  aws:
+                    # REQUIRED: Provide a Role ARN with access to the domain or collection. This role should have a trust relationship with osis-pipelines.amazonaws.com
+                    sts_role_arn: "${PipelineRole.Arn}"
+                    # Provide the region of the domain or collection.
+                    region: "${AWS::Region}"
+                    # Enable the 'serverless' flag if the sink is an Amazon OpenSearch Serverless collection
+                    serverless: true
+                  # Optional: Enable the S3 DLQ to capture any failed requests in an S3 bucket. Delete this entire block if you don't want a DLQ.. This is recommended as a best practice for all pipelines.
+                  dlq:
+                    s3:
+                      # Provide an S3 bucket
+                      bucket: "${Bucket}"
+                      # Provide a key path prefix for the failed requests
+                      key_path_prefix: "dynamopipeline/dlq"
+                      # Provide the region of the bucket.
+                      region: "${AWS::Region}"
+                      # Provide a Role ARN with access to the bucket. This role should have a trust relationship with osis-pipelines.amazonaws.com
+                      sts_role_arn: "${PipelineRole.Arn}"
+
+Outputs:
+  BucketName:
+    Description: Empty this bucket before deleting the project.
+    Value: !Ref Bucket
+  DevToolsURL:
+    Description: Direct URL to Dev Tools within the OpenSearch dashboard.
+    Value: !Sub "${OpenSearchServerless.DashboardEndpoint}/app/dev_tools#/console"
+  DataAccessPolicyEditURL:
+    Description: Direct URL to modify data access policy.
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/aos/home?region=${AWS::Region}#opensearch/security/access-policies/${DeploymentName}/editAccessPolicy"
+  InsertItemURL:
+    Description: Direct URL to insert item into DynamoDB.
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/dynamodbv2/home?region=${AWS::Region}#edit-item?itemMode=1&route=ROUTE_ITEM_EXPLORER&table=${DeploymentName}"
+
