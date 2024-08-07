@@ -25,6 +25,10 @@
       {
         "text": "Amazon Q Business - AI Assistant for Enterprise",
         "link": "https://aws.amazon.com/q/business/"
+      },
+      {
+        "text": "Discover insights with Amazon Q S3 connector",
+        "link": "https://aws.amazon.com/blogs/machine-learning/discover-insights-from-amazon-s3-with-amazon-q-s3-connector/"
       }
     ]
   },
