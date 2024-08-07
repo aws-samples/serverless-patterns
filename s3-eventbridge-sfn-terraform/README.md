@@ -1,6 +1,6 @@
-# S3 to StepFunctions with EventBridge Rule
+# Amazon S3 to AWS Step Functions with Amazon EventBridge Rule
 
-This pattern demonstrates how to create an EventBridge rule with S3 as the event source and Step Functions as target. Implemented with Terraform.
+This pattern demonstrates invoking a Step Functions state machine from an S3 event via EventBridge. Implemented with Terraform.
 
 Learn more about this pattern at Serverless Land Patterns: [erverlessland.com/patterns/s3-eventbridge-sfn-terraform](https://serverlessland.com/patterns/s3-eventbridge-sfn-terraform)
 
@@ -41,29 +41,22 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 - Upload a file to the newly created S3 bucket
-- This will send an `Object Created` event to EventBridge
+- This sends an `Object Created` event to EventBridge
 - Based on the EventBridge rule, the state machine is executed
 
 
 ## Testing
 
-1. Navigate to AWS console and go to the S3 bucket that was created by this terraform template
+1. Navigate to Amazon S3 console, then choose the S3 bucket created by this Terraform template.
 
 2. Upload a file to the S3 bucket
 
-3. Immediately after the upload is completed successfully, navigate to the Step Functions state machine, you will see an execution has been triggered
-
-## Cleanup
-
-1. Delete the stack
-   ```bash
-   cdk destroy
-   ```
+3. Immediately after the upload completes successfully, navigate to the Step Functions console. Select the state machine created by the template, and observe the state machine execution.
 
 
-## Documentations and next step
+## Documentation and next step
 
-To create a full Step Functions workflow with the pattern created, you can find out example workflows at Step Functions Workflow: [serverlessland.com/workflows](https://serverlessland.com/workflows)
+To create a full Step Functions workflow with this pattern, search the example workflows available at [serverlessland.com/workflows](https://serverlessland.com/workflows)
 
 
 ## Cleanup
