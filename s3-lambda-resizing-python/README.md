@@ -19,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd s3-lambda
+    cd s3-lambda-resizing-python
     ```
 1. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
