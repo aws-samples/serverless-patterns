@@ -1,0 +1,49 @@
+{
+  "title": "Automating AWS REST API Gateway resources export",
+  "description": "  Automate periodic export of your API Gateway Resources, Integrations or Authorizers using Lambda to S3.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The AWS SAM template deploys an An Amazon EventBridge Scheduler that triggers a Lambda function based on the schedule defined by the customer to export the REST API Gateway resources along with the integrations or authorizers and store in the S3 bucket on the same account and region, based on the customer's input. An SNS topic that notifies for any failures while creating snapshots.",
+      "This pattern sets up the following resources:",
+      "An Amazon EventBridge Scheduler that triggers a Lambda function based on the schedule defined by the customer to take snapshots of the provided FSx VolumeID.",
+      "An SNS topic that notifies for any failures while creating snapshots.",
+      "The function also deletes the older snapshots.",
+      "A sample Lambda functions that creates snapshots of the source FSx VolumeID and replicates them by performing copy_snapshot_and_update_volume call to the target VolumeId in same account and same region."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-apigateway-s3-automate-periodic-exports",
+      "templateURL": "serverless-patterns/eventbridge-lambda-apigateway-s3-automate-periodic-exports",
+      "projectFolder": "eventbridge-lambda-apigateway-s3-automate-periodic-exports",
+      "templateFile": "template.yaml"
+    }
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Annangarachari",
+      "image": "https://media.licdn.com/dms/image/C5603AQHDdhBrpBtWsg/profile-displayphoto-shrink_800_800/0/1651409742725?e=1728518400&v=beta&t=5SW8ryaZYm84rx6VoPUV-m6U2hfpSgtVRYvpegBUORE",
+      "bio": "Serverless enthusiast",
+      "linkedin": "annangarachari-r/"
+    }
+  ]
+}

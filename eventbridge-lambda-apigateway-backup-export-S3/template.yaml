@@ -1,0 +1,181 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  (ananr-1234abcd) (tag:API-Gateway-REST-API-automated-export)
+  Automate periodic export of your API Gateway Resources, Integrations or Authorizers using Lambda to S3.
+
+Parameters:
+  # Schedule for creating executing the Lambda function to export the API Gateway resources 
+  CronSchedule:
+    Description: CRON schedule for API Export (default every 6 hours)
+    Type: String
+    Default: "* 0/6 * * ? *"
+
+  # Email for sending completion notification
+  Email:
+    Description: Email for API Gateway export completion notifications
+    Type: String
+  
+  # Option to choose between integrations or authorizers
+  Choice:
+    Description: Do you want to backup the backend integrations along with the resource or the authorizers attached along with the resources
+    Type: String
+    AllowedValues:
+      - "integrations"
+      - "authorizers"
+    Default: "integrations"
+
+  # S3 Bucket to store the data
+  S3BucketName:
+    Type: String
+
+Resources:
+  #
+  # SNS topic to notify
+  #
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub ${AWS::StackName}-notification
+      TopicName: !Sub ${AWS::StackName}-notification
+      Subscription:
+      - Endpoint: !Ref Email
+        Protocol: "email"
+
+  #
+  # Lambda Execution Role
+  #
+  BackupLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub BackupLambdaRole-${AWS::StackName}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: !Sub APIGatewayExportLambdaPolicy-${AWS::StackName}
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+          - Effect: Allow
+            Action:
+             - apigateway:GET
+            Resource:
+              - '*'
+          - Effect: Allow
+            Action:
+              - s3:PutObject*
+            Resource: !Sub "arn:aws:s3:::${S3BucketName}/*"
+          - Effect: Allow
+            Action:
+              - sns:Publish
+            Resource: !GetAtt SNSTopic.TopicArn
+
+  #
+  # Lambda function
+  #
+  BackupLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-Lambda
+      Description: Lambda function that creates the the backup of API Gateway resources and Integration/Authorizers
+      Environment:
+        Variables:
+          PARAMETER_EXTENSION: !Ref Choice
+          YOUR_S3_BUCKET_NAME: !Ref S3BucketName
+          SNS_TOPIC_ARN: !GetAtt SNSTopic.TopicArn
+      Handler: PeriodicBackup.lambda_handler
+      Role: !GetAtt BackupLambdaRole.Arn
+      CodeUri: src/
+      Runtime: python3.12
+      Timeout: 900
+
+  #
+  # EventBridge Scheduler Role
+  #
+  APIBackupEventBridgeSchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: APIBackupEventBridgeSchedulerRolePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunction'
+                Resource:
+                  - !GetAtt BackupLambda.Arn
+
+  #
+  # EventBridge Scheduler to trigger a Lambda function
+  #
+  APIBackupEventBridgeScheduler:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: !Sub ${AWS::StackName}-Scheduler
+      ScheduleExpression: !Sub 'cron(${CronSchedule})'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Target:
+        Arn: !GetAtt BackupLambda.Arn
+        RoleArn: !GetAtt APIBackupEventBridgeSchedulerRole.Arn
+
+#
+# Stack output section
+#
+Outputs:
+  SNSTopic:
+    Description: SNS Topic
+    Value: !Ref 'SNSTopic'
+  EventBridgeSchedulerRole:
+    Description: EventBridge Scheduler Role
+    Value: !GetAtt APIBackupEventBridgeSchedulerRole.Arn
+  EventBridgeScheduler:
+    Description: EventBridge Scheduler
+    Value: !GetAtt APIBackupEventBridgeScheduler.Arn
+  LambdaExecutionRole:
+    Description: Lambda Execution Role
+    Value: !GetAtt BackupLambdaRole.Arn
+  LambdaFunction:
+    Description: Lambda Function
+    Value: !GetAtt BackupLambda.Arn
+  # S3BucketName:
+  #   Description: S3 Bucket
+  #   Value: !GetAtt S3BucketName.Arn
