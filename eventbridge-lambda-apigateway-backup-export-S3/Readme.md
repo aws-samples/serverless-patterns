@@ -1,5 +1,3 @@
-#My first repository
-
 Amazon EventBridge to trigger AWS Lambda function to exports all the REST API Gateway resources along with either the backend integrations or authorizers based on choice and store this in a S3 bucket.
 
 The AWS SAM template deploys an Amazon EventBridge Scheduler to trigger an AWS Lambda function based on a user schedule to exports all the REST API Gateway resources along with either the backend integrations or authorizers based on choice and store this in a S3 bucket.
