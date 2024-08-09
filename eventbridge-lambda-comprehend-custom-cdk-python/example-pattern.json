@@ -1,0 +1,64 @@
+{
+    "title": "EventBridge - Lambda - Comprehend",
+    "description": "Automate the deployment and deletion of endpoints for hosting Comprehend custom models using EventBridge Scheduler, Lambda, DynamoDB, and Comprehend",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This patterns shows CDK deployment on how to leverage Amazon EventBridge, AWS Lambda, Amazon DynamoDB, and Amazon Comprehend to automate the creation & deletion of an endpoint in Amazon Comprehend, to host custom-trained models for document classification or entity recognition."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-comprehend-custom-cdk-python",
+        "templateURL": "serverless-patterns/eventbridge-lambda-comprehend-custom-cdk-python",
+        "projectFolder": "eventbridge-lambda-comprehend-custom-cdk-python",
+        "templateFile": "app.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Comprehend Classification",
+          "link": "https://docs.aws.amazon.com/comprehend/latest/dg/how-document-classification.html"
+        },
+        {
+          "text": "Amazon Comprehend Custom Entity Recognition",
+          "Link": "https://docs.aws.amazon.com/comprehend/latest/dg/custom-entity-recognition.html"
+        },
+        {
+          "text": "Amazon EventBridge Scheduler",
+          "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/using-eventbridge-scheduler.html"
+        },
+        {
+          "text": "AWS Lambda",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Arjun Arippa",
+        "image": "https://github.com/awsarippa/amazon-textract-comprehend-pii-analysis/blob/main/image.png",
+        "bio": "Arjun Arippa is a Solutions Architect based in Bangalore, India. He works with some of the strategic and global customers in India, to build and architect their applications on AWS. Before joining AWS, Arjun spent over a decade and half working as a Software Developer. Reach out to him on LinkedIn",
+        "linkedin": "arjun-arippa"
+      }
+    ]
+  }
