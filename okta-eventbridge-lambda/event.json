@@ -1,0 +1,109 @@
+{
+  "version": "0",
+  "id": "4ab6d852-09e9-1036-fc04-2e22004b3c3f",
+  "detail-type": "SystemLog",
+  "source": "aws.partner/okta.com/evership/evershipsecuritylake",
+  "account": "999999999999",
+  "time": "2023-05-30T14:17:58Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+      "actor": {
+          "id": "00uttidj04jqI21bA1d6",
+          "type": "User",
+          "alternateId": "user@evership.biz",
+          "displayName": "A User",
+          "detailEntry": null
+      },
+      "client": {
+          "userAgent": {
+              "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+              "os": "Mac OS X",
+              "browser": "CHROME"
+          },
+          "zone": "null",
+          "device": "Computer",
+          "id": null,
+          "ipAddress": "127.0.0.1",
+          "geographicalContext": {
+              "city": "Fictionville",
+              "state": "Pennsylvania",
+              "country": "United States",
+              "postalCode": "19513",
+              "geolocation": {
+                  "lat": 41.1286,
+                  "lon": -73.4835
+              }
+          }
+      },
+      "device": null,
+      "authenticationContext": {
+          "authenticationProvider": null,
+          "credentialProvider": null,
+          "credentialType": null,
+          "issuer": null,
+          "interface": null,
+          "authenticationStep": 0,
+          "externalSessionId": "102BoThue9qT2uRBdaO_Z9msg"
+      },
+      "displayMessage": "User accessing Okta admin app",
+      "eventType": "user.session.access_admin_app",
+      "outcome": {
+          "result": "SUCCESS",
+          "reason": null
+      },
+      "published": "2023-05-30T14:17:58.126Z",
+      "securityContext": {
+          "asNumber": 6167,
+          "asOrg": "verizon",
+          "isp": "verizon",
+          "domain": "myvzw.com",
+          "isProxy": false
+      },
+      "severity": "INFO",
+      "debugContext": {
+          "debugData": {
+              "requestId": "ZHYFlX6QY0rHqq1oihP7CwAACSI",
+              "dtHash": "e463841eed07369aeb7ace43a41fcef75ccefa573ced0420039c16b0e3d7cc99",
+              "requestUri": "/admin/sso/callback",
+              "url": "/admin/sso/callback?code=******&state=vdC6CnQXeZqyxBJKBVmtej9wMnF4nM1r"
+          }
+      },
+      "legacyEventType": "app.admin.sso.login.success",
+      "transaction": {
+          "type": "WEB",
+          "id": "ZHYFlX6QY0rHqq1oihP7CwAACSI",
+          "detail": {}
+      },
+      "uuid": "c6ed294a-fef4-11ed-a5b1-bbb7c1de1a4b",
+      "version": "0",
+      "request": {
+          "ipChain": [
+              {
+                  "ip": "127.0.0.1",
+                  "geographicalContext": {
+                      "city": "Fictionville",
+                      "state": "Pennsylvania",
+                      "country": "United States",
+                      "postalCode": "19513",
+                      "geolocation": {
+                          "lat": 41.1286,
+                          "lon": -73.4835
+                      }
+                  },
+                  "version": "V4",
+                  "source": null
+              }
+          ]
+      },
+      "target": [
+          {
+              "id": "00uttidj04jqI21bA1d6",
+              "type": "AppUser",
+              "alternateId": "user@evership.biz",
+              "displayName": "A User",
+              "detailEntry": null
+          }
+      ]
+  }
+}
