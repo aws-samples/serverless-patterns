@@ -1,4 +1,4 @@
-# Amazon DynamoDB Streams to AWS AppSync Subscription
+# Amazon Bedrock Streaming with AWS Appsync
 
 This pattern creates an AppSync API to invoke an Amazon Bedrock model (here Anthropic Claude V3 Haiku) through a mutation and a subscription to listen for the response.
 

@@ -1,6 +1,6 @@
 {
-  "title": "AWS AppSync to Amazon Bedrock",
-  "description": "Invoke Amazon Bedrock models from AWS AppSync HTTP resolver",
+  "title": "Amazon Bedrock Streaming with AWS Appsync",
+  "description": "Stream Amazon Bedrock responses with AWS AppSync",
   "language": "YAML",
   "level": "200",
   "framework": "SAM",
