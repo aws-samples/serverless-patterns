@@ -23,7 +23,7 @@ Resources:
     Properties:
       RestApiId: !Ref AppApi
       ParentId: !Ref ResourceFolder
-      PathPart: '{item}'
+      PathPart: '{item+}'
 
   RootMethodGet:
     Type: AWS::ApiGateway::Method
@@ -146,4 +146,4 @@ Outputs:
   # API Gateway endpoint to be used during tests
   AppApiEndpoint:
     Description: API Endpoint
-    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/{folder}/{item+}"
