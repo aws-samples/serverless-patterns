@@ -13,9 +13,9 @@
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apig-rest-api-lambda-python",
-        "templateURL": "serverless-patterns/apig-rest-api-lambda-python",
-        "projectFolder": "apig-rest-api-lambda-python",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-lambda-python",
+        "templateURL": "serverless-patterns/apigw-rest-api-lambda-python",
+        "projectFolder": "apigw-rest-api-lambda-python",
         "templateFile": "template.yaml"
       }
     },
@@ -46,13 +46,12 @@
         "Delete the application: <code>sam delete</code>."
       ]
     },
-    "authors": [
-      {
-        "name": "Your name",
-        "image": "link-to-your-photo.jpg",
-        "bio": "Your bio.",
-        "linkedin": "linked-in-ID",
-        "twitter": "twitter-handle"
-      }
-    ]
-  }
+   "authors": [
+    {
+      "name": "Seshu Brahma",
+      "image": "https://i.postimg.cc/ZR0MyrTN/seshub-photo.jpg",
+      "bio": "SDE II, Lambda, AWS",
+      "linkedin": "seshu-brahma"
+    }
+  ]
+}
