@@ -27,6 +27,7 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.12
       MemorySize: 2048
+      Timeout: 60
       Layers:
         - !Sub 'arn:aws:lambda:${AWS::Region}:175033217214:layer:graphicsmagick:2'
       Policies:
@@ -47,7 +48,7 @@ Resources:
               S3Key:
                 Rules:
                   - Name: suffix
-                    Value: '.jpg'     
+                    Value: '.jpeg'     
 Outputs:
   SourceBucketName:
     Value: !Ref SourceBucketName

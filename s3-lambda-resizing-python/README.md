@@ -38,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 * Use the AWS CLI upload an image to S3
-* If the object is a .jpg or a .png, the code creates a thumbnail and saves it to the target bucket. 
+* If the object is a .jpeg or a .png, the code creates a thumbnail and saves it to the target bucket. 
 * The code assumes that the destination bucket exists and its name is a concatenation of the source bucket name followed by the string -resized
 
 ==============================================
@@ -48,7 +48,7 @@ Important: this application uses various AWS services and there are costs associ
 Run the following S3 CLI  command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the S3 Bucket. This is provided in the stack outputs.
 
 ```bash
-aws s3 cp './events/example.jpg'  s3://{SourceBucketName}
+aws s3 cp './events/white_dog.jpeg'  s3://{SourceBucketName}
 ```
 
 Run the following command to check that a new version of the image has been created in the destination bucket.

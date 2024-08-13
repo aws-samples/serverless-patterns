@@ -1,6 +1,7 @@
-import boto3
+import os
 import uuid
 from urllib.parse import unquote_plus
+import boto3
 from PIL import Image
 
 s3_client = boto3.client('s3')
@@ -19,4 +20,4 @@ def lambda_handler(event, context):
         upload_path = '/tmp/resized-{}'.format(tmpkey)
         s3_client.download_file(bucket, key, download_path)
         resize_image(download_path, upload_path)
-        s3_client.upload_file(upload_path, '{}-resized'.format(bucket), 'resized-{}'.format(key))
+        s3_client.upload_file(upload_path, os.getenv('DestinationBucketName'), 'resized-{}'.format(key))
