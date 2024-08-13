@@ -41,5 +41,13 @@
       "text": [
         "Delete the application: <code>sam delete</code>."
       ]
+    },
+    "authors": [
+    {
+      "name": "Seshu Brahma",
+      "image": "https://i.postimg.cc/ZR0MyrTN/seshub-photo.jpg",
+      "bio": "SDE II, Lambda, AWS",
+      "linkedin": "seshu-brahma"
     }
+  ]
 }

@@ -5,8 +5,12 @@ Description: Image resizing service (tag:s3-lambda-resizing-python)
 Parameters:
   SourceBucketName:
     Type: String
+    # Pass your bucket name dynamically or change it here
+    Default: my-source-bucket-name
   DestinationBucketName:
     Type: String
+    # Pass your bucket name dynamically or change it here
+    Default: my-destination-bucket-name
 
 Resources:
   ## S3 bucket
@@ -27,7 +31,6 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.12
       MemorySize: 2048
-      Timeout: 60
       Layers:
         - !Sub 'arn:aws:lambda:${AWS::Region}:175033217214:layer:graphicsmagick:2'
       Policies:

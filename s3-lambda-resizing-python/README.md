@@ -30,6 +30,7 @@ Important: this application uses various AWS services and there are costs associ
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
+    * Enter names for your source and destination S3 buckets. Make sure these are unique as S3 bucket names share a global namespace.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
@@ -39,16 +40,16 @@ Important: this application uses various AWS services and there are costs associ
 
 * Use the AWS CLI upload an image to S3
 * If the object is a .jpeg or a .png, the code creates a thumbnail and saves it to the target bucket. 
-* The code assumes that the destination bucket exists and its name is a concatenation of the source bucket name followed by the string -resized
+* The code assumes that the destination bucket exists.
 
 ==============================================
 
 ## Testing
 
-Run the following S3 CLI  command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the S3 Bucket. This is provided in the stack outputs.
+Run the following S3 CLI command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the S3 Bucket. This is provided in the stack outputs.
 
 ```bash
-aws s3 cp './events/white_dog.jpeg'  s3://{SourceBucketName}
+aws s3 cp './events/white_dog.jpeg' s3://{SourceBucketName}
 ```
 
 Run the following command to check that a new version of the image has been created in the destination bucket.
