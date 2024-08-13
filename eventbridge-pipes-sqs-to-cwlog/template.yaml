@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Sample SAM template that shows the filter and transformation capability of Amazon EventBridge Pipes.
+Description: Sample SAM template that shows the filter and transformation capability of Amazon EventBridge Pipes.(uksb-1tthgi812) (tag:eventbridge-pipes-sqs-to-cwlog)
 
 Resources:
   # source queue
