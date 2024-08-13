@@ -67,7 +67,7 @@ Resources:
 Outputs:
   SourceQueueURL:
     Description: "Source Queue URL"
-    Value: !GetAtt SourceQueue.Arn
+    Value: !GetAtt SourceQueue.QueueUrl
   TargetCWLogGroup:
     Description: 'Target Log Group Name'
     Value: !GetAtt TargetCWLogGroup.Arn
