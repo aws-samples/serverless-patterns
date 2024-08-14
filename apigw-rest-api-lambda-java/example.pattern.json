@@ -13,9 +13,9 @@
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apig-rest-api-lambda-java",
-        "templateURL": "serverless-patterns/apig-rest-api-lambda-java",
-        "projectFolder": "apig-rest-api-lambda-java",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-lambda-java",
+        "templateURL": "serverless-patterns/apigw-rest-api-lambda-java",
+        "projectFolder": "apigw-rest-api-lambda-java",
         "templateFile": "template.yaml"
       }
     },
@@ -47,12 +47,11 @@
       ]
     },
     "authors": [
-      {
-        "name": "Your name",
-        "image": "link-to-your-photo.jpg",
-        "bio": "Your bio.",
-        "linkedin": "linked-in-ID",
-        "twitter": "twitter-handle"
-      }
-    ]
-  }
+    {
+      "name": "Seshu Brahma",
+      "image": "https://i.postimg.cc/ZR0MyrTN/seshub-photo.jpg",
+      "bio": "SDE II, Lambda, AWS",
+      "linkedin": "seshu-brahma"
+    }
+  ]
+}
