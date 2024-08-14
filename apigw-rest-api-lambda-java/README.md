@@ -38,7 +38,7 @@ To use the AWS SAM CLI, you need the following tools.
 To build and deploy your application for the first time, run the following in your shell:
 
 ```bash
-$ cd apigw-rest-api-lambda-python
+$ cd apigw-rest-api-lambda-java
 $ sam build --use-container
 $ sam deploy --guided
 ```
