@@ -1,0 +1,76 @@
+{
+    "title": "Hello World AWS Lambda and Amazon API Gateway REST API",
+    "description": "Create a simple Lambda function connected to a REST API.",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to invoke a simple Lambda function using a REST API.",
+            "This pattern deploys one Lambda Function, and one API Gateway REST API."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-lambda-node",
+            "templateURL": "serverless-patterns/apigw-rest-api-lambda-node",
+            "projectFolder": "apigw-rest-api-lambda-node",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Invoke Lambda with a REST API",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html"
+            },
+            {
+                "text": "Amazon API Gateway REST API",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the application: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Seshu Brahma",
+            "image": "https://i.postimg.cc/ZR0MyrTN/seshub-photo.jpg",
+            "bio": "SDE II, Lambda, AWS",
+            "linkedin": "seshu-brahma"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway REST API"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Request"
+        }
+    }
+}
