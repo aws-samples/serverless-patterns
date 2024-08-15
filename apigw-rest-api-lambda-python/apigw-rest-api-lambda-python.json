@@ -46,7 +46,14 @@
             "Delete the application: <code>sam delete</code>."
         ]
     },
-    "authors": [],
+    "authors": [
+        {
+          "name": "Seshu Brahma",
+          "image": "https://i.postimg.cc/ZR0MyrTN/seshub-photo.jpg",
+          "bio": "SDE for AWS Lambda",
+          "linkedin": "seshu-brahma"
+        }
+    ],
     "patternArch": {
         "icon1": {
             "x": 20,
