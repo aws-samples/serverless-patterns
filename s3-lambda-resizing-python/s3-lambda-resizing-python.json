@@ -1,0 +1,82 @@
+{
+    "title": "Resizing images uploaded to Amazon S3 with AWS Lambda",
+    "description": "Create an AWS Lambda function that resizes images uploaded to Amazon S3.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "A Lambda function consumes events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image, creates a thumbnail version of the image, then uploads the thumbnail to the destination bucket.",
+            "This pattern deploys a Lambda function and two S3 buckets."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-resizing-python",
+            "templateURL": "serverless-patterns/s3-lambda-resizing-python",
+            "projectFolder": "s3-lambda-resizing-python",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Process S3 events with Lambda",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the application: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Seshu Brahma",
+            "image": "https://i.postimg.cc/ZR0MyrTN/seshub-photo.jpg",
+            "bio": "SDE for AWS Lambda",
+            "linkedin": "seshu-brahma"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Object Created"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    }
+}
