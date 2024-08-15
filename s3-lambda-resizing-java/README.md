@@ -41,6 +41,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
 - During the prompts:
   * Enter a stack name
   * Enter the desired AWS Region
+  * Enter names for your source and destination S3 buckets. Make sure these are unique as S3 bucket names share a global namespace.
   * Allow SAM CLI to create IAM roles with the required permissions.
 
 Once you have run above once and saved arguments to a configuration file (`samconfig.toml`), 
