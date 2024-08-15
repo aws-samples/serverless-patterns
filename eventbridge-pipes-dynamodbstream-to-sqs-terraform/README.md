@@ -1,4 +1,4 @@
-# DynamoDB Stream to SQS using EventBridge Pipes with Terraform
+# Amazon DynamoDB Stream to Amazon SQS using Amazon EventBridge Pipes
 
 This pattern sends DynamoDB Stream records to an SQS queue using EventBridge Pipes.
 
