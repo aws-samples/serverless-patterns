@@ -1,6 +1,6 @@
 # DynamoDB Stream to SQS using EventBridge Pipes with Terraform
 
-This pattern will poll messages from a DynamoDB Stream into SQS queue using EventBridge Pipes.
+This pattern sends DynamoDB Stream records to an SQS queue using EventBridge Pipes.
 
 
 
