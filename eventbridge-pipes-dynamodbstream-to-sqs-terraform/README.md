@@ -29,7 +29,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     terraform init
     ```
-4.  Deploy the AWS resources for the pattern as specified in the `main.tf` file. Input variables are configured in `variables.tf`. But, there are different ways to pass variables to the CLI.
+4.  Deploy the AWS resources for the pattern as specified in the `main.tf` file. 
 
     Use the below command to review the changes before deploying.
     ```
