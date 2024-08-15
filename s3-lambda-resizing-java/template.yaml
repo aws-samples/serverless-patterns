@@ -7,6 +7,8 @@ Parameters:
     Type: String
   DestinationBucketName:
     Type: String
+    # Pass your bucket name dynamically or change it here
+    Default: my-destination-bucket-name
 
 Resources:
   SourceBucket:
