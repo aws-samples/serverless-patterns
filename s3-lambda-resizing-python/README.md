@@ -29,8 +29,8 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
     * Enter names for your source and destination S3 buckets. Make sure these are unique as S3 bucket names share a global namespace.
+    * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
@@ -62,7 +62,7 @@ aws s3 ls s3://{DestinationBucketName}
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete --stack-name STACK_NAME
     ```
 1. Confirm the stack has been deleted
     ```bash
