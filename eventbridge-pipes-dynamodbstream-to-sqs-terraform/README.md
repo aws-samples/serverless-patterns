@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd serverless-patterns/eventbridge-pipes-dynamodbstream-to-sqs-terraform
     ```
-3. Run the below command to initialize, download, and install the defined providers. In case you are not already familiar with the Terraform CLI, refer Terraform [documentation](https://www.terraform.io/cli/commands) to learn more about the various commands.
+3. Run the follow command to initialize, download, and install the defined providers. If you are unfamiliar with the Terraform CLI, refer Terraform [documentation](https://www.terraform.io/cli/commands) to learn more about the available commands.
     ```
     terraform init
     ```
