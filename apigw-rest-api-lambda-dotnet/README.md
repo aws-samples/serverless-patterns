@@ -2,7 +2,7 @@
 
 This project contains source code and supporting files for a serverless application that you can deploy with the AWS SAM CLI. It includes the following files and folders.
 
-- hello_world - Code for the application's Lambda function.
+- src/hello_world - Code for the application's Lambda function.
 - events - Invocation events that you can use to invoke the function.
 - template.yaml - A template that defines the application's AWS resources.
 
@@ -56,7 +56,7 @@ You can find your API Gateway Endpoint URL in the output values displayed after 
 
 ## Use the AWS SAM CLI to test locally
 
-The SAM CLI installs dependencies defined in `hello_world/package.json`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+The SAM CLI installs dependencies defined in `src/HelloWorld.csproj`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
 Ypu can test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
 
