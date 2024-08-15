@@ -5,6 +5,8 @@ Description: Image resizing service with Java-based Lambda functions
 Parameters:
   SourceBucketName:
     Type: String
+    # Pass your bucket name dynamically or change it here
+    Default: my-source-bucket-name
   DestinationBucketName:
     Type: String
     # Pass your bucket name dynamically or change it here
