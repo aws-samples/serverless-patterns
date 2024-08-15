@@ -77,7 +77,7 @@ When you poll the messages from the SQS queue, you would see the two message fro
     ```bash
     terraform destroy
     ```
-3. Enter 'yes' hen prompted.
+3. Enter 'yes' when prompted.
 
 4. Check if all the resources were deleted successfully.
     ```bash
