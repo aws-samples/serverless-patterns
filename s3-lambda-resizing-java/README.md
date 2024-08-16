@@ -76,6 +76,7 @@ To run the JUnit test `AppTest.java`, you need to make few changes:
 - Modify the [events/s3_event.json](./ResizerFunction/src/test/resources) file to reflect the source bucket name and object key. Replace these values in the placeholders.
 - Replace the destination bucket name placeholder in the surefire plugin's environment variable placeholder in the `pom.xml` file.
 - Enable the test [`AppTest.java`](./ResizerFunction/src/test/java/resizer/AppTest.java) by removing the `@Disabled` annotation.
+- Change directory to `./ResizerFunction`.
 - Run `mvn clean test`
 
 You should see the test passing. 
