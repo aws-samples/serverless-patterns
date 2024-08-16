@@ -1,6 +1,6 @@
 {
     "title": "Hello World AWS Lambda and Amazon API Gateway REST API",
-    "description": "Create a simple Lambda Function connected to a REST API.",
+    "description": "Create a simple Lambda function connected to a REST API.",
     "language": "Python",
     "level": "200",
     "framework": "SAM",
@@ -8,7 +8,7 @@
         "headline": "How it works",
         "text": [
             "This sample project demonstrates how to trigger a simple Lambda function using a REST API.",
-            "This pattern deploys one Lambda Function and one API Gateway REST API."
+            "This pattern deploys one Lambda function and one API Gateway REST API."
         ]
     },
     "gitHub": {
