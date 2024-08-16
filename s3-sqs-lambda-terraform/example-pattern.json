@@ -1,15 +1,15 @@
 {
-  "title": "S3 to Step Functions using EventBridge",
-  "description": "How to create an EventBridge rule with S3 as the event source and Step Functions as target.",
-  "language": "nodejs",
+  "title": "AWS Amazon S3 Lambda with SQS queue",
+  "description": "Create a Lambda function triggered for every jpg image file stored to S3 via SQS.",
+  "language": "node.js",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
     "headline": "How to create an EventBridge rule with S3 as the event source and Step Functions as target.",
     "text": [
-      "This sample project demonstrates how you can trigger an execution in Step Functions state machine when an object is created in an S3 bucket.",
-      "When you uploads an object to the newly created S3 bucket, this will send an `Object Created` event to EventBridge, based on the EventBridge rule, the state machine is executed.",
-      "This pattern deploys one Step Functions state machine, one S3 bucket, one EventBridge rule."
+      "The terraform manifest deploys a Lambda function, an SQS queue, one S3 bucket and the IAM resources required to run the application.",
+      "An SQS queue consumes ObjectCreated events from an Amazon S3 bucket if the file has .jpg extension. The SQS triggers a Lambda function.",
+      "The Lambda app acts as a boilerplate code.",
     ]
   },
   "gitHub": {
@@ -23,19 +23,19 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS S3 Event Notifications with EventBridge",
-        "link": "https://aws.amazon.com/blogs/aws/new-use-amazon-s3-event-notifications-with-amazon-eventbridge"
+        "text": "Building resilient serverless patterns by combining messaging services",
+        "link": "https://github.com/aws-samples/s3-to-lambda-patterns"
       },
       {
-        "text": "Using EventBridge with S3",
+        "text": "S3-to-Lambda serverless applications",
         "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "terraform init",
-      "terraform apply"
+      "<code>terraform init</code>",
+      "<code>terraform apply</code>"
     ]
   },
   "testing": {
@@ -45,15 +45,15 @@
   },
   "cleanup": {
     "text": [
-      "terraform destroy"
+      "<code>terraform destroy</code>"
     ]
   },
   "authors": [
     {
       "name": "Oriol Matavacas",
-      "image": "https://togithub.s3.eu-west-1.amazonaws.com/Oriol.jpg",
+      "image": "link-to-your-photo.jpg",
       "bio": "Oriol Matavacas is a Sr. Solutions Architect at AWS based in Barcelona. Oriol primarily supporting customers on the journey to the Cloud. He enjoys building new solutions with scalability, availability and easy to maintain by using serverless.",
-      "linkedin": "https://www.linkedin.com/in/oriol-matavacas-rodriguez-b165868a",
+      "linkedin": "oriol-matavacas-rodriguez-b165868a",
       "twitter": ""
     }
   ]
