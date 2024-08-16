@@ -18,7 +18,7 @@ Please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
-
+* [Java 21](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html)
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have enough permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
@@ -73,7 +73,7 @@ aws s3 ls s3://{DestinationBucketName}
 ## Running JUnit 5 test
 To run the JUnit test `AppTest.java`, you need to make few changes:
 
-- Modify the [events/s3_event.json](./ResizerFunction/src/test/resources) file to reflect the source bucket name and object key. Replace these values in the placeholders.
+- Modify the [events/s3_event.json](./ResizerFunction/src/test/resources) file to reflect the source bucket name. Replace the value in the placeholder.
 - Replace the destination bucket name placeholder in the surefire plugin's environment variable placeholder in the `pom.xml` file.
 - Enable the test [`AppTest.java`](./ResizerFunction/src/test/java/resizer/AppTest.java) by removing the `@Disabled` annotation.
 - Change directory to `./ResizerFunction`.
