@@ -1,4 +1,4 @@
-# Hello World AWS Lambda and Amazon API Gateway REST API
+# Hello World AWS Lambda and Amazon API Gateway REST API (Python)
 
 This project contains source code and supporting files for a serverless application that you can deploy with the AWS SAM CLI. It includes the following files and folders.
 
@@ -32,8 +32,7 @@ To use the AWS SAM CLI, you need the following tools.
 ### Requirements
 
 * AWS SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-* [Python 3 installed](https://www.python.org/downloads/)
-* Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
+* Docker - [Install Docker Desktop](https://hub.docker.com/search/?type=edition&offering=community)
 
 To build and deploy your application for the first time, run the following in your shell:
 
@@ -50,9 +49,11 @@ The first command will build the source of your application. The second command 
 * **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
 * **HelloWorldFunction has no authentication. Is this okay? [y/N]:**: Select `y` for the purposes of this sample application. As a result, anyone will be able to call this example REST API without any form of authentication. For production applications, you should [enable authentication for the API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html) using one of several available options and [follow the API Gateway security best practices](https://docs.aws.amazon.com/apigateway/latest/developerguide/security-best-practices.html). If `N` is selected for this question, this deployment will not succeed.
 * **Allow AWS SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
-* **Save arguments to samconfig.toml**: If set to yes, your choices will be saved to a configuration file inside the project, so that in the future you can just re-run `sam deploy` without parameters to deploy changes to your application.
+* **Save arguments to samconfig.toml**: If set to yes, your choices will be saved to a configuration file inside the project.
+* 
+For future deploys, you can run `sam deploy` without parameters to deploy changes to your application.
 
-You can find your API Gateway Endpoint URL in the output values displayed after deployment.
+You can find your API Gateway endpoint URL in the output values displayed after deployment.
 
 ## Use AWS SAM CLI to test locally
 
@@ -101,7 +102,7 @@ To simplify troubleshooting, AWS SAM CLI has a command called `sam logs`. `sam l
 `NOTE`: This command works for all AWS Lambda functions; not just the ones you deploy using AWS SAM.
 
 ```bash
-$ sam logs -n HelloWorldFunction --stack-name "YOUR_STACK_NAME_HERE" --tail
+sam logs -n HelloWorldFunction --stack-name "YOUR_STACK_NAME_HERE" --tail
 ```
 
 You can find more information and examples about filtering Lambda function logs in the [AWS SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).

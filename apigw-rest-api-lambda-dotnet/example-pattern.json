@@ -1,14 +1,14 @@
 {
     "title": "Hello World AWS Lambda and Amazon API Gateway REST API",
-    "description": "Create a simple Lambda Function connected to a REST API.",
+    "description": "Create a simple Lambda function connected to a REST API.",
     "language": ".NET",
     "level": "200",
     "framework": "SAM",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This sample project demonstrates how to trigger a simple Lambda function using a REST API.",
-        "This pattern deploys one Lambda Function, andn one API Gateway REST API."
+        "This sample project shows how to trigger a simple Lambda function using a REST API.",
+        "This pattern deploys one Lambda function and one API Gateway REST API."
       ]
     },
     "gitHub": {
@@ -22,7 +22,7 @@
     "resources": {
       "bullets": [
         {
-          "text": "Trigger Lambda with a REST API",
+          "text": "Invoking a Lambda function using an Amazon API Gateway endpoint",
           "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html"
         },
         {

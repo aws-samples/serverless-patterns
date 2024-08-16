@@ -1,7 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Sample SAM Template for REST API Lambda Hello World
+  Hello World AWS Lambda and Amazon API Gateway REST API
+
+  Sample AWS SAM template to create a simple Lambda function connected to a REST API.
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
