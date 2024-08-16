@@ -25,7 +25,7 @@ The AWS Toolkit is an open source plug-in for popular IDEs that uses the AWS SAM
 
 ## Deploy the sample application
 
-The Serverless Application Model Command Line Interface (SAM CLI) is an extension of the AWS CLI that adds functionality for building and testing Lambda applications. It uses Docker to run your functions in an Amazon Linux environment that matches Lambda. It can also emulate your application's build environment and API.
+The AWS Serverless Application Model Command Line Interface (AWS SAM CLI) is a framework for building and testing Lambda applications. It uses Docker to run your functions in an Amazon Linux environment that matches Lambda. It can also emulate your application's build environment and API.
 
 To use the AWS SAM CLI, you need the following tools.
 
@@ -38,9 +38,9 @@ To use the AWS SAM CLI, you need the following tools.
 To build and deploy your application for the first time, run the following in your shell:
 
 ```bash
-$ cd apigw-rest-api-lambda-python
-$ sam build --use-container
-$ sam deploy --guided
+cd apigw-rest-api-lambda-python
+sam build --use-container
+sam deploy --guided
 ```
 
 The first command will build the source of your application. The second command will package and deploy your application to AWS, with a series of prompts:
@@ -54,26 +54,26 @@ The first command will build the source of your application. The second command 
 
 You can find your API Gateway Endpoint URL in the output values displayed after deployment.
 
-## Use the AWS SAM CLI to test locally
+## Use AWS SAM CLI to test locally
 
-The SAM CLI installs dependencies defined in `hello_world/package.json`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+The AWS SAM CLI installs dependencies defined in `hello_world/package.json`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
-Ypu can test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
+You can test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
 
 Run functions locally and invoke them with the `sam local invoke` command.
 
 ```bash
-$ sam local invoke HelloWorldFunction --event events/event.json
+sam local invoke HelloWorldFunction --event events/event.json
 ```
 
-The AWS SAM CLI can also emulate your application's API. Use the `sam local start-api` to run the API locally on port 3000.
+AWS SAM CLI can also emulate your application's API. Use the `sam local start-api` to run the API locally on port 3000.
 
 ```bash
-$ sam local start-api
-$ curl http://localhost:3000/
+sam local start-api
+curl http://localhost:3000/
 ```
 
-The AWS SAM CLI reads the application template to determine the API's routes and the functions they invoke. The `Events` property on each function's definition includes the route and method for each path.
+AWS SAM CLI reads the application template to determine the API's routes and the functions they invoke. The `Events` property on each function's definition includes the route and method for each path.
 
 ```yaml
       Events:
@@ -84,13 +84,13 @@ The AWS SAM CLI reads the application template to determine the API's routes and
             Method: get
 ```
 
-## Use the AWS SAM CLI to test remotely
+## Use AWS SAM CLI to test remotely
 After you have deployed your application, you can remotely invoke your Lambda function to test it in the cloud. 
 
 Invoke functions remotely with the `sam remote invoke` command.
 
 ```bash
-$ sam remote invoke HelloWorldFunction --event-file events/event.json
+sam remote invoke HelloWorldFunction --event-file events/event.json
 ```
 
 You can also go to the API Gateway endpoint URL that was output after the deployment of your application, which will similarly invoke your deployed Lambda function. 
@@ -106,7 +106,6 @@ $ sam logs -n HelloWorldFunction --stack-name "YOUR_STACK_NAME_HERE" --tail
 
 You can find more information and examples about filtering Lambda function logs in the [AWS SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).
 
-
 ## Cleanup
 
 To delete the sample application that you created, use the AWS CLI. Assuming you used your project name for the stack name, you can run the following:
@@ -117,4 +116,4 @@ $ sam delete
 
 ## Resources
 
-See the [AWS SAM developer guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html) for an introduction to SAM specification, the SAM CLI, and serverless application concepts.
+See the [AWS SAM developer guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html) for an introduction to AWS SAM specification, the AWS SAM CLI, and serverless application concepts.
