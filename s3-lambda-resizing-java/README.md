@@ -1,4 +1,4 @@
-# AWS Amazon S3 to AWS Lambda — Create a Java-based Lambda function that resizes images uploaded to S3
+# Resizing images uploaded to Amazon S3 with AWS Lambda in Java
 
 The SAM template deploys:
  - A Java-based Lambda function:
