@@ -22,7 +22,7 @@
     "resources": {
       "bullets": [
         {
-          "text": "Process S3 events with Lambda",
+          "text": "Process Amazon S3 event notifications with Lambda",
           "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
         }
       ]

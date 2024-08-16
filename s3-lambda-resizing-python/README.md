@@ -1,6 +1,6 @@
-# Resizing images uploaded to Amazon S3 with AWS Lambda 
+# Resizing images uploaded to Amazon S3 with AWS Lambda (Python)
 
-The SAM template deploys an AWS Lambda function, an Amazon S3 bucket, and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The Lambda code checks if the uploaded file is an image and then creates a thumbnail version of the image in the same bucket.
+The AWS SAM template deploys an AWS Lambda function, an Amazon S3 bucket, and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The Lambda code checks if the uploaded file is an image and then creates a thumbnail version of the image in the same bucket.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -69,6 +69,3 @@ aws s3 ls s3://{DestinationBucketName}
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-SPDX-License-Identifier: MIT-0
