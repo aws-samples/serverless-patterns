@@ -135,7 +135,7 @@ jobs:
           done < changed_folders.txt
       
       - name: Clean up
-        if: ((needs.get-release.outputs.latest_release != '') && ( steps. ))
+        if: (needs.get-release.outputs.latest_release != '') && ( steps. )
         run: |
           rm -r temp_archives
           rm changed_folders.txt
