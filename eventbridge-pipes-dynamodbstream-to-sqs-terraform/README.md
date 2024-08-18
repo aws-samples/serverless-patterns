@@ -66,6 +66,9 @@ Record2:
 ```
 
 When you poll the messages from the SQS queue, you would see the two message from DynamoDB stream.
+```sh
+    aws sqs receive-message --queue-url <SQS_url> --attribute-names All --message-attribute-names All --max-number-of-messages 10
+```
 
 ## Cleanup
  
