@@ -14,7 +14,7 @@ provider "aws" {
 
 # Create DynamoDB table
 resource "aws_dynamodb_table" "source" {
-  name           = "demo-table"
+  name           = "demo_table"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "Id"
 
@@ -29,18 +29,18 @@ resource "aws_dynamodb_table" "source" {
 
 # Create SQS queue
 resource "aws_sqs_queue" "target" {
-  name = "demo-queue"
+  name = "demo_queue"
 }
 
 # Create EventBridge Pipe
-resource "aws_pipes_pipe" "demo-pipe" {
-  name     = "demo-pipe"
+resource "aws_pipes_pipe" "demo_pipe" {
+  name     = "demo_pipe"
   role_arn = aws_iam_role.demo_role.arn
   source   = aws_dynamodb_table.source.stream_arn
   target   = aws_sqs_queue.target.arn
   source_parameters {
     dynamodb_stream_parameters {
-      starting_position = "LATEST"
+      starting_position = "TRIM_HORIZON"
       batch_size = 1
     }
   }
@@ -55,7 +55,7 @@ resource "aws_iam_role" "demo_role" {
       {
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Sid    = ""
+        Sid    = "PipesPermissions"
         Principal = {
           Service = "pipes.amazonaws.com"
         }
@@ -103,3 +103,12 @@ resource "aws_iam_role_policy_attachment" "demo-attach" {
   policy_arn = aws_iam_policy.demo_policy.arn
 }
 
+output "SQS_arn" {
+  value       = aws_sqs_queue.target.arn
+  description = "The ARN of the SQS queue."
+}
+
+output "DynamoDB_arn" {
+  value       = aws_dynamodb_table.source.arn
+  description = "The ARN of the DynamoDB table."
+}
