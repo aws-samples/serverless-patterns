@@ -104,8 +104,8 @@ resource "aws_iam_role_policy_attachment" "demo-attach" {
 }
 
 output "SQS_arn" {
-  value       = aws_sqs_queue.target.arn
-  description = "The ARN of the SQS queue."
+  value       = aws_sqs_queue.target.id
+  description = "The ARN of the SQS queue URL."
 }
 
 output "DynamoDB_arn" {
