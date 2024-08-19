@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   get-release:
     runs-on: ubuntu-latest
@@ -61,14 +62,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           for file in temp/*.zip; do
-            gh release upload v1.0.0 "$file" --clobber
-            echo "Uploaded $file, waiting to avoid rate limits..."
-            sleep 3  
+            if [ -f "$file" ]; then
+              gh release upload v1.0.0 "$file" --clobber
+              echo "Uploaded $file, waiting to avoid rate limits..."
+              sleep 3
+            else
+              echo "File $file not found"
+            fi
           done
-    
-      - name: clean up
-        run: |
-          rm -r temp
 
   update-release:
     needs: get-release
@@ -133,10 +134,3 @@ jobs:
               echo "Archive $archive not found"
             fi
           done < changed_folders.txt
-      
-      - name: Clean up
-        if: (needs.get-release.outputs.latest_release != '') && ( steps. )
-        run: |
-          rm -r temp_archives
-          rm changed_folders.txt
-          rm changed_files.txt
