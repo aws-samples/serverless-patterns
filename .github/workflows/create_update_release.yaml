@@ -41,7 +41,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v1.0.0 --generate-notes --prerelease=false
+          gh release create v1.0.0 --notes "Initial release v1.0.0" --prerelease=false
           echo "Release created"
       
       - name: Zip files of folders
