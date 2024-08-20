@@ -30,7 +30,7 @@ Learn more about this pattern at Serverless Land Patterns: [https://serverlessla
 
 3. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-4. From the command line, run the below command to upload the `index.html` to the S3 bucket. Replace `WebsiteBucket` from the `sam deploy` output.
+4. From the command line, run the below command to upload the `index.html` to the S3 bucket. Replace `{WebsiteBucket}` with the output value of the `sam deploy` command.
     ```
     aws s3 cp index.html s3://{WebsiteBucket}
     ```
@@ -51,23 +51,24 @@ This template deploys Amazon Route53, Application Load Balancer (ALB), VPC Endpo
     * Subnet - Select any of the two available subnets under the above VPC.
     * Security - `ALBSecurityGroup` from the `sam deploy` output.
 
-2. From the CloudShell command prompt run the following command to access your private website. Replace `PrivateWebsiteUrl` from the `sam deploy` output.:
+2. From the CloudShell command prompt run the following command to access your private website. Replace `{PrivateWebsiteUrl}` with the output value of the `sam deploy` command:
     ```
     curl -v -k -L {PrivateWebsiteUrl}   
     ```
-3. You can also test by spinning up an EC2 instance within the same VPC. However, if you try to access the URL from outside network, it will not be reachable.
+3. You can also test by spinning up an EC2 instance within the same VPC or from another location that has private connectivity to the VPC. However, if you try to access the URL from outside network, it will not be reachable.
 
 ## Cleanup
  
-1. Delete the content of the S3 bucket.
+1. Delete the contents of the S3 bucket.
     ```bash
     aws s3 rm s3://{WebsiteBucket} --recursive
     ```
-2. Delete the stack
+2. Delete the CloudShell environment created in the VPC.   
+3. Delete the stack
     ```bash
     sam delete
     ```
-3. Delete the newly created CloudShell environment.
+
 ----
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
