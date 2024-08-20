@@ -1,6 +1,6 @@
 # Internal static website hosting using Amazon Route53, ALB and S3
 
-This pattern deploys a framework to host a internal static website on Amazon S3 bucket that can only be accessed from private network. 
+This pattern deploys a framework to host an internal static website on Amazon S3 bucket that can only be accessed from private network. 
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/route53-alb-s3](https://serverlessland.com/patterns/route53-alb-s3)
 
@@ -30,7 +30,7 @@ Learn more about this pattern at Serverless Land Patterns: [https://serverlessla
 
 3. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-4. From the command line, run the below command to upload the `index.html` to the S3 bucket. Replace `{WebsiteBucket}` with the output value of the `sam deploy` command.
+4. From the command line, run the below command to upload the `index.html` to the S3 bucket. Replace `{WebsiteBucket}` with the corresponding output value of the `sam deploy` command.
     ```
     aws s3 cp index.html s3://{WebsiteBucket}
     ```
@@ -51,7 +51,7 @@ This template deploys Amazon Route53, Application Load Balancer (ALB), VPC Endpo
     * Subnet - Select any of the two available subnets under the above VPC.
     * Security - `ALBSecurityGroup` from the `sam deploy` output.
 
-2. From the CloudShell command prompt run the following command to access your private website. Replace `{PrivateWebsiteUrl}` with the output value of the `sam deploy` command:
+2. From the CloudShell command prompt run the following command to access your private website. Replace `{PrivateWebsiteUrl}` with the corresponding output value of the `sam deploy` command:
     ```
     curl -v -k -L {PrivateWebsiteUrl}   
     ```
