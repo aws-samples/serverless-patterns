@@ -159,7 +159,7 @@ Resources:
       DisplayName: MyS3DataSource
       Description: S3 Data Source for Amazon Q Business
       RoleArn: !GetAtt S3DataSourceRole.Arn
-      Configuration: # S3 configuration schema https://docs.aws.amazon.com/amazonq/latest/business-use-dg/s3-api.html#s3-json
+      Configuration:
         connectionConfiguration:
           repositoryEndpointMetadata:
             BucketName: !Ref S3DSBucketName
