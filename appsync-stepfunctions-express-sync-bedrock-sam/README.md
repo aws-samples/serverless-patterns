@@ -1,4 +1,4 @@
-# AWS AppSync, AWS StepFunctions (Synchronous Express Workflow), Intrinsic Functions, and Prompt Chaining with Amazon Bedrock.
+# AppSync, StepFunctions, Intrinsic Functions, and Bedrock Prompt Chaining.
 
 
 The AWS Serverless Application Model (SAM) template deploys an AWS AppSync serverless GraphQL endpoint connected to an AWS Step Functions state machine. This example demonstrates how to invoke an Express state machine synchronously and utilize AWS Step Functions intrinsic functions to chain two prompts, which are then used to invoke the Amazon Bedrock language model. The output from the state machine execution is returned to the client within 29 seconds, using the HTTP API. This no-code example showcases how the results from the first prompt can be used to provide context for the second prompt, allowing the language model to deliver a highly-curated response. By chaining these prompts, the system can leverage the capabilities of the language model to generate more meaningful and contextual outputs.
@@ -51,13 +51,13 @@ In this example, the state machine is invoked with a JSON payload
   "prompt_one": "Write a 500 word blog post on The Beatles"
 }
 ```
-During execution, the Task state calls the Bedrock API and the response goes into the task result_one.
+During execution, the Task state calls the Bedrock API and the response is passed to the task 'result_one'.
 ```asl
 {
   "result_one.$": "$.Body.generations[0].text"
 }
 ```
-A Pass state is then used to pass the data to the next state using an Intrinsic Function (States.).
+A Pass state is then used to format the data using an Intrinsic Function (States.) which is passed to the next state.
 ```asl
 {
   "convo_one.$": "States.Format('{}',$.result_one.result_one)"
