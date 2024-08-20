@@ -30,7 +30,7 @@ Learn more about this pattern at Serverless Land Patterns: [https://serverlessla
 
 3. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-4. From the command line, run the below command to upload the `index.html` to the S3 bucket. Replace `` from the `sam deploy` output.
+4. From the command line, run the below command to upload the `index.html` to the S3 bucket. Replace `WebsiteBucket` from the `sam deploy` output.
     ```
     aws s3 cp index.html s3://{WebsiteBucket}
     ```
