@@ -1,0 +1,74 @@
+# Internal static website hosting using Amazon Route53, ALB and S3
+
+This pattern deploys a framework to host a internal static website on Amazon S3 bucket that can only be accessed from private network. 
+
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/route53-alb-s3](https://serverlessland.com/patterns/route53-alb-s3)
+
+**Important:** this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+
+## Requirements
+
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+
+## Deployment Instructions
+
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+    ```
+    sam deploy --guided
+    ```
+2. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region e.g. us-east-1 
+    * Enter PrivateWebsiteDomainName e.g. hello-world.example.com
+    * Allow SAM CLI to create IAM roles with the required permissions
+    * Leave all other options to default values
+
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+
+3. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+
+4. From the command line, run the below command to upload the `index.html` to the S3 bucket. Replace `` from the `sam deploy` output.
+    ```
+    aws s3 cp index.html s3://{WebsiteBucket}
+    ```
+
+## How it works
+
+Please refer to the architecture diagram below:
+
+![End to End Architecture](architecture.png)
+
+This template deploys Amazon Route53, Application Load Balancer (ALB), VPC Endpoint and Amazon S3. The private website URL will be exposed via Route 53 private hosted zone. This URL is accessible from within VPC.
+
+## Testing
+
+1. [Create a CloudShell VPC environment](https://docs.aws.amazon.com/cloudshell/latest/userguide/creating-vpc-environment.html). Enter the following values:
+    * Name - enter your preferred environment name.
+    * VPC - `VPCId` from the `sam deploy` output.
+    * Subnet - Select any of the two available subnets under the above VPC.
+    * Security - `ALBSecurityGroup` from the `sam deploy` output.
+
+2. From the CloudShell command prompt run the following command to access your private website. Replace `PrivateWebsiteUrl` from the `sam deploy` output.:
+    ```
+    curl -v -k -L {PrivateWebsiteUrl}   
+    ```
+3. You can also test by spinning up an EC2 instance within the same VPC. However, if you try to access the URL from outside network, it will not be reachable.
+
+## Cleanup
+ 
+1. Delete the content of the S3 bucket.
+    ```bash
+    aws s3 rm s3://{WebsiteBucket} --recursive
+    ```
+2. Delete the stack
+    ```bash
+    sam delete
+    ```
+3. Delete the newly created CloudShell environment.
+----
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
