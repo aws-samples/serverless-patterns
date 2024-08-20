@@ -58,9 +58,5 @@
     "@aws-cdk/aws-appsync:useArnForSourceApiAssociationIdentifier": true,
     "@aws-cdk/aws-rds:preventRenderingDeprecatedCredentials": true,
     "@aws-cdk/aws-codepipeline-actions:useNewDefaultBranchForCodeCommitSource": true
-  },
-    "dependencies": {
-      "aws-cdk-lib": "^2.38.0",
-      "constructs": "^10.0.0"
-    }
+  }
 }
