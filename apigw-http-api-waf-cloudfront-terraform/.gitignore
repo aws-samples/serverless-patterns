@@ -1,0 +1,6 @@
+### Terraform files ###
+*.hcl
+*.tfstate
+*.backup
+.terraform
+*.zip
