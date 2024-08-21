@@ -1,4 +1,4 @@
-# Amazon API Gateway HTTP API, AWS StepFunctions (Synchronous Express Workflow), Intrinsic Functions, and Prompt Chaining with Amazon Bedrock.
+# Prompt Chaining with Amazon API Gateway, AWS StepFunctions & Amazon Bedrock.
 
 The AWS Serverless Application Model (SAM) template deploys an Amazon API Gateway HTTP API endpoint connected to an AWS Step Functions state machine. This example demonstrates how to invoke an Express state machine synchronously and utilize AWS Step Functions intrinsic functions to chain two prompts, which are then used to invoke the Amazon Bedrock language model. The output from the state machine execution is returned to the client within 29 seconds, using the HTTP API. This no-code example showcases how the results from the first prompt can be used to provide context for the second prompt, allowing the language model to deliver a highly-curated response. By chaining these prompts, the system can leverage the capabilities of the language model to generate more meaningful and contextual outputs.
 
@@ -50,13 +50,13 @@ In this example, the state machine is invoked with a JSON payload
   "prompt_one": "Write a 500 word blog post on The Beatles"
 }
 ```
-During execution, the Task state calls the Bedrock API and the response goes into the task result_one.
+During execution, the Task state calls the Bedrock API and the response is passed to the task 'result_one'.
 ```asl
 {
   "result_one.$": "$.Body.generations[0].text"
 }
 ```
-A Pass state is then used to pass the data to the next state using an Intrinsic Function (States.).
+A Pass state is then used to format the data using an Intrinsic Function (States.) which is passed to the next state.
 ```asl
 {
   "convo_one.$": "States.Format('{}',$.result_one.result_one)"
@@ -77,10 +77,10 @@ By default, the state then sends the task result as output.
 The stack will output the **api endpoint**. You can use *Postman* or *curl* to send a POST request to the API Gateway endpoint.
    
 ```
-curl -H "Content-type: application/json" -X POST -d '{"prompt_one": "Write a 500 word blog post on The Beatles"}' <Your Sync WF API endpoint>
+curl -H "Content-type: application/json" -X POST -d '{"prompt_one": "Write a 500 word blog post on The Beatles"}' <Your API endpoint>
 
 ```
-After runnning the above command, API Gateway will invoke the State machine and return the complete results back to the client instead of just the State machine's execution Id. 
+After runnning the above command, API Gateway will invoke the State machine and return the results back to the client instead of just the State machine's execution Id. 
 
 ## Cleanup
  
@@ -93,6 +93,6 @@ After runnning the above command, API Gateway will invoke the State machine and 
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
