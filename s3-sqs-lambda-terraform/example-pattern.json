@@ -5,11 +5,11 @@
   "level": "200",
   "framework": "Terraform",
   "introBox": {
-    "headline": "How to create an EventBridge rule with S3 as the event source and Step Functions as target.",
+    "headline": "Create a Lambda function triggered for every jpg image file stored to S3 via SQS",
     "text": [
       "The terraform manifest deploys a Lambda function, an SQS queue, one S3 bucket and the IAM resources required to run the application.",
       "An SQS queue consumes ObjectCreated events from an Amazon S3 bucket if the file has .jpg extension. The SQS triggers a Lambda function.",
-      "The Lambda app acts as a boilerplate code.",
+      "The Lambda function serve as a pre-configured template, providing a starting point for developing your application."
     ]
   },
   "gitHub": {
@@ -23,8 +23,8 @@
   "resources": {
     "bullets": [
       {
-        "text": "Building resilient serverless patterns by combining messaging services",
-        "link": "https://github.com/aws-samples/s3-to-lambda-patterns"
+        "text": "Configuring an Amazon SQS queue to trigger an AWS Lambda function",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-lambda-function-trigger.html",
       },
       {
         "text": "S3-to-Lambda serverless applications",
