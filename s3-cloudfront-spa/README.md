@@ -1,6 +1,9 @@
 # S3 Hosted Website Served by a CloudFront Distribution restricted by Cloudfront Origin Access Control (OAC)
+This project serves as a practical example or demonstration of how to leverage two powerful services from Amazon Web Services (AWS) - Amazon CloudFront and Amazon Simple Storage Service (S3) - to host and deliver a static website efficiently and securely.
 
-This repo contains serverless patterns showing how to setup a S3 website hosting bucket that is served by a CloudFront distribution that also obfuscates the CloudFront Distribution domain via Cloudfront Origin Access Control (OAC).
+Amazon S3 is an object storage service that provides a highly scalable, durable, and cost-effective way to store and retrieve data, including website files such as HTML, CSS, JavaScript, and other static assets. In this project, S3 is utilized as the origin, which means it hosts the static website content.
+
+Amazon CloudFront, on the other hand, is a content delivery network (CDN) service that caches and distributes the website content from multiple edge locations around the world. By integrating CloudFront with the S3-hosted website, the project showcases how to leverage CloudFront's caching and content distribution capabilities to improve website performance, reduce latency, and enhance the end-user experience.
 
 ![Demo Project Solution Architecture Diagram](diagram.PNG)
 
@@ -39,7 +42,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     During the prompts:
     * Enter yes
-    
+
 6. Copy your front end assests
 
 ## Testing
