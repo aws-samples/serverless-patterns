@@ -1,6 +1,6 @@
-# Resizing images uploaded to Amazon S3 with AWS Lambda in Java
+# Resizing images uploaded to Amazon S3 with AWS Lambda
 
-The SAM template deploys:
+The AWS SAM template deploys:
  - A Java-based Lambda function:
    - Powered by [Amazon Q Developer](https://aws.amazon.com/q/developer/)
    - [**NEW**] [Lambda SnapStart enabled for ARM64](https://aws.amazon.com/about-aws/whats-new/2024/07/aws-lambda-snapstart-java-functions-arm64-architecture/) based architecture
@@ -47,18 +47,17 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
 Once you have run above once and saved arguments to a configuration file (`samconfig.toml`), 
 you can use `sam deploy` in future to use these defaults.
 
-Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+Note the outputs from the AWS SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-* Use the AWS CLI upload an image to S3
-* If the object is a .jpeg, the code creates an image of 800x600 resolution and saves it to the destination bucket.
+* Use the AWS CLI to upload an image to S3
+* If the object is a .jpeg file, the code creates a 800x600 resolution image and saves it to the destination bucket.
 
 ## Testing
 
-Run the following S3 CLI command to upload an image to the S3 bucket. 
-Note, you must edit the {SourceBucketName} and {DestinationBucketName} placeholder with the name of the S3 Bucket. 
-This is provided in the stack outputs.
+Run the following S3 CLI command to upload an image to the S3 bucket.
+Note, you must edit the {SourceBucketName} and {DestinationBucketName} placeholders with the name of the S3 Bucket which are provided in the stack outputs.
 
 ```bash
 aws s3 cp './data/white_dog.jpeg'  s3://{SourceBucketName}
