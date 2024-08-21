@@ -1,0 +1,105 @@
+{
+  "Comment" : "A description of my state machine",
+  "StartAt" : "Does ID exist?",
+  "States" : {
+    "Does ID exist?" : {
+      "Type" : "Choice",
+      "Choices" : [ {
+        "Variable" : "$.pathParam",
+        "IsPresent" : true,
+        "Next" : "Check HTTP Method with ID"
+      } ],
+      "Default" : "Check HTTP Method"
+    },
+    "Check HTTP Method" : {
+      "Type" : "Choice", 
+      "Choices" : [ {
+        "Variable" : "$.httpMethod",
+        "StringMatches" : "POST",
+        "Next" : "Create Item"
+      } ],
+      "Default" : "Scan"
+    },
+    "Scan" : {
+      "Type" : "Task",
+      "Parameters" : {
+        "TableName" : "${DDBTable}"
+      },
+      "Resource" : "arn:aws:states:::aws-sdk:dynamodb:scan",
+      "End" : true
+    },
+    "Create Item" : {
+      "Type" : "Task",
+      "Resource" : "arn:aws:states:::dynamodb:putItem",
+      "Parameters" : {
+        "TableName" : "${DDBTable}",
+        "Item" : {
+          "id" : {
+            "S.$" : "States.UUID()"
+          },
+          "data" : {
+            "M.$" : "$.data"
+          }
+        }
+      },
+      "ResultPath" : null,
+      "End" : true
+    },
+    "Check HTTP Method with ID" : {
+      "Type" : "Choice",
+      "Choices" : [ {
+        "Variable" : "$.httpMethod",
+        "StringMatches" : "PUT",
+        "Next" : "Update Item"
+      }, {
+        "Variable" : "$.httpMethod",
+        "StringMatches" : "DELETE",
+        "Next" : "DynamoDB DeleteItem"
+      } ],
+      "Default" : "Get Item"
+    },
+    "Get Item" : {
+      "Type" : "Task",
+      "Resource" : "arn:aws:states:::dynamodb:getItem",
+      "Parameters" : {
+        "TableName" : "${DDBTable}",
+        "Key" : {
+          "id" : {
+            "S.$" : "$.pathParam"
+          }
+        }
+      },
+      "End" : true
+    },
+    "Update Item" : {
+      "Type" : "Task",
+      "Resource" : "arn:aws:states:::dynamodb:putItem",
+      "Parameters" : {
+        "TableName" : "${DDBTable}",
+        "Item" : {
+          "id" : {
+            "S.$" : "$.pathParam"
+          },
+          "data" : {
+            "M.$" : "$.data"
+          }
+        }
+      },
+      "ResultPath" : null,
+      "End" : true
+    },
+    "DynamoDB DeleteItem" : {
+      "Type" : "Task",
+      "Resource" : "arn:aws:states:::dynamodb:deleteItem",
+      "Parameters" : {
+        "TableName" : "${DDBTable}",
+        "Key" : {
+          "id" : {
+            "S.$" : "$.pathParam"
+          }
+        }
+      },
+      "End" : true
+    }
+  }
+}
