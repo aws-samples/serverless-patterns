@@ -11,30 +11,48 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Requirements
 
-* AWS Account
-* AWS CLI already configured with Administrator permission
-* Terraform
-* Clone this repo!
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [Terraform Install](https://www.terraform.io/)
 
 ## Deployment Instructions
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+2. Change directory to the pattern directory:
+    ```
+    cd s3-cloudfront-spa
+    ```
+3. Create terraform s3 bucket for state file:
+    ```
+    aws s3 mb s3://your-bucket-name
+    ```
+4. Update bucket name in terraform backend configuration in template.tf
 
-1. Go to s3-cloudfront-spa and copy template.tf to your project
-2. Setup terraform backend and define your state file S3 bucket by replacing your bucket name with "my-projects-terraform-state" in template.tf
-3. Run terraform init
-4. Run terraform plan
-5. Run terraform apply
+5. Initilize terraform
+    ```
+    Run terraform init
+    ```
+6. Create terrform plan
+    ```
+    Run terraform plan
+    ```
+7. Create AWS resources
+    ```
+    Run terraform apply
+    ```
+8. Copy your front end assests
 
 ### Removing the resources
 
-1. Run terraform apply -destroy
-
-```
-git clone https://github.com/aws-samples/serverless-patterns/s3-cloudfront-spa
-```
-
-Each subdirectory contains additional installation and usage instructions. 
+1. To destory deployed resources
+    ```
+    Run terraform destroy
+    ```
 
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 ----
 

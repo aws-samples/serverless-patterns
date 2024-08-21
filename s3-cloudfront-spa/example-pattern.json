@@ -1,9 +1,8 @@
-
 {
-  "title": "AWS CloudFront and S3 for Single Page Application Hosting",
-  "description": "This sample project demonstrates how to use AWS CloudFront and S3 to host a single-page application (SPA). The pattern creates a CloudFront distribution that serves the SPA content from an S3 bucket configured for static website hosting.",
+  "title": "AWS CloudFront and Amazon S3 for Single Page Application Hosting",
+  "description": "This project shows how to host a Single-Page Application (SPA) using AWS CloudFront & S3. CloudFront serves the SPA content from an S3 bucket configured for static hosting.",
   "level": "200",
-  "framework": "terraform",
+  "framework": "Terraform",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -50,17 +49,12 @@
   },
   "testing": {
     "text": [
-      "Go to S3",
-      "Upload front end content. Copy Index.html from current repository for testing",
-      "Go to AWS Console",
-      "Go to AWS Cloudfront",
-      "Go to Distributions",
-      "Select your distribution domain and browse it. e.g ***********.cloudfront.net/Index.html"
+      "Refer to README"
     ]
   },
   "cleanup": {
     "text": [
-      "terraform apply -destroy"
+      "terraform destroy"
     ]
   },
   "authors": [
@@ -68,7 +62,7 @@
       "name": "Junaid Ansari",
       "image": "https://media.licdn.com/dms/image/v2/C4E03AQEekYWyjMINfg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1659715539214?e=1728518400&v=beta&t=HVpwkCvJ_QdUYDW2YXbCabZDcWKWv3VpTBKmnCS5uVg",
       "bio": "Cloud Application Architect at AWS.",
-      "linkedin": "https://www.linkedin.com/in/junaid-ansari-2734a912/"
+      "linkedin": "junaid-ansari-2734a912/"
     }
   ]
 }
