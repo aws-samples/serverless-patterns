@@ -1,5 +1,5 @@
 {
-  "title": "Amazon SQS to CloudWatch Log group via Amazon EventBridge",
+  "title": "Amazon SQS to Amazon CloudWatch Log group via Amazon EventBridge Pipes",
   "description": "Amazon SQS to CloudWatch Log group via Amazon EventBridge Pipes filter and transformation",
   "language": "",
   "level": "200",
@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use Amazon EventBridge Pipes to connect an Amazon SQS queue with an AWS CloudWatch Log group. The pipe will apply a filter and transformation before sending the message to AWS CloudWatch Log group.",
+      "This sample project shows how to use Amazon EventBridge Pipes to connect an Amazon SQS queue with an AWS CloudWatch Log group. The pipe will apply a filter and transformation before sending the message to AWS CloudWatch Log group.",
       "This pattern deploys one SQS queue, EventBridge Pipe, and CloudWatch Log group"
     ]
   },

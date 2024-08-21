@@ -1,5 +1,5 @@
 {
-  "title": "SQS to Step Functions with EventBridge Pipes",
+  "title": "Invoke AWS Step Functions state machine from Amazon SQS messages using Amazon EventBridge Pipes",
   "description": "This pattern shows how to use EventBridge Pipes to launch a Step Functions state machine with a message coming from SQS Queue.",
   "language": "",
   "level": "200",

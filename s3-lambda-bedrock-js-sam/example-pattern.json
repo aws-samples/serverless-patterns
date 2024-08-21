@@ -1,6 +1,6 @@
 {
     "title": "Amazon S3 to AWS Lambda to Amazon Bedrock using AWS SAM",
-    "description": "This pattern facilitates generating vector embeddings for text data uploaded to S3.",
+    "description": "This pattern uses AWS Lambda to generate vector embeddings from text data uploaded to S3 using Amazon Bedrock.",
     "language": "Node.js",
     "level": "200",
     "framework": "SAM",
