@@ -1,4 +1,4 @@
-# S3 Hosted Website Served by a CloudFront Distribution restricted by Cloudfront Origin Access Control (OAC)
+# Amazon S3 hosted website served by a CloudFront distribution restricted by CloudFront Origin Access Control (OAC)
 This project serves as a practical example or demonstration of how to leverage two powerful services from Amazon Web Services (AWS) - Amazon CloudFront and Amazon Simple Storage Service (S3) - to host and deliver a static website efficiently and securely.
 
 Amazon S3 is an object storage service that provides a highly scalable, durable, and cost-effective way to store and retrieve data, including website files such as HTML, CSS, JavaScript, and other static assets. In this project, S3 is utilized as the origin, which means it hosts the static website content.
