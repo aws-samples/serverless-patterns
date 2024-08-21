@@ -6,23 +6,13 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys the following resources:",
-      "- An AWS CloudFront distribution with the following configurations:",
-      "- Enabled and IPv6 enabled",
-      "- Default root object set to `index.html`",
-      "- Allows all HTTP methods for caching",
-      "- Redirects HTTP to HTTPS",
-      "- Sets custom error responses for 404 and 403 errors to serve `index.html`",
-      "- Uses an S3 bucket as the origin",
-
-      "- An S3 bucket to host the SPA content with the following configurations:",
-      "- Public access blocked",
-      "- Bucket ownership controls set to `BucketOwnerPreferred`",
-      "- Access control list (ACL) set to `private`",
-      "- Configured for static website hosting with `index.html` as the index document and `error.html` as the error document",
-      "- A bucket policy that allows CloudFront to access the bucket objects",
-
-      "The pattern ensures that the SPA content is served securely through CloudFront, while the S3 bucket hosting the content is private and accessible only through CloudFront."
+      "Here's how hosting a static website using Amazon CloudFront and Amazon S3 works:",
+      "- An Amazon S3 bucket is created and configured for static website hosting",
+      "- A CloudFront web distribution is created, with the S3 bucket configured as the origin server. CloudFront acts as a content delivery network (CDN) for the website",
+      "- When a user requests a file from the website, CloudFront first checks if the file is cached at one of its edge locations (data centers) closest to the user. If the file is cached, CloudFront serves it directly to the user.",
+      "- If the requested file is not cached at an edge location, CloudFront fetches the file from the S3 bucket origin. It then caches the file at the edge location for subsequent requests",
+      "- For subsequent requests, CloudFront serves the cached files from the nearest edge location to the user, providing low latency and fast content delivery.",
+      "- When website files are updated in the S3 bucket, CloudFront automatically detects the changes and retrieves the updated files from the origin. Cache invalidation can also be manually triggered to force CloudFront to fetch the latest versions."
     ]
   },
   "gitHub": {
@@ -36,7 +26,12 @@
   "resources": {
     "bullets": [
       {
-        "text": "Update terraform backend for s3 state file location"
+        "text": "Amazon S3 bucket to host the website",
+        "link": "https://aws.amazon.com/s3/"
+      },
+      {
+        "text": "Amazon CloudFront uses Amazon S3 as the origin server to host and serve static websites.",
+        "link": "https://aws.amazon.com/cloudfront/"
       }
     ]
   },
@@ -62,7 +57,7 @@
       "name": "Junaid Ansari",
       "image": "https://media.licdn.com/dms/image/v2/C4E03AQEekYWyjMINfg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1659715539214?e=1728518400&v=beta&t=HVpwkCvJ_QdUYDW2YXbCabZDcWKWv3VpTBKmnCS5uVg",
       "bio": "Cloud Application Architect at AWS.",
-      "linkedin": "junaid-ansari-2734a912/"
+      "linkedin": "junaid-ansari-2734a912"
     }
   ]
 }

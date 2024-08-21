@@ -25,26 +25,31 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd s3-cloudfront-spa
     ```
-3. Create terraform s3 bucket for state file:
-    ```
-    aws s3 mb s3://your-bucket-name
-    ```
-4. Update bucket name in terraform backend configuration in template.tf
-
-5. Initilize terraform
+3. Initilize terraform
     ```
     Run terraform init
     ```
-6. Create terrform plan
+4. Create terrform plan
     ```
     Run terraform plan
     ```
-7. Create AWS resources
+5. Create AWS resources
     ```
     Run terraform apply
     ```
-8. Copy your front end assests
+    During the prompts:
+    * Enter yes
+    
+6. Copy your front end assests
 
+## Testing
+    "Go to your hosting Amazon S3 bucket ",
+    "Upload your front end content or Copy index.html from "s3-cloudfront-spa" pattern "src" folder for testing",
+    "Go to AWS Console",
+    "Go to AWS Cloudfront",
+    "Go to Distributions",
+    "Select your distribution domain and browse it. e.g ***********.cloudfront.net/index.html"
+    
 ### Removing the resources
 
 1. To destory deployed resources
