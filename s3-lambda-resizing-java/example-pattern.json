@@ -1,14 +1,14 @@
 {
-  "title": "S3 event notification triggers Java-based Lambda function",
-  "description": "Trigger a Java-based Lambda function on S3 ObjectCreated event to resize an image.",
+  "title": "Resizing images uploaded to Amazon S3 with AWS Lambda",
+  "description": "Create an AWS Lambda function that resizes images uploaded to Amazon S3.",
   "language": "Java",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use a Java-based Lambda function to resize an image from source bucket and put the resized image in a destination bucket.",
-      "When a new JPEG image is added to the source S3 bucket, an event gets triggered which in turn invoked the Java-based Lambda function. The Lambda functions gets the object from the bucket, resizes it to 800x600 resolution, and finally puts the resized image in the destination bucket.",
+      "This sample project shows how to use a Java-based Lambda function to resize an image from a source S3 bucket and put the resized image in a destination S3 bucket.",
+      "When a new JPEG image is added to the source S3 bucket, an event gets triggered which invoks the Java-based Lambda function. The Lambda functions gets the object from the bucket, resizes it to 800x600 resolution, and puts the resized image in the destination bucket.",
       "This pattern uses AWS SAM with Lambda SnapStart on ARM64 architecture on a Java 21 manged runtime."
     ]
   },
