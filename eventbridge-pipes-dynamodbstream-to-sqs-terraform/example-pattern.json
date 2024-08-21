@@ -1,6 +1,6 @@
 {
-    "title": "Amazon DynamoDB Streams to Amazon SQS queue using AWS EventBridge Pipes",
-    "description": "This pattern creates an AWS EventBridge Pipe to deliver messages from an Amazon DynamoDB Stream to Amazon SQS.",
+    "title": "Amazon DynamoDB Streams to Amazon SQS queue using Amazon EventBridge Pipes",
+    "description": "This pattern creates an Amazon EventBridge Pipe to deliver messages from an Amazon DynamoDB Stream to Amazon SQS.",
     "language": "",
     "level": "200",
     "framework": "Terraform",
