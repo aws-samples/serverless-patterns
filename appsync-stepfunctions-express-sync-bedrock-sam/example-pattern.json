@@ -1,6 +1,6 @@
 {
-  "title": "AppSync, StepFunctions, Intrinsic Functions,and Bedrock Prompt Chaining.",
-  "description":  "AppSync, StepFunctions(Sync/Express), Intrinsic Functions, and Bedrock Prompt Chaining.",
+  "title": "Prompt Chaining with AWS AppSync, AWS StepFunctions & Amazon Bedrock.",
+  "description":  "Prompt Chaining with AWS AppSync, AWS StepFunctions(Sync/Express) & Amazon Bedrock.",
   "language": "",
   "level": "200",
   "framework": "SAM",
@@ -28,6 +28,14 @@
       {
         "text": "AWS Step Functions Intrinsic functions",
         "link": "https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-intrinsic-functions.html"
+      },
+      {
+        "text": "AWS Appsync",
+        "link": "https://aws.amazon.com/pm/appsync/"
+      },
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/bedrock/"
       },
       {
         "text": "Synchronous and Asynchronous Express Workflows",
