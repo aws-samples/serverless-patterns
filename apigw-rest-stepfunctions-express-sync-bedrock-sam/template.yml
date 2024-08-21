@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Amazon API Gateway HTTP API, AWS StepFunctions (Synchronous Express Workflow), Intrinsic Functions, and Prompt Chaining with Amazon Bedrock.
+Description: Prompt Chaining with Amazon API Gateway HTTP API, AWS StepFunctions and Amazon Bedrock.
 
 Resources:
 
