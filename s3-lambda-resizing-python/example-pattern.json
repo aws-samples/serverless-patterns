@@ -1,0 +1,53 @@
+{
+    "title": "AWS Amazon S3 to AWS Lambda Image Resizing",
+    "description": "Create a Lambda function that resizes images uploaded to S3.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "A Lambda function consumes events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image and creates a thumbnail version of the image in the destination bucket.",
+        "This pattern deploys a Lambda function and two S3 buckets."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-resizing-python",
+        "templateURL": "serverless-patterns/s3-lambda-resizing-python",
+        "projectFolder": "s3-lambda-resizing-python",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Process Amazon S3 event notifications with Lambda",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the application: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+    {
+      "name": "Seshu Brahma",
+      "image": "https://i.postimg.cc/ZR0MyrTN/seshub-photo.jpg",
+      "bio": "SDE for AWS Lambda",
+      "linkedin": "seshu-brahma"
+    }
+  ]
+}
