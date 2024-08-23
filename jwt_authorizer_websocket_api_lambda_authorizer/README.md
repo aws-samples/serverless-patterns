@@ -1,7 +1,7 @@
-# Serverless JWT Authorizer for Websocket Amazon API Gateway with AWS Lambda Authorizer
+# Serverless JWT Authorizer for Websocket APIGW using Lambda Authorizer
 ![Concept](./images/flow.png)
 
-This serverless pattern demonstrates how to authenticate and authorize users via a Lambda authorizer for an API Gateway WebSocket API using Amazon Cognito user pool tokens.
+This serverless pattern allows users to Authenticate/Authorizer using Cognito Token via Lambda Authorizer for API Gateway websocket API. 
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/jwt_authorizer_websocket_api_lambda_authorizer
 
@@ -9,15 +9,15 @@ Important: this ready-to-use application uses various AWS services and there are
 
 ## Requirements:
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Create one account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have, create the account and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configure default profile with credentials for the individual account as below :
 ```
 [default]
 ```
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [SAM Installed](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
-* [Cognito User Pool](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html)
 * [Wscat Installed](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-how-to-call-websocket-api-wscat.html)
+* [Cognito User Pool](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html)
 
 ## Deployment Instructions
 
@@ -51,9 +51,16 @@ Important: this ready-to-use application uses various AWS services and there are
 1. Note the outputs from the deployment process. It contain the full url link which can be used for testing.
 
 ## Testing
-1. Get the Authorization token for your user pool
+1. Run the below commands to get the Authorization token for your user pool. 
+```   
+echo -n "[username][app client ID]" | openssl dgst -sha256 -hmac [app client secret] -binary | openssl enc -base64
 
-1. Run the following websocket command to invoke the websocket Rest API:
+aws cognito-idp initiate-auth --auth-flow ADMIN_NO_SRP_AUTH --auth-parameters USERNAME=<username>,PASSWORD=<password>,SECRET_HASH=<secret_hash> --client-id <client-id>
+```
+
+1. Copy the Access Token and save in a notepad
+
+1. Run the following websocket command to invoke the websocket Rest API with the retrieved access token:
 ```
 wscat -c wss://<apiId>.execute-api.<region>.amazonaws.com/prod/ -H Authorization:Xyz
 ```

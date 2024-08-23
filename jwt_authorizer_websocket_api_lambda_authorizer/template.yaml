@@ -147,7 +147,7 @@ Resources:
   OnConnectFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/onConnect.zip
+      CodeUri: src/onConnect
       Description: AWS Lambda function
       MemorySize: 256
       Timeout: 5
@@ -170,7 +170,7 @@ Resources:
   OnDisconnectFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/onDisconnect.zip
+      CodeUri: src/onDisconnect
       Description: AWS Lambda function
       MemorySize: 256
       Timeout: 5
@@ -193,7 +193,7 @@ Resources:
   SendMessageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/sendMessage.zip
+      CodeUri: src/sendMessage
       Description: AWS Lambda function
       MemorySize: 256
       Timeout: 5
@@ -216,7 +216,7 @@ Resources:
   AuthorizerLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/authLambda.zip
+      CodeUri: src/authLambda
       Description: AWS Lambda function
       MemorySize: 256
       Timeout: 5
@@ -247,7 +247,7 @@ Resources:
     Properties:
       LayerName: jwt-cognito-layer
       Description: My jwt cognito Layer
-      ContentUri: src/nodejs.zip
+      ContentUri: src/jwt-layer.zip
       CompatibleRuntimes:
         - nodejs20.x
 
