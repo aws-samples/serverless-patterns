@@ -27,7 +27,7 @@
         "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-lambda-function-trigger.html",
       },
       {
-        "text": "S3-to-Lambda serverless applications",
+        "text": "Amazon Simple Storage Service (S3) -> User Guide -> Using EventBridge",
         "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html"
       }
     ]
