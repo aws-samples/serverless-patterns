@@ -1,5 +1,5 @@
 # Amazon S3 hosted website served by a CloudFront distribution restricted by CloudFront Origin Access Control (OAC)
-This project serves as a practical example or demonstration of how to leverage two powerful services from Amazon Web Services (AWS) - Amazon CloudFront and Amazon Simple Storage Service (S3) - to host and deliver a static website efficiently and securely.
+This project serves as a demonstration of how to leverage Amazon CloudFront and Amazon Simple Storage Service (S3) to host and deliver a static website efficiently and securely.
 
 Amazon S3 is an object storage service that provides a highly scalable, durable, and cost-effective way to store and retrieve data, including website files such as HTML, CSS, JavaScript, and other static assets. In this project, S3 is utilized as the origin, which means it hosts the static website content.
 
@@ -17,7 +17,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Terraform Install](https://www.terraform.io/)
+* [Terraform Installed](https://www.terraform.io/)
 
 ## Deployment Instructions
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -46,12 +46,12 @@ Important: this application uses various AWS services and there are costs associ
 6. Copy your front end assests
 
 ## Testing
-    "Go to your hosting Amazon S3 bucket ",
-    "Upload your front end content or Copy index.html from "s3-cloudfront-spa" pattern "src" folder for testing",
-    "Go to AWS Console",
-    "Go to AWS Cloudfront",
-    "Go to Distributions",
-    "Select your distribution domain and browse it. e.g ***********.cloudfront.net/index.html"
+1.  Go to your hosting Amazon S3 bucket.
+2.  Upload your front end content or Copy index.html from "s3-cloudfront-spa" pattern "src" folder for testing.
+3.  Go to AWS Console.
+4.  Go to AWS Cloudfront.
+5.  Go to Distributions.
+5.  Select your distribution domain and browse it. e.g ***********.cloudfront.net/index.html.
     
 ### Removing the resources
 

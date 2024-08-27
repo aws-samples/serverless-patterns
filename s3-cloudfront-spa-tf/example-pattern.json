@@ -1,6 +1,7 @@
 {
   "title": "AWS CloudFront and Amazon S3 for Single Page Application Hosting",
-  "description": "This project shows how to host a Single-Page Application (SPA) using AWS CloudFront & S3. CloudFront serves the SPA content from an S3 bucket configured for static hosting.",
+  "description": "This project demonstrates hosting a Single-Page App using AWS CloudFront & S3, where CloudFront serves the SPA from an S3 bucket for static hosting.",
+  "language": "HCL",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -27,19 +28,19 @@
     "bullets": [
       {
         "text": "Amazon S3 bucket to host the website",
-        "link": "https://aws.amazon.com/s3/"
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html"
       },
       {
         "text": "Amazon CloudFront uses Amazon S3 as the origin server to host and serve static websites.",
-        "link": "https://aws.amazon.com/cloudfront/"
+        "link": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/getting-started-cloudfront-overview.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "terraform init",
-      "terraform plan",
-      "terraform apply"
+      "<code>terraform init</code>",
+      "<code>terraform plan</code>",
+      "<code>terraform apply</code>"
     ]
   },
   "testing": {
@@ -49,7 +50,7 @@
   },
   "cleanup": {
     "text": [
-      "terraform destroy"
+      "<code>terraform destroy</code>"
     ]
   },
   "authors": [
