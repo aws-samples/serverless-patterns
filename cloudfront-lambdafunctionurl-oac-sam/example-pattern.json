@@ -24,20 +24,32 @@
     }
   },
   "resources": {
-    
+    "bullets": [
+      {
+        "text": "Amazon CloudFront now supports Origin Access Control (OAC) for Lambda function URL origins",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2024/04/amazon-cloudfront-oac-lambda-function-url-origins/"
+      }
+    ]
   },
   "deploy": {
     "text": [
+      "sam build"
+      "sam deploy --guided"
+
       "See the GitHub repo for detailed build and deploy instructions."
     ]
   },
   "testing": {
     "text": [
+      "Access the Lambda function URL both through the CloudFront distribution and directly, then observe the results."
+      
       "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
     "text": [
+      "sam delete"
+      
       "See the GitHub repo for detailed cleanup instructions."
     ]
   },
@@ -45,7 +57,7 @@
     {
       "name": "Shekhar Shrinivasan",
       "image": "https://avatars.githubusercontent.com/u/58206425?s=400&u=90899732423049a2e45523f631ab0379330aec62&v=4",
-      "bio": "Senior Technical Consultant (TAM)",
+      "bio": "Senior Technical Consultant (TAM) at Amazon Web Services (AWS)",
       "linkedin": "https://www.linkedin.com/in/shekhar-shrinivasan/",
       "twitter": ""
     }
