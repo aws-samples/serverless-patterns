@@ -11,9 +11,10 @@ Description: >
 Resources:
   
   # Lambda function to be used as the origin for the CloudFront Distribution
-  MyCFToLambda:
+  MyCFNToLambda:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${AWS::StackName}-lambda-function"
       CodeUri: ./src/cfn-lambdaurl-oac
       Description: 'CloudFront and Lambda Function URL integration with OAC'
       MemorySize: 128
@@ -33,8 +34,8 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-          - DomainName: !Select [2, !Split ["/", !GetAtt MyCFToLambdaUrl.FunctionUrl]] 
-            Id: MyCFToLambdaOrigin
+          - DomainName: !Select [2, !Split ["/", !GetAtt MyCFNToLambdaUrl.FunctionUrl]] 
+            Id: MyCFNToLambdaOrigin
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
               OriginSSLProtocols:
@@ -43,7 +44,7 @@ Resources:
             OriginAccessControlId: !Ref MyCloudFrontOriginAccessControl  
         Enabled: true
         DefaultCacheBehavior:
-          TargetOriginId: MyCFToLambdaOrigin
+          TargetOriginId: MyCFNToLambdaOrigin
           ViewerProtocolPolicy: redirect-to-https
           AllowedMethods:
             - GET
@@ -67,7 +68,7 @@ Resources:
   MyLambdaInvokePermissionForCloudFront:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !Ref MyCFToLambda
+      FunctionName: !Ref MyCFNToLambda
       Action: lambda:InvokeFunctionUrl
       Principal: "cloudfront.amazonaws.com"
       SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${MyCloudFrontDistribution}"
@@ -78,7 +79,7 @@ Resources:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Name: MyCFToLambda
+        Name: !Sub "${AWS::StackName}-oac-for-lambda-url" 
         SigningBehavior: always
         OriginAccessControlOriginType: lambda
         SigningProtocol: sigv4
@@ -88,7 +89,7 @@ Resources:
     Type: AWS::CloudFront::CachePolicy
     Properties:
       CachePolicyConfig:
-        Name: CachingDisabled
+        Name: !Sub "${AWS::StackName}-cache-policy"
         DefaultTTL: 0
         MinTTL: 0
         MaxTTL: 0
@@ -112,7 +113,7 @@ Outputs:
     Value: !GetAtt MyCloudFrontDistribution.DomainName
   LambdaFunctionDomain:
     Description: Lambda Function URL domain.
-    Value: !Select [2, !Split ["/", !GetAtt MyCFToLambdaUrl.FunctionUrl]]
+    Value: !Select [2, !Split ["/", !GetAtt MyCFNToLambdaUrl.FunctionUrl]]
   LambdaFunctionUrl:
     Description: "The Lambda Function URL"
-    Value: !GetAtt MyCFToLambdaUrl.FunctionUrl
+    Value: !GetAtt MyCFNToLambdaUrl.FunctionUrl
