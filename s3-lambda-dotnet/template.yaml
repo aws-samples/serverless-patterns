@@ -38,8 +38,15 @@ Resources:
                   - Name: suffix
                     Value: '.jpeg'
       Policies:
-        - S3FullAccessPolicy:
-            BucketName: !Sub "imageresizer-${AWS::AccountId}/*"
+        - Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource: !Sub arn:aws:s3:::imageresizer-${AWS::AccountId}/*
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+              Resource: !Sub arn:aws:s3:::imageresizer-${AWS::AccountId}/*
 
 Outputs:
   SourceBucketName:
