@@ -23,13 +23,15 @@ Change directory to the solution directory:
 From the command line, use AWS SAM to build and deploy the AWS resources as specified in the template.yml file.  
 
 **Build**
-```sam build
-```
-Once build is sucessfull deploy the stack using the deploy command as seen below.
+
+    sam build
+
+Once the build is sucessfull, deploy the stack using the following command.
 
 **Deploy**
-```sam deploy --guided
-```
+
+    sam deploy --guided
+
 **During the prompts:**  
 
 **Stack Name:** {Enter your preferred stack name}  
@@ -41,8 +43,7 @@ Once build is sucessfull deploy the stack using the deploy command as seen below
 **SAM configuration file:** {Press enter to use default name}  
 **SAM configuration environment:** {Press enter to use default name}  
 
-
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+**Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.**
 
 ## How it works
 
@@ -51,23 +52,26 @@ The SAM template sets up a CloudFront Distribution with a Lambda function URL as
 ## Testing
 
 **Access the Lambda Function URL directly**
-- Copy the Lambda Function URL value from the SAM deployment process output key 'LambdaFunctionUrl'
+- Copy the Lambda Function URL value from the SAM deployment process output key **'LambdaFunctionUrl'**
 - Try accessing the function URL using a web browser
-- You should see a page with "Message": "Forbidden" message
+- You should see a page with **"Message": "Forbidden"** message.
+  
 **Acccess the Lambda Function URL using CloudFront Distribution domain name**
-- Copy the LamCloudFront Distribution Domain Name value from the SAM deployment process output key 'CloudFrontDomainName'
+- Copy the CloudFront Distribution Domain Name value from the SAM deployment process output key **'CloudFrontDomainName'**
 - Try accessing the function URL using the CloudFront domain name.
-- You should see a page with success message starting with "Hello from AWS !!! ..."
+- You should see a page with success message starting with **"Hello from AWS !!! ..."**
 
 
 ## Cleanup
  
-1. Delete the stack
-    ```sam delete
-    ```
-1. Confirm the stack has been deleted
-    ``'aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
+**Delete the stack**
+
+    sam delete
+    
+**Confirm the stack has been deleted**
+
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+
 ----
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
