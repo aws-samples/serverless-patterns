@@ -46,9 +46,9 @@ Important: this application uses various AWS services and there are costs associ
 6. Copy your front end assests
 
 ## Testing
-1.  Go to your hosting Amazon S3 bucket.
-2.  Upload your front end content or Copy index.html from "s3-cloudfront-spa" pattern "src" folder for testing.
-3.  Go to AWS Console.
+1.  Go to AWS Console.
+2.  Go to your hosting Amazon S3 bucket.
+3.  Upload your front end content or Copy index.html from "s3-cloudfront-spa" pattern "test" folder for testing.
 4.  Go to AWS Cloudfront.
 5.  Go to Distributions.
 5.  Select your distribution domain and browse it. e.g ***********.cloudfront.net/index.html.

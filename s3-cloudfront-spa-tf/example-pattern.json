@@ -1,7 +1,7 @@
 {
   "title": "AWS CloudFront and Amazon S3 for Single Page Application Hosting",
   "description": "This project demonstrates hosting a Single-Page App using AWS CloudFront & S3, where CloudFront serves the SPA from an S3 bucket for static hosting.",
-  "language": "HCL",
+  "language": "Terraform",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
