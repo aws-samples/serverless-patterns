@@ -1,4 +1,4 @@
-# Organization Resource Value Defaults
+# Organization Resource Default Value Fetcher
 
 ![Concept](./Organization_default_values.png)
 
@@ -38,3 +38,15 @@ The `default-module` will input to the user module.
 A list of the organization's default resource names will be displayed.
 
 ## Sample Output
+
+```shell
+amis = {
+  "amzn2" = "ami-01b799c439fd5516a"
+}
+ec2_user_ssh = "Test-key-value"
+kms_s3_server_side = "ARN:kms:us-east-1:123456789:key/1234567-1234-4480-bd89-ebf400ef88c3"
+subnet_cidr_blocks = [
+  "10.0.0.0/18"
+]
+```
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
