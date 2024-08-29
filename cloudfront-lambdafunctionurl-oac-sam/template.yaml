@@ -1,0 +1,118 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A SAM template will be used to create a CloudFront Distribution with a Lambda 
+  function URL as the origin. An Origin Access Control (OAC) of type 'lambda' will be created 
+  and associated with the CloudFront Distribution to ensure that only CloudFront can access 
+  the Lambda function URL. Appropriate invoke permissions will also be granted to the Lambda 
+  function. The Origin and Behaviors configuration on the CloudFront Distribution will follow 
+  best practices for a Lambda function URL origin.
+
+Resources:
+  
+  # Lambda function to be used as the origin for the CloudFront Distribution
+  MyCFToLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/cfn-lambdaurl-oac
+      Description: 'CloudFront and Lambda Function URL integration with OAC'
+      MemorySize: 128
+      Timeout: 3
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      FunctionUrlConfig:
+        AuthType: AWS_IAM
+        InvokeMode: BUFFERED
+
+  # CloudFront Distribution with Lambda function URL as the origin with Origin and Behaviors configuration 
+  # following best practices for a Lambda function URL origin.
+  MyCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !Select [2, !Split ["/", !GetAtt MyCFToLambdaUrl.FunctionUrl]] 
+            Id: MyCFToLambdaOrigin
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols:
+                - TLSv1.2
+              OriginKeepaliveTimeout: 60
+            OriginAccessControlId: !Ref MyCloudFrontOriginAccessControl  
+        Enabled: true
+        DefaultCacheBehavior:
+          TargetOriginId: MyCFToLambdaOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          CachePolicyId: !Ref MyCachingDisabledPolicy
+          ForwardedValues:
+            QueryString: true
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+          MinimumProtocolVersion: TLSv1.2_2021
+        HttpVersion: http2
+        DefaultRootObject: index.html
+        PriceClass: PriceClass_All
+
+  # Permission to invoke the Lambda function from the CloudFront Distrinbution
+  MyLambdaInvokePermissionForCloudFront:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref MyCFToLambda
+      Action: lambda:InvokeFunctionUrl
+      Principal: "cloudfront.amazonaws.com"
+      SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${MyCloudFrontDistribution}"
+      SourceAccount: !Sub "${AWS::AccountId}"
+
+  # Origin Access Control to associate with the CloudFront Distribution    
+  MyCloudFrontOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: MyCFToLambda
+        SigningBehavior: always
+        OriginAccessControlOriginType: lambda
+        SigningProtocol: sigv4
+  
+  # Recommended cache policy to disable caching for the Lambda function URL origin
+  MyCachingDisabledPolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: CachingDisabled
+        DefaultTTL: 0
+        MinTTL: 0
+        MaxTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingBrotli: false
+          EnableAcceptEncodingGzip: false
+          HeadersConfig:
+            HeaderBehavior: none
+          CookiesConfig:
+            CookieBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+
+# Output values of created resources to be referenced in the calling stack
+Outputs:
+  CloudFrontDistributionId:
+    Description: "The CloudFront Distribution ID"
+    Value: !Ref MyCloudFrontDistribution
+  CloudFrontDomainName:
+    Description: "The CloudFront Distribution Domain Name"
+    Value: !GetAtt MyCloudFrontDistribution.DomainName
+  LambdaFunctionDomain:
+    Description: Lambda Function URL domain.
+    Value: !Select [2, !Split ["/", !GetAtt MyCFToLambdaUrl.FunctionUrl]]
+  LambdaFunctionUrl:
+    Description: "The Lambda Function URL"
+    Value: !GetAtt MyCFToLambdaUrl.FunctionUrl
