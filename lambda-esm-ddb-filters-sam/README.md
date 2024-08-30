@@ -2,6 +2,11 @@
 
 This pattern demonstrates the ability to filter Amazon DynamoDB Stream events so that only a subset of all events is sent to an AWS Lambda function for processing. Demo stack will create a single Amazon DynamoDB Table (table-lambda-esm-filter), enable [Change Data Capture](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html) for that table, and create a number of AWS Lambda functions that are subscribed to the Amazon DynamoDB stream using different filter configurations.
 
+> Please note that this template is meant to be for testing the filters, you can subscribe more than two Lambda functions to a DynamoDB Stream, but you'll likely experience [read throttling](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.html).
+> 
+> If you require more than two consumers ([one if it is a global table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ServiceQuotas.html#limits-dynamodb-streams)), consider integrating with [Amazon EventBridge](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/eventbridge-for-dynamodb.html).
+
+
 Review [Filter rule syntax](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html#filtering-syntax) for more details on the message filtering configuration.
 **Important note**: Filter definition should not contain any whitespace (tabs, space, etc.) in order to work properly!
 
