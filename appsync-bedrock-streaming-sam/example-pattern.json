@@ -1,5 +1,5 @@
 {
-  "title": "Amazon Bedrock Streaming with AWS Appsync",
+  "title": "Amazon Bedrock Streaming with AWS AppSync",
   "description": "Stream Amazon Bedrock responses with AWS AppSync",
   "language": "YAML",
   "level": "200",
