@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Prompt Chaining with Amazon API Gateway HTTP API, AWS StepFunctions and Amazon Bedrock.
+
+Resources:
+
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+  StateMachineExpressSync:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: StateMachineExpressSync
+      #Name: APIGWStepFunctionExpressSync
+      DefinitionUri: statemachine/stateMachine.asl.json
+      DefinitionSubstitutions:
+        ModelId: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/cohere.command-text-v14
+      Role:
+        Fn::GetAtt: [ StatesMachineExecutionRole, Arn ]
+      Type: EXPRESS
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+        IncludeExecutionData: false
+        Level: 'ALL'
+
+##########################################################################
+#  STEP FUNCTION LOG GROUP                                               #
+##########################################################################
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", StateMachineExpressSync]]
+       
+##########################################################################
+#   REST API                                                             #
+##########################################################################
+  RestApiforSyncWF:
+     Type: AWS::Serverless::Api
+     Properties:
+        StageName: dev
+        DefinitionBody: # an OpenApi definition
+          'Fn::Transform':
+            Name: 'AWS::Include'
+            Parameters:
+              Location: './api.yaml'
+        OpenApiVersion: 3.0.3
+        EndpointConfiguration:
+            Type: REGIONAL
+            
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+  RestApiRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - apigateway.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+      - PolicyName: AllowSFNExec
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: "states:StartSyncExecution"
+              Resource: !GetAtt StateMachineExpressSync.Arn
+
+ 
+  StatesMachineExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: CWLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogDelivery"
+                  - "logs:CreateLogStream"
+                  - "logs:GetLogDelivery"
+                  - "logs:UpdateLogDelivery"
+                  - "logs:DeleteLogDelivery"
+                  - "logs:ListLogDeliveries"
+                  - "logs:PutLogEvents"
+                  - "logs:PutResourcePolicy"
+                  - "logs:DescribeResourcePolicies"
+                  - "logs:DescribeLogGroups"
+                Resource: "*"         
+        - PolicyName: BedrockAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "bedrock:InvokeModel"
+                Resource: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/cohere.command-text-v14                           
+
+##########################################################################
+#   Outputs                                                              #
+##########################################################################
+Outputs:
+  PromptChainApi:
+    Description: "Sync WF API endpoint"
+    Value: !Sub "https://${RestApiforSyncWF}.execute-api.${AWS::Region}.amazonaws.com/dev"
+
+
