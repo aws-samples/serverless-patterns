@@ -1,6 +1,6 @@
 {
-  "title": "Q Business to S3",
-  "description": "Amazon Q Business to build a generative AI application to derive insights from content present in an S3 bucket.",
+  "title": "Amazon Q Business to Amazon S3",
+  "description": "Use Amazon Q Business to build a generative AI application to derive insights from content present in an S3 bucket.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
