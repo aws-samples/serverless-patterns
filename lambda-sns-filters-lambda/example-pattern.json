@@ -1,0 +1,51 @@
+{
+	"title": "Lambda to SNS with filters to Lambda",
+	"description": "Creates a Lambda function that sends a message to a SNS that contains a filter. One function gets trigger always but the other depends on the filter.",
+	"language": "TypeScript",
+	"level": "200",
+	"framework": "CDK",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This sample project demonstrates how to use create a SNS with filters and trigger different functions depending on the filtering."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sns-filters-lambda",
+			"templateURL": "serverless-patterns/lambda-sns-filters-lambda",
+			"projectFolder": "lambda-sns-filters-lambda",
+			"templateFile": "src/lib/lambda-sns-filters-lambda.ts"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "AWS SNS",
+				"link": "https://aws.amazon.com/sns/"
+			},
+			{
+				"text": "Amazon SNS message filtering",
+				"link": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["cdk deploy"]
+	},
+	"testing": {
+		"text": ["See the GitHub repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>cdk delete</code>."]
+	},
+	"authors": [
+		{
+			"name": "Marcia Villalba",
+			"image": "link-to-your-photo.jpg",
+			"bio": "Your bio.",
+			"linkedin": "linked-in-ID",
+			"twitter": "twitter-handle"
+		}
+	]
+}

@@ -1,0 +1,65 @@
+{
+  "title": "Cognito to API Gateway private REST API",
+  "description": "This pattern shows how to authenticate and authorize requests to a private REST API Gateway with Amazon Cognito.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use Amazon Cognito with a private AWS REST API Gateway to authenticate and authorize requests to a private HTTP endpoint hosted on a Network Load Balancer and ECS/Fargate."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-restapi-vpclink-cdk",
+      "templateURL": "serverless-patterns/cognito-restapi-vpclink-cdk",
+      "projectFolder": "cognito-restapi-vpclink-cdk",
+      "templateFile": "cognito-restapi-vpclink-cdk/cdk/lib/cdk-cognito-fargate-stack.js"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Controlling access to a REST API with a Cognito User Pools Authorizer",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html"
+      },
+      {
+        "text": "Understanding VPC links in Amazon API Gateway private integrations",
+        "link": "https://aws.amazon.com/blogs/compute/understanding-vpc-links-in-amazon-api-gateway-private-integrations/"
+      },
+      {
+        "text": "Architecture patterns for consuming private APIs cross-account",
+        "link": "https://aws.amazon.com/blogs/compute/architecture-patterns-for-consuming-private-apis-cross-account/"
+      },
+      {
+        "text": "Building private cross-account APIs using Amazon API Gateway and AWS PrivateLink",
+        "link": "https://aws.amazon.com/blogs/compute/building-private-cross-account-apis-using-amazon-api-gateway-and-aws-privatelink/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Justin Plock",
+      "image": "",
+      "bio": "Principal Solutions Architect at AWS",
+      "linkedin": "justinplock",
+      "twitter": "@jplock"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "title": "EventBridge CloudEvents Input Transformer to Lambda",
+  "description": "This pattern uses an EventBridge input transfomer to convert an EventBridge event to a CloudEvent and send it to a Lambda function using the CloudEvents SDK for event handling.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "EventBridge events are converted to CloudEvents using an input transformer in a rule on a custom event bus. A Lambda function is configured as a target for that rule. The Lambda function uses the CloudEvents TypeScript SDK to deserialize and validate incoming CloudEvents."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-cloudevents-transformer-cdk-typescript",
+      "templateURL": "serverless-patterns/eventbridge-cloudevents-transformer-cdk-typescript",
+      "projectFolder": "eventbridge-cloudevents-transformer-cdk-typescript",
+      "templateFile": "src/lib/eb-lambda-cloudevents-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Input Transformation Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-transform-target-input.html"
+      },
+      {
+        "text": "CloudEvents Specification",
+        "link": "https://cloudevents.io/"
+      },
+      {
+        "text": "Cloudformation API for EventBridge",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/AWS_Events.html"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "Michael Gasch",
+      "image": "https://avatars.githubusercontent.com/u/15986659",
+      "bio": "Senior Product Manager Technical for Amazon EventBridge.",
+      "linkedin": "michael-gasch-10603298"
+    }
+  ]
+}

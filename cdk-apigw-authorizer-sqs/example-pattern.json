@@ -1,0 +1,60 @@
+{
+  "title": "API Gateway REST API protected with Authorizer to SQS",
+  "description": "Create an API Gateway REST API that is protected with a Lambda token authorizer and integrates with AmazonSQS",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK project demonstrates how to set up a queue based leveling pattern using AWS API Gateway REST API and SQS.",
+      "Processing higher number of HTTP and webhook events synchronously during traffic peaks can cause performance deteroration." , 
+      "To avoid these situations, a common architectural strategy is to use a queue that acts as a buffer for these synchronous requests.",
+      "This CDK project deploys an API Gateway REST API that can act as a front door for requests and stores them in an Amazon SQS queue.",
+      "Furthermore, if you want to to protect your API Gateway with a custom authorizer the project also has a stack to takes a Lambda ARN which implements authorization logic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns.git",
+      "templateURL": "serverless-patterns/cdk-apigw-authorizer-sqs",
+      "projectFolder": "cdk-apigw-authorizer-sqs",
+      "templateFile": "apigw_sqs/apigw_sqs_auth_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Solutions Construct for aws-apigateway-sqs",
+        "link": "https://docs.aws.amazon.com/solutions/latest/constructs/aws-apigateway-sqs.html"
+      },
+      {
+        "text": "AWS APIGateway lambda authorizer blueprint",
+        "link": "https://github.com/awslabs/aws-apigateway-lambda-authorizer-blueprints/blob/master/blueprints/python/api-gateway-authorizer-python.py"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "CDK deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sai Kotagiri",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Sai Kotagiri is a Partner Solutions Architect at Amazon Web Services based in New York metropolitan area. Sai has over 20 years of experience focusing on digital transformation and IT strategy",
+      "linkedin": "https://www.linkedin.com/in/sai-diwakar-kotagiri-1251928/"
+    }
+  ]
+}

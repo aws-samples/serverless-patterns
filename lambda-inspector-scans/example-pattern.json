@@ -1,0 +1,43 @@
+{
+  "title": "Event driven vulnerability scanning with EventBridge and Lambda",
+  "description": "This pattern listens to Amazon Inspector events and triggers downstream consumers",
+  "language": "YAMl",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["Listening to Amazon Inspector events a rule is set up to trigger a downstream consumer (Lambda function). Every scan complete of Lambda function triggers the consumer allowing automation around vulnerability scanning."]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/lambda-inspector-scans",
+      "templateURL": "serverless-patterns/lambda-inspector-scans",
+      "projectFolder": "lambda-inspector-scans",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Inspector Now Scans AWS Lambda Functions for Vulnerabilities",
+        "link": "https://aws.amazon.com/blogs/aws/amazon-inspector-now-scans-aws-lambda-functions-for-vulnerabilities/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy --guided"]
+  },
+  "testing": {
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.png",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

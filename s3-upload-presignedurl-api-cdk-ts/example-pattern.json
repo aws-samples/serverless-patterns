@@ -1,0 +1,58 @@
+{
+    "title": "API Gateway and Lambda to generate S3 pre-signed URLS",
+    "description": "Secured REST API that expose a Lambda function to generate S3 pre-signed URLs",
+    "language": "TypeScript",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "Web and mobile applications often provide their users ability to upload files, documents or pictures. A good and now common practice is to upload them directly to Amazon S3, using pre-signed URLs. To generate this pre-signed URL, you have to use the AWS SDK (generally in an AWS Lambda function), and expose the feature to the client through an API (with Amazon API Gateway).",
+        "The infrastructure deployed by this pattern contains an API Gateway REST API, exposing a Lambda function that will generate the S3 pre-signed URL and return it to the client. The API, the Lambda function and the S3 bucket handle CORS headers so that there is no error on the client side. The API is protected by a Cognito User Pool."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-upload-presignedurl-api-cdk-ts",
+        "templateURL": "serverless-patterns/s3-upload-presignedurl-api-cdk-ts",
+        "projectFolder": "bin",
+        "templateFile": "s3-upload-presignedurl-api-cdk.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "S3 Presigned URLs documentation",
+          "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html"
+        },
+        {
+          "text": "Blog post on S3 pre-signed URLs",
+          "link": "https://aws.amazon.com/blogs/compute/uploading-to-amazon-s3-directly-from-a-web-or-mobile-application/ "
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Jerome Van Der Linden",
+        "image": "https://avatars.githubusercontent.com/u/117538?v=4",
+        "bio": "Jerome is a Solutions Architect Builder at AWS. Passionate about building stuff using the AWS services, and especially the serverless ones.",
+        "linkedin": "jeromevdl",
+        "twitter": "jeromevdl"
+      }
+    ]
+  }

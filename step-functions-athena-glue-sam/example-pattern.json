@@ -1,0 +1,58 @@
+{
+  "title": "Using Step Functions to query Athena S3 data - SAM",
+  "description": "This serverless example helps to process all results from S3 data fetched in Athena Query using Step Functions.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works:",
+    "text": [
+      "This serverless pattern uses AWS Athena allows to analyze data in Amazon S3 using standard SQL.", 
+      "A Glue crawler creates a database table from the S3 data which is queried by Athena.", 
+      "Step Function is leveraged to query as well as process each result in this data received from Athena with the help of NextToken parameter.
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/step-functions-athena-glue-sam",
+      "templateURL": "serverless-patterns/step-functions-athena-glue-sam",
+      "projectFolder": "step-functions-athena-glue-sam",
+      "templateFile": "step-functions-athena-glue-sam/template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Tutorial: Step Functions to Athena connection",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+      },
+      {
+        "text": "Using AWS Glue to connect to data sources in Amazon S3",
+        "link": "https://docs.aws.amazon.com/athena/latest/ug/data-sources-glue.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abhishek Agawane",
+      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+      "bio": "I am a Cloud Support Engineer (Serverless) at AWS who loves baking pizzas",
+      "linkedin": "https://www.linkedin.com/in/agawabhi/"
+    }
+  ]
+}

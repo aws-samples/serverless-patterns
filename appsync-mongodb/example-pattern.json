@@ -1,0 +1,57 @@
+{
+	"title": "AppSync to MongoDB",
+	"description": "Perform a write and list operation from AWS AppSync to Amazon DynamoDB that is protected with an idenity pool and userpool from Amazon Cognito.",
+	"language": "TypeScript",
+	"level": "300",
+	"framework": "CDK",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This project demonstrates how to connect directly to a MongoDB Atlas cluster using AWS Appsync.",
+			"Connecting directly to MongoDB requires the use of their Data API and AppSync's HTTP resolver.",
+			"In doing so, there is no need for a proxying Lambda function."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-mongodb",
+			"templateURL": "serverless-patterns/appsync-mongodb",
+			"projectFolder": "appsync-mongodb",
+			"templateFile": "appsync-mongodb/cdk/lib/main.ts"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "Blog post: The fullstack guide to using AWS AppSync and MongoDB Atlas",
+				"link": "https://aws.amazon.com/blogs/mobile/the-fullstack-guide-to-using-aws-appsync-and-mongodb-atlas/"
+			},
+			{
+				"text": "Amazon AppSync - Managed GraphQL service",
+				"link": "https://aws.amazon.com/appsync/"
+			},
+			{
+				"text": "Fullstack repo",
+				"link": "https://github.com/focusOtter/fullstack-appsync-mongodb"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["<code>npx aws-cdk deploy</code>"]
+	},
+	"testing": {
+		"text": ["See the GitHub repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>npx aws-cdk destroy</code>."]
+	},
+	"authors": [
+		{
+			"name": "Michael Liendo 🦦",
+			"image": "https://pbs.twimg.com/profile_images/1610321865213444096/OttGok0S_400x400.jpg",
+			"bio": "Michael Liendo is a fullstack developer, avid taco eater, and Senior Developer Advocate for AWS AppSync.",
+			"linkedin": "focusotter",
+			"twitter": "focusotter"
+		}
+	]
+}

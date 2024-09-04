@@ -1,0 +1,62 @@
+{
+  "title": "Amazon S3 to AWS Lambda  with .NET",
+  "description": "Automate the creation of thumbnail images from new images on Amazon S3 leveraging Lambda and .NET",
+  "language": ".NET",
+  "level": "200",
+  "framework": "SAM",
+  "services": {
+    "from": "s3",
+    "to": "lambda"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon S3 bucket for image hosting with an AWS Lambda function that gets invoked when new images are added to the bucket. The Lambda function uses .NET 6 to create a thumbnail of the image and save the thumbnail back to the same S3 bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-dotnet",
+      "templateURL": "serverless-patterns/s3-lambda-dotnet",
+      "projectFolder": "s3-lambda-dotnet",
+      "templateFile": "s3-lambda-dotnet/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using an Amazon S3 trigger to invoke a Lambda function",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Building Lambda functions with C#",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-csharp.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo readme for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Empty the S3 bucket",
+      "sam delete --stack-name STACK_NAME"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Garrett Johnson",
+      "image": "https://grream-rando-7-19-26-bucket.s3.amazonaws.com/images/IMG_1549.jpg",
+      "bio": "Garrett is a Sr. Solutions Architect at AWS based in Utah.",
+      "linkedin": "/garrett-johnson-30998247"
+    }
+  ]
+}

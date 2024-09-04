@@ -1,0 +1,53 @@
+{
+  "title": "CloudWatch Logs Subscription to Lambda with SNS to SQS",
+  "description": "Create a CloudWatch Logs subscription to a Lambda function, publish to SNS topic and deliver logs to SQS queue.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to use CloudWatch Logs to create Lambda subscription filter and publish the filtered logs to an SNS topic and deliver to an SQS queue. The logs sent to Lambda through a subsciption filter are base64 encoded and compressed with gzip format."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cwlogs-lambda-sns-sqs-cdk",
+      "templateURL": "serverless-patterns/cwlogs-lambda-sns-sqs-cdk",
+      "projectFolder": "cwlogs-lambda-sns-sqs-cdk",
+      "templateFile": "src/cwlogs_lambda_sns_sqs/cwlogs_lambda_sns_sqs_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using CloudWatch Logs subscription filters",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Kimia Yahyazadeh",
+      "image": "",
+      "bio": "AWS Cloud Application Developer",
+      "linkedin": "kimiayahyazadeh"
+    },
+    {
+      "name": "Sakthivel Chellapparimanam",
+      "image": "",
+      "bio": "AWS - Cloud Application Architect",
+      "linkedin": "srcsakthivel",
+      "twitter": "@srcsakthivel"
+    }
+  ]
+}

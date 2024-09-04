@@ -1,0 +1,51 @@
+{
+	"title": "Lambda Destinations to Lambda and SQS",
+	"description": "Lambda function that on success sends message to another function and on failure to SQS using Lambda destinations",
+	"language": "TypeScript",
+	"level": "200",
+	"framework": "CDK",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This sample proyect shows how to create a Lambda function that on success sends message to another function and on failure to SQS using Lambda destinations "
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-destinations-cdk",
+			"templateURL": "serverless-patterns/lambda-destinations-cdk",
+			"projectFolder": "lambda-destinations-cdk",
+			"templateFile": "cdk/async-functions.ts"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "Introducing AWS Lambda Destinations",
+				"link": "https://aws.amazon.com/blogs/compute/introducing-aws-lambda-destinations/"
+			},
+			{
+				"text": "Asynchronous invocation",
+				"link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["cdk deploy"]
+	},
+	"testing": {
+		"text": ["See the GitHub repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>cdk destroy</code>."]
+	},
+	"authors": [
+		{
+			"name": "Marcia Villalba",
+			"image": "https://marcia.dev/images/marcia_profile.jpg",
+			"bio": "AWS Developer Advocate, AWS Serverless",
+			"linkedin": "https://www.linkedin.com/in/marciavillalba/",
+			"twitter": "https://twitter.com/mavi888uy"
+		}
+	]
+}

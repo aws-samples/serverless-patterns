@@ -1,0 +1,59 @@
+{
+    "title": "Step Functions to Amazon SES with CDK (Typescript)",
+    "description": "Step Functions - SES SDK integration to send email.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This project demonstrates how to implement a State Function State machine to send email with Amazon SES with SDK integrations",
+        "This is implemented with CDK (Typescript)"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunction-ses-cdk",
+        "templateURL": "serverless-patterns/stepfunction-ses-cdk",
+        "projectFolder": "stepfunction-ses-cdk",
+        "templateFile": "stepfunction-ses-cdk/stepfunction-ses-cdk-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AWS Step Functions",
+          "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+        },
+        {
+          "text": "Amazon SES",
+          "link": "https://docs.aws.amazon.com/ses/latest/dg/Welcome.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy --all --parameters sesFromEmail='YOUR_SES_FROM_EMAIL_ADDRESS'"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destory --all</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Pubudu Jayawardana",
+        "image": "https://avatars.githubusercontent.com/u/1263087",
+        "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusiast.",
+        "linkedin": "pubudusj",
+        "twitter": "@pubudusj"
+      }
+    ]
+  }
+  

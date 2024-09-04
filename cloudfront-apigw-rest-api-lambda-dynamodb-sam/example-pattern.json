@@ -1,0 +1,54 @@
+{
+  "title": "Amazon Cloudfront distribution in front of Amazon S3 and an Amazon API Gateway REST API to AWS Lambda to Amazon DynamoDB",
+  "description": "This pattern creates an Amazon Cloudfront distribution in front of Amazon S3 and an Amazon API Gateway REST API which invokes an AWS Lambda function to store data in an Amazon DynamoDB table.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project creates a simple webform application using Amazon Cloudfront in front of Amazon S3 and Amazon API Gateway REST API.  The Amazon API Gateway REST API invokes an AWS Lambda function which stores the webform data in an Amazon DynamoDB table.",
+      "This pattern uses AWS WAF to secure the CloudFront distribution and AWS Secrets Manager to store a validation string to validate API requests flow through Amazon Cloudfront.  AWS X-Ray is also enabled to allow for distributed tracing."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-apigw-rest-api-lambda-dynamodb-sam",
+      "templateURL": "serverless-patterns/cloudfront-apigw-rest-api-lambda-dynamodb-sam",
+      "projectFolder": "cloudfront-apigw-rest-api-lambda-dynamodb-sam",
+      "templateFile": "cloudfront-apigw-rest-api-lambda-dynamodb-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon API Gateway Developer Guide",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy",
+      "sh deploy_frontend.sh"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "John Dwyer",
+      "image": "https://avatars.githubusercontent.com/u/130080657?v=4",
+      "bio": "I am a WWPS Solutions Architect with AWS.  I help customers build and architect serverless applications at scale.",
+      "linkedin": "jrd326"
+    }
+  ]
+}

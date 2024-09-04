@@ -1,0 +1,47 @@
+{
+	"title": "Lambda to SNS to Lambda",
+	"description": "Creates a Lambda function that sends a message to a SNS and then another function gets triggered when there is a new notification in the topic.",
+	"language": "TypeScript",
+	"level": "200",
+	"framework": "CDK",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This sample project demonstrates how to create a Lambda function that sends a message to an SNS topic using AWS SDK. Then another function gets trigger when a message is in the topic."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sns-lambda-cdk",
+			"templateURL": "serverless-patterns/lambda-sns-lambda-cdk",
+			"projectFolder": "lambda-sns-lambda-cdk",
+			"templateFile": "src/lib/lambda-sns-lambda.ts"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "AWS SNS",
+				"link": "https://aws.amazon.com/sns/"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["cdk deploy"]
+	},
+	"testing": {
+		"text": ["See the GitHub repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>cdk delete</code>."]
+	},
+	"authors": [
+		{
+			"name": "Marcia Villalba",
+			"image": "link-to-your-photo.jpg",
+			"bio": "Your bio.",
+			"linkedin": "linked-in-ID",
+			"twitter": "twitter-handle"
+		}
+	]
+}

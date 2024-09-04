@@ -1,0 +1,60 @@
+{
+    "title": "S3 to Lambda to Rekognition",
+    "description": "Use Amazon Rekognition to index a face in a Rekognition faces collection.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This project demonstrates how to index a face in Amazon Rekognition faces collection.",
+        "Once a image with a headshot uploaded into S3 bucket, a Lambda function is triggered to index the face in the image in a Amazon Rekognition faces collection.",
+        "Image name is used as the ExternalImageId within the faces collection. This is implemented with CDK (Typescript)"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-rekognition-cdk",
+        "templateURL": "serverless-patterns/s3-lambda-rekognition-cdk",
+        "projectFolder": "s3-lambda-rekognition-cdk",
+        "templateFile": "s3-lambda-rekognition-cdk/s3-lambda-rekognition-cdk-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Rekognition",
+          "link": "https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html"
+        },
+        {
+          "text": "Amazon Rekognition Face Indexing",
+          "link": "https://docs.aws.amazon.com/rekognition/latest/dg/add-faces-to-collection-procedure.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy --all'"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destory --all</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Pubudu Jayawardana",
+        "image": "https://avatars.githubusercontent.com/u/1263087",
+        "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusiast.",
+        "linkedin": "pubudusj",
+        "twitter": "@pubudusj"
+      }
+    ]
+  }
+  

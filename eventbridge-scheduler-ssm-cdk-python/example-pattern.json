@@ -1,0 +1,55 @@
+{
+  "title": "Amazon EventBridge Scheduler to AWS Systems Manager State Manager Associations",
+  "description": "Create an EventBridge scheduler to run SSM Associations",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to create an EventBridge scheduler to run SSM Associations using AWS Cloud Development Kit (CDK) for Python."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduler-ssm-cdk-python",
+      "templateURL": "serverless-patterns/eventbridge-scheduler-ssm-cdk-python",
+      "projectFolder": "eventbridge-scheduler-ssm-cdk-python",
+      "templateFile": "eventbridge_scheduler_ssm_cdk_python/eventbridge_scheduler_ssm_cdk_python_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting Started with EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "AWS Systems Manager State Manager",
+        "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Eugene Kim",
+      "bio": "Eugene is a Sr. Solutions Architect at AWS and Serverless Enthusiast.",
+      "linkedin": "kimeugene"
+    }
+  ]
+}

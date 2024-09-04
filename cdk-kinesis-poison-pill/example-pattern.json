@@ -1,0 +1,52 @@
+{
+    "title": "Handling a Kinesis Data Stream Poison Pill with a Lambda Consumer",
+    "description": "Handling failure when consuming a Kinesis Data Stream can keep your iterator healthy and allow your consumer to retry attempts that are likely to recover or abandon messages that are inherentl bad",
+    "language": "Go",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates how to handle a Lambda consumer failure when reading from a Kinesis Data Stream with CDK.  Without proper handling of failure when working with Kinesis Data Streams, an iterator will get stuck and the only way for the data to clear the stream is for it to **Age Out** beyond the trim horizon.  By leveraging OnFailure triggers when using CDK's KinesisEventSource, Lambda consumers will be more resiliant, less wasteful and allow downstreawm consumers to get events in the most timely manner possible."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-kinesis-poison-pill",
+            "templateURL": "serverless-patterns/cdk-kinesis-poison-pill",
+            "projectFolder": "cdk-kinesis-poison-pill",
+            "templateFile": "lib/main-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS Using Lambda with Kinesis",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+            },
+            {
+                "text": "AWS Lambda Failure-Handling Features",
+                "link": "https://www.amazonaws.cn/en/new/2019/aws-lambda-supports-failure-handling-features-for-kinesis-and-dynamodb-event-sources/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": ["make deploy"]
+    },
+    "testing": {
+        "text": ["See the GitHub repo for detailed testing instructions."]
+    },
+    "cleanup": {
+        "text": ["make destroy"]
+    },
+    "authors": [
+        {
+            "headline": "Presented by Benjamen Pyle",
+            "name": "Benjamen Pyle",
+            "image": "https://www.binaryheap.com/wp-content/uploads/2023/02/cropped-Photo-on-1-26-23-at-8.57-AM-2.png",
+            "bio": "Benjamen Pyle is an AWS Community Builder who loves building scalable and useful applications with Serverless and Event Driven Architectures",
+            "linkedin": "benjamenpyle",
+            "twitter": "benjamenpyle"
+        }
+    ]
+}

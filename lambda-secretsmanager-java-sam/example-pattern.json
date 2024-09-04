@@ -1,0 +1,56 @@
+{
+  "title": "Lambda Secrets Manager using Java SDK",
+  "description": "Lambda function retrieving a secret from Secrets Manager using Java SDK.",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern stores a secret in Secrets Manager. A Lambda function uses AWS SDK for Java to read the secret in the init phase, outside the handler."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-secretsmanager-java-sam",
+      "templateURL": "serverless-patterns/lambda-secretsmanager-java-sam",
+      "projectFolder": "lambda-secretsmanager-java-sam",
+      "templateFile": "lambda-secretsmanager-java-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [{
+      "text": "Retrieve AWS Secrets Manager secrets in Java applications",
+      "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets_cache-java.html"
+    }]
+  },
+  "build": {
+      "text": [
+        "sam build"
+      ]
+    },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Paras Jain",
+      "image": "https://avatars.githubusercontent.com/u/583119?v=4",
+      "bio": "Paras is a Technical Account Manager with AWS based out of Herndon, Virginia, USA. He is a member of Serverless Technical Field community",
+      "linkedin": "parasjain01",
+      "twitter": "parasjain01"
+    }
+  ]
+}

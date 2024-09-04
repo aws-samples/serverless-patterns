@@ -1,0 +1,46 @@
+{
+  "title": "Fan-out pattern using SNS-SQS filters",
+  "description": "Creates SNS topic and Sqs queues with message body based and attribute based filter using configuration file (appSettings.json)",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application demonstrates how to create fan-out pattern using sns topic and sqs queues using subscription filters. ",
+      "Number of queues required and type of filter (Message attribute based or message body based) can be defined in appSettings.json (Sample json is provided, replace queue names and filter by conditions as needed)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-fanout-pattern-cdk-dotnet",
+      "projectFolder": "sns-sqs-fanout-pattern-cdk-dotnet",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-fanout-pattern-cdk-dotnet/README.md",
+      "templateURL": "serverless-patterns/sns-sqs-fanout-pattern-cdk-dotnet",
+      "templateFile": "src/Cdk/CdkStack.cs"
+    }
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vedanayagan Damodaran",
+      "image": "https://avatars.githubusercontent.com/u/55715043?v=4",
+      "bio": "Vedanayagan Damodaran is a Cloud Application Architect at Amazon Web Services.",
+      "linkedin": "vedanayagand"      
+    }
+  ]
+}

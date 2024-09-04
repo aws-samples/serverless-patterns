@@ -1,0 +1,57 @@
+{
+    "title": "Live Streaming on AWS for SRT/Zixi/RIST/RTP FEC input sources",
+    "description": "This pattern creates a live streaming stack leveraging AWS MediaConnect, AWS Elemental MediaLive and MediaPackage for SRT/Zixi/RIST/RTP FEC input sources.",
+    "language": "typescript",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "The solution configures AWS Elemental MediaLive with one of three encoding profiles: HD-1080p, HD-720p and SD-540p.",
+        "AWS Elemental MediaPackage ingests the MediaLive Output and package the Live stream into HLS,DASH and CMAF."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/elemental-mediaconnect-medialive-mediapackage-cdk-ts",
+        "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/elemental-mediaconnect-medialive-mediapackage-cdk-ts/README.md"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Live Streaming on AWS with Amazon S3",
+          "link": "https://github.com/aws-solutions/live-streaming-on-aws-with-amazon-s3"
+        },
+        {
+          "text": "Live Streaming on AWS",
+          "link": "https://github.com/aws-solutions/live-stream-on-aws"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "cdk destroy"
+      ]
+    },
+    "authors": [
+      {
+        "headline": "Presented by Corneliu Croitoru, Prototyping Architect",
+        "name": "Corneliu Croitoru",
+        "image": "https://serverlessland.com/assets/images/resources/contributors/ext-corneliu-croitoru.jpg",
+        "bio": "Developer at heart, in 2018 joined AWS as a Solution Architect and in 2021 joined EMEA Prototyping Team. Now he is building, jointly with customers, the most exciting and innovative prototypes on AWS. Specialized on Serverless/Edge Services/Media Streaming.",
+        "linkedin": "corneliucroitoru",
+        "twitter": "@cornel_croi"
+      }
+    ]
+  }

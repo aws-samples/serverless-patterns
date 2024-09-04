@@ -1,0 +1,46 @@
+{
+  "title": "API Gateway to Step Functions",
+  "description": "Create an API Gateway HTTP APIs endpoint that starts a Step Functions synchronous Express Workflow.",
+  "language": ".NET",
+  "architectureURL": "",
+  "videoId": "",
+  "level":"300",
+  "framework": "CDK",
+  "services": {
+    "from": "apigw",
+    "to": "sfn"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern explains how to deploy a CDK application with Amazon API Gateway that invokes a syncronous Step Functions workflow."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn-cdk",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn-cdk/README.md"
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [    
+    ]
+  },
+  "author": {
+    "headline": "Presented by James Eastham, Cloud Infrastructure Architect",
+    "name": "James Eastham",
+    "twitter": "plantpowerjames"
+  }
+}

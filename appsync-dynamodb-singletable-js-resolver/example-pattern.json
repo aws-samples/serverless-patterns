@@ -1,0 +1,62 @@
+{
+  "title": "AppSync to DynamoDB using JS Resolvers",
+  "description": "Use AppSync JS Resolvers to query a DynamoDB table using single table design.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project creates an AppSync API with a schema and a javascript pipeline resolver to query a DynamoDB table following a single table design model.",
+      "Using JS pipeline resolvers can help you easily transform your query to retrieve nested records in your DynamoDB table in a single API call."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-dynamodb-singletable-js-resolver",
+      "templateURL": "serverless-patterns/appsync-dynamodb-singletable-js-resolver",
+      "projectFolder": "appsync-dynamodb-singletable-js-resolver",
+      "templateFile": "appsync-dynamodb-singletable-js-resolver/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Appsync",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "AWS AppSync - JS Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-overview-js.html"
+      },
+      {
+        "text": "AWS AppSync - SAM Appsync Abstraction",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-graphqlapi.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alexis Philippart de Foy",
+      "image": "https://media.licdn.com/dms/image/C4D03AQFyN5GLrFk-0g/profile-displayphoto-shrink_800_800/0/1586853008031?e=1693440000&v=beta&t=0BtjX92oZxhHUrrIzh55wah8V1OiwOAOyigPtfAcZdo",
+      "bio": " I am a Startup Solutions Architect, Serverless Enthusiast and former startup founder.",
+      "linkedin": "apdf",
+      "twitter": "@aphilippartd"
+    }
+  ]
+}

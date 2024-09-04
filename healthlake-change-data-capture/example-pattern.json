@@ -1,0 +1,60 @@
+{
+    "title": "Using AWS HealthLake as an Event Producer (CDC)",
+    "description": "AWS HealthLake is fantastic datastore when working with Healthcare data, especially data that is Patient centric.  It comes with a robust API, many integrations to other AWS services and is purely hands-off (serverless).",
+    "language": "Go",
+    "level": "400",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "When using this pattern, AWS HealthLake becomes not only a consumer of data but also a producer. By adding this capability to HealthLake, it can be put in the center of a modern distributed Healthcare application and serve as an ingress and egress point.  When changes occur in HealthLake, they are read, hydrated and then published onto an EventBridge Custom Bus.  Once on the Bus, many Rules can be added to extend to any number of consumers needed."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/healthlake-change-data-capture",
+            "templateURL": "serverless-patterns/healthlake-change-data-capture",
+            "projectFolder": "healthlake-change-data-capture",
+            "templateFile": "lib/main-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS HealthLake",
+                "link": "https://aws.amazon.com/healthlake/"
+            },
+            {
+                "text": "AWS EventBridge CDK Documentation",
+                "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_events-readme.html"
+            },
+            {
+                "text": "AWS CloudTrail",
+                "link": "https://aws.amazon.com/cloudtrail/"
+            },
+            {
+                "text": "Golang Lambda",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": ["make deploy"]
+    },
+    "testing": {
+        "text": ["See the GitHub repo for detailed testing instructions."]
+    },
+    "cleanup": {
+        "text": ["make destroy"]
+    },
+    "authors": [
+        {
+            "headline": "Presented by Benjamen Pyle",
+            "name": "Benjamen Pyle",
+            "image": "https://www.binaryheap.com/wp-content/uploads/2023/02/cropped-Photo-on-1-26-23-at-8.57-AM-2.png",
+            "bio": "Benjamen Pyle is an AWS Community Builder who loves building scalable and useful applications with Serverless and Event Driven Architectures",
+            "linkedin": "benjamenpyle",
+            "twitter": "benjamenpyle"
+        }
+    ]
+}

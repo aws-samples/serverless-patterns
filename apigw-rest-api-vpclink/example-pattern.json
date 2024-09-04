@@ -1,0 +1,55 @@
+{
+    "title": "Amazon API Gateway with a VPC Link integration",
+    "description": "Create a REST API Gateway with a VPC Link integration",
+    "language": "",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern deploys an Amazon API Gateway REST API endpoint with a VPC Link integration.",
+        "Since REST APIs only support VPC Links associated with NLBs (Network Load Balancers), this pattern assumes that an internal NLB already exists in a VPC in the same Region."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-vpclink",
+        "templateURL": "serverless-patterns/apigw-rest-api-vpclink",
+        "projectFolder": "apigw-rest-api-vpclink",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "REST API with VPC Link integration",
+          "link": "https://docs.amazonaws.cn/en_us/apigateway/latest/developerguide/getting-started-with-private-integration.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "Deploy the stack: <code>sam deploy</code>."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "headline": "Presented by Albert Blaya, Solutions Architect",
+        "name": "Albert Blaya",
+        "image": "https://media-exp1.licdn.com/dms/image/C5603AQEw2HXx9zs7yg/profile-displayphoto-shrink_200_200/0/1600474292127?e=1655942400&v=beta&t=SbeIn9psV0BIFkbROTDRIfPMKMtyrrgBdgt0tRHY0BY",
+        "bio": "Albert is a Solutions Architect at Amazon Web Services based in Australia.",
+        "linkedin": "albertblaya"
+      }
+    ]
+  }
+  

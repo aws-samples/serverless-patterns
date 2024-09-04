@@ -1,0 +1,47 @@
+{
+	"title": "Lambda to SNS to SQS to Lambda",
+	"description": "Creates one Lambda function that sends a message to an SNS topic. That topic sends the message to a SQS queue and finally another Lambda picks the message.",
+	"language": "Typescript",
+	"level": "200",
+	"framework": "CDK",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This sample project demonstrates how to create a SNS + SQS system, in which all the messages sent by a publisher are sent to all the consumers, and there is a buffer between the message producer and the consumer. In this way the consumers don't get overload with messages. "
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-sqs-lambda-cdk",
+			"templateURL": "serverless-patterns/sns-sqs-lambda-cdk",
+			"projectFolder": "sns-sqs-lambda-cdk",
+			"templateFile": "src/lib/sns-sqs-lambda-cdk.ts"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "AWS SNS",
+				"link": "https://aws.amazon.com/sns/"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["cdk deploy"]
+	},
+	"testing": {
+		"text": ["See the GitHub repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>cdk delete</code>."]
+	},
+	"authors": [
+		{
+			"name": "Marcia Villalba",
+			"image": "link-to-your-photo.jpg",
+			"bio": "Your bio.",
+			"linkedin": "linked-in-ID",
+			"twitter": "twitter-handle"
+		}
+	]
+}

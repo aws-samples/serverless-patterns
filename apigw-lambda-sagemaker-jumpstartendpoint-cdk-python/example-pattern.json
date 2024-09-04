@@ -1,0 +1,58 @@
+{
+  "title": "Accessing Amazon SageMaker Endpoint via API Gateway and Lambda",
+  "description": "This pattern deploys a SageMaker Jumpstart model (Flan T5 XL) endpoint. It also uses a Lambda function and API Gateway to integrate the endpoint",
+  "language": "Python",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Amazon SageMaker Jumpstart model (Flan T5 XL from HuggingFace) endpoint using Amazon SageMaker. The model can be changed by modifying the MODEL_ID attribute in app.py file.",
+      "The pattern also adds a Lambda function with API Gateway integration to query the endpoint.",
+      "The API Gateway is protected using an API Key. To query the API Gateway endpoint, x-api-key header needs to be added to the HTTP request."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-sagemaker-jumpstartendpoint-cdk-python",
+      "templateURL": "serverless-patterns/apigw-lambda-sagemaker-jumpstartendpoint-cdk-python",
+      "projectFolder": "apigw-lambda-sagemaker-jumpstartendpoint-cdk-python",
+      "templateFile": "stack/ApigwLambdaSagemakerJumpstartendpointStack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Zero-shot prompting for the Flan-T5 foundation model in Amazon SageMaker JumpStart",
+        "link": "https://aws.amazon.com/blogs/machine-learning/zero-shot-prompting-for-the-flan-t5-foundation-model-in-amazon-sagemaker-jumpstart/"
+      },
+      {
+        "text": "Instruction fine-tuning for FLAN T5 XL with Amazon SageMaker Jumpstart",
+        "link": "https://aws.amazon.com/blogs/machine-learning/instruction-fine-tuning-for-flan-t5-xl-with-amazon-sagemaker-jumpstart/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kaustav Dey",
+      "image": "https://avatars.githubusercontent.com/u/13236519",
+      "bio": "Solution Architect at AWS",
+      "linkedin": "https://www.linkedin.com/in/kaustavbecs/"
+    }
+  ]
+}

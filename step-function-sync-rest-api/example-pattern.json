@@ -1,0 +1,53 @@
+{
+    "title": "Integrate Express State Machine with Rest API using StartSyncExecution API call",
+    "description": "Using mapping template and StartSyncExecution API call, integrating Express State Machine with Rest API",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to Integrate Express State Machine with Rest API"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/step-function-sync-rest-api",
+        "templateURL": "serverless-patterns/step-function-sync-rest-api",
+        "projectFolder": "step-function-sync-rest-api",
+        "templateFile": "step-function-sync-rest-api/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Creating a Step Functions API Using API Gateway",
+          "link": "https://docs.aws.amazon.com/step-functions/latest/dg/tutorial-api-gateway.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Himanshu Goyal",
+        "image": "https://drive.google.com/file/d/1huHQQHRlYQ3gxrJob9pXlwE5zv5CI996/view?usp=drivesdk",
+        "bio": "A Serverless Cloud Engineer and technical writer, working towards building efficient and scalable solutions using AWS services.",
+        "linkedin": "https://www.linkedin.com/in/himanshugoyal20"
+      }
+    ]
+  }
+  

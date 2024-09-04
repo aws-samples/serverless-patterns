@@ -1,0 +1,50 @@
+{
+    "title": "Live Streaming content at scale using Amazon CloudFront",
+    "description": "This pattern demonstrates how to create MediaPackage custom endpoints as the Origins for a CloudFront distribution to enable the live stream content to be delivered globally and at scale.",
+    "language": "typescript",
+    "level": "300",
+    "framework": "CDK",
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/elemental-mediapackage-cloudfront-cdk-ts",
+        "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/elemental-mediapackage-cloudfront-cdk-ts/README.md"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Live Streaming on AWS with Amazon S3",
+          "link": "https://github.com/aws-solutions/live-streaming-on-aws-with-amazon-s3"
+        },
+        {
+          "text": "Live Streaming on AWS",
+          "link": "https://github.com/aws-solutions/live-stream-on-aws"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "cdk destroy"
+      ]
+    },
+    "authors": [
+      {
+        "headline": "Presented by Corneliu Croitoru, Prototyping Architect",
+        "name": "Corneliu Croitoru",
+        "image": "https://serverlessland.com/assets/images/resources/contributors/ext-corneliu-croitoru.jpg",
+        "bio": "Developer at heart, in 2018 joined AWS as a Solution Architect and in 2021 joined EMEA Prototyping Team. Now he is building, jointly with customers, the most exciting and innovative prototypes on AWS. Specialized on Serverless/Edge Services/Media Streaming",
+        "linkedin": "corneliucroitoru",
+        "twitter": "@cornel_croi"
+      }
+    ]
+  }

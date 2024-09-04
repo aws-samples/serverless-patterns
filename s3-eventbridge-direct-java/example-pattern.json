@@ -1,0 +1,60 @@
+{
+  "title": "S3 to EventBridge",
+  "description": "Creates an S3 bucket that publishes events to EventBridge.",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys an S3 bucket that publishes events to Amazon EventBridge, and sets up a Lambda function to show how to consume these events via an EventBridge rule. It deploys the the IAM resources required to run the application.",
+      "EventBridge consumes events directly from S3 buckets when the NoticationConfiguration is enabled, as shown in the template."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-direct-java",
+      "templateURL": "serverless-patterns/s3-eventbridge-direct-java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "James Beswick",
+      "image": "https://serverlessland.com/assets/images/resources/jbes.jpg",
+      "bio": "I am a self-confessed serverless geek and enjoy helping developers build faster with serverless! I have been software developer and product manager before becoming a Developer Advocate. Ask me anything!",
+      "linkedin": "jamesbeswick",
+      "twitter": "@jbesw"
+    },
+    {
+      "name": "Steven Cook",
+      "bio": "Senior Solutions Architect at AWS."
+    }
+  ]
+}

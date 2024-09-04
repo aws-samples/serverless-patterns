@@ -1,0 +1,57 @@
+{
+  "title": "AWS WAF attached to Amazon API Gateway REST API",
+  "description": "Creates an Amazon API Gateway with a WebACL attached to control access. This WebACL limits the requests to certain countries.",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use AWS WAF to add extra security to an Amazon API Gateway REST API. In this example, only requests from the US will be accepted. All others will be rejected with a 403. To add another country add the country code to the 'CountryCode' array starting on line 32."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/waf-apigw-rest",
+      "templateURL": "serverless-patterns/waf-apigw-rest",
+      "projectFolder": "waf-apigw-rest",
+      "templateFile": "waf-apigw-rest/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS WAF",
+        "link": "https://aws.amazon.com/waf/"
+      },
+      {
+        "text": "Building rules",
+        "link": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rules.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Eric Johnson",
+      "image": "https://serverlessland.com/assets/images/resources/ericdj.jpg",
+      "bio": "Eric Johnson is a Principal Developer Advocate for Serverless Applications at Amazon Web Services and is based in Northern Colorado. Eric is a fanatic about serverless and enjoys helping developers understand how serverless technologies introduces a major paradigm shift in how they approach building and running applications at massive scale with minimal administration overhead. Prior to this, Eric has worked as a developer, solutions architect and AWS Evangelist for an AWS partner company.",
+      "linkedin": "singledigit",
+      "twitter": "edjgeek"
+    }
+  ]
+}
