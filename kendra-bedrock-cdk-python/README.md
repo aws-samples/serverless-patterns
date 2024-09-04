@@ -1,4 +1,4 @@
-# AWS Lambda to Amazon Kendra to Amazon Bedrock
+# AWS Lambda from Amazon Kendra to Amazon Bedrock
 
 This pattern contains a sample stack that utilizes an AWS Lambda function to retrieve documents from an Amazon Kendra index and then pass it to Amazon Bedrock to generate a response. The pattern includes usage of the Amazon S3 data source connector. 
 
