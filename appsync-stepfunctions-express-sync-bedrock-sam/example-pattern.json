@@ -1,6 +1,6 @@
 {
-  "title": "Prompt Chaining with AWS AppSync, AWS Step Functions and Amazon Bedrock.",
-  "description":  "Prompt Chaining no-code example with AWS AppSync, AWS Step Functions and Amazon Bedrock.",
+  "title": "Prompt chaining with AWS AppSync, AWS Step Functions and Amazon Bedrock.",
+  "description":  "Prompt chaining no-code example with AWS AppSync, AWS Step Functions and Amazon Bedrock.",
   "language": "",
   "level": "200",
   "framework": "SAM",
@@ -21,7 +21,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-stepfunctions-express-sync-bedrock-sam",
       "templateURL": "serverless-patterns/appsync-stepfunctions-express-sync-bedrock-sam",
       "projectFolder": "appsync-stepfunctions-express-sync-bedrock-sam",
-      "templateFile": "template.yml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
