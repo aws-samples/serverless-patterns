@@ -11,24 +11,41 @@ Globals:
     Timeout: 10
     Runtime: dotnet6
 
+Parameters:
+  SourceBucketName:
+    Type: String
+    # Pass your bucket name dynamically or change it here
+    Default: my-source-bucket-name
+  DestinationBucketName:
+    Type: String
+    # Pass your bucket name dynamically or change it here
+    Default: my-destination-bucket-name
+
 Resources:
-  ## Source S3 bucket
   SourceBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "imageresizer-source-${AWS::AccountId}"
-  ## Destination S3 bucket
+      BucketName: !Ref SourceBucketName
+
   DestinationBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "imageresizer-destination-${AWS::AccountId}"
+      BucketName: !Ref DestinationBucketName
 
   ResizerFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ImageResize/
       Handler: ImageResize::ImageResize.Function::FunctionHandler
       MemorySize: 2048
+      Environment:
+        Variables:
+          DESTINATION_BUCKET_NAME: !Ref DestinationBucketName
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref SourceBucketName
+        - S3CrudPolicy:
+            BucketName: !Ref DestinationBucketName
       Events:
         FileUpload:
           Type: S3
@@ -38,32 +55,16 @@ Resources:
             Filter:
               S3Key:
                 Rules:
-                  - Name: prefix
-                    Value: 'images/'
                   - Name: suffix
                     Value: '.jpeg'
-        Environment:
-          Variables:
-            SOURCE_BUCKET: !Ref SourceBucket
-            DESTINATION_BUCKET: !Ref DestinationBucket
-      Policies:
-        - Statement:
-            - Effect: Allow
-              Action:
-                - s3:GetObject
-              Resource: !Sub arn:aws:s3:::imageresizer-source-${AWS::AccountId}/*
-            - Effect: Allow
-              Action:
-                - s3:PutObject
-              Resource: !Sub arn:aws:s3:::imageresizer-destination-${AWS::AccountId}/*
 
 Outputs:
   SourceBucketName:
-    Value: !Ref SourceBucket
-    Description: S3 Source Bucket for incoming images
-   DestinationBucketName:
-    Value: !Ref DestinationBucket
-    Description: S3 Destination Bucket for resized images
+    Value: !Ref SourceBucketName
+    Description: S3 Bucket for object storage
+  DestinationBucketName:
+    Value: !Ref DestinationBucketName
+    Description: S3 destination Bucket for object storage
   FunctionArn:
     Value: !Ref ResizerFunction
     Description: ResizerFunction function Arn
