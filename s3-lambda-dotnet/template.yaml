@@ -12,11 +12,16 @@ Globals:
     Runtime: dotnet6
 
 Resources:
-  ## S3 bucket
+  ## Source S3 bucket
   SourceBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "imageresizer-${AWS::AccountId}"
+      BucketName: !Sub "imageresizer-source-${AWS::AccountId}"
+  ## Destination S3 bucket
+  DestinationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "imageresizer-destination-${AWS::AccountId}"
 
   ResizerFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -37,21 +42,28 @@ Resources:
                     Value: 'images/'
                   - Name: suffix
                     Value: '.jpeg'
+        Environment:
+          Variables:
+            SOURCE_BUCKET: !Ref SourceBucket
+            DESTINATION_BUCKET: !Ref DestinationBucket
       Policies:
         - Statement:
             - Effect: Allow
               Action:
                 - s3:GetObject
-              Resource: !Sub arn:aws:s3:::imageresizer-${AWS::AccountId}/*
+              Resource: !Sub arn:aws:s3:::imageresizer-source-${AWS::AccountId}/*
             - Effect: Allow
               Action:
                 - s3:PutObject
-              Resource: !Sub arn:aws:s3:::imageresizer-${AWS::AccountId}/*
+              Resource: !Sub arn:aws:s3:::imageresizer-destination-${AWS::AccountId}/*
 
 Outputs:
   SourceBucketName:
     Value: !Ref SourceBucket
-    Description: S3 Bucket for object storage
+    Description: S3 Source Bucket for incoming images
+   DestinationBucketName:
+    Value: !Ref DestinationBucket
+    Description: S3 Destination Bucket for resized images
   FunctionArn:
     Value: !Ref ResizerFunction
-    Description: ResizerFunction function  Arn
+    Description: ResizerFunction function Arn
