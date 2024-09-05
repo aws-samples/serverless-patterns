@@ -1,6 +1,6 @@
-# Amazon CloudWatch Mertics Streaming to Amazon Kinesis Firehose with Terraform
+# Amazon CloudWatch Mertics Streaming to Amazon Data Firehose with Terraform
 
-This pattern demonstrates how to create the Amazon CloudWatch Metric Streams to Amazon Kinesis Firehose. Metrics are saved to S3 from Amazon Kinesis Firehose. Metric selection is also demonstrated to stream only certain metrics related to certain AWS services to be sent from Cloudwatch to Firehose.
+This pattern demonstrates how to create the Amazon CloudWatch Metric Streams to Amazon Data Firehose. Metrics are saved to S3 from Amazon Data Firehose. Metric selection is also demonstrated to stream only certain metrics related to certain AWS services to be sent from Cloudwatch to Amazon Data Firehose.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cloudwatch-metric-streams-firehose-terraform
 
@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 
 ## How it works
-When AWS services are provisioned, the listed metrics(in the IaC) will be captured and streamed to Kinesis Firehose. The destination in this case is a S3 bucket, where the metrics are saved. The code is configured to eu-west-2, but can be changed to any desired region.
+When AWS services are provisioned, the listed metrics(in the IaC) will be captured and streamed to Amazon Data Firehose. The destination in this case is a S3 bucket, where the metrics are saved. The code is configured to eu-west-2, but can be changed to any desired region.
 
 ![pattern](Images/pattern.png)
 

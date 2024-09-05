@@ -112,7 +112,7 @@ resource "aws_s3_bucket" "metric_stream" {
   force_destroy = true
 }
 
-# Create the Kinesis Firehose instance
+# Create the Amazon Data Firehose instance
 resource "aws_kinesis_firehose_delivery_stream" "metrics" {
   name        = "test_streams"
   destination = "extended_s3"
