@@ -38,11 +38,19 @@ source .venv/bin/activate
 ```
 python -m pip install -r requirements.txt
 ```
-7. To generate a cloudformation templates (optional)
+7. Install jwt package for Lambda:
+```
+cd src; pip install pyjwt --target . 
+```
+8. Zip the Lambda function and dependencies 
+```
+zip -r lambda.zip .
+```
+9. To generate a cloudformation templates (optional)
 ```
 cdk synth
 ```
-8. To deploy AWS resources as a CDK project
+10. To deploy AWS resources as a CDK project
 ```
 cdk deploy 
 ```

@@ -1,6 +1,6 @@
 {
   "title": "API Gateway direct integration to DynamoDB",
-  "description": "Create direct integration with API Gateway to DynamoDB showcasing transformation of request/response using VTL and CDK and implement examples for using Cognito, Lambda authorizer and API keys.",
+  "description": "Direct integration with API Gateway to DynamoDB with transformation using VTL and CDK and examples for Cognito, Lambda authorizer and API keys.",
   "language": "Python",
   "level": "300",
   "framework": "CDK",
