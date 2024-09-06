@@ -1,4 +1,4 @@
-# Internal static website hosting using Amazon Route53, ALB and S3
+# Internal static website hosting using Amazon Route53, Application Load Balancer and Amazon S3
 
 This pattern deploys a framework to host an internal static website on Amazon S3 bucket that can only be accessed from private network. 
 
@@ -41,7 +41,7 @@ Please refer to the architecture diagram below:
 
 ![End to End Architecture](architecture.png)
 
-This template deploys Amazon Route53, Application Load Balancer (ALB), VPC Endpoint and Amazon S3. The private website URL will be exposed via Route 53 private hosted zone. This URL is accessible from within VPC.
+This template deploys a Route53 hosted zone, an Application Load Balancer (ALB), a VPC Endpoint and a S3 bucket. The private website URL will be exposed via the Route 53 private hosted zone. This URL is accessible from within the VPC.
 
 ## Testing
 
@@ -63,7 +63,7 @@ This template deploys Amazon Route53, Application Load Balancer (ALB), VPC Endpo
 
 ## Cleanup
  
-1. Delete the contents of the S3 bucket.
+1. Delete the contents of the S3 bucket. Make sure to use the correct bucket name.
     ```bash
     aws s3 rm s3://{WebsiteBucket} --recursive
     ```

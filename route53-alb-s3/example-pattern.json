@@ -1,14 +1,14 @@
 {
-  "title": "Internal static website hosting using Amazon Route53, ALB and S3",
-  "description": "This pattern deploys a framework to host a internal static website on Amazon S3 bucket that can only be accessed from private network.",
-  "language": "SAM",
+  "title": "Internal static website hosting using Amazon Route53, ALB and Amazon S3",
+  "description": "This pattern hosts an internal static website on an Amazon S3 bucket that can only be accessed from private network.",
+  "language": "YAML",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This template deploys Amazon Route53, Application Load Balancer (ALB), VPC Endpoint and Amazon S3.",
-      "The private website URL will be exposed via Route 53 private hosted zone. This URL is accessible from within VPC."
+      "This template deploys a Route53 hosted zone, an Application Load Balancer (ALB), a VPC Endpoint and a S3 bucket.",
+      "The private website URL will be exposed via the Route 53 private hosted zone. This URL is accessible from within the VPC."
     ]
   },
   "gitHub": {
