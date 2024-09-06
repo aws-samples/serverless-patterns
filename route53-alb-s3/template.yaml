@@ -380,7 +380,4 @@ Outputs:
     Value: !Ref ALBSecurityGroup
   VPCEndpointSecurityGroup:
     Description: The Security Group ID for the VPC Endpoint
-    Value: !Ref VPCEndpointSecurityGroup  
-
-
-
+    Value: !Ref VPCEndpointSecurityGroup

@@ -53,8 +53,12 @@ This template deploys Amazon Route53, Application Load Balancer (ALB), VPC Endpo
 
 2. From the CloudShell command prompt run the following command to access your private website. Replace `{PrivateWebsiteUrl}` with the corresponding output value of the `sam deploy` command:
     ```
-    curl -v -k -L {PrivateWebsiteUrl}   
+    curl -k -L {PrivateWebsiteUrl}   
     ```
+   - The `curl` command makes an HTTP GET request to the deployed private website.
+     - `-k` option allows curl to ignore that the certificate is issued by a private certificate authority and proceed with making the invocation. 
+     - `-L` option tells curl to follow any HTTP redirects that the server sends. If the server responds with a 3xx HTTP status code and provides a new URL, curl will automatically issue a new request to the new URL.
+
 3. You can also test by spinning up an EC2 instance within the same VPC or from another location that has private connectivity to the VPC. However, if you try to access the URL from outside network, it will not be reachable.
 
 ## Cleanup
