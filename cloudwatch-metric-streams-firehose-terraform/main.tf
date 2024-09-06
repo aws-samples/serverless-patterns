@@ -104,7 +104,7 @@ EOF
 
 # Create the S3 bucket to hold the metrics
 resource "aws_s3_bucket" "metric_stream" {
-  bucket = "test-streams-${data.aws_caller_identity.current.account_id}"
+  bucket = "test-streams-${data.aws_caller_identity.current.account_id}-${var.region}"
 
   tags = var.tags
 

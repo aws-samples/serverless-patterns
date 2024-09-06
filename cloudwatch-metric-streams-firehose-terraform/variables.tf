@@ -21,7 +21,7 @@ variable "s3_compression_format" {
 
 variable "output_format" {
   type        = string
-  default     = "opentelemetry0.7"
+  default     = "json"
   description = "Output format of metrics. You should probably not modify this value; the default format is supported, but others may not be."
 
   validation {
