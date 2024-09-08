@@ -1,0 +1,82 @@
+{
+  "title": "appsync-notify-subscribers-of-database-updates",
+  "description": "Asynchronous updates via WebSockets with AWS AppSync and GraphQL",
+  "language": "Node.js",
+  "architectureURL": "",
+  "videoId": "",
+  "level":"100",
+  "framework": "SAM",
+  "services": {
+    "from": "eventbridge",
+    "to": "appsync"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a EventBridge, AppSync. We have described how to use Amazon EventBridge to simplify publishing out-of-band database updates to AppSync subscribers. By using EventBridge rules and input transformers, we created a GraphQL mutation payload that was sent to AppSync using an API destination without the need to write a Lambda function or specific code that would need to be maintained.",
+      "With AppSync and EventBridge, you can seamlessly push data changes and events from your cloud backend all the way to thousands of connected front-end web and mobile clients with built-in WebSockets connection management leveraging flexible serverless technologies that scale automatically according to demand.(c)"
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy -g --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "",
+      "templateURL": "",
+      "readmeURL": ""
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "How do I notify AWS AppSync subscribers of external database updates that aren't performed by client-side mutations?(article)",
+        "link": "https://aws.amazon.com/premiumsupport/knowledge-center/appsync-notify-subscribers-real-time/"
+      },
+      {
+        "text": "How do I notify AWS AppSync subscribers of external database updates that aren't performed by client-side mutations?(video)",
+        "link": "https://www.youtube.com/watch?v=KrmFAcucjzQ"
+      },
+      {
+        "text": "Simplify out of band AWS AppSync real-time subscriptions with Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/mobile/appsync-eventbridge/"
+      },
+      {
+        "text": "Using multiple authorization types with AWS AppSync GraphQL APIs",
+        "link": "https://aws.amazon.com/blogs/mobile/using-multiple-authorization-types-with-aws-appsync-graphql-apis/"
+      },
+      {
+        "text": "Amazon Cognito to Amazon API Gateway HTTP APIs (JWT)",
+        "link": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-httpapi"
+      },
+      {
+        "text": "Create an AWS AppSync API using SAM - SnappyFeatures #3",
+        "link": "https://www.youtube.com/watch?v=J0qfMYRmQcc"
+      },
+      {
+        "text": "AWS Well-Architected Framework/Performance Efficiency Pillar/Serverless Event Submission with Status Updates/Asynchronous updates via WebSockets with AWS AppSync and GraphQL",
+        "link": "https://docs.aws.amazon.com/wellarchitected/latest/serverless-applications-lens/serverless-event-submission-with-status-updates.html"
+      },
+      {
+        "text": "Filtering GraphQL Subscriptions with Arguments with AWS Amplify & AWS AppSync",
+        "link": "https://www.youtube.com/watch?v=CeeoFqE2OU0&t=335s"
+      }
+    ]
+  },
+  "author": {
+    "headline": "Presented by Andrii Sorochan, Developer",
+    "name": "Andrii Sorochan",
+    "imageURL": "https://avatars.githubusercontent.com/u/14042193?s=400&u=2235702adbb77bb75e67ecbc850a17863eca3687&v=4",
+    "twitter": "s_andriy_",
+    "bio": "Andrii is Developer from Ukraine"
+  }
+}

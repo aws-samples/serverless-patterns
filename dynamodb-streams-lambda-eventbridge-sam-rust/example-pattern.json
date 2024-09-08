@@ -1,0 +1,62 @@
+{
+  "title": "Amazon Dynamodb Streams to AWS Lambda to Amazon EventBridge",
+  "description": "TThe AWS SAM template deploys a Lambda function, a DynamoDB table and an Amazon EventBridge bus, and the minimum IAM resources required to run the application.",
+  "language": "Rust",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The changes are sent to a stream when items are written in a DynamoDB table. This pattern configures a Lambda function to poll this stream. The function is invoked with a payload containing the table item that has been inserted. The Lambda will then emit an event to Amazon EventBridge."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-streams-lambda-eventbridge-sam-rust",
+      "templateURL": "serverless-patterns/dynamodb-streams-lambda-eventbridge-sam-rust",
+      "projectFolder": "dynamodb-streams-lambda-eventbridge-sam-rust",
+      "templateFile": "dynamodb-streams-lambda-eventbridge-sam-rust/template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon DynamoDB Streams",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/streamsmain.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>make delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "headline": "Presented by Daniele Frasca",
+      "name": "Daniele Frasca",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "linkedin": "daniele-frasca",
+      "twitter": "dfrasca80"
+    }
+  ]
+}

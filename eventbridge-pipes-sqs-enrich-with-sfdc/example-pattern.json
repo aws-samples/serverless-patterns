@@ -1,0 +1,65 @@
+{
+  "title": "Enrich SQS message data with EventBridge Pipes using Salesforce via API Destination",
+  "description": "This pattern shows how to use EventBridge Pipes to enrich SQS message data using Salesforce via API destination and then send response to Pipe target.",
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The sample project demonstrates how to use Amazon EventBridge Pipes to enrich data using Salesforce via API destination before sending it to the target. The pattern uses SQS message as a source to EventBridge Pipe, Pipe enriches the data by calling the Salesforce API via an API destination using input from the SQS message. Pipe extracts data from SQS message and sends it as path parameter(s) to API. Response from API is sent to an EventBridge Pipe target of Amazon CloudWatch logs."
+    ]
+  },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-enrich-with-sfdc",
+        "templateURL": "serverless-patterns/eventbridge-pipes-sqs-enrich-with-sfdc",
+        "projectFolder": "eventbridge-pipes-sqs-enrich-with-sfdc",
+        "templateFile": "template.yaml"
+      }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rohan Mehta",
+      "image": "https://phonetool.amazon.com/users/merohan",
+      "bio": "Cloud Application Architect at AWS",
+      "linkedin": "https://www.linkedin.com/in/rohan-mehta-dev/",
+      "twitter": "@rohanmehta_dev"
+    }
+  ]
+}

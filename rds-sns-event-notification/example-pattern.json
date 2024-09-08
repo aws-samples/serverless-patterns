@@ -1,0 +1,51 @@
+{
+	"title": "RDS Instance Event Subscription for Failure, Low Storage and Availability Events",
+	"description": "RDS Event Subscriptions allow users to configure notifications for RDS Events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances.",
+	"language": "Python",
+	"level": "200",
+	"framework": "SAM",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"RDS Event Subscriptions allow users to configure notifications for RDS Events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rds-sns-event-notification",
+			"templateURL": "serverless-patterns/rds-sns-event-notification",
+			"projectFolder": "rds-sns-event-notification",
+			"templateFile": "rds-sns-event-notification/template.yaml"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "Working with Amazon RDS event notification",
+				"link": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Events.html"
+			},
+			{
+				"text": "Creating an Amazon RDS DB instance",
+				"link": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html#USER_CreateDBInstance.Creating"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["sam deploy"]
+	},
+	"testing": {
+		"text": ["See the GitHub repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>sam delete</code>."]
+	},
+	"authors": [
+		{
+			"name": "Jainam Shah",
+			"image": "https://drive.google.com/file/d/19NrbeT5LdQRAqnOGdEXsPZKvWph3Ba8U/view?usp=sharing",
+			"bio": "Technical Account Manager @ AWS",
+			"linkedin": "https://www.linkedin.com/in/jainamshah92",
+			"twitter": "@imJshah92"
+		}
+	]
+}

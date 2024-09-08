@@ -1,0 +1,64 @@
+{
+    "title": "DynamoDB Stream to SQS queue using EventBridge Pipes with CDK Python",
+    "description": "Simple pattern that sends events from DynamoDB Stream to SQS using EventBridge Pipes. Implemented with CDK using Python. ",
+    "language": "Python",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "Whenever there is an change in a item of the DynamoDB table, a message about the change and item will be available in DynamoDB Stream.",
+        "EventBridge Pipe polls these messages in DynamoDB stream. When the messages are available, Pipe first filter them based on the filter criteria provided. Then, the matched messages are sent to the target SQS."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-dynamodbstream-to-sqs-cdk-python",
+        "templateURL": "serverless-patterns/eventbridge-pipes-dynamodbstream-to-sqs-cdk-python",
+        "projectFolder": "eventbridge-pipes-dynamodbstream-to-sqs-cdk-python",
+        "templateFile": "eventbridge-pipes-dynamodbstream-to-sqs-cdk-python/eventbridge_pipes_dynamodbstream_to_sqs_cdk_python_stack.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "EventBridge Pipes Documentation",
+          "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+        },
+        {
+          "text": "Cloudformation API for Pipes",
+          "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+        },
+        {
+          "text": "Pipes Documentation for CDK v2 Python",
+          "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_pipes/CfnPipe.html"
+        },
+        {
+          "text": "Video explaining EventBridge Pipes",
+          "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+        },
+        {
+          "text": "Learn more about event-driven architecture",
+          "link": "https://serverlessland.com/event-driven-architecture"
+        }
+      ]
+    },
+    "deploy": {
+      "text": ["cdk deploy"]
+    },
+    "testing": {
+      "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    },
+    "cleanup": {
+      "text": ["Delete the stack: <code>cdk destroy</code>."]
+    },
+    "authors": [
+        {
+          "name": "Pubudu Jayawardana",
+          "image": "https://avatars.githubusercontent.com/u/1263087",
+          "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusiast.",
+          "linkedin": "pubudusj",
+          "twitter": "@pubudusj"
+        }
+      ]
+  }

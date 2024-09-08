@@ -1,0 +1,63 @@
+{
+    "title": "AWS Lambda to AWS Secrets Manager in Private Subnet",
+    "description": "Deployment of an AWS Lambda function in private and isolated subnets, along with allowing communication with selected AWS service API endpoints using AWS PrivateLink VPC interface endpoints.",
+    "language": "TypeScript",
+    "level": "400",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern allows to operate a Lambda function that doesn't have outbound public internet access but have access to Secrets Manager service endpoint.",
+        "This pattern deploys one private VPC, one private and isolated subnet, one security group, one Python Lambda function, one VPC Interface Endpoint for Amazon Secrets Manager and one example secret."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/lambda-vpc-interface-endpoints-secrets-manager",
+        "templateURL": "serverless-patterns/lambda-vpc-interface-endpoints-secrets-manager",
+        "projectFolder": "lambda-vpc-interface-endpoints-secrets-manager",
+        "templateFile": "lib/aws-lambda-to-secrets-manager-in-private-subnet-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "VPC with public and private subnets (NAT)",
+          "link": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario2.html"
+        },
+        {
+          "text": "AWS services that integrate with AWS PrivateLink",
+          "link": "https://docs.aws.amazon.com/vpc/latest/privatelink/aws-services-privatelink-support.html"
+        },
+        {
+          "text": "Use AWS PrivateLink to Access AWS Lambda Over Private AWS Network",
+          "link": "https://aws.amazon.com/blogs/aws/new-use-aws-privatelink-to-access-aws-lambda-over-private-aws-network/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See README.md file in the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Emir Ayar",
+        "image": "https://eercan.com/emir-ercan-ayar-2022-profile-mid.png",
+        "bio": "Emir Ayar is a Tech Lead Solutions Architect on the AWS Prototyping Team to help customers build IoT, Edge AI, and Industry 4.0 solutions and implement architectural best practices.",
+        "linkedin": "https://www.linkedin.com/in/eercanayar/",
+        "twitter": "https://twitter.com/eercanayar"
+      }
+    ]
+  }
+  

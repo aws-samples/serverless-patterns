@@ -1,0 +1,55 @@
+{
+  "title": "Amazon SQS to AWS Lambda",
+  "description": "The SAM template deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. SQS invokes the Lambda function when new messages are available.",
+  "language": "Rust",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Send the SQS message.",
+      "Then check the logs in Cloudwatch logs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-rust-sam",
+      "templateURL": "serverless-patterns/sqs-lambda-rust-sam",
+      "projectFolder": "sqs-lambda-rust-sam",
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon SQS",
+        "link": "https://aws.amazon.com/sqs/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "headline": "Presented by Daniele Frasca",
+      "name": "Daniele Frasca",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "linkedin": "daniele-frasca",
+      "twitter": "dfrasca80"
+    }
+  ]
+}

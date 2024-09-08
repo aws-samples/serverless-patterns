@@ -1,0 +1,64 @@
+{
+  "title": "EventBridge schedule to trigger Step Function with CDK Go",
+  "description": "Simple pattern that triggers Step Function execution at the beginning of every hour using EventBridge Scheduler with CDK/Go. ",
+  "language": "Go",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "EventBridge Scheduler triggers a new Step Function execution every hour."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-step-function-cdk-go",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-step-function-cdk-go",
+      "projectFolder": "eventbridge-schedule-to-step-function-cdk-go",
+      "templateFile": "cdk/main.go"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "Amazon EventBridge Scheduler Docs",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "Scheduler Documentation for CDK v2 Go",
+        "link": "https://pkg.go.dev/github.com/aws/aws-cdk-go/awscdk/awsscheduler"
+      },
+      {
+        "text": "Working with the AWS CDK in Go",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-go.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "André Stoll",
+      "image": "https://user-images.githubusercontent.com/44157083/231747014-89cb4bc7-d977-45c8-be01-007831d346ad.jpeg",
+      "bio": "André is a Solutions Architect at Amazon Web Services based in Switzerland.",
+      "linkedin": "andre-stoll"
+    }
+  ]
+}

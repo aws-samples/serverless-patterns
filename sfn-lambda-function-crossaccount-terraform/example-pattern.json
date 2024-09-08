@@ -1,0 +1,60 @@
+{
+  "title": "Invoke cross account Lambda function directly via Step function",
+  "description": "Create a Step function which invokes cross account Lambda function",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample pattern allows users from one account to invoke their Lambda function present in a different account via Step function and retrieve the desired output.",
+      "This is highly efficient and useful when it comes to pulling cross account data all in one place."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/step-function-lambda-function-crossaccount-terraform",
+      "templateURL": "serverless-patterns/step-function-lambda-function-crossaccount-terraform",
+      "projectFolder": "step-function-lambda-function-crossaccount-terraform",
+      "templateFile": "step-function-lambda-function-crossaccount-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+          {
+            "text": "Tutorial - How to invoke a Lambda function from Step function",
+            "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-lambda.html"
+          },
+          {
+            "text": "Orchestration examples",
+            "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-stepfunctions.html"
+          }
+    ]
+  },
+  "deploy": {
+    "text": [
+        "terraform init",
+        "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+        "terraform destroy",
+        "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shivam Rajawat",
+      "image": "https://drive.google.com/file/d/1q872K5V1RKFHCrkwGSssWNeIwug6ZLxO/view",
+      "bio": "I am a Cloud Support Engineer (Serverless) at AWS and I love to solve complex problems.",
+      "linkedin": "shivam-rajawat-a42b68124",
+      "twitter": ""
+    }
+  ]
+}

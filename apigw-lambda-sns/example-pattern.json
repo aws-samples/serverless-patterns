@@ -1,0 +1,57 @@
+{
+    "title": "Amazon API Gateway REST API to Lambda to SNS",
+    "description": "Integration of Amazon API Gateway REST API with Amazon Lambda to publish to Amazon SNS",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to publish to a SNS Topic whenever the REST API is invoked using Lambda function.",
+        "This pattern deploys a Amazon API Gateway REST API with Lambda Function integration and SNS Topic."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-sns",
+        "templateURL": "serverless-patterns/apigw-lambda-sns",
+        "projectFolder": "apigw-lambda-sns",
+        "templateFile": "apigw-lambda-sns/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Choosing between messaging services for serverless applications.",
+          "link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+        },
+        {
+          "text": "Publishing Messages in Amazon SNS",
+          "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#topic"
+        },
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>same delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Sanskar",
+        "image": "https://drive.google.com/file/d/1dP8XHHevaOC-eEKOq6Gty75ZBZ428KHT/view?usp=sharing",
+        "bio": "Sanskar is a Serverless Cloud Engineer at Amazon Web Services and is based in India. Sanskar has avid interest in microservices and serverless patterns.",
+        "linkedin": "https://www.linkedin.com/in/sanskar05/"
+      }
+    ]
+  }

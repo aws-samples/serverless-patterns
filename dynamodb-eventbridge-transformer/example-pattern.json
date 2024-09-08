@@ -1,0 +1,53 @@
+{
+  "title": "Amazon DynamoDB to Amazon EventBridge using Amazon Eventbridge Pipes.",
+  "description": "This pattern takes a change data capture event from DynamoDB, removes the data type descriptors and sends the simplified event to an EventBridge bus.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The key components of this architecture are DynamoDB as source and EventBridge as target, connected by a pipe. To demonstrate the end-to-end message flow, the Lambda function writes sample data to the DynamoDB table.",
+      "The pattern uses an input transformer to change the event's structure from DynamoDB's response format, which includes data type descriptors, to a simpler JSON structure. The input transformer also allows us to transform the list using the following notation: <$.dynamodb.NewImage.list.L[*].S>"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-eventbridge-transformer",
+      "templateURL": "serverless-patterns/dynamodb-eventbridge-transformer",
+      "projectFolder": "dynamodb-eventbridge-transformer",
+      "templateFile": "src/lib/pipes-from-dynamo-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "More Enterprise Integration Patterns on AWS Samples",
+        "link": "https://github.com/aws-samples/amazon-eventbridge-pipes-architectural-patterns"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dominik Richter",
+      "image": "https://avatars.githubusercontent.com/u/29404931",
+      "bio": "Solutions Architect at AWS, passionate about event-driven architectures and Serverless.",
+      "linkedin": "do-richter"
+    }
+  ]
+}

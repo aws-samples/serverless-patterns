@@ -1,0 +1,63 @@
+{
+    "title": "AWS API Gateway HTTP API to AWS Lambda w/ ASP.NET 6.0",
+    "description": "Create an HTTP API to AWS Lambda w/ ASP.NET 6.0",
+    "language": ".NET",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This project shows how to use AWS SAM for an ASP.NET Core Web API project using a AWS Lambda function exposed through Amazon API Gateway.",
+        "The function takes a request from an API Gateway Proxy or from an Application Load Balancer and converts that request into the classes the ASP.NET Core framework expects and then converts the response from the ASP.NET Core framework into the response body that API Gateway Proxy or Application Load Balancer understands."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda-dotnet-sam",
+        "templateURL": "serverless-patterns/apigw-http-api-lambda-dotnet-sam",
+        "projectFolder": "apigw-http-api-lambda-dotnet-sam",
+        "templateFile": "apigw-http-api-lambda-dotnet-sam/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Building Lambda functions with C#",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-csharp.html"
+        },
+        {
+          "text": "ASP.NET Core Lambda NuGet Package",
+          "link": "https://www.nuget.org/packages/Amazon.Lambda.AspNetCoreServer" 
+        },
+        {
+          "text": "More blueprints for .NET Lambdas",
+          "link": "https://github.com/aws/aws-lambda-dotnet/tree/master/Blueprints" 
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam build",
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo readme for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Empty the S3 bucket",
+        "sam delete --stack-name STACK_NAME"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Kevin Chan",
+        "image": "https://github.com/Kevinwochan/kevinwochan.github.io/blob/main/src/images/kevin.jpeg?raw=true",
+        "bio": "ISV Solutions Architect @ Amazon Web Services",
+        "linkedin": "kevinwochan"
+      }
+    ]
+  }

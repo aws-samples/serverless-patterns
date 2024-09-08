@@ -1,0 +1,54 @@
+{
+    "title": "Lambda PowerShell Runtime",
+    "description": "Lambda Custom Runtime for PowerShell.",
+    "language": "PowerShell",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern deploys an AWS Lambda PowerShell custom runtime for running native PowerShell on Lambda. The pattern includes am example Lambda function in PowerShell."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/awslabs/aws-lambda-powershell-runtime",
+        "templateURL": "serverless-patterns/lambda-powershell-runtime-sam",
+        "projectFolder": "lambda-powershell-runtime-sam"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Introducing the PowerShell custom runtime for AWS Lambda",
+          "link": "https://aws.amazon.com/blogs/compute/introducing-the-powershell-custom-runtime-for-aws-lambda/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam build",
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+          "name": "Julian Wood",
+          "image": "/assets/images/resources/jrwood.jpg",
+          "bio": "Julian Wood helps developers and builders learn about and love how serverless technologies can transform the way they build and run applications. I was an infrastructure architect and manager in global enterprises and start-ups for more than 25 years before going all in on serverless at AWS.",
+          "linkedin": "woodjulian",
+          "twitter": "@julian_wood"
+        }
+    ]
+  }
+  

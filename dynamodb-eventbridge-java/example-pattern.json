@@ -1,0 +1,56 @@
+{
+  "title": "DynamoDB to Lambda to EventBridge",
+  "description": "Send DynamoDB table changes to EventBridge via Lambda.",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a Lambda function that captures data in DynamoDB streams and sends to EventBridge.",
+      "When new items are added, updated or deleted on the DynamoDB table, the item-level changes in the table are streamed to the EventBridge custom bus."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-eventbridge-java",
+      "templateURL": "serverless-patterns/dynamodb-eventbridge-java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Docs: DynamoDB Streams and AWS Lambda Triggers",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tadeu Mendonça",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-luiz-tadeu-mendonca.jpg",
+      "bio": "Cloud Application Architect, AWS.",
+      "twitter": "@tadeumendonca"
+    },
+    {
+      "name": "Steven Cook",
+      "bio": "Senior Solutions Architect at AWS."
+    }
+  ]
+}

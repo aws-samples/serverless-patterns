@@ -1,0 +1,54 @@
+{
+  "title": "SQS to EventBridge Bus using EventBridge Pipes",
+  "description": "This pattern uses SQS and triggers EventBridge events directly with optional filtering supported.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["SQS queue is polled and messages are sent to EventBridge. Custom events in EventBridge are raised."]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-eventbridge-cdk-dotnet",
+      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-eventbridge-cdk-dotnet",
+      "projectFolder": "eventbridge-pipes-sqs-to-eventbridge-cdk-dotnet",
+      "templateFile": "cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "James Eastham",
+      "bio": "Senior Cloud Architect at AWS focusing on .NET and Serverless."
+    }
+  ]
+}

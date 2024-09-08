@@ -1,0 +1,57 @@
+{
+  "title": "API Gateway REST API to Lambda function and AWS Translate",
+  "description": "This pattern creates an Amazon API Gateway REST API and an AWS Lambda function that calls AWS Translate service.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "API Gateway REST API is integrated to AWS Lambda function which calls AWS Translate service"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-translate",
+      "templateURL": "serverless-patterns/apigw-lambda-translate",
+      "projectFolder": "apigw-lambda-translate",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Serverless Application Model",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html"
+      },
+      {
+        "text": "AWS Translate",
+        "link": "https://aws.amazon.com/translate/"
+      },
+      {
+        "text": "AWS Translate Languages",
+        "link": "https://docs.aws.amazon.com/translate/latest/dg/pairs.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+        "sam deploy --guided"    ]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+      {
+        "name": "Sudheer Yalamanchili",
+        "image": "./sudheer.jpg",
+        "bio": "Sudheer is a Cloud Application Architect at AWS ProServ.",
+        "linkedin": "sudheeryalamanchili"
+      }
+  ]
+}

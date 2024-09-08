@@ -1,0 +1,56 @@
+{
+  "title": "Amazon Kinesis Data Streams to Amazon API Gateway via Amazon Kinesis Data Firehose",
+  "description": "POST data received by Kinesis Data Streams to an HTTP endpoint securely using Kinesis Data Firehose",
+  "level": "200",
+  "language": "Python",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to send data received by Kinesis Data Streams to an HTTP endpoint with authorization (here API Gateway REST API) using Kinesis Data Firehose."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-data-stream-firehose-apigw-sam",
+      "templateURL": "serverless-patterns/kinesis-data-stream-firehose-apigw-sam",
+      "projectFolder": "kinesis-data-stream-firehose-apigw-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Stream data to an HTTP endpoint with Amazon Kinesis Data Firehose",
+        "link": "https://aws.amazon.com/blogs/big-data/stream-data-to-an-http-endpoint-with-amazon-kinesis-data-firehose/"
+      },
+      {
+        "text": "Kinesis Data Firehose HTTP Endpoint Destination",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/create-destination.html#create-destination-http"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Udit Parikh",
+      "image": "https://drive.google.com/file/d/1SfEjQtLkPaOHC7JlfugR4OaUD0yNjHu6/view?usp=drivesdk",
+      "bio": "Udit is passionate about serverless & event-driven architectures.",
+      "linkedin": "parikhudit"
+    }
+  ]
+}

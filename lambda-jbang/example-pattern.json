@@ -1,0 +1,57 @@
+{
+  "title": "AWS Lambda function using JBang",
+  "description": "Create a Java Lambda function using JBang",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A sample project showcasing a self-contained JBang application as a Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-jbang",
+      "templateURL": "serverless-patterns/lambda-jbang",
+      "projectFolder": "lambda-jbang",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "JBang website",
+        "link": "https://www.jbang.dev/"
+      },
+      {
+        "text": "JBang IDE support",
+        "link": "https://www.jbang.dev/ide/#main"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>sam deploy --guided --stack-name lambda-jbang</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name lambda-jbang</code>.",
+      "Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'lambda-jbang')].StackStatus\"</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Marcin Szałomski",
+      "bio": "Software Architect at Hapag-Lloyd AG",
+      "twitter": "baldram",
+      "linkedin": "https://www.linkedin.com/in/marcin-szalomski/"
+    }
+  ]
+}

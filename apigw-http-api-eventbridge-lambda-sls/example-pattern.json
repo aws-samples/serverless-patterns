@@ -1,0 +1,66 @@
+{
+    "title": "HTTP API Gateway to EventBridge",
+    "description": "Create an HTTP API Gateway that sends events to EventBridge.",
+    "language": "Node.js, TypeScript",
+    "architectureURL": "",
+    "videoId": "",
+    "level": "100",
+    "framework": "Serverless Framework",
+    "services": {
+        "from": "apigatewayv2",
+        "to": "eventbridge"
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an Amazon API gateway HTTP API endpoint. The endpoint uses service integrations to directly connect to Amazon EventBridge. ",
+            "",
+            "Once a new event is published to EventBridge \"WebApp\" custom event bus it is delivered to a Lambda function, which will simply log that event to EventLog. ",
+            "Lambda function is written in TypeScript and deployed to ARM64 architecture for demo purposes."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-eventbridge-lambda-sls",
+            "templateURL": "serverless-patterns/apigw-http-api-eventbridge-lambda-sls",
+            "projectFolder": "apigw-http-api-eventbridge-lambda-sls",
+            "templateFile": "serverless.yml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "Integrating Amazon EventBridge into your serverless applications",
+                "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+            },
+            {
+                "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+                "link": "https://serverlessland.com/learn/eventbridge"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "<code>serverless deploy --verbose</code>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>serverless remove --verbose</code>."
+        ]
+    },
+    "authors": [
+        {
+            "headline": "Presented by Dmitry Gulin, Modernization Architect, AWS",
+            "name": "Dmitry Gulin",
+            "bio": "Dmitry is a modernization architect for Professional Services at Amazon Web Services based in the US.",
+            "imageURL": "https://www.gravatar.com/avatar/223055bd132d244f6a96c3aef7453a5a?s=200"
+        }
+    ]
+}

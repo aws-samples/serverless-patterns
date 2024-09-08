@@ -1,0 +1,55 @@
+{
+	"title": "Amazon S3 to Amazon EventBridge to Amazon SNS",
+	"description": "Publish events directly from S3 to EventBridge and send notifications to SNS when an object is created. This template creates an S3 bucket that publishes events to Amazon EventBridge. When an object is uploaded to the bucket, the EventBridge is triggered and a SNS notification is sent.",
+	"language": "",
+	"level": "200",
+	"framework": "SAM",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This template creates an S3 bucket that publishes events to Amazon EventBridge, allows you to upload objects to that bucket, and will send you notifications from EventBridge to SNS when an object is created in that bucket."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-sam",
+			"templateURL": "serverless-patterns/s3-eventbridge-sam",
+			"projectFolder": "s3-eventbridge-sam",
+			"templateFile": "template.yaml"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+				"link": "https://serverlessland.com/learn/eventbridge"
+			},
+			{
+				"text": "Use Amazon S3 Event Notifications with Amazon EventBridge",
+				"link": "https://aws.amazon.com/blogs/aws/new-use-amazon-s3-event-notifications-with-amazon-eventbridge/"
+			},
+			{
+				"text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+				"link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["sam deploy --guided"]
+	},
+	"testing": {
+		"text": ["See the GitHub repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>sam delete</code>"]
+	},
+	"authors": [
+		{
+			"name": "Makendran G",
+			"image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
+			"bio": "Cloud Support Engineer @ AWS",
+			"linkedin": "https://www.linkedin.com/in/makendran",
+			"twitter": "@MakendranG"
+		}
+	]
+}

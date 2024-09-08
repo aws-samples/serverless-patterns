@@ -1,0 +1,57 @@
+{
+  "title": "Lambda to MemoryDB",
+  "description": "Create Lambda Functions to interact with MemoryDB.",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample shows how to build a durable, in-memory, cluster-enabled database service and integrate it with AWS Lambda. Lambda functions use REST API calls to access the data and configuration from the MemoryDB.",
+      "This pattern deploys 2 Lambda Functions, one MemoryDB cluster and one API gateway public endpoint."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-memorydb",
+      "templateURL": "serverless-patterns/apigw-lambda-memorydb",
+      "projectFolder": "apigw-lambda-memorydb",
+      "templateFile": "apigw-lambda-memorydb/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Amazon MemoryDB for Redis",
+        "link": "https://aws.amazon.com/memorydb/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mansi Doshi",
+      "image": "",
+      "bio": "Mansi is a Cloud Consultant at Amazon Web Services based in India.",
+      "linkedin": "https://www.linkedin.com/in/mansi-doshi-2a448177"
+    }
+  ]
+}

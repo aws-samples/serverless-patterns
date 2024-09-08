@@ -1,0 +1,53 @@
+{
+	"title": "Amazon API Gateway to AWS Lambda to Amazon DynamoDB",
+	"description": "This pattern demonstrates how to deploy an application with Amazon API Gateway, AWS Lambda, and Amazon DynamoDB using Terraform.",
+	"language": "Python",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"When an HTTP POST request is sent to the Amazon API Gateway endpoint, the AWS Lambda function is invoked and inserts an item into the Amazon DynamoDB table."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-dynamodb-terraform",
+			"templateURL": "serverless-patterns/apigw-lambda-dynamodb-terraform",
+			"projectFolder": "apigw-lambda-dynamodb-terraform",
+			"templateFile": "apigw-lambda-dynamodb-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "AWS Docs:Writing Data to a Table",
+				"link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.WriteData.html"
+			},
+			{
+				"text": "Using AWS Lambda with Amazon API Gateway",
+				"link": "https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+		"name": "Carlos Bauer",
+		"bio": "I am a Technical Account Manager at AWS"
+	}]
+}

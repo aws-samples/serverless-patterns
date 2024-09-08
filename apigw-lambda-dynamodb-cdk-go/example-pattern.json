@@ -1,0 +1,58 @@
+{
+  "title": "API Gateway to Lambda to DynamoDB",
+  "description": "Create a Lambda function that receives a request from API Gateway and inserts a record into a DynamoDB table.",
+  "language": "Go",
+  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
+  "videoId": "",
+  "level":"200",
+  "framework": "CDK",
+  "services": {
+    "from": "apigw",
+    "to": "dynamodb"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern explains how to deploy a CDK application with Amazon API Gateway, AWS Lambda, and Amazon DynamoDB using the Go programming language."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-dynamodb-cdk-golang",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-dynamodb-cdk-golang/README.md"
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [    
+    ]
+  },
+  "author": {
+    "headline": "Presented by Abhishek Gupta, Principal Developer Advocate at AWS",
+    "name": "Abhishek Gupta",
+    "twitter": "abhi_tweeter",
+    "linkedin":"https://www.linkedin.com/in/abhirockzz/",
+    "imageURL":"https://abhirockzz.github.io/icon.jpg"
+  }
+}

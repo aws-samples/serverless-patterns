@@ -1,0 +1,46 @@
+{
+  "title": "Delayed EventBridge events with EventBridge Scheduler",
+  "description": "Setup future EventBridge events with EventBridge Scheduler",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern listens for EventBridge events, processes them and creates schedules for every user. 24 hours after user has been created a schedule is run that publishes events directly into EventBridge"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/delayed-eventbridge-events",
+      "templateURL": "serverless-patterns/delayed-eventbridge-events",
+      "projectFolder": "delayed-eventbridge-events",
+      "templateFile": "cdk/lib/delayed-eventbridge-events-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "What is Amazon EventBridge Scheduler?",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.png",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

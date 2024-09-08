@@ -1,0 +1,65 @@
+{
+  "title": "EventBridge Scheduler to Start State Manager Association Once",
+  "description": "This pattern will create an EventBridge Scheduler to start State Manager Association once in AWS Systems Manager every 5 minutes.",
+  "language": "Go",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An EventBridge Scheduler is created that start State Manager Association once in an AWS Systems Manager every 5 minutes.",
+      "The demo Association will use an Automation Document \"AWS-DisablePublicAccessForSecurityGroup\" to revoke RDP and SSH public access in security group.",
+      "Along with a scheduler, the CDK stack creates VPC, security group, association, IAM role and policy for Automation and EventBridge Scheduler to assume and start association."
+    ]
+  },
+  "gitHub": {
+    "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-ssm-cdk-go",
+        "templateURL": "serverless-patterns/eventbridge-schedule-ssm-cdk-go",
+        "projectFolder": "eventbridge-schedule-ssm-cdk-go",
+        "templateFile": "eventbridge-schedule-ssm-cdk-go.go"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with the AWS CDK in Go",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-go.html"
+      },
+      {
+        "text": "AWS CLI start-execution",
+        "link": "https://docs.aws.amazon.com/cli/latest/reference/stepfunctions/start-execution.html#start-execution"
+      },
+      {
+        "text": "Getting Started with EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "Getting started with AWS Systems Manager",
+        "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/getting-started-launch-managed-instance.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Hoi Wing Chan",
+      "bio": "Hoi Wing is a Technical Account Manager at Amazon Web Services with a background of software development and architecture.",
+      "linkedin": "https://www.linkedin.com/in/wing-chan-0943a344"
+    }
+  ]
+}

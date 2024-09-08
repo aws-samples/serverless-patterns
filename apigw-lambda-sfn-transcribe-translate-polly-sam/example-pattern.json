@@ -1,0 +1,66 @@
+{
+    "title": "API Gateway to Lambda to Step Function to Transcribe, Translate and Polly",
+    "description": "Invoke step function execution from API Gateway to orchestrate workflow across Transcribe, Translate and Polly",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This patterns explains how to integrate API Gateway, Lambda, Step Functions, Transcribe, Translate, Polly and S3 to develop an audio language converter.",
+        "The API gateway exposes a websocket to keep the channel open for the process to complete and send response back. "
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-sfn-transcribe-translate-polly-sam",
+        "templateURL": "serverless-patterns/apigw-lambda-sfn-transcribe-translate-polly-sam/src",
+        "projectFolder": "apigw-lambda-sfn-transcribe-translate-polly-sam",
+        "templateFile": "apigw-lambda-sfn-transcribe-translate-polly-sam/src/serverless.yml"
+      }
+    },
+    "resources": {
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Bubai Bal",
+        "image": "./bubai.png",
+        "bio": "Solutions Architect @ AWS",
+        "linkedin": "bubai-bal"
+      },
+      {
+        "name": "Avinandan Bandyopadhyay",
+        "image": "./Avinandan.png",
+        "bio": "Solutions Architect @ AWS",
+        "linkedin": "avinandan-bandyopadhyay-8592ab29"
+      },
+      {
+        "name": "Kaushal Bisht",
+        "image": "",
+        "bio": "Solutions Architect @ AWS",
+        "linkedin": ""
+      },
+      {
+        "name": "Aravind Kannan",
+        "image": "",
+        "bio": "Solutions Architect @ AWS",
+        "linkedin": ""
+      }
+    ]
+  }
+  

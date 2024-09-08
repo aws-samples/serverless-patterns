@@ -1,0 +1,56 @@
+{
+  "title": "Appsync to EventBridge directly using Appsync Datasource",
+  "description": "The AWS AppSync resolver function request and response used with the EventBridge data source allows you to send custom events to the Amazon EventBridge bus.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to integrate Amazon EventBridge with AWS Appsync.",
+      "This pattern deploys one AWS Appsync api, one custom EventBus, and one appsync Javascript function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-eventbridge-datasource",
+      "templateURL": "serverless-patterns/appsync-eventbridge-datasource",
+      "projectFolder": "appsync-eventbridge-datasource",
+      "templateFile": "lib/appsync-eventbridge-datasource-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "CDK Custom Resource",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResource.html"
+      },
+      {
+        "text": "Call Amazon SQS with Step Functions",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-eventbridge-js.html/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shankar Srinivasan",
+      "bio": "I am a Cloud Application Architect at AWS. I specialize in architecting and developing serverless, event-driven solutions on AWS.",
+      "linkedin": "https://www.linkedin.com/in/shankar-srinivasan-3863a110"
+    }
+  ]
+}

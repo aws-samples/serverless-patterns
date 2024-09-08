@@ -42,8 +42,8 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 * Use the AWS CLI upload an image to S3
-* If the object is a .jpeg in the /images folder, the code creates a thumbnail and saves it to the target bucket in a new folder, /thumbnails. 
-* The code assumes that the destination bucket exists and is watching a folder you need to create called "images".
+* If the object is a .jpeg in the source bucket, the code creates a thumbnail and saves it to the destination bucket in a new folder, /thumbnails. 
+* The code assumes that the destination bucket exists and is defined in the `template.yaml` file
 
 ==============================================
 
@@ -52,7 +52,7 @@ Important: this application uses various AWS services and there are costs associ
 Run the following S3 CLI  command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the S3 Bucket. This is provided in the stack outputs.
 
 ```bash
-aws s3 cp './images/example.jpeg'  s3://{BucketName}/images/example.jpeg
+aws s3 cp 'example.jpeg'  s3://{BucketName}/example.jpeg
 ```
 
 Run the following command to check that a new thumbnails folder has been created with a new version of the image.

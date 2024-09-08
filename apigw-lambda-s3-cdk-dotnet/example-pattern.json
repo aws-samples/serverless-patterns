@@ -1,0 +1,56 @@
+{
+  "title": "ApiGateway Endpoint to Generate SignedURL",
+  "description": "Creates APIGateway Endpoint backed by AWS Lambda Function will generate the PresignedURL for the object available in the S3 Bucket.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an API Gateway, a Lambda (Docker Image & ECR), a S3 Bucket with sample files",
+      "Generate Docker Image for the Function - dotnet6.0",
+      "Deploy the Lamdba with the Image",
+      "Deploy an APIGateway Endpoint with Get method in Root to proxy to Lambda",
+      "Deploy a S3 Bucket and upload sample files for SignedURL quick validation"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-s3-cdk-dotnet",
+      "templateURL": "serverless-patterns/apigw-lambda-s3-cdk-dotnet",
+      "projectFolder": "apigw-lambda-s3-cdk-dotnet",
+      "templateFile": "apigw-lambda-s3-cdk-dotnet/cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "API Gateway >> Lambda >> S3"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for detailed cleanup instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sakthivel Chellapparimanam",
+      "image": "",
+      "bio": "AWS - Cloud Application Architect",
+      "linkedin": "https://www.linkedin.com/in/srcsakthivel",
+      "twitter": "@srcsakthivel"
+    }
+  ]
+}

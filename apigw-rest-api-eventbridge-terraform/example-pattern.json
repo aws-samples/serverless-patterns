@@ -1,0 +1,49 @@
+{
+	"title": "API Gateway REST API to Amazon EventBridge",
+	"description": "This pattern creates an Amazon API gateway REST API endpoint that uses a service integration to directly connect to Amazon EventBridge.",
+	"language": "N/A",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This pattern creates an Amazon API gateway REST API endpoint.",
+			"The endpoint uses service integrations to directly connect to Amazon EventBridge."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-eventbridge-terraform",
+			"templateURL": "serverless-patterns/apigw-rest-api-eventbridge-terraform",
+			"projectFolder": "apigw-rest-api-eventbridge-terraform",
+			"templateFile": "apigw-rest-api-eventbridge-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+			"text": "Storage first integrations",
+			"link": "https://aws.amazon.com/blogs/compute/building-storage-first-applications-with-http-apis-service-integrations/"
+		}]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+		"name": "Carlos Bauer",
+		"bio": "I am Technical Account Manager at AWS"
+	}]
+}

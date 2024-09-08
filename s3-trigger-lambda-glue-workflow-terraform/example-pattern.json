@@ -1,0 +1,62 @@
+{
+  "title": "AWS S3 Trigger to AWS Lambda to AWS Glue workflow",
+  "description": "This pattern creates an s3 bucket trigger that triggers a Lambda function(Whenever file lands), The Lambda function is used for triggering a Glue workflow with input parameters such as file key and bucket names. All elements covered in this pattern are built using Terraform.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "For cases where we need to process files using Glue jobs, we can use Glue Workflows to orchestrate our Glue jobs and Glue crawlers.",
+       "S3 trigger is set up to trigger the Lambda on file upload event. To be able to trigger a Glue workflow with certain parameters, we use AWS Lambda to start glue workflows with parameters."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-trigger-lambda-glue-workflow-terraform",
+      "templateURL": "serverless-patterns/s3-trigger-lambda-glue-workflow-terraform",
+      "projectFolder": "s3-trigger-lambda-glue-workflow-terraform",
+      "templateFile": "sfn_athena_cdk_python/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS Glue - What is AWS Glue?",
+        "link": "https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html"
+      },
+      {
+        "text": "AWS boto3 library for Python- Glue",
+        "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/glue.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ananth Tirumanur",
+      "image": "https://avatars.githubusercontent.com/u/105808773?v=4",
+      "bio": "AWS Data Architect | Demonstrated leadership in Data related Technical Programs. 16 years of Proficiency in data management, analytics and visualization, data flow, data integrity, data automation and data science.",
+      "linkedin": "https://www.linkedin.com/in/ananthtirumanur",
+      "twitter": "akrish82"
+    }
+  ]
+}

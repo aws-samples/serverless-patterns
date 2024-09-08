@@ -1,0 +1,225 @@
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  S3DSBucketName:
+    Type: String
+    Description: Enter the S3 bucket name where the contents you want to be indexed are stored.
+  IdentityCenterInstanceArn:
+    Type: String
+    Description: Enter the ARN of the Amazon Q Business Identity Center instance.
+Resources:
+  QBusinessApplication:
+    Type: AWS::QBusiness::Application
+    Properties:
+      DisplayName: !Sub MyQBusinessApp-${AWS::StackName}
+      Description: Amazon Q Business Application
+      IdentityCenterInstanceArn: !Ref IdentityCenterInstanceArn
+  QBusinessWebExperienceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - application.qbusiness.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:SetContext
+      Description: IAM role for Q Business Web Experience
+      RoleName: !Sub QBusinessWebExperienceRole-${AWS::StackName}
+      Policies:
+        - PolicyName:  WebExperiencePolicyIdC
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: QBusinessConversationPermission
+                Effect: Allow
+                Action:
+                  - qbusiness:Chat
+                  - qbusiness:ChatSync
+                  - qbusiness:ListMessages
+                  - qbusiness:ListConversations
+                  - qbusiness:DeleteConversation
+                  - qbusiness:PutFeedback
+                  - qbusiness:GetWebExperience
+                  - qbusiness:GetApplication
+                  - qbusiness:ListPlugins
+                  - qbusiness:GetChatControlsConfiguration
+                Resource:
+                  Fn::Sub:
+                    - 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${ApplicationId}'
+                    - ApplicationId: !GetAtt QBusinessApplication.ApplicationId
+              - Sid: QBusinessKMSDecryptPermissions
+                Effect: Allow
+                Action: kms:Decrypt
+                Resource:
+                  Fn::Sub: 'arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/*'
+                Condition:
+                  StringLike:
+                    kms:ViaService:
+                      Fn::Sub: 'qbusiness.${AWS::Region}.amazonaws.com'
+              - Sid: QBusinessSetContextPermissions
+                Effect: Allow
+                Action: sts:SetContext
+                Resource: 'arn:aws:sts::*:self'
+                Condition:
+                  StringLike:
+                    aws:CalledViaLast: 'qbusiness.amazonaws.com'
+
+  # Create a QBusiness Web Experience
+  QBusinessWebExperience:
+    Type: 'AWS::QBusiness::WebExperience'
+    DependsOn:
+      - QBusinessApplication
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      RoleArn: !GetAtt QBusinessWebExperienceRole.Arn
+  
+  QBusinessIndex:
+    DependsOn:
+      - QBusinessApplication
+      - QBusinessWebExperience
+    Type: AWS::QBusiness::Index
+    Properties:
+      DisplayName: MyQBusinessIndex
+      Description: My Amazon Q Business Index
+      ApplicationId: !Ref QBusinessApplication
+  
+  QBusinessRetriever:
+    Type: AWS::QBusiness::Retriever
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      Configuration: 
+        NativeIndexConfiguration:
+          IndexId: !GetAtt QBusinessIndex.IndexId
+      DisplayName: MyQBusinessRetriever
+      Type: 'NATIVE_INDEX'
+
+  S3DataSourceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service:
+                - qbusiness.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: S3DataSourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource:
+                  - !Sub 'arn:aws:s3:::${S3DSBucketName}/*'
+                Condition:
+                  StringEquals:
+                    aws:ResourceAccount:
+                      - !Sub '${AWS::AccountId}'
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource:
+                  - !Sub 'arn:aws:s3:::${S3DSBucketName}'
+                Condition:
+                  StringEquals:
+                    aws:ResourceAccount:
+                      - !Sub '${AWS::AccountId}'
+              - Effect: Allow
+                Action:
+                  - qbusiness:BatchPutDocument
+                  - qbusiness:BatchDeleteDocument
+                Resource:
+                  - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}/index/*'
+              - Effect: Allow
+                Action:
+                  - qbusiness:PutGroup
+                  - qbusiness:CreateUser
+                  - qbusiness:DeleteGroup
+                  - qbusiness:UpdateUser
+                  - qbusiness:ListGroups
+                Resource:
+                  - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}'
+                  - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}/index/*'
+
+  S3DataSource:
+    DependsOn:
+      - QBusinessApplication
+      - QBusinessIndex
+    Type: AWS::QBusiness::DataSource
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      DisplayName: MyS3DataSource
+      Description: S3 Data Source for Amazon Q Business
+      RoleArn: !GetAtt S3DataSourceRole.Arn
+      Configuration:
+        connectionConfiguration:
+          repositoryEndpointMetadata:
+            BucketName: !Ref S3DSBucketName
+        repositoryConfigurations:
+          document:
+            fieldMappings:
+              - indexFieldName: 's3_document_id'
+                indexFieldType: 'STRING'
+                dataSourceFieldName: 's3_document_id'
+        syncMode: 'FULL_CRAWL'
+        type: 'S3'
+        version: '1.0.0'
+      IndexId: !GetAtt QBusinessIndex.IndexId
+  DataSourceSyncLambda:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - QBusinessApplication
+      - S3DataSource
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: DataSourceSyncLambda
+      CodeUri: src/dataSourceSync/
+      Handler: dataSourceSyncLambda.lambda_handler
+      Runtime: python3.12
+      MemorySize: 1024
+      Timeout: 900
+      Tracing: Active
+      Policies:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - qbusiness:StartDataSourceSyncJob
+              - qbusiness:StopDataSourceSyncJob
+            Resource:
+              - !Sub arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}
+              - !Sub arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}/*
+      Environment:
+        Variables:
+          INDEX_ID: !GetAtt QBusinessIndex.IndexId
+          DS_ID: !GetAtt S3DataSource.DataSourceId
+          APP_ID: !GetAtt QBusinessApplication.ApplicationId
+  DataSourceSync:
+    Type: Custom::DataSourceSync
+    DependsOn:
+      - QBusinessIndex
+      - DataSourceSyncLambda
+    Properties:
+      ServiceToken: !GetAtt DataSourceSyncLambda.Arn
+Outputs:
+  QBusinessApplicationId:
+    Description: Amazon Q Business Application ID
+    Value: !Ref QBusinessApplication
+  S3DataSourceId:
+    Description: S3 Data Source ID
+    Value: !Ref S3DataSource
