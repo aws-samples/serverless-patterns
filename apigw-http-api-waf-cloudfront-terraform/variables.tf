@@ -75,22 +75,27 @@ variable "waf_rule_name" {
 
 variable "cloudfront_domain_name" {
   type = string
+  default = ""
 }
 
 variable "domain_name" {
   type = string
+  default = ""
 }
 
 variable "cloudfront_certificate_arn" {
   type = string
+  default = ""
 }
 
 variable "certificate_arn" {
   type = string
+  default = ""
 }
 
 variable "zone_id" {
   type = string
+  default = ""
 }
 
 variable "cloudfront_api_secret_name" {
