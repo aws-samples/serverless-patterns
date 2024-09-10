@@ -1,4 +1,4 @@
-# Access your Lambda Function URLs securely using Amazon CloudFront Origin Access Control
+# Amazon CloudFront Origin Access Control for AWS Lambda Function URL
 
 This pattern demonstrates how to enhance security and integrate features between Amazon CloudFront and AWS Lambda by utilizing Origin Access Control (OAC) for Lambda function URLs. This approach secures Lambda functions by restricting access exclusively to designated CloudFront distributions, using AWS Signature Version 4 (SigV4) for authentication.
 
