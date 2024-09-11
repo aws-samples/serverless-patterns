@@ -62,7 +62,7 @@ Message2:
 
 ```
 
-Optional: You could create an EventBridge rule with the below event pattern on the custom bus and add relevant targets. With this setup, Message2 would be filtered out by the Pipe, and only Message1 would invoke the configured EventBridge target. Ensure to delete the EventBridge rule before the clean up proecess.
+Optional: You could create an EventBridge rule with the below event pattern on the custom bus and add relevant targets. With this setup, Message2 would be filtered out by the Pipe, and only Message1 would invoke the configured EventBridge target. Ensure to delete the EventBridge rule before the clean up process.
 
 
 
