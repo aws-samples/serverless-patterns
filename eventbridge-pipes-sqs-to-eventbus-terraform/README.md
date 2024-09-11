@@ -1,6 +1,6 @@
 # Amazon SQS queue to Amazon EventBridge custom event bus using Amazon EventBridge Pipe
 
-This pattern sends SQS messages to an Event Bus using EventBridge Pipe.
+This pattern sends messages from an SQS queue to an EventBridge event bus using an EventBridge pipe.
 
 
 
