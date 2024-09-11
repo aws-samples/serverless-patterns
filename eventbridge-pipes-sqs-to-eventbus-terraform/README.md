@@ -90,6 +90,6 @@ Optional: You could create an EventBridge rule with the below event pattern on t
     terraform show
     ```
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
