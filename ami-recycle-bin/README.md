@@ -1,3 +1,5 @@
+# AMI de-registration with AWS Lambda and retention in Amazon EC2 Recycle Bin
+
 ## Description
 
 In this pattern an Amazon EventBridge trigger AWS Lambda function to deregister AMI, delete the associated snapshot and move them to Recycle Bin for retention.
@@ -24,7 +26,7 @@ An AMI to deregister that has the following Tags:
 | Key    | Value |
 | -------- | ------- |
 | Expire-After  | Date in Zulu format (e.g. 2024-08-30T17:39:00Z)    |
-| Matching value for <i>resource_tag_key</i> in <i>src/variables.tf</i> | Matching value for <i>resource_tag_value</i> in <i>src/variables.tf</i>     |
+| Same value as <i>resource_tag_key</i> in <i>src/variables.tf</i> | Same value as <i>resource_tag_value</i> in <i>src/variables.tf</i>     |
 
   
 ## Deployment Instructions

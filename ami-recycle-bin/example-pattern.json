@@ -1,7 +1,7 @@
 {
-    "title": "Deregister expired AMIs and its snapshot with AWS Lambda and retain them in Amazon EC2 Recycle Bin",
+    "title": "AMI de-registration with AWS Lambda and retention in Amazon EC2 Recycle Bin",
     "description": "This project demonstrates a pattern to deregister and retain expired AMI and its snapshot with AWS Lambda and Amazon EC2 Recycle Bin",
-    "language": "YAML",
+    "language": "",
     "level": "200",
     "framework": "Terraform",
     "introBox": {
