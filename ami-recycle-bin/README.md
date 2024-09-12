@@ -2,11 +2,11 @@
 
 ## Description
 
-In this pattern an Amazon EventBridge trigger AWS Lambda function to deregister AMI, delete the associated snapshot and move them to Recycle Bin for retention.
+In this pattern an Amazon EventBridge rule triggers an AWS Lambda function which deregisters an Amazon Machine Image (AMI), deletes the associated snapshot and moves them to the Recycle Bin for retention.
 
 The template creates all the necessary resources including an Amazon EventBridge Rule that triggers the AWS Lambda function once every day. Additionally, Recycle Bin rules for AMI and EBS Snapshots are created to retain deleted resources matching the resources for a retention period.
 
-AWS Lambda function automates the expiration of Amazon Machine Images (AMIs) moving the AMIs and its associated snapshot to Recycle Bin af. The Recycle Bin is a feature in Amazon Elastic Compute Cloud (EC2) that allows you to retain AMIs that you have deregistered for a specified retention period, providing an opportunity to recover them if needed. To recover the deleted AMI, its associated snapshot should be recovered first. The lambda function also adds corresponding tags to both, the AMI and the EBS Snapshot before moving them to Recyle Bin for recovery.
+The AWS Lambda function automates the expiration of Amazon Machine Images (AMIs) by moving the AMIs and their associated snapshots to Recycle Bin. Recycle Bin is a feature of Amazon Elastic Compute Cloud (EC2) that allows you to retain AMIs that you have de-registered for a specified retention period, providing an opportunity to recover them if needed. To recover the deleted AMI, its associated snapshot should be recovered first. The Lambda function also adds corresponding tags to both, the AMI and the EBS snapshot, before moving them to Recycle Bin.
 
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/ami-recycle-bin
