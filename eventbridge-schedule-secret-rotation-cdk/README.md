@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd serverless-patterns/eventbridge-schedule-secret-rotation-cdk
     ```
-3. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the [EventbridgeScheduleSecretRotationCdkStack.py](/cdk/EventbridgeScheduleSecretRotationCdkStack.py) file:
+3. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the [eventbridge_schedule_secret_rotation_stack.py](/cdk/eventbridge_schedule_secret_rotation_stack.py) file:
     ```
     cdk deploy
     ```
