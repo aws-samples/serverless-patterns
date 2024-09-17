@@ -1,0 +1,22 @@
+Parameters:
+
+  PeerID:
+    Description: Peering ID connection
+    Type: String
+    
+  REMOTEVPCCIDR:
+    Description: CIDR Block of the remote VPC
+    Type: String
+
+  RouteTableId:
+     Description: ID of the Route Table
+     Type: String
+
+Resources:
+  myRoutePeering:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: RouteTableId
+      DestinationCidrBlock: !Ref REMOTEVPCCIDR
+      VpcPeeringConnectionId: !Ref PeerID

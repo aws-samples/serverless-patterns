@@ -1,0 +1,150 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  ExecuteApiInterfaceEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    "DependsOn" : [ subnetA, subnetB, mySecurityGroup ]
+    Properties:
+      VpcEndpointType: 'Interface'
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.execute-api'
+      VpcId: !Ref myVPC
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Ref subnetA
+        - !Ref subnetB
+      SecurityGroupIds:
+        - !Ref mySecurityGroup
+
+  myVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  subnetA:
+    Type: 'AWS::EC2::Subnet'
+    DependsOn: myVPC
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: '10.0.1.0/24'
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+
+  subnetB: 
+    Type: 'AWS::EC2::Subnet'
+    DependsOn: myVPC
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: '10.0.2.0/24'
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+
+  myRouteTable:
+    Type: AWS::EC2::RouteTable
+    DependsOn: myVPC
+    Properties:
+      VpcId:  
+        Ref: myVPC
+
+  mySubnetRouteTableAssociationA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: subnetA
+      RouteTableId:
+        Ref: myRouteTable
+
+  mySubnetRouteTableAssociationB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: subnetB
+      RouteTableId:
+        Ref: myRouteTable
+
+  mySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow HTTPS traffic from the VPC'
+      VpcId: !Ref myVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    DependsOn: ExecuteApiInterfaceEndpoint
+    Properties:
+      Name: CloudFormation-APIGW
+      OpenApiVersion: '2.0'
+      StageName: test
+      EndpointConfiguration: "PRIVATE"
+      DefinitionBody: 
+        openapi: "3.0.1"
+        info:
+          description: "API Gateway created from CloudFormation stack"
+          version: "1.0"
+        basePath: "/"
+        schemes:
+        - "https"
+        paths:
+          /test-resource:
+            get:
+              responses:
+                "200":
+                  description: "200 response"
+                  content:
+                    application/json:
+                      schema:
+                        $ref: "#/components/schemas/Empty"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+        components:
+          schemas:
+            Empty:
+              title: "Empty Schema"
+              type: "object"
+        x-amazon-apigateway-policy:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Deny"
+            Principal: "*"
+            Action: "execute-api:Invoke"
+            Resource: "*"
+            Condition:
+              StringNotEquals:
+                aws:SourceVpce: !Sub ${ExecuteApiInterfaceEndpoint}
+          - Effect: "Allow"
+            Principal: "*"
+            Action: "execute-api:Invoke"
+            Resource: "*"
+
+Outputs:
+  ROUTETABLEID:
+    Description: The ID of the RouteTable
+    Value: !Ref myRouteTable
+  VPCCIDR:
+    Description: The ID of the VPC
+    Value: 10.0.0.0/16
+  VPCID:
+    Description: The ID of the VPC
+    Value: !Ref myVPC
+  APIGWID:
+    Description: The ID of the API Gateway
+    Value: !Ref MyApi
+  VPCEID:
+    Description: The ID of the VPC Endpoint 
+    Value: !Join
+    - ','
+    - !GetAtt ExecuteApiInterfaceEndpoint.DnsEntries
+  Region:
+    Description: The region ID
+    Value: !Sub ${AWS::Region}
