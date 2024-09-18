@@ -73,7 +73,7 @@ namespace IntegrationTests
             var response = await ExecuteGraphQLRequest(query, variables);
 
             // Assert
-            AssertSuccessfulResponse(response, id, content, timestamp);
+            AssertSuccessfulResponse(response, "getHotData", id, content, timestamp);
 
             // Delete item from DynamoDB
             var deleteItemRequest = new DeleteItemRequest
@@ -139,7 +139,7 @@ namespace IntegrationTests
             var response = await ExecuteGraphQLRequest(query, variables);
 
             // Assert
-            AssertSuccessfulResponse(response, id, content, timestamp);
+            AssertSuccessfulResponse(response, "getColdData", id, content, timestamp);
 
             // Delete uploaded file from S3
             await _s3Client.DeleteObjectAsync(new DeleteObjectRequest
@@ -186,12 +186,12 @@ namespace IntegrationTests
             return JObject.Parse(responseString);
         }
 
-        private static void AssertSuccessfulResponse(JObject response, string id, string content, DateTime timestamp)
+        private static void AssertSuccessfulResponse(JObject response, string query, string id, string content, DateTime timestamp)
         {
-            Assert.NotEmpty(response?["data"]?["getHotData"]?.ToString() ?? string.Empty);
-            Assert.Equal(id, response?["data"]?["getHotData"]?["id"]?.ToString());
-            Assert.Equal(content, response?["data"]?["getHotData"]?["content"]?.ToString());
-            Assert.Equal(timestamp.ToString("yyyy/MM/dd HH:mm:ss tt"), DateTime.Parse(response?["data"]?["getHotData"]?["timestamp"]?.ToString() ?? string.Empty).ToString("yyyy/MM/dd HH:mm:ss tt"));
+            Assert.NotEmpty(response?["data"]?[query]?.ToString() ?? string.Empty);
+            Assert.Equal(id, response?["data"]?[query]?["id"]?.ToString());
+            Assert.Equal(content, response?["data"]?[query]?["content"]?.ToString());
+            Assert.Equal(timestamp.ToString("yyyy/MM/dd HH:mm:ss tt"), DateTime.Parse(response?["data"]?[query]?["timestamp"]?.ToString() ?? string.Empty).ToString("yyyy/MM/dd HH:mm:ss tt"));
             Assert.Null(response?["error"]?.ToString());            
         }
 
