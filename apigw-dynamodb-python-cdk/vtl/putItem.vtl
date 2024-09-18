@@ -1,0 +1,14 @@
+#set($inputRoot = $input.path('$'))
+{
+    "TableName": "$stageVariables.TableName",
+    "Item": {
+        "ID": { "S": "$inputRoot.ID" },
+        "FirstName": { "S": "$inputRoot.FirstName" },
+        "Age": { "N": "$inputRoot.Age" }
+        #foreach($key in $inputRoot.keySet())
+            #if ($key != 'FirstName' && $key != 'Age' && $key != 'ID')
+                ,"$key": { "S": "$inputRoot.get($key)" }
+            #end
+        #end
+    }
+}

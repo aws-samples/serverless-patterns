@@ -1,0 +1,8 @@
+#set($inputRoot = $input.path('$'))
+{
+    "TableName": "$stageVariables.TableName",
+    "Key": {
+        "ID": { "S": "$inputRoot.ID.S" }, 
+        "FirstName": {"S": "$inputRoot.FirstName.S"}
+    }
+}
