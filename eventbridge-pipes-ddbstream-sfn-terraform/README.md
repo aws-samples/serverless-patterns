@@ -1,6 +1,6 @@
 # DynamoDB Stream to Step Functions with EventBridge Pipes
 
-This pattern shows how to use Amazon EventBridge Pipes to launch a AWS Step Functions state machine with a message coming from an Amazon DynamoDB stream
+This pattern shows how to use Amazon EventBridge Pipes to connect Amazon DynamoDB streams with AWS Step Functions and launch a state machine.
 
 ![Pipes diagram](./ArchDiagram.png)
 
@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd eventbridge-pipes-ddbstream-sfn-terraform
     ```
-3. From the command line, initialize terraform to download and install the providers defined in the configuration:
+3. From the command line, initialize Terraform to download and install the providers defined in the configuration:
     ```
     terraform init
     ```
@@ -38,11 +38,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Previously, whenever we needed DynamoDB Streams to send messages to Step Functions based on changes made to your DynamoDB table, we had to implement a Lambda function in between DynamoDB and Step Functions because Amazon DynamoDB streams did not support AWS Step Functions as a target directly.
+Previously, whenever you needed to send DynamoDB record changes through DynamoDB streams to Step Functions, you had to implement an AWS Lambda function to invoke a state machine because Amazon DynamoDB streams did not support AWS Step Functions as a direct target.
 
-But at re:Invent 2022, AWS launched a new feature for Amazon EventBridge known as EventBridge Pipes.
-
-Now, we can directly integrate DynamoDB streams with AWS Step Functions without the need for having an additional Lambda function.
+Now, you can directly integrate DynamoDB streams with AWS Step Functions.
 
 ## Testing
 
@@ -61,7 +59,7 @@ aws dynamodb put-item \
     --item PlayerName={S="Lionel Messi"},Nationality={S="Argentina"},GoalsScored={S="1"}
 ```
 
-The Step Functions workflow should be invoked and you should see the logs for the new execution.
+The Step Functions state machine is invoked and you should see the logs for the new execution.
 
 Now add an item to the DynamoDB stream which doesn't match the filter.
 ```bash
@@ -70,7 +68,7 @@ aws dynamodb put-item \
     --item PlayerName={S="Sergy Gnabry"},Nationality={S="Germany"},GoalsScored={S="1"}
 ```
 
-No Step Function workflow should be invoked and you should not see any new logs.
+No Step Function state machine is invoked and you will not see any new logs.
 
 ## Cleanup
 1. Change directory to the pattern directory:
