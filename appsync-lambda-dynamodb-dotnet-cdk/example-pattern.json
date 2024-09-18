@@ -1,0 +1,76 @@
+{
+    "title": "GraphQL API with Hot and Cold Data Storage using AppSync, Lambda, DynamoDB, and S3/Athena",
+    "description": "Create a serverless GraphQL API using AWS AppSync with separate storage solutions for hot and cold data, leveraging AWS Lambda, Amazon DynamoDB, Amazon S3, and Amazon Athena",
+    "language": ".NET",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern demonstrates how to implement a GraphQL API using AWS AppSync with separate storage solutions for hot and cold data. It uses AWS Lambda for resolvers, Amazon DynamoDB for hot data storage, and Amazon S3 with Amazon Athena for cold data querying. The pattern includes integration with AWS Glue Data Catalog and showcases efficient data management techniques for varying access patterns."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-lambda-dynamodb-dotnet-cdk",
+        "templateURL": "serverless-patterns/appsync-lambda-dynamodb-dotnet-cdk",
+        "projectFolder": "appsync-lambda-dynamodb-dotnet-cdk",
+        "templateFile": "/src/AppsyncLambdaDynamodbDotnetCdk/AppsyncLambdaDynamodbDotnetCdkStack.cs"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AWS AppSync",
+          "link": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html"
+        },
+        {
+          "text": "AWS Lambda",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+        },
+        {
+          "text": "Amazon DynamoDB",
+          "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+        },
+        {
+          "text": "Amazon S3",
+          "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+        },
+        {
+          "text": "Amazon Athena",
+          "link": "https://docs.aws.amazon.com/athena/latest/ug/what-is.html"
+        },
+        {
+          "text": "AWS Glue",
+          "link": "https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html"
+        },
+        {
+          "text": "AWS CDK",
+          "link": "https://docs.aws.amazon.com/cdk/latest/guide/home.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions, including how to query the GraphQL API for hot and cold data, and how to verify the data storage in DynamoDB and S3/Athena."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Tejas Vora",
+        "image": "./TejasVora.jpg",
+        "bio": "Tejas Vora is a Senior Solutions Architect with Amazon Web Services.",
+        "linkedin": "tejas-vora-b4758a47"
+      }
+    ]
+  }
