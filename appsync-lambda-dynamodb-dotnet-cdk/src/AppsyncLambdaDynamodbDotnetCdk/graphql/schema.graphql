@@ -1,0 +1,14 @@
+type Query {
+  getHotData(id: ID!): Data
+  getColdData(id: ID!): Data
+}
+
+type Data {
+  id: ID
+  content: String
+  timestamp: AWSDateTime
+}
+
+schema {
+  query: Query
+}
