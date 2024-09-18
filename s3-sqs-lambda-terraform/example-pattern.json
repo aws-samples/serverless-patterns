@@ -1,15 +1,15 @@
 {
-  "title": "AWS Amazon S3 Lambda with SQS queue",
-  "description": "Create a Lambda function triggered for every jpg image file stored to S3 via SQS.",
-  "language": "node.js",
+  "title": "Amazon S3 to AWS Lambda with Amazon SQS queue",
+  "description": "Create a Lambda function that is triggered for every jpg image file uploaded to S3 via an SQS queue.",
+  "language": "Node.js",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
     "headline": "Create a Lambda function triggered for every jpg image file stored to S3 via SQS",
     "text": [
-      "The terraform manifest deploys a Lambda function, an SQS queue, one S3 bucket and the IAM resources required to run the application.",
-      "An SQS queue consumes ObjectCreated events from an Amazon S3 bucket if the file has .jpg extension. The SQS triggers a Lambda function.",
-      "The Lambda function serve as a pre-configured template, providing a starting point for developing your application."
+      "Terraform deploys Lambda, SQS, S3, and IAM resources.",
+      "SQS consumes S3 .jpg events, triggering Lambda.",
+      "Lambda serves as a template for app development."
     ]
   },
   "gitHub": {
@@ -24,18 +24,14 @@
     "bullets": [
       {
         "text": "Configuring an Amazon SQS queue to trigger an AWS Lambda function",
-        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-lambda-function-trigger.html",
-      },
-      {
-        "text": "Amazon Simple Storage Service (S3) -> User Guide -> Using EventBridge",
-        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html"
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-lambda-function-trigger.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "<code>terraform init</code>",
-      "<code>terraform apply</code>"
+      "terraform init",
+      "terraform apply"
     ]
   },
   "testing": {
