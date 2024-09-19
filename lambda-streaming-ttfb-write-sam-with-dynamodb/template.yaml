@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: (uksb-1tthgi812) (tag:lambda-streaming-ttfb-write-sam-with-dynamodb) Serverless Patterns - Lambda Streaming Response with DynamoDB
+Resources:
+  StreamingFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Timeout: 30
+      MemorySize: 512
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          DDB_TABLE_NAME: !Ref DDBTable
+      FunctionUrlConfig:
+        AuthType: AWS_IAM
+        InvokeMode: RESPONSE_STREAM
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !GetAtt DDBTable.Arn
+
+  DDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: StreamingFunction
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: model
+          AttributeType: S
+        - AttributeName: identifier
+          AttributeType: S
+      KeySchema:
+        - AttributeName: model
+          KeyType: HASH
+        - AttributeName: identifier
+          KeyType: RANGE
+  MyFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !Ref StreamingFunction2
+      AuthType: AWS_IAM
+      InvokeMode: RESPONSE_STREAM
+Outputs:
+  StreamingFunction:
+    Description: "Streaming Lambda Function ARN"
+    Value: !GetAtt StreamingFunction2.Arn
+  StreamingFunctionURL:
+    Description: "Streaming Lambda Function URL"
+    Value: !GetAtt MyFunctionUrl.FunctionUrl
