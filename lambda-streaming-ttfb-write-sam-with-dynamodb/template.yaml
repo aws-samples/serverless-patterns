@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: (uksb-1tthgi812) (tag:lambda-streaming-ttfb-write-sam-with-dynamodb) Serverless Patterns - Lambda Streaming Response with DynamoDB
 Resources:
-  StreamingFunction2:
+  StreamingFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
@@ -39,13 +39,13 @@ Resources:
   MyFunctionUrl:
     Type: AWS::Lambda::Url
     Properties:
-      TargetFunctionArn: !Ref StreamingFunction2
+      TargetFunctionArn: !Ref StreamingFunction
       AuthType: AWS_IAM
       InvokeMode: RESPONSE_STREAM
 Outputs:
   StreamingFunction:
     Description: "Streaming Lambda Function ARN"
-    Value: !GetAtt StreamingFunction2.Arn
+    Value: !GetAtt StreamingFunction.Arn
   StreamingFunctionURL:
     Description: "Streaming Lambda Function URL"
     Value: !GetAtt MyFunctionUrl.FunctionUrl
