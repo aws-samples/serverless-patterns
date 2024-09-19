@@ -21,6 +21,10 @@
   "resources": {
     "bullets": [
       {
+        "text": "Supercharging User Experience with AWS Lambda Response Streaming",
+        "link": "https://aws.amazon.com/blogs/apn/supercharging-user-experience-with-aws-lambda-response-streaming/"
+      },
+      {
         "text": "Configure Lambda Function Response Streaming",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html"
       },
