@@ -1,7 +1,5 @@
 # Lambda Response streaming: Streaming incremental DynamoDB Query results.
 
-This pattern shows how to use Lambda response streaming to improve time-to-first byte using the write() For more information on the feature, see the [launch blog post](https://aws.amazon.com/blogs/compute/introducing-aws-lambda-response-streaming/).
-
 This pattern shows how to use Lambda response streaming to incrementally retrieve and stream DynamoDB query / scan results using the write() method. Instead of waiting for the entire query / scan operation to complete, the Lambda function streams data in batches by setting a limit on the number of items per query and sending each batch as soon as it's retrieved. This improves the time-to-first-byte (TTFB) by streaming results to the client as they become available.
 
 For more information on the Lambda response streaming feature, see the [launch blog post](https://aws.amazon.com/blogs/compute/introducing-aws-lambda-response-streaming/).
