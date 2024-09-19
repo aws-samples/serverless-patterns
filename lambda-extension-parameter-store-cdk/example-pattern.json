@@ -1,0 +1,53 @@
+{
+  "title": "Lambda Extension for SSM Parameter Store with CDK (Typescript)",
+  "description": "Read the Parameter Store value using Parameter Store Extension for Lambda",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project demonstrates how to access SSM Parameter Store value from Lambda using Lambda extension."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-extension-parameter-store-cdk",
+      "templateURL": "serverless-patterns/lambda-extension-parameter-store-cdk",
+      "projectFolder": "lambda-extension-parameter-store-cdk",
+      "templateFile": "lambda-extension-parameter-store-cdk/lambda-extension-parameter-store-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Parameter Store Lambda Extension",
+        "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all --parameters parameterStoreExtensionArn='[Parameter Store Lambda extension layer ARN]'"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destory --all</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pubudu Jayawardana",
+      "image": "https://avatars.githubusercontent.com/u/1263087",
+      "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusisast.",
+      "linkedin": "pubudusj",
+      "twitter": "@pubudusj"
+    }
+  ]
+}

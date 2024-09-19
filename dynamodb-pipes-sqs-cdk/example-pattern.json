@@ -1,0 +1,63 @@
+{
+  "title": "DynamoDB Streams to SQS using EventBridge Pipes",
+  "description": "This pattern demonstrates a low code way to send DynamoDB stream records to an SQS queue using EventBridge Pipes.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates a low code way to send DynamoDB stream records to an SQS queue using EventBridge Pipes.",
+      "When items are put in the DynamoDB table, the DynamoDB stream captures a time ordered sequence of the changes to the items. The EventBridge pipe uses the stream records as a source and writes those records to the target SQS queue.",
+      "This pattern deploys one DynamoDB Table with streams enabled, one SQS Queue, one an EventBride Pipe to connect them."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-pipes-sqs-cdk",
+      "templateURL": "serverless-patterns/dynamo-pipes-sqs-cdk",
+      "projectFolder": "dynamodb-pipes-sqs-cdk",
+      "templateFile": "dynamodb-pipes-sqs-cdk/src/DynamoPipeSqsDynamoPipeSqsStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "DynamoDB Table L2 Construct",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_dynamodb.Table.html"
+      },
+      {
+        "text": "EventBridge Pipes L1 Construct",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_pipes.CfnPipe.html"
+      },
+      {
+        "text": "SQS Queue L2 Construct",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_sqs.Queue.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tim Wondergem",
+      "image": "https://avatars.githubusercontent.com/u/4333425",
+      "bio": "Tim Wondergem is a Cloud Application Architect at AWS whose passions include event driven systems serverless.",
+      "linkedin": "https://www.linkedin.com/in/tim-wondergem-18591a3/",
+      "twitter": "tim_wondergem"
+    }
+  ]
+}

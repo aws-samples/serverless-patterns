@@ -1,0 +1,63 @@
+{
+  "title": "SQS to Step Functions with EventBridge Pipes",
+  "description": "This pattern shows how to use EventBridge Pipes to launch a StepFunctions state machine with a message coming from SQS Queue.",
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "EventBridge Pipe used to poll a SQS queue and use the message to launch a StepFunctions state machine"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-stepfunctions",
+      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-stepfunctions",
+      "projectFolder": "eventbridge-pipes-sqs-to-stepfunctions",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Roman Boiko",
+      "image": "https://avatars.githubusercontent.com/u/856463?s=400&u=ace30327876b4d197d0ca3c94dee2e679fb34801&v=4",
+      "bio": "AWS Serverless Specialist Solutions Architect"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+    "title": "Amazon S3 integration with AWS Lambda to send email notifications about the object",
+    "description": "This pattern creates an Amazon API Gateway HTTP API and an AWS Lambda function.",
+    "language": "Python",
+    "level": "200",
+    "framework": "terraform",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This template deploys a AWS Lambda Function and Amazon S3 bucket with the required IAM resources to run the application", 
+        "The Lambda Function consumes **ObjectCreated** events from an Amazon S3 bucket", 
+        "Further, Lambda code checks the object size if the uploded file size is <= 25MB then the object will be attached to the email for higher payloads Lambda generates a presigned URL and generates short URL which will be attached to the email"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-ses-terraform",
+        "templateURL": "serverless-patterns/s3-lambda-ses-terraform",
+        "projectFolder": "s3-lambda-ses-terraform",
+        "templateFile": "s3-lambda-ses-terraform/deploy.tf"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Using AWS Lambda with Amazon S3",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
+        },
+        {
+          "test": "AWS Lambda - the Basics",
+          "link": "https://docs.aws.amazon.com/whitepapers/latest/serverless-architectures-lambda/aws-lambdathe-basics.html"
+        },
+        {
+          "text": "How do I send email using Lambda and Amazon SES",
+          "link": "https://aws.amazon.com/premiumsupport/knowledge-center/lambda-send-email-ses/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "terraform apply"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "terraform destroy"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Akhil Deshneni",
+        "bio": "I am a Cloud Support Associate at AWS"
+      }
+    ]
+  }

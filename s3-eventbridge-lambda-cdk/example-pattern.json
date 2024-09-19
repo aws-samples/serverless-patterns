@@ -1,0 +1,59 @@
+{
+    "title": "AWS S3 to AWS EventBridge to AWS Lambda",
+    "description": "Create a S3 bucket with EventBridge notifications enabled and send S3 events to AWS Lambda.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template for creating an AWS S3 bucket with AWS EventBridge notifications turned on",
+        "All S3 events in this bucket is sent to AWS EventBridge",
+        "This CDK template also deploys a AWS Lambda function which will process the event sent to AWS EventBridge and create a tag for the S3 object that was created",
+        "An AWS EventBridge rule is also created to send only the Object Created event of the bucket to the Lambda function"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-lambda-cdk",
+        "templateURL": "serverless-patterns/s3-eventbridge-lambda-cdk",
+        "projectFolder": "s3-eventbridge-lambda-cdk",
+        "templateFile": "s3-eventbridge-lambda-cdk/cdk/stack/s3-eventbridge-lambda-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AWS S3 Event Notifications with EventBridge",
+          "link": "https://aws.amazon.com/blogs/aws/new-use-amazon-s3-event-notifications-with-amazon-eventbridge/"
+        },
+        {
+          "text": "Using EventBridge with S3",
+          "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Arun Thangaraj",
+        "image": "link-to-your-photo.jpg",
+        "bio": "Arun is a Cloud Application Architect at AWS Professional Services based out of Dallas, TX.",
+        "linkedin": "www.linkedin.com/in/arunvthangaraj"
+      }
+    ]
+  }

@@ -1,0 +1,58 @@
+{
+  "title": "Amazon SQS to Amazon API Gatewy using Amazon Eventbridge Pipes with enrichment",
+  "description": "Create an EventBridge pipe to simplify process of pushing items to Amazon DynamoDB",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use EventBridge pipe to push and modify messages before sending it to DynamoDB.", 
+      "This pattern is leveraging EventBridge pipe to first integrate 3 services together, simplifying the process by reducing the need for integration code.",
+      "Here, SQS is the EventBridge source and Lambda to enrich the data, before pushing to the target API Destination that invokes an API Gateway."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/pjx98/serverless-patterns/tree/pjx98-feature-eventbridge-pipes-sqs-lambda-api-destination/eventbridge-pipes-sqs-lambda-api-destination",
+      "templateURL": "https://github.com/pjx98/serverless-patterns/blob/pjx98-feature-eventbridge-pipes-sqs-lambda-api-destination/eventbridge-pipes-sqs-lambda-api-destination/template.yaml",
+      "projectFolder": "eventbridge-pipes-sqs-lambda-api-destination",
+      "templateFile": "eventbridge-pipes-sqs-lambda-api-destination/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Peh Jing Xiang",
+      "image": "profile-pic.jpg",
+      "bio": "Jing Xiang is an Associate Solutions Architect based in Singapore",
+      "linkedin": "jing-xiang-peh"
+    }
+  ]
+}

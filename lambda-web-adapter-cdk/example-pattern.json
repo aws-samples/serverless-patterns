@@ -1,0 +1,49 @@
+{
+	"title": "Lambda Web Adapter with Function URL",
+	"description": "Create a Lambda function that contains a NodeJS application and it is invoked by a Function URL",
+	"language": "Typescript",
+	"level": "200",
+	"framework": "CDK",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This examples creates a Lambda function that is triggered by a Function URL.",
+			"The function contains a NodeJS application - lift and shift - that is wrapped using the Lambda Web Adapter",
+			"Lambda Web Adapter is an open source project that allows you to wrap any HTTP web application with a Lambda function"
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-web-adapter-cdk",
+			"templateURL": "serverless-patterns/lambda-web-adapter-cdk",
+			"projectFolder": "lambda-web-adapter-cdk",
+			"templateFile": "lambda-web-adapter-cdk/cdk/stack/lambda-web-adapter-stack.ts"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "Lambda Web Adapter GitHub project",
+				"link": "https://github.com/awslabs/aws-lambda-web-adapter"
+			},
+			{
+				"text": "Is lift and shift migration Lambda possible? Demo with Node-Express app",
+				"link": "https://youtu.be/MvVaFPCdiZY"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["cdk deploy"]
+	},
+	"testing": {
+		"text": ["See the GitHub repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>cdk destroy</code>."]
+	},
+	"authors": [
+		{
+			"name": "Marcia Villalba"
+		}
+	]
+}

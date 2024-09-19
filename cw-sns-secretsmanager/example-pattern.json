@@ -1,0 +1,58 @@
+{
+  "title": "CloudWatch Events, SNS and AWS Secrets Manager Integration",
+  "description": "An application that Detects and Notify on Amazon Secrets Manager Secret Key Creation, Updation and Deletion using Amazon CloudWatch event and Amazon SNS",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template deploys an application to Detect and Notify on Amazon Secrets Manager Secret Key Creation, Updation and Deletion using Amazon CloudWatch event and Amazon SNS", 
+      "Once the template is deployed, you will receive an email notification on the email address you defined in Requirements. Make sure to confirm email subscription in order to receive updates related to your Secret Keys present in AWS Secret manager."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cw-sns-secretsmanager",
+      "templateURL": "serverless-patterns/cw-sns-secretsmanager",
+      "projectFolder": "cw-sns-secretsmanager",
+      "templateFile": "cw-sns-secretsmanager/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Create an AWS Secrets Manager secret",
+        "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html"
+      },
+      {
+        "text": "Monitor AWS Secrets Manager secrets",
+        "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/monitoring.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jainam Shah",
+      "image": "https://drive.google.com/file/d/19NrbeT5LdQRAqnOGdEXsPZKvWph3Ba8U/view?usp=sharing",
+      "bio": "Technical Account Manager @ AWS",
+      "linkedin": "https://www.linkedin.com/in/jainamshah92",
+      "twitter": "@imJshah92"
+    }
+  ]
+}

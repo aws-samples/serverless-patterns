@@ -1,0 +1,55 @@
+{
+  "title": "DynamoDB Stream to EventBridge using Spitter pattern",
+  "description": "This pattern takes a change data capture event from DynamoDB and splits it into multiple events into EventBridge.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["Insert happens into DynamoDB table (source), EventBridge pipes then splits the event into three events EventBridge (target)."]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-splitter-pattern",
+      "templateURL": "serverless-patterns/eventbridge-pipes-splitter-pattern",
+      "projectFolder": "eventbridge-pipes-splitter-pattern",
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.png",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

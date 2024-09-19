@@ -1,0 +1,61 @@
+{
+    "title": "Asynchronous invocation between Lambda functions with S3 when payload size is large",
+    "description": "Create a Lambda function that invoke another Lambda function asynchronously. When the payload exceed Lambda asynchronous invocation payload quota, payload is saved to S3 bucket. Then S3 trigger second asynchronous Lambda function",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to use a Lambda function to invoke another Lambda function asynchronously.",
+        "The SAM template provided deploys two Lambda functions. First Lambda function invokes second Lambda function asynchronously.",
+        "When the payload size is exceed the invocation payload size quota, then payload is saved to S3 bucket.",
+        "S3 bucket `s3:ObjectCreated` event triggers second Lambda function.",
+        "Using Lambda function asynchronous invocation saves time and cost."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-async-lambda",
+        "templateURL": "serverless-patterns/lambda-s3-async-lambda",
+        "projectFolder": "lambda-s3-async-lambda",
+        "templateFile": "lambda-s3-async-lambda/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AWS Lambda Developer Guide - Invoking functions - Asynchronous invocation",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html"
+        },
+        {
+          "text": "AWS Lambda Developer Guide - Lambda Quotas",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html#function-configuration-deployment-and-execution"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Seoyeon Park",
+        "image": "https://avatars.githubusercontent.com/SeoyeonPark",
+        "bio": "Seoyeon is an Associate Application Developer at AWS Professional Services based in Seoul.",
+        "linkedin": "https://www.linkedin.com/in/seoyeonpark8080"
+      }
+    ]
+  }
+  

@@ -1,0 +1,55 @@
+{
+  "title": "SQS to Lambda with Step Functions event enrichment",
+  "description": "This pattern triggers a Lambda function from an SQS queue with Step functions enrichment inbetween them using EventBridge Pipes",
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["SQS queue is polled and messages are sent to Step Function workflow, the workflow enriches the event and forwards them onto the Lambda function"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/eventbridge-pipes-sqs-to-lambda-with-stepfunction-enrichment",
+      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-lambda-with-stepfunction-enrichment",
+      "projectFolder": "eventbridge-pipes-sqs-to-lambda-with-stepfunction-enrichment",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy --guided"]
+  },
+  "testing": {
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.png",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "title": "EventBridge to Systems Manager Associations",
+  "description": "Create an EventBridge Schedule to execute a SSM State Manager Association",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample pattern demonstrates how to use EventBridge Scheduler to run a SSM Association every 15 minutes and deployed using SAM."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-ssm-sam",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-ssm-sam",
+      "readmeURL":"https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-ssm-sam/README.md",
+      "projectFolder": "eventbridge-schedule-to-ssm-sam",
+      "templateFile": "eventbridge-schedule-to-ssm-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Scheduler User Guide",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "CloudFormation AWS::Scheduler::Schedule",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedule.html"
+      },
+      {
+        "text": "SSM Start_associations_Once SDK Reference",
+        "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ssm/client/start_associations_once.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>sam build</code>",
+      "<code>sam deploy --guided</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for detailed clean-up instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Joe Losinski",
+      "image": "https://avatars.githubusercontent.com/u/128616881?s=400&u=709f313db9eab1162d1874860c96bbd44164f1bf&v=4",
+      "bio": "AWS Senior Solutions Architect and Serverless Enthusiast."
+    }
+  ]
+}

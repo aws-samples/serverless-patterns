@@ -1,0 +1,52 @@
+{
+  "title": "API Gateway to Lambda with SnapStart deployed with Terraform",
+  "description": "Create a Java Lambda function with SnapStart deployed with Terraform",
+  "language": "Java",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an API Gateway, Lambda and DynamoDB with Lambda SnapStart for Java, and deploy it with Terraform"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-snapstart-terraform",
+      "templateURL": "serverless-patterns/apigw-lambda-snapstart-terraform",
+      "projectFolder": "apigw-lambda-snapstart-terraform",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda SnapStart",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>.",
+      "Confirm the stack has been deleted: <code>terraform show</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Michele Ricciardi",
+      "bio": "Senior Specialist Solutions Architect, DevAx",
+      "twitter": "_mriccia_"
+    }
+  ]
+}

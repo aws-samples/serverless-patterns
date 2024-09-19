@@ -1,0 +1,52 @@
+{
+  "title": "Amazon API Gateway REST API to AWS Lambda to Amazon EFS",
+  "description": "This AWS CDK application demonstrates how to attach, configure and access Amazon EFS from AWS Lambda function.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern outlines a solution on accessing the Elastic File System (EFS) from an AWS Lambda. An ideal use case to connect to EFS from AWS Lambda is to process files shared across multiple components of the application. When a upstream components writes data to a file and a backend task needs to process the data for downstream component, utilizing a file storage with AWS Lambda yields desired results. EFS is a serverless, no maintenance file system that can be accessed from various AWS resources. "
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-lambda-efs-dotnet",
+       "projectFolder": "apigw-rest-api-lambda-efs-dotnet",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-lambda-efs-dotnet/README.md",        
+      "templateURL": "serverless-patterns/apigw-rest-api-lambda-efs-dotnet",
+      "templateFile": "cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pankaj Rawat",
+      "image": "https://avatars.githubusercontent.com/u/21244341?s=96&v=4",
+      "bio": "Pankaj Rawat is a Lead Consultant at Amazon Web Services.",
+      "linkedin": "pankaj-rawat-14568765",
+      "twitter": "pankajrawat333"
+    },
+    {
+      "name": "Vijai Anand Ramalingam",
+      "image": "https://avatars.githubusercontent.com/u/83067978?v=4",
+      "bio": "Vijai Anand Ramalingam ia an Application Developer - ISV at Amazon Web Services",
+      "linkedin": "vijai-anand-ramalingam-77439736"
+    }
+  ]
+}

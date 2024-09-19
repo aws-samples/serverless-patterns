@@ -1,0 +1,54 @@
+{
+  "title": "AWS Lambda To Amazon DynamoDB",
+  "description": "This pattern creates a Lambda function that persist data into DynamoDB",
+  "language": "Rust",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a Lambda function that persist data into DynamoDB"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-dynamodb-rust",
+      "templateURL": "serverless-patterns/lambda-dynamodb-rust",
+      "projectFolder": "lambda-dynamodb-rust",
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon DynamoDB",
+        "link": "https://aws.amazon.com/dynamodb/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "headline": "Presented by Daniele Frasca",
+      "name": "Daniele Frasca",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "linkedin": "daniele-frasca",
+      "twitter": "dfrasca80"
+    }
+  ]
+}

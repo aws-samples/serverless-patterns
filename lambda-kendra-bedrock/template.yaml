@@ -89,6 +89,14 @@ Resources:
                 Action:
                   - kendra:BatchPutDocument
                   - kendra:BatchDeleteDocument
+              - Effect: Allow
+                Resource: !Sub arn:aws:s3:::${S3DSBucketName}/*
+                Action:
+                  - s3:GetObject
+              - Effect: Allow
+                Resource: !Sub arn:aws:s3:::${S3DSBucketName}
+                Action:
+                  - s3:ListBucket
           PolicyName: !Sub ${AWS::StackName}-DocsDSPolicy
       RoleName: !Sub ${AWS::StackName}-DocsDSRole
   # Kendra S3 data source

@@ -1,0 +1,52 @@
+{
+  "title": "DynamoDB Stream to Amazon SNS with Amazon EventBridge Pipes",
+  "description": "This pattern uses Amazon EventBridge Pipes to connect DynamoDB Stream directly to Amazon SNS with filtering option.",
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon EventBridge Pipes used to connect DynamoDB stream directly to Amazon SNS with filtering option."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-dynamodbstream-sns",
+      "templateURL": "serverless-patterns/eventbridge-pipes-dynamodbstream-sns",
+      "projectFolder": "eventbridge-pipes-dynamodbstream-sns",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+        "sam deploy --guided"    ]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+      {
+        "name": "Sayan Moitra",
+        "image": "./smoitra.png",
+        "bio": "Associate Solutions Architect, CSC"
+      }
+  ]
+}

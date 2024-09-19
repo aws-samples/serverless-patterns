@@ -1,0 +1,59 @@
+{
+    "title": "Amazon API Gateway HTTP API to SQS to Lambda",
+    "description": "This pattern creates an HTTP API endpoint that send message to SQS and trigger a Lambda function to process the message",
+    "language": "Node.js, TypeScript",
+    "level": "100",
+    "framework": "Serverless Framework",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an Amazon API Gateway HTTP API with a <code>send</code> route that send message to a SQS queue.",
+            "The  Amazon API Gateway HTTP API has basic CORS configured. ",
+            "Upon receiving message, SQS will trigger a Lambda function to process the message.",
+            "The function will only <code>print</code> the message only. The function written in TypeScript."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-sqs-lambda-sls",
+            "templateURL": "serverless-patterns/apigw-http-api-sqs-lambda-sls",
+            "projectFolder": "apigw-http-api-sqs-lambda-sls",
+            "templateFile": "serverless.yml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Using Lambda with Amazon SQS",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+            },
+            {
+                "text": "Amazon API Gateway HTTP Integration subtype reference",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-aws-services-reference.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "<code>serverless deploy --verbose</code>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>serverless remove --verbose</code>."
+        ]
+    },
+    "authors": [
+        {
+            "headline": "Presented by Dmitry Gulin, Modernization Architect, AWS",
+            "name": "Dmitry Gulin",
+            "bio": "Dmitry is a modernization architect for Professional Services at Amazon Web Services based in the US.",
+            "imageURL": "https://www.gravatar.com/avatar/223055bd132d244f6a96c3aef7453a5a?s=200"
+        }
+    ]
+}

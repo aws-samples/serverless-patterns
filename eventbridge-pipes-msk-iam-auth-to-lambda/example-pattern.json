@@ -1,0 +1,58 @@
+{
+    "title": "EventBridge Pipes with IAM Authentication enabled Amazon MSK cluster as source and Lambda function as target",
+    "description": "This pattern shows how to use EventBridge Pipes with data coming in from Amazon MSK cluster with IAM Authentication enabled and process these messages using Lambda function",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": ["Amazon MSK with IAM Auth is configured as the pipe source with Lambda function. This patterns allows EventBridge pipes to integrate with Amazon MSK deployed in a private subnet and Lambda function to process the messages"]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-msk-iam-auth-to-lambda",
+        "templateURL": "serverless-patterns/eventbridge-pipes-msk-iam-auth-to-lambda",
+        "projectFolder": "eventbridge-pipes-msk-iam-auth-to-lambda",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "EventBridge Pipes Documentation",
+          "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+        },
+        {
+          "text": "Cloudformation API for Pipes",
+          "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+        },
+        {
+          "text": "Video explaining EventBridge Pipes",
+          "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+        },
+        {
+          "text": "Learn more about event-driven architecture",
+          "link": "https://serverlessland.com/event-driven-architecture"
+        }
+      ]
+    },
+    "deploy": {
+      "text": ["sam deploy --guided"]
+    },
+    "testing": {
+      "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    },
+    "cleanup": {
+      "text": ["Delete the stack: <code>sam delete</code>."]
+    },
+    "authors": [
+      {
+        "name": "Pawan Puthran",
+        "image": "https://media.licdn.com/dms/image/C4E03AQEB6pHc64s7_w/profile-displayphoto-shrink_400_400/0/1596015570736?e=1681948800&v=beta&t=P5_awh6zx-dBEXCSI94ksIjOcKEtknqyQkvQjMGTnzc",
+        "bio": "Principal Serverless Specialist at AWS",
+        "linkedin": "https://www.linkedin.com/in/pawan-puthran-a4659226/",
+        "twitter": "@pawanputhran"
+      }
+    ]
+  }
+  

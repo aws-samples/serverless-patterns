@@ -1,0 +1,57 @@
+{
+  "title": "DynamoDB seed data on create with custom resource using CDK (Typescript)",
+  "description": "Create a DynamoDB table and insert data upon creation using custom resource.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project demonstrates how to create a DynamoDB table and insert data upon creation using custom resource."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-seed-data-on-create-cdk",
+      "templateURL": "serverless-patterns/dynamodb-seed-data-on-create-cdk",
+      "projectFolder": "dynamodb-seed-data-on-create-cdk",
+      "templateFile": "dynamodb-seed-data-on-create-cdk/app-config-feature-flag-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "CDK Custom Resource",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResource.html"
+      },
+      {
+        "text": "Cloudformation Custom Resource",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources-lambda.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destory --all</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pubudu Jayawardana",
+      "image": "https://avatars.githubusercontent.com/u/1263087",
+      "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusisast.",
+      "linkedin": "pubudusj",
+      "twitter": "@pubudusj"
+    }
+  ]
+}

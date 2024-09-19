@@ -1,0 +1,49 @@
+{
+  "title": "Route53 to ALB to ECS Fargate",
+  "description": "This pattern shows how to deploy a containerized Web API as an ECS fargate service, and expose it with a custom domain using Route53",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK stack creates an ECS fargate service that hosts a containerized Web API.",
+      "The ECS service is fronted by Application Load Balancer present in public subnet, while ECS tasks runs in private subnet.",
+      "Requests are first recieved by the Route53, and then forwarded to Application Load Balancer (ALB).",
+      "ALB does the SSL offloading and forward the requests to ECS tasks."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/route53-alb-fargate-cdk-dotnet",
+      "projectFolder": "route53-alb-fargate-cdk-dotnet",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/route53-alb-fargate-cdk-dotnet/README.md",
+      "templateURL": "serverless-patterns/route53-alb-fargate-cdk-dotnet",
+      "templateFile": "src/Route53AlbFargateCdkDotnet/Route53AlbFargateCdkDotnetStack.cs"
+    }
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for detailed cleanup instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ankush Jain",
+      "image": "https://avatars.githubusercontent.com/u/13661966?v=4",
+      "bio": "Application Development Consultant at AWS Professional Services.",
+      "linkedin": "ankush-jain-developer",
+      "twitter": "ankushjain358"
+    }
+  ]
+}

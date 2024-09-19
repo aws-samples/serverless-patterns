@@ -1,0 +1,70 @@
+{
+  "title": "Amazon API Gateway to Amazon Kinesis",
+  "description": "Create an Amazon API Gateway to Amazon Kinesis REST API",
+  "language": "Typescript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon Kinesis Data Stream using the AWS Cloud Development Kit (AWS CDK) in Typescript."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-kinesis-cdk",
+      "projectFolder": "apigw-rest-api-kinesis-cdk",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-kinesis-cdk/README.md",
+      "templateURL": "serverless-patterns/apigw-rest-api-kinesis-cdk",
+      "templateFile": "cdk/lib/apigw-kinesis-integration-stack.ts"
+    }
+  },
+"resources": {
+    "headline": "Documentation",
+    "bullets": [
+      {
+        "text": "Tutorial: Create a REST API as an Amazon Kinesis proxy in API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-kinesis.html"
+      },
+      {
+        "text": "How do I use API Gateway as a proxy for another AWS service?",
+        "link": "https://repost.aws/knowledge-center/api-gateway-proxy-integrate-service"
+      },
+      {
+        "text": "Amazon API Gateway API request and response data mapping reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html"
+      },
+      {
+        "text": "API Gateway mapping template and access logging variable reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo README for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mudassar Bashir",
+      "bio": "Solutions Architect at Amazon Web Services.",
+      "linkedin": "mudassar-bashir"
+    },
+    {
+      "name": "Brittany Ly",
+      "bio": "Solutions Architect at Amazon Web Services",
+      "linkedin": "brittany-ly-173025b4"
+    }
+  ]
+}

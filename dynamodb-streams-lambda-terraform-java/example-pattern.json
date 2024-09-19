@@ -1,0 +1,57 @@
+{
+  "title": "DynamoDB to Lambda",
+  "description": "Invoke a Lambda function from changes to a DynamoDB table using event-based filters",
+  "language": "Java",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Terraform template deploys a Lambda function, a DynamoDB table, and the minimum IAM resources required to run the application.",
+      "When items are written or updated in the DynamoDB table, the changes are sent to a stream. This pattern configures a Lambda function to poll this stream. The function is invoked with a payload containing the contents of the table item that changed."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-streams-lambda-terraform-java",
+      "templateURL": "serverless-patterns/dynamodb-streams-lambda-terraform-java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Docs: DynamoDB Streams and AWS Lambda Triggers",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Change directory: <code>cd eventbridge-cloudwatch-terraform</code>.",
+      "Delete the stack: <code>terraform destroy</code>.",
+      "Confirm the stack has been deleted: <code>terraform show</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ezzeddine El Ayoubi",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-ezzeddine-el-ayoubi.jpg",
+      "bio": "Devops Cloud Engineer (via Passionate People) at IKEA",
+      "linkedin": "ezzeddine-62535397"
+    },
+    {
+      "name": "Steven Cook",
+      "bio": "Senior Solutions Architect at AWS."
+    }
+  ]
+}

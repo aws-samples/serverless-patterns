@@ -1,0 +1,47 @@
+{
+  "title": "EventBridge Scheduler to Lambda every 5 minutes",
+  "description": "Simple pattern that triggers a Lambda function every 5 minutes using Amazon EventBridge Scheduler",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["Creates a scheulde that runs every 5 minutes to trigger a given Lambda function."]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-lambda",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-lambda",
+      "projectFolder": "eventbridge-schedule-to-lambda",
+      "templateFile": "eventbridge-schedule-to-lambda/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "Amazon EventBridge Scheduler Docs",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.jpg",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

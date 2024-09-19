@@ -1,0 +1,55 @@
+{
+  "title": "EventBridge Scheduler to send messages to Amazon SQS",
+  "description": "Simple pattern that publishes a message to an SQS queue every 5 minutes",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample pattern demonstrates how to send a message to an Amazon SQS queue every 5 minutes using EventBridge Scheduler and deployed using the AWS CDK for TypeScript."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-sqs-cdk-typescript",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-sqs-cdk-typescript",
+      "projectFolder": "eventbridge-schedule-to-sqs-cdk-typescript",
+      "templateFile": "eventbridge-schedule-to-sqs-cdk-typescript/lib/eventbridge-schedule-to-sqs-cdk-typescript-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting Started with EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "Getting started with Amazon SQS",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-getting-started.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tadhg O'Brien",
+      "bio": "Tadhg is a Technical Account Manager at Amazon Web Services supporting Public Sector customers and has a passion for all things Serverless",
+      "linkedin": "tadhgobrien"
+    }
+  ]
+}

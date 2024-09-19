@@ -1,0 +1,54 @@
+{
+    "title": "Amazon EventBridge to SNS to Lambda Function",
+    "description": "Using SNS to forward EventBridge rule trigger to AWS Lambda Function",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to create a SNS Topic can be used as target for an EventBridge rule and then invokes a Lambda function.",
+        "This pattern deploys a EventBridge rule with target as SNS topic which has a Lambda function as subscription"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sns-lambda",
+        "templateURL": "serverless-patterns/eventbridge-sns-lambda",
+        "projectFolder": "eventbridge-sns-lambda",
+        "templateFile": "eventbridge-sns-lambda/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Creating Amazon EventBridge rules that react to events",
+          "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-rule.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Bhavyesh",
+        "image": "https://drive.google.com/file/d/1oe_B5KT6iPJgOnS9RzVAlQNVr1GY3N0s/view?usp=sharing",
+        "bio": "Bhavyesh is a Serverless Cloud Engineer at Amazon Web Services and is based in India. Bhavyesh is a SME of serverless and messaging domains",
+        "linkedin": "https://www.linkedin.com/in/vyasbhavyesh/"
+      }
+    ]
+  }
+

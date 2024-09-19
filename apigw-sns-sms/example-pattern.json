@@ -1,0 +1,52 @@
+{
+    "title": "Amazon API Gateway REST API with SNS SMS integration",
+    "description": "Send SMS messages from API Gateway using SNS",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to send a SMS messages using API Gateway."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sns-sms",
+        "templateURL": "serverless-patterns/apigw-sns-sms",
+        "projectFolder": "apigw-sns-sms",
+        "templateFile": "apigw-sns-sms/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "REST API with SNS integration",
+          "link": "https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-proxy-integrate-service/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided --capabilities CAPABILITY_IAM"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Siddhi Jha",
+        "image": "https://drive.google.com/file/d/1H62Y6-JfUTiT-gIwDRYH6R45y7KJVHvN/view",
+        "bio": "A Serverless Cloud Engineer who works on building scalable, economic and sustainable solutions using AWS",
+        "linkedin": "https://www.linkedin.com/in/siddhi-jha/"
+      }
+    ]
+  }
+  

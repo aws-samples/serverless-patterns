@@ -1,0 +1,62 @@
+{
+    "title": "Amazon S3 triggering AWS Lambda using Amazon Rekognition and writing Amazon DynamoDB",
+    "description": "Detect labels in pictures using Amazon S3, AWS Lambda, Amazon Rekognition, and Amazon DynamoDB with Amazon Cloud Development Kit (AWS CDK)",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to deliver an event-driven mechanism to update DynamoDB for labels in images uploaded to S3.",
+            "Implemented in CDK."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-rekognition-ddb-cdk",
+            "templateURL": "serverless-patterns/s3-lambda-rekognition-ddb-cdk",
+            "projectFolder": "s3-lambda-rekognition-ddb-cdk/lib",
+            "templateFile": "s3-lambda-rekognition-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Using AWS Lambda with Amazon S3",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
+              },
+            {
+                "text": "Amazon Rekognition",
+                "link": "https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html"
+            },
+            {
+                "text": "Using AWS Lambda with Amazon DynamoDB",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html"
+            }
+            
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy --all"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy --all</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Chris Peter Francis",
+            "image": "https://media.licdn.com/dms/image/D5603AQGSCw1U075kjQ/profile-displayphoto-shrink_800_800/0/1679337668977?e=2147483647&v=beta&t=18EMAaL8Qrm0hpxVVR525WEImFw1cyHrASNg3iYw6k4",
+            "bio": "Chris is a Solution Architect for AWS Energy. Serverless advocate and enthusiast.",
+            "linkedin": "chrispf"
+        }
+    ]
+}

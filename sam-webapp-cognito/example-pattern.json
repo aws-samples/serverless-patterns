@@ -1,0 +1,51 @@
+{
+  "title": "Serverless Web Application",
+  "description": "Create a serverless web application using S3, CloudFront, API Gateway, Lambda, DynamoDB and Cognito.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to deploy a serverless web application using SAM. It uses S3, CloudFront, API Gateway, Lambda, DynamoDB and Cognito to build the application. This pattern uses CloudFront to serve both static and dynamic content with two origins to S3 and API Gateway. It also demonstrates how to protect the API using JWT authorizer with Cognito."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sam-webapp-cognito",
+      "templateURL": "serverless-patterns/sam-webapp-cognito",
+      "projectFolder": "sam-webapp-cognito",
+      "templateFile": "sam-webapp-cognito/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Controlling access to HTTP API using JWT authorizer",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html"
+      },
+      {
+        "text": "Amazon API Gateway HTTP API",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "Muthu Kumar",
+      "image": "https://twitter.com/klmuthu/photo",
+      "bio": "Senior Solutions Architect at AWS.",
+      "linkedin": "klmuthu",
+      "twitter": "@kmuthu"
+    }
+  ]
+}

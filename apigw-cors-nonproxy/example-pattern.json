@@ -1,0 +1,58 @@
+{
+  "title": "API Gateway REST API with Lambda non-proxy integration and CORS enabled",
+  "description": "API Gateway REST API with Lambda non-proxy integration and CORS enabled for GET and OPTIONS methods",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A REST API is created that has a GET method with a Lambda function integration.",
+      "The API also has an OPTIONS method with a MOCK integration",
+      "CORS is enabled for both GET and OPTIONS method i.e. 'Access-Control-Allow-Methods', 'Access-Control-Allow-Headers', 'Access-Control-Allow-Origin' headers are returned."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-cors-nonproxy",
+      "templateURL": "serverless-patterns/apigw-cors-nonproxy",
+      "projectFolder": "apigw-cors-nonproxy",
+      "templateFile": "apigw-cors-nonproxy/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Enabling CORS for a REST API resource",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html"
+      },
+      {
+        "text": "Testing CORS",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-test-cors.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Noor Bari",
+      "image": "https://media.licdn.com/dms/image/D4D03AQF-Eqdxb5EgDg/profile-displayphoto-shrink_800_800/0/1681412120461?e=1687392000&v=beta&t=4PQGZ9dxklC2oRdf_vdJxQH6UNkmqWScVMga9H4C3Qw",
+      "bio": "Cloud Support Engineer @ AWS",
+      "linkedin": "https://www.linkedin.com/in/noor-bari-521251206/"
+    }
+  ]
+}

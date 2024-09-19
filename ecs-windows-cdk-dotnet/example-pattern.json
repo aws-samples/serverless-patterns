@@ -1,0 +1,52 @@
+{
+    "title": "Running Windows Containers with Amazon ECS",
+    "description": "This AWS CDK application demonstrates how to deploy a application on Windows based Amazon Elastic Container Service (Amazon ECS) Cluster.",
+    "language": ".NET",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern uses .NET as a programming language to create the entire AWS CDK stack. For demonstration purpose, Windows sample image is used (mcr.microsoft.com/windows/servercore/iis), however same steps can be performed if Windows Docker image need to be deployed from Amazon Elastic Container Registry (Amazon ECR) repository."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ecs-windows-cdk-dotnet",
+        "projectFolder": "ecs-windows-cdk-dotnet",
+        "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ecs-windows-cdk-dotnet/README.md",
+        "templateURL": "serverless-patterns/ecs-windows-cdk-dotnet",
+        "templateFile": "cdk/src/Cdk/WindowsECS/WindowsECSClusterStack.cs"
+      }
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy --all"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Pankaj Rawat",
+        "image": "https://avatars.githubusercontent.com/u/21244341?s=96&v=4",
+        "bio": "Pankaj Rawat is a Lead Consultant at Amazon Web Services.",
+        "linkedin": "pankaj-rawat-14568765",
+        "twitter": "pankajrawat333"
+      },
+	  {
+      "name": "Vijai Anand Ramalingam",
+      "image": "https://avatars.githubusercontent.com/u/83067978?v=4",
+      "bio": "Vijai Anand Ramalingam ia an Application Developer - ISV at Amazon Web Services",
+      "linkedin": "vijai-anand-ramalingam-77439736"
+	  }
+    ]
+  }

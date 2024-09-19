@@ -1,0 +1,59 @@
+{
+  "title": "Response Transformation from XML to JSON in API Gateway",
+  "description": "Use VTL template to transform json response to xml in Amazon API Gateway.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "As part of this article, we will be creating a lambda and an API Gateway. The API Gateway will return custom xml transforming the json response from lambda."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-json-xml-vtl-transformation",
+      "templateURL": "serverless-patterns/apigw-lambda-json-xml-vtl-transformation",
+      "projectFolder": "apigw-lambda-json-xml-vtl-transformation",
+      "templateFile": "apigw-lambda-json-xml-vtl-transformation/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "API Gateway Mapping Template Reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html"
+      },
+      {
+        "text": "Error Handling Patterns in Amazon API Gateway and AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/"
+      },
+      {
+        "text": "Apache VTL reference user guide",
+        "link": "https://velocity.apache.org/engine/2.0/user-guide.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vamsi Krishna Ganti",
+      "bio": "Cloud Consultant at AWS focusing on Application Development."
+    }
+  ]
+}

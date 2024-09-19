@@ -1,0 +1,58 @@
+{
+  "title": "API Gateway WebSocket API to Step Functions Standard (Asynchronous Execution)",
+  "description": "Start Step Functions Standard Workflow asynchronous execution via WebSocket API",
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern uses Amazon API Gateway WebSocket API and AWS Service integration type with AWS Step Functions workflow as a business logics implementation.",
+      "This approach simplifies architecture by eliminating need to use additional compute components such as AWS Lambda."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-sfn-async",
+      "templateURL": "serverless-patterns/apigw-websocket-api-sfn-async",
+      "projectFolder": "apigw-websocket-api-sfn-async",
+      "templateFile": "apigw-websocket-api-sfn-async/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with WebSocket APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html"
+      },
+      {
+        "text": "Extended examples of this pattern implementation",
+        "link": "https://github.com/aws-samples/serverless-samples/tree/main/apigw-ws-integrations"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Giedrius Praspaliauskas",
+      "image": "",
+      "bio": "Giedrius is a senior solutions architect focusing on serverless at Amazon Web Services based in the US.",
+      "linkedin": "https://www.linkedin.com/in/gpraspaliauskas/",
+      "twitter": ""
+    }
+  ]
+}
