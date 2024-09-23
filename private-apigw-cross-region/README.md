@@ -1,6 +1,6 @@
-# Private Amazon API Gateway REST API to be invoked from an EC2 machine in a different AWS Region
+# Private Amazon API Gateway REST API to be invoked from an Amazon instance in a different AWS Region
 
-This pattern creates a Private Amazon API Gateway REST API, along with an Interface VPC Endpoint in an AWS Region. Subsequently, it creates a VPC, an EC2 Instance, a Private Hosted Zone and a VPC Peering Connection in a second AWS Region. Finally, the VPC Peering connection is created in the first AWS Region. This way, a client in an AWS Region can send requests to the Private API Gateway in a different AWS Region.
+This pattern creates a Private Amazon API Gateway REST API, along with an Interface VPC Endpoint in an AWS Region. Subsequently, it creates a VPC, an EC2 Instance, a Private Hosted Zone, and a VPC Peering Connection in a second AWS Region. Finally, the VPC Peering connection is created in the first AWS Region. This way, a client in an AWS Region can send requests to the Private API Gateway in a different AWS Region.
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-rest-api-lambda-vpc-sqs). edit this
 
@@ -19,9 +19,9 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory: (edit this)
+1. Change directory to the pattern directory:
     ```
-    cd apigw-rest-api-lambda-vpc-sqs
+    cd private-apigw-cross-region
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
