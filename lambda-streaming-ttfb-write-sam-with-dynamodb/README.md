@@ -39,7 +39,7 @@ git clone https://github.com/aws-samples/serverless-patterns
    - Enter the desired AWS Region
    - Allow SAM CLI to create IAM roles with the required permissions.
 
-1. Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file `samconfig.toml`, you can use `sam deploy` in future to use these defaults.
+1. After running `sam deploy --guided` mode once and saving arguments to a configuration file `samconfig.toml`, you can use `sam deploy` in future to use these defaults.
 
 AWS SAM deploys a Lambda function with streaming support and a function URL
 
