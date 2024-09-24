@@ -1,4 +1,4 @@
-# Lambda Response streaming: Streaming incremental DynamoDB Query results.
+# AWS Lambda Response streaming: Streaming incremental Amazon DynamoDB Query results.
 
 This pattern shows how to use Lambda response streaming to incrementally retrieve and stream DynamoDB query / scan results using the write() method. Instead of waiting for the entire query / scan operation to complete, the Lambda function streams data in batches by setting a limit on the number of items per query and sending each batch as soon as it's retrieved. This improves the time-to-first-byte (TTFB) by streaming results to the client as they become available.
 
@@ -36,7 +36,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 1. During the prompts:
 
    - Enter a stack name
-   - Enter the desired AWS Region - AWS CLI default region is recommended if you are planning to run the test (test.sh) script
+   - Enter the desired AWS Region
    - Allow SAM CLI to create IAM roles with the required permissions.
 
 1. Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file `samconfig.toml`, you can use `sam deploy` in future to use these defaults.
@@ -60,7 +60,7 @@ The service interaction in this pattern uses AWS Lambda's response streaming cap
 3. Querying
    The Lambda function begins querying DynamoDB using the defined limit (e.g., 100 items per batch). DynamoDB will return only a limited set of results instead of the entire result set at once.
 4. Response Streaming
-   As soon as a batch of results is retrieved, the Lambda function uses the `write()` method of Lambda's streaming API to send the data to the client. This happens immediately, without waiting for the entire query operation to complete.
+   As soon as a batch of results is retrieved, the function uses Lambda's streaming API `write()` method to send the data to the client. This happens immediately, without waiting for the entire query operation to complete.
 5. Pagination Handling
    If DynamoDB returns a LastEvaluatedKey (which indicates that more data is available), the Lambda function automatically continues querying the next batch of data. Each batch is streamed to the client as it becomes available.
 6. Final Response
@@ -68,13 +68,23 @@ The service interaction in this pattern uses AWS Lambda's response streaming cap
 
 ## Testing
 
-1. Use curl with your AWS credentials to view the streaming response as the url uses AWS Identity and Access Management (IAM) for authorization. Replace the URL and Region parameters for your deployment.
+1. Run the data dump function to populate the DynamoDB table.
+
+   Use curl with your AWS credentials as the url uses AWS Identity and Access Management (IAM) for authorization. Replace the URL and Region parameters for your deployment.
 
    ```
-   curl --request GET https://<url>.lambda-url.<Region>.on.aws/ --user AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY --aws-sigv4 'aws:amz:<Region>:lambda'
+   curl --request GET https://<url-of-data-dump-lambda>.lambda-url.<Region>.on.aws/ --user AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY --aws-sigv4 'aws:amz:<Region>:lambda'
    ```
 
-You can see the gradual display of the streamed response.
+2. Run the streaming function to view the streaming response.
+
+   Use curl with your AWS credentials to view the streaming response as the url uses AWS Identity and Access Management (IAM) for authorization. Replace the URL and Region parameters for your deployment.
+
+   ```
+   curl --request GET https://<url-of-streaming-lambda>.lambda-url.<Region>.on.aws/ --user AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY --aws-sigv4 'aws:amz:<Region>:lambda'
+   ```
+
+   You can see the gradual display of the streamed response.
 
 ## Cleanup
 

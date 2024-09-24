@@ -42,7 +42,6 @@ export const handler = awslambda.streamifyResponse(
 
       // If there are more items to scan, recursively call the scanDynamoDBTable function with the last evaluated key
       if (data.LastEvaluatedKey && counter < 10) {
-        console.log(counter);
         return scanDynamoDBTable(data.LastEvaluatedKey);
       }
 
