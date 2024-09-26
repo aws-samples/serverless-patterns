@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway Custom Domain Name (uksb-1tthgi812) (tag:apigw-custom-domain-regional)
+
+Parameters:
+
+  DomainName:
+    Type: String
+
+  CertificateArn:
+    Type: String
+
+  PublicHostedZoneId:
+    Type: String
+  
+  FailoverDomainName:
+    Type: String
+    
+  GeoLocationValue:
+    Type: String
+    
+  Priority:
+    Type: String
+    Description: PRIMARY or SECONDARY
+    AllowedValues: ["PRIMARY", "SECONDARY"]
+  
+Conditions:
+  CreatePrimaryResources: !Equals 
+    - !Ref Priority
+    - PRIMARY
+
+Resources:
+  #Lambda function
+  LambdaRegionalApi:
+    Type: AWS::Serverless::Function 
+    Properties:
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        def lambda_handler(event, context):
+            return {
+        "statusCode": 200,
+        "body": json.dumps({
+          "message" : "Hello World! This is the regional API"})
+        }
+      Runtime: python3.9
+      Events:
+        HelloWorld:
+          Type: Api 
+          Properties: 
+            Path: /
+            Method: get
+            RestApiId:
+              Ref: ApiRegional
+              
+  #REST Regional API
+  ApiRegional:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      EndpointConfiguration: REGIONAL
+  
+  CustomDomainRegional:
+    Type: AWS::ApiGatewayV2::DomainName
+    Properties:
+      DomainName: !Ref DomainName
+      DomainNameConfigurations:
+      - SecurityPolicy: TLS_1_2
+        CertificateArn: !Ref CertificateArn
+        EndpointType: REGIONAL
+
+  MappingRegional:
+    Type: AWS::ApiGatewayV2::ApiMapping
+    DependsOn:
+      - CustomDomainRegional
+    Properties:
+      DomainName: !Ref DomainName
+      ApiId: !Ref ApiRegional
+      Stage: !Ref ApiRegional.Stage
+
+  HealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Properties: 
+      HealthCheckConfig:
+        EnableSNI: true
+        FullyQualifiedDomainName: !Sub ${ApiRegional}.execute-api.${AWS::Region}.amazonaws.com
+        Type: HTTPS
+        FailureThreshold: 3 ## Default is 3
+        MeasureLatency: true ## Cannot be changed after creation
+        ResourcePath: /Prod
+  
+  FailoverRecord:
+    Type: AWS::Route53::RecordSet
+    DependsOn:
+      - CustomDomainRegional
+    Properties:
+      Failover: !Ref Priority
+      Name: !Ref FailoverDomainName
+      HostedZoneId: !Ref PublicHostedZoneId
+      HealthCheckId: !Ref HealthCheck
+      SetIdentifier: !Sub ${AWS::Region}-failover
+      AliasTarget:
+        DNSName: !GetAtt CustomDomainRegional.RegionalDomainName
+        HostedZoneId: !GetAtt CustomDomainRegional.RegionalHostedZoneId
+      Type: A
+      
+  GeoLocationRecord:
+    Condition: CreatePrimaryResources
+    Type: AWS::Route53::RecordSet
+    DependsOn:
+      - FailoverRecord
+    Properties:
+      GeoLocation:
+        CountryCode: !Ref GeoLocationValue
+      Name: !Ref DomainName
+      SetIdentifier: !Sub ${AWS::Region}-geolocation
+      HostedZoneId: !Ref PublicHostedZoneId
+      AliasTarget:
+        DNSName: !Ref FailoverDomainName
+        HostedZoneId: !Ref PublicHostedZoneId
+      Type: A
+
+Outputs:
+
+  # Custom Domain Name endpoint to be used during tests
+  CustomDomainNameEndpoint:
+    Description: Custom Domain Name endpoint
+    Value: !Sub "https://${DomainName}"/
