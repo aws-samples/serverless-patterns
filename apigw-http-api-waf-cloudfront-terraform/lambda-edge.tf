@@ -7,6 +7,7 @@ resource "aws_lambda_function" "http_api_edge_lambda" {
   filename         = data.archive_file.http_api_edge_lambda_zip.output_path
   source_code_hash = filebase64sha256(data.archive_file.http_api_edge_lambda_zip.output_path)
   publish = true
+  provider = aws.cloudfront
 }
 
 # Zip Lambda code
@@ -23,12 +24,13 @@ resource "aws_lambda_permission" "http_api_edge_lambda_permission" {
   function_name = var.edge_function_name
   principal     = "cloudfront.amazonaws.com"
   source_arn    = aws_cloudfront_distribution.http_api_distribution.arn
+  provider = aws.cloudfront
 }
 
 # Lambda role
 resource "aws_iam_role" "http_api_edge_lambda_role" {
   name = "http_api_edge_lambda_role"
-
+  provider = aws.cloudfront
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -54,7 +56,7 @@ resource "aws_iam_policy" "http_api_edge_lambda_logs_policy" {
   name        = "http_api_edge_lambda_policy"
   path        = "/"
   description = "http_api_edge_lambda_policy"
-
+  provider = aws.cloudfront
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -77,7 +79,7 @@ resource "aws_iam_policy" "http_api_edge_lambda_execution_policy" {
   name        = "http_api_edge_lambda_execution_policy"
   path        = "/"
   description = "http_api_edge_lambda_execution_policy"
-
+  provider = aws.cloudfront
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -98,7 +100,7 @@ resource "aws_iam_policy" "http_api_edge_lambda_secret_policy" {
   name        = "http_api_edge_lambda_secret_policy"
   path        = "/"
   description = "http_api_edge_lambda_secret_policy"
-
+  provider = aws.cloudfront
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -119,14 +121,17 @@ EOF
 resource "aws_iam_role_policy_attachment" "http_api_edge_lambda_log_policy_attachment" {
   role       = aws_iam_role.http_api_edge_lambda_role.name
   policy_arn = aws_iam_policy.http_api_edge_lambda_logs_policy.arn
+  provider = aws.cloudfront
 }
 
 resource "aws_iam_role_policy_attachment" "http_api_edge_lambda_execution_policy_attachment" {
   role       = aws_iam_role.http_api_edge_lambda_role.name
   policy_arn = aws_iam_policy.http_api_edge_lambda_execution_policy.arn
+  provider = aws.cloudfront
 }
 
 resource "aws_iam_role_policy_attachment" "http_api_edge_lambda_secret_policy_attachment" {
   role       = aws_iam_role.http_api_edge_lambda_role.name
   policy_arn = aws_iam_policy.http_api_edge_lambda_secret_policy.arn
+  provider = aws.cloudfront
 }

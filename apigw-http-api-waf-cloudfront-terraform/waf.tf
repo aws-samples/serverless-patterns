@@ -2,6 +2,7 @@ resource "aws_wafv2_web_acl" "cloudfront_web_acl" {
   name        = var.waf_webacl_name
   description = var.waf_webacl_name
   scope       = "CLOUDFRONT"
+  provider    = aws.cloudfront
 
   default_action {
     allow {}

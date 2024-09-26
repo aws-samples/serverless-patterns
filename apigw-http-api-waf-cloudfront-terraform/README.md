@@ -82,7 +82,10 @@ If you enter the URL of the API Gateway: this should return a failure response.
 
 ## Cleanup
  
-In order to delete the solution, run the below command:
+In order to delete the solution, the follow the steps below.
+
+
+1. Destroy the resources via Terraform
 
 ```bash
 terraform destroy -auto-approve \
@@ -94,7 +97,23 @@ terraform destroy -auto-approve \
 -var "zone_id=#zoneid#" #hosted zone id (required only if domain_name is set)
 ```
 
-Note: The secret will not be immediately deleted after running the above command. It will be scheduled for deletion. To fully delete the secret, you can the below command:
+2. Re-run terraform destroy if you the Lambda@Edge function failed to be deleted
+
+(Note: When the Lambda@Edge function fails to be deleted, you may see the following error message: "Lambda was unable to delete arn:aws:lambda:#region#:#account-id#:function:http-edge-lambda:#version# because it is a replicated function. Please see our documentation for Deleting Lambda@Edge Functions and Replicas")
+
+```bash
+terraform destroy -auto-approve \
+-var "region=#your-region#" \ #region where resources will be deployed (default is us-east-1)
+-var "cloudfront_domain_name=#your-cloudfront-domain-name#" \ #domain name for your CloudFront distribution (optional)
+-var "cloudfront_certificate_arn=arn:aws:acm:#region#:#accountid#:certificate/#certificateid#" \ #cloudfront certificate arn (required only if cloudfront_domain_name is set)
+-var "domain_name=#your-api-domain-name#" \ #domain name for your API Gateway (optional)
+-var "certificate_arn=arn:aws:acm:#region#:#accountid#:certificate/#certificateid#" \ #certificate arn (required only if domain_name is set)
+-var "zone_id=#zoneid#" #hosted zone id (required only if domain_name is set)
+```
+
+3. Delete the secret
+
+(Note: The secret will not be immediately deleted after Step 1. It will only be scheduled for deletion. To fully delete the secret, you will need to use the below command)
 
 ```bash
 aws secretsmanager delete-secret --secret-id waf-http-api --force-delete-without-recovery
