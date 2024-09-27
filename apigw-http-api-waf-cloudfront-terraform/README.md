@@ -1,4 +1,4 @@
-# Protect HTTP API Gateway with Amazon CloudFront and AWS WAF
+# Protect Amazon API Gateway with Amazon CloudFront and AWS WAF
 
 This pattern demonstrates how to increase the security posture of HTTP API Gateways against common attack patterns such as SQL injection, cross-site scripting (XSS) or DDOS attacks
 
