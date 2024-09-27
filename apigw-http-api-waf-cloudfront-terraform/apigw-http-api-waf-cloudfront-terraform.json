@@ -1,0 +1,111 @@
+{
+  "title": "Protect Amazon API Gateway with Amazon CloudFront and AWS WAF",
+  "description": "Provision a Amazon API Gateway (with Amazon CloudFront and AWS WAF) using Terraform",
+  "language": "Python",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to increase the security posture of HTTP API Gateways against common attack patterns such as SQL injection, cross-site scripting (XSS) or DDOS attacks"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://serverlessland.com/patterns/apigw-http-api-waf-cloudfront-terraform",
+      "templateURL": "serverless-patterns/apigw-http-api-waf-cloudfront-terraform",
+      "projectFolder": "apigw-http-api-waf-cloudfront-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "HTTP API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      },
+      {
+        "text": "How AWS WAF works with Amazon CloudFront features",
+        "link": "https://docs.aws.amazon.com/waf/latest/developerguide/cloudfront-features.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["See the GitHub repo for detailed deployment instructions."]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["See the GitHub repo for detailed cleanup instructions."]
+  },
+  "authors": [
+    {
+      "name": "Mehdi Amrane",
+      "bio": "Senior Solutions Architect at AWS"
+    }
+  ],
+  "patternArch": {
+    "icon4": {
+      "x": 10,
+      "y": 70,
+      "service": "waf",
+      "label": "AWS WAF"
+    },
+    "icon1": {
+      "x": 37,
+      "y": 70,
+      "service": "cloudfront",
+      "label": "Amazon CloudFront"
+    },
+    "icon2": {
+      "x": 64,
+      "y": 70,
+      "service": "apigw",
+      "label": "Amazon API Gateway"
+    },
+    "icon3": {
+      "x": 90,
+      "y": 70,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon5": {
+      "x": 64,
+      "y": 20,
+      "service": "lambda",
+      "label": "Lambda@Edge"
+    },
+    "icon6": {
+      "x": 90,
+      "y": 20,
+      "service": "lambda",
+      "label": "Authorizer"
+    },
+    "line1": {
+      "from": "icon4",
+      "to": "icon1",
+      "label": ""
+    },
+    "line2": {
+      "from": "icon1",
+      "to": "icon2",
+      "label": ""
+    },
+    "line3": {
+      "from": "icon2",
+      "to": "icon3",
+      "label": "Get unique key"
+    },
+    "line4": {
+      "from": "icon1",
+      "to": "icon5",
+      "label": "Retrieve unique key for header"
+    },
+    "line5": {
+      "from": "icon2",
+      "to": "icon6",
+      "label": "Validate key"
+    }
+  }
+}
