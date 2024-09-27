@@ -1,6 +1,6 @@
 # Protect Amazon API Gateway with Amazon CloudFront and AWS WAF
 
-This pattern demonstrates how to increase the security posture of HTTP API Gateways against common attack patterns such as SQL injection, cross-site scripting (XSS) or DDOS attacks
+This pattern demonstrates how to increase the security posture of Amazon API Gateway against common attack patterns such as SQL injection, cross-site scripting (XSS) or DDOS attacks
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-http-api-waf-cloudfront-terraform
 
