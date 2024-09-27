@@ -1,6 +1,6 @@
 {
   "title": "Protect Amazon API Gateway with Amazon CloudFront and AWS WAF",
-  "description": "Provision a Amazon API Gateway (with Amazon CloudFront and AWS WAF) using Terraform",
+  "description": "Provision an Amazon API Gateway (with Amazon CloudFront and AWS WAF) using Terraform",
   "language": "Python",
   "level": "300",
   "framework": "Terraform",
