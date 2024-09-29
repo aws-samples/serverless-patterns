@@ -1,10 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Template for VPC with peering connection and EC2 instance'
+
 Parameters:
 
   PeerName:
-    Description: Name of the VPC Peer
+    Description: Choose a VPC Peering name
     MaxLength: 255
     Type: String
-  
+
+  VpcCidrBlock:
+    Type: String
+    Default: 192.168.0.0/16
+    Description: The CIDR block for the VPC (must be a /16 block)
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){2}0\.0\/16$
+    ConstraintDescription: Must be a valid /16 IP CIDR range of the form x.x.0.0/16.
+
   APIID:
     Description: ID of the API Gateway
     Type: String
@@ -12,31 +22,47 @@ Parameters:
   PeerVPCID:
     AllowedPattern: '^vpc-[0-9a-f]{17}$'
     ConstraintDescription: Must have a prefix of "vpc-". Followed by 17 characters (numbers, letters "a-f")
-    Description: ID of the VPC with which you are creating the VPC peering connection
-    Type: String
-    
-  REMOTEVPCCIDR:
-    Description: CIDR Block of the remote VPC
+    Description: ID of the VPC which you are creating the VPC peering connection with
     Type: String
 
-  VPCENDPOINTID:
-    Description: VPC Endpoint ID
+  REMOTEVPCCIDR:
+    Description: Remote VPC CIDR Block
+    Type: String
+
+  VPCENDPOINTURL:
+    Description: VPC Endpoint URL
     Type: String
 
   PeerRegion:
-    Description: Region of the VPC Accepter (not required)
+    Description: Region of the VPC Accepter
     Type: String
+      
+  AmiType:
+    Type: String
+    Default: amzn2-ami-hvm-x86_64-gp2
+    AllowedValues: 
+      - amzn2-ami-hvm-x86_64-gp2
+      - amzn2-ami-hvm-x86_64-ebs
+      - amzn-ami-hvm-x86_64-gp2
+    Description: The type of Amazon Linux 2 AMI to use
 
 Resources:
   myVPC:
     Type: 'AWS::EC2::VPC'
     Properties:
-      CidrBlock: 192.168.0.0/16
+      CidrBlock: !Ref VpcCidrBlock
       EnableDnsSupport: true
       EnableDnsHostnames: true
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-VPC'
 
   myInternetGateway:
     Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-IGW'
 
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -52,8 +78,11 @@ Resources:
     DependsOn: myVPC
     Properties:
       VpcId: !Ref myVPC
-      CidrBlock: '192.168.1.0/24'
+      CidrBlock: !Select [ 0, !Cidr [ !Ref VpcCidrBlock, 1, 8 ] ]
       AvailabilityZone: !Select [ 0, !GetAZs ]
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Subnet'
 
   myRouteTable:
     Type: AWS::EC2::RouteTable
@@ -61,6 +90,9 @@ Resources:
     Properties:
       VpcId:  
         Ref: myVPC
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-RT'
 
   myRoute:
     Type: AWS::EC2::Route
@@ -96,7 +128,10 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: !Ref REMOTEVPCCIDR
-  
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-SG'
+
   VPCPeeringConnection:
     Type: AWS::EC2::VPCPeeringConnection
     Properties:
@@ -104,6 +139,9 @@ Resources:
       PeerVpcId: !Ref PeerVPCID
       PeerOwnerId: !Ref "AWS::AccountId"
       PeerRegion: !Ref PeerRegion
+      Tags: 
+        - Key: Name
+          Value: !Ref PeerName
 
   myRoutePeering:
     Type: AWS::EC2::Route
@@ -130,8 +168,8 @@ Resources:
     Properties:
       HostedZoneId: !Ref DNS
       Name: !Join ['', [!Ref 'APIID', ., execute-api, ., !Ref 'PeerRegion', ., amazonaws.com]]
-      ResourceRecords:
-      - !Join ['', [!Ref 'VPCENDPOINTID', ., execute-api, ., !Ref 'PeerRegion', ., vpce.amazonaws.com]]
+      ResourceRecords: 
+        - !Ref 'VPCENDPOINTURL'
       TTL: 900
       Type: CNAME
 
@@ -139,7 +177,8 @@ Resources:
     Type: 'AWS::EC2::Instance'
     DependsOn: subnet
     Properties: 
-      ImageId: ami-0b31d93fb777b6ae6
+      ImageId: 
+        !Sub '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/${AmiType}}}'
       InstanceType: t2.micro
       NetworkInterfaces: 
       - AssociatePublicIpAddress: "true"
@@ -148,11 +187,15 @@ Resources:
           - Ref: mySecurityGroup
         SubnetId: 
           Ref: subnet
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Instance'
 
 Outputs:
   PeeringConnection:
     Description: The ID of the VPC Peering
     Value: !Ref VPCPeeringConnection
+
   VPCCidr:
     Description: Cidr Range of the VPC
-    Value: 192.168.0.0/16
+    Value: !Ref VpcCidrBlock

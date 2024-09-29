@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/private-apigw-cross-region",
       "templateURL": "serverless-patterns/private-apigw-cross-region",
       "projectFolder": "private-apigw-cross-region",
-      "templateFile": "private-apigw-cross-region/template1-private-apigw.yaml"
+      "templateFile": "private-apigw-cross-region/template1-regionA.yaml"
     }
   },
   "resources": {

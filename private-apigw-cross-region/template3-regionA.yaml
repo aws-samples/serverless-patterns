@@ -1,0 +1,36 @@
+Parameters:
+
+  PeerID:
+    Description: Peering ID connection (Must have a prefix of "pcx-")
+    Type: String
+    
+  REMOTEVPCCIDR:
+    Description: Remote vpc CIDR Block (must be a /16 block)
+    Type: String
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){2}0\.0\/16$
+    ConstraintDescription: Must be a valid /16 IP CIDR range of the form x.x.0.0/16.
+
+  RouteTableId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /myapp/routetableid
+    Description: "DO NOT CHANGE THIS VALUE. It retrieves the RouteTableId from SSM Parameter Store."
+
+  ApiUrl:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /myapp/api-url
+    Description: "DO NOT CHANGE THIS VALUE. It retrieves the API Gateway URL to be invoked from SSM Parameter Store."
+    
+
+Resources:
+  myRoutePeering:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: RouteTableId
+      DestinationCidrBlock: !Ref REMOTEVPCCIDR
+      VpcPeeringConnectionId: !Ref PeerID
+
+Outputs:
+  APIUrl:
+    Description: The API Gateway URL of the VPC Peering
+    Value: !Ref ApiUrl

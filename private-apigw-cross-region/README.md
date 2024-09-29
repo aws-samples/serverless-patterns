@@ -40,21 +40,119 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern contains three templates. Template1 deploys a Private Amazon API Gateway REST API with a Test stage, an Amazon VPC with two subnets where an AWS Interface Endpoint is deployed. This will need to forward requests to the Private API Gateway.
+## Template 1: VPC with Private API Gateway
 
-Template 2 needs to be deployed in a different AWS Region from the one chosen to deploy the first one. This template will create an Amazon VPC with a subnet where an Amazon EC2 Instance will be deployed. The Amazon EC2 Instance will act as the client. A Private Hosted Zone for the Interface VPC Endpoint created in the first template will be also deployed. This is needed to ensure DNS resolution between the two AWS Regions.
+This template is deployed in an AWS Region you choose
 
-Additionally, a CNAME record is created so that the EC2 Instance can point to it to send requests to the Private API Gateway. Finally, a VPC Peering connection is created between the two Amazon VPCs created, along with its route table.
+### Resources:
 
-Finally in the template 3, the route tables for the AWS VPC in the first AWS Region are updated with the newly created Peering connection.
+1. **VPC (myVPC)**
+   - CIDR block: Parameterized, default 10.0.0.0/16
+   - DNS support and hostnames enabled
 
-VPC Peering is needed to ensure Networking traffic can flow between the Amazon EC2 Instance in the first AWS Region, and the AWS Interface Endpoint in the second AWS Region.
+2. **Subnets (subnetA and subnetB)**
+   - Two subnets in different Availability Zones
+   - CIDR blocks calculated from VPC CIDR
+
+3. **Route Table (myRouteTable)**
+   - Associated with both subnets
+
+4. **Security Group (mySecurityGroup)**
+   - Allows inbound HTTPS traffic (port 443)
+
+5. **VPC Endpoint (ExecuteApiInterfaceEndpoint)**
+   - For API Gateway
+   - Interface type
+   - Associated with both subnets and the security group
+
+6. **API Gateway (MyApi)**
+   - Private endpoint configuration
+   - Simple GET method on /test-resource path
+   - Access restricted to requests from the VPC Endpoint
+
+7. **SSM Parameters**
+   - Stores Route Table ID
+   - Stores API Gateway URL
+
+### Outputs:
+- VPC CIDR
+- VPC ID
+- API Gateway ID
+- VPC Endpoint URL
+- Region
+
+## Template 2: VPC Peering and EC2 Instance
+
+This template needs to be deployed in an AWS Region you choose, but different from the one chosen in the first template
+
+### Resources:
+
+1. **VPC (myVPC)**
+   - CIDR block: Parameterized, default 192.168.0.0/16
+   - DNS support and hostnames enabled
+
+2. **Internet Gateway (myInternetGateway)**
+   - Attached to the VPC
+
+3. **Subnet (subnet)**
+   - Single subnet in one Availability Zone
+
+4. **Route Table (myRouteTable)**
+   - Associated with the subnet
+   - Route to Internet Gateway for internet access
+
+5. **Security Group (mySecurityGroup)**
+   - Allows inbound SSH (port 22)
+   - Allows outbound HTTPS to the peered VPC
+
+6. **VPC Peering Connection (VPCPeeringConnection)**
+   - Connects this VPC to the VPC from Template 1
+
+7. **Route53 Private Hosted Zone (DNS)**
+   - For execute-api.{region}.amazonaws.com
+
+8. **Route53 Record Set (myDNSRecord)**
+   - CNAME record for the API Gateway
+
+9. **EC2 Instance (myInstance)**
+   - Amazon Linux 2 AMI
+   - t2.micro instance type
+   - Placed in the subnet with a public IP
+
+### Outputs:
+- VPC Peering Connection ID
+- VPC CIDR
+
+## Template 3: Peering Route Configuration
+
+This template needs to be deployed in the same AWS Region as tbe first template
+
+### Resources:
+
+1. **Route (myRoutePeering)**
+   - Adds a route to the Route Table from Template 1
+   - Destination is the CIDR of the VPC from Template 2
+   - Target is the VPC Peering Connection
+
+### Outputs:
+- API Gateway URL (retrieved from SSM Parameter Store)
+
+## Overall Architecture
+
+1. Two VPCs are created, one in each of the first two templates.
+2. These VPCs are connected via a VPC Peering Connection.
+3. The first VPC hosts a private API Gateway, accessible via a VPC Endpoint.
+4. The second VPC contains an EC2 instance that can access the API Gateway through the peering connection.
+5. DNS resolution is set up to allow the EC2 instance to resolve the API Gateway's domain name to the VPC Endpoint's private IP.
+6. The third template adds the necessary route to the first VPC's route table to enable communication over the peering connection.
+
+This setup allows for secure, private communication between resources in the two VPCs, with the API Gateway acting as a controlled access point for services in the first VPC.
 
 ## Testing
 
-Once the application is deployed, retrieve the RestApiId value from CloudFormation Outputs. You can run curl command from the Amazon EC2 Instance the following way:
+Once the application is deployed, retrieve the ApiURL value from the third CloudFormation template's Outputs section. You can run curl command from the Amazon EC2 Instance the following way:
 
-Example: curl -v -X GET https://{RestApiId}.execute-api.{AWS Region}.amazonaws.com/Test/test-resouece
+Example: curl -v -X GET https://{RestApiId}.execute-api.{AWS Region}.amazonaws.com/Test/test-resource
 
 ## Documentation
 - [Working with Private REST API Gateways](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html)
