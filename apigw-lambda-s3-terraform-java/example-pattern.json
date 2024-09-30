@@ -1,6 +1,6 @@
 {
-  "title": "Upload file up to 5GB to Amazon S3 bucket using presigned URL",
-  "description": "This project deploys Amazon API Gateway with AWS Lambda integration to showcase how to upload a file to Amazon S3 bucket using a presigned S3 URL.",
+  "title": "Upload file to Amazon S3 bucket using presigned URL",
+  "description": "This project deploys Amazon API Gateway with AWS Lambda integration to showcase how to upload a file up to 5GB to Amazon S3 bucket using a presigned S3 URL.",
   "language": "Java",
   "level": "200",
   "framework": "Terraform",
@@ -9,7 +9,7 @@
     "text": [
       "Amazon API Gateway receives the HTTP POST request containing the file name to be uploaded",
       "AWS Lambda is triggered by the API Gateway, this java based function generates Amazon S3 presigned URL.",
-      "A Java program is used to upload a file to the Amazon S3 bucket using the pre-signed URL"
+      "A Java program is used to upload a file to the Amazon S3 bucket using the presigned URL"
     ]
   },
   "gitHub": {
@@ -54,8 +54,8 @@
     {
       "name": "Jing Xiang Peh",
       "image": "images/profile-pic.jpg",
-      "bio": "I am a specialist solutions architect, Serveless based in Singapore",
-      "linkedin": "https://www.linkedin.com/in/jing-xiang-peh/"
+      "bio": "I am a Specialist Solutions Architect for Serveless based in Singapore",
+      "linkedin": "jing-xiang-peh"
     }
   ]
 }

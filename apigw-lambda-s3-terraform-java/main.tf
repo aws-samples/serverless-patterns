@@ -134,7 +134,7 @@ resource "aws_api_gateway_deployment" "deployment" {
 
 
 #========================================================================
-// lambda setup
+// Lambda setup
 #========================================================================
 
 resource "aws_lambda_function" "generate_presigned_url" {
@@ -143,8 +143,8 @@ resource "aws_lambda_function" "generate_presigned_url" {
   role          =  aws_iam_role.lambda_role.arn
   handler       = "com.example.MyS3PreSignedURLGeneratorFunction::handleRequest"
   runtime       = "java21"
-  memory_size   = 3008
-  timeout       = 120
+  memory_size   = 1024
+  timeout       = 30
   environment {
     variables = {
       BUCKET_NAME = aws_s3_bucket.upload_bucket.bucket

@@ -1,6 +1,6 @@
-# Upload file up to 5GB to Amazon S3 bucket using presigned URL using Terraform 
+# Upload file to Amazon S3 bucket using presigned URL using Terraform 
 
-This sample project deploys an Amazon API Gateway REST API with an AWS Lambda integration. The Lambda function, written in Java, generates a presigned URL with write access to an Amazon S3 Bucket. The provided test class uploads a file into the S3 bucket using the presigned URL.
+This sample project deploys an Amazon API Gateway REST API with an AWS Lambda integration. The Lambda function, written in Java, generates a presigned URL with write access to an Amazon S3 Bucket. The provided test class uploads a file up to 5GB into the S3 bucket using the presigned URL.
 
 Learn more about this pattern at Serverless Land Patterns: serverlessland.com/patterns/apigw-lambda-s3-terraform-java
 
@@ -51,7 +51,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This Terraform project uses allows user to upload a file up to 5 GB size using Amazon S3 bucket pre-sienged URL. Please refer to the architecture diagram below:
+This Terraform project uses allows user to upload a file up to 5 GB size using Amazon S3 bucket presigned URL. Please refer to the architecture diagram below:
 
 ![End to End Architecture](images/architecture.png)
 
@@ -59,16 +59,16 @@ Here's a breakdown of the steps:
 
 1. **Amazon API Gateway**: Receives the HTTP POST request containing the file name to be uploaded.
 
-2. **AWS Lambda**: Triggered by the API Gateway, this function creates a pre-signed S3 bucket URL with PUT object permission for the provided key (file name).
+2. **AWS Lambda**: Triggered by the API Gateway, this function creates a presigned S3 bucket URL with PUT object permission for the provided key (file name).
 
-3. **Amazon S3**: User uploads a file upto 5 GB size using pre-signed URL. 
+3. **Amazon S3**: User uploads a file up to 5 GB size using presigned URL. 
 
 ## Testing
 
-1. For testing this, you can use any file upto 5 GB in size. For example you can downlaod the [Amazon S3 user guide](https://s3.amazonaws.com/awsdocs/S3/latest/s3-gsg.pdf). 
+1. For testing this, you can use any file up to 5 GB in size. For example you can download the [Amazon S3 user guide](https://docs.aws.amazon.com/pdfs/AmazonS3/latest/userguide/s3-userguide.pdf). 
 
 
-2. Run the following command from to run the test class to upload a file using Amazon S3 pre-signed URL:
+2. Run the following command from to run the test class to upload a file using Amazon S3 presigned URL:
 
    ```bash
    java -cp target/test-classes/ com.example.S3UploadIntegrationTest
@@ -76,7 +76,7 @@ Here's a breakdown of the steps:
 
 2. During the prompts:
 
-   - Enter the REST API URL to get the pre-signed URL: from the `terraform apply` output
+   - Enter the REST API URL to get the presigned URL: from the `terraform apply` output
    - Enter the file name on S3 (key): your-file.pdf
    - Enter the path to the local file: your-file.pdf
 
