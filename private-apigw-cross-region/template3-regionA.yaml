@@ -15,12 +15,6 @@ Parameters:
     Default: /myapp/routetableid
     Description: "DO NOT CHANGE THIS VALUE. It retrieves the RouteTableId from SSM Parameter Store."
 
-  ApiUrl:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /myapp/api-url
-    Description: "DO NOT CHANGE THIS VALUE. It retrieves the API Gateway URL to be invoked from SSM Parameter Store."
-    
-
 Resources:
   myRoutePeering:
     Type: AWS::EC2::Route
@@ -29,8 +23,3 @@ Resources:
         Ref: RouteTableId
       DestinationCidrBlock: !Ref REMOTEVPCCIDR
       VpcPeeringConnectionId: !Ref PeerID
-
-Outputs:
-  APIUrl:
-    Description: The API Gateway URL of the VPC Peering
-    Value: !Ref ApiUrl

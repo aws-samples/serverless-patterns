@@ -1,13 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Template for VPC with peering connection and EC2 instance'
+Transform: AWS::Serverless-2016-10-31
+Description: 'SAM Template for VPC with peering connection and Lambda function'
 
 Parameters:
-
-  PeerName:
-    Description: Choose a VPC Peering name
-    MaxLength: 255
-    Type: String
-
   VpcCidrBlock:
     Type: String
     Default: 192.168.0.0/16
@@ -36,15 +31,6 @@ Parameters:
   PeerRegion:
     Description: Region of the VPC Accepter
     Type: String
-      
-  AmiType:
-    Type: String
-    Default: amzn2-ami-hvm-x86_64-gp2
-    AllowedValues: 
-      - amzn2-ami-hvm-x86_64-gp2
-      - amzn2-ami-hvm-x86_64-ebs
-      - amzn-ami-hvm-x86_64-gp2
-    Description: The type of Amazon Linux 2 AMI to use
 
 Resources:
   myVPC:
@@ -57,6 +43,23 @@ Resources:
         - Key: Name
           Value: !Sub '${AWS::StackName}-VPC'
 
+  subnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: !Select [ 0, !Cidr [ !Ref VpcCidrBlock, 1, 8 ] ]
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Subnet'
+
+  myRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myVPC
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-RT'
   myInternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -66,63 +69,29 @@ Resources:
 
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
-    DependsOn: myInternetGateway
-    Properties:
-      VpcId:
-        Ref: myVPC
-      InternetGatewayId:
-        Ref: myInternetGateway
-
-  subnet:
-    Type: 'AWS::EC2::Subnet'
-    DependsOn: myVPC
     Properties:
       VpcId: !Ref myVPC
-      CidrBlock: !Select [ 0, !Cidr [ !Ref VpcCidrBlock, 1, 8 ] ]
-      AvailabilityZone: !Select [ 0, !GetAZs ]
-      Tags: 
-        - Key: Name
-          Value: !Sub '${AWS::StackName}-Subnet'
-
-  myRouteTable:
-    Type: AWS::EC2::RouteTable
-    DependsOn: myVPC
-    Properties:
-      VpcId:  
-        Ref: myVPC
-      Tags: 
-        - Key: Name
-          Value: !Sub '${AWS::StackName}-RT'
+      InternetGatewayId: !Ref myInternetGateway
 
   myRoute:
     Type: AWS::EC2::Route
-    DependsOn: myRouteTable
+    DependsOn: AttachGateway
     Properties:
-      RouteTableId:
-        Ref: myRouteTable
+      RouteTableId: !Ref myRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId:
-        Ref: myInternetGateway
+      GatewayId: !Ref myInternetGateway
 
   mySubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
-    DependsOn: myRoute
     Properties:
-      SubnetId:
-        Ref: subnet
-      RouteTableId:
-        Ref: myRouteTable
+      SubnetId: !Ref subnet
+      RouteTableId: !Ref myRouteTable
 
   mySecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: 'Allow HTTPS traffic from the VPC'
       VpcId: !Ref myVPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 443
@@ -141,55 +110,66 @@ Resources:
       PeerRegion: !Ref PeerRegion
       Tags: 
         - Key: Name
-          Value: !Ref PeerName
+          Value: !Sub '${AWS::StackName}-peering'
 
   myRoutePeering:
     Type: AWS::EC2::Route
-    DependsOn: VPCPeeringConnection
     Properties:
-      RouteTableId:
-        Ref: myRouteTable
+      RouteTableId: !Ref myRouteTable
       DestinationCidrBlock: !Ref REMOTEVPCCIDR
       VpcPeeringConnectionId: !Ref VPCPeeringConnection
 
   DNS: 
     Type: AWS::Route53::HostedZone
-    DependsOn: myVPC
     Properties: 
-      Name: !Join ['', [execute-api, ., !Ref 'PeerRegion', ., amazonaws, ., com]]
+      Name: !Sub 'execute-api.${PeerRegion}.amazonaws.com'
       VPCs: 
-        - 
-          VPCId: !Ref myVPC
-          VPCRegion: !Sub ${AWS::Region}
-       
+        - VPCId: !Ref myVPC
+          VPCRegion: !Ref AWS::Region
+
   myDNSRecord:
     Type: AWS::Route53::RecordSet
-    DependsOn: DNS
     Properties:
       HostedZoneId: !Ref DNS
-      Name: !Join ['', [!Ref 'APIID', ., execute-api, ., !Ref 'PeerRegion', ., amazonaws.com]]
+      Name: !Sub '${APIID}.execute-api.${PeerRegion}.amazonaws.com'
       ResourceRecords: 
-        - !Ref 'VPCENDPOINTURL'
+        - !Ref VPCENDPOINTURL
       TTL: 900
       Type: CNAME
 
-  myInstance:
-    Type: 'AWS::EC2::Instance'
-    DependsOn: subnet
-    Properties: 
-      ImageId: 
-        !Sub '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/${AmiType}}}'
-      InstanceType: t2.micro
-      NetworkInterfaces: 
-      - AssociatePublicIpAddress: "true"
-        DeviceIndex: "0"
-        GroupSet: 
-          - Ref: mySecurityGroup
-        SubnetId: 
-          Ref: subnet
-      Tags: 
-        - Key: Name
-          Value: !Sub '${AWS::StackName}-Instance'
+  myLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: UrlLibLambdaFunction
+      Handler: index.lambda_handler
+      Runtime: python3.11
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref mySecurityGroup
+        SubnetIds:
+          - !Ref subnet
+      Environment:
+        Variables:
+          API_ID: !Ref APIID
+          API_REGION: !Ref PeerRegion
+      InlineCode: |
+        import urllib.request
+        import json
+        import os
+
+        def lambda_handler(event, context):
+            api_id = os.environ['API_ID']
+            api_region = os.environ['API_REGION']
+            url = f'https://{api_id}.execute-api.{api_region}.amazonaws.com/test/test-resource'
+            with urllib.request.urlopen(url) as response:
+                data = response.read()
+                return {
+                    'statusCode': response.status,
+                    'body': data.decode('utf-8')
+                }
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaVPCAccessExecutionRole
 
 Outputs:
   PeeringConnection:

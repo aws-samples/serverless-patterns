@@ -40,119 +40,113 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
+# Multi-Region VPC Peering with Private API Gateway Setup
+
+This document outlines the process of setting up a multi-region VPC peering connection with a private API Gateway using three CloudFormation templates.
+
+## Deployment Order and Regions
+
+1. **Template 1**: Deployed in Region A
+2. **Template 2**: Deployed in Region B (different from Region A)
+3. **Template 3**: Deployed in Region A (same as Template 1)
+
+## Important Notes
+
+- The VPC CIDR block in Template 2 must be different from the one chosen in Template 1.
+- Templates 1 and 3 are deployed in the same AWS Region.
+- Template 2 is deployed in a different AWS Region from Templates 1 and 3.
+- The Lambda function created in Template 2 acts as a client, sending requests to the Amazon API Gateway created in Template 1.
+
 ## Template 1: VPC with Private API Gateway
 
-This template is deployed in an AWS Region you choose
+This template creates an Amazon VPC with an Amazon Private API Gateway and necessary resources in Region A. It sets up the infrastructure for a Private API that can be accessed securely from another VPC.
 
-### Resources:
-
-1. **VPC (myVPC)**
-   - CIDR block: Parameterized, default 10.0.0.0/16
-   - DNS support and hostnames enabled
-
-2. **Subnets (subnetA and subnetB)**
-   - Two subnets in different Availability Zones
-   - CIDR blocks calculated from VPC CIDR
-
-3. **Route Table (myRouteTable)**
-   - Associated with both subnets
-
-4. **Security Group (mySecurityGroup)**
-   - Allows inbound HTTPS traffic (port 443)
-
-5. **VPC Endpoint (ExecuteApiInterfaceEndpoint)**
-   - For API Gateway
-   - Interface type
-   - Associated with both subnets and the security group
-
-6. **API Gateway (MyApi)**
-   - Private endpoint configuration
-   - Simple GET method on /test-resource path
-   - Access restricted to requests from the VPC Endpoint
-
-7. **SSM Parameters**
-   - Stores Route Table ID
-   - Stores API Gateway URL
+### Key Resources:
+- VPC: Creates a new Virtual Private Cloud.
+- Two Subnets: Sets up two subnets within the VPC for high availability.
+- Route Table: Configures routing for the VPC.
+- Security Group: Defines inbound and outbound traffic rules.
+- VPC Endpoint for Execute API: Allows private access to the API Gateway.
+- Private API Gateway: Creates a private API that can only be accessed within the VPC or through VPC peering.
+- SSM Parameter: Stores the Route Table ID for use in Template 3.
 
 ### Outputs:
-- VPC CIDR
-- VPC ID
-- API Gateway ID
-- VPC Endpoint URL
-- Region
+- Remote VPC CIDR: The CIDR block of the VPC created in this template.
+- Peer VPC ID: The ID of the VPC created in this template.
+- API Gateway ID: The ID of the created private API Gateway.
+- VPC Endpoint URL: The URL of the VPC Endpoint for the Execute API service.
+- Region: The region where this template is deployed.
 
-## Template 2: VPC Peering and EC2 Instance
+## Template 2: VPC with Peering Connection and Lambda Function
 
-This template needs to be deployed in an AWS Region you choose, but different from the one chosen in the first template
+This template creates a VPC in a different region (Region B) and sets up a peering connection to the VPC created in Template 1. It also creates a Lambda function that acts as a client to the API Gateway.
 
-### Resources:
+### Key Resources:
+- VPC: Creates a new VPC in Region B.
+- Subnet: Sets up a subnet within the VPC.
+- Internet Gateway: Provides internet access for the VPC.
+- Route Table: Configures routing for the VPC.
+- Security Group: Defines traffic rules, allowing outbound HTTPS traffic to the remote VPC.
+- VPC Peering Connection: Establishes a peering connection with the VPC in Region A.
+- Route53 Hosted Zone and DNS Record: Sets up DNS resolution for the private API Gateway.
+- Lambda Function: Creates a function that sends requests to the private API Gateway in Region A.
 
-1. **VPC (myVPC)**
-   - CIDR block: Parameterized, default 192.168.0.0/16
-   - DNS support and hostnames enabled
-
-2. **Internet Gateway (myInternetGateway)**
-   - Attached to the VPC
-
-3. **Subnet (subnet)**
-   - Single subnet in one Availability Zone
-
-4. **Route Table (myRouteTable)**
-   - Associated with the subnet
-   - Route to Internet Gateway for internet access
-
-5. **Security Group (mySecurityGroup)**
-   - Allows inbound SSH (port 22)
-   - Allows outbound HTTPS to the peered VPC
-
-6. **VPC Peering Connection (VPCPeeringConnection)**
-   - Connects this VPC to the VPC from Template 1
-
-7. **Route53 Private Hosted Zone (DNS)**
-   - For execute-api.{region}.amazonaws.com
-
-8. **Route53 Record Set (myDNSRecord)**
-   - CNAME record for the API Gateway
-
-9. **EC2 Instance (myInstance)**
-   - Amazon Linux 2 AMI
-   - t2.micro instance type
-   - Placed in the subnet with a public IP
+### Important Parameters:
+- VPC CIDR Block: Must be different from the CIDR block used in Template 1.
+- API ID: The ID of the API Gateway created in Template 1.
+- Peer VPC ID: The ID of the VPC created in Template 1.
+- Remote VPC CIDR: The CIDR block of the VPC created in Template 1.
+- VPC Endpoint URL: The URL of the VPC Endpoint created in Template 1.
+- Peer Region: The region where Template 1 was deployed (Region A).
 
 ### Outputs:
-- VPC Peering Connection ID
-- VPC CIDR
+- Peering Connection ID: The ID of the VPC peering connection.
+- VPC CIDR: The CIDR block of the VPC created in this template.
 
-## Template 3: Peering Route Configuration
+## Template 3: VPC Peering Route
 
-This template needs to be deployed in the same AWS Region as tbe first template
+This template adds a route in the VPC created by Template 1 to enable traffic flow through the VPC peering connection.
 
-### Resources:
+### Key Resources:
+- Route for VPC Peering: Adds a route to the Route Table in the VPC created by Template 1, directing traffic destined for the VPC in Region B through the peering connection.
 
-1. **Route (myRoutePeering)**
-   - Adds a route to the Route Table from Template 1
-   - Destination is the CIDR of the VPC from Template 2
-   - Target is the VPC Peering Connection
+### Important Parameters:
+- Peering ID: The ID of the VPC peering connection created by Template 2.
+- Remote VPC CIDR: The CIDR block of the VPC created by Template 2.
+- Route Table ID: Retrieved from SSM Parameter Store, set by Template 1.
 
-### Outputs:
-- API Gateway URL (retrieved from SSM Parameter Store)
+## Deployment Process
 
-## Overall Architecture
+1. Deploy Template 1 in Region A
+   - This sets up the VPC with the private API Gateway.
+2. Note the outputs from Template 1
+3. Deploy Template 2 in Region B
+   - Use the outputs from Template 1 as input parameters.
+   - This creates a VPC in Region B and establishes the peering connection.
+4. Note the Peering Connection ID from the output of Template 2
+5. Deploy Template 3 in Region A
+   - Use the Peering Connection ID from Template 2 and the VPC CIDR from Template 2 as input parameters.
+   - This adds the necessary route to complete the peering connection.
 
-1. Two VPCs are created, one in each of the first two templates.
-2. These VPCs are connected via a VPC Peering Connection.
-3. The first VPC hosts a private API Gateway, accessible via a VPC Endpoint.
-4. The second VPC contains an EC2 instance that can access the API Gateway through the peering connection.
-5. DNS resolution is set up to allow the EC2 instance to resolve the API Gateway's domain name to the VPC Endpoint's private IP.
-6. The third template adds the necessary route to the first VPC's route table to enable communication over the peering connection.
+## Lambda Function as Client
 
-This setup allows for secure, private communication between resources in the two VPCs, with the API Gateway acting as a controlled access point for services in the first VPC.
+The Lambda function created in Template 2 acts as a client that sends requests to the Private API Gateway created in Template 1. This setup allows the Lambda function to securely access the private API across regions through the VPC peering connection. The function uses the DNS record created in Template 2 to resolve the API Gateway's endpoint, ensuring that the traffic flows through the VPC peering connection.
 
-## Testing
+This multi-region setup creates a secure, private network between two VPCs in different regions, allowing the Lambda function in one region to communicate with a private API Gateway in another region.
 
-Once the application is deployed, retrieve the ApiURL value from the third CloudFormation template's Outputs section. You can run curl command from the Amazon EC2 Instance the following way:
+## Testing the Setup
 
-Example: curl -v -X GET https://{RestApiId}.execute-api.{AWS Region}.amazonaws.com/Test/test-resource
+To test the setup and verify that the Lambda function can successfully communicate with the API Gateway:
+
+1. Navigate to the AWS Lambda console in Region B.
+2. Locate and select the Lambda function created by Template 2.
+3. In the Lambda function details page, find the "Test" tab or button.
+4. Create a new test event or use the default test event configuration.
+5. Click the "Test" button to invoke the Lambda function.
+6. Review the execution results to confirm successful communication with the API Gateway.
+
+This test will demonstrate that the Lambda function in Region B can successfully send requests to the private API Gateway in Region A through the VPC peering connection.
+
 
 ## Documentation
 - [Working with Private REST API Gateways](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html)

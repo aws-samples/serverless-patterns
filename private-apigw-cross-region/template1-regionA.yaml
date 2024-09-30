@@ -10,15 +10,6 @@ Parameters:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/16)$
     ConstraintDescription: Must be a valid /16 IP CIDR range of the form x.x.0.0/16.
 
-  ApiGatewayStageName:
-    Type: String
-    Default: test
-    Description: The stage name for the API Gateway deployment
-    AllowedPattern: ^[a-z0-9]+$
-    MinLength: 1
-    MaxLength: 128
-    ConstraintDescription: Can only contain lowercase letters and numbers, and must be between 1 and 128 characters.
-
 Resources:
   ExecuteApiInterfaceEndpoint:
     Type: 'AWS::EC2::VPCEndpoint'
@@ -121,7 +112,7 @@ Resources:
     Properties:
       Name: CloudFormation-APIGW
       OpenApiVersion: '2.0'
-      StageName: !Ref ApiGatewayStageName
+      StageName: test
       EndpointConfiguration: "PRIVATE"
       DefinitionBody: 
         openapi: "3.0.1"
@@ -169,24 +160,20 @@ Resources:
             Action: "execute-api:Invoke"
             Resource: "*"
 
-  StoreApiUrl:
-    Type: AWS::SSM::Parameter
-    DependsOn: MyApi
-    Properties:
-      Name: /myapp/api-url
-      Type: String
-      Value: !Sub 'https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiGatewayStageName}/test-resource'
 
 Outputs:
   RemoteVPCCidr:
     Description: The Cidr block of the VPC
     Value: !Ref VpcCidrBlock
+    
   PeerVPCID:
     Description: The VPC ID
     Value: !Ref myVPC
+
   APIGWID:
     Description: The API Gateway ID
     Value: !Ref MyApi
+
   VPCEndpointURL:
     Description: VPC Endpoint URL
     Value: !Select 
