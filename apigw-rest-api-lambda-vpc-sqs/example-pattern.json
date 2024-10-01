@@ -1,0 +1,71 @@
+{
+    "title": "Amazon API Gateway REST API to AWS Lambda in VPC to SQS",
+    "description": "Create a Rest API to send message to Lambda, then to SQS",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern deploys an Amazon API Gateway REST API with Dev stage, API key required for the authentication and a Lambda proxy integration. The API will send a message to the Lambda function that is in a VPC, and this function will send the message to SQS queue."
+
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-lambda-vpc-sqs",
+        "templateURL": "serverless-patterns/apigw-rest-api-lambda-vpc-sqs",
+        "projectFolder": "apigw-rest-api-lambda-vpc-sqs",
+        "templateFile": "apigw-rest-api-lambda-vpc-sqs/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Working with REST APIs",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+        },
+        {
+          "text": "Working with AWS Lambda proxy integrations",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html"
+        },
+        {
+            "text": "API key",
+            "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-key-with-console.html"
+          },
+          {
+            "text": "Lambda in a VPC",
+            "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html"
+          },
+          {
+            "text": "Lambda with SQS",
+            "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+          }
+
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Sana FATHALLAH",
+        "image": "n/a",
+        "bio": "I'm an AWS premium support engineer and I worked before as Full-Stack engineer",
+        "linkedin": "n/a",
+        "twitter": "n/a"
+      }
+    ]
+  }

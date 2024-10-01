@@ -1,0 +1,59 @@
+{
+  "title": "Lambda to SQS",
+  "description": "Create a Lambda function that publishes to an SQS queue",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. The Lambda function publishes a message to the SQS queue when invoked."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sqs-java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using AWS Lambda with Amazon SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+      },
+      {
+        "text": "Choosing between messaging services for serverless applications.",
+        "link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>.",
+      "Confirm the stack has been deleted: aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\""
+    ]
+  },
+  "authors": [
+    {
+      "name": "James Beswick",
+      "image": "https://serverlessland.com/assets/images/resources/jbes.jpg",
+      "bio": "I am a self-confessed serverless geek and enjoy helping developers build faster with serverless! I have been software developer and product manager before becoming a Developer Advocate. Ask me anything!",
+      "linkedin": "jamesbeswick",
+      "twitter": "@jbesw"
+    },
+    {
+      "name": "Steven Cook",
+      "bio": "Senior Solutions Architect at AWS."
+    }
+  ]
+}

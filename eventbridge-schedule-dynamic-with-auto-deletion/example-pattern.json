@@ -1,0 +1,55 @@
+{
+  "title": "Dynamic schedules with auto deletion with Amazon EventBridge Scheduler",
+  "description": "Event-driven pattern that creates three schedules when records get added to a DynamoDB table. These schedules trigger an email service and are automatically deleted.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When a new user signs up a record is added into the DynamoDB table. Using EventBridge pipes, changes are captured and transformed into an EventBridge event. Downstream consumers listen and create schedules for each user that automatically  delete."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-dynamic-with-auto-deletion",
+      "templateURL": "serverless-patterns/eventbridge-schedule-dynamic-with-auto-deletion",
+      "projectFolder": "eventbridge-schedule-dynamic-with-auto-deletion",
+      "templateFile": "src/src/schedule-creator/index.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Automatically delete schedules upon completion with Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/automatically-delete-schedules-upon-completion-with-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "EventBridge Visuals",
+        "link": "https://serverlessland.com/serverless/visuals/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.png",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

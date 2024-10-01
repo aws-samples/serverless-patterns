@@ -1,0 +1,57 @@
+{
+  "title": "Amazon Managed Streaming for Apache Kafka (Amazon MSK) to AWS Lambda",
+  "description": "Create a Lambda function that uses an Amazon MSK Topic as an event source.",
+  "language": "Node.js",
+  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
+  "videoId": "",
+  "level":"100",
+  "framework": "SAM",
+  "services": {
+    "from": "MSK",
+    "to": "lambda"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Lambda is a consumer application for your Kafka topic. It processes records from one or more partitions and sends the payload to the target function. Lambda continues to process batches until there are no more messages in the topic."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-lambda",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/msk-lambda/template.yaml",
+      "readmeURL": ""
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Using Lambda with Amazon MSK",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+      },
+      {
+        "text": "Using Amazon MSK as an event source for AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-msk-as-an-event-source-for-aws-lambda/"
+      }      
+    ]
+  },
+  "author": {
+    "headline": "Presented by Parnab Basak, AWS Solutions Architect",
+    "name": "Parnab Basak",
+    "imageURL": "https://avatars.githubusercontent.com/u/18371977?v=4",
+    "twitter": "@ParnabBasak",
+    "bio": "Parnab is a Solutions Architect for the Service Creation team in AWS. He specializes in creating net new solutions that are cloud native using modern s/w dev practices like Serverless, DevOps & Analytics"
+  }
+}

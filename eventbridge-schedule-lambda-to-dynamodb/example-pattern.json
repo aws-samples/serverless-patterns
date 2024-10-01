@@ -1,0 +1,52 @@
+{
+  "title": "Eventbridge to Lambda to DynamoDB",
+  "description": "This AWS CDK application demonstrates how to Schedule AWS Lambda to add items to DynamoDB.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern uses .NET as a programming language to create the entire AWS CDK stack."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-lambda-to-dynamodb",
+       "projectFolder": "eventbridge-schedule-lambda-to-dynamodb",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-lambda-to-dynamodb/README.md",        
+      "templateURL": "serverless-patterns/eventbridge-schedule-lambda-to-dynamodb",
+      "templateFile": "cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pankaj Rawat",
+      "image": "https://avatars.githubusercontent.com/u/21244341?s=96&v=4",
+      "bio": "Pankaj Rawat is a Lead Consultant at Amazon Web Services.",
+      "linkedin": "pankaj-rawat-14568765",
+      "twitter": "pankajrawat333"
+    },
+    {
+      "name": "Vijai Anand Ramalingam",
+      "image": "https://avatars.githubusercontent.com/u/83067978?v=4",
+      "bio": "Vijai Anand Ramalingam ia an Application Developer - ISV at Amazon Web Services",
+      "linkedin": "vijai-anand-ramalingam-77439736"
+    }
+  ]
+}

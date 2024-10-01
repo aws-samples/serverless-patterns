@@ -1,0 +1,55 @@
+{
+    "title": "Amazon EventBridge Schedule to AWS Lambda",
+    "description": "Creates an EventBridge schedule to invoke a Go based Lambda function every 5 minutes",
+    "language": "Go",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern demonstrates how to invoke a Go based Lambda function using EventBridge Scheduler and deployed with the AWS Serverless Application Model (SAM)."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-lambda-sam-go",
+        "templateURL": "serverless-patterns/eventbridge-schedule-to-lambda-sam-go",
+        "projectFolder": "eventbridge-schedule-to-lambda-sam-go",
+        "templateFile": "eventbridge-schedule-to-lambda-sam-go/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Getting Started with EventBridge Scheduler",
+          "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+        },
+        {
+          "text": "Building Lambda functions with Go",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-golang.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "See the GitHub repo for detailed deployment instructions."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack and follow the prompts: <code>sam delete</code>"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Tadhg O'Brien",
+        "bio": "Tadhg is a Technical Account Manager at Amazon Web Services supporting Public Sector customers and has a passion for Serverless",
+        "linkedin": "tadhgobrien"
+      }
+    ]
+  }

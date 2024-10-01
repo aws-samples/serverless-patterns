@@ -1,0 +1,55 @@
+{
+    "title": "EventBridge Scheduler to send messages to Amazon SNS",
+    "description": "Simple pattern that publishes a message to an SNS topic every 5 minutes",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample pattern demonstrates how to send a message to an Amazon SNS topic every 5 minutes using EventBridge Scheduler and deployed using the AWS CDK for TypeScript."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-sns-cdk-typescript",
+        "templateURL": "serverless-patterns/eventbridge-schedule-to-sns-cdk-typescript",
+        "projectFolder": "eventbridge-schedule-to-sns-cdk-typescript",
+        "templateFile": "lib/eventbridge-schedule-to-sns-cdk-typescript-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Getting Started with EventBridge Scheduler",
+          "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+        },
+        {
+          "text": "Getting started with Amazon SNS",
+          "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-getting-started.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "See the GitHub repo for detailed deployment instructions."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Tadhg O'Brien",
+        "bio": "Tadhg is a Technical Account Manager at Amazon Web Services supporting Public Sector customers and has a passion for Serverless",
+        "linkedin": "tadhgobrien"
+      }
+    ]
+  }

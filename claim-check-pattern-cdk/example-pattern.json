@@ -1,0 +1,55 @@
+{
+  "title": "Implementing the claim check pattern using EventBridge Pipes.",
+  "description": "To reduce the size of the events in your event-driven application, you can temporarily remove attributes. This approach is known as the claim check pattern.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "You split a message into a reference (“claim check”) and the associated payload. Then, you store the payload in external storage and add only the claim check to events. When you process events, you retrieve relevant parts of the payload using the claim check. For example, you can retrieve a user's name and birthday based on their userID.",
+      "The claim check pattern has two parts. First, when an event is received, you split it and store the payload elsewhere. Second, when the event is processed, you retrieve the relevant information. You can implement both aspects with a pipe.",
+      "In the first pipe, you use the enrichment to split the event, in the second to retrieve the payload. In this example Lambda is used to store the data in DynamoDB.",
+      "Using a pipe to split and retrieve messages has three advantages. First, you keep events concise as they move through the system. Second, you ensure that the event contains all relevant information when it is processed. Third, you encapsulate the complexity of splitting and retrieving within the pipe."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/claim-check-pattern-cdk",
+      "templateURL": "serverless-patterns/claim-check-pattern-cdk",
+      "projectFolder": "claim-check-pattern-cdk",
+      "templateFile": "src/lib/claim-check-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "More Enterprise Integration Patterns on AWS Samples",
+        "link": "https://github.com/aws-samples/amazon-eventbridge-pipes-architectural-patterns"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dominik Richter",
+      "image": "https://avatars.githubusercontent.com/u/29404931",
+      "bio": "Solutions Architect at AWS, passionate about event-driven architectures and Serverless.",
+      "linkedin": "do-richter"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "title": "Amazon API Gateway HTTP API to Amazon EventBridge",
+  "description": "Create an Amazon API Gateway HTTP API connected to Amazon EventBridge.",
+  "language": "Python",
+  "architectureURL": "",
+  "videoId": "",
+  "level": "100",
+  "framework": "CDK",
+  "services": {
+    "from": "apigatewayv2",
+    "to": "eventbridge"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK project creates an Amazon API gateway HTTP API endpoint. The endpoint uses service integrations to directly connect to Amazon EventBridge. An EventBridge rule sends all events to Cloudwatch Logs."
+    ]
+  },
+  "deploy": {
+    "text": [
+      "python3 -m venv .venv",
+      "source .venv/bin/activate",
+      "pip install -r requirements.txt",
+      "cdk deploy"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "projectFolder": "apigw-http-api-eventbridge-python",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-eventbridge-python",
+      "templateURL": "apigw-http-api-eventbridge/apigw_http_api_eventbridge_stack.py",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-eventbridge-python/README.md"
+    },
+    "payloads": [
+      {
+        "headline": "",
+        "payloadURL": ""
+      }
+    ]
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Integrating Amazon EventBridge into your serverless applications",
+        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      },
+      {
+        "text": "Choosing between REST APIs and HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html"
+      },
+      {
+        "text": "Capturing client events using Amazon API Gateway and Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/capturing-client-events-using-amazon-api-gateway-and-amazon-eventbridge/"
+      }
+    ]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "headline": "Presented by Cesar Izquierdo Tello, Cloud Engineer",
+      "name": "Cesar Izquierdo Tello",
+      "bio": "Cesar is a cloud engineer specialist on serverless architectures, based in the NL."
+    }
+  ]
+}

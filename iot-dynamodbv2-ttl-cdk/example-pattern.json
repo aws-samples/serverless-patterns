@@ -1,0 +1,50 @@
+{
+	"title": "IoT Core to DynamoDB",
+	"description": "Create an DynamoDBv2 IoT rule action to ingest data over AWS IoT core and publish to Amazon DynamoDB table.",
+	"level": "200",
+	"framework": "CDK",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This pattern uses the DynamoDBv2 action to write all or parts of an MQTT message to an Amazon DynamoDB table.",
+			"Each attribute in the payload is written to a separate column in the DynamoDB table. The SQL statement calculates a time to live and puts into the payload when writing to the table.",
+			"This pattern deploys one DynamoDB table, one IoT Rule."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-dynamodbv2-ttl-cdk",
+			"templateURL": "serverless-patterns/iot-dynamodbv2-ttl-cdk",
+			"projectFolder": "iot-dynamodbv2-ttl-cdk",
+			"templateFile": "iot-dynamodbv2-ttl-cdk/iot-ddbv2/lib/iot-ddbv2-stack.ts"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "Amazon DynamoDBv2 IoT Rule Action",
+				"link": "https://docs.aws.amazon.com/iot/latest/developerguide/dynamodb-v2-rule-action.html"
+			},
+			{
+				"text": "Expiring items using DynamoDB Time to live (TTL)",
+				"link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["cdk deploy"]
+	},
+	"testing": {
+		"text": ["See the GitHub repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>cdk destroy</code>."]
+	},
+	"authors": [{
+		"name": "Ashu Joshi",
+		"image": "https://avatars.githubusercontent.com/u/79330125?s=400&u=4802ebc8f24e64031052d3bf95af3dea7920357d&v=4",
+		"bio": "I am a Principal Architect, AWS Cloud Architect, Full-Stack Developer, Edge AI/ML/IoT Engineer, and Serverless Enthusiast.",
+		"linkedin": "ashujoshi",
+		"twitter": "@ashujoshi"
+	}]
+}

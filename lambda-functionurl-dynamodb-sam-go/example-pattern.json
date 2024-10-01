@@ -1,0 +1,59 @@
+{
+    "title": "AWS Lambda Function URL to Amazon DynamoDB",
+    "description": "Create a Lambda function with a Lambda Function URL that recieves a payload and inserts a record into a DynamoDB table.",
+    "language": "Go",
+    "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
+    "videoId": "",
+    "level":"200",
+    "framework": "SAM",
+    "services": {
+      "from": "lambda",
+      "to": "dynamodb"
+    },
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "When an HTTP `POST` request is sent to the Lambda Function URL endpoint, the AWS Lambda function is invoked and inserts an item into the Amazon DynamoDB table."
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam build && sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "sam delete"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-functionurl-dynamodb-sam-go",
+        "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-functionurl-dynamodb-sam-go/README.md"
+      },
+      "payloads": [
+        {
+          "headline": "",
+          "payloadURL": ""
+        }
+      ]
+    },
+    "resources": {
+      "headline": "Additional resources",
+      "bullets": [    
+      ]
+    },
+    "author": {
+      "headline": "Presented by Abhishek Gupta, Principal Developer Advocate at AWS",
+      "name": "Abhishek Gupta",
+      "twitter": "abhi_tweeter",
+      "linkedin":"https://www.linkedin.com/in/abhirockzz/",
+      "imageURL":"https://abhirockzz.github.io/icon.jpg"
+    }
+  }
+  

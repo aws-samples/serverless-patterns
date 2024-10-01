@@ -1,0 +1,55 @@
+{
+    "title": "Deploy a NGINX server on private EC2 server and proxy it via REST API",
+    "description": "Create a REST API which acts as a proxy for a NGINX server hosted on a Amazon Elastic Compute Cloud (Amazon EC2)",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample pattern allows users to quickly deploy a REST API, Network Load Balancer and NGINX server on a EC2 machine in their VPC.",
+        "The pattern uses Amazon API Gateway with VPC Link to securely connect to the NLB which routes traffic to EC2 instances running NGINX server.",
+        "By using this pattern, users can ensure that their private resources are not exposed to the public internet while still allowing secure access through API Gateway.",
+        "This pattern can be useful in scenarios where there is a need to integrate with private resources, such as internal databases or applications, while also maintaining a high level of security."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-ec2",
+        "templateURL": "serverless-patterns/apigw-ec2",
+        "projectFolder": "apigw-ec2",
+        "templateFile": "apigw-ec2/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Tutorial - Build a REST API with API Gateway private integration",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-with-private-integration.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: sam delete --stack-name <stackname>"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Shivam Rajawat",
+        "image": "https://shivamrajawat.s3.amazonaws.com/shivamrajawat.jpg",
+        "bio": "I am a Cloud Support Engineer (Serverless) at AWS and I love to solve complex problems.",
+        "linkedin": "shivam-rajawat-a42b68124"
+      }
+    ]
+  }

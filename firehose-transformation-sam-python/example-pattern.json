@@ -1,0 +1,65 @@
+{
+  "title": "Kinesis Firehose Data Transformation with Lambda",
+  "description": "Transform incoming source data and deliver the transformed data to destinations.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to transform streaming data received by Kinesis Data Firehose using AWS Lambda before delivering the transformed data to Amazon S3.",
+      "To transform incoming source data, Kinesis Data Firehose invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode. The transformed data is sent from Lambda to Kinesis Data Firehose. Kinesis Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/firehose-transformation-sam-python",
+      "templateURL": "serverless-patterns/firehose-transformation-sam-python",
+      "projectFolder": "firehose-transformation-sam-python",
+      "templateFile": "firehose-transformation-sam-python/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Kinesis Data Firehose Data Transformation",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/data-transformation.html"
+      },
+      {
+        "text": "Using AWS Lambda with Amazon Kinesis Data Firehose",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-kinesisfirehose.html"
+      },
+      {
+        "text": "Ingesting enriched IoT data into Amazon S3 using Amazon Kinesis Data Firehose",
+        "link": "https://aws.amazon.com/blogs/iot/ingesting-enriched-iot-data-into-amazon-s3-using-amazon-kinesis-data-firehose/"
+      },
+      {
+        "text": "Capture clickstream data using AWS serverless services",
+        "link": "https://aws.amazon.com/blogs/industries/capture-clickstream-data-using-aws-serverless-services/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Edward Schaefer",
+      "image": "https://d2siip5gg18ho0.cloudfront.net/images/schaeedw-photo-centered_250x250.jpg",
+      "bio": "Solutions Architect @ Amazon Web Services",
+      "linkedin": "ejschaefer"
+    }
+  ]
+}

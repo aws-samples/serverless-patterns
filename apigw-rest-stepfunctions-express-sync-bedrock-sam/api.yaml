@@ -1,0 +1,41 @@
+openapi: "3.0.1"
+info:
+  title: "step-function-integration"
+  version: "2022-06-20T05:39:09Z"
+servers:
+  variables:
+    basePath:
+      default: "/dev"
+paths:
+  /:
+    post:
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials: 
+          Fn::Sub: "${RestApiRole.Arn}"
+        httpMethod: "POST"
+        uri: 
+          "arn:aws:apigateway:${AWS::Region}:states:action/StartSyncExecution"
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set ($parsedPayload = $util.parseJson($input.json('$.output')))\n\
+                $parsedPayload"
+        requestTemplates:
+          application/json: "#set($data = $util.escapeJavaScript($input.json('$')))\n\
+            \    {\n        \"input\": \"$data\",\n        \"stateMachineArn\": \"\
+            arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:StateMachineExpressSync\"\n    }"
+        passthroughBehavior: "when_no_templates"
+components:
+  schemas:
+    Empty:
+      title: "Empty Schema"
+      type: "object"

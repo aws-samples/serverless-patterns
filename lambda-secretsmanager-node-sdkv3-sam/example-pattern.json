@@ -1,0 +1,52 @@
+{
+    "title": "Lambda Secrets Manager top-level await + SDKv3",
+    "description": "Lambda function retrieving a secret from Secrets Manager using top-level await using AWS SDK for JavaScript v3.",    
+    "language": "Node.js",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern stores a secret in Secrets Manager. A Node.js Lambda function uses top-level await and the AWS SDK for Javascript v3 to read the secret in the init phase, outside the handler."
+      ]
+    },
+    "gitHub": {
+        "template": {
+          "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-secretsmanager-node-sdkv3-sam",
+          "templateURL": "serverless-patterns/lambda-secretsmanager-node-sdkv3-sam",
+          "projectFolder": "lambda-secretsmanager-node-sdkv3-sam",
+          "templateFile": "lambda-secretsmanager-node-sdkv3-sam/template.yaml"
+        }
+      },    
+    "resources": {
+    "build": {
+        "text": [
+            "sam build"
+        ]
+        },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+          "name": "Julian Wood",
+          "image": "/assets/images/resources/jrwood.jpg",
+          "bio": "Julian Wood helps developers and builders learn about and love how serverless technologies can transform the way they build and run applications. I was an infrastructure architect and manager in global enterprises and start-ups for more than 25 years before going all in on serverless at AWS.",
+          "linkedin": "woodjulian",
+          "twitter": "@julian_wood"
+        }
+    ]
+  }
+  

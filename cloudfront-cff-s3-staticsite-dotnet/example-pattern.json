@@ -1,0 +1,59 @@
+{
+  "title": "CloudFront to S3 - Static Website",
+  "description": "Creates CloudFront Distributions to server the static site from S3.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how can you deploy a MKDOCS site to S3 with Cloud Front.",
+      "The CloudFront execute a function when recieves a request from viewer and append index.html to each request for proper routing",
+      "In S3 we host the html files generated from the MKDOCS"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-cff-s3-staticsite-dotnet",
+      "templateURL": "serverless-patterns/cloudfront-cff-s3-staticsite-dotnet",
+      "projectFolder": "cloudfront-cff-s3-staticsite-dotnet",
+      "templateFile": "cloudfront-cff-s3-staticsite-dotnet/MdsiteStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "CloudFront",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"
+      },
+      {
+        "text": "Simple Storage Service - S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for detailed cleanup instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sakthivel Chellapparimanam",
+      "image": "",
+      "bio": "AWS - Cloud Application Architect",
+      "linkedin": "https://www.linkedin.com/in/srcsakthivel",
+      "twitter": "@srcsakthivel"
+    }
+  ]
+}

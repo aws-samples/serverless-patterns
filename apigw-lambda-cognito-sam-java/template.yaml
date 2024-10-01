@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: This template exposes API to create and confirm user in Amazon Cognito user pool
+
+Globals:
+  Function:
+    Runtime: java21
+    Timeout: 29
+    Environment: 
+      Variables:
+        MY_COGNITO_POOL_APP_CLIENT_ID: !Ref MyCognitoUserPoolClient
+        MY_COGNITO_POOL_APP_CLIENT_SECRET: !GetAtt MyCognitoUserPoolClient.ClientSecret
+        MY_COGNITO_POOL_ID: !Ref MyCognitoUserPool
+  Api:
+    OpenApiVersion: '3.0.1'
+
+Resources:
+  #Create API Gateway
+  MyAPIGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Name: my-api-gateway
+  
+  #Create User Lambda Function
+  MyCreateUserFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: .
+      Handler: com.example.CreateUserFunction::handleRequest
+      Events:
+        CreateUser:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+            RestApiId: !Ref MyAPIGateway
+
+  # Confirm User Lambda Function
+  MyConfirmUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: com.example.ConfirmUserFunction::handleRequest
+      Events:
+        ConfirmUser:
+          Type: Api
+          Properties:
+            Path: /confirm
+            Method: post
+            RestApiId: !Ref MyAPIGateway
+
+  # Login User Lambda Function
+  MyLoginUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: com.example.LoginUserFunction::handleRequest
+      Events:
+        LoginUser:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: post
+            RestApiId: !Ref MyAPIGateway
+
+  # Create Cognito User Pool
+  MyCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: my-user-pool
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+      UsernameAttributes:
+        - email
+      MfaConfiguration: 'OFF'
+      EmailVerificationMessage: 'The verification code to your new account is {####}'
+      EmailVerificationSubject: 'Verify your new account'
+      SmsVerificationMessage: 'The verification code to your new account is {####}'
+      SmsAuthenticationMessage: 'Your authentication code is {####}'
+      UserPoolAddOns:
+        AdvancedSecurityMode: ENFORCED
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Required: true
+          Mutable: false
+        - Name: name
+          AttributeDataType: String
+          Required: true
+          Mutable: true
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+
+  # Create Cognito User Pool Client
+  MyCognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: MyUserPoolClient
+      UserPoolId: !Ref MyCognitoUserPool
+      GenerateSecret: true
+      RefreshTokenValidity: 30
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+
+Outputs:
+  CreateUserAPIGatewayEndpoint:
+    Description: Create User API Gateway Endpoint
+    Value:
+      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/users
+  
+  ConfirmUserAPIGatewayEndpoint:
+    Description: Confirm User API Gateway Endpoint
+    Value:
+      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/confirm
+  
+  LoginUserAPIGatewayEndpoint:
+    Description: Login User API Gateway Endpoint
+    Value:
+      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/login
+
+  MyCognitoUserPoolId:
+    Description: The ID of the Cognito User Pool
+    Value: !Ref MyCognitoUserPool

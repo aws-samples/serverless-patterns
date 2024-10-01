@@ -103,10 +103,10 @@ public class Function
                 }
 
                 LambdaLogger.Log("----> Thumbnail file Key: " + thumbnailObjectKey);
-
+                var destinationBucket = Environment.GetEnvironmentVariable("DESTINATION_BUCKET_NAME");
                 await S3Client.PutObjectAsync(new PutObjectRequest
                 {
-                    BucketName = record.S3.Bucket.Name,
+                    BucketName = destinationBucket,
                     Key = thumbnailObjectKey,
                     InputStream = imageStream
                 });

@@ -1,0 +1,62 @@
+{
+  "title": "Authenticate AppSync Api with Cognito",
+  "description": "Create an appsync api and authenticate all request with AWS Cognito User Pools.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample projects demonstrates how to use AWS Cognito to authenticate an AWS Appsync API with lambda resolvers.The same concept can be applied to vtl resolvers as well.",
+      "This pattern deploys one appsync api, with a direct lamda resolver."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-cognito-lambda-cdk",
+      "templateURL": "serverless-patterns/appsync-cognito-lambda-cdk",
+      "projectFolder": "appsync-cognito-lambda-cdk",
+      "templateFile": "appsync-cognito-lambda-cdk/lib/cognito-auth-cdk-stack.ts"
+    }
+  },
+  "resources": {
+     "bullets": [
+      {
+        "text": "AWS CDK- Define cloud infrastructure using familiar programming languages",
+        "link": "https://aws.amazon.com/cdk/"
+      },
+      {
+        "text": "AWS Appsync - Accelerate application development with serverless GraphQL and Pub/Sub APIs",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "Amazon Cognito - Implement secure, frictionless customer identity and access management that scales",
+        "link": "https://aws.amazon.com/cognito/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rosius Ndimofor",
+      "image": "https://rosius.s3.us-east-2.amazonaws.com/ro.jpeg",
+      "bio": "AWS Serverless Hero with a high affinity for building fullstack serverless apps",
+      "linkedin": "rosius",
+      "twitter": "atehrosius"
+    }
+  ]
+}

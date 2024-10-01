@@ -1,0 +1,57 @@
+{
+  "title": "Trigger ECS task from SQS using EventBridge",
+  "description": "Create an application to create ECS tasks based on SQS messages pushed through EventBridge.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains sample AWS CDK code to integrate Amazon EventBridge, Amazon SQS and Amazon Elastic Container Service (ECS).",
+      "As a new event is sent to EventBridge, it is queued in SQS and then, based on the number of messages in the queue, it creates an ECS cluster with Fargate task definitions.",
+      "When the task is completed, it deletes the message from the queue."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sqs-ecs-cdk",
+      "templateURL": "serverless-patterns/eventbridge-sqs-ecs-cdk",
+      "projectFolder": "eventbridge-sqs-ecs-cdk/src",
+      "templateFile": "eventbridge-sqs-ecs-cdk/src/lib/eb-sqs-ecs-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge- Build event-driven applications at scale across AWS",
+        "link": "https://aws.amazon.com/eventbridge/"
+      },
+      {
+        "text": "Amazon SQS- Fully managed message queuing for microservices, distributed systems, and serverless applications",
+        "link": "https://aws.amazon.com/sqs/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kiranpreet Chawla",
+      "bio": "Solutions Architect at AWS",
+      "linkedin": "https://www.linkedin.com/in/kiranpreet-chawla/"
+    }
+  ]
+}

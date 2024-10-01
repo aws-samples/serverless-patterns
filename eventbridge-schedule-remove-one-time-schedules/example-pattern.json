@@ -1,0 +1,47 @@
+{
+  "title": "EventBridge Scheduler Sweaper: Remove one-time schedules after they run",
+  "description": "Simple pattern to remove one-time schedules after 2 days of their execution.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["Creates a schedule that is run every day at 00:00 that checks for one-time schedules. If any schedules are found it removes them"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-remove-one-time-schedules",
+      "templateURL": "serverless-patterns/eventbridge-schedule-remove-one-time-schedules",
+      "projectFolder": "eventbridge-schedule-remove-one-time-schedules",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "Amazon EventBridge Scheduler Docs",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam build && sam deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.png",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "title": "Amazon EventBridge Schedule to Lambda",
+  "description": "Creates an EventBridge schedule to run a Lambda every 5 minutes",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project demonstrates how to use Amazon EventBridge Scheduler with Lambda to invoke a function on a schedule. This pattern uses the rate type schedule to run the Lambda function every 5 minutes.",
+      "This deploys one EventBridge rate based schedule and one Java 11 based Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-lambda-sam-java",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-lambda-sam-java",
+      "projectFolder": "eventbridge-schedule-to-lambda-sam-java",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Scheduler Types",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kurt Tometich",
+      "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
+      "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
+      "linkedin": "kurt-tometich",
+      "twitter": ""
+    }
+  ]
+}

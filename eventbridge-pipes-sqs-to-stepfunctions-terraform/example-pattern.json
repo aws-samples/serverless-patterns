@@ -1,0 +1,56 @@
+{
+  "title": "Invoke AWS Step Functions state machine from Amazon SQS messages using Amazon EventBridge Pipes",
+  "description": "This pattern shows how to use EventBridge Pipes to launch a Step Functions state machine with a message coming from SQS Queue.",
+  "language": "",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon EventBridge Pipes connects sources to targets. This Terraform stack creates an EventBridge Pipe which polls message from source SQS queue and sends it to the target AWS Step Functions state machine."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-stepfunctions-terraform",
+      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-stepfunctions-terraform",
+      "projectFolder": "eventbridge-pipes-sqs-to-stepfunctions-terraform",
+      "templateFile": "eventbridge-pipes-sqs-to-stepfunctions-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Pipes",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Farrukh Jamal",
+      "image": "https://media.licdn.com/dms/image/C5103AQHH_uSeGxOlZw/profile-displayphoto-shrink_400_400/0/1570698220038?e=1726099200&v=beta&t=7HUDKvPyM5GbBA1eOhVGB9POwFhXC3v87-vrqCIk1d0",
+      "bio": "Farrukh is a Cloud Support Engineer at AWS based in the Australia.",
+      "linkedin": "https://www.linkedin.com/in/farrukhjamal/"
+    }
+  ]
+}

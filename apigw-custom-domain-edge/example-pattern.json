@@ -1,0 +1,59 @@
+{
+    "title": "Amazon API Gateway Edge Custom Domain",
+    "description": "Create Edge Custom Domain in API Gateway",
+    "language": "",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "The SAM template deploys an Amazon API Gateway Edge Custom Domain Name.",
+        "The Edge Custom Domain Name is mapped to a Stage in an existing API Gateway. Additionally, a Route53 A record is created to map the Edge Custom Domain Name (i.e. example.com) to the Target Domain Name created by API Gateway (i.e. d-abcde12345.execute-api.ap-southeast-2.amazonaws.com).",
+        "As prerequisites for this pattern, you must have:",
+        "* A valid certificate in ACM (Amazon Certificate Manager) in the us-east-1 Region that covers the namespace of the domain you would like to use (i.e. *.mydomain.com).",
+        "* A public Hosted Zone in Route 53 with the domain name you would like to use (i.e. mydomain.com).",
+        "* An API Gateway API (REST, HTTP or Websockets) and a deployed Stage within this API."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-custom-domain-edge",
+        "templateURL": "serverless-patterns/apigw-custom-domain-edge",
+        "projectFolder": "apigw-custom-domain-edge",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon API Gateway Edge Custom Domain",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-edge-optimized-custom-domain-name.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "Deploy the stack: <code>sam deploy</code>."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "headline": "Presented by Albert Blaya, Solutions Architect",
+        "name": "Albert Blaya",
+        "image": "https://media-exp1.licdn.com/dms/image/C5603AQEw2HXx9zs7yg/profile-displayphoto-shrink_200_200/0/1600474292127?e=1655942400&v=beta&t=SbeIn9psV0BIFkbROTDRIfPMKMtyrrgBdgt0tRHY0BY",
+        "bio": "Albert is a Solutions Architect at Amazon Web Services based in Australia.",
+        "linkedin": "albertblaya"
+      }
+    ]
+  }
+  

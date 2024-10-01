@@ -1,0 +1,61 @@
+{
+  "title": "Amazon S3 to AWS Step Functions with Amazon EventBridge Rule",
+  "description": "How to create an EventBridge rule with S3 as the event source and Step Functions as target.",
+  "language": "nodejs",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How to create an EventBridge rule with S3 as the event source and Step Functions as target.",
+    "text": [
+      "This sample project demonstrates how you can trigger an execution in Step Functions state machine when an object is created in an S3 bucket.",
+      "When you uploads an object to the newly created S3 bucket, this will send an `Object Created` event to EventBridge, based on the EventBridge rule, the state machine is executed.",
+      "This pattern deploys one Step Functions state machine, one S3 bucket, one EventBridge rule."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-sqs-lambda-terraform",
+      "templateURL": "serverless-patterns/s3-sqs-lambda-terraform",
+      "projectFolder": "s3-sqs-lambda-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS S3 Event Notifications with EventBridge",
+        "link": "https://aws.amazon.com/blogs/aws/new-use-amazon-s3-event-notifications-with-amazon-eventbridge"
+      },
+      {
+        "text": "Using EventBridge with S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Oriol Matavacas",
+      "image": "https://togithub.s3.eu-west-1.amazonaws.com/Oriol.jpg",
+      "bio": "Oriol Matavacas is a Sr. Solutions Architect at AWS based in Barcelona. Oriol primarily supporting customers on the journey to the Cloud. He enjoys building new solutions with scalability, availability and easy to maintain by using serverless.",
+      "linkedin": "https://www.linkedin.com/in/oriol-matavacas-rodriguez-b165868a",
+      "twitter": ""
+    }
+  ]
+}
+

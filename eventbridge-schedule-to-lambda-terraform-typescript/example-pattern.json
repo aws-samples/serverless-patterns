@@ -1,0 +1,55 @@
+{
+  "title": "Amazon EventBridge Schedule to Lambda",
+  "description": "Creates an EventBridge schedule to invoke a Lambda every 5 minutes",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to invoke a TypeScript based Lambda function using EventBridge Scheduler and deployed with Terraform."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-lambda-terraform-typescript",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-lambda-terraform-typescript",
+      "projectFolder": "eventbridge-schedule-to-lambda-terraform-typescript",
+      "templateFile": "eventbridge-schedule-to-lambda-terraform-typescript/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting Started with EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "Building Lambda functions with TypeScript",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-typescript.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tadhg O'Brien",
+      "bio": "Tadhg is a Technical Account Manager at Amazon Web Services supporting Public Sector customers and has a passion for Serverless",
+      "linkedin": "tadhgobrien"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "title": "Amazon CloudFront to AWS WAF to Amazon S3 using .Net CDK",
+  "description": "Creates CloudFront, WAF Web ACL, and S3 bucket for UI code. Then WAF Web ACL gets applied to CloudFront distribution to restrict Website access based on source IP address.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When user access the CloudFront distribution URL, user source IP address will get inspected by WAF Web ACL.",
+      "If source IP address is in the IP set used by Web ACL then user will see the Html page which is served from S3 bucket.", 
+      "If source IP address is not in the IP set then user will get 403 http status code."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-waf-s3-cdk",
+      "templateURL": "serverless-patterns/cloudfront-waf-s3-cdk",
+      "projectFolder": "cloudfront-waf-s3-cdk",
+      "templateFile": "cloudfront-waf-s3-cdk/src/CdkStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Call Athena with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+      },
+      {
+        "text": "Amazon Athena - Serverless Interactive Query Service",
+        "link": "https://aws.amazon.com/athena/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy CloudFrontS3WafStack"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Get the CloudFrontURL from CloudFormation output", 
+      "Access the Url to confirm you can see the message - \"Hello S3 static WebSite\"",
+      "Use 'WAF & Shield' -> 'Ip Set' service on AWS console to remove your local machine IP address and access the CloudFrontURL again to confirm 403 http status code"
+    ]
+  },
+  "cleanup": {
+    "text": [
+     "Delete the stack: cdk destroy CloudFrontS3WafStack",
+     "Confirm the stack has been deleted: aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'CloudFrontS3WafStack')].StackStatus\""
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vikramsinha Patil",
+      "image": "",
+      "bio": "Cloud Application Architect at AWS",
+      "linkedin": "https://www.linkedin.com/in/vikramsinha-patil-834a4b2b",
+      "twitter": ""
+    }
+  ]
+}

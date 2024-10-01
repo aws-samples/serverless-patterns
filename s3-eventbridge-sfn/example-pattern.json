@@ -1,0 +1,57 @@
+{
+  "title": "S3 to EventBridge to Step Functions",
+  "description": "Uses EventBridge to trigger a Step Functions workflow each time an object is uploaded to S3.",
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys an Amazon S3 bucket that publishes events to Amazon EventBridge, and sets up an AWS Step Functions workflow to show how to consume these events via an EventBridge rule. It deploys the the IAM resources required to run the application.",
+      "EventBridge consumes events directly from S3 buckets when the NoticationConfiguration is enabled, as shown in the template.",
+      "The template contains a sample Step Functions workflow that detects cats in images uploaded to the Amazon S3 bucket using Amazon Rekognition's DetectLabels API. Replace this workflow with your own state machine."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-sfn",
+      "templateURL": "serverless-patterns/s3-eventbridge-sfn",
+      "projectFolder": "s3-eventbridge-sfn",
+      "templateFile": "s3-eventbridge-sfn/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Detecting labels in an image - Amazon Rekognition Developer Guide",
+        "link": "https://docs.aws.amazon.com/rekognition/latest/dg/labels-detect-labels-image.html"
+      },
+      {
+        "text": "AWS SDK service integrations - AWS Step Functions Developer Guide",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      },
+      {
+        "text": "AWS Step Functions Workshop",
+        "link": "https://catalog.workshops.aws/stepfunctions/en-US/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "Pascal Vogel",
+      "image": "https://avatars.githubusercontent.com/u/100202393?v=4",
+      "bio": "Pascal Vogel is an Associate Solutions Architect at Amazon Web Services (AWS).",
+      "linkedin": "pascal-vogel",
+      "twitter": "pvogel_"
+    }
+  ]
+}

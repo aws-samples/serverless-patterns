@@ -1,0 +1,58 @@
+{
+  "title": "Eventbridge to Kinesis Firehose to S3",
+  "description": "Forward custom events to Amazon Simple Storage Service (Amazon S3) using EventBridge rules and Amazon Kinesis Data Firehose.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The purpose of this pattern is to demonstrate how to forward custom events to Amazon Simple Storage Service (Amazon S3) for long-term storage, analysis, and auditing purposes using EventBridge rules and Amazon Kinesis Data Firehose. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
+      "Using Kinesis Data Firehose as an intermediary step between EventBridge and S3 takes advantage of Kinesis Data Firehose's dynamic partitioning capability to deliver events to the S3 bucket partitioned by detail-type and receipt time.",
+      "This pattern deploys one KMS Key, one IAM Role, one Kinesis Firehose Delivery Stream, one EventBridge Event Bus and Rule, and one S3 Bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-firehose-cdk",
+      "templateURL": "serverless-patterns/eventbridge-firehose-cdk",
+      "projectFolder": "eventbridge-firehose-cdk",
+      "templateFile": "eventbridge-firehose-cdk/app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Dynamic Partitioning in Kinesis Data Firehose",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/dynamic-partitioning.html"
+      },
+      {
+        "text": "Audit AWS service events with Amazon EventBridge and Amazon Kinesis Data Firehose",
+        "link": "https://aws.amazon.com/blogs/big-data/audit-aws-service-events-with-amazon-eventbridge-and-amazon-kinesis-data-firehose/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Maya Flores",
+      "image": "https://media-exp1.licdn.com/dms/image/C4E03AQGFaDVfkIJi4g/profile-displayphoto-shrink_200_200/0/1620953260457?e=1671062400&v=beta&t=pVt_BUU-r7MtlMwcOxgXgtaUM2tVRe4CUtlUknM--os",
+      "bio": "Partner Solutions Architect @ AWS. Serverless enthusiast.",
+      "linkedin": "maya-m-flores"
+    }
+  ]
+}

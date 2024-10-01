@@ -1,0 +1,56 @@
+{
+  "title": "API Gateway data validation",
+  "description": "This pattern creates an Amazon API Gateway that handles simple data validation at the endpoint without invoking the Lambda function when the data validation fails.",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The data model is declared in the API Gateway resource. The Lambda function then requires the request body to be validated against this model."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-data-validation",
+      "templateURL": "serverless-patterns/apigw-data-validation",
+      "projectFolder": "apigw-data-validation"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "API Gateway model example",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-models"
+      },
+      {
+        "text": "JSON Schema",
+        "link": "https://datatracker.ietf.org/doc/html/draft-zyp-json-schema-04#section-4.1"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Eric Johnson",
+      "image": "https://serverlessland.com/assets/images/resources/ericdj.jpg",
+      "bio": "Eric Johnson is a Principal Developer Advocate for Serverless Applications at Amazon Web Services and is based in Northern Colorado. Eric is a fanatic about serverless and enjoys helping developers understand how serverless technologies introduces a major paradigm shift in how they approach building and running applications at massive scale with minimal administration overhead. Prior to this, Eric has worked as a developer, solutions architect and AWS Evangelist for an AWS partner company.",
+      "linkedin": "singledigit",
+      "twitter": "edjgeek"
+    }
+  ]
+}

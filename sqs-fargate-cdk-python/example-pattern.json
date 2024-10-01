@@ -1,0 +1,73 @@
+{
+  "title": "Amazon SQS connected to an Amazon ECS",
+  "description": "This pattern show how to scale an ECS cluster task that is connected to SQS queue.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "It creates an SQS and an ECS cluster, for every message sent to queue a new task is created on the cluster",
+      "and the message is consumed by a Python application inside a Docker container."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-fargate-cdk-python",
+      "templateURL": "serverless-patterns/sqs-fargate-cdk-python",
+      "projectFolder": "sqs-fargate-cdk-python",
+      "templateFile": "sqs-fargate-cdk-python/sqs_fargate_cdk_python/sqs_fargate_cdk_python.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS CDK Patterns",
+        "link": "https://cdkpatterns.com/"
+      },
+      {
+        "text": "AWS SQS",
+        "link": "https://aws.amazon.com/sqs/"
+      },
+      {
+        "text": "AWS Fargate",
+        "link": "https://aws.amazon.com/fargate/"
+      },
+      {
+        "text": "AWS ECS",
+        "link": "https://aws.amazon.com/ecs/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Gustavo Martim",
+      "image": "https://pbs.twimg.com/profile_images/1382662130462306311/Be4jS62J_400x400.jpg",
+      "bio": "Cloud Application Architect at AWS.",
+      "linkedin": "https://www.linkedin.com/in/gumar/",
+      "twitter": ""
+    },
+    {
+      "name": "Mart Noten",
+      "image": "https://media-exp1.licdn.com/dms/image/C5603AQETLKyceFuJnw/profile-displayphoto-shrink_800_800/0/1567630510954?e=2147483647&v=beta&t=CpkrTXviK63-4VLr89iut5lCX-M9SsxE-yTXOl6LBMQ",
+      "bio": "Consultant, AppDev at AWS.",
+      "linkedin": "https://www.linkedin.com/in/martnoten/",
+      "twitter": ""
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+    "title": "Amazon CloudTrail to AWS Lambda to Amazon OpenSearch",
+    "description": "Create an OpenSearch cluster in VPC that receives CloudTrail CloudWatch logs from Lambda.",
+    "language": "python",
+    "architectureURL": "docs/architecture.png",
+    "videoId": "",
+    "level": "200",
+    "framework": "CDK",
+    "services": {
+        "from": "cloudtrail",
+        "to": "opensearch"
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This project contains a sample AWS CDK template to create Amazon CloudTrail, a CloudWatch Logs Group, AWS Lambda function and Amazon OpenSearch Serverless Collection",
+            "The EventBridge Rule publishes matched events to CloudWatch Logs from CloudTrail.",
+            "Lambda function indexes those logs to Amazon OpenSearch which can be further viewed from Amazon OpenSearch Dashboard."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudtrail-streaming-to-opensearch-serverless-cdk",
+            "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudtrail-streaming-to-opensearch-serverless-cdk/README.md",
+            "projectFolder": "cloudtrail-streaming-to-opensearch-serverless-cdk",
+            "templateFile": "stacks/opensearch_serverless_stack.py"
+        },
+        "payloads": [
+            {
+                "headline": "",
+                "payloadURL": ""
+            }
+        ]
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "Ingesting data into Amazon OpenSearch Serverless collections",
+                "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-clients.html"
+            },
+            {
+                "text": "Fine-grained access control in Amazon OpenSearch Service",
+                "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/fgac.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "author": {
+        "headline": "Presented by Rupesh Tiwari, AWS Senior Solution Architect",
+        "name": "Rupesh Tiwari",
+        "image": "https://avatars.githubusercontent.com/u/330383?v=4",
+        "bio": "Senior Solutions Architect at AWS Global Financial Services.",
+        "linkedin": "in/rupesh-tiwari",
+        "twitter": "rupeshtiwari"
+    }
+}

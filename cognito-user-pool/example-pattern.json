@@ -1,0 +1,56 @@
+{
+    "title": "Amazon Cognito User Pool",
+    "description": "Create a Cognito User Pool with its associated User, App Client, Domain and Resource Server",
+    "language": "",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern deploys an Amazon Cognito User Pool with its associated User, App Client, Domain and Resource Server.",
+        "You can use the tokens provided upon successful authentication with your User Pool to, for example, access a REST API protected with a Cognito User Pool authorizer."
+        
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-user-pool",
+        "templateURL": "serverless-patterns/cognito-user-pool",
+        "projectFolder": "cognito-user-pool",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Cognito User Pool with its associated User, App Client, Domain and Resource Server",
+          "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "Deploy the stack: <code>sam deploy</code>."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "headline": "Presented by Albert Blaya, Solutions Architect",
+        "name": "Albert Blaya",
+        "image": "https://media-exp1.licdn.com/dms/image/C5603AQEw2HXx9zs7yg/profile-displayphoto-shrink_200_200/0/1600474292127?e=1655942400&v=beta&t=SbeIn9psV0BIFkbROTDRIfPMKMtyrrgBdgt0tRHY0BY",
+        "bio": "Albert is a Solutions Architect at Amazon Web Services based in Australia.",
+        "linkedin": "albertblaya"
+      }
+    ]
+  }
+  

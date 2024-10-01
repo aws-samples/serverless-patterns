@@ -1,0 +1,87 @@
+{
+  "title": "Cloudformation template to deploy serverless or provisioned MSK Cluster and SAM project with Lambda function to demonstrate SASL authentication",
+  "description": "Create a Lambda function that uses an Amazon MSK Topic as an event source.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern provides two resources - ",
+      " - A CloudFormation template that can be used to deploy serverless or provisioned MSK cluster and Cloud9 instance in the same VPC to interact with the MSK cluster",
+      " - A SAM project with a Lambda Function to demonstrate SASL authentication.",
+      "To test this pattern, first deploy the CloudFormation stack using the template file MSKSampleStack.yml under msk-cfn-sasl-lambda/create-cluster-cfn. You will need to chose if you'd like to provision serverless or provisioned cluster. For both options, all available authentication mechanisms are enabled - TLS, SASL/SCRAM, and IAM for provisioned cluster, and IAM for serverless. Follow msk-cfn-sasl-lambda/create-cluster-cfn/README.md for detailed instructions",
+      "Next step is to deploy the Lambda Function. Follow steps under msk-cfn-sasl-lambda/README.md to deploy and test the Lambda Function.",
+      "Note - Presently MSK with serverless is not supported for SASL authentication, you must use Provisioned option when deplying the MSK cluster." 
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-cfn-sasl-lambda",
+      "templateURL": "serverless-patterns/msk-cfn-sasl-lambda",
+      "projectFolder": "msk-cfn-sasl-lambda",
+      "templateFile": "msk-cfn-sasl-lambda/create-cluster-cfn/MSKSampleStack.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Lambda with Amazon MSK",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+      },
+      {
+        "text": "CloudFormation Provisioned MSK cluster reference",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-msk-cluster.html"
+      },
+      {
+        "text": "CloudFormation serverless MSK cluster reference",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-msk-serverlesscluster.html"
+      } 
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Lambda Function: <code>sam delete</code>.",
+        "Delete CloudFormation stack to delete the MSK stack and associated resources."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vaibhav Jain",
+      "bio": "AWS - Sr. Application Architect",
+      "image": "https://media.licdn.com/dms/image/C4E03AQEqzZWHGT4dBQ/profile-displayphoto-shrink_800_800/0/1580165399872?e=1687392000&v=beta&t=zdxENLnqCpqCz9i1Uf5Yx4YXlR9EYvgxP8N5UTsy6J8",
+      "linkedin": "https://www.linkedin.com/in/vaibhavjainv/"
+    },
+    {
+      "name": "Paveen Allam",
+      "bio": "Senior Solutions Architect",
+      "image": "https://www.fintail.me/images/pa.jpg",
+      "linkedin": "https://www.linkedin.com/in/pallam/"
+    }, 
+     {
+      "name": "Suraj Tripathi",
+      "bio": "AWS - AppDev Cloud Consultant",
+      "linkedin": "https://www.linkedin.com/in/suraj-tripathi-01b49a140/"
+    },
+    {
+      "name": "Adam Wagner",
+      "bio": "AWS - Principal Serverless Solutions Architect",
+      "linkedin": "https://www.linkedin.com/in/adam-wagner-4bb412/"
+    },
+    {
+      "name": "Indranil Banerjee",
+      "bio": "AWS - Senior Solutions Architect",
+      "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
+    }
+  ]
+}
