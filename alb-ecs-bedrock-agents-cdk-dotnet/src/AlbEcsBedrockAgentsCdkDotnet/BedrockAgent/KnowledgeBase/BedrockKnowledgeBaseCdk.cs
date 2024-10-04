@@ -17,7 +17,6 @@ namespace AlbEcsBedrockAgentsCdkDotnet.BedrockAgent.KnowledgeBase;
 /// </summary>
 internal sealed class BedrockKnowledgeBaseCdk
 {
-    private readonly string _randomString = Utils.GenerateRandomString();
     private readonly Stack _stack;
     private readonly string _kbRoleName;
 
@@ -28,7 +27,9 @@ internal sealed class BedrockKnowledgeBaseCdk
     internal BedrockKnowledgeBaseCdk(Stack stack)
     {
         _stack = stack;
-        _kbRoleName = "AmazonBedrockExecutionRoleForKnowledgeBase_" + _randomString;
+
+        // Role name for the Knowledge Base
+        _kbRoleName = "AmazonBedrockExecutionRoleForKnowledgeBase_" + Utils.GenerateRandomStringFromStackId(_stack.StackId);
     }
 
     /// <summary>
@@ -104,10 +105,10 @@ internal sealed class BedrockKnowledgeBaseCdk
         // Create an OpenSearch Serverless Collection
         var ossCollection = new CfnCollection(
             _stack, 
-            "BedrockKnowledgeBaseOpenSearchServerlessCollection", 
+            "ChatBotBedrockKnowledgeBaseOpenSearchServerlessCollection", 
             new CfnCollectionProps
             {
-                Name = "bedrock-knowledge-base-" + _randomString,
+                Name = $"chatbot-bedrock-kb-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Description = "Collection for Bedrock Agents vector embeddings",
                 Type = "VECTORSEARCH",
                 StandbyReplicas = "DISABLED"
@@ -120,13 +121,13 @@ internal sealed class BedrockKnowledgeBaseCdk
         // Network Policy
         var networkPolicy = new CfnSecurityPolicy(
             _stack, 
-            "OssNetworkPolicy", 
+            "ChatBotOssNetworkPolicy", 
             new CfnSecurityPolicyProps
             {
-                Name = "bedrock-knowledge-base-" + _randomString,
+                Name = $"chatbot-bedrock-kb-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Type = "network",
                 Description = "Custom network policy created by Amazon Bedrock Knowledge Base service to allow a created IAM role " +
-                                "to have permissions on Amazon Open Search collections and indexes.",
+                              "to have permissions on Amazon Open Search collections and indexes.",
                 Policy = Fn.Sub(
                     policies["networkPolicy"].ToString(),
                     new Dictionary<string, string>
@@ -138,13 +139,13 @@ internal sealed class BedrockKnowledgeBaseCdk
         // Encryption Policy
         var encryptionPolicy = new CfnSecurityPolicy(
             _stack, 
-            "OssEncryptionPolicy", 
+            "ChatBotOssEncryptionPolicy", 
             new CfnSecurityPolicyProps
             {
-                Name = "bedrock-knowledge-base-" + _randomString,
+                Name = $"chatbot-bedrock-kb-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Type = "encryption",
                 Description = "Custom encryption policy created by Amazon Bedrock Knowledge Base service to allow a created IAM role " + 
-                            "to have permissions on Amazon Open Search collections and indexes.",
+                               "to have permissions on Amazon Open Search collections and indexes.",
                 Policy = Fn.Sub(
                     policies["encryptionPolicy"].ToString(),
                     new Dictionary<string, string>
@@ -156,10 +157,10 @@ internal sealed class BedrockKnowledgeBaseCdk
         // Access Policy
         var accessPolicy = new CfnAccessPolicy(
             _stack, 
-            "OssAccessPolicy", 
+            "ChatBotOssAccessPolicy", 
             new CfnAccessPolicyProps
             {
-                Name = "bedrock-knowledge-base-" + _randomString,
+                Name = $"chatbot-bedrock-kb-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Type = "data",
                 Description = "Custom data access policy created by Amazon Bedrock Knowledge Base service to allow a created IAM role " +
                               "to have permissions on Amazon Open Search collections and indexes.",
@@ -201,7 +202,7 @@ internal sealed class BedrockKnowledgeBaseCdk
         // Create custom resource to invoke Index Creation Lambda
         return new CustomResource(
             _stack, 
-            "IndexCreationCustomResource", 
+            "ChatBotIndexCreationCustomResource", 
             new CustomResourceProps
             {
                 ServiceToken = indexCreateLambdaFunction.FunctionArn,
@@ -225,9 +226,10 @@ internal sealed class BedrockKnowledgeBaseCdk
     {
         return new Bucket(
             _stack, 
-            "BedrockKnowledgeBaseBucket", 
+            "ChatBotBedrockKnowledgeBaseBucket", 
             new BucketProps
             {
+                BucketName = $"chatbot-bedrock-knowledge-base-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Versioned = true,
                 Encryption = BucketEncryption.S3_MANAGED,
                 RemovalPolicy = RemovalPolicy.DESTROY, // Be cautious with this in production
@@ -246,10 +248,10 @@ internal sealed class BedrockKnowledgeBaseCdk
 
         return new CfnKnowledgeBase(
             _stack, 
-            "BedrockKnowledgeBase", 
+            "ChatBotBedrockKnowledgeBase", 
             new CfnKnowledgeBaseProps
             {
-                Name = "bedrock-knowledge-base-" + Utils.GenerateRandomString(),
+                Name = $"bedrock-knowledge-base-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Description = "Knowledge base for my Bedrock Agent",
                 RoleArn = kbRole.RoleArn,
                 KnowledgeBaseConfiguration = new CfnKnowledgeBase.KnowledgeBaseConfigurationProperty
@@ -287,7 +289,7 @@ internal sealed class BedrockKnowledgeBaseCdk
         // Create an IAM role for the Knowledge Base
         var kbRole = new Role(
             _stack, 
-            "BedrockKnowledgeBaseRole",
+            "ChatBotBedrockKnowledgeBaseRole",
             new RoleProps
             {
                 RoleName = _kbRoleName,
@@ -313,7 +315,7 @@ internal sealed class BedrockKnowledgeBaseCdk
                 InlinePolicies = new Dictionary<string, PolicyDocument>
                 {
                     // Access to Foundation Models
-                    ["AmazonBedrockFoundationModelPolicyForKnowledgeBase_" + _randomString] = 
+                    ["AmazonBedrockFoundationModelPolicyForKnowledgeBase_" + Utils.GenerateRandomStringFromStackId(_stack.StackId)] = 
                         new PolicyDocument(new PolicyDocumentProps
                         {
                             Statements =
@@ -333,7 +335,7 @@ internal sealed class BedrockKnowledgeBaseCdk
                         }),
 
                     // Policy to allow access to OpenSearch Serverless
-                    ["AmazonBedrockOSSPolicyForKnowledgeBase_" + _randomString] = 
+                    ["AmazonBedrockOSSPolicyForKnowledgeBase_" + Utils.GenerateRandomStringFromStackId(_stack.StackId)] = 
                         new PolicyDocument(new PolicyDocumentProps
                         {
                             Statements =
@@ -354,7 +356,7 @@ internal sealed class BedrockKnowledgeBaseCdk
                             ]
                         }),
 
-                    ["AmazonBedrockS3PolicyForKnowledgeBase_" + _randomString] = 
+                    ["AmazonBedrockS3PolicyForKnowledgeBase_" + Utils.GenerateRandomStringFromStackId(_stack.StackId)] = 
                         new PolicyDocument(new PolicyDocumentProps
                         {
                             Statements =
@@ -406,13 +408,13 @@ internal sealed class BedrockKnowledgeBaseCdk
     {
         return new CfnDataSource(
             _stack, 
-            "BedrockKnowledgeBaseDataSource", 
+            "ChatBotBedrockKnowledgeBaseDataSource", 
             new CfnDataSourceProps
             {
                 DataDeletionPolicy = "DELETE",
                 Description = "Data source for Bedrock Knowledge Base",
                 KnowledgeBaseId = KnowledgeBase.AttrKnowledgeBaseId,
-                Name = "bedrock-knowledge-base-data-source",
+                Name = $"chatbot-bedrock-knowledge-base-datasource-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 VectorIngestionConfiguration = new CfnDataSource.VectorIngestionConfigurationProperty
                 {
                     ChunkingConfiguration = new CfnDataSource.ChunkingConfigurationProperty
@@ -461,7 +463,7 @@ internal sealed class BedrockKnowledgeBaseCdk
         // Create custom resource to invoke Policy Document Ingestion and Data source sync
         return new CustomResource(
             _stack, 
-            "KnowledgeBasePrepareCustomResource", 
+            "ChatBotKnowledgeBasePrepareCustomResource", 
             new CustomResourceProps
             {
                 ServiceToken = knowledgeBaseSynclambdaFunction.FunctionArn,
@@ -484,9 +486,10 @@ internal sealed class BedrockKnowledgeBaseCdk
         // Create Lambda functions for resolvers
         var indexCreationLambda = new Function(
             _stack, 
-            "BedrockAgentsOssIndexCreationLambdaFunction", 
+            "ChatBotBedrockAgentsOssIndexCreationLambdaFunction", 
             new FunctionProps
             {
+                FunctionName = $"chatbot-bedrock-knowledge-base-index-creation-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Runtime = Runtime.DOTNET_8,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(180),
@@ -515,9 +518,10 @@ internal sealed class BedrockKnowledgeBaseCdk
         // Create Lambda functions for resolvers
         var documentIngestionLambda = new Function(
             _stack, 
-            "BedrockAgentsKnowledgeBaseIngestionLambdaFunction", 
+            "ChatBotBedrockAgentsKnowledgeBaseIngestionLambdaFunction", 
             new FunctionProps
             {
+                FunctionName = $"chatbot-bedrock-knowledge-base-ingestion-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Runtime = Runtime.DOTNET_8,
                 MemorySize = 512,
                 Timeout = Duration.Minutes(15),

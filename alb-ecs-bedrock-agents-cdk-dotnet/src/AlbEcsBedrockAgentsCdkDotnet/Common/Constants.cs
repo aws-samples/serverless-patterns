@@ -1,4 +1,4 @@
-namespace AlbEcsBedrockAgentsCdkDotnet;
+namespace AlbEcsBedrockAgentsCdkDotnet.Common;
 
 internal static class Constants
 {
@@ -13,4 +13,6 @@ internal static class Constants
     internal static readonly string Bedrock_KB_AOSS_TextField_Name = "AMAZON_BEDROCK_TEXT_CHUNK";
 
     internal static readonly string Bedrock_KB_AOSS_VectorField_Name = "bedrock-knowledge-base-default-vector";
+
+    internal static readonly string ResourceNamePrefix = "chatbot-alb-ecs-bedrockagents-cdk-dotnet";
 }

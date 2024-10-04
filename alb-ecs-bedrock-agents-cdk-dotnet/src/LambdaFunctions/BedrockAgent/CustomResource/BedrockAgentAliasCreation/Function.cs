@@ -24,7 +24,9 @@ public class Function
             StackId = cfnRequest.StackId,
             RequestId = cfnRequest.RequestId,
             LogicalResourceId = cfnRequest.LogicalResourceId,
-            PhysicalResourceId = $"{cfnRequest.ResourceProperties.AgentId}-{cfnRequest.ResourceProperties.AliasName}",
+            PhysicalResourceId = !string.IsNullOrEmpty(cfnRequest.PhysicalResourceId) 
+                ? cfnRequest.PhysicalResourceId 
+                : $"{cfnRequest.ResourceProperties.AgentId}-{cfnRequest.ResourceProperties.AliasName}",
         };
 
         try
@@ -46,7 +48,10 @@ public class Function
 
                 case "delete":
                     context.Logger.LogInformation("Received Delete request");
+                    await DeleteAllAliasesAsync(cfnRequest.ResourceProperties, context);
+
                     response.Status = "SUCCESS";
+                    response.PhysicalResourceId = cfnRequest.PhysicalResourceId;
                     break;
 
                 case "update":
@@ -75,7 +80,8 @@ public class Function
     /// <param name="resourceProperties">Resource properties</param>
     /// <param name="context">Lambda context</param>
     /// <returns>Created Alias Id</returns>
-    private static async Task<(string aliasId, string aliasArn)> CreateBedrockAgentAliasAsync(ResourceProperties resourceProperties, ILambdaContext context)
+    private static async Task<(string aliasId, string aliasArn)> CreateBedrockAgentAliasAsync(
+        ResourceProperties resourceProperties, ILambdaContext context)
     {
         // Get Region
         var region = resourceProperties.Region?.ToString() ?? throw new Exception("Region not provided from resource properties");
@@ -87,7 +93,7 @@ public class Function
 
         // Get AgentId
         var agentId = resourceProperties.AgentId?.ToString() ?? throw new Exception("AgentId not provided from resource properties");
-        context.Logger.LogInformation($"CreateAlias:AgentId: {agentId}");        
+        context.Logger.LogInformation($"CreateAlias:AgentId: {agentId}");
 
         // Get Description
         var description = resourceProperties.Description?.ToString() ?? throw new Exception("Description not provided from resource properties");
@@ -126,5 +132,110 @@ public class Function
             context.Logger.LogError($"Error creating agent alias: {e.Message}{Environment.NewLine}{e.StackTrace}");
             throw;
         }
-    }    
+    }
+
+    /// <summary>
+    /// Deletes all aliases for the given agent
+    /// </summary>
+    /// <param name="resourceProperties">Resource properties</param>
+    /// <param name="context">Lambda context</param>
+    private static async Task DeleteAllAliasesAsync(
+        ResourceProperties resourceProperties, ILambdaContext context)
+    {
+        // Get Region
+        var region = resourceProperties.Region?.ToString() ?? throw new Exception("Region not provided from resource properties");
+        context.Logger.LogInformation($"CreateAlias:Region: {region}");
+
+        // Get AgentId
+        var agentId = resourceProperties.AgentId?.ToString() ?? throw new Exception("AgentId not provided from resource properties");
+        context.Logger.LogInformation($"CreateAlias:AgentId: {agentId}");
+
+        // Get all agent aliases
+        var agentAliases = await GetAllAgentAliasesAsync(agentId, context);
+
+        try
+        {
+            // Create 
+            context.Logger.LogInformation("Deleting All Bedrock Agent Aliases");
+
+            using var bedrockAgentClient = new AmazonBedrockAgentClient();
+            
+            // Delete all aliases
+            agentAliases.ForEach(async agentAliasId =>
+            {
+                // Delete alias
+                var deleteAgentAliasResponse = await bedrockAgentClient.DeleteAgentAliasAsync(
+                    new DeleteAgentAliasRequest
+                    {
+                        AgentAliasId = agentAliasId,
+                        AgentId = agentId
+                    });
+
+                // Check for successful status code
+                if (deleteAgentAliasResponse.HttpStatusCode >= HttpStatusCode.BadRequest)
+                    throw new Exception($"Failed to delete agent alias. Status code: {deleteAgentAliasResponse.HttpStatusCode}");
+                else
+                    context.Logger.LogInformation($"Agent Alias was deleted successfully, Id: {agentAliasId}");
+            });
+        }
+        catch (Exception e)
+        {
+            context.Logger.LogError($"Error creating agent alias: {e.Message}{Environment.NewLine}{e.StackTrace}");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Gets all aliases for the given agent
+    /// </summary>
+    /// <param name="agentId">AgentId</param>
+    /// <param name="context">Lambda context</param>
+    /// <returns></returns>
+    private static async Task<List<string>> GetAllAgentAliasesAsync(string agentId, ILambdaContext context)
+    {
+        context.Logger.LogInformation("Getting All Bedrock Agent Aliases");
+
+        var agentAliases = new List<string>();
+        string? nextToken = null;
+        using var bedrockAgentClient = new AmazonBedrockAgentClient();
+
+        try
+        {
+            while (true)
+            {
+                // List all aliases
+                var listAgentAliasesResponse = await bedrockAgentClient.ListAgentAliasesAsync(
+                    new ListAgentAliasesRequest
+                    {
+                        AgentId = agentId,
+                        MaxResults = 10,
+                        NextToken = nextToken
+                    });
+
+                // Check for successful status code
+                if (listAgentAliasesResponse.HttpStatusCode >= HttpStatusCode.BadRequest)
+                    throw new Exception($"Failed to create agent alias. Status code: {listAgentAliasesResponse.HttpStatusCode}");
+
+                // Check if there are no aliases
+                if (listAgentAliasesResponse.AgentAliasSummaries.Count == 0)
+                    break;
+
+                // Add Aliases to list
+                agentAliases.AddRange(listAgentAliasesResponse.AgentAliasSummaries.Select(alias => alias.AgentAliasId));
+
+                // Check if there are more aliases
+                if (string.IsNullOrEmpty(listAgentAliasesResponse.NextToken))
+                    break;
+
+                nextToken = listAgentAliasesResponse.NextToken;
+            }
+
+            return agentAliases;
+        }
+        catch(Exception ex)
+        {
+            context.Logger.LogError($"Error getting agent aliases: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            throw;
+        }
+    }
 }

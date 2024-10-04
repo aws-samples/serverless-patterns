@@ -14,6 +14,12 @@ internal sealed class BedrockAgentKnowledgeBaseStack : NestedStack
     private readonly BedrockKnowledgeBaseCdk _bedrockKnowledgeBaseCdk;
     private readonly BedrockAgentCdk _bedrockAgentCdk;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="BedrockAgentKnowledgeBaseStack"/>
+    /// </summary>
+    /// <param name="scope"><see cref="Construct"/></param>
+    /// <param name="id">Stack Name</param>
+    /// <param name="props">Nested stack properties</param>        
     internal BedrockAgentKnowledgeBaseStack(Construct scope, string id, INestedStackProps props = null)
         : base(scope, id, props)
     {
@@ -29,6 +35,10 @@ internal sealed class BedrockAgentKnowledgeBaseStack : NestedStack
         BedrockAgent.Node.AddDependency(_bedrockKnowledgeBaseCdk.KnowledgeBaseSyncCustomResource);
     }
     
+    /// <summary>
+    /// Gets Bedrock Knowledge Base
+    /// </summary>
+    /// <value><see cref="CfnKnowledgeBase"/></value>
     internal CfnKnowledgeBase KnowledgeBase { get; }
 
     /// <summary>

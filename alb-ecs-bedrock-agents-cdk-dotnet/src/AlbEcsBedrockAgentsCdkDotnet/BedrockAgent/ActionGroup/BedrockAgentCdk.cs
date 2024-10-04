@@ -15,7 +15,6 @@ namespace AlbEcsBedrockAgentsCdkDotnet.BedrockAgent.ActionGroup;
 internal sealed class BedrockAgentCdk
 {
     private readonly Stack _stack;
-
     private readonly CfnKnowledgeBase _knowledgeBase;
 
     /// <summary>
@@ -73,7 +72,7 @@ internal sealed class BedrockAgentCdk
 
         // Add resource-based policy to lambda function to allow Bedrock to invoke the Lambda function
         ActionGroupLambdaFunction.AddPermission(
-            "BedrockInvokePermission", 
+            "ChatBotBedrockInvokePermission", 
             new Permission
             {
                 Principal = new ServicePrincipal("bedrock.amazonaws.com"),
@@ -104,10 +103,10 @@ internal sealed class BedrockAgentCdk
 
         return new CfnAgent(
             _stack, 
-            "BedrockAgent", 
+            "ChatBotBedrockAgent", 
             new CfnAgentProps
             {
-                AgentName = "BedrockAgentDotNetCdk",
+                AgentName = $"chatbot-bedrock-agent-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Description = "Bedrock Agent for email generation and sendng an email.",
                 AgentResourceRoleArn = agentRole.RoleArn,
                 Instruction = promptContent,
@@ -126,7 +125,7 @@ internal sealed class BedrockAgentCdk
                 {
                     new CfnAgent.AgentActionGroupProperty
                     {
-                        ActionGroupName = "action-group",
+                        ActionGroupName = $"chatbot-action-group-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                         Description = "Action group for Bedrccok Agent",
                         ActionGroupExecutor = new CfnAgent.ActionGroupExecutorProperty
                         {
@@ -155,15 +154,13 @@ internal sealed class BedrockAgentCdk
     /// <returns><see cref="Role"/></returns>
     private Role CreateRoleForBedrockAgent()
     {
-        var randomString = Utils.GenerateRandomString();
-
         // Create an IAM role for the Knowledge Base
         var agentRole = new Role(
             _stack, 
-            "BedrockAgentRole", 
+            "ChatBotBedrockAgentRole", 
             new RoleProps
             {
-                RoleName = "AmazonBedrockExecutionRoleForAgents_" + randomString,
+                RoleName = "ChatBot_AmazonBedrockExecutionRoleForAgents_" + Utils.GenerateRandomStringFromStackId(_stack.StackId),
                 Path = "/service-role/",
                 Description = "Bedrock Agent Role",                
                 AssumedBy = new ServicePrincipal(
@@ -185,7 +182,7 @@ internal sealed class BedrockAgentCdk
                 MaxSessionDuration = Duration.Minutes(60),
                 InlinePolicies = new Dictionary<string, PolicyDocument>
                 {
-                    ["AmazonBedrockAgentBedrockFoundationModelPolicy_" + randomString] = 
+                    ["AmazonBedrockAgentBedrockFoundationModelPolicy_" + Utils.GenerateRandomStringFromStackId(_stack.StackId)] = 
                         new PolicyDocument(new PolicyDocumentProps
                         {
                             Statements =
@@ -200,7 +197,7 @@ internal sealed class BedrockAgentCdk
                             ]
                         }),
 
-                    ["AmazonBedrockAgentRetrieveKnowledgeBasePolicy_" + randomString] = 
+                    ["AmazonBedrockAgentRetrieveKnowledgeBasePolicy_" + Utils.GenerateRandomStringFromStackId(_stack.StackId)] = 
                         new PolicyDocument(new PolicyDocumentProps
                         {
                             Statements =
@@ -224,14 +221,15 @@ internal sealed class BedrockAgentCdk
     /// Creates Lambda function for Bedrock Agents
     /// </summary>
     /// <returns><see cref="Function"/></returns>
-    private static Function CreateLambdaFunctionForBedrockAgents(Stack stack)
+    private Function CreateLambdaFunctionForBedrockAgents(Stack stack)
     {
         // Create Lambda functions for resolvers
         return new Function(
             stack, 
-            "BedrockActionGroupLambdaFunction", 
+            "ChatBotBedrockActionGroupLambdaFunction", 
             new FunctionProps
             {
+                FunctionName = $"chatbot-bedrock-agent-action-group-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Runtime = Runtime.DOTNET_8,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(300),
@@ -261,7 +259,7 @@ internal sealed class BedrockAgentCdk
         // Create custom resource to invoke the Lambda function
         var customResource = new CustomResource(
             _stack, 
-            "AgentAliasCreationCustomResource", 
+            "ChatBotAgentAliasCreationCustomResource", 
             new CustomResourceProps
             {
                 ServiceToken = aliasCreationLambdaFunction.FunctionArn,
@@ -290,9 +288,10 @@ internal sealed class BedrockAgentCdk
         // Create Lambda functions
         var aliasCreationLambda = new Function(
             _stack, 
-            "BedrockAgentAliasCreationLambdaFunction", 
+            "ChatBotBedrockAgentAliasCreationLambdaFunction", 
             new FunctionProps
             {
+                FunctionName = $"chatbot-bedrock-agent-alias-creation-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
                 Runtime = Runtime.DOTNET_8,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(180),
@@ -319,6 +318,9 @@ internal sealed class BedrockAgentCdk
                     Effect = Effect.ALLOW,
                     Actions = [
                         "bedrock:CreateAgentAlias",
+                        "bedrock:GetAgentAlias",
+                        "bedrock:UpdateAgentAlias",
+                        "bedrock:DeleteAgentAlias",
 				        "bedrock:ListAgentAliases"
                     ],
                     Resources = [

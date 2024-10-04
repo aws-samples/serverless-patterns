@@ -1,22 +1,18 @@
 using System;
 using System.Linq;
+using Amazon.CDK;
 
-namespace AlbEcsBedrockAgentsCdkDotnet;
+namespace AlbEcsBedrockAgentsCdkDotnet.Common;
 
 internal static class Utils
 {
     /// <summary>
-    /// 
+    /// Generates a random string from the stack id
     /// </summary>
     /// <returns></returns>
-    internal static string GenerateRandomString()
+    internal static string GenerateRandomStringFromStackId(string stackId)
     {
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        var random = new Random();
-        var randomString = new string(Enumerable.Repeat(chars, 5)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
-
-        return randomString.ToLowerInvariant();
+        return Fn.Select(4, Fn.Split("-", Fn.Select(2, Fn.Split("/", stackId))));
     }
 
     /// <summary>

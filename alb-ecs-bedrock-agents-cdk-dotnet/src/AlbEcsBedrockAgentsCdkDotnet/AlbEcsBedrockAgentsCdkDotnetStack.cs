@@ -1,14 +1,26 @@
 using System.Collections.Generic;
 using AlbEcsBedrockAgentsCdkDotnet.BedrockAgent;
+using AlbEcsBedrockAgentsCdkDotnet.ECS;
 using Amazon.CDK;
 using Constructs;
 
 namespace AlbEcsBedrockAgentsCdkDotnet
 {
+    /// <summary>
+    /// Class to define the stack for the Bedrock Agent with Knowledge Base and ECS service with ALB
+    /// </summary>
     public class AlbEcsBedrockAgentsCdkDotnetStack : Stack
-    {
-        internal AlbEcsBedrockAgentsCdkDotnetStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
+    {   
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AlbEcsBedrockAgentsCdkDotnetStack"/> class.
+        /// </summary>
+        /// <param name="scope"><see cref="Construct"/></param>
+        /// <param name="id">Stack Name</param>
+        /// <param name="props">Stack properties</param>
+        internal AlbEcsBedrockAgentsCdkDotnetStack(Construct scope, string id, IStackProps props = null) 
+            : base(scope, id, props)
         {
+            // Create Bedrock agent with Knowledge Base and Action Group
             var bedrockAgentWithKnowledgeBaseStack = new BedrockAgentKnowledgeBaseStack(
                 this, 
                 "BedrockAgentWithKnowledgeBaseStack", 
@@ -20,6 +32,21 @@ namespace AlbEcsBedrockAgentsCdkDotnet
                     Parameters = new Dictionary<string, string> {}
                 });
 
+            // Create Fargate-based ECS service with Application Load Balancer
+            var albEcsStack = new AlbEcsStack(
+                this,
+                "AlbEcsStack",
+                new NestedStackProps
+                {
+                    Description = "Nested stack to create an ECS Cluster with an ALB",
+                    RemovalPolicy = RemovalPolicy.DESTROY,
+                    Timeout = Duration.Minutes(30),
+                    Parameters = new Dictionary<string, string> 
+                    {
+                        { "AgentId", bedrockAgentWithKnowledgeBaseStack.BedrockAgent.AttrAgentId },
+                        { "AgentAliasId", bedrockAgentWithKnowledgeBaseStack.AgentAliasId }
+                    }                  
+                });
 
             // Output the Agent ID
             _ = new CfnOutput(this, "AgentId", new CfnOutputProps
@@ -61,6 +88,13 @@ namespace AlbEcsBedrockAgentsCdkDotnet
             {
                 Description = "Knowledge Base Data Source",
                 Value = bedrockAgentWithKnowledgeBaseStack.KnowledgeBaseDataSource.AttrDataSourceId
+            });
+
+            // Output ALB's Endpoint
+            _ = new CfnOutput(this, "AlbEndpoint", new CfnOutputProps
+            {
+                Description = "Application Load Balancer Endpoint",
+                Value = $"http://{albEcsStack.ApplicationLoadBalancer.LoadBalancerDnsName}"
             });
         }
     }
