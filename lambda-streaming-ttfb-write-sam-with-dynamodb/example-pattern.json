@@ -1,5 +1,5 @@
 {
-  "title": "AWS Lambda Response streaming: Streaming incremental Amazon DynamoDB Query results.",
+  "title": "AWS Lambda response streaming incremental Amazon DynamoDB Query results",
   "description": "This pattern uses AWS Lambda response streaming to incrementally retrieve and stream Amazon DynamoDB results in batches, reducing time-to-first-byte (TTFB) by sending data as it's retrieved.",
   "language": "nodejs",
   "level": "200",
