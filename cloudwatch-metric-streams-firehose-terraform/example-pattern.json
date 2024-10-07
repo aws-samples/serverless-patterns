@@ -1,5 +1,5 @@
 {
-  "title": "CloudWatch Metric Streams to Amazon Data Firehose",
+  "title": "Amazon CloudWatch Metric Streams to Amazon Data Firehose",
   "description": "Create CloudWatch Metric stream using Amazon Data Firehose and save them in Amazon S3",
   "language": "",
   "level": "300",
