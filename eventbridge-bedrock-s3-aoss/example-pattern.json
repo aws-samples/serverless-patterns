@@ -1,6 +1,6 @@
 {
-  "title": "# EventBridge to Amazon Bedrock to Amazon OpenSearch Serverless",
-  "description": "Periodically sync Bedrock Knowledge Base",
+  "title": "Automatically sync Amazon Bedrock Knowledge Base Data source on Periodic basis using Amazon EventBridge Scheduler",
+  "description": "Use Amazon EventBridge Scheduler to trigger an Ingestion Job periodically to keep the Knowledge Bases vector store up-to-date",
   "language": "Python",
   "level": "200",
   "framework": "CDK",
@@ -58,43 +58,5 @@
           "linkedin": "rajav",
           "twitter": "rajav"
       }
-  ],
-  "patternArch": {
-    "icon1": {
-        "x": 10,
-        "y": 50,
-        "service": "evenbridge",
-        "label": "Amazon EventBridge Scheduler"
-    },
-    "icon2": {
-        "x": 35,
-        "y": 50,
-        "service": "bedrock",
-        "label": "Amazon Bedrock"
-    },
-    "icon3": {
-        "x": 60,
-        "y": 50,
-        "service": "aoss",
-        "label": "Amazon OpenSearch Serverless"
-    },
-    "icon4": {
-        "x": 75,
-        "y": 100,
-        "service": "s3",
-        "label": "Amazon S3"
-    },
-    "line1": {
-        "from": "icon1",
-        "to": "icon2"
-    },
-    "line2": {
-        "from": "icon2",
-        "to": "icon3"
-    },
-    "line3": {
-        "from": "icon2",
-        "to": "icon4"
-    }
-  }
+  ]
 }
