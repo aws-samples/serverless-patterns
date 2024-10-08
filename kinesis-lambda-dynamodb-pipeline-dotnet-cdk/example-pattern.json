@@ -1,0 +1,64 @@
+{
+  "title": "Real-time Data Pipeline with Kinesis, Lambda, and DynamoDB",
+  "description": "Create a serverless real-time data pipeline using Amazon Kinesis, AWS Lambda, and Amazon DynamoDB with error handling",
+  "language": ".NET",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to create a serverless real-time data pipeline using Amazon Kinesis for data ingestion, AWS Lambda for processing, Amazon DynamoDB for data storage and error logging, and Amazon SQS as a Dead Letter Queue for handling failed records. The pattern includes robust error handling and retry mechanisms, and is implemented using AWS CDK with .NET."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-lambda-dynamodb-pipeline-dotnet-cdk",
+      "templateURL": "serverless-patterns/kinesis-lambda-dynamodb-pipeline-dotnet-cdk",
+      "projectFolder": "kinesis-lambda-dynamodb-pipeline-dotnet-cdk",
+      "templateFile": "/src/KinesisLambdaDynamoDbCdk/KinesisLambdaDynamoDbCdkStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Kinesis Data Streams",
+        "link": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "Amazon DynamoDB",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+      },
+      {
+        "text": "AWS CDK",
+        "link": "https://docs.aws.amazon.com/cdk/latest/guide/home.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions, including how to put records into the Kinesis stream and verify processing in DynamoDB tables."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tejas Vora",
+      "image": "./TejasVora.jpg",
+      "bio": "Tejas Vora is a Senior Solutions Architect with Amazon Web Services.",
+      "linkedin": "tejas-vora-b4758a47"
+    }
+  ]
+}
