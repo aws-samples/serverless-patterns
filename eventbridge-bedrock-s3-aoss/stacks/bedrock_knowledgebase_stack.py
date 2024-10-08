@@ -84,8 +84,9 @@ class BedrockKnowledgebaseStack(Stack):
                     )
                 )
             ),
-            knowledge_base_id=knowledge_base_id,
+            knowledge_base_id=knowledge_base_id
         )
+
         log_group = logs.LogGroup(self,
             "BedrockKBLogGroup",
             log_group_name=f"{kb_cw_log_group_name_prefix}-{knowledge_base_id}",
@@ -103,7 +104,7 @@ class BedrockKnowledgebaseStack(Stack):
                         "aws:SourceAccount": self.account
                     },
                     "ArnLike": {
-                        "aws:SourceArn": f"arn:aws:bedrock:{self.region}:{self.account}:knowledge-base/*"
+                        "aws:SourceArn": f"arn:aws:logs:{self.region}:{self.account}:delivery-source:{bedrock_kb_log_delivery_source}"
                     }
                 }
             )
