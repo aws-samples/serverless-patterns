@@ -25,7 +25,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 > [!Important]
 > This pattern uses Knowledge Bases and the Titan Text Embeddings V2 model. See [Supported regions and models for Amazon Bedrock knowledge bases](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-supported.html) to select a region where knowledge bases  is supported
 
-## Enable Model Access on Amazon Bedrock
+## Enable Model Access in Bedrock console
   Knowledge bases use a foundation model to embed your data sources in a vector store. Before creating a knowledge base and selecting an embeddings model for the Knowledge Base, You must request access to the model. If you try to use the model (with the API or console) before you have requested access to it, you receive an error message. For more information, see [Model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
 1. In the AWS console, select the region from which you want to access Bedrock. 
