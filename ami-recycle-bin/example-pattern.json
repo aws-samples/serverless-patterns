@@ -1,0 +1,55 @@
+{
+    "title": "AMI de-registration with AWS Lambda and retention in Amazon EC2 Recycle Bin",
+    "description": "This project demonstrates a pattern to deregister and retain expired AMI and its snapshot with AWS Lambda and Amazon EC2 Recycle Bin",
+    "language": "",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "In this pattern an Amazon EventBridge rule triggers an AWS Lambda function which deregisters an Amazon Machine Image (AMI), deletes the associated snapshot and moves them to the Recycle Bin for retention.",
+        "The AWS Lambda function automates the expiration of Amazon Machine Images (AMIs) by moving the AMIs and their associated snapshots to Recycle Bin. Recycle Bin is a feature of Amazon Elastic Compute Cloud (EC2) that allows you to retain AMIs that you have de-registered for a specified retention period, providing an opportunity to recover them if needed. To recover the deleted AMI, its associated snapshot should be recovered first. The Lambda function also adds corresponding tags to both, the AMI and the EBS snapshot, before moving them to Recycle Bin."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ami-recycle-bin",
+        "templateURL": "serverless-patterns/ami-recycle-bin",
+        "projectFolder": "ami-recycle-bin",
+        "templateFile": "main.tf"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Recover deleted Amazon EBS snapshots and EBS-backed AMIs with Recycle Bin",
+          "link": "https://docs.aws.amazon.com/ebs/latest/userguide/recycle-bin.html"
+        }
+      ]
+    },
+      "deploy": {
+          "text": [
+                    "terraform init",
+                    "terraform plan",
+                    "terraform apply"
+                  ]
+      },
+      "testing": {
+          "text": [
+          "See the Github repo for detailed testing instructions."
+          ]
+      },
+      "cleanup": {
+          "text": [
+                    "terraform destroy"
+                  ]
+      },
+      "authors": [
+          {
+              "name": "Divya Vijendra Girase",
+              "image": "https://avatars.githubusercontent.com/u/172667506?v=4",
+              "bio": "I am a Cloud Infrastructure Architect at AWS and I work with our strategic customers to build, run and maintain their infrastructure on AWS.",
+              "linkedin": "divya-girase"
+          }
+      ]
+  }
