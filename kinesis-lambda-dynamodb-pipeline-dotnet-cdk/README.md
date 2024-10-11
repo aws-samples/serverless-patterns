@@ -1,6 +1,6 @@
 # Real-time Data Pipeline with Kinesis, Lambda, and DynamoDB using AWS CDK .NET
 
-This pattern demonstrates how to create a serverless real-time data pipeline using Amazon Kinesis for data ingestion, AWS Lambda for processing, Amazon DynamoDB for data storage and error logging, and Amazon SQS as a Dead Letter Queue for handling failed records. The pattern includes robust error handling and retry mechanisms, and is implemented using AWS CDK with .NET.
+This pattern demonstrates how to create a serverless real-time data pipeline using Amazon Kinesis for data ingestion, AWS Lambda for processing, Amazon DynamoDB for data storage. The pattern is implemented using AWS CDK with .NET.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/kinesis-lambda-dynamodb-pipeline-dotnet-cdk
 
@@ -49,13 +49,13 @@ This pattern creates a serverless real-time data pipeline:
 1. Data is ingested through an Amazon Kinesis Data Stream.
 2. An AWS Lambda function is triggered by new records in the Kinesis stream.
 3. The Lambda function processes the data and stores it in an Amazon DynamoDB table.
-4. If any errors occur during processing, they are logged in a separate DynamoDB table for error tracking. The Lambda function will retry processing failed records up to maximum retry count. If a record consistently fails processing after these retries, it is automatically sent to an SQS Dead Letter Queue (DLQ) for further investigation and handling, ensuring no data is lost due to processing errors.
+4. If any errors occur during processing, they are logged to CloudWatch. It can also be stored in a separate database table for error tracking. The Lambda function will retry processing failed records up to maximum retry count. If a record consistently fails processing after these retries, you can use SQS Dead Letter Queue (DLQ) for further investigation and handling, ensuring no data is lost due to processing errors.
 
-The AWS CDK is used to define and deploy all the necessary AWS resources, including the Kinesis stream, Lambda function, DynamoDB tables, SQS Dead Letter Queue (DLQ) and associated IAM roles and permissions.
+The AWS CDK is used to define and deploy all the necessary AWS resources, including the Kinesis stream, Lambda function, DynamoDB tables and associated IAM roles and permissions.
 
 ## Testing
 
-1. Out new record into Kinesis stream.
+1. Put new record into Kinesis stream.
 
     - Use the AWS CLI to put a record into the Kinesis stream (replace `<KinesisStreamName>` with the actual stream name from the CDK output):
 
@@ -66,32 +66,21 @@ The AWS CDK is used to define and deploy all the necessary AWS resources, includ
     --partition-key 1 \
     --data '{ "Timestamp": "2024-09-13T23:06:55.934081Z", "Value": 81, "Category": "C" }'
     ```
-    - Use Lambda function to put a record into the Kinesis stream (replace `<DataIngestionLambdaFunctionName>` with the actual data ingestion lambda function name from the CDK output):
-    ```
-    aws lambda invoke \
-    --cli-binary-format raw-in-base64-out \
-    --function-name <DataIngestionLambdaFunctionName> \
-    --payload '{ "Timestamp": "2024-09-13T23:06:55.934081Z", "Value": 81, "Category": "C" }' \
-    response.json
-    ```
-
 2. Check the DynamoDB tables in the AWS Console:
    - The "processed-data-table" should contain the processed record.
-   - If any errors occurred, they would be logged in the "error-log-table".
+   - If any errors occurred, they would be logged in the CloudWatch.
 
 3. You can also check the CloudWatch Logs for the Lambda function to see the processing details and any potential errors.
 
-4. To test error scenarios, you can intentionally send malformed data to the Kinesis stream and verify that it ends up in the Dead Letter Queue after the retry attempts.
+4. If you have implemented DLQ, to test error scenarios, you can intentionally send malformed data to the Kinesis stream and verify that it ends up in the Dead Letter Queue after the retry attempts.
 
 5. Additional unit and integration tests are located in the `test` directory under each Lambda function's directory. These tests can be run locally to verify the behavior of individual components:
     ```
     dotnet test src
     ```
-These tests cover various scenarios including successful processing, error handling, and DLQ interactions.
-
 6. For a more comprehensive end-to-end test, you can use the AWS Step Functions service to orchestrate a test workflow that includes putting records into Kinesis, waiting for processing, and then checking the results in DynamoDB and the DLQ.
 
-Remember to clean up any test data from your DynamoDB tables and SQS queues after testing to avoid unnecessary storage costs.
+Remember to clean up any test data from your DynamoDB table after testing to avoid unnecessary storage costs.
 
 ## Cleanup
  
