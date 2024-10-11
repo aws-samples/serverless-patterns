@@ -8,11 +8,16 @@ using DataProcessFunction.Serialization;
 using Microsoft.Extensions.Configuration;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
+using Amazon.Kinesis;
+using Amazon.Kinesis.Model;
 
 namespace DataProcessFunction.Tests;
 
 public class FunctionTest
 {
+    private static readonly string TableName = "processed-data-table";
+    private static readonly string StreamName = "AnalyticsDataStream";
+    
     [Fact]
     public async Task TestFunction()
     {
@@ -20,8 +25,7 @@ public class FunctionTest
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                { "PROCESSED_TABLE_NAME", "processed-data-table" },
-                { "ERROR_TABLE_NAME", "error-log-table" }
+                { "PROCESSED_TABLE_NAME", TableName }
             })
             .Build();
                     
@@ -62,7 +66,7 @@ public class FunctionTest
 
         // Check record in DynamoDB
         var dynamoDbClient = new AmazonDynamoDBClient();
-        var tableName = "processed-data-table";
+        var tableName = TableName;
         var id = data.Id;
         var getItemRequest = new GetItemRequest
         {
@@ -75,6 +79,46 @@ public class FunctionTest
 
         var getItemResponse = await dynamoDbClient.GetItemAsync(getItemRequest);
         Assert.NotNull(getItemResponse.Item);
+    }
+
+    [Fact]
+    public async Task IntegrationTest()
+    {
+        var data = GenerateRandomData();
+        var serializedData = JsonSerializer.Serialize(data, LambdaFunctionJsonSerializerContext.Default.DataModel);
+
+        // Write record to Kinesis
+        var kinesisClient = new AmazonKinesisClient();
+        var streamName = StreamName;
+        var putRecordRequest = new PutRecordRequest
+        {
+            StreamName = streamName,
+            Data = new MemoryStream(Encoding.UTF8.GetBytes(serializedData)),
+            PartitionKey = Guid.NewGuid().ToString()
+        };
+
+        var putRecordResponse = await kinesisClient.PutRecordAsync(putRecordRequest);
+        Assert.NotNull(putRecordResponse);
+        Assert.NotNull(putRecordResponse.SequenceNumber);
+
+        // Wait for some time
+        await Task.Delay(5000);
+
+        // Check record in DynamoDB
+        var dynamoDbClient = new AmazonDynamoDBClient();
+        var tableName = TableName;
+        var id = data.Id;
+        var getItemRequest = new GetItemRequest
+        {
+            TableName = tableName,
+            Key = new Dictionary<string, AttributeValue>
+            {
+                { "Id", new AttributeValue { S = id } }
+            }
+        };
+
+        var getItemResponse = await dynamoDbClient.GetItemAsync(getItemRequest);
+        Assert.NotNull(getItemResponse.Item);        
     }
 
     private static DataModel GenerateRandomData()

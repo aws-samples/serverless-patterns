@@ -6,21 +6,18 @@ using DataProcessFunction.Serialization;
 using Amazon.DynamoDBv2;
 using Microsoft.Extensions.Configuration;
 using Amazon.DynamoDBv2.Model;
+using System.Text;
 
 namespace DataProcessFunction
 {
     public class DataProcessFunction(IConfigurationRoot? configuration = null)
     {
         private const string ProcessedTableEnvName = "PROCESSED_TABLE_NAME";
-        private const string ErrorTableEnvName = "ERROR_TABLE_NAME";
 
         private readonly IAmazonDynamoDB _dynamoDbClient = new AmazonDynamoDBClient();
         private readonly string _processedTableName =
             (configuration != null ? configuration[ProcessedTableEnvName] : Environment.GetEnvironmentVariable(ProcessedTableEnvName))
                     ?? throw new ArgumentException(ProcessedTableEnvName);
-        private readonly string _errorTableName =
-            (configuration != null ? configuration[ErrorTableEnvName] : Environment.GetEnvironmentVariable(ErrorTableEnvName))
-                    ?? throw new ArgumentException(ErrorTableEnvName);
 
         public async Task<StreamsEventResponse> FunctionHandler(KinesisEvent kinesisEvent, ILambdaContext context)
         {
@@ -128,29 +125,32 @@ namespace DataProcessFunction
             }
         }
 
-        private async Task LogError(string sequenceNumber, Exception ex, ILambdaContext context)
+        private static Task LogError(string sequenceNumber, Exception ex, ILambdaContext context)
         {
             try
             {
-                var request = new PutItemRequest
+                // Log Error - to Logs to Database
+                var logItem = new Dictionary<string, string>
                 {
-                    TableName = _errorTableName,
-                    Item = new Dictionary<string, AttributeValue>
-                    {
-                        ["ErrorId"] = new AttributeValue { S = Guid.NewGuid().ToString() },
-                        ["Timestamp"] = new AttributeValue { N = DateTime.UtcNow.Ticks.ToString() },
-                        ["SequenceNumber"] = new AttributeValue { S = sequenceNumber },
-                        ["ErrorMessage"] = new AttributeValue { S = ex.Message },
-                        ["StackTrace"] = new AttributeValue { S = ex.StackTrace }
-                    }
+                    ["ErrorId"] = Guid.NewGuid().ToString(),
+                    ["Timestamp"] = DateTime.UtcNow.Ticks.ToString(),
+                    ["SequenceNumber"] = sequenceNumber,
+                    ["ErrorMessage"] = ex.Message,
+                    ["StackTrace"] = ex.StackTrace ?? string.Empty
                 };
-        
-                await _dynamoDbClient.PutItemAsync(request);
+
+                var sb = new StringBuilder();
+                sb.AppendLine("Error while processing request.");
+                sb.AppendLine(JsonSerializer.Serialize(logItem, LambdaFunctionJsonSerializerContext.Default.DictionaryStringString));
+                
+                context.Logger.LogError(sb.ToString());
             }
             catch (Exception logEx)
             {
                 context.Logger.LogError($"Error logging error: {logEx.Message}");
             }
+
+            return Task.CompletedTask;
         }
     }
 }
