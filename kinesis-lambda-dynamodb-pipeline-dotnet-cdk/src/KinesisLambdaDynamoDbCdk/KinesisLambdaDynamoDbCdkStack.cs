@@ -8,7 +8,6 @@ using Amazon.CDK.AWS.Logs;
 using System.Runtime.InteropServices;
 using Amazon.CDK.AWS.DynamoDB;
 using Attribute = Amazon.CDK.AWS.DynamoDB.Attribute;
-using Amazon.CDK.AWS.SQS;
 
 namespace KinesisLambdaDynamoDbCdk
 {   
@@ -39,25 +38,6 @@ namespace KinesisLambdaDynamoDbCdk
                 Encryption = TableEncryption.AWS_MANAGED
             });
 
-            // Create DynamoDB table for error logging
-            var errorTable = new Table(this, "ErrorLogTable", new TableProps
-            {
-                PartitionKey = new Attribute { Name = "ErrorId", Type = AttributeType.STRING },
-                SortKey = new Attribute { Name = "Timestamp", Type = AttributeType.NUMBER },
-                BillingMode = BillingMode.PAY_PER_REQUEST,
-                TableName = "error-log-table",
-                RemovalPolicy = RemovalPolicy.DESTROY,
-                DeletionProtection = false,
-                PointInTimeRecovery = false,
-                Encryption = TableEncryption.AWS_MANAGED
-            });
-
-            // Create Dead Letter Queue
-            var dlq = new Queue(this, "DeadLetterQueue", new QueueProps
-            {
-                QueueName = "kinesis-lambda-dlq"
-            });
-
             // Build options for Lambda functions
             var buildOption = new BundlingOptions()
             {
@@ -76,41 +56,11 @@ namespace KinesisLambdaDynamoDbCdk
 
             };
 
-            // Create Lambda function for data ingestion
-            var ingestFunction = new Function(this, "DataIngestFunction", new FunctionProps
-            {
-                Runtime = Runtime.DOTNET_8,
-                MemorySize = 512,
-                LogRetention = RetentionDays.ONE_DAY,
-                Timeout = Duration.Seconds(30),
-                Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X64
-                    ? Amazon.CDK.AWS.Lambda.Architecture.X86_64
-                    : Amazon.CDK.AWS.Lambda.Architecture.ARM_64,
-                FunctionName = "DataIngestFunction",
-                Description = "Function to ingest data into Kinesis Data Stream",
-
-                Handler = "DataIngestFunction",
-                Code = Code.FromAsset(
-                    "src/LambdaFunctions/DataIngestFunction/src",
-                    new Amazon.CDK.AWS.S3.Assets.AssetOptions
-                    {
-                        Bundling = buildOption
-                    }),
-                Environment = new Dictionary<string, string>
-                {
-                    {"KINESIS_STREAM_NAME", dataStream.StreamName}
-                }
-            });
-
-            // Grant permissions to the ingest function to write to Kinesis
-            dataStream.GrantWrite(ingestFunction);
-
             // Create Lambda function for data processing
             var processFunction = new Function(this, "DataProcessFunction", new FunctionProps
             {
                 Runtime = Runtime.DOTNET_8,
                 MemorySize = 512,
-                LogRetention = RetentionDays.ONE_DAY,
                 Timeout = Duration.Seconds(300),
                 Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X64
                     ? Amazon.CDK.AWS.Lambda.Architecture.X86_64
@@ -128,8 +78,7 @@ namespace KinesisLambdaDynamoDbCdk
 
                 Environment = new Dictionary<string, string>
                 {
-                    ["PROCESSED_TABLE_NAME"] = table.TableName,
-                    ["ERROR_TABLE_NAME"] = errorTable.TableName
+                    ["PROCESSED_TABLE_NAME"] = table.TableName
                 },
                 RetryAttempts = 0
             });
@@ -144,27 +93,18 @@ namespace KinesisLambdaDynamoDbCdk
                 RetryAttempts = 1,
                 ParallelizationFactor = 1,
                 MaxBatchingWindow = Duration.Seconds(0),
-                OnFailure = new SqsDlq(dlq),
                 ReportBatchItemFailures = true
             }));
 
             // Grant permissions
             dataStream.GrantRead(processFunction);
             table.GrantWriteData(processFunction);
-            errorTable.GrantWriteData(processFunction);
 
             // Output the stream name
             _ = new CfnOutput(this, "KinesisStreamName", new CfnOutputProps
             {
                 Value = dataStream.StreamName,
                 Description = "Kinesis Data Stream Name",
-            });
-
-            // Output the ingest function name
-            _ = new CfnOutput(this, "DataIngestFunctionName", new CfnOutputProps
-            {
-                Value = ingestFunction.FunctionName,
-                Description = "Ingest Function Name",
             });
 
             // Output the process function name
@@ -174,24 +114,11 @@ namespace KinesisLambdaDynamoDbCdk
                 Description = "Process Function Name",
             });
 
-            _ = new CfnOutput(this, "DeadLetterQueueUrl", new CfnOutputProps
-            {
-                Value = dlq.QueueUrl,
-                Description = "Dead Letter Queue URL"
-            });
-
             // Output the processed data table name
             _ = new CfnOutput(this, "ProcessedDataTableName", new CfnOutputProps
             {
                 Value = table.TableName,
                 Description = "Processed Data Table Name",
-            });
-
-            // Output the error log table name
-            _ = new CfnOutput(this, "ErrorLogTableName", new CfnOutputProps
-            {
-                Value = errorTable.TableName,
-                Description = "Error Log Table Name",
             });
         }
     }
