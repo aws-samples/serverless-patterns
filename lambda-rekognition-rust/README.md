@@ -72,7 +72,7 @@ aws s3 cp './image/helloworld1.png' s3://*SourceBucketName*
 2. Run the following command to check to get the logs from the deployed Lambda function (use the function name from the stack output):
 
 ```bash
-sam logs -n *FunctionName* --region *YourRegion*
+aws logs filter-log-events --log-group-name /aws/lambda/*FunctionName* --region *YourRegion*
 ```
 
 below are snippets from the logs
