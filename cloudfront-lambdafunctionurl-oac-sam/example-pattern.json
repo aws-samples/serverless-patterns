@@ -1,0 +1,46 @@
+{
+  "title": "Amazon CloudFront Origin Access Control for AWS Lambda Function URLl",
+  "description": "Access your Lambda Function URLs securely using Amazon CloudFront Origin Access Control",
+  "language": "Nodejs",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+      "headline": "How it works",
+      "text": [
+          "The SAM template sets up a CloudFront Distribution with a Lambda function URL as the origin. An Origin Access Control (OAC) specific to Lambda is created and linked to the CloudFront Distribution,ensuring that only CloudFront can access the Lambda function URL. The template also configuresappropriate invoke permissions for the Lambda function. The Origin and Cache Behavior settings in the CloudFront Distribution are optimized for best practices when using a Lambda function URL as the origin."
+      ]
+  },
+  "gitHub": {
+      "template": {
+          "repoURL": "https://github.com/aws-samples/serverless-patterns/cloudfront-lambdafunctionurl-oac-sam",
+          "templateURL": "serverless-patterns/cloudfront-lambdafunctionurl-oac-sam",
+          "projectFolder": "cloudfront-lambdafunctionurl-oac-sam",
+          "templateFile": "template.yaml"
+      }
+  },
+  "resources": {},
+  "deploy": {
+      "text": [
+          "See the GitHub repo for detailed build and deploy instructions."
+      ]
+  },
+  "testing": {
+      "text": [
+          "See the GitHub repo for detailed testing instructions."
+      ]
+  },
+  "cleanup": {
+      "text": [
+          "See the GitHub repo for detailed cleanup instructions."
+      ]
+  },
+  "authors": [
+      {
+          "name": "Shekhar Shrinivasan",
+          "image": "https://avatars.githubusercontent.com/u/58206425?s=400&u=90899732423049a2e45523f631ab0379330aec62&v=4",
+          "bio": "Senior Technical Consultant (TAM)",
+          "linkedin": "https://www.linkedin.com/in/shekhar-shrinivasan/",
+          "twitter": ""
+      }
+  ]
+}

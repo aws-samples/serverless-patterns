@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: (uksb-1tthgi812) (tag:lambda-streaming-ttfb-write-sam-with-dynamodb) Serverless Patterns - Lambda Streaming Response with DynamoDB
+Resources:
+  # AWS Lambda Function to dump data to Amazon DynamoDB
+  DataDumpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/data-dump/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Timeout: 30
+      MemorySize: 512
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          DDB_TABLE_NAME: !Ref DDBTable
+      FunctionUrlConfig:
+        AuthType: AWS_IAM
+        InvokeMode: BUFFERED
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DDBTable
+  # AWS Lambda Function to Stream data from Amazon DynamoDB
+  StreamingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/streaming-function/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Timeout: 30
+      MemorySize: 512
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          DDB_TABLE_NAME: !Ref DDBTable
+      FunctionUrlConfig:
+        AuthType: AWS_IAM
+        InvokeMode: RESPONSE_STREAM
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref DDBTable
+  # Amazon DynamoDB Table
+  DDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+Outputs:
+  DataDumpFunctionURL:
+    Description: "Data Dump Lambda Function URL"
+    Value: !GetAtt DataDumpFunctionUrl.FunctionUrl
+  StreamingFunctionURL:
+    Description: "Streaming Lambda Function URL"
+    Value: !GetAtt StreamingFunctionUrl.FunctionUrl

@@ -1,0 +1,54 @@
+{
+  "title": "AWS Lambda response streaming incremental Amazon DynamoDB Query results",
+  "description": "This pattern uses AWS Lambda response streaming to incrementally retrieve and stream Amazon DynamoDB results in batches, reducing time-to-first-byte (TTFB) by sending data as it's retrieved.",
+  "language": "nodejs",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The service interaction in this pattern uses AWS Lambda's response streaming capability to stream data in batches from Amazon DynamoDB. Instead of retrieving all query / scan results at once, the Lambda function processes the query incrementally, retrieving and sending results as they become available."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-streaming-ttfb-write-sam-with-dynamodb",
+      "templateURL": "serverless-patterns/lambda-streaming-ttfb-write-sam-with-dynamodb",
+      "projectFolder": "lambda-streaming-ttfb-write-sam-with-dynamodb",
+      "templateFile": "lambda-streaming-ttfb-write-sam-with-dynamodb/src/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Supercharging User Experience with AWS Lambda Response Streaming",
+        "link": "https://aws.amazon.com/blogs/apn/supercharging-user-experience-with-aws-lambda-response-streaming/"
+      },
+      {
+        "text": "Configure Lambda Function Response Streaming",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html"
+      },
+      {
+        "text": "DynamoDB Read and Write Operations",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/read-write-operations.html#read-operation-consumption"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "Sandeep Kumar P",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQFs4Yt815MOaw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1695457883755?e=1732147200&v=beta&t=C-bNWZXdsiHnCh4n3S377BXlhMQVl1fl-iJKkwkwDpU",
+      "bio": "Principal Solutions Architect at AntStack",
+      "linkedin": "https://www.linkedin.com/in/sandykumar93/"
+    }
+  ]
+}
