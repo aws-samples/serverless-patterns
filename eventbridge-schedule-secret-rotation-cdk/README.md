@@ -1,6 +1,6 @@
-# EventBridge Scheduler to Lambda to Secrets Manager
+# Amazon EventBridge Scheduler to AWS Lambda to AWS Secrets Manager
 
-This sample project demonstrates rotating secrets using AWS Amazon EventBridge Scheduler and AWS Lambda at desired intervals.
+This sample project demonstrates rotating secrets in AWS Secrets Manager using Amazon EventBridge Scheduler and AWS Lambda at desired intervals.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/eventbridge-schedule-secret-rotation-cdk](https://serverlessland.com/patterns/eventbridge-schedule-secret-rotation-cdk)
 
@@ -19,11 +19,19 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-2. Change directory to the pattern directory:
+
+2. Create and activate Python virtual environment. For instructions, please refer this [page](https://python.land/virtual-environments/virtualenv#Python_venv_activation)
+
+3. Install the required pacakages
+     ``` 
+    pip install -r requirements.txt
+    ```
+
+4. Change directory to the pattern directory:
     ```
     cd serverless-patterns/eventbridge-schedule-secret-rotation-cdk
     ```
-3. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the [eventbridge_schedule_secret_rotation_stack.py](/cdk/eventbridge_schedule_secret_rotation_stack.py) file:
+5. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the [eventbridge_schedule_secret_rotation_stack.py](/cdk/eventbridge_schedule_secret_rotation_stack.py) file:
     ```
     cdk deploy
     ```
@@ -32,7 +40,7 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy --parameters SecretRotationSchedule="cron(* 0/1 * * ? *)"
     ```
 
-4. Note the outputs from the CDK deployment process. These contain the arns for the Demo Secret and the rotation lambda.
+6. Note the outputs from the CDK deployment process. These contain the arns for the Demo Secret and the rotation lambda.
 
 ## How it works
 
@@ -45,16 +53,16 @@ An EventBridge schedule is created based on the 'SecretRotationschedule' CDK par
 
 ## Testing
 
-- Copy *DemoSecretArn* value from the cdk output.
+- Copy *SecretArn* value from the cdk output.
 - Run the following command from the command line to retrive the secret value
 
     ```
-    aws secretsmanager get-secret-value --secret-id="{DemoSecretArn}"
+    aws secretsmanager get-secret-value --secret-id="{SecretArn}"
     ```
 - Run the following command to view the versions created for the secret as part of rotation process
 
     ```
-    aws secretsmanager describe-secret --secret-id="{DemoSecretArn}"
+    aws secretsmanager describe-secret --secret-id="{SecretArn}"
     ```
 
 ## Cleanup
@@ -63,7 +71,8 @@ An EventBridge schedule is created based on the 'SecretRotationschedule' CDK par
     ```
     cdk destroy EventbridgeScheduleSecretRotationCdkStack
     ```
-
+2. Deactivate the Python virtual environment. For instructions, please refer this [page](https://python.land/virtual-environments/virtualenv#Python_venv_activation)
+   
 ----
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
