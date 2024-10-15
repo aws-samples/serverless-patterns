@@ -1,0 +1,52 @@
+{
+  "title": "ALB Path-Based Session Stickiness",
+  "description": "Deploy an Application Load Balancer with path-based session stickiness using AWS CDK.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to set up an Application Load Balancer (ALB) with path-based session stickiness using AWS Cloud Development Kit (CDK). The ALB routes traffic to different target groups based on the request path.",
+      "The project creates a Virtual Private Cloud (VPC) with public and private subnets, an ALB, and two target groups (one for each path). It also deploys two Lambda functions, each associated with a different target group.",
+      "When a client sends a request to a specific path (e.g., /app1), the ALB forwards the request to the corresponding target group and Lambda function. Subsequent requests from the same client session are routed to the same target group, ensuring session stickiness."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-path-based-session-stickiness",
+      "templateURL": "serverless-patterns/alb-path-based-session-stickiness",
+      "projectFolder": "alb-path-based-session-stickiness",
+      "templateFile": "alb-path-based-session-stickiness.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Call Athena with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+      },
+      {
+        "text": "Amazon Athena - Serverless Interactive Query Service",
+        "link": "https://aws.amazon.com/athena/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Jason Enderle",
+      "image": "https://www.jasonend.cloud/images/profilepic.jpg",
+      "bio": "Senior Solutions Architect with Amazon Web Services",
+      "linkedin": "jason-enderle-97356b3"
+    }
+  ]
+}
