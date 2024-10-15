@@ -1,53 +1,74 @@
 
-# Welcome to your CDK Python project!
+# ALB Path-Based Session Stickiness
 
-This is a blank project for CDK development with Python.
+## Project Description and Purpose
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+This project demonstrates how to implement path-based session stickiness using AWS CDK with Python. The purpose is to showcase a solution for maintaining user sessions based on specific URL paths in an Application Load Balancer (ALB) environment.
 
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
+## Architecture
 
-To manually create a virtualenv on MacOS and Linux:
+The architecture consists of:
+- An Application Load Balancer (ALB)
+- EC2 instances as targets
+- A Lambda function for cookie generation
+- CloudWatch for monitoring and logging
+
+The ALB uses path-based routing and a Lambda function to generate session cookies, ensuring requests are directed to the same target based on the URL path.
+
+## Requirements
+
+- AWS Account
+- AWS CLI configured with appropriate permissions
+- Python 3.7 or later
+- Node.js 10.13.0 or later
+- AWS CDK CLI
+
+## Deployment Instructions
+
+1. Clone the repository
+2. Navigate to the project directory
+3. Create and activate a virtual environment:
+   ```
+   python3 -m venv .venv
+   source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
+   ```
+4. Install the required dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+5. Synthesize the CloudFormation template:
+   ```
+   cdk synth
+   ```
+6. Deploy the stack:
+   ```
+   cdk deploy
+   ```
+
+## How it Works
+
+1. The ALB receives incoming requests
+2. Based on the URL path, the ALB triggers the Lambda function
+3. The Lambda function generates a session cookie
+4. The ALB uses this cookie to maintain session stickiness
+5. Subsequent requests with the same cookie are routed to the same target
+
+## Testing
+
+To test the deployment:
+1. Access the ALB URL provided in the deployment output
+2. Navigate through different paths and observe the session stickiness behavior
+3. Monitor the CloudWatch logs for the Lambda function and ALB
+
+## Cleanup
+
+To avoid incurring future charges, remember to destroy the resources:
 
 ```
-$ python3 -m venv .venv
+cdk destroy
 ```
 
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
-
-```
-$ source .venv/bin/activate
-```
-
-If you are a Windows platform, you would activate the virtualenv like this:
-
-```
-% .venv\Scripts\activate.bat
-```
-
-Once the virtualenv is activated, you can install the required dependencies.
-
-```
-$ pip install -r requirements.txt
-```
-
-At this point you can now synthesize the CloudFormation template for this code.
-
-```
-$ cdk synth
-```
-
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
-
-## Useful commands
+## Useful Commands
 
  * `cdk ls`          list all stacks in the app
  * `cdk synth`       emits the synthesized CloudFormation template
