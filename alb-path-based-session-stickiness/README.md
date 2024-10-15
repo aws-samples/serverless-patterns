@@ -7,11 +7,12 @@ This project demonstrates how to implement path-based session stickiness using A
 
 ## Architecture
 
+![architecture.jpg](architecture.jpg)
+
 The architecture consists of:
 - An Application Load Balancer (ALB)
 - EC2 instances as targets
 - A Lambda function for cookie generation
-- CloudWatch for monitoring and logging
 
 The ALB uses path-based routing and a Lambda function to generate session cookies, ensuring requests are directed to the same target based on the URL path.
 
