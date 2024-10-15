@@ -20,18 +20,6 @@
       "templateFile": "alb-path-based-session-stickiness.py"
     }
   },
-  "resources": {
-    "bullets": [
-      {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
-      },
-      {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
-      }
-    ]
-  },
   "deploy": {
     "text": ["cdk deploy"]
   },
