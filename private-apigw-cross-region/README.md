@@ -79,7 +79,7 @@ This template creates an Amazon VPC with an Amazon Private API Gateway and neces
 
 ## Template 2: VPC with Peering Connection and Lambda Function
 
-This template creates a VPC in a different region (Region B) and sets up a peering connection to the VPC created in Template 1. It also creates a Lambda function that acts as a client to the API Gateway.
+This template creates a VPC in a different region (Region B) and configures a peering connection to the VPC created in Template 1. It also creates a Lambda function that acts as a client to the API Gateway.
 
 ### Key Resources:
 - VPC: Creates a new VPC in Region B.
