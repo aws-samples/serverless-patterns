@@ -20,6 +20,22 @@
       "templateFile": "alb-path-based-session-stickiness.py"
     }
   },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS Cloud Development Kit (CDK)",
+        "link": "https://aws.amazon.com/cdk/"
+      }
+    ]
+  },
   "deploy": {
     "text": ["cdk deploy"]
   },
