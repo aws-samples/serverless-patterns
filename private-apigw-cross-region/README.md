@@ -15,30 +15,119 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Deployment Instructions
 
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ``` 
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-1. Change directory to the pattern directory:
-    ```
-    cd private-apigw-cross-region
-    ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
-    ```
-    sam deploy --guided
-    ```
-1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
-    * Enter Subnets
-    * Enter LambdaSecurityGroupId
+Follow these steps to deploy the three templates in the correct order:
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+### Template 1: VPC with Private API Gateway (Region A)
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+1. Navigate to the directory containing Template 1:
+
+```
+cd path/to/template1
+```
+
+2. Deploy Template 1 using AWS SAM:
+
+```
+sam deploy --guided
+```
+
+3. During the prompts:
+* Enter a stack name for Template 1 (e.g., private-api-vpc-regionA)
+* Select Region A as the deployment region
+* Enter the desired VPC CIDR block
+* Allow SAM CLI to create IAM roles with the required permissions
+
+4. Note the outputs from the deployment, including:
+* Remote VPC CIDR
+* Peer VPC ID
+* API Gateway ID
+* VPC Endpoint URL
+* Region
+
+### Template 2: VPC with Peering Connection and Lambda Function (Region B)
+
+1. Navigate to the directory containing Template 2:
+
+```
+cd path/to/template2
+```
+
+2. Deploy Template 2 using AWS SAM:
+
+```
+sam deploy --guided
+```
+
+3. During the prompts:
+* Enter a stack name for Template 2 (e.g., client-vpc-lambda-regionB)
+* Select Region B as the deployment region (different from Region A)
+* Enter the VPC CIDR block (must be different from Template 1)
+* Enter the API ID from Template 1's output
+* Enter the Peer VPC ID from Template 1's output
+* Enter the Remote VPC CIDR from Template 1's output
+* Enter the VPC Endpoint URL from Template 1's output
+* Enter Region A as the Peer Region
+* Allow SAM CLI to create IAM roles with the required permissions
+
+4. Note the outputs from the deployment, including:
+* Peering Connection ID
+* VPC CIDR
+
+### Template 3: VPC Peering Route (Region A)
+
+1. Navigate to the directory containing Template 3:
+
+```
+cd path/to/template3
+```
+
+2. Deploy Template 3 using AWS SAM:
+
+```
+sam deploy --guided
+```
+
+3. During the prompts:
+* Enter a stack name for Template 3 (e.g., vpc-peering-route-regionA)
+* Select Region A as the deployment region (same as Template 1)
+* Enter the Peering Connection ID from Template 2's output
+* Enter the Remote VPC CIDR from Template 2's output
+* Allow SAM CLI to create IAM roles with the required permissions
+
+After deploying all three templates, your multi-region VPC peering with private API Gateway setup should be complete and ready for testing.
 
 ## How it works
+
+This solution enables an AWS Lambda function in one AWS region to securely invoke a Private Amazon API Gateway in another region using VPC peering and VPC endpoints. Here's an overview of the setup:
+
+### (Client Region)
+
+- A VPC is created to host the client AWS Lambda function.
+- A Lambda function is deployed within this VPC, acting as the client.
+- A Private Hosted Zone is set up for DNS resolution of the API Gateway endpoint.
+
+### (API Region)
+
+- Another VPC is created to host the Private API Gateway.
+- A Private API Gateway is deployed and a VPC Endpoint for API Gateway Service (Execute API) is created in this VPC.
+
+### VPC Peering
+
+- A VPC peering connection is established between the VPCs in Region A and Region B.
+- Appropriate routes are added to the route tables in both VPCs to enable traffic flow through the peering connection.
+
+### DNS Resolution
+
+- The Private Hosted Zone in Region A is configured to resolve the API Gateway's domain name to the VPC Endpoint in Region B.
+
+### Invocation Process
+
+1. The Lambda function in Region A initiates a request to the API Gateway's endpoint URL.
+2. DNS resolution occurs using the Private Hosted Zone, resolving to the VPC Endpoint in Region B.
+3. The request travels through the VPC peering connection to reach the VPC Endpoint in Region B.
+4. The VPC Endpoint forwards the request to the private API Gateway.
+
+This setup ensures that all traffic between the AWS  Lambda function and the Amazon API Gateway remains within the AWS network, never traversing the public internet. It provides a secure way to access private resources across regions while maintaining network isolation.
 
 # Multi-Region VPC Peering with Private API Gateway Setup
 
@@ -155,15 +244,34 @@ This test will demonstrate that the Lambda function in Region B can successfully
 - [VPC Endpoints](https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html)
 
 ## Cleanup
- 
-1. Delete the stack
+
+To avoid incurring future charges, it's important to delete the resources in the correct order. Follow these steps to clean up the resources created by the three templates:
+
+1. Delete Template 3 stack (in Region A)
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    aws cloudformation delete-stack --stack-name STACK_NAME_TEMPLATE_3 --region REGION_A
     ```
-1. Confirm the stack has been deleted
+
+2. Delete Template 2 stack (in Region B)
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    aws cloudformation delete-stack --stack-name STACK_NAME_TEMPLATE_2 --region REGION_B
     ```
+
+3. Delete Template 1 stack (in Region A)
+    ```bash
+    aws cloudformation delete-stack --stack-name STACK_NAME_TEMPLATE_1 --region REGION_A
+    ```
+
+4. Confirm all stacks have been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus" --region REGION_A
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus" --region REGION_B
+    ```
+
+Replace `STACK_NAME_TEMPLATE_1`, `STACK_NAME_TEMPLATE_2`, `STACK_NAME_TEMPLATE_3`, `REGION_A`, and `REGION_B` with the actual stack names and regions you used during deployment.
+
+Note: Ensure you wait for each stack deletion to complete before proceeding to the next one. This helps avoid dependency conflicts during the cleanup process.
+
 This pattern was contributed by Luigi Napoleone Capasso
 ----
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.

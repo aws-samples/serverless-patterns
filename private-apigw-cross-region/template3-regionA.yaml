@@ -1,3 +1,6 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'This template creates a route in an existing route table to enable communication through a VPC peering connection'
+
 Parameters:
 
   PeerID:
@@ -10,7 +13,7 @@ Parameters:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){2}0\.0\/16$
     ConstraintDescription: Must be a valid /16 IP CIDR range of the form x.x.0.0/16.
 
-  RouteTableId:
+  RouteTableReference:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /myapp/routetableid
     Description: "DO NOT CHANGE THIS VALUE. It retrieves the RouteTableId from SSM Parameter Store."
@@ -20,6 +23,6 @@ Resources:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId:
-        Ref: RouteTableId
+        Ref: RouteTableReference
       DestinationCidrBlock: !Ref REMOTEVPCCIDR
       VpcPeeringConnectionId: !Ref PeerID

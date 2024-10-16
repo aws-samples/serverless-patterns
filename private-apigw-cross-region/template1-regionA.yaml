@@ -187,3 +187,11 @@ Outputs:
   Region:
     Description: Region ID
     Value: !Sub ${AWS::Region}
+
+  SSMParameterName:
+    Description: The name of the SSM Parameter storing the Route Table ID
+    Value: !Ref StoreRouteTableId
+
+  SSMParameterValue:
+    Description: The value stored in the SSM Parameter (Route Table ID)
+    Value: !GetAtt StoreRouteTableId.Value

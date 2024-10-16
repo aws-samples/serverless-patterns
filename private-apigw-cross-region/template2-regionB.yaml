@@ -60,6 +60,7 @@ Resources:
       Tags: 
         - Key: Name
           Value: !Sub '${AWS::StackName}-RT'
+          
   myInternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -179,3 +180,7 @@ Outputs:
   VPCCidr:
     Description: Cidr Range of the VPC
     Value: !Ref VpcCidrBlock
+
+  LambdaFunctionName:
+    Description: Name of the Lambda function
+    Value: !Ref myLambdaFunction
