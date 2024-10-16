@@ -66,7 +66,7 @@ This template creates an Amazon VPC with an Amazon Private API Gateway and neces
 - Two Subnets: Sets up two subnets within the VPC for high availability.
 - Route Table: Configures routing for the VPC.
 - Security Group: Defines inbound and outbound traffic rules.
-- VPC Endpoint for Execute API: Allows private access to the API Gateway.
+- VPC Endpoint for Execute API: Provides private access to the API Gateway.
 - Private API Gateway: Creates a private API that can only be accessed within the VPC or through VPC peering.
 - SSM Parameter: Stores the Route Table ID for use in Template 3.
 
