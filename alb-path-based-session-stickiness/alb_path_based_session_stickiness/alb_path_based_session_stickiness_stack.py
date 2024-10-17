@@ -77,11 +77,11 @@ class AlbPathBasedSessionStickinessStack(Stack):
                 "alb_path_based_session_stickiness/lambda_functions/generate_cookie"
             ),
             handler="index.lambda_handler",
-            vpc=vpc,
-            vpc_subnets=ec2.SubnetSelection(
-                subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS
-            ),
-            allow_public_subnet=False,
+            # vpc=vpc,
+            # vpc_subnets=ec2.SubnetSelection(
+            #     subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS
+            # ),
+            # allow_public_subnet=False,
             layers=[requests_layer],
             tracing=lambda_.Tracing.ACTIVE,
         )
@@ -92,6 +92,10 @@ class AlbPathBasedSessionStickinessStack(Stack):
             vpc=vpc,
             target_type=elbv2.TargetType.LAMBDA,
             targets=[alb_targets.LambdaTarget(cookie_function)],
+        )
+        lambda_tg.set_attribute(
+            key="lambda.multi_value_headers.enabled", 
+            value="true"
         )
 
         alb_sg = ec2.SecurityGroup(
@@ -111,15 +115,10 @@ class AlbPathBasedSessionStickinessStack(Stack):
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
         )
 
-        web_user_data = ec2.UserData.for_linux()
-
-        web_user_data.add_commands(
-            "dnf update -y --security",
-            "dnf install -y httpd",
-            "hostname > /var/www/html/index.html",
-            "systemctl start httpd",
-            "systemctl enable httpd",
-        )
+        with open("alb_path_based_session_stickiness/user_data/user_data.sh", "r") as f:
+            web_user_data = ec2.UserData.custom(
+                content=f.read()
+            )
 
         web_asg = autoscaling.AutoScalingGroup(
             self,
@@ -176,7 +175,7 @@ class AlbPathBasedSessionStickinessStack(Stack):
             "WebServer",
             priority=1,
             action=elbv2.ListenerAction.forward(
-                [lambda_tg],
+                [web_tg],
             ),
             conditions=[
                 elbv2.ListenerCondition.http_header(

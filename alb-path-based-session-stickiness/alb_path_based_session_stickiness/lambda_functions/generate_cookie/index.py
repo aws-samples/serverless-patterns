@@ -20,8 +20,8 @@ def lambda_handler(event, context):
         path = event.get('path', '')
 
         # Construct the target URL for the proxied request
-        headers = event.get('headers', {})
-        url = f"{headers.get('x-forwarded-proto', 'https')}://{headers.get('host')}{path}"
+        headers = event.get('multiValueHeaders', {})
+        url = f"{headers.get('x-forwarded-proto')[0]}://{headers.get('host')[0]}{path}"
         
         # Create cookie with the path
         cookie = f'AWSALBAPP={path}'
@@ -29,12 +29,13 @@ def lambda_handler(event, context):
         # Prepare headers for the proxied request, including the cookie and tracing ID
         proxy_headers = {
             'Cookie': cookie,
-            'X-Amzn-Trace-Id': headers.get('x-amzn-trace-id', '')
+            'X-Amzn-Trace-Id': headers.get('x-amzn-trace-id')[0]
         }
         
         # Extract method and body from the original request for proxying
         method = event.get('httpMethod', 'GET')
         body = event.get('body', '')
+        print(f"{method}, {body}, {url}")
         try:
             response = requests.request(method, url, headers=proxy_headers, data=body, timeout=1)
             response.raise_for_status()  # This will raise an exception for 4xx and 5xx status codes
@@ -42,13 +43,16 @@ def lambda_handler(event, context):
             # Prepare the response
             response_headers = dict(response.headers)
             expiration = (datetime.datetime.now() + datetime.timedelta(minutes=30)).strftime('%a, %d %b %Y %H:%M:%S GMT')
-            response_headers['Set-Cookie'] = f'{cookie}; Secure; SameSite=None; Expires={expiration};'
+            if headers.get('x-forwarded-proto')[0] == 'https':
+                response_headers['Set-Cookie'] = f'{cookie}; Secure; SameSite=None; Expires={expiration};'
+            else:
+                response_headers['Set-Cookie'] = f'{cookie}; SameSite=None; Expires={expiration};'
 
             
             return {
                 'statusCode': response.status_code,
                 'headers': response_headers,
-                'body': f"FROM LAMBDA: {response.text}"
+                'body': response.text
             }
         except requests.exceptions.Timeout:
             return {
