@@ -1,0 +1,61 @@
+{
+  "title": "Upload file to Amazon S3 bucket using presigned URL",
+  "description": "This project deploys Amazon API Gateway with AWS Lambda integration to showcase how to upload a file up to 5GB to Amazon S3 bucket using a presigned S3 URL.",
+  "language": "Java",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon API Gateway receives the HTTP POST request containing the file name to be uploaded",
+      "AWS Lambda is triggered by the API Gateway, this java based function generates Amazon S3 presigned URL.",
+      "A Java program is used to upload a file to the Amazon S3 bucket using the presigned URL"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-s3-terraform-java",
+      "templateURL": "serverless-patterns/apigw-lambda-s3-terraform-java",
+      "projectFolder": "apigw-lambda-s3-terraform-java",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Create a presigned URL for Amazon S3 using an AWS SDK",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/example_s3_Scenario_PresignedUrl_section.html"
+      },
+      {
+        "text": "Uploading objects with presigned URLs",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html"
+      }      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "mvn clean package",
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Amazon S3 bucket content: <code>aws s3 rm s3://{MyS3BucketName} --recursive</code>",
+      "Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jing Xiang Peh",
+      "image": "images/profile-pic.jpg",
+      "bio": "I am a Specialist Solutions Architect for Serveless based in Singapore",
+      "linkedin": "jing-xiang-peh"
+    }
+  ]
+}
