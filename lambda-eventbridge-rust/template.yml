@@ -27,13 +27,15 @@ Resources:
   PublisherFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - EventBridgePutEventsPolicy:
             EventBusName: !Ref EventBusName
       Environment:
         Variables:
           EVENT_BUS_NAME: !Ref EventBusName
+    Metadata:
+      BuildMethod: rust-cargolambda
 
 Outputs:
   PublisherFunction:

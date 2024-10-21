@@ -48,7 +48,7 @@ Resources:
   MyFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - S3ReadPolicy:
             BucketName: !Ref SourceBucket
@@ -73,6 +73,9 @@ Resources:
                 reason:
                   - PutObject
                   - CompleteMultipartUpload
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 
 Outputs:
   SourceBucketName:

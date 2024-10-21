@@ -76,7 +76,7 @@ Resources:
   PutObjectFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: '2012-10-17'
@@ -94,4 +94,6 @@ Resources:
           AWS_APPCONFIG_PROFILE: MyTestProfile
           AWS_APPCONFIG_EXTENSION_HTTP_PORT: 2772
       Layers:
-        - arn:aws:lambda:eu-central-1:066940009817:layer:AWS-AppConfig-Extension-Arm64:2
+        - arn:aws:lambda:eu-central-1:066940009817:layer:AWS-AppConfig-Extension-Arm64:101
+    Metadata:
+      BuildMethod: rust-cargolambda

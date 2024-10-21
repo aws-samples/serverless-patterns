@@ -27,7 +27,7 @@ Resources:
   QueuePublisherFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Environment:
         Variables:
           SQS_QUEUE_NAME: !Ref MySqsQueue
@@ -36,6 +36,9 @@ Resources:
         ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - SQSSendMessagePolicy:
             QueueName: !GetAtt MySqsQueue.QueueName
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 
 Outputs:
   QueuePublisherFunction:

@@ -15,7 +15,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Rust](https://www.rust-lang.org/) 1.56.0 or higher
-* [cargo-zigbuild](https://github.com/messense/cargo-zigbuild) and [Zig](https://ziglang.org/) for cross-compilation
+* [CargoLambda](https://www.cargo-lambda.info/guide/installation.html)
 
 ## Deployment Instructions
 
@@ -33,11 +33,11 @@ cd lambda-rekognition-rust
 
 3. Install dependencies and build (docker and cross build are required):
     ```
-    make build
+    sam build
     ```
 4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
-    make deploy
+    sam deploy
     ```
 5. During the prompts:
     * Enter a stack name
@@ -72,7 +72,7 @@ aws s3 cp './image/helloworld1.png' s3://*SourceBucketName*
 2. Run the following command to check to get the logs from the deployed Lambda function (use the function name from the stack output):
 
 ```bash
-sam logs -n *FunctionName* --region *YourRegion*
+aws logs filter-log-events --log-group-name /aws/lambda/*FunctionName* --region *YourRegion*
 ```
 
 below are snippets from the logs

@@ -34,7 +34,7 @@ Resources:
   MyFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Events:
         MySQSEvent:
           Type: SQS
@@ -43,6 +43,8 @@ Resources:
             BatchSize: 10
             FunctionResponseTypes:
               - ReportBatchItemFailures
+    Metadata:
+      BuildMethod: rust-cargolambda
 
 Outputs:
   MySqsQueueName:
@@ -54,4 +56,3 @@ Outputs:
   MySqsQueueURL:
     Description: SQS queue URL
     Value: !Ref MySqsQueue
-

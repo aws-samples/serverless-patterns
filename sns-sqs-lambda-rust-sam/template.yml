@@ -57,13 +57,16 @@ Resources:
   MyFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Events:
         MySQSEvent:
           Type: SQS
           Properties:
             Queue: !GetAtt MySqsQueue.Arn
             BatchSize: 10
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 
 Outputs:
   MySqsQueueName:
@@ -81,4 +84,3 @@ Outputs:
   MySnsTopicArn:
     Description: SNS topic ARN
     Value: !Ref MySnsTopic
-

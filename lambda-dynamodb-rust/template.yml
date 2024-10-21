@@ -23,7 +23,7 @@ Resources:
   LambdaPutDynamoDB:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Environment:
         Variables:
           TABLE_NAME: !Ref DynamoTable
@@ -32,6 +32,9 @@ Resources:
         ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - DynamoDBWritePolicy:
             TableName: !Ref DynamoTable
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 
 ##########################################################################
 #   DynamoDB                                                            #

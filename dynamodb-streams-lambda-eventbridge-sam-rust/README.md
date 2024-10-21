@@ -15,7 +15,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Rust](https://www.rust-lang.org/) 1.67.0 or higher
-* [cargo-zigbuild](https://github.com/messense/cargo-zigbuild) and [Zig](https://ziglang.org/) for cross-compilation
+* [CargoLambda](https://www.cargo-lambda.info/guide/installation.html)
 * [AWS AppConfig integration with Lambda extensions](https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions.
 
 ## Deployment Instructions
@@ -30,11 +30,11 @@ Important: this application uses various AWS services and there are costs associ
     ```
 3. From the command line, initialize terraform to  to downloads and installs the providers defined in the configuration:
     ```
-    make build
+    sam build
     ```
 4. From the command line, apply the configuration in the main.tf file:
     ```
-    make deploy
+    sam deploy
     ```
 5. During the prompts:
     * Enter a stack name

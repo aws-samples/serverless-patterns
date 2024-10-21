@@ -46,7 +46,10 @@ Resources:
   LambdaFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
+    Metadata:
+      BuildMethod: rust-cargolambda
+
   # Function permissions grant an AWS service or another account permission to use a function
   FunctionResourcePermission:
     Type: 'AWS::Lambda::Permission'

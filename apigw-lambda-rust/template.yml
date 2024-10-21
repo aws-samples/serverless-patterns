@@ -8,7 +8,7 @@ Globals:
     MemorySize: 128
     Architectures: ["arm64"]
     Handler: bootstrap
-    Runtime: provided.al2
+    Runtime: provided.al2023
     Timeout: 29
     Environment:
       Variables:
@@ -46,7 +46,7 @@ Resources:
   LambdaFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - AWSLambdaBasicExecutionRole
       Events:
@@ -56,6 +56,8 @@ Resources:
             Path: /do
             Method: POST
             RestApiId: !Ref MyApi
+    Metadata:
+      BuildMethod: rust-cargolambda
 
 Outputs:
   HttpApiEndpoint:

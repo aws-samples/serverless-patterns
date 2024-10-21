@@ -28,10 +28,13 @@ Resources:
   PutObjectFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Environment:
         Variables:
           BUCKET_NAME: !Ref DestinationBucket
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref DestinationBucket
+    Metadata:
+      BuildMethod: rust-cargolambda
+
