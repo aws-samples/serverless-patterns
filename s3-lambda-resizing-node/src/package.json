@@ -1,0 +1,16 @@
+{
+  "name": "resizer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "James Beswick",
+  "license": "MIT-0",
+  "dependencies": {
+    "gm": "^1.25.0",
+    "@aws-sdk/client-s3": "^3.32.0"
+  }
+}
