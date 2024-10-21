@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sample SAM template to deploy a simplified workflow that waits for human approval in Step Functions.
+
+Parameters:
+  ApproverEmailAddress:
+    Description: Enter the email address that will receive review notifications.
+    Type: String
+
+Resources:
+  SNSNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub ${AWS::StackName}-sns-topic
+      TopicName: !Sub ${AWS::StackName}-sns-topic
+      Subscription:
+      - Endpoint: !Ref ApproverEmailAddress
+        Protocol: "email"
+    Metadata:
+      SamResourceId: SNSNotificationTopic
+
+  ReviewRESTApiRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - apigateway.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+      - PolicyName: !Sub ${AWS::StackName}-sfn-permissions
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - states:SendTaskSuccess
+            Resource: "*"
+    Metadata:
+      SamResourceId: ReviewRESTApiRole
+
+  ReviewRESTApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: ./APIGateway/ReviewRESTApi.yaml
+    Metadata:
+      SamResourceId: ReviewRESTApi
+
+  ReviewSfnRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-review-sfn-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-review-sfn-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !GetAtt SNSNotificationTopic.TopicArn
+    Metadata:
+      SamResourceId: ReviewSfnRole
+
+  ReviewStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: "./StepFunction/step-function-definition.json"
+      DefinitionSubstitutions:
+        TopicArn: !GetAtt SNSNotificationTopic.TopicArn
+        ApiEndpoint: !Sub https://${ReviewRESTApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+      Role: !GetAtt ReviewSfnRole.Arn
+    Metadata:
+      SamResourceId: "ReviewStateMachine"
+
