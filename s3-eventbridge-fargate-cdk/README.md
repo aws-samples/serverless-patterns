@@ -1,6 +1,6 @@
 # Amazon S3 to AWS Fargate
 
-This pattern demonstrates how to trigger an AWS Fargate task when an object is uploaded to Amazon S3.
+This pattern demonstrates how to invoke an AWS Fargate task when an object is uploaded to Amazon S3.
 This pattern is commonly implemented with an AWS Lambda function, but this is not always possible:
 - Processing > 15 min
 - Docker image > 10G
@@ -65,7 +65,7 @@ aws logs describe-log-streams --log-group-name /ecs/doc-ingestion
 aws logs get-log-events --log-group-name /ecs/doc-ingestion --log-stream-name doc-ingestion-logs/DocIngestion/...
 ```
 
-4. You should see the content of your file in the logs.
+4. The file contents are displayed in the log.
 
 ## Cleanup
 
