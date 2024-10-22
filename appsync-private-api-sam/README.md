@@ -40,6 +40,8 @@ aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-xxxxxxxxxxx" --query 
 
    - Enter a stack name
    - Enter the desired AWS Region
+   - Enter the VpcID where to deploy the Private AppSync API
+   - Enter a comma-separated list of SubnetIds in the VPC to deploy theA AppSync API Interface Endpoint
    - Allow SAM CLI to create IAM roles with the required permissions.
 
    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -50,11 +52,11 @@ aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-xxxxxxxxxxx" --query 
 
 This patterns creates and AppSync Interface VPC Endpoint and a sample AppSync Private API backed with a DynamoDB data source. Requests to AppSync Private APIs will go through AWS’s private network without going over the internet. GraphQL requests from your application are routed via the interface VPC endpoint to AppSync Private API. Interface VPC endpoint is powered by [AWS PrivateLink](https://aws.amazon.com/privatelink/), a highly available, scalable technology that enables you to privately connect your VPC to AWS services like AWS AppSync as if the services were in your VPC.
 
-API Key is used as the authorization mode for the AppSync API however it is not recommended to use API Key for production application, kindly refer to other authorization modes supported by AppSync in the [documentation](https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html)
+API Key is used as the authorization mode for the AppSync API. However it is not recommended to use API Key for production application, please refer to other authorization modes supported by AppSync in the [documentation](https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html)
 
 ## Testing
 
-You can easily test this pattern using any command prompt that supports the `curl` command. Refer to the outputs `AppSyncApiUrl`, `AppSyncApiKey` and `AppSyncVPCEndpointDNS` from deploying the SAM application which will be used for testing.
+You can test this pattern using any command prompt that supports the `curl` command. Refer to the outputs `AppSyncApiUrl`, `AppSyncApiKey` and `AppSyncVPCEndpointDNS` from deploying the SAM application which will be used for testing.
 
 1. Create a resource (for example EC2 instance) within your private network to invoke the AppSync API
 2. Open your command prompt where you can run a `curl` commands
@@ -70,7 +72,7 @@ Note: You can either use the `AppSync GraphQL API URL` or `AppSync VPC Interface
    -d '{"query": "query MyQuery {listRestaurants {items {name state restaurantId zip cuisine }}}","variables":"{}"}'
 ```
 
--- Using AppSync VPC Interface Endpoint DNS (you will need to pass the`AppSyncGraphQLAPIURL` in the host header, remember to remove suffix `www.`)
+-- Using AppSync VPC Interface Endpoint DNS (you will need to pass the`AppSyncGraphQLAPIURL` in the host header, remember to remove prefix `www.`)
 
 ```curl https://{AppSyncVPCEndpointDNS}/graphql \
    -H "Host:{AppSyncGraphQLAPIURL}" \

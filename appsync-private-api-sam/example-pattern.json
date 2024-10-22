@@ -1,7 +1,7 @@
 {
   "title": "AWS AppSync Private API ",
   "description": "Create an AWS AppSync Private API with a sample API to demonstrate how you can invoke Private API from resources in your private network",
-  "language": "Yaml",
+  "language": "YAML",
   "level": "200",
   "framework": "SAM",
   "introBox": {
