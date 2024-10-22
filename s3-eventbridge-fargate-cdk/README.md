@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/s3-teventbridge-fargate-cdk
+    cd serverless-patterns/s3-eventbridge-fargate-cdk
     ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
