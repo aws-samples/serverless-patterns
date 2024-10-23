@@ -1,0 +1,60 @@
+{
+  "title": "Serverless Microservices Communication with AWS Step Functions and .NET Lambda",
+  "description": "Create a serverless blog processing system using AWS Step Functions to orchestrate multiple AWS Lambda functions for content creation, validation, image processing, and publishing",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to create a serverless blog processing system using AWS Step Functions to orchestrate multiple AWS Lambda functions. The pattern includes steps for content creation, validation, image processing, and publishing, implemented using AWS CDK with .NET."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunctions-lambda-dotnet-cdk",
+      "templateURL": "serverless-patterns/stepfunctions-lambda-dotnet-cdk",
+      "projectFolder": "stepfunctions-lambda-dotnet-cdk",
+      "templateFile": "/src/StepfunctionsLambdaDotnetCdk/StepfunctionsLambdaDotnetCdkStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS CDK",
+        "link": "https://docs.aws.amazon.com/cdk/latest/guide/home.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions, including how to start a Step Functions execution, monitor its progress, and verify the output of published blog posts."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tejas Vora",
+      "image": "./TejasVora.jpg",
+      "bio": "Tejas Vora is a Senior Solutions Architect with Amazon Web Services.",
+      "linkedin": "tejas-vora-b4758a47"
+    }
+  ]
+}
