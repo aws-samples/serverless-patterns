@@ -22,13 +22,13 @@ Follow these steps to deploy the three templates in the correct order:
 1. Navigate to the directory containing Template 1:
 
 ```
-cd path/to/template1
+cd aws-samples/serverless-patterns/private-apigw-cross-region/
 ```
 
 2. Deploy Template 1 using AWS SAM:
 
 ```
-sam deploy --guided
+sam deploy --guided --template template1-regionA.yaml
 ```
 
 3. During the prompts:
@@ -36,6 +36,7 @@ sam deploy --guided
 * Select Region A as the deployment region
 * Enter the desired VPC CIDR block
 * Allow SAM CLI to create IAM roles with the required permissions
+* When prompted to save the configuration, choose a unique name for this template's configuration file
 
 4. Note the outputs from the deployment, including:
 * Remote VPC CIDR
@@ -49,13 +50,13 @@ sam deploy --guided
 1. Navigate to the directory containing Template 2:
 
 ```
-cd path/to/template2
+cd aws-samples/serverless-patterns/private-apigw-cross-region/
 ```
 
 2. Deploy Template 2 using AWS SAM:
 
 ```
-sam deploy --guided
+sam deploy --guided --template template2-regionB.yaml --region <region 2 name>
 ```
 
 3. During the prompts:
@@ -68,6 +69,7 @@ sam deploy --guided
 * Enter the VPC Endpoint URL from Template 1's output
 * Enter Region A as the Peer Region
 * Allow SAM CLI to create IAM roles with the required permissions
+* When prompted to save the configuration, choose a unique name for this template's configuration file
 
 4. Note the outputs from the deployment, including:
 * Peering Connection ID
@@ -78,13 +80,13 @@ sam deploy --guided
 1. Navigate to the directory containing Template 3:
 
 ```
-cd path/to/template3
+cd aws-samples/serverless-patterns/private-apigw-cross-region/
 ```
 
 2. Deploy Template 3 using AWS SAM:
 
 ```
-sam deploy --guided
+sam deploy --guided --template template3-regionA.yaml
 ```
 
 3. During the prompts:
@@ -93,12 +95,13 @@ sam deploy --guided
 * Enter the Peering Connection ID from Template 2's output
 * Enter the Remote VPC CIDR from Template 2's output
 * Allow SAM CLI to create IAM roles with the required permissions
+* When prompted to save the configuration, choose a unique name for this template's configuration file
 
 After deploying all three templates, your multi-region VPC peering with private API Gateway setup should be complete and ready for testing.
 
 ## How it works
 
-This solution enables an AWS Lambda function in one AWS region to securely invoke a Private Amazon API Gateway in another region using VPC peering and VPC endpoints. Here's an overview of the setup:
+This solution enables an AWS Lambda function in one AWS region to securely invoke a private Amazon API Gateway in another region using VPC peering and VPC endpoints. Here's an overview of the setup:
 
 ### (Client Region)
 
@@ -108,7 +111,7 @@ This solution enables an AWS Lambda function in one AWS region to securely invok
 
 ### (API Region)
 
-- Another VPC is created to host the Private API Gateway.
+- A second VPC is created to host the Private API Gateway.
 - A Private API Gateway is deployed and a VPC Endpoint for API Gateway Service (Execute API) is created in this VPC.
 
 ### VPC Peering
@@ -249,17 +252,17 @@ To avoid incurring future charges, it's important to delete the resources in the
 
 1. Delete Template 3 stack (in Region A)
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME_TEMPLATE_3 --region REGION_A
+    sam delete --stack-name STACK_NAME_TEMPLATE_3 --region REGION_A
     ```
 
 2. Delete Template 2 stack (in Region B)
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME_TEMPLATE_2 --region REGION_B
+    sam delete --stack-name STACK_NAME_TEMPLATE_2 --region REGION_B
     ```
 
 3. Delete Template 1 stack (in Region A)
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME_TEMPLATE_1 --region REGION_A
+    sam delete --stack-name STACK_NAME_TEMPLATE_1 --region REGION_A
     ```
 
 4. Confirm all stacks have been deleted
