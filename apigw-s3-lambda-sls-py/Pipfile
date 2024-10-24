@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-urllib3 = "2.2.2"
+urllib3 = "2.2.3"
 [dev-packages]
 boto3 = "*"
 aws-lambda-powertools = "*"
