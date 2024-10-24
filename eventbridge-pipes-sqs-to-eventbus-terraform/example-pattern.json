@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-eventbus-terraform",
       "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-eventbus-terraform",
       "projectFolder": "eventbridge-pipes-sqs-to-eventbus-terraform",
-      "templateFile": "eventbridge-pipes-sqs-to-eventbus-terraform/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {
