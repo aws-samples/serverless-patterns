@@ -1,5 +1,5 @@
 {
-  "title": "Real-time Data Pipeline with Kinesis, Lambda, and DynamoDB",
+  "title": "Real-time Data Pipeline with Amazon Kinesis and AWS Lambda",
   "description": "Create a serverless real-time data pipeline using Amazon Kinesis, AWS Lambda, and Amazon DynamoDB",
   "language": ".NET",
   "level": "200",
