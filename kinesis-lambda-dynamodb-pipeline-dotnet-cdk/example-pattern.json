@@ -7,7 +7,17 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to create a serverless real-time data pipeline using Amazon Kinesis for data ingestion, AWS Lambda for processing, Amazon DynamoDB for data storage. The pattern is implemented using AWS CDK with .NET."
+      "This pattern demonstrates how to create a serverless real-time data pipeline using Amazon Kinesis for data ingestion, AWS Lambda for processing, Amazon DynamoDB for data storage, and includes comprehensive error handling mechanisms.",
+      "The data pipeline works as follows:",
+      "1. Data is ingested through an Amazon Kinesis Data Stream, which acts as the entry point for real-time data.",
+      "2. An AWS Lambda function is automatically triggered when new records appear in the Kinesis stream.",
+      "3. The Lambda function processes the incoming data and stores it in an Amazon DynamoDB table.",
+      "4. For robust error handling, the system includes several mechanisms:",
+      "   - Processing errors are logged to Amazon CloudWatch",
+      "   - Errors can be stored in a separate DynamoDB table for tracking",
+      "   - Failed records are automatically retried up to a configured maximum count",
+      "   - Persistently failing records can be sent to an Amazon SQS Dead Letter Queue (DLQ) for further investigation",
+      "The entire infrastructure is defined and deployed using AWS CDK with .NET, including all necessary AWS resources, IAM roles, and permissions, ensuring a fully automated and reproducible deployment process."      
     ]
   },
   "gitHub": {
