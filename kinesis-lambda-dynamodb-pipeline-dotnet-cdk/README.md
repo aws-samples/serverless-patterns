@@ -1,4 +1,4 @@
-# Real-time Data Pipeline with Kinesis, Lambda, and DynamoDB using AWS CDK .NET
+# Real-time Data Pipeline with Amazon Kinesis, AWS Lambda, and Amazon DynamoDB
 
 This pattern demonstrates how to create a serverless real-time data pipeline using Amazon Kinesis for data ingestion, AWS Lambda for processing, Amazon DynamoDB for data storage. The pattern is implemented using AWS CDK with .NET.
 
