@@ -49,7 +49,7 @@ This pattern creates a serverless real-time data pipeline:
 1. Data is ingested through an Amazon Kinesis Data Stream.
 2. An AWS Lambda function is triggered by new records in the Kinesis stream.
 3. The Lambda function processes the data and stores it in an Amazon DynamoDB table.
-4. If any errors occur during processing, they are logged to CloudWatch. It can also be stored in a separate database table for error tracking. The Lambda function will retry processing failed records up to maximum retry count. If a record consistently fails processing after these retries, you can use SQS Dead Letter Queue (DLQ) for further investigation and handling, ensuring no data is lost due to processing errors.
+4. If any errors occur during processing, they are logged to Amazon CloudWatch. It can also be stored in a separate database table for error tracking. The Lambda function will retry processing failed records up to maximum retry count. If a record consistently fails processing after these retries, you can use Amazon SQS Dead Letter Queue (DLQ) for further investigation and handling, ensuring no data is lost due to processing errors.
 
 The AWS CDK is used to define and deploy all the necessary AWS resources, including the Kinesis stream, Lambda function, DynamoDB tables and associated IAM roles and permissions.
 
