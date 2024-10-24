@@ -45,7 +45,7 @@
   },
   "cleanup": {
     "text": [
-      "terraform destroy"
+      "<code>terraform destroy</code>"
     ]
   },
   "authors": [
