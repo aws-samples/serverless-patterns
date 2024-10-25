@@ -48,7 +48,9 @@ aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-xxxxxxxxxxx" --query 
 
 ## How it works
 
-This patterns creates and AppSync Interface VPC Endpoint and a sample AppSync Private API backed with a DynamoDB data source. Requests to AppSync Private APIs will go through AWS’s private network without going over the internet. GraphQL requests from your application are routed via the interface VPC endpoint to AppSync Private API. Interface VPC endpoint is powered by [AWS PrivateLink](https://aws.amazon.com/privatelink/), a highly available, scalable technology that enables you to privately connect your VPC to AWS services like AWS AppSync as if the services were in your VPC.
+This patterns creates and AppSync Interface VPC Endpoint and a sample AppSync Private API backed with a DynamoDB data source. Requests to AppSync Private APIs will go through AWS’s private network without going over the internet. GraphQL requests from your application are routed via the interface VPC endpoint to AppSync Private API. Interface VPC endpoint is powered by [AWS PrivateLink](https://aws.amazon.com/privatelink/), a highly available, scalable technology that enables you to privately connect your VPC to AWS services like AWS AppSync as if the services were in your VPC. The diagram below shows a high level architecture of private API with AWS AppSync.
+
+![High Level Architecture, Private API on AWS AppSync](./images/hla_appsync_private_api.png)
 
 API Key is used as the authorization mode for the AppSync API however it is not recommended to use API Key for production application, kindly refer to other authorization modes supported by AppSync in the [documentation](https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html)
 
