@@ -1,5 +1,5 @@
 {
-    "title": "Secret rotation in AMS Secrets Manager using Amazon EventBridge Scheduler and AWS Lambda",
+    "title": "Secret rotation using Amazon EventBridge Scheduler and AWS Lambda",
     "description": "Secret rotation in AMS Secrets Manager using Amazon EventBridge Scheduler and AWS Lambda",
     "language": "Python",
     "level": "200",
@@ -15,9 +15,9 @@
     "gitHub": {
       "template": {
         "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-secret-rotation-cdk",
-        "templateURL": "cdk/eventbridge_schedule_secret_rotation_stack.py",
+        "templateURL": "serverless-patterns/eventbridge-schedule-secret-rotation-cdk",
         "projectFolder": "eventbridge-schedule-secret-rotation-cdk",
-        "templateFile": "template.yaml"
+        "templateFile": "cdk/eventbridge_schedule_secret_rotation_stack.py"
       }
     },    
     "deploy": {
