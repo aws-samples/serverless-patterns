@@ -1,5 +1,5 @@
 {
-  "title": "Automatically sync Amazon Bedrock Knowledge Base Data source periodically",
+  "title": "Automatic sync of Amazon Bedrock Knowledge Base using EventBridge Scheduler",
   "description": "Use Amazon EventBridge Scheduler to trigger an Ingestion Job periodically to keep the Knowledge Bases vector store up-to-date",
   "language": "Python",
   "level": "200",
