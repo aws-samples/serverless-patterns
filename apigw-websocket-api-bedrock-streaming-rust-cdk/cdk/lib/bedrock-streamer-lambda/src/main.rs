@@ -18,6 +18,10 @@ use tracing::{error, info};
 
 const MODEL_ID: &str = "anthropic.claude-3-haiku-20240307-v1:0";
 
+const WS_CONNECT: &str = "$connect";
+const WS_DISCONNECT: &str = "$disconnect";
+const WS_DEFAULT: &str = "$default";
+
 /// Bedrock story
 #[derive(Debug, Deserialize)]
 struct StoryRequest {
@@ -71,9 +75,9 @@ async fn function_handler(
         .ok_or_else(|| LambdaError::from("Missing stage"))?;
 
     match event.payload.request_context.route_key.as_deref() {
-        Some("$connect") => handle_connect(connection_id).await,
-        Some("$disconnect") => handle_disconnect(connection_id).await,
-        Some("$default") => {
+        Some(WS_CONNECT) => handle_connect(connection_id).await,
+        Some(WS_DISCONNECT) => handle_disconnect(connection_id).await,
+        Some(WS_DEFAULT) => {
             let bedrock_client = Client::new(&config);
             let apigw_client = api_gateway_config(domain_name, stage, &config)?;
             let request_body = event.payload.body;
