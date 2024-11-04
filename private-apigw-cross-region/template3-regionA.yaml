@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'This template creates a route in an existing route table to enable communication through a VPC peering connection'
+Description: 'This template creates a route in an existing route table to enable communication through a VPC peering connection (uksb-1tthgi812) (tag:private-apigw-cross-region-3)'
 
 Parameters:
 
