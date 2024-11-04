@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: 'SAM Template for VPC with peering connection and Lambda function (uksb-1tthgi812) (tag:private-apigw-cross-region)'
+Description: 'SAM Template for VPC with peering connection and Lambda function (uksb-1tthgi812) (tag:private-apigw-cross-region-2)'
 
 Parameters:
   VpcCidrBlock:
