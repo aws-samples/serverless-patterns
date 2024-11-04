@@ -1,6 +1,6 @@
 {
-  "title": "Private Amazon API Gateway REST API to be invoked from an Amazon instance in a different AWS Region",
-  "description": "This pattern creates a Private Amazon API Gateway REST API, along with an Interface VPC Endpoint in an AWS Region. Subsequently, it creates a VPC, an EC2 Instance, a Private Hosted Zone, and a VPC Peering Connection in a second AWS Region. Finally, the VPC Peering connection is created in the first AWS Region. This way, a client in an AWS Region can send requests to the Private API Gateway in a different AWS Region.",
+  "title": "Private Amazon API Gateway REST API to be invoked from an AWS Lambda function in a different AWS Region",
+  "description": "This pattern creates a Private Amazon API Gateway REST API, along with an Interface VPC Endpoint in an AWS Region. Subsequently, it creates a VPC, a Lambda function, a Private Hosted Zone, and a VPC Peering Connection in a second AWS Region. Finally, the VPC Peering connection is created in the first AWS Region. This way, a client in an AWS Region can send requests to the Private API Gateway in a different AWS Region.",
   "language": "Python",
   "level": "300",
   "framework": "SAM",
@@ -21,12 +21,20 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS WAF",
-        "link": "https://aws.amazon.com/waf/"
+        "text": "Private APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html"
       },
       {
-        "text": "Building rules",
-        "link": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rules.html"
+        "text": "Private Hosted Zones",
+        "link": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-private.html"
+      },
+      {
+        "text": "VPC Peering",
+        "link": "https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html"
+      },
+      {
+        "text": "VPC Endpoints",
+        "link": "https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html"
       }
     ]
   },
