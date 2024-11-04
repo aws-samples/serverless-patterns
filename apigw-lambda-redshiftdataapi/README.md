@@ -25,15 +25,25 @@ Important: this application uses various AWS services and there are costs associ
    ```
    cd apigw-lambda-redshiftdataapi
    ```
-1. Install dependencies:
+1. Create python virtual environment and install dependencies:
    ```
+   python3 -m venv venv
+   source ./venv/bin/activate
    pipenv install
    pipenv requirements > requirements.txt
    ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. Create .env file to include Redshift cluster environment variables:
+   ```
+   Create a .env file in the cloned directory
+   Add the following variables with respective to values
+      REDSHIFT_CLUSTER_ARN=arn:aws:redshift-serverless:<region>:<accountid>:workgroup/<workgroupid>
+      REDSHIFT_WORKGROUP=<workgroup-name>
+      REDSHIFT_DATABASE=<database-name>
+   ```
+1. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the template.yml file:
 
    ```
-   cdk deploy
+   cdk deploy --app "python3 apigw_lambda_redshiftdataapi_stack.py"
    ```
 
 1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
@@ -44,11 +54,11 @@ This setup orchestrates exposing data from Redshift through API Gateway with Cog
 
 ## Testing
 
-1. Use an api client with oauth capability such as Postman or Rapid API to test the api with the url found from CDK stack deployment output.
+1. Use an api client with oauth capability such as Postman or Rapid API to test the api. API url can be found from CDK stack deployment output. You will need to login to AWS Console, navigate to Cognito app client and retrieve the client id and secret to pass it in the api call.
 
 ## Cleanup
 
-cdk destroy --all
+cdk destroy --app "python3 apigw_lambda_redshiftdataapi_stack.py"
 
 ---
 
