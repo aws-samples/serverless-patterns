@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: 'This template creates a VPC with a private API Gateway and necessary resources (uksb-1tthgi812) (tag:private-apigw-cross-region)'
+Description: 'This template creates a VPC with a private API Gateway and necessary resources (uksb-1tthgi812) (tag:private-apigw-cross-region-1)'
 
 Parameters:
   VpcCidrBlock:
