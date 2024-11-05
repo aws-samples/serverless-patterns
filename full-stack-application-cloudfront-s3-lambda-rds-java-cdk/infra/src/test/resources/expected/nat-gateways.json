@@ -1,0 +1,50 @@
+{
+  "FlashcardsVPCPublicSubnet1NATGatewayCEC10D25": {
+    "Type": "AWS::EC2::NatGateway",
+    "Properties": {
+      "AllocationId": {
+        "Fn::GetAtt": [
+          "FlashcardsVPCPublicSubnet1EIP8AA98670",
+          "AllocationId"
+        ]
+      },
+      "SubnetId": {
+        "Ref": "FlashcardsVPCPublicSubnet1SubnetE51C9FFF"
+      },
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "FlashcardsInfraStack/FlashcardsVPC/PublicSubnet1"
+        }
+      ]
+    },
+    "DependsOn": [
+      "FlashcardsVPCPublicSubnet1DefaultRouteFE218F6B",
+      "FlashcardsVPCPublicSubnet1RouteTableAssociation20088D6B"
+    ]
+  },
+  "FlashcardsVPCPublicSubnet2NATGatewayE77A7CE6": {
+    "Type": "AWS::EC2::NatGateway",
+    "Properties": {
+      "AllocationId": {
+        "Fn::GetAtt": [
+          "FlashcardsVPCPublicSubnet2EIPF58D8B7A",
+          "AllocationId"
+        ]
+      },
+      "SubnetId": {
+        "Ref": "FlashcardsVPCPublicSubnet2SubnetEED12D85"
+      },
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "FlashcardsInfraStack/FlashcardsVPC/PublicSubnet2"
+        }
+      ]
+    },
+    "DependsOn": [
+      "FlashcardsVPCPublicSubnet2DefaultRouteABB90D10",
+      "FlashcardsVPCPublicSubnet2RouteTableAssociation0D84689A"
+    ]
+  }
+}

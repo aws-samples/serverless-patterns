@@ -1,0 +1,4 @@
+{
+  "host": "http://localhost:5500/",
+  "mock": true
+}

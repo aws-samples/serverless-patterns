@@ -1,0 +1,58 @@
+{
+  "FlashcardsVPCPublicSubnet1RouteTable6BA72070": {
+    "Type": "AWS::EC2::RouteTable",
+    "Properties": {
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "FlashcardsInfraStack/FlashcardsVPC/PublicSubnet1"
+        }
+      ],
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  },
+  "FlashcardsVPCPublicSubnet2RouteTableD8EF62FD": {
+    "Type": "AWS::EC2::RouteTable",
+    "Properties": {
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "FlashcardsInfraStack/FlashcardsVPC/PublicSubnet2"
+        }
+      ],
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  },
+  "FlashcardsVPCPrivateSubnet1RouteTable10E37C35": {
+    "Type": "AWS::EC2::RouteTable",
+    "Properties": {
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "FlashcardsInfraStack/FlashcardsVPC/PrivateSubnet1"
+        }
+      ],
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  },
+  "FlashcardsVPCPrivateSubnet2RouteTableC4B83F96": {
+    "Type": "AWS::EC2::RouteTable",
+    "Properties": {
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "FlashcardsInfraStack/FlashcardsVPC/PrivateSubnet2"
+        }
+      ],
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  }
+}

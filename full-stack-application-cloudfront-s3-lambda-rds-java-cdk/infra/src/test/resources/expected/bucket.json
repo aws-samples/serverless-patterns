@@ -1,0 +1,24 @@
+{
+  "FlashcardsBucket3ACBD7C6": {
+    "Type": "AWS::S3::Bucket",
+    "Properties": {
+      "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": true,
+        "BlockPublicPolicy": true,
+        "IgnorePublicAcls": true,
+        "RestrictPublicBuckets": true
+      },
+      "Tags": [
+        {
+          "Key": "aws-cdk:cr-owned:8849a490",
+          "Value": "true"
+        }
+      ],
+      "WebsiteConfiguration": {
+        "IndexDocument": "index.html"
+      }
+    },
+    "UpdateReplacePolicy": "Retain",
+    "DeletionPolicy": "Retain"
+  }
+}

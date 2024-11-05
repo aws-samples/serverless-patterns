@@ -1,0 +1,55 @@
+{
+  "FlashcardsDatabase828C0B26": {
+    "Type": "AWS::RDS::DBInstance",
+    "Properties": {
+      "AllocatedStorage": "20",
+      "BackupRetentionPeriod": 0,
+      "CopyTagsToSnapshot": true,
+      "DBInstanceClass": "db.t3.micro",
+      "DBName": "flashcards",
+      "DBSubnetGroupName": {
+        "Ref": "FlashcardsDatabaseSubnetGroup8DD8EC3B"
+      },
+      "Engine": "postgres",
+      "EngineVersion": "16.4",
+      "MasterUserPassword": {
+        "Fn::Join": [
+          "",
+          [
+            "{{resolve:secretsmanager:",
+            {
+              "Ref": "FlashcardsDatabaseSecretD7477562"
+            },
+            ":SecretString:password::}}"
+          ]
+        ]
+      },
+      "MasterUsername": {
+        "Fn::Join": [
+          "",
+          [
+            "{{resolve:secretsmanager:",
+            {
+              "Ref": "FlashcardsDatabaseSecretD7477562"
+            },
+            ":SecretString:username::}}"
+          ]
+        ]
+      },
+      "MonitoringInterval": 0,
+      "Port": "5432",
+      "PubliclyAccessible": false,
+      "StorageType": "gp2",
+      "VPCSecurityGroups": [
+        {
+          "Fn::GetAtt": [
+            "FlashcardsDatabaseSecurityGroup42052078",
+            "GroupId"
+          ]
+        }
+      ]
+    },
+    "UpdateReplacePolicy": "Delete",
+    "DeletionPolicy": "Delete"
+  }
+}

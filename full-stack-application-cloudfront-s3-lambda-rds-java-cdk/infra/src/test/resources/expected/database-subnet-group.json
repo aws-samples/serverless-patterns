@@ -1,0 +1,16 @@
+{
+  "FlashcardsDatabaseSubnetGroup8DD8EC3B": {
+    "Type": "AWS::RDS::DBSubnetGroup",
+    "Properties": {
+      "DBSubnetGroupDescription": "Subnet group for FlashcardsDatabase database",
+      "SubnetIds": [
+        {
+          "Ref": "FlashcardsVPCPrivateSubnet1Subnet5584D35B"
+        },
+        {
+          "Ref": "FlashcardsVPCPrivateSubnet2SubnetF83FBD5D"
+        }
+      ]
+    }
+  }
+}

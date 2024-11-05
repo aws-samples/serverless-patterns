@@ -1,0 +1,46 @@
+{
+  "FlashcardsVPCPublicSubnet1RouteTableAssociation20088D6B": {
+    "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    "Properties": {
+      "RouteTableId": {
+        "Ref": "FlashcardsVPCPublicSubnet1RouteTable6BA72070"
+      },
+      "SubnetId": {
+        "Ref": "FlashcardsVPCPublicSubnet1SubnetE51C9FFF"
+      }
+    }
+  },
+  "FlashcardsVPCPublicSubnet2RouteTableAssociation0D84689A": {
+    "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    "Properties": {
+      "RouteTableId": {
+        "Ref": "FlashcardsVPCPublicSubnet2RouteTableD8EF62FD"
+      },
+      "SubnetId": {
+        "Ref": "FlashcardsVPCPublicSubnet2SubnetEED12D85"
+      }
+    }
+  },
+  "FlashcardsVPCPrivateSubnet1RouteTableAssociationCFC81E85": {
+    "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    "Properties": {
+      "RouteTableId": {
+        "Ref": "FlashcardsVPCPrivateSubnet1RouteTable10E37C35"
+      },
+      "SubnetId": {
+        "Ref": "FlashcardsVPCPrivateSubnet1Subnet5584D35B"
+      }
+    }
+  },
+  "FlashcardsVPCPrivateSubnet2RouteTableAssociation07A3CD65": {
+    "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    "Properties": {
+      "RouteTableId": {
+        "Ref": "FlashcardsVPCPrivateSubnet2RouteTableC4B83F96"
+      },
+      "SubnetId": {
+        "Ref": "FlashcardsVPCPrivateSubnet2SubnetF83FBD5D"
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "FlashcardsVPC9A18D56F": {
+    "Type": "AWS::EC2::VPC",
+    "Properties": {
+      "CidrBlock": "10.0.0.0/16",
+      "EnableDnsHostnames": true,
+      "EnableDnsSupport": true,
+      "InstanceTenancy": "default",
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "FlashcardsVPC"
+        }
+      ]
+    }
+  }
+}

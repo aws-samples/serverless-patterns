@@ -1,0 +1,13 @@
+{
+  "FlashcardsVPCVPCGW86C7F428": {
+    "Type": "AWS::EC2::VPCGatewayAttachment",
+    "Properties": {
+      "InternetGatewayId": {
+        "Ref": "FlashcardsVPCIGWF6B9AEF5"
+      },
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  }
+}

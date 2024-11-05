@@ -1,0 +1,10 @@
+{
+  "FlashCardsOriginAccessIdentity974EEF6A": {
+    "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+    "Properties": {
+      "CloudFrontOriginAccessIdentityConfig": {
+        "Comment": "OAI for accessing the flashcards frontend S3 bucket."
+      }
+    }
+  }
+}

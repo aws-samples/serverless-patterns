@@ -1,0 +1,52 @@
+{
+  "FlashcardsLambdaSecurityGroup4BDB2D7C": {
+    "Type": "AWS::EC2::SecurityGroup",
+    "Properties": {
+      "GroupDescription": "FlashcardsInfraStack/FlashcardsLambdaSecurityGroup",
+      "GroupName": "FlashcardsLambdaSecurityGroup",
+      "SecurityGroupEgress": [
+        {
+          "CidrIp": "0.0.0.0/0",
+          "Description": "Allow all outbound traffic by default",
+          "IpProtocol": "-1"
+        }
+      ],
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  },
+  "FlashcardsDatabaseSecurityGroup42052078": {
+    "Type": "AWS::EC2::SecurityGroup",
+    "Properties": {
+      "GroupDescription": "FlashcardsInfraStack/FlashcardsDatabaseSecurityGroup",
+      "GroupName": "FlashcardsDatabaseSecurityGroup",
+      "SecurityGroupEgress": [
+        {
+          "CidrIp": "255.255.255.255/32",
+          "Description": "Disallow all traffic",
+          "FromPort": 252,
+          "IpProtocol": "icmp",
+          "ToPort": 86
+        }
+      ],
+      "SecurityGroupIngress": [
+        {
+          "Description": "Allow database traffic from the lambda function security group.",
+          "FromPort": 5432,
+          "IpProtocol": "tcp",
+          "SourceSecurityGroupId": {
+            "Fn::GetAtt": [
+              "FlashcardsLambdaSecurityGroup4BDB2D7C",
+              "GroupId"
+            ]
+          },
+          "ToPort": 5432
+        }
+      ],
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  }
+}

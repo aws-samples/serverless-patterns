@@ -1,0 +1,130 @@
+{
+  "FlashcardsVPCPublicSubnet1SubnetE51C9FFF": {
+    "Type": "AWS::EC2::Subnet",
+    "Properties": {
+      "AvailabilityZone": {
+        "Fn::Select": [
+          0,
+          {
+            "Fn::GetAZs": ""
+          }
+        ]
+      },
+      "CidrBlock": "10.0.0.0/18",
+      "MapPublicIpOnLaunch": true,
+      "Tags": [
+        {
+          "Key": "aws-cdk:subnet-name",
+          "Value": "Public"
+        },
+        {
+          "Key": "aws-cdk:subnet-type",
+          "Value": "Public"
+        },
+        {
+          "Key": "Name",
+          "Value": "FlashcardsInfraStack/FlashcardsVPC/PublicSubnet1"
+        }
+      ],
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  },
+  "FlashcardsVPCPublicSubnet2SubnetEED12D85": {
+    "Type": "AWS::EC2::Subnet",
+    "Properties": {
+      "AvailabilityZone": {
+        "Fn::Select": [
+          1,
+          {
+            "Fn::GetAZs": ""
+          }
+        ]
+      },
+      "CidrBlock": "10.0.64.0/18",
+      "MapPublicIpOnLaunch": true,
+      "Tags": [
+        {
+          "Key": "aws-cdk:subnet-name",
+          "Value": "Public"
+        },
+        {
+          "Key": "aws-cdk:subnet-type",
+          "Value": "Public"
+        },
+        {
+          "Key": "Name",
+          "Value": "FlashcardsInfraStack/FlashcardsVPC/PublicSubnet2"
+        }
+      ],
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  },
+  "FlashcardsVPCPrivateSubnet1Subnet5584D35B": {
+    "Type": "AWS::EC2::Subnet",
+    "Properties": {
+      "AvailabilityZone": {
+        "Fn::Select": [
+          0,
+          {
+            "Fn::GetAZs": ""
+          }
+        ]
+      },
+      "CidrBlock": "10.0.128.0/18",
+      "MapPublicIpOnLaunch": false,
+      "Tags": [
+        {
+          "Key": "aws-cdk:subnet-name",
+          "Value": "Private"
+        },
+        {
+          "Key": "aws-cdk:subnet-type",
+          "Value": "Private"
+        },
+        {
+          "Key": "Name",
+          "Value": "FlashcardsInfraStack/FlashcardsVPC/PrivateSubnet1"
+        }
+      ],
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  },
+  "FlashcardsVPCPrivateSubnet2SubnetF83FBD5D": {
+    "Type": "AWS::EC2::Subnet",
+    "Properties": {
+      "AvailabilityZone": {
+        "Fn::Select": [
+          1,
+          {
+            "Fn::GetAZs": ""
+          }
+        ]
+      },
+      "CidrBlock": "10.0.192.0/18",
+      "MapPublicIpOnLaunch": false,
+      "Tags": [
+        {
+          "Key": "aws-cdk:subnet-name",
+          "Value": "Private"
+        },
+        {
+          "Key": "aws-cdk:subnet-type",
+          "Value": "Private"
+        },
+        {
+          "Key": "Name",
+          "Value": "FlashcardsInfraStack/FlashcardsVPC/PrivateSubnet2"
+        }
+      ],
+      "VpcId": {
+        "Ref": "FlashcardsVPC9A18D56F"
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "title": "Full-stack application, CloudFront to S3, Lambda to RDS",
+  "description": "This sample project demonstrates how to create and deploy a serverless full-stack web application.",
+  "language": "Java",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project creates and deploys a serverless full-stack application to AWS.",
+      "The frontend of the application is deployed as a static website to an AWS S3 bucket and delivered to end users through a CloudFront distribution.",
+      "The backed of the application is deployed as an AWS Lambda function. The frontend is accessing the backed through a lambda function URL.",
+      "The database of the application is a AWS RDS Postgres instance.",
+      "The infrastructure is created through a CDK application which also builds and deploys everything to AWS.",
+      "The application will allow end users to take flashcard tests with questions from different categories available in the RDS database created."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://serverlessland.com/patterns/full-stack-application-cloudfront-s3-lambda-rds-java-cdk",
+      "templateURL": "serverless-patterns/full-stack-application-cloudfront-s3-lambda-rds-java-cdk",
+      "projectFolder": "full-stack-application-cloudfront-s3-lambda-rds-java-cdk",
+      "templateFile": "src/main/java/com/example/flashcards/FlashCardsInfraStack.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Building Lambda functions with Java",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-java"
+      },
+      {
+        "text": "Amazon RDS for PostgreSQL",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL"
+      },
+      {
+        "text": "Hosting a static website using Amazon S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting"
+      },
+      {
+        "text": "Get started with a secure static website",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/getting-started-secure-static-website-cloudformation-template"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for detailed cleanup instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mihai Barbos",
+      "bio": "Java developer and serverless enthusiast."
+    }
+  ]
+}

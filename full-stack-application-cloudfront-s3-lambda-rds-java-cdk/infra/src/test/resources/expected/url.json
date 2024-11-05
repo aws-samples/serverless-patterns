@@ -1,0 +1,30 @@
+{
+  "FlashcardsLambdaFunctionUrlCD76ADDB": {
+    "Type": "AWS::Lambda::Url",
+    "Properties": {
+      "AuthType": "NONE",
+      "Cors": {
+        "AllowHeaders": [
+          "*"
+        ],
+        "AllowMethods": [
+          "GET"
+        ],
+        "AllowOrigins": [
+          "*"
+        ]
+      },
+      "InvokeMode": "BUFFERED",
+      "Qualifier": "Prod",
+      "TargetFunctionArn": {
+        "Fn::GetAtt": [
+          "FlashcardsLambdaFunction8F0027D3",
+          "Arn"
+        ]
+      }
+    },
+    "DependsOn": [
+      "FlashcardsProdAliasB8A9679F"
+    ]
+  }
+}

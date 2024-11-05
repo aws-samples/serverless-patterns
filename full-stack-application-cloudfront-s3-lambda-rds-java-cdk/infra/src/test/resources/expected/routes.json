@@ -1,0 +1,56 @@
+{
+  "FlashcardsVPCPublicSubnet1DefaultRouteFE218F6B": {
+    "Type": "AWS::EC2::Route",
+    "Properties": {
+      "DestinationCidrBlock": "0.0.0.0/0",
+      "GatewayId": {
+        "Ref": "FlashcardsVPCIGWF6B9AEF5"
+      },
+      "RouteTableId": {
+        "Ref": "FlashcardsVPCPublicSubnet1RouteTable6BA72070"
+      }
+    },
+    "DependsOn": [
+      "FlashcardsVPCVPCGW86C7F428"
+    ]
+  },
+  "FlashcardsVPCPublicSubnet2DefaultRouteABB90D10": {
+    "Type": "AWS::EC2::Route",
+    "Properties": {
+      "DestinationCidrBlock": "0.0.0.0/0",
+      "GatewayId": {
+        "Ref": "FlashcardsVPCIGWF6B9AEF5"
+      },
+      "RouteTableId": {
+        "Ref": "FlashcardsVPCPublicSubnet2RouteTableD8EF62FD"
+      }
+    },
+    "DependsOn": [
+      "FlashcardsVPCVPCGW86C7F428"
+    ]
+  },
+  "FlashcardsVPCPrivateSubnet1DefaultRouteA41A304A": {
+    "Type": "AWS::EC2::Route",
+    "Properties": {
+      "DestinationCidrBlock": "0.0.0.0/0",
+      "NatGatewayId": {
+        "Ref": "FlashcardsVPCPublicSubnet1NATGatewayCEC10D25"
+      },
+      "RouteTableId": {
+        "Ref": "FlashcardsVPCPrivateSubnet1RouteTable10E37C35"
+      }
+    }
+  },
+  "FlashcardsVPCPrivateSubnet2DefaultRouteA245F2DA": {
+    "Type": "AWS::EC2::Route",
+    "Properties": {
+      "DestinationCidrBlock": "0.0.0.0/0",
+      "NatGatewayId": {
+        "Ref": "FlashcardsVPCPublicSubnet2NATGatewayE77A7CE6"
+      },
+      "RouteTableId": {
+        "Ref": "FlashcardsVPCPrivateSubnet2RouteTableC4B83F96"
+      }
+    }
+  }
+}

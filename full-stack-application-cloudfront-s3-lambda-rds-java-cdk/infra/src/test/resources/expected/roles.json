@@ -1,0 +1,82 @@
+{
+  "FlashcardsLambdaFunctionServiceRoleD7AF7F5A": {
+    "Type": "AWS::IAM::Role",
+    "Properties": {
+      "AssumeRolePolicyDocument": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            }
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "ManagedPolicyArns": [
+        {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+            ]
+          ]
+        },
+        {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+            ]
+          ]
+        }
+      ]
+    },
+    "DependsOn": [
+      "FlashcardsVPCPrivateSubnet1DefaultRouteA41A304A",
+      "FlashcardsVPCPrivateSubnet1RouteTableAssociationCFC81E85",
+      "FlashcardsVPCPrivateSubnet2DefaultRouteA245F2DA",
+      "FlashcardsVPCPrivateSubnet2RouteTableAssociation07A3CD65"
+    ]
+  },
+  "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265": {
+    "Type": "AWS::IAM::Role",
+    "Properties": {
+      "AssumeRolePolicyDocument": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            }
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "ManagedPolicyArns": [
+        {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}

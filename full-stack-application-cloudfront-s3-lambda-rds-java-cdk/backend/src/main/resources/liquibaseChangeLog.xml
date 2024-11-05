@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="9fc80e92-711a-4d26-9b96-38385c710b00" author="system_generated">
+        <createTable tableName="CATEGORIES">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="PK_CATEGORIES" nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="QUESTIONS">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="PK_QUESTIONS" nullable="false"/>
+            </column>
+            <column name="CATEGORY_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="QUESTION_TEXT" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="ANSWERS">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="PK_ANSWERS" nullable="false"/>
+            </column>
+            <column name="QUESTION_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ANSWER_TEXT" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CORRECT" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="QUESTIONS"
+                                 baseColumnNames="CATEGORY_ID"
+                                 referencedTableName="CATEGORIES"
+                                 referencedColumnNames="ID"
+                                 constraintName="FK_QUESTIONS_CATEGORIES"/>
+
+        <addForeignKeyConstraint baseTableName="ANSWERS"
+                                 baseColumnNames="QUESTION_ID"
+                                 referencedTableName="QUESTIONS"
+                                 referencedColumnNames="ID"
+                                 constraintName="FK_ANSWERS_QUESTIONS"/>
+    </changeSet>
+    <changeSet id="f2abdf41-828a-4854-aadc-0d4d6c0e72fb" author="system_generated">
+        <sql>
+            INSERT INTO CATEGORIES (ID, NAME) VALUES (1, 'Periodic table');
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (1, 1, 'How many electrons does Hydrogen have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (1, 1, '1', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (2, 1, '6', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (3, 1, '7', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (4, 1, '11', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (2, 1, 'How many electrons does Helium have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (5, 2, '2', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (6, 2, '7', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (7, 2, '3', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (8, 2, '6', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (3, 1, 'How many electrons does Lithium have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (9, 3, '3', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (10, 3, '7', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (11, 3, '12', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (12, 3, '8', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (4, 1, 'How many electrons does Beryllium have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (13, 4, '4', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (14, 4, '8', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (15, 4, '10', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (16, 4, '18', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (5, 1, 'How many electrons does Boron have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (17, 5, '5', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (18, 5, '14', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (19, 5, '18', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (20, 5, '3', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (6, 1, 'How many electrons does Carbon have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (21, 6, '6', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (22, 6, '18', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (23, 6, '9', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (24, 6, '11', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (7, 1, 'How many electrons does Nitrogen have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (25, 7, '7', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (26, 7, '17', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (27, 7, '20', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (28, 7, '12', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (8, 1, 'How many electrons does Oxygen have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (29, 8, '8', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (30, 8, '20', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (31, 8, '3', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (32, 8, '12', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (9, 1, 'How many electrons does Fluorine have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (33, 9, '9', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (34, 9, '1', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (35, 9, '16', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (36, 9, '20', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (10, 1, 'How many electrons does Neon have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (37, 10, '10', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (38, 10, '11', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (39, 10, '5', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (40, 10, '19', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (11, 1, 'How many electrons does Sodium have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (41, 11, '11', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (42, 11, '3', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (43, 11, '18', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (44, 11, '7', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (12, 1, 'How many electrons does Magnesium have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (45, 12, '12', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (46, 12, '14', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (47, 12, '13', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (48, 12, '7', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (13, 1, 'How many electrons does Aluminium have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (49, 13, '13', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (50, 13, '9', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (51, 13, '6', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (52, 13, '10', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (14, 1, 'How many electrons does Silicon have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (53, 14, '14', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (54, 14, '8', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (55, 14, '9', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (56, 14, '10', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (15, 1, 'How many electrons does Phosphorus have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (57, 15, '15', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (58, 15, '9', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (59, 15, '2', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (60, 15, '5', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (16, 1, 'How many electrons does Sulfur have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (61, 16, '16', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (62, 16, '1', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (63, 16, '20', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (64, 16, '19', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (17, 1, 'How many electrons does Chlorine have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (65, 17, '17', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (66, 17, '18', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (67, 17, '19', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (68, 17, '15', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (18, 1, 'How many electrons does Argon have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (69, 18, '18', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (70, 18, '15', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (71, 18, '8', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (72, 18, '5', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (19, 1, 'How many electrons does Potassium have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (73, 19, '19', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (74, 19, '17', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (75, 19, '7', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (76, 19, '14', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (20, 1, 'How many electrons does Calcium have?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (77, 20, '20', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (78, 20, '19', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (79, 20, '3', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (80, 20, '10', false);
+            INSERT INTO CATEGORIES (ID, NAME) VALUES (2, 'Capitals');
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (21, 2, 'What is the capital of France?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (81, 21, 'Paris', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (82, 21, 'Mexico City', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (83, 21, 'Stockholm', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (84, 21, 'Moscow', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (22, 2, 'What is the capital of Japan?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (85, 22, 'Tokyo', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (86, 22, 'Madrid', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (87, 22, 'Rome', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (88, 22, 'Pretoria', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (23, 2, 'What is the capital of Italy?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (89, 23, 'Rome', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (90, 23, 'Oslo', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (91, 23, 'Ankara', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (92, 23, 'Berlin', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (24, 2, 'What is the capital of Canada?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (93, 24, 'Ottawa', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (94, 24, 'Berlin', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (95, 24, 'New Delhi', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (96, 24, 'Buenos Aires', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (25, 2, 'What is the capital of Brazil?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (97, 25, 'Brasília', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (98, 25, 'Ankara', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (99, 25, 'Athens', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (100, 25, 'Ottawa', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (26, 2, 'What is the capital of Australia?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (101, 26, 'Canberra', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (102, 26, 'Seoul', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (103, 26, 'Oslo', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (104, 26, 'Cairo', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (27, 2, 'What is the capital of Egypt?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (105, 27, 'Cairo', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (106, 27, 'Madrid', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (107, 27, 'Seoul', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (108, 27, 'Ottawa', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (28, 2, 'What is the capital of Russia?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (109, 28, 'Moscow', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (110, 28, 'Stockholm', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (111, 28, 'Tokyo', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (112, 28, 'Ankara', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (29, 2, 'What is the capital of China?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (113, 29, 'Beijing', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (114, 29, 'Buenos Aires', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (115, 29, 'Berlin', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (116, 29, 'Tokyo', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (30, 2, 'What is the capital of India?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (117, 30, 'New Delhi', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (118, 30, 'Ottawa', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (119, 30, 'Beijing', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (120, 30, 'Brasília', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (31, 2, 'What is the capital of Germany?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (121, 31, 'Berlin', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (122, 31, 'Canberra', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (123, 31, 'Athens', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (124, 31, 'Beijing', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (32, 2, 'What is the capital of Mexico?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (125, 32, 'Mexico City', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (126, 32, 'Madrid', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (127, 32, 'Rome', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (128, 32, 'Pretoria', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (33, 2, 'What is the capital of South Africa?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (129, 33, 'Pretoria', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (130, 33, 'Paris', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (131, 33, 'Madrid', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (132, 33, 'Ankara', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (34, 2, 'What is the capital of Argentina?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (133, 34, 'Buenos Aires', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (134, 34, 'Pretoria', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (135, 34, 'Stockholm', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (136, 34, 'New Delhi', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (35, 2, 'What is the capital of Greece?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (137, 35, 'Athens', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (138, 35, 'Beijing', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (139, 35, 'Paris', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (140, 35, 'Rome', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (36, 2, 'What is the capital of Turkey?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (141, 36, 'Ankara', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (142, 36, 'Rome', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (143, 36, 'Buenos Aires', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (144, 36, 'Tokyo', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (37, 2, 'What is the capital of South Korea?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (145, 37, 'Seoul', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (146, 37, 'Buenos Aires', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (147, 37, 'Berlin', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (148, 37, 'Ankara', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (38, 2, 'What is the capital of Spain?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (149, 38, 'Madrid', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (150, 38, 'Brasília', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (151, 38, 'Pretoria', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (152, 38, 'Oslo', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (39, 2, 'What is the capital of Norway?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (153, 39, 'Oslo', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (154, 39, 'New Delhi', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (155, 39, 'Berlin', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (156, 39, 'Paris', false);
+            INSERT INTO QUESTIONS (ID, CATEGORY_ID, QUESTION_TEXT) VALUES (40, 2, 'What is the capital of Sweden?');
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (157, 40, 'Stockholm', true);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (158, 40, 'Moscow', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (159, 40, 'Canberra', false);
+            INSERT INTO ANSWERS (ID, QUESTION_ID, ANSWER_TEXT, CORRECT) VALUES (160, 40, 'Rome', false);
+        </sql>
+    </changeSet>
+</databaseChangeLog>
