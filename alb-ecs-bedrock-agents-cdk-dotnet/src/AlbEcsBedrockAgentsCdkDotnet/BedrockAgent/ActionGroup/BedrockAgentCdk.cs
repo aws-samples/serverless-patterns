@@ -107,7 +107,7 @@ internal sealed class BedrockAgentCdk
             new CfnAgentProps
             {
                 AgentName = $"chatbot-bedrock-agent-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
-                Description = "Bedrock Agent for email generation and sendng an email.",
+                Description = "Bedrock Agent for GlobalTrek Adventures.",
                 AgentResourceRoleArn = agentRole.RoleArn,
                 Instruction = promptContent,
                 IdleSessionTtlInSeconds = 300,
@@ -192,7 +192,7 @@ internal sealed class BedrockAgentCdk
                                     Sid = "AmazonBedrockAgentBedrockFoundationModelPolicyProd",
                                     Effect = Effect.ALLOW,
                                     Actions = ["bedrock:InvokeModel"],
-                                    Resources = [Utils.GetCluade3HaikuFMArn(_stack.Region)],
+                                    Resources = [Utils.GetCluade35HaikuFMArn(_stack.Region)],
                                 })
                             ]
                         }),
