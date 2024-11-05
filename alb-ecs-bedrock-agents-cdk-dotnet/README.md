@@ -38,9 +38,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 4. Deploy the stack to your default AWS account and region.
 
-**Please be aware that the deploy command will take about 5-15 minutes to complete**
-
-The output of this command should give you the API Gateway endpoint URL:
+    **Please be aware that the deploy command will take about 5-15 minutes to complete.** The output of this command should give you the ALB endpoint URL:
     ```
     cdk deploy
     ```
