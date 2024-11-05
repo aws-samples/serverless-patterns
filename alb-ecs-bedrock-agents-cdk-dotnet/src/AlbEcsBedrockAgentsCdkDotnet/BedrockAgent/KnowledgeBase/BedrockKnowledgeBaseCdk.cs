@@ -328,7 +328,8 @@ internal sealed class BedrockKnowledgeBaseCdk
                                         Actions = ["bedrock:InvokeModel"],
                                         Resources = [
                                             Utils.GetTitanV2FMArn(_stack.Region),
-                                            Utils.GetCluade3HaikuFMArn(_stack.Region)
+                                            Utils.GetCluade3HaikuFMArn(_stack.Region),
+                                            Utils.GetCluade35HaikuFMArn(_stack.Region)
                                         ]
                                     })                            
                             ]

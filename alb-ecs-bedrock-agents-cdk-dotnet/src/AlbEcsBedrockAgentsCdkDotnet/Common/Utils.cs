@@ -16,21 +16,31 @@ internal static class Utils
     }
 
     /// <summary>
-    /// 
+    /// Gets ARN for Titan V2 Foundation Model from region
     /// </summary>
-    /// <param name="region"></param>
-    /// <returns></returns>
+    /// <param name="region">AWS region</param>
+    /// <returns>FM ARN</returns>
     internal static string GetTitanV2FMArn(string region)
     {
         return $"arn:aws:bedrock:{region}::" + "foundation-model/" + Constants.Bedrock_FoundationModel_Titan_Embed_Text_V2;
-    }
+    } 
 
     /// <summary>
-    /// 
+    /// Gets ARN for Cluade 3 Haiku Foundation Model from region
     /// </summary>
-    /// <param name="region"></param>
-    /// <returns></returns>
+    /// <param name="region">AWS region</param>
+    /// <returns>FM ARN</returns>
     internal static string GetCluade3HaikuFMArn(string region)
+    {
+        return $"arn:aws:bedrock:{region}::" + "foundation-model/" + Constants.Bedrock_FoundationModel_Claude3_Haiku;
+    }   
+
+    /// <summary>
+    /// Gets ARN for Cluade 3.4 Haiku Foundation Model from region
+    /// </summary>
+    /// <param name="region">AWS region</param>
+    /// <returns>FM ARN</returns>
+    internal static string GetCluade35HaikuFMArn(string region)
     {
         return $"arn:aws:bedrock:{region}::" + "foundation-model/" + Constants.Bedrock_FoundationModel_Claude3_5_Haiku;
     }    

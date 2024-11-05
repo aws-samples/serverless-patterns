@@ -4,6 +4,8 @@ internal static class Constants
 {
     internal static readonly string Bedrock_FoundationModel_Titan_Embed_Text_V2 = "amazon.titan-embed-text-v2:0";
 
+    internal static readonly string Bedrock_FoundationModel_Claude3_Haiku = "anthropic.claude-3-haiku-20240307-v1:0";
+
     internal static readonly string Bedrock_FoundationModel_Claude3_5_Haiku = "anthropic.claude-3-5-haiku-20241022-v1:0";
 
     internal static readonly string Bedrock_KB_AOSS_IndexName = "bedrock-knowledge-base-default-index";
