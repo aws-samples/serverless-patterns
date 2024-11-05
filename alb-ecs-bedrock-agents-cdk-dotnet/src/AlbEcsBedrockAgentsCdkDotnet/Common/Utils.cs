@@ -32,6 +32,6 @@ internal static class Utils
     /// <returns></returns>
     internal static string GetCluade3HaikuFMArn(string region)
     {
-        return $"arn:aws:bedrock:{region}::" + "foundation-model/" + Constants.Bedrock_FoundationModel_Claude3_Haiku;
+        return $"arn:aws:bedrock:{region}::" + "foundation-model/" + Constants.Bedrock_FoundationModel_Claude3_5_Haiku;
     }    
 }

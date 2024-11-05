@@ -111,7 +111,7 @@ internal sealed class BedrockAgentCdk
                 AgentResourceRoleArn = agentRole.RoleArn,
                 Instruction = promptContent,
                 IdleSessionTtlInSeconds = 300,
-                FoundationModel = Constants.Bedrock_FoundationModel_Claude3_Haiku,
+                FoundationModel = Constants.Bedrock_FoundationModel_Claude3_5_Haiku,
                 KnowledgeBases = new[]
                 {
                     new CfnAgent.AgentKnowledgeBaseProperty
