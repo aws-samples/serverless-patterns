@@ -48,6 +48,13 @@ namespace AlbEcsBedrockAgentsCdkDotnet
                     }                  
                 });
 
+            // Output the Agent Name
+            _ = new CfnOutput(this, "AgentName", new CfnOutputProps
+            {
+                Description = "Bedrock Agent Name",
+                Value = bedrockAgentWithKnowledgeBaseStack.BedrockAgent.AgentName
+            });
+
             // Output the Agent ID
             _ = new CfnOutput(this, "AgentId", new CfnOutputProps
             {
@@ -60,6 +67,13 @@ namespace AlbEcsBedrockAgentsCdkDotnet
             {
                 Description = "Bedrock Agent Alias ID",
                 Value = bedrockAgentWithKnowledgeBaseStack.AgentAliasId
+            });
+
+            // Output the Knowledge Base Name
+            _ = new CfnOutput(this, "KnowledgeBaseName", new CfnOutputProps
+            {
+                Description = "Knowledge Base Name",
+                Value = bedrockAgentWithKnowledgeBaseStack.KnowledgeBase.Name
             });
 
             // Output the Knowledge Base ID
