@@ -9,6 +9,7 @@
       "post": {
         "summary": "Search for available flights",
         "description": "Search for available flights based on the provided search criteria",
+        "operationId": "searchFlights",
         "requestBody": {
           "required": true,
           "content": {
