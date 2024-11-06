@@ -4,7 +4,7 @@ namespace TestApp.Model;
 
 public class BedrockAgentResponse
 {
-public required string SessionId { get; set; }
+    public required string SessionId { get; set; }
 
     public required string MemoryId { get; set; }
 
