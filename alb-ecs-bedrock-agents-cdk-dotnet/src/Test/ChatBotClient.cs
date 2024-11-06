@@ -118,11 +118,8 @@ internal sealed class ChatBotClient : IDisposable
                         },
                         cancellationToken: cancellationToken);
 
-                    if (!responseMessage.IsSuccessStatusCode)
-                    {
-                        _logger.LogError("Error sending request to BedrockAgent: {responsePhrase}", responseMessage.ReasonPhrase);
-                        continue;
-                    }
+                    // Success
+                    responseMessage.EnsureSuccessStatusCode();
 
                     // Response
                     response = await responseMessage.Content.ReadFromJsonAsync<BedrockAgentResponse>(_jsonSerializerOptions, cancellationToken);
@@ -134,7 +131,10 @@ internal sealed class ChatBotClient : IDisposable
                     else
                     {
                         Console.WriteLine($"Response: {response?.Message}");
-                        await WriteTraceAsync(iteration, sessionId, input, response?.Message, response?.Trace);
+
+                        // Write Trace
+                        if (_enableTrace)
+                            await WriteTraceAsync(iteration, sessionId, input, response?.Message, response?.Trace);
                     }
 
                     break; //break from retry loop
