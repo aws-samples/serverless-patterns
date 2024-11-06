@@ -74,14 +74,16 @@ To access and test the Bedrock Agent:
    - In the agent details page, click on "Test" in the top right corner
    - This will open the Agent Playground where you can interact with your agent
    - Change the version from `TestAlias: Working draft` to `BedrockAgentCdkAlias: Version 1`
+   - ![console_test](./Test_Bedrock_Agent_From_Console_1.png)
 
 3. Example Interactions:
 
-- Example 1 - Flight Search:
+- **Example 1 - Flight Search:**
 ```
 User: "I want to find flights from Seattle to New York for 3 day trip for my wife and I in the week on December 31, 2024." (use future dates)
-
+```
 Expected Agent Response:
+```
 "I found several flight options for your trip from Seattle to New York: 
 1. Delta Air Lines: 
     - Outbound Flight: Departs 3:00 AM on Dec 31, arrives 5:00 PM 
@@ -107,11 +109,12 @@ Expected Agent Response:
 The most budget-friendly option is the Delta Air Lines flight at $848.67. Would you like me to help you book one of these flights?"
 ```
 
-- Example 2 - Policy Question:
+- **Example 2 - Policy Question:**
 ```
 User: "What is your cancellation policy for international flights?"
-
+```
 Expected Agent Response:
+```
 "Here are the details of GlobalTrek Adventures' cancellation policy for international flights: 
 1. Cancellation Timeframes: - 30+ days before travel: Full refund minus $50 administrative fee - 15-29 days before travel: 50% refund - 14 days or less before travel: No refund 
 2. Company Cancellations: If GlobalTrek Adventures cancels a trip, they offer: - Full refund, OR - Option to rebook for a future date with a 10% discount 
@@ -158,7 +161,7 @@ You can test the flight search functionality directly through the Application Lo
     Expected agent response:
     ```json
     {
-        "sessionId": "Test123",
+        "sessionId": "<session-id>",
         "memoryId": null,
         "message": "I found several flight options for your round trip from Seattle (SEA) to New York (JFK):\n\n1. American Airlines (Lowest Price Option):\n   - Outbound: Flight AA1958 on Dec 31, 2024, at 5:00 PM\n   - Return: Flight AA6048 on Jan 7, 2025, at 12:00 AM\n   - Total Price: $591.59\n\n2. British Airways Options:\n   a) Flight BA4018:\n      - Outbound: Dec 31, 2024, at 7:00 PM\n      - Return: Flight BA1431 on Jan 7, 2025, at 4:00 PM\n      - Total Price: $1,191.94\n\n   b) Flight BA7836:\n      - Outbound: Dec 31, 2024, at 4:00 AM\n      - Return: Flight BA7778 on Jan 7, 2025, at 10:00 AM\n      - Total Price: $1,315.32\n\n3. Other Airlines:\n   - Lufthansa: Total price around $1,476.94\n   - Another British Airways option: Total price around $1,394.10\n\nThe American Airlines option offers the most budget-friendly choice. Would you like me to help you book one of these flights or provide more details?",
         "files": null,
@@ -193,7 +196,7 @@ You can test the flight search functionality directly through the Application Lo
     Expected agent response:
     ```json
     {
-        "sessionId": "Test123",
+        "sessionId": "<session-id>",
         "memoryId": null,
         "message": "Here are the key details for GlobalTrek Adventures' Reservation and Transportation Policies:\n\nReservation Policy:\n\nCancellation Terms:\n- 30+ days before travel: Full refund minus $50 administrative fee\n- 15-29 days before travel: 50% refund\n- 14 days or less before travel: No refund\n\nBooking Change Fees:\n- 30+ days before travel: No fee\n- 15-29 days before travel: $50 change fee\n- 14 days or less before travel: $100 change fee\n\nRefunds are processed within 10 business days to the original payment method.\n\nIf GlobalTrek Adventures cancels a trip, customers can choose between:\n- A full refund\n- Rebooking with a 10% discount\n\n\n\n\nTransportation Policy:\n\nBaggage Guidelines:\n- Air Travel: Follow operating airline's policies\n- Bus Tours: One large suitcase (max 23kg/50lbs) and one small carry-on per person\n- Excess baggage is subject to additional charges and space availability\n\nAdditional Transportation Rules:\n- Arrive 2 hours before domestic flights\n- Arrive 3 hours before international flights\n- Ground transportation details provided in itinerary\n- Customers responsible for being at designated pick-up locations\n- Missed transfers due to customer delay are non-refundable\n\nRecommended: Travel insurance with baggage coverage\n\n\n\n\nIs there anything specific about these policies you would like me to clarify?",
         "files": null,
@@ -212,7 +215,7 @@ You can test the flight search functionality directly through the Application Lo
 cd ./src/Test
 ```
 - Update `<AlbEndpoint>` in `appsettings.json` file.
-- Update `enableTrace` to `true` if need to check request traces from Bedrock Agents. Traces will be written to a file.
+- Update `enableTrace` to `true` if need to check request traces from Bedrock Agents. Traces will be written to a file in `Test` directory with filename format: `trace_<session-id>_<iteration>.json`.
 - Run Test application.
     ```
     dotnet run
@@ -223,14 +226,16 @@ cd ./src/Test
 
 To add new documents (such as updated policies, travel guides, or FAQs) to the system:
 
-1. Upload Documents to S3: (replace `<KnowledgeBaseBucket>` with the actual bucket name from the CDK output. e.g. chatbot-bedrock-knowledge-base-XXXXXXXXX)
-```bash
-# Upload a single document
-aws s3 cp new-policy.md s3://<KnowledgeBaseBucket>/
+1. Upload Documents to S3
+- You can upload new documents to S3 bucket from console, or
+- Using CLI: (replace `<KnowledgeBaseBucket>` with the actual bucket name from the CDK output. e.g. `chatbot-bedrock-knowledge-base-XXXXXXXXX`)
+    ```bash
+    # Upload a single document
+    aws s3 cp new-policy.md s3://<KnowledgeBaseBucket>/
 
-# Upload multiple documents
-aws s3 cp ./travel-docs/ s3://<KnowledgeBaseBucket>/ --recursive
-```
+    # Upload multiple documents
+    aws s3 cp ./travel-docs/ s3://<KnowledgeBaseBucket>/ --recursive
+    ```
 
 2. Document Processing:
 - Once documents are uploaded to S3, you will have to sync the Bedrock Knowledge base with newly uploaded documents.
@@ -240,6 +245,7 @@ aws s3 cp ./travel-docs/ s3://<KnowledgeBaseBucket>/ --recursive
 - Click on the name to open it.
 - Go to "Data source" section and select the data source named `chatbot-bedrock-knowledge-base-datasource-XXXXXXXXXXX`
 - Click `Sync` in top-right corner. This will initiate a new sync, find newly uploaded documents and will index the documents in "Amazon OpenSearch Serveless Collection"
+- ![console_sync](./Sync_Knowledge_Base_From_Console.png)
 
 3. Test the Agent with New Content:
 ```
