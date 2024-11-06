@@ -1,5 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TestApp.Model;
@@ -16,7 +18,14 @@ internal sealed class ChatBotClient : IDisposable
     private readonly HttpClient httpClient;
     private readonly bool _enableTrace;
     private readonly string _albMessageEndpointUrl;
-
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = 
+        new()
+        { 
+            WriteIndented = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            PropertyNameCaseInsensitive = true
+        };
+        
     /// <summary>
     /// Initializes a new instance of <see cref="ChatBotClient"/>
     /// </summary>
@@ -57,20 +66,33 @@ internal sealed class ChatBotClient : IDisposable
         // Ids
         var sessionId = Guid.NewGuid().ToString();
 
+        // Iteration
+        var iteration = 0;
+
         // Response from BedrockAgent
         BedrockAgentResponse? response = null;
 
         while (!cancellationToken.IsCancellationRequested)
-        {
+        {   
+            iteration++;
+            string? input = null;
             Console.WriteLine("Please enter your input: ");
-            var input = Console.ReadLine();
+            try
+            {
+                input = await ReadLineAsync(cancellationToken);
+            }
+            catch(OperationCanceledException)
+            {
+                break; //break from main loop
+            }
+
+            // No input
             if (string.IsNullOrEmpty(input))
                 continue;
 
+            // Exit
             if (input.Equals("exit", StringComparison.InvariantCultureIgnoreCase))
-            {
-                break;
-            }
+                break; //break from main loop
 
             // Try in loop for retry
             while (!cancellationToken.IsCancellationRequested)
@@ -102,33 +124,87 @@ internal sealed class ChatBotClient : IDisposable
                         continue;
                     }
 
-                    // Content
-                    var content = await responseMessage.Content.ReadFromJsonAsync<BedrockAgentResponse>(cancellationToken);
+                    // Response
+                    response = await responseMessage.Content.ReadFromJsonAsync<BedrockAgentResponse>(_jsonSerializerOptions, cancellationToken);
 
                     // Error
-                    if (content?.HasError ?? false)
-                        _logger.LogWarning("Error received from BedrockAgent: {error}", content?.Error);
+                    if (response?.HasError ?? false)
+                        _logger.LogWarning("Error received from BedrockAgent: {error}", response?.Error);
                     // Message
                     else
                     {
-                        Console.WriteLine($"Response: {content?.Message}");
-                        _logger.LogTrace("Trace: {trace}", content?.Trace);
+                        Console.WriteLine($"Response: {response?.Message}");
+                        await WriteTraceAsync(iteration, sessionId, input, response?.Message, response?.Trace);
                     }
 
-                    break;
+                    break; //break from retry loop
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError("Error sending request to BedrockAgent: {error}", ex.Message);
 
-                    Console.WriteLine("Do you want to retry the operation (y/N): ");
-                    var retry = Console.ReadLine();
+                    ConsoleKey responseKey;
+                    do
+                    {
+                        Console.WriteLine("Do you want to retry the operation (y/N): ");
+                        responseKey = Console.ReadKey(false).Key;
+                        if (responseKey != ConsoleKey.Enter)
+                            Console.WriteLine();
+                    } while (responseKey != ConsoleKey.Y && responseKey != ConsoleKey.N);
 
-                    if (string.IsNullOrEmpty(retry) || !retry.Equals("y", StringComparison.InvariantCultureIgnoreCase))
-                        break;
+                    if (responseKey == ConsoleKey.N)
+                        break; //break from retry loop
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Reads a line from console asynchronously
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>String from console</returns>
+    private static async Task<string?> ReadLineAsync(CancellationToken cancellationToken = default)
+    {
+        var readTask = Task.Run(Console.ReadLine);
+        await Task.WhenAny(readTask, Task.Delay(-1, cancellationToken));
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        string? result = readTask.Result;
+        return result;
+    }
+
+    /// <summary>
+    /// Writes trace to file asynchronously
+    /// </summary>
+    /// <param name="iteration">Iteration count</param>
+    /// <param name="sessionId">Session Id</param>
+    /// <param name="input">user input</param>
+    /// <param name="output">Agent output</param>
+    /// <param name="trace">Trace</param>
+    /// <returns>A <see cref="Task"/></returns>
+    private static async Task WriteTraceAsync(
+        int iteration, 
+        string sessionId, 
+        string input,
+        string? output,
+        BedrockAgentTrace? trace)
+    {
+        if (trace == null)
+            return;
+
+        var fileName = $"trace_{sessionId}_{iteration}.json";
+        await File.WriteAllTextAsync(
+            fileName, 
+            JsonSerializer.Serialize(
+                new
+                {
+                    Input = input,
+                    Output = output,
+                    Trace = trace
+                },
+                _jsonSerializerOptions));
     }
 
     /// <summary>
