@@ -7,7 +7,7 @@ namespace ActionGroupLambdaFunction;
 
 public class Function
 {
-    public Task<ApiResponse> FunctionHandler(ApiRequest request, ILambdaContext context)
+    public static Task<ApiResponse> FunctionHandler(ApiRequest request, ILambdaContext context)
     {
         context.Logger.LogInformation("Processing request: " +
             $"{JsonSerializer.Serialize(request, LambdaFunctionJsonSerializerContext.Default.ApiRequest)}");
@@ -35,13 +35,13 @@ public class Function
             apiResponse.response.responseBody =
                 new Dictionary<string, ResponseBody>
                 {
-                {
-                    "application/json",
-                    new ResponseBody
                     {
-                        body = JsonSerializer.Serialize(flights, LambdaFunctionJsonSerializerContext.Default.ListFlight)
+                        "application/json",
+                        new ResponseBody
+                        {
+                            body = JsonSerializer.Serialize(flights, LambdaFunctionJsonSerializerContext.Default.ListFlight)
+                        }
                     }
-                }
                 };
 
             var serializedResponse = JsonSerializer.Serialize(apiResponse, LambdaFunctionJsonSerializerContext.Default.ApiResponse);
@@ -70,10 +70,35 @@ public class Function
         return Task.FromResult(apiResponse);
     }
 
+    /// <summary>
+    /// Creates <see cref="FlightSearchRequest"/> from <see cref="ApiRequest"/>
+    /// </summary>
+    /// <param name="apiRequest">API Request (from user)</param>
+    /// <returns><see cref="FlightSearchRequest"/></returns>
+    /// <exception cref="Exception">If invalid API request</exception>
     private static FlightSearchRequest GetFlightSearchRequest(ApiRequest apiRequest)
     {
         var properties = apiRequest?.RequestBody?.Content?.JsonProperties?.Properties
             ?? throw new Exception("Invalid request body, cannot find properties");
+
+        // Departure Date
+        var departureDateStr = properties?.FirstOrDefault(p => p.Name == "departureDate")?.Value?.ToString()
+            ?? throw new Exception("Invalid request body, cannot find departureDate");
+        if (!DateTime.TryParse(departureDateStr, out DateTime departureDatetime))
+            throw new Exception("Invalid departure date");
+        if (departureDatetime < DateTime.Now)
+            throw new Exception("Departure date must be in the future");
+
+        // Return Date
+        DateTime returnDatetime = DateTime.MinValue;
+        var returnDateStr = properties?.FirstOrDefault(p => p.Name == "returnDate")?.Value?.ToString();
+        if (!string.IsNullOrEmpty(returnDateStr))
+        {
+            if (DateTime.TryParse(returnDateStr, out returnDatetime))
+                throw new Exception("Invalid return date");
+            if (returnDatetime < departureDatetime)
+                throw new Exception("Return date must be after departure date");
+        }
 
         var request = new FlightSearchRequest
         {
@@ -83,81 +108,31 @@ public class Function
             Destination = properties?.FirstOrDefault(p => p.Name == "destination")?.Value?.ToString() 
                 ?? throw new Exception("Invalid request body, cannot find destination"),
             
-            DepartureDate = properties?.FirstOrDefault(p => p.Name == "departureDate")?.Value?.ToString() 
-                ?? throw new Exception("Invalid request body, cannot find departureDate"),
+            DepartureDate = departureDatetime,
             
-            ReturnDate = properties?.FirstOrDefault(p => p.Name == "returnDate")?.Value?.ToString() 
-                ?? throw new Exception("Invalid request body, cannot find returnDate"),
+            ReturnDate = returnDatetime == DateTime.MinValue ? null : returnDatetime,
+
             Passengers = int.Parse(properties?.FirstOrDefault(p => p.Name == "passengers")?.Value?.ToString() ?? "1")
         };
 
         return request;
     }
 
-    // private static APIGatewayProxyResponse HandleFlightSearch(APIGatewayProxyRequest request)
-    // {
-    //     try
-    //     {
-    //         var searchRequest = JsonSerializer.Deserialize(
-    //             request.Body,
-    //             LambdaFunctionJsonSerializerContext.Default.FlightSearchRequest)
-    //             ?? throw new Exception("Invalid request body");
-
-    //         var flights = GenerateMockFlights(searchRequest);
-
-    //         return new APIGatewayProxyResponse
-    //         {
-    //             StatusCode = 200,
-    //             Body = JsonSerializer.Serialize(flights, LambdaFunctionJsonSerializerContext.Default.ListFlight),
-    //             Headers = new Dictionary<string, string>
-    //             {
-    //                 { "Content-Type", "application/json" },
-    //                 { "Access-Control-Allow-Origin", "*" }
-    //             },
-    //             IsBase64Encoded = false
-    //         };
-    //     }
-    //     catch (Exception ex)
-    //     {   
-    //         var error = new Error
-    //         {
-    //             Message = ex.Message,
-    //             Code = ex.HResult
-    //         };
-
-    //         return new APIGatewayProxyResponse
-    //         {
-    //             StatusCode = 400,
-    //             Body = JsonSerializer.Serialize(error, LambdaFunctionJsonSerializerContext.Default.Error),
-    //             Headers = new Dictionary<string, string>
-    //             {
-    //                 { "Content-Type", "application/json" },
-    //                 { "Access-Control-Allow-Origin", "*" },
-    //                 { "x-amzn-ErrorType", ex.HResult.ToString() }
-    //             },
-    //             IsBase64Encoded = false                
-    //         };
-    //     }
-    // }
-
+    /// <summary>
+    /// Creates mock flight data from request
+    /// </summary>
+    /// <param name="request"><see cref="FlightSearchRequest"/></param>
+    /// <returns>List of <see cref="Flight"/></returns>
     private static List<Flight> GenerateMockFlights(FlightSearchRequest request)
     {
         var random = new Random();
         var flights = new List<Flight>();
 
-        var departureDatetime = DateTime.Parse(request.DepartureDate);
-        if (departureDatetime < DateTime.Now)
-            throw new Exception("Departure date must be in the future");
-
-        var returnDatetime = DateTime.Parse(request.ReturnDate);
-        if (returnDatetime < departureDatetime)
-            throw new Exception("Return date must be after departure date");
-
         for (int i = 0; i < 5; i++)
         {
             var airlineCode = RandomAirlineCode();
 
-            var departureTime = departureDatetime.AddHours(random.Next(24));
+            var departureTime = request.DepartureDate.AddHours(random.Next(24));
             var arrivalTime = departureTime.AddHours(random.Next(1, 24));
 
             flights.Add(
@@ -170,11 +145,11 @@ public class Function
                     Price = Math.Round(random.NextDouble() * (1000 - 100) + 100, 2)
                 });
 
-            departureTime = returnDatetime.AddHours(random.Next(24));
-            arrivalTime = departureTime.AddHours(random.Next(1, 24));
-
             if (request.ReturnDate != null)
             {
+                departureTime = request.ReturnDate.Value.AddHours(random.Next(24));
+                arrivalTime = departureTime.AddHours(random.Next(1, 24));
+
                 flights[i].ReturnFlight = new Flight
                 {
                     FlightNumber = $"{airlineCode}{random.Next(1000, 9999)}",
@@ -189,9 +164,16 @@ public class Function
         return flights;
     }
 
+    /// <summary>
+    /// Gets random airline code
+    /// </summary>
+    /// <returns>Airline code</returns>
     private static string RandomAirlineCode() => new string[] { "AA", "DL", "UA", "BA", "LH" }[new Random().Next(5)];
 
-    private static readonly Dictionary<string, string> Airlines = new Dictionary<string, string>
+    /// <summary>
+    /// List of airlines
+    /// </summary>
+    private static readonly Dictionary<string, string> Airlines = new()
     {
         { "AA", "American Airlines" },
         { "DL", "Delta Air Lines" },

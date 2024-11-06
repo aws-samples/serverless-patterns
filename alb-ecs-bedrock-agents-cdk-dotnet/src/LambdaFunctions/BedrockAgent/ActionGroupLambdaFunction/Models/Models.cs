@@ -6,9 +6,9 @@ public class FlightSearchRequest
     
     public required string Destination { get; set; }
 
-    public required string DepartureDate { get; set; }
+    public required DateTime DepartureDate { get; set; }
 
-    public required string ReturnDate { get; set; }
+    public required DateTime? ReturnDate { get; set; }
 
     public int Passengers { get; set; }
 }

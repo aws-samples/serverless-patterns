@@ -15,9 +15,7 @@ public class Program
     /// </summary>
     private static async Task Main()
     {
-        var function = new Function();
-
-        Func<ApiRequest, ILambdaContext, Task<ApiResponse>> handler = function.FunctionHandler;
+        Func<ApiRequest, ILambdaContext, Task<ApiResponse>> handler = Function.FunctionHandler;
         await LambdaBootstrapBuilder.Create(handler, new SourceGeneratorLambdaJsonSerializer<LambdaFunctionJsonSerializerContext>())
             .Build()
             .RunAsync();
