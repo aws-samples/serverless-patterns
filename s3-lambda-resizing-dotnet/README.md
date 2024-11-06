@@ -2,7 +2,7 @@
 
 The SAM template deploys a .NET 6 Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The function code checks the uploaded file is an image and creates a thumbnail version of the image in the same bucket.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-lambda-dotnet](https://serverlessland.com/patterns/s3-lambda-dotnet)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-lambda-resizing-dotnet](https://serverlessland.com/patterns/s3-lambda-resizing-dotnet)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd s3-lambda-dotnet
+    cd s3-lambda-resizing-dotnet
     ```
 1. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -52,7 +52,7 @@ Important: this application uses various AWS services and there are costs associ
 Run the following S3 CLI  command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the S3 Bucket. This is provided in the stack outputs.
 
 ```bash
-aws s3 cp 'example.jpeg'  s3://{BucketName}/example.jpeg
+aws s3 cp './images/example.jpeg'  s3://{BucketName}/example.jpeg
 ```
 
 Run the following command to check that a new thumbnails folder has been created with a new version of the image.
