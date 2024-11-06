@@ -11,10 +11,14 @@ namespace TestApp;
 /// </remarks>
 /// <param name="chatBotClient">ChatBot client (<see cref="ChatBotClient"/>)</param>
 /// <param name="logger">Logger</param>
-internal class ChatBotClientWorker(ChatBotClient chatBotClient, ILogger<ChatBotClientWorker> logger) 
+internal class ChatBotClientWorker(
+    ChatBotClient chatBotClient, 
+    IHostApplicationLifetime hostApplicationLifetime,
+    ILogger<ChatBotClientWorker> logger) 
     : IHostedService
 {
     private readonly ChatBotClient _chatBotClient = chatBotClient ?? throw new ArgumentNullException(nameof(chatBotClient));
+    private readonly IHostApplicationLifetime _hostApplicationLifetime = hostApplicationLifetime ?? throw new ArgumentNullException(nameof(hostApplicationLifetime));
     private readonly ILogger<ChatBotClientWorker> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private CancellationTokenSource? _cancellationTokenSource;
 
@@ -28,7 +32,8 @@ internal class ChatBotClientWorker(ChatBotClient chatBotClient, ILogger<ChatBotC
         _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
         
         _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        return _chatBotClient.RunAsync(_cancellationTokenSource.Token);
+        //return _chatBotClient.RunAsync(_cancellationTokenSource.Token);
+        return RunAndMonitorChatBotClientAsync(_cancellationTokenSource.Token);
     }
 
     /// <summary>
@@ -42,5 +47,22 @@ internal class ChatBotClientWorker(ChatBotClient chatBotClient, ILogger<ChatBotC
 
         _cancellationTokenSource?.Cancel();
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Runs and monitors <see cref="ChatBotClient"/> asynchronously. Exits the application if the client exits.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>A <see cref="Task"/> that runs and monitors <see cref="ChatBotClient.RunAsync(CancellationToken)"/></returns>
+    private async Task RunAndMonitorChatBotClientAsync(CancellationToken cancellationToken)
+    {
+        await _chatBotClient.RunAsync(cancellationToken);
+
+        // Task has completed, exit the application
+        if (!cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogInformation("ChatBotClient has exited. Exiting the application...");
+            _hostApplicationLifetime.StopApplication();
+        }
     }
 }
