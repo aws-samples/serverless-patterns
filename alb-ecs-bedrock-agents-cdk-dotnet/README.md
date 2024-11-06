@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 * [.NET](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) (.NET 8.0 or later) installed
@@ -280,7 +280,7 @@ Best Practices:
 - Check any sync warnings
 
 ### 5. CloudWatch Logs
-Check the CloudWatch Logs for the Lambda function to see the processing details and any potential errors.
+Check the CloudWatch Logs for the Lambda function and ECS Task to see the processing details and any potential errors.
 
 ## Cleanup
  
