@@ -94,7 +94,7 @@ public class Function
         var returnDateStr = properties?.FirstOrDefault(p => p.Name == "returnDate")?.Value?.ToString();
         if (!string.IsNullOrEmpty(returnDateStr))
         {
-            if (DateTime.TryParse(returnDateStr, out returnDatetime))
+            if (!DateTime.TryParse(returnDateStr, out returnDatetime))
                 throw new Exception("Invalid return date");
             if (returnDatetime < departureDatetime)
                 throw new Exception("Return date must be after departure date");
