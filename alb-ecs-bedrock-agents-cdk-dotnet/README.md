@@ -150,7 +150,7 @@ You can test the flight search functionality directly through the Application Lo
     -H "Content-Type: application/json" \
     -d '{
         "SessionId": "<session-id>",
-        "Message": "I am looking for a flight for 2 people from SEA to JFK on coming 31st of December 2024 and coming back on 7th of January.",
+        "Message": "I am looking for a flight for 2 people from SEA to JFK on 31st of December 2024 and coming back on 7th of January.",
         "EndSession": false,
         "EnableTrace": false,
         "SessionAttributes": {},
@@ -184,7 +184,7 @@ You can test the flight search functionality directly through the Application Lo
     -H "Content-Type: application/json" \
     -d '{
         "SessionId": "<session-id>",
-        "Message": "I am looking for reservation policy and transportation policy.",
+        "Message": "I am looking for cancellation policy for international travel.",
         "EndSession": false,
         "EnableTrace": false,
         "SessionAttributes": {},
@@ -196,15 +196,15 @@ You can test the flight search functionality directly through the Application Lo
     Expected agent response:
     ```json
     {
-        "sessionId": "<session-id>",
-        "memoryId": null,
-        "message": "Here are the key details for GlobalTrek Adventures' Reservation and Transportation Policies:\n\nReservation Policy:\n\nCancellation Terms:\n- 30+ days before travel: Full refund minus $50 administrative fee\n- 15-29 days before travel: 50% refund\n- 14 days or less before travel: No refund\n\nBooking Change Fees:\n- 30+ days before travel: No fee\n- 15-29 days before travel: $50 change fee\n- 14 days or less before travel: $100 change fee\n\nRefunds are processed within 10 business days to the original payment method.\n\nIf GlobalTrek Adventures cancels a trip, customers can choose between:\n- A full refund\n- Rebooking with a 10% discount\n\n\n\n\nTransportation Policy:\n\nBaggage Guidelines:\n- Air Travel: Follow operating airline's policies\n- Bus Tours: One large suitcase (max 23kg/50lbs) and one small carry-on per person\n- Excess baggage is subject to additional charges and space availability\n\nAdditional Transportation Rules:\n- Arrive 2 hours before domestic flights\n- Arrive 3 hours before international flights\n- Ground transportation details provided in itinerary\n- Customers responsible for being at designated pick-up locations\n- Missed transfers due to customer delay are non-refundable\n\nRecommended: Travel insurance with baggage coverage\n\n\n\n\nIs there anything specific about these policies you would like me to clarify?",
-        "files": null,
-        "returnControlPayload": null,
-        "trace": null,
-        "error": null,
-        "hasError": false
-    }    
+    "sessionId": "<session-id>",
+    "memoryId": null,
+    "message": "Here are the details of GlobalTrek Adventures' international travel cancellation policy:\n\nCancellation by Customer:\n- 30+ days before travel: Full refund minus $50 administrative fee\n- 15-29 days before travel: 50% refund\n- 14 days or less before travel: No refund\n\nIf GlobalTrek Adventures Cancels:\n- Full refund or option to rebook with a 10% discount\n- Note: Not responsible for additional expenses like visas or non-refundable flights\n\nAdditional Recommendation:\n- The company strongly suggests purchasing travel insurance through SafeJourney Insurance for extra protection.\n\n\n\nWould you like more information about the cancellation policy or travel insurance options?",
+    "files": null,
+    "returnControlPayload": null,
+    "trace": null,
+    "error": null,
+    "hasError": false
+    }  
     ```
 
 ### 3. Test using test application.
@@ -216,11 +216,15 @@ cd ./src/Test
 ```
 - Update `<AlbEndpoint>` in `appsettings.json` file.
 - Update `enableTrace` to `true` if need to check request traces from Bedrock Agents. Traces will be written to a file in `Test` directory with filename format: `trace_<session-id>_<iteration>.json`.
+- Example: `appsettings.json` configuration
+    ![test_app_settings](./Test_App_Settings.png)
 - Run Test application.
     ```
     dotnet run
     ```
-- Press `CTRL+C` to exit the application.
+- Press `CTRL+C` or type `exit` and press enter to exit the application.
+- Example input/output using test application
+    ![test_app_input_output](./Test_App_Input_Output.png)
 
 ### 4. Adding and Managing Documents
 
@@ -245,7 +249,7 @@ To add new documents (such as updated policies, travel guides, or FAQs) to the s
 - Click on the name to open it.
 - Go to "Data source" section and select the data source named `chatbot-bedrock-knowledge-base-datasource-XXXXXXXXXXX`
 - Click `Sync` in top-right corner. This will initiate a new sync, find newly uploaded documents and will index the documents in "Amazon OpenSearch Serveless Collection"
-- ![console_sync](./Sync_Knowledge_Base_From_Console.png)
+    ![console_sync](./Sync_Knowledge_Base_From_Console.png)
 
 3. Test the Agent with New Content:
 ```
