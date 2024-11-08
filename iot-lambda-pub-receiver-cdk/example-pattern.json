@@ -1,40 +1,48 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "title": "Lambda to IoT Core to Lambda",
+  "description": "Create a Lambda publishing into IoT topic, triggering an action calling another Lambda.",
   "language": "Python",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
+      "This sample project demonstrates how to use an AWS Lambda Function to publish messages into AWS IoT Core topic and get a rule triggered by a condition to process relevant messages into another Lambda. This pattern is leveraging CloudWatch logs to ease the debugging and visibility into the processed messages.",
+      "The function are written in Python and the infrastructure is described with AWS CDKv2 in Typescript. The patterns also shows an effective way to manage Python dependencies through Docker built image and requiements.txt file.",
+      "This pattern deploys 2 Lambda functions, 1 IoT rule and action, 3 log groups."
     ]
   },
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
       "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python_stack.py"
+      "projectFolder": "iot-lambda-pub-receiver-cdk",
+      "templateFile": "lambda-iot-cdk-stack.ts"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "text": "AWS IoT Core - Getting started with AWS IoT Core tutorials",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-gs.html"
       },
       {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "AWS IoT Core action resources",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-action-resources.html"
+      },
+      {
+        "test": "Building Lambda with Python",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html"
+      },
+      {
+        "text": "Working with the AWS CDK in TypeScript",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "cdk deploy"
     ]
   },
   "testing": {
@@ -44,16 +52,15 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>cdk destroy</code>."
     ]
   },
   "authors": [
     {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "name": "Philippe Wanner",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/philippe-wanner.jpg",
+      "bio": "Philippe is a Senior Specialist Solutions Architect at Amazon Web Services based in Zurich, Switzerland. His role is to spread the migration and modernization best practices for large organisations.",
+      "linkedin": "philippe-wanner"
     }
   ]
 }

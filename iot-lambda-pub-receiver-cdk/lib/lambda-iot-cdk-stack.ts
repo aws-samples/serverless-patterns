@@ -18,7 +18,6 @@ export class LambdaIotCdkStack extends Stack {
 
     // Publisher lambda function. 
     // Remark - if the Lambda is in the same account and region as the IoT Core endpoint, then setting the endpoint is optional.
-    // Documention - AWS IoT Core action resources: https://docs.aws.amazon.com/iot/latest/developerguide/iot-action-resources.html
     const iotPubPermission = new PolicyStatement(({
       effect: Effect.ALLOW,
       resources: [ `arn:aws:iot:${mqttTopicRegion}:${mqttTopicAccount}:topic/${mqttTopicName}` ],
