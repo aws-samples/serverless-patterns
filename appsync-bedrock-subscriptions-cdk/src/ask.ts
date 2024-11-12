@@ -1,7 +1,7 @@
-import { AppSyncResolverEvent } from 'aws-lambda'
-import { ChatBedrock } from 'langchain/chat_models/bedrock'
-import { AppSyncRequestIAM } from "./appsyncRequest"
-import { StringOutputParser } from "langchain/schema/output_parser";
+import { AppSyncResolverEvent } from "aws-lambda";
+import { ChatBedrock } from "@langchain/community/chat_models/bedrock";
+import { AppSyncRequestIAM } from "./appsyncRequest";
+import { StringOutputParser } from "@langchain/core/output_parsers";
 const GRAPHQL_URL = process.env.GRAPHQL_URL || "";
 const REGION = process.env.REGION || 'us-east-1';
 
@@ -39,4 +39,4 @@ exports.handler = async (event: AppSyncResolverEvent<{ chatId: string, prompt: s
             }
         })
     }
-}
+  }
