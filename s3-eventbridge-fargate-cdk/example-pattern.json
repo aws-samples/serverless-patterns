@@ -58,35 +58,5 @@
             "linkedin": "jeromevdl",
             "twitter": "jeromevdl"
         }
-    ],
-    "patternArch": {
-        "icon1": {
-            "x": 20,
-            "y": 50,
-            "service": "s3",
-            "label": "Amazon S3"
-        },
-        "icon2": {
-            "x": 50,
-            "y": 50,
-            "service": "eventbridge",
-            "label": "Amazon EventBridge"
-        },
-        "icon3": {
-            "x": 80,
-            "y": 50,
-            "service": "fargate",
-            "label": "AWS Fargate"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2",
-            "label": "Event"
-        },
-        "line2": {
-            "from": "icon2",
-            "to": "icon3",
-            "label": "Rule"
-        }
-    }
+    ]
 }

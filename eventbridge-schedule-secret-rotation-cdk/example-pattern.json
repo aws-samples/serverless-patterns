@@ -1,13 +1,13 @@
 {
     "title": "Secret rotation using Amazon EventBridge Scheduler and AWS Lambda",
-    "description": "Secret rotation in AMS Secrets Manager using Amazon EventBridge Scheduler and AWS Lambda",
+    "description": "Secret rotation in AWS Secrets Manager using Amazon EventBridge Scheduler and AWS Lambda",
     "language": "Python",
     "level": "200",
     "framework": "CDK",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This sample project demonstrates rotating secrets in AWS Secrests Manager using Amazon EventBridge Scheduler and AWS Lambda at desired intervals for several use cases. e.g. rotating OAtuth tokens with limited lifespan.",
+        "This sample project demonstrates rotating secrets in AWS Secrets Manager using Amazon EventBridge Scheduler and AWS Lambda at desired intervals for several use cases. e.g. rotating OAuth tokens with limited lifespan.",
         "An EventBridge schedule is created based on the 'Secret rotation schedule' CDK parameter with rotation Lambda as the target which does the job",
         "You could provide the interval at which you want the secret to be rotated as a cron or rate expression."
       ]
