@@ -1,0 +1,197 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'This template creates a VPC with a private API Gateway and necessary resources (uksb-1tthgi812) (tag:private-apigw-cross-region-1)'
+
+Parameters:
+  VpcCidrBlock:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: The CIDR block for the VPC (must be a /16 block)
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/16)$
+    ConstraintDescription: Must be a valid /16 IP CIDR range of the form x.x.0.0/16.
+
+Resources:
+  ExecuteApiInterfaceEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    "DependsOn" : [ subnetA, subnetB, mySecurityGroup ]
+    Properties:
+      VpcEndpointType: 'Interface'
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.execute-api'
+      VpcId: !Ref myVPC
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Ref subnetA
+        - !Ref subnetB
+      SecurityGroupIds:
+        - !Ref mySecurityGroup
+
+  myVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags: 
+        - Key: Name
+          Value: MyVPC
+
+  subnetA:
+    Type: 'AWS::EC2::Subnet'
+    DependsOn: myVPC
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: !Select [ 0, !Cidr [ !Ref VpcCidrBlock, 256, 8 ] ]
+      AvailabilityZone: !Select [ 0, !GetAZs '']
+      Tags: 
+        - Key: Name
+          Value: SubnetA
+
+  subnetB: 
+    Type: 'AWS::EC2::Subnet'
+    DependsOn: myVPC
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: !Select [ 1, !Cidr [ !Ref VpcCidrBlock, 256, 8 ] ]
+      AvailabilityZone: !Select [ 1, !GetAZs '']
+      Tags: 
+        - Key: Name
+          Value: SubnetB
+
+
+  myRouteTable:
+    Type: AWS::EC2::RouteTable
+    DependsOn: myVPC
+    Properties:
+      VpcId: 
+        !Ref myVPC
+      Tags: 
+        - Key: Name
+          Value: MyRouteTable
+
+  mySubnetRouteTableAssociationA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: subnetA
+      RouteTableId:
+        Ref: myRouteTable
+
+  mySubnetRouteTableAssociationB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: subnetB
+      RouteTableId:
+        Ref: myRouteTable
+
+  mySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow HTTPS traffic from the VPC'
+      VpcId: !Ref myVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      Tags: 
+        - Key: Name
+          Value: MySecurityGroup
+
+  StoreRouteTableId:
+    Type: AWS::SSM::Parameter
+    DependsOn: myRouteTable
+    Properties:
+      Name: /myapp/routetableid
+      Type: String
+      Value: !Ref myRouteTable
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    DependsOn: ExecuteApiInterfaceEndpoint
+    Properties:
+      Name: CloudFormation-APIGW
+      OpenApiVersion: '2.0'
+      StageName: test
+      EndpointConfiguration: "PRIVATE"
+      DefinitionBody: 
+        openapi: "3.0.1"
+        info:
+          description: "API Gateway created from CloudFormation stack"
+          version: "1.0"
+        basePath: "/"
+        schemes:
+        - "https"
+        paths:
+          /test-resource:
+            get:
+              responses:
+                "200":
+                  description: "200 response"
+                  content:
+                    application/json:
+                      schema:
+                        $ref: "#/components/schemas/Empty"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+        components:
+          schemas:
+            Empty:
+              title: "Empty Schema"
+              type: "object"
+        x-amazon-apigateway-policy:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Deny"
+            Principal: "*"
+            Action: "execute-api:Invoke"
+            Resource: "*"
+            Condition:
+              StringNotEquals:
+                aws:SourceVpce: !Sub ${ExecuteApiInterfaceEndpoint}
+          - Effect: "Allow"
+            Principal: "*"
+            Action: "execute-api:Invoke"
+            Resource: "*"
+
+
+Outputs:
+  RemoteVPCCidr:
+    Description: The Cidr block of the VPC
+    Value: !Ref VpcCidrBlock
+    
+  PeerVPCID:
+    Description: The VPC ID
+    Value: !Ref myVPC
+
+  APIGWID:
+    Description: The API Gateway ID
+    Value: !Ref MyApi
+
+  VPCEndpointURL:
+    Description: VPC Endpoint URL
+    Value: !Select 
+      - 1
+      - !Split
+        - ':'
+        - !Select 
+          - 0
+          - !GetAtt ExecuteApiInterfaceEndpoint.DnsEntries
+
+  Region:
+    Description: Region ID
+    Value: !Sub ${AWS::Region}
+
+  SSMParameterName:
+    Description: The name of the SSM Parameter storing the Route Table ID
+    Value: !Ref StoreRouteTableId
+
+  SSMParameterValue:
+    Description: The value stored in the SSM Parameter (Route Table ID)
+    Value: !GetAtt StoreRouteTableId.Value
