@@ -1,0 +1,205 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  centralAccount
+  Sample SAM Template for central Account containing Private API Gateway, VPC link, Network Load Balancer and execute-api VPC Endpoint.
+
+Parameters:
+  VPCId:
+    Description: Please provide a VPC to deploy the solution into.
+    Type: AWS::EC2::VPC::Id
+  PrivateSubnet1:
+    Description: Please provide the first private subnet id with outbound connectivity within the VPC you selected above.
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet2:
+    Description: Please provide the second private subnet id with outbound connectivity within the VPC you selected above.
+    Type: AWS::EC2::Subnet::Id
+  AccountAVpcEndpoint:
+    Type: String
+    Description: The ID of the VPC Endpoint you want to use from Account A
+  AccountBApiGwURL:
+    Type: String
+    Description: The API GW URL from Account B including path
+  AccountCApiGwURL:
+    Type: String
+    Description: The API GW URL from Account B including path
+
+Resources:
+  ########### API Gateway REST API ###############
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration: PRIVATE
+      StageName: Prod
+      AlwaysDeploy: true
+      DefinitionBody:
+        openapi: "3.0.1"
+        info:
+          title: !Sub "PrivateApi-${AWS::StackName}"
+          version: "1.0"
+        x-amazon-apigateway-binary-media-types:
+          - "*/*"
+        servers:
+        - x-amazon-apigateway-endpoint-configuration:
+            vpcEndpointIds:
+            - !Ref AccountAVpcEndpoint
+        paths:
+          /text:
+            get:
+              responses:
+                "200":
+                  description: "200 response"
+              x-amazon-apigateway-integration:
+                connectionId: !Ref ApiGatewayVpcLink
+                httpMethod: "GET"
+                uri: !Ref AccountBApiGwURL
+                connectionType: "VPC_LINK"
+                passthroughBehavior: "when_no_templates"
+                type: "http"
+                responses:
+                  default:
+                    statusCode: "200"
+          /image:
+            post:
+              responses:
+                "200":
+                  description: "200 response"
+              x-amazon-apigateway-integration:
+                connectionId: !Ref ApiGatewayVpcLink
+                httpMethod: "POST"
+                uri: !Ref AccountCApiGwURL
+                connectionType: "VPC_LINK"
+                passthroughBehavior: "when_no_templates"
+                type: "http"
+                responses:
+                  default:
+                    statusCode: "200"
+        x-amazon-apigateway-policy:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Principal: "*"
+            Action: "execute-api:Invoke"
+            Resource: "execute-api:/*"
+            Condition:
+              StringEquals:
+                aws:sourceVpce: 
+                - !Ref AccountAVpcEndpoint
+
+  ########### API Gateway VPC Link ###############
+  ApiGatewayVpcLink:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: VPCLinkRestNlbInternal
+      TargetArns: 
+        - !Ref MyNLB
+
+  ########### Network Load Balancer (NLB) ###############
+  MyNLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: network
+      Subnets:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroups:
+        - !Ref NLBVpcEndpointSG
+      EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic: "off"
+
+  ########### NLB Target Group ###############
+  NLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref VPCId
+      Protocol: TCP
+      Port: 443
+      TargetType: ip
+      Targets:
+        - Id: !GetAtt GetPrivateIPs.IP0
+        - Id: !GetAtt GetPrivateIPs.IP1
+      HealthCheckProtocol: TCP
+
+  ########### NLB Listener ###############
+  NLBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref MyNLB
+      Port: 443
+      Protocol: TCP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref NLBTargetGroup
+
+  ########### Execute API VPC Endpoint ###############
+  ExecuteApiVpcEndpoint:
+    DependsOn: NLBVpcEndpointSG
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.execute-api
+      VpcId: !Ref VPCId
+      SubnetIds: 
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref NLBVpcEndpointSG
+
+  ########### Security Group for NLB and VPC Endpoint ###############
+  NLBVpcEndpointSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for NLB and VPC endpoint
+      VpcId: !Ref VPCId
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  ########### Security Group Ingress Rule ###############
+  NLBVpcEndpointSGingress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId:
+        Ref: NLBVpcEndpointSG
+      IpProtocol: tcp
+      FromPort: '0'
+      ToPort: '65535'
+      SourceSecurityGroupId:
+        Ref: NLBVpcEndpointSG
+
+  ########### Lambda Function to Fetch VPC Endpoint IPs ###############
+  FetchVPCEndpointIPsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Timeout: 10
+      Architectures: 
+        - arm64
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Policies:
+        - AWSLambdaExecute
+        - Version: '2012-10-17' 
+          Statement:
+            - Effect: Allow
+              Action:
+                - ec2:DescribeNetworkInterfaces
+              Resource: "*"
+
+  ########### Custom Resource to Fetch Private IPs ###############
+  GetPrivateIPs:
+    DependsOn:
+      - ExecuteApiVpcEndpoint
+    Type: Custom::NLBTargets
+    Properties:
+      ServiceToken: !GetAtt FetchVPCEndpointIPsFunction.Arn
+      NetworkInterfaceIds: !GetAtt ExecuteApiVpcEndpoint.NetworkInterfaceIds
+
+Outputs:
+  ApiUrlForECS:
+    Description: "API Gateway Invoke URL with GET method for ECS Fargate integration"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${MyApi.Stage}/text"
+  ApiUrlForLambda:
+    Description: "API Gateway Invoke URL with POST method for Lambda function integration"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${MyApi.Stage}/image"

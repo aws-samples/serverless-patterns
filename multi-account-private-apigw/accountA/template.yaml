@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  accountA
+  Sample SAM Template for accountA containing EC2 Instance and execute-api VPC Endpoint
+
+Parameters:
+  ########### Parameters for EC2 Instance and Network ###########
+  InstanceType:
+    Description: Enter t2.micro or t2.small. Default is t2.micro.
+    Type: String
+    AllowedValues:
+      - t2.micro
+      - t2.small
+    Default: t2.micro
+    ConstraintDescription: Must be either t2.micro or t2.small.
+  AmiID:
+    Description: Please provide a valid AMI id to launch EC2 Instance.
+    Type: AWS::EC2::Image::Id
+  AllowedIP:
+    Description: CIDR block to allow SSH access (e.g., 203.0.113.0/24).
+    Type: String
+    Default: 0.0.0.0/0
+  VPCId:
+    Description: Please provide a VPC to deploy the solution into.
+    Type: AWS::EC2::VPC::Id
+  PublicSubnet:
+    Description: Please provide the public subnet id to launch EC2 Instance
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet1:
+    Description: Please provide the first private subnet id to create Interface VPC Endpoint.
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet2:
+    Description: Please provide the second private subnet id to create Interface VPC Endpoint.
+    Type: AWS::EC2::Subnet::Id
+
+Resources:
+  ########### EC2 Client Instance ###########
+  ClientInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiID
+      InstanceType: !Ref InstanceType
+      SubnetId: !Ref PublicSubnet
+      KeyName: !Ref NewKeyPair
+      SecurityGroupIds: 
+        - !GetAtt ClientEC2SecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [!Ref InstanceType, "Client"]]
+        - Key: InstanceType
+          Value: !Ref InstanceType
+
+  ########### EC2 Key Pair ###########
+  NewKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Sub ${AWS::StackName}-${AWS::Region}-MyKeyPair
+
+  ########### API Gateway VPC Endpoint ###########
+  ApiGatewayVpcEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.execute-api"
+      VpcId: !Ref VPCId
+      SubnetIds: 
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref VpcEndpointSG
+
+  ########### Security Group for Client EC2 ###########
+  ClientEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH inbound traffic
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref AllowedIP
+
+  ########### Security Group for VPC Endpoint ###########
+  VpcEndpointSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for NLB and VPC endpoint
+      VpcId: !Ref VPCId
+
+  ########### Self-Allow Rule for VPC Endpoint Security Group ###########
+  VpcEndpointSGingressSelfAllow:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref VpcEndpointSG
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt VpcEndpointSG.GroupId
+
+  ########### Allow Client EC2 to Access VPC Endpoint ###########
+  VpcEndpointSGingressEC2Client:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref VpcEndpointSG
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt ClientEC2SecurityGroup.GroupId
+
+Outputs:
+  ########### Outputs ###########
+  VPCEndpointID:
+    Value: !Ref ApiGatewayVpcEndpoint
+    Description: The ID of the VPC endpoint for API Gateway
+  EC2KeyPairName:
+    Value: !Ref NewKeyPair
+    Description: Name of Newly created EC2 Key Pair, that you can use to SSH into the EC2 Instance
+  EC2PublicIP:
+  Value: !GetAtt ClientInstance.PublicIp
+  Description: Public IP address of the EC2 instance.
