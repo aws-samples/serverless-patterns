@@ -1,5 +1,5 @@
+use aws_lambda_events::s3::S3Entity;
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
-use serde::{Deserialize, Serialize};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -12,7 +12,7 @@ async fn main() -> Result<(), Error> {
     let config = aws_config::load_from_env().await;
     let s3_client = aws_sdk_s3::Client::new(&config);
 
-    run(service_fn(|event: LambdaEvent<S3Event>| {
+    run(service_fn(|event: LambdaEvent<S3Entity>| {
         function_handler(&s3_client, event)
     }))
     .await
@@ -20,14 +20,27 @@ async fn main() -> Result<(), Error> {
 
 pub async fn function_handler(
     client: &aws_sdk_s3::Client,
-    event: LambdaEvent<S3Event>,
+    event: LambdaEvent<S3Entity>,
 ) -> Result<(), Error> {
     println!("{:?}", event);
 
+    let bucket_name = event
+        .payload
+        .bucket
+        .name
+        .as_ref()
+        .ok_or("Bucket name is missing")?;
+    let object_key = event
+        .payload
+        .object
+        .key
+        .as_ref()
+        .ok_or("Object key is missing")?;
+
     let resp = client
         .get_object()
-        .bucket(event.payload.bucket.name)
-        .key(event.payload.object.key)
+        .bucket(bucket_name)
+        .key(object_key)
         .send()
         .await?;
 
@@ -35,22 +48,4 @@ pub async fn function_handler(
     println!("data: {:?}", data.unwrap().into_bytes());
 
     Ok(())
-}
-
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct S3Event {
-    pub bucket: S3Bucket,
-    pub object: S3Object,
-    pub reason: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct S3Bucket {
-    pub name: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct S3Object {
-    pub key: String,
-    pub size: i64,
 }

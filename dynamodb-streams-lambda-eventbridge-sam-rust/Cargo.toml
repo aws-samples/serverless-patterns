@@ -13,9 +13,9 @@ aws_lambda_events = { version = "0.15", default-features = false, features = ["d
 aws-types = "1"
 aws-config = {version = "1", features = ["behavior-version-latest"] }
 aws-sdk-eventbridge = "1"
-lambda_runtime = "0.11"
+lambda_runtime = "0.13"
 serde_json = "1"
-serde = {version = "1.0", features = ["derive"] }
+serde = {version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["macros"] }
 tracing-subscriber = { version = "0.3", features = ["fmt", "json"] }
-typed-builder = "0.18"
+typed-builder = "0.20.0"
