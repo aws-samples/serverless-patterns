@@ -1,0 +1,57 @@
+{
+  "title": "Amazon S3 to AWS Lambda with Amazon SQS queue",
+  "description": "Create a Lambda function that is triggered for every jpg image file uploaded to S3 via an SQS queue.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "Lambda function triggered for every image file stored to S3 via SQS",
+    "text": [
+        "The terraform manifest deploys a Lambda function, an SQS queue, one S3 bucket and the IAM resources required to run the application.",
+        "An SQS queue consumes ObjectCreated events from an Amazon S3 bucket if the file has .jpg extension. The SQS triggers a Lambda function.",
+        "The Lambda function serve as a pre-configured template, providing a starting point for developing your application."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-sqs-lambda-terraform",
+      "templateURL": "serverless-patterns/s3-sqs-lambda-terraform",
+      "projectFolder": "s3-sqs-lambda-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Configuring an Amazon SQS queue to trigger an AWS Lambda function",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-lambda-function-trigger.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>terraform destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Oriol Matavacas",
+      "image": "",
+      "bio": "Oriol Matavacas is a Sr. Solutions Architect at AWS based in Barcelona. Oriol primarily supporting customers on the journey to the Cloud. He enjoys building new solutions with scalability, availability and easy to maintain by using serverless.",
+      "linkedin": "oriol-matavacas-rodriguez-b165868a",
+      "twitter": ""
+    }
+  ]
+}
+
