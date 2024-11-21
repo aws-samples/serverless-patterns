@@ -1,0 +1,229 @@
+{
+  "version": "0",
+  "id": "f1420bc9-aca1-dc6b-7cb1-65bbdbd96e89",
+  "detail-type": "PagerDuty Webhook",
+  "source": "aws.partner/pagerduty.com/example-example",
+  "account": "999999999999",
+  "time": "2019-07-12T23:30:39Z",
+  "region": "us-west-1",
+  "resources": [
+    "pagerduty"
+  ],
+  "detail": {
+    "event": "incident.acknowledge",
+    "log_entries": [
+      {
+        "id": "R01VZ6VKNDJ0CJHSW30OHVHMQV",
+        "type": "acknowledge_log_entry",
+        "summary": "Acknowledged by Pagey the Pager",
+        "self": "https://api.pagerduty.com/log_entries/R01VZ6VKNDJ0CJHSW30OHVHMQV",
+        "html_url": null,
+        "created_at": "2019-07-12T23:30:33Z",
+        "agent": {
+          "id": "PHLAIIG",
+          "type": "user_reference",
+          "summary": "Pagey the Pager",
+          "self": "https://api.pagerduty.com/users/PHLAIIG",
+          "html_url": "https://example.pagerduty.com/users/PHLAIIG"
+        },
+        "channel": {
+          "type": "website",
+          "details_omitted": false
+        },
+        "service": {
+          "id": "P6MZ15N",
+          "type": "service_reference",
+          "summary": "pd sandbox eventbridge",
+          "self": "https://api.pagerduty.com/services/P6MZ15N",
+          "html_url": "https://example.pagerduty.com/services/P6MZ15N"
+        },
+        "incident": {
+          "id": "P8E12U3",
+          "type": "incident_reference",
+          "summary": "[#2618] Taco Shells",
+          "self": "https://api.pagerduty.com/incidents/P8E12U3",
+          "html_url": "https://example.pagerduty.com/incidents/P8E12U3"
+        },
+        "teams": [],
+        "contexts": [],
+        "acknowledgement_timeout": 600,
+        "event_details": {}
+      }
+    ],
+    "webhook": {
+      "endpoint_url": null,
+      "name": "eventbridge-999999999999-us-west-1-example",
+      "description": null,
+      "webhook_object": {
+        "id": "P6MZ15N",
+        "type": "service_reference",
+        "summary": "pd sandbox eventbridge",
+        "self": "https://api.pagerduty.com/services/P6MZ15N",
+        "html_url": "https://example.pagerduty.com/services/P6MZ15N"
+      },
+      "config": {},
+      "outbound_integration": {
+        "id": "PF8FPF1",
+        "type": "outbound_integration_reference",
+        "summary": "Amazon EventBridge",
+        "self": "https://api.pagerduty.com/outbound_integrations/PF8FPF1",
+        "html_url": null
+      },
+      "accounts_addon": {
+        "id": "PH4YM53",
+        "addon_id": "PXFR4L8",
+        "name": "Amazon EventBridge",
+        "version": "0.0.1",
+        "location": "extension",
+        "key": "com.pagerduty.amazon_bridge",
+        "url": "https://{pagerduty}/integration-eventbridge-ui?accountsAddonId={accountsAddon.id}",
+        "description": "Deliver webhooks to Amazon EventBridge",
+        "help_url": "",
+        "config": {},
+        "type": "accounts_addon",
+        "summary": "Amazon EventBridge",
+        "self": "https://api.pagerduty.com/accounts_addons/PH4YM53",
+        "html_url": "https://example.pagerduty.com/accounts_addons/PH4YM53"
+      },
+      "id": "P7X0R2I",
+      "type": "webhook",
+      "summary": "eventbridge-999999999999-us-west-1-example",
+      "self": "https://api.pagerduty.com/webhooks/P7X0R2I",
+      "html_url": null
+    },
+    "incident": {
+      "incident_number": 2618,
+      "title": "Taco Shells",
+      "description": "Taco Shells",
+      "created_at": "2019-07-12T23:26:41Z",
+      "status": "acknowledged",
+      "incident_key": "4338c648a3614c0ea46b534344f73b10",
+      "service": {
+        "id": "P6MZ15N",
+        "name": "example eventbridge",
+        "description": null,
+        "created_at": "2019-07-12T15:36:28Z",
+        "status": "critical",
+        "teams": [],
+        "alert_creation": "create_alerts_and_incidents",
+        "addons": [],
+        "scheduled_actions": [],
+        "support_hours": null,
+        "last_incident_timestamp": "2019-07-12T23:26:41Z",
+        "escalation_policy": {
+          "id": "PYIM1C5",
+          "type": "escalation_policy_reference",
+          "summary": "Default",
+          "self": "https://api.pagerduty.com/escalation_policies/PYIM1C5",
+          "html_url": "https://example.pagerduty.com/escalation_policies/PYIM1C5"
+        },
+        "incident_urgency_rule": {
+          "type": "constant",
+          "urgency": "high"
+        },
+        "acknowledgement_timeout": 600,
+        "auto_resolve_timeout": null,
+        "alert_grouping": null,
+        "alert_grouping_timeout": null,
+        "integrations": [],
+        "metadata": {
+          "conference_number": "",
+          "conference_url": ""
+        },
+        "response_play": null,
+        "type": "service",
+        "summary": "example eventbridge",
+        "self": "https://api.pagerduty.com/services/P6MZ15N",
+        "html_url": "https://example.pagerduty.com/services/P6MZ15N"
+      },
+      "assignments": [
+        {
+          "at": "2019-07-12T23:30:33Z",
+          "assignee": {
+            "id": "PHLAIIG",
+            "type": "user_reference",
+            "summary": "Pagey the Pager",
+            "self": "https://api.pagerduty.com/users/PHLAIIG",
+            "html_url": "https://example.pagerduty.com/users/PHLAIIG"
+          }
+        }
+      ],
+      "last_status_change_at": "2019-07-12T23:30:33Z",
+      "first_trigger_log_entry": {
+        "id": "RNNXHZY9ZKI3FQIGVSIL4UO9Q3",
+        "type": "trigger_log_entry_reference",
+        "summary": "Triggered through the website",
+        "self": "https://api.pagerduty.com/log_entries/RNNXHZY9ZKI3FQIGVSIL4UO9Q3",
+        "html_url": "https://example.pagerduty.com/incidents/P8E12U3/log_entries/RNNXHZY9ZKI3FQIGVSIL4UO9Q3"
+      },
+      "alert_counts": {
+        "all": 0,
+        "triggered": 0,
+        "resolved": 0
+      },
+      "is_mergeable": true,
+      "escalation_policy": {
+        "id": "PYIM1C5",
+        "type": "escalation_policy_reference",
+        "summary": "Default",
+        "self": "https://api.pagerduty.com/escalation_policies/PYIM1C5",
+        "html_url": "https://example.pagerduty.com/escalation_policies/PYIM1C5"
+      },
+      "teams": [],
+      "impacted_services": [
+        {
+          "id": "P6MZ15N",
+          "type": "service_reference",
+          "summary": "pd sandbox eventbridge",
+          "self": "https://api.pagerduty.com/services/P6MZ15N",
+          "html_url": "https://example.pagerduty.com/services/P6MZ15N"
+        }
+      ],
+      "pending_actions": [
+        {
+          "type": "unacknowledge",
+          "at": "2019-07-12T23:40:33Z"
+        }
+      ],
+      "acknowledgements": [
+        {
+          "at": "2019-07-12T23:30:33Z",
+          "acknowledger": {
+            "id": "PHLAIIG",
+            "type": "user_reference",
+            "summary": "Pagey the Pager",
+            "self": "https://api.pagerduty.com/users/PHLAIIG",
+            "html_url": "https://example.pagerduty.com/users/PHLAIIG"
+          }
+        }
+      ],
+      "basic_alert_grouping": null,
+      "alert_grouping": null,
+      "last_status_change_by": {
+        "id": "PHLAIIG",
+        "type": "user_reference",
+        "summary": "Pagey the Pager",
+        "self": "https://api.pagerduty.com/users/PHLAIIG",
+        "html_url": "https://example.pagerduty.com/users/PHLAIIG"
+      },
+      "metadata": {},
+      "external_references": [],
+      "priority": null,
+      "incidents_responders": [],
+      "responder_requests": [],
+      "subscriber_requests": [],
+      "urgency": "high",
+      "id": "P8E12U3",
+      "type": "incident",
+      "summary": "[#2618] Taco Shells",
+      "self": "https://api.pagerduty.com/incidents/P8E12U3",
+      "html_url": "https://example.pagerduty.com/incidents/P8E12U3",
+      "alerts": []
+    },
+    "id": "0c282730-a4fd-11e9-8326-0a5ff7c88466",
+    "created_on": "2019-07-12T23:30:33Z",
+    "account_features": {
+      "response_automation": true
+    }
+  }
+}
