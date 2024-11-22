@@ -42,7 +42,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
       - Key: Name
-        Value: !Sub ${AWS::StackName}-VPC
+        Value: !Sub ${AWS::StackName}
 
   # ########### Public Subnet ###########
   PublicSubnet:

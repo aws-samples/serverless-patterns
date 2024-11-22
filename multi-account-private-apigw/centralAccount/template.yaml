@@ -1,22 +1,36 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  centralAccount
-  Sample SAM Template for central Account containing Private API Gateway, VPC link, Network Load Balancer and execute-api VPC Endpoint.
+  SAM Template for central Account containing Private API Gateway, VPC link, Network Load Balancer and execute-api VPC Endpoint.
 
 Parameters:
+  InstanceType:
+    Description: Enter t2.micro or t2.small. Default is t2.micro.
+    Type: String
+    AllowedValues:
+      - t2.micro
+      - t2.small
+    Default: t2.micro
+    ConstraintDescription: Must be either t2.micro or t2.small.
+  AmiID:
+    Description: Please provide a valid AMI id to launch EC2 Instance.
+    Type: AWS::EC2::Image::Id
+  AllowedIP:
+    Description: CIDR block to allow SSH access (e.g., 203.0.113.0/24).
+    Type: String
+    Default: 0.0.0.0/0
   VPCId:
     Description: Please provide a VPC to deploy the solution into.
     Type: AWS::EC2::VPC::Id
+  PublicSubnet:
+    Description: Please provide the public subnet id to launch EC2 Instance
+    Type: AWS::EC2::Subnet::Id
   PrivateSubnet1:
     Description: Please provide the first private subnet id with outbound connectivity within the VPC you selected above.
     Type: AWS::EC2::Subnet::Id
   PrivateSubnet2:
     Description: Please provide the second private subnet id with outbound connectivity within the VPC you selected above.
     Type: AWS::EC2::Subnet::Id
-  AccountAVpcEndpoint:
-    Type: String
-    Description: The ID of the VPC Endpoint you want to use from Account A
   AccountBApiGwURL:
     Type: String
     Description: The API GW URL from Account B including path
@@ -25,8 +39,43 @@ Parameters:
     Description: The API GW URL from Account B including path
 
 Resources:
+  ########### EC2 Client Instance ###########
+  ClientInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiID
+      InstanceType: !Ref InstanceType
+      SubnetId: !Ref PublicSubnet
+      KeyName: !Ref NewKeyPair
+      SecurityGroupIds: 
+        - !GetAtt ClientEC2SecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [!Ref InstanceType, "Client"]]
+        - Key: InstanceType
+          Value: !Ref InstanceType
+  
+  ########### EC2 Key Pair ###########
+  NewKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Sub ${AWS::StackName}-${AWS::Region}-MyKeyPair
+
+  ########### Security Group for Client EC2 ###########
+  ClientEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH inbound traffic
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref AllowedIP
+  
   ########### API Gateway REST API ###############
   MyApi:
+    DependsOn: ApiGatewayVpcLink
     Type: AWS::Serverless::Api
     Properties:
       EndpointConfiguration: PRIVATE
@@ -42,9 +91,9 @@ Resources:
         servers:
         - x-amazon-apigateway-endpoint-configuration:
             vpcEndpointIds:
-            - !Ref AccountAVpcEndpoint
+            - !Ref ExecuteApiVpcEndpoint
         paths:
-          /text:
+          /fargate:
             get:
               responses:
                 "200":
@@ -59,14 +108,14 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
-          /image:
-            post:
+          /lambda:
+            get:
               responses:
                 "200":
                   description: "200 response"
               x-amazon-apigateway-integration:
                 connectionId: !Ref ApiGatewayVpcLink
-                httpMethod: "POST"
+                httpMethod: "GET"
                 uri: !Ref AccountCApiGwURL
                 connectionType: "VPC_LINK"
                 passthroughBehavior: "when_no_templates"
@@ -84,7 +133,7 @@ Resources:
             Condition:
               StringEquals:
                 aws:sourceVpce: 
-                - !Ref AccountAVpcEndpoint
+                - !Ref ExecuteApiVpcEndpoint
 
   ########### API Gateway VPC Link ###############
   ApiGatewayVpcLink:
@@ -151,6 +200,9 @@ Resources:
     Properties:
       GroupDescription: Security Group for NLB and VPC endpoint
       VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          SourceSecurityGroupId: !GetAtt ClientEC2SecurityGroup.GroupId
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
@@ -198,8 +250,14 @@ Resources:
 
 Outputs:
   ApiUrlForECS:
-    Description: "API Gateway Invoke URL with GET method for ECS Fargate integration"
-    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${MyApi.Stage}/text"
+    Description: API Gateway Invoke URL with GET method for ECS Fargate integration
+    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${MyApi.Stage}/fargate
   ApiUrlForLambda:
-    Description: "API Gateway Invoke URL with POST method for Lambda function integration"
-    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${MyApi.Stage}/image"
+    Description: API Gateway Invoke URL with GET method for Lambda function integration
+    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${MyApi.Stage}/lambda
+  EC2KeyPairName:
+    Value: !Ref NewKeyPair
+    Description: Name of Newly created EC2 Key Pair, that you can use to SSH into the EC2 Instance
+  EC2PublicIP:
+    Value: !GetAtt ClientInstance.PublicIp
+    Description: Public IP address of the EC2 instance.

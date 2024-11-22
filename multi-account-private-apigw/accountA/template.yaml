@@ -1,123 +1,177 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  accountA
-  Sample SAM Template for accountA containing EC2 Instance and execute-api VPC Endpoint
+  SAM Template for accountA containing Private API Gateway, VPC Link, Network Load Balancer, and ECS Cluster with Fargate. 
 
 Parameters:
-  ########### Parameters for EC2 Instance and Network ###########
-  InstanceType:
-    Description: Enter t2.micro or t2.small. Default is t2.micro.
-    Type: String
-    AllowedValues:
-      - t2.micro
-      - t2.small
-    Default: t2.micro
-    ConstraintDescription: Must be either t2.micro or t2.small.
-  AmiID:
-    Description: Please provide a valid AMI id to launch EC2 Instance.
-    Type: AWS::EC2::Image::Id
-  AllowedIP:
-    Description: CIDR block to allow SSH access (e.g., 203.0.113.0/24).
-    Type: String
-    Default: 0.0.0.0/0
+  ########### Parameters ###########
   VPCId:
-    Description: Please provide a VPC to deploy the solution into.
     Type: AWS::EC2::VPC::Id
-  PublicSubnet:
-    Description: Please provide the public subnet id to launch EC2 Instance
-    Type: AWS::EC2::Subnet::Id
+    Description: The VPC ID where the ECS service will be deployed.
   PrivateSubnet1:
-    Description: Please provide the first private subnet id to create Interface VPC Endpoint.
     Type: AWS::EC2::Subnet::Id
+    Description: The first private subnet ID within the VPC.
   PrivateSubnet2:
-    Description: Please provide the second private subnet id to create Interface VPC Endpoint.
     Type: AWS::EC2::Subnet::Id
+    Description: The second private subnet ID within the VPC.
+  CentralAccountVpcID:
+    Type: String
+    Description: The ID of the VPC from the Central Account
 
 Resources:
-  ########### EC2 Client Instance ###########
-  ClientInstance:
-    Type: AWS::EC2::Instance
+  ########### Private API Gateway ###########
+  PrivateApi:
+    Type: AWS::Serverless::Api
     Properties:
-      ImageId: !Ref AmiID
-      InstanceType: !Ref InstanceType
-      SubnetId: !Ref PublicSubnet
-      KeyName: !Ref NewKeyPair
-      SecurityGroupIds: 
-        - !GetAtt ClientEC2SecurityGroup.GroupId
-      Tags:
-        - Key: Name
-          Value: !Join ['-', [!Ref InstanceType, "Client"]]
-        - Key: InstanceType
-          Value: !Ref InstanceType
+      EndpointConfiguration: PRIVATE
+      StageName: Prod
+      AlwaysDeploy: true
+      DefinitionBody:
+        openapi: "3.0.1"
+        info:
+          title: !Sub "PrivateApi-${AWS::StackName}"
+          version: "1.0"
+        paths:
+          /:
+            get:
+              responses:
+                "200":
+                  description: "200 response"
+              x-amazon-apigateway-integration:
+                connectionId: !Ref ApiGatewayVpcLink
+                httpMethod: GET
+                uri: !Sub http://${NLB.DNSName}/
+                connectionType: VPC_LINK
+                passthroughBehavior: when_no_match
+                type: http_proxy
+        x-amazon-apigateway-policy:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Principal: "*"
+            Action: "execute-api:Invoke"
+            Resource: "execute-api:/*"
+            Condition:
+              StringEquals:
+                aws:sourceVpc: !Ref CentralAccountVpcID
 
-  ########### EC2 Key Pair ###########
-  NewKeyPair:
-    Type: AWS::EC2::KeyPair
+  ########### API Gateway VPC Link ###########
+  ApiGatewayVpcLink:
+    Type: AWS::ApiGateway::VpcLink
     Properties:
-      KeyName: !Sub ${AWS::StackName}-${AWS::Region}-MyKeyPair
+      Name: !Sub VPCLinkRestNlbInternal-${AWS::StackName}
+      TargetArns:
+        - !Ref NLB
 
-  ########### API Gateway VPC Endpoint ###########
-  ApiGatewayVpcEndpoint:
-    Type: AWS::EC2::VPCEndpoint
+  ########### Network Load Balancer (NLB) ###########
+  NLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      ServiceName: !Sub "com.amazonaws.${AWS::Region}.execute-api"
+      Name: !Sub PrivateNLB-${AWS::StackName}
+      Scheme: internal
+      Subnets:
+        - Ref: PrivateSubnet1
+        - Ref: PrivateSubnet2
+      Type: network
+      EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic: "off"
+      SecurityGroups:
+        - !Ref NLBSecurityGroup
+
+  ########### NLB Listener ###########
+  NLBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref NLBTG
+      LoadBalancerArn: !Ref NLB
+      Port: 80
+      Protocol: TCP
+
+  ########### NLB Target Group ###########
+  NLBTG:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub FargateNLB-TG-${AWS::StackName}
+      Port: 80
+      Protocol: TCP
       VpcId: !Ref VPCId
-      SubnetIds: 
-        - !Ref PrivateSubnet1
-        - !Ref PrivateSubnet2
-      VpcEndpointType: Interface
-      PrivateDnsEnabled: true
-      SecurityGroupIds:
-        - !Ref VpcEndpointSG
+      TargetType: ip
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: '80'
+      HealthCheckPath: '/'
+      Matcher:
+        HttpCode: 200
 
-  ########### Security Group for Client EC2 ###########
-  ClientEC2SecurityGroup:
+  ########### ECS Cluster ###########
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub FargateCluster-${AWS::StackName}
+
+  ########### ECS Fargate Task Definition ###########
+  ECSFargateTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: FargateTask
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ContainerDefinitions:
+        - Name: nginx
+          Image: public.ecr.aws/nginx/nginx:latest
+          Essential: true
+          PortMappings:
+            - ContainerPort: 80
+              Protocol: tcp
+
+  ########### ECS Fargate Service ###########
+  ECSFargateService:
+    Type: AWS::ECS::Service
+    DependsOn: NLBListener
+    Properties:
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref ECSFargateTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - Ref: PrivateSubnet1
+            - Ref: PrivateSubnet2
+          SecurityGroups:
+            - !Ref ECSSecurityGroup
+      LoadBalancers:
+        - ContainerName: nginx
+          ContainerPort: 80
+          TargetGroupArn: !Ref NLBTG
+
+  ########### ECS Security Group ###########
+  ECSSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow SSH inbound traffic
+      GroupDescription: Security group for ECS Fargate Service
       VpcId: !Ref VPCId
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: !Ref AllowedIP
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref NLBSecurityGroup
 
-  ########### Security Group for VPC Endpoint ###########
-  VpcEndpointSG:
+  ########### NLB Security Group ###########
+  NLBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security Group for NLB and VPC endpoint
+      GroupDescription: Security group for the NLB
       VpcId: !Ref VPCId
-
-  ########### Self-Allow Rule for VPC Endpoint Security Group ###########
-  VpcEndpointSGingressSelfAllow:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref VpcEndpointSG
-      IpProtocol: tcp
-      FromPort: 0
-      ToPort: 65535
-      SourceSecurityGroupId: !GetAtt VpcEndpointSG.GroupId
-
-  ########### Allow Client EC2 to Access VPC Endpoint ###########
-  VpcEndpointSGingressEC2Client:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref VpcEndpointSG
-      IpProtocol: tcp
-      FromPort: 0
-      ToPort: 65535
-      SourceSecurityGroupId: !GetAtt ClientEC2SecurityGroup.GroupId
 
 Outputs:
   ########### Outputs ###########
-  VPCEndpointID:
-    Value: !Ref ApiGatewayVpcEndpoint
-    Description: The ID of the VPC endpoint for API Gateway
-  EC2KeyPairName:
-    Value: !Ref NewKeyPair
-    Description: Name of Newly created EC2 Key Pair, that you can use to SSH into the EC2 Instance
-  EC2PublicIP:
-  Value: !GetAtt ClientInstance.PublicIp
-  Description: Public IP address of the EC2 instance.
+  ApiUrl:
+    Description: "API Gateway Invoke URL"
+    Value: !Sub "https://${PrivateApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
+ 
