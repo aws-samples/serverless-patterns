@@ -9,7 +9,7 @@ name = "handler"
 path = "src/bin/handler.rs"
 
 [dependencies]
-aws_lambda_events = { version = "0.7", default-features = false, features = ["cloudwatch_events"] }
-lambda_runtime = "0.11"
+aws_lambda_events = { version = "0.15", default-features = false, features = ["cloudwatch_events"] }
+lambda_runtime = "0.13"
 tokio = { version = "1", features = ["macros"] }
 tracing-subscriber = { version = "0.3", features = ["fmt", "json"] }
