@@ -50,7 +50,7 @@ Resources:
   LambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub Bedrock-Lambda-${AWS::StackName}
+      FunctionName: !Sub Lambda-${AWS::StackName}
       Handler: index.lambda_handler
       Runtime: python3.13
       InlineCode: |
