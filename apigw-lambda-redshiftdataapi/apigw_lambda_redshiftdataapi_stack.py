@@ -89,45 +89,61 @@ class ApigwRedshiftDataApi(Stack):
             self,
             "RedshiftApiLambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
-            handler="redshiftapi.lambda_handler",
+            handler="index.lambda_handler",
             code=_lambda.InlineCode(
                 """
-                import json
-                import boto3
-                import os
-                from botocore.exceptions import ClientError
+import json
+import boto3
+import time
+import os
+from botocore.exceptions import ClientError
 
-                def lambda_handler(event, context):
-                    redshift_workgroup = os.environ['REDSHIFT_WORKGROUP']
-                    redshift_database = os.environ['REDSHIFT_DATABASE']
-                    sql_query = "SELECT * FROM tickit.users LIMIT 10;"
+def lambda_handler(event, context):
+    redshift_workgroup = os.environ['REDSHIFT_WORKGROUP']
+    redshift_database = os.environ['REDSHIFT_DATABASE']
+    sql_query = "SELECT * FROM tickit.users LIMIT 10;"
 
-                    client = boto3.client("redshift-data")
-                    
-                    try:
-                        response = client.execute_statement(
-                            WorkgroupName=redshift_workgroup,
-                            Database=redshift_database,
-                            Sql=sql_query
-                        )
-                        query_id = response["Id"]
-                        
-                        result = client.get_statement_result(Id=query_id)
-
-                        columns = [col["name"] for col in result["ColumnMetadata"]]
-                        rows = result["Records"]
-                        results = [
-                            dict(zip(columns, [list(value.values())[0] for value in row]))
-                            for row in rows
-                        ]
-
-                        return {"statusCode": 200, "body": json.dumps(results)}
-                    
-                    except ClientError as e:
-                        error_message = e.response['Error']['Message']
-                        return {"statusCode": 500, "body": json.dumps({"error": error_message})}
-                    except Exception as e:
-                        return {"statusCode": 500, "body": json.dumps({"error": str(e)})}
+    client = boto3.client("redshift-data")
+    
+    try:
+        # Execute the query
+        response = client.execute_statement(
+            WorkgroupName=redshift_workgroup,
+            Database=redshift_database,
+            Sql=sql_query
+        )
+        query_id = response["Id"]
+        
+        # Wait for the query to complete
+        while True:
+            status_response = client.describe_statement(Id=query_id)
+            status = status_response['Status']
+            
+            if status == 'FINISHED':
+                # Query completed successfully
+                result = client.get_statement_result(Id=query_id)
+                columns = [col["name"] for col in result["ColumnMetadata"]]
+                rows = result["Records"]
+                results = [
+                    dict(zip(columns, [list(value.values())[0] for value in row]))
+                    for row in rows
+                ]
+                return {"statusCode": 200, "body": json.dumps(results)}
+            elif status == 'FAILED':
+                # Query failed
+                error = status_response.get('Error', 'Unknown error')
+                return {"statusCode": 500, "body": json.dumps({"error": error})}
+            elif status == 'ABORTED':
+                return {"statusCode": 500, "body": json.dumps({"error": "Query was aborted"})}
+            
+            # Add a small delay before checking again
+            time.sleep(0.5)
+    
+    except ClientError as e:
+        error_message = e.response['Error']['Message']
+        return {"statusCode": 500, "body": json.dumps({"error": error_message})}
+    except Exception as e:
+        return {"statusCode": 500, "body": json.dumps({"error": str(e)})}
                 """
             ),
             timeout=Duration.seconds(29),
