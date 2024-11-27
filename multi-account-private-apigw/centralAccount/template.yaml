@@ -147,6 +147,8 @@ Resources:
   MyNLB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      Name: !Sub PrivateNLB-${AWS::StackName}
+      Scheme: internal
       Type: network
       Subnets:
         - !Ref PrivateSubnet1
