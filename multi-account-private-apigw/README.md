@@ -90,7 +90,7 @@ Once you have run `sam deploy --guided --profile PROFILE_NAME` mode once and sav
 2. During the prompts:
     -  Enter **stack name** and desired **AWS Region**.
     -  Enter **Instance type** either `t2.micro` or `t2.small`
-    -  Enter **unique [AMI Id](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)** from chosen region.
+    -  Enter **unique [Amazon Linux 2023 AMI Id](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)** from AMI Catalog in the chosen region.
     -  Enter **Allowed IP** from where you can SSH into the EC2 Instance. If left empty, the default CIDR range will be **0.0.0.0/0**
     -  Enter **current account's VPC ID** where NLB and VPC Endpoint will be created.
     -  Enter **Public Subnet ID**.
@@ -103,7 +103,7 @@ Once you have run `sam deploy --guided --profile PROFILE_NAME` mode once and sav
 
 ## How it works
 
-This pattern utilizes four accounts and their respective templates. 
+This pattern utilizes three accounts and their respective templates. 
 
 2. **Central API Account** : Hosts the central components required to manage and route API requests securely across multiple AWS accounts. This template contains:
 
@@ -132,24 +132,20 @@ This pattern utilizes four accounts and their respective templates.
 ## Testing
 1. Once you have deployed all the Stacks, [connect to your EC2 instance using SSH](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-to-linux-instance.html) or [using EC2 Instance Connect](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-eic.html) in **Central Account**.
 
-2. After connecting to the EC2 instance, run the following `curl` command from the outputs to test the **/text** path (you can add `-v` flag for verbose response):
+2. After connecting to the EC2 instance, run the following `curl` command to test the **/fargate** and **/lambda** path (*replace the URL with your own API GW URL*):
     ```bash
-    curl --location 'https://abcdefghij.execute-api.eu-west-1.amazonaws.com/Prod/text'
+    curl --location 'https://abcdefghij.execute-api.eu-west-1.amazonaws.com/Prod/fargate'
+    
+    curl --location 'https://abcdefghij.execute-api.eu-west-1.amazonaws.com/Prod/lambda'
     ```
-3. For **/image** path, use the following curl command (*you can update the prompt and image name as needed*):
-    ```bash
-    curl --location --request POST 'https://abcdefghij.execute-api.eu-west-1.amazonaws.com/Prod/image' \
-    --data 'A bustling futuristic city at night with neon signs, towering skyscrapers, flying vehicles, and busy street life, in the rain. Detailed and atmospheric.' --output image.jpg
-    ```
-
 
 ## Cleanup
 
-To avoid incurring future charges, it's important to delete the resources in the correcct order. Follow these steps to clean up the resources created by the four templates *(Make sure to navigate to the correct directory before running the below commands)*:
+To avoid incurring future charges, it's important to delete the resources in the correcct order. Follow these steps to clean up the resources created by the four templates *(Make sure to navigate to the directory containing the template before running the below commands)*:
 
 1. Delete Account A template 
     ```bash
-    sam delete --stack-name STACK_NAME_ACCOUNT_A --profile accountA
+    sam delete --stack-name STACK_NAME --profile PROFILE_NAME
     ```
 2. Delete Account B template 
     ```bash
