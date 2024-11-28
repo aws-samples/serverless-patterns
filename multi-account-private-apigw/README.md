@@ -14,7 +14,7 @@ Important: This application uses various AWS Services and there are costs associ
 
 ### Requirements
 
-- Three [AWS accounts](https://signin.aws.amazon.com/signup?request_type=register). IAM users with sufficient permissions to make necessary AWS service calls and manage AWS resources.
+- Three [AWS accounts](https://signin.aws.amazon.com/signup?request_type=register). IAM users or roles with sufficient permissions to make the necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed and configured.
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)  (AWS SAM) installed.
 - Setup .aws/credentials [named profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) namely **centralAccount**, **accountA** and **accountB** so you can run CLI and AWS SAM commands against them.
