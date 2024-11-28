@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM template to demonstrate alerting with CloudWatch Subscription Filter
+
+Parameters:
+  EmailAddress:
+    Type: String
+    Description: Email address to receive notifications
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  # SNS Topic for notifications
+  NotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: TaskTimedOutNotification
+  # SNS Topic Subscription for Email Notifications
+
+  EmailSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !Ref EmailAddress
+      Protocol: email
+      TopicArn: !Ref NotificationTopic
+
+  # Sample Lambda function
+  SampleLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python3.13
+      CodeUri: sample-lambda/
+
+  # creating loggroup first
+  SampleLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      LogGroupName: !Join [ "", [ "/aws/lambda/", !Ref SampleLambda] ]
+      RetentionInDays: 30
+
+  # Notification Lambda function
+  NotificationLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python3.13
+      CodeUri: notification-lambda/
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref NotificationTopic
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt NotificationTopic.TopicName
+
+  #Gives permissions to the Log Group to invoke the second Lambda Function 
+  CloudWatchSubscriptionFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt NotificationLambda.Arn
+      Action: 'lambda:InvokeFunction'
+      Principal: 'logs.amazonaws.com'
+      SourceArn: !GetAtt SampleLambdaLogGroup.Arn
+
+  # CloudWatch Subscription Filter for "Task timed out" logs
+  TaskTimedOutSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Properties: 
+      DestinationArn: !GetAtt NotificationLambda.Arn
+      FilterName: Lambda
+      FilterPattern: "\"Status: timeout\""
+      LogGroupName: !Ref SampleLambdaLogGroup
+    DependsOn: CloudWatchSubscriptionFunctionPermission
+
+
+Outputs:
+  SampleLambdaArn:
+    Description: ARN of the Sample Lambda function
+    Value: !GetAtt SampleLambda.Arn
+  NotificationLambdaArn:
+    Description: ARN of the Notification Lambda function
+    Value: !GetAtt NotificationLambda.Arn
+  NotificationTopicArn:
+    Description: ARN of the SNS Topic for notifications
+    Value: !Ref NotificationTopic
