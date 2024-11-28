@@ -1,4 +1,4 @@
-# Enabling East/West Communication in Multi-Account AWS Architectures with Private API Gateway.
+# Enabling East/West Communication in Multi-Account AWS Architectures with Amazon Private API Gateway.
 
 ![Architecture Diagram](./images/architecture.png)
 
