@@ -1,6 +1,6 @@
 # AWS Lambda and Amazon Bedrock Response Streaming with Rust
 
-This CDK application demonstrates how to write a Lambda function, expose it as a function URL, use the Bedrock ConverseStream API to invoke the Anthropic Claude 3.5 Haiku model, and then stream a response back to the client using chunked transfer encoding. Written in Rust, it showcases how to efficiently stream responses from Amazon Bedrock to a client. The example serves as a practical illustration of implementing real-time, serverless communication between Bedrock's GenAI capabilities and a client application.
+This CDK application demonstrates how to write a Lambda function, expose it as a function URL, use the Bedrock ConverseStream API to invoke the Anthropic Claude 3 Haiku model, and then stream a response back to the client using chunked transfer encoding. Written in Rust, it showcases how to efficiently stream responses from Amazon Bedrock to a client. The example serves as a practical illustration of implementing real-time, serverless communication between Bedrock's GenAI capabilities and a client application.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

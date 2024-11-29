@@ -1,5 +1,5 @@
 {
-  "title": "# AWS Lambda and Amazon Bedrock Response Streaming with Rust",
+  "title": "AWS Lambda and Amazon Bedrock Response Streaming with Rust",
   "description": "Create a Lambda function URL that streams a response from an Amazon Bedrock LLM.",
   "language": "Rust",
   "level": "200",
