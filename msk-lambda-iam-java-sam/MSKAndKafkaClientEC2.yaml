@@ -20,6 +20,9 @@ Parameters:
   KafkaTopicForLambda:
     Type: String
     Default: MskIamJavaLambdaTopic
+  ServerlessLandGithubLocation:
+    Type: String
+    Default: https://github.com/aws-samples/serverless-patterns/
 Conditions:
   CreateProvisionedCluster: !Equals 
     - !Ref EnvType
@@ -287,7 +290,7 @@ Resources:
           - |
             #!/bin/bash
             yum update -y
-            yum install java-1.8.0-openjdk-devel -y
+            yum install java-openjdk11-devel -y
             yum install nmap-ncat -y
             yum install git -y
             yum erase awscli -y
@@ -365,10 +368,23 @@ Resources:
             echo "source /home/ec2-user/.bash_profile" >> kafka_message_sender.sh
             echo "/home/ec2-user/kafka/bin/kafka-console-producer.sh --bootstrap-server \$BOOTSTRAP_BROKERS_IAM --producer.config /home/ec2-user/kafka/bin/client.properties --topic $KAFKA_TOPIC" >> kafka_message_sender.sh
             sudo chmod +x kafka_message_sender.sh
+            CLUSTER_NAME="$(echo $MSK_CLUSTER_ARN | cut -d '/' -f2)"
+            CLUSTER_ID="$(echo $MSK_CLUSTER_ARN | cut -d '/' -f3)"
+            echo "export CLUSTER_NAME=$CLUSTER_NAME" >> /home/ec2-user/.bash_profile
+            echo "export CLUSTER_ID=$CLUSTER_ID" >> /home/ec2-user/.bash_profile
+            ./kafka_topic_creator.sh > kafka_topic_creator_output.txt
             
             #Checkout Serverless Patterns from Github
             cd /home/ec2-user
-            git clone https://github.com/aws-samples/serverless-patterns/
+            SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
+            git clone $SERVERLESS_LAND_GITHUB_LOCATION
+            cd ./serverless-patterns/msk-lambda-iam-java-sam
+            cp template_original.yaml template.yaml
+            sudo chown -R ec2-user .
+            source /home/ec2-user/.bash_profile
+            sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
+            sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
+            sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -388,6 +404,7 @@ Resources:
             kafka_topic_for_lambda : !Ref KafkaTopicForLambda
             msk_kafka_version: !Ref MSKKafkaVersion
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
+            serverless_land_github_location: !Ref ServerlessLandGithubLocation
 
   KafkaClientEC2InstanceServerless:
     Condition: CreateServerlessCluster
@@ -418,7 +435,7 @@ Resources:
           - |
             #!/bin/bash
             yum update -y
-            yum install java-1.8.0-openjdk-devel -y
+            yum install java-openjdk11-devel -y
             yum install nmap-ncat -y
             yum install git -y
             yum erase awscli -y
@@ -496,10 +513,23 @@ Resources:
             echo "source /home/ec2-user/.bash_profile" >> kafka_message_sender.sh
             echo "/home/ec2-user/kafka/bin/kafka-console-producer.sh --bootstrap-server \$BOOTSTRAP_BROKERS_IAM --producer.config /home/ec2-user/kafka/bin/client.properties --topic $KAFKA_TOPIC" >> kafka_message_sender.sh
             sudo chmod +x kafka_message_sender.sh
+            CLUSTER_NAME="$(echo $MSK_CLUSTER_ARN | cut -d '/' -f2)"
+            CLUSTER_ID="$(echo $MSK_CLUSTER_ARN | cut -d '/' -f3)"
+            echo "export CLUSTER_NAME=$CLUSTER_NAME" >> /home/ec2-user/.bash_profile
+            echo "export CLUSTER_ID=$CLUSTER_ID" >> /home/ec2-user/.bash_profile
+            ./kafka_topic_creator.sh > kafka_topic_creator_output.txt
             
             #Checkout Serverless Patterns from Github
             cd /home/ec2-user
-            git clone https://github.com/aws-samples/serverless-patterns/
+            SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
+            git clone $SERVERLESS_LAND_GITHUB_LOCATION
+            cd ./serverless-patterns/msk-lambda-iam-java-sam
+            cp template_original.yaml template.yaml
+            sudo chown -R ec2-user .
+            source /home/ec2-user/.bash_profile
+            sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
+            sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
+            sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -519,6 +549,7 @@ Resources:
             kafka_topic_for_lambda : !Ref KafkaTopicForLambda
             msk_kafka_version: !Ref MSKKafkaVersion
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
+            serverless_land_github_location: !Ref ServerlessLandGithubLocation
 
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint
@@ -548,6 +579,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::aws:policy/AWSCertificateManagerPrivateCAFullAccess
         - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
       Policies:
         - PolicyName: MSKConfigurationAccess
           PolicyDocument: !Sub '{
@@ -904,11 +936,11 @@ Outputs:
     Value: !Ref 'AWS::StackName'
     Export:
       Name: !Sub "${AWS::StackName}-VPCStackName"
-  ProvisionedMSKArn:
+  MSKArn:
     Description: Provisioned MSK Cluster ARN. 
     Value: !Ref MSKCluster
     Export:
-      Name: !Sub "${AWS::StackName}-ProvisionedMSKArn"
+      Name: !Sub "${AWS::StackName}-MSKArn"
     Condition: "CreateProvisionedCluster"
   CredentialsSecretArn:
     Description: ARN for secret manager secret with credentials. 
