@@ -40,7 +40,7 @@ Resources:
       Handler: bootstrap
       Runtime: provided.al2
       Timeout: 6
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - EventBridgePutEventsPolicy:
             EventBusName: !Ref MyBus
@@ -63,6 +63,9 @@ Resources:
           BUS_NAME: !Ref MyBus
           RUST_BACKTRACE: 1
           RUST_LOG: info
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 
   MyFunctionLogGroup:
     Type: AWS::Logs::LogGroup

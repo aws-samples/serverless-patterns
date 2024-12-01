@@ -23,13 +23,16 @@ Resources:
   LambdaProxy:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - StepFunctionsExecutionPolicy:
             StateMachineName: !GetAtt StateMachine.Name
       Environment:
         Variables:
           STATE_MACHINE_ARN: !GetAtt StateMachine.Arn
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 ##########################################################################
 #   STEP FUNCTION                                                        #
 ##########################################################################
