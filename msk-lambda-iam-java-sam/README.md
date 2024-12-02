@@ -22,6 +22,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Run the Cloudformation template using the file MSKAndKafkaClientEC2.yaml] - You can go to the AWS Cloudformation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the Cloudformation stack to be created. This Cloudformation template will create an MSK cluster (Provisioned or Serverless based on your selection). It will also create an EC2 machine that you can use as a client.
 
 * [Connect to the EC2 machine] - Once the Cloudformation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
+Note: You may need to wait for some time after the Cloudformation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.
 
 * [Check if Kafka Topic has been created] - Once you are inside the EC2 machine, you should be in the /home/ec2-user folder. Check to see the contents of the file kafka_topic_creator_output.txt by running the command cat kafka_topic_creator_output.txt. You should see an output such as "Created topic MskIamJavaLambdaTopic."
 
@@ -166,6 +167,7 @@ cd /home/ec2-user
 
 You should see a script called kafka_message_sender.sh. Run that script and you should be able to send a new Kafka message in every line as shown below
 
+```
 [ec2-user@ip-10-0-0-126 ~]$ sh kafka_message_sender.sh
 >My first message
 >My second message
@@ -177,6 +179,8 @@ You should see a script called kafka_message_sender.sh. Run that script and you 
 >My eigth message
 >My ninth message
 >My tenth message
+>Ctrl-C
+```
 
 Either send at least 10 messages or wait for 300 seconds (check the values of BatchSize: 10 and MaximumBatchingWindowInSeconds: 300 in the template.yaml file)
 
