@@ -14,6 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Docker](https://docs.docker.com/engine/install/) installed and running locally (needed for Rust cross-platform Lambda build)
 * [Rust](https://www.rust-lang.org/) 🦀 installed with v1.79.0 or higher
 * [Cargo Lambda](https://www.cargo-lambda.info/) installed
+* [cross](https://github.com/cross-rs/cross) compilation installed for Cargo Lambda: `cargo install cross --git https://github.com/cross-rs/cross`
 * [wscat](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-how-to-call-websocket-api-wscat.html) installed for CLI WebSocket capabilities
 
 
