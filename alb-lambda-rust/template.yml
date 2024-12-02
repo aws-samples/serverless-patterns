@@ -28,11 +28,13 @@ Resources:
   MyLambdaFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - AWSLambdaBasicExecutionRole
       Tags:
         name: !Ref AWS::StackName
+    Metadata:
+      BuildMethod: rust-cargolambda
 
   MyLambdaFunctionPermission:
     Type: AWS::Lambda::Permission

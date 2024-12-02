@@ -1,0 +1,47 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "Total Expenses >= $500",
+    "States": {
+        "Total Expenses >= $500": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.expense",
+                    "NumericLessThan": 500,
+                    "Next": "Auto approved"
+                }
+            ],
+            "Default": "Get human approval"
+        },
+        "Auto approved": {
+            "Type": "Succeed"
+        },
+        "Get human approval": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::sns:publish.waitForTaskToken",
+            "Parameters": {
+                "TopicArn": "${TopicArn}",
+                "Message.$": "States.Format('Please review \n\nApprove: \"${ApiEndpoint}?Type=Approved&Token={}\" \n\nDecline: \"${ApiEndpoint}?Type=Rejected&Token={}\"',States.Base64Encode($$.Task.Token), States.Base64Encode($$.Task.Token))",
+                "Subject": "Expense Approval"
+            },
+            "Next": "Approval/Decline"
+        },
+        "Approval/Decline": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.Result",
+                    "StringEquals": "Approved",
+                    "Next": "Request Approved"
+                }
+            ],
+            "Default": "Request Rejected"
+        },
+        "Request Approved": {
+            "Type": "Succeed"
+        },
+        "Request Rejected": {
+            "Type": "Fail"
+        }
+    }
+}
