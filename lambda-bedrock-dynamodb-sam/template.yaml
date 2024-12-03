@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Sam for Bedrock and Dynamodb pattern
+  Sam for Bedrock and Dynamodb pattern (uksb-1tthgi812) (tag:lambda-bedrock-dynamodb-sam)
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
