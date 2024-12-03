@@ -47,7 +47,7 @@ This pattern creates a Lambda function that uses Amazon Bedrock's Claude 3 Haiku
 
 1. Invoke the Lambda function with a test event containing a query:
     ```bash
-    aws lambda invoke --function-name lambda-processor --payload '{"query": "What is the capital of France?"}' output.txt
+    aws lambda invoke --function-name lambda-processor --cli-binary-format raw-in-base64-out --payload '{"query": "What is the capital of France?"}' output.txt
     ```
 2. Check the DynamoDB table to see the stored query and response:
     ```bash
