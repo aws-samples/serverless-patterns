@@ -60,7 +60,7 @@ Replace `YOUR_TABLE_NAME` with the actual name of your DynamoDB table.
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+sam delete
     ```
 1. Confirm the stack has been deleted
     ```bash
