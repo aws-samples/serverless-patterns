@@ -71,12 +71,15 @@ Parameters:
   MSKClusterName:
     Type: String
     Description: Enter the name of the MSK Cluster
+    Default: CLUSTER_NAME
   MSKClusterId:
     Type: String
     Description: Enter the ID of the MSK Cluster
+    Default: CLUSTER_ID
   MSKTopic:
     Type: String
     Description: Enter the name of the MSK Topic
+    Default: KAFKA_TOPIC
 Outputs:
   LambdaMSKConsumerPythonFunction:
     Description: "Topic Consumer Lambda Function ARN"
