@@ -16,6 +16,9 @@ Parameters:
   tableName:
     Type: String
     Description: Dynamodb table name
+  modelID:
+    Type: String
+    Description: Bedrock model id
 Resources:
   # Creates dynamodb table 
   Outputtable:
@@ -43,6 +46,7 @@ Resources:
       Environment:
         Variables:
           table_name: !Ref Outputtable
+          model_ID: !Sub "${modelID}"
          
       Runtime: python3.12
       Architectures:
@@ -57,7 +61,7 @@ Resources:
             - Effect: Allow
               Action:
                 - bedrock:InvokeModel
-              Resource: !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-3-haiku-20240307-v1:0'
+              Resource: !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/${modelID}'
         
               
         
