@@ -6,7 +6,7 @@ bedrock = boto3.client('bedrock-runtime')
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['table_name']
 
-model_id = "anthropic.claude-3-haiku-20240307-v1:0"
+model_id = os.environ['model_ID']
 
 def lambda_handler(event, context):
 
