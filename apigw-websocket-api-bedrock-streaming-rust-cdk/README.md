@@ -1,4 +1,4 @@
-# API Gateway WebSocket API to Lambda to Bedrock Streamed Response
+# Streaming Amazon Bedrock response with Amazon API Gateway WebSocket API and AWS Lambda
 
 This CDK application demonstrates a simple, serverless approach to integrating Amazon Bedrock with AWS Lambda and Amazon API Gateway. Written in Rust, it showcases how to efficiently stream responses from Amazon Bedrock to a client via WebSocket connections. The example serves as a practical illustration of implementing real-time, serverless communication between Bedrock's GenAI capabilities and a client application.
 
