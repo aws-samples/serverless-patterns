@@ -4,7 +4,8 @@ import * as cdk from 'aws-cdk-lib';
 import { BedrockStreamerStack } from '../lib/bedrock-streamer-stack';
 
 const app = new cdk.App();
-new BedrockStreamerStack(app, 'BedrockStreamerStack', {
+const description = "Serverlessland Bedrock streamining pattern. (uksb-1tthgi812) (tag:apigw-websocket-api-bedrock-streamining-rust-cdk)"
+new BedrockStreamerStack(app, 'BedrockStreamerStack', {description:description
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
