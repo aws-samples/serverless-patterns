@@ -1,6 +1,6 @@
 # Amazon Bedrock to Amazon DynamoDB
 
-This pattern demonstrates how to use AWS Lambda to process queries using Amazon Bedrock's Claude 3 Haiku model and store the results in Amazon DynamoDB.
+This pattern demonstrates how to use AWS Lambda to process queries using Amazon Bedrock's Claude 3 Haiku model and store the conversation results in Amazon DynamoDB.
 This pattern helps the system to persist the conversation with the model in DynamoDB which is a NoSQL database offering from AWS
 
 Learn more about this pattern at Serverless Land Patterns: [Serverless Land](https://serverlessland.com/patterns/)
