@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: |
+  SAM Template for accountB containing Private API Gateway, with Lambda integration.
+
+Parameters:
+  ########### Parameters ###########
+  CentralAccountVpcID:
+    Type: String
+    Description: The ID of the VPC Endpoint you want to use from the Central Account
+    
+Resources:
+  ########### Private API Gateway ###########
+  PrivateApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration: PRIVATE
+      StageName: Prod
+      AlwaysDeploy: true
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          version: '1.0'
+          title: !Sub PrivateApi-${AWS::StackName}
+        x-amazon-apigateway-binary-media-types:
+          - '*/*'
+        paths:
+          /:
+            get:
+              responses:
+                '200':
+                  description: 200 response
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
+                passthroughBehavior: when_no_match
+                type: aws_proxy
+        x-amazon-apigateway-policy:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource: execute-api:/*
+              Condition:
+                StringEquals:
+                  aws:sourceVpc: !Ref CentralAccountVpcID
+  
+  ########### Lambda Function ###########
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub Lambda-${AWS::StackName}
+      Handler: index.lambda_handler
+      Runtime: python3.13
+      InlineCode: |
+        import json
+        def lambda_handler(event, context):
+            return {
+        "statusCode": 200,
+        "body": json.dumps({
+          "message" : "Hello from Lambda!"})
+        }
+      Events:
+        APIRoot:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+            RestApiId: !Ref PrivateApi
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway Invoke URL
+    Value: !Sub https://${PrivateApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
