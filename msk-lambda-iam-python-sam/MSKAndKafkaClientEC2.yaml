@@ -10,7 +10,20 @@ Parameters:
     ConstraintDescription: Must specify Serverless or Provisioned.
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-    Default: 'al2023-ami-kernel-default-x86_64'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
+  Python3Version:
+    Type: String
+    Description: Choose the version of Python 3 between 3.9 and 3.12. Note that in Amazon Linux 2023, 3.9 is installed by default and maximum allowed version is 3.12
+    AllowedValues:
+      - python3.9
+      - python3.10
+      - python3.11
+      - python3.12
+    Default: python3.12
+  EC2KeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html
+    Default: my-key-pair
   MSKKafkaVersion:
     Type: String
     Default: 3.5.1
@@ -275,6 +288,7 @@ Resources:
       SubnetId: !Ref PublicSubnetOne
       SecurityGroupIds: [!GetAtt KafkaClientInstanceSecurityGroup.GroupId]
       ImageId: !Ref LatestAmiId
+      KeyName: !Ref EC2KeyPair
       Tags:
         - Key: 'Name'
           Value: 'KafkaClientInstance'
@@ -290,18 +304,24 @@ Resources:
           - |
             #!/bin/bash
             yum update -y
-            yum install java-openjdk11-devel -y
+            sudo yum install ec2-instance-connect
+            sudo yum install java-11-amazon-corretto-devel -y
             yum install nmap-ncat -y
             yum install git -y
-            yum erase awscli -y
             yum install jq -y
-            amazon-linux-extras install docker -y
-            sudo dnf install python3
-            sudo pip install boto3
-            service docker start
-            usermod -a -G docker ec2-user
+            
+            #install latest python3
+            PYTHON3_VERSION=${python3_version}
+            sudo yum install $PYTHON3_VERSION -y
+            echo "export PYTHON3_VERSION=$PYTHON3_VERSION" >> /home/ec2-user/.bash_profile
+            
+            # install and start docker
+            sudo yum install -y docker
+            sudo service docker start
+            sudo usermod -a -G docker ec2-user
 
             # install AWS CLI 2 - access with aws2
+            sudo yum remove awscli
             cd /home/ec2-user
             mkdir -p awscli
             cd awscli
@@ -345,7 +365,7 @@ Resources:
             echo "#!/bin/bash" > kafka_topic_creator.sh
             sudo chmod +x kafka_topic_creator.sh
             echo "MSK_CLUSTER_ARN=$MSK_CLUSTER_ARN" >> kafka_topic_creator.sh
-            AWS_REGION=$(curl -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
+            AWS_REGION=${aws_region}
             echo "AWS_REGION=$AWS_REGION" >> kafka_topic_creator.sh
             echo "BOOTSTRAP_BROKERS_IAM=\$(aws kafka get-bootstrap-brokers --region \$AWS_REGION --cluster-arn \$MSK_CLUSTER_ARN --query 'BootstrapBrokerStringSaslIam' --output text)" >> kafka_topic_creator.sh
             echo "sleep 5" >> kafka_topic_creator.sh
@@ -376,6 +396,7 @@ Resources:
             sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
+            sed -i "s/PYTHON3_VERSION/$PYTHON3_VERSION/g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -383,7 +404,7 @@ Resources:
             cd ip_prefix
             git clone https://github.com/joetek/aws-ip-ranges-json.git
             cd aws-ip-ranges-json
-            AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
+            AWS_REGION=${aws_region}
             EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
             echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
             SECURITY_GROUP=${security_group_id}
@@ -396,6 +417,8 @@ Resources:
             msk_kafka_version: !Ref MSKKafkaVersion
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
+            python3_version: !Ref Python3Version
+            aws_region: !Ref 'AWS::Region'
 
   KafkaClientEC2InstanceServerless:
     Condition: CreateServerlessCluster
@@ -426,18 +449,24 @@ Resources:
           - |
             #!/bin/bash
             yum update -y
-            yum install java-openjdk11-devel -y
+            sudo yum install ec2-instance-connect
+            sudo yum install java-11-amazon-corretto-devel -y
             yum install nmap-ncat -y
             yum install git -y
-            yum erase awscli -y
             yum install jq -y
-            amazon-linux-extras install docker -y
-            sudo dnf install python3
-            sudo pip install boto3
-            service docker start
-            usermod -a -G docker ec2-user
+            
+            #install latest python3
+            PYTHON3_VERSION=${python3_version}
+            sudo yum install $PYTHON3_VERSION -y
+            echo "export PYTHON3_VERSION=$PYTHON3_VERSION" >> /home/ec2-user/.bash_profile
+            
+            # install and start docker
+            sudo yum install -y docker
+            sudo service docker start
+            sudo usermod -a -G docker ec2-user
 
             # install AWS CLI 2 - access with aws2
+            sudo yum remove awscli
             cd /home/ec2-user
             mkdir -p awscli
             cd awscli
@@ -481,7 +510,7 @@ Resources:
             echo "#!/bin/bash" > kafka_topic_creator.sh
             sudo chmod +x kafka_topic_creator.sh
             echo "MSK_CLUSTER_ARN=$MSK_CLUSTER_ARN" >> kafka_topic_creator.sh
-            AWS_REGION=$(curl -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
+            AWS_REGION=${aws_region}
             echo "AWS_REGION=$AWS_REGION" >> kafka_topic_creator.sh
             echo "BOOTSTRAP_BROKERS_IAM=\$(aws kafka get-bootstrap-brokers --region \$AWS_REGION --cluster-arn \$MSK_CLUSTER_ARN --query 'BootstrapBrokerStringSaslIam' --output text)" >> kafka_topic_creator.sh
             echo "sleep 5" >> kafka_topic_creator.sh
@@ -512,6 +541,7 @@ Resources:
             sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
+            sed -i "s/PYTHON3_VERSION/$PYTHON3_VERSION/g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -519,7 +549,7 @@ Resources:
             cd ip_prefix
             git clone https://github.com/joetek/aws-ip-ranges-json.git
             cd aws-ip-ranges-json
-            AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
+            AWS_REGION=${aws_region}
             EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
             echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
             SECURITY_GROUP=${security_group_id}
@@ -532,6 +562,8 @@ Resources:
             msk_kafka_version: !Ref MSKKafkaVersion
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
+            python3_version: !Ref Python3Version
+            aws_region: !Ref 'AWS::Region'
 
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint
