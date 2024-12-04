@@ -15,7 +15,7 @@
   ,
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/multi-account-private-apigw",
       "templateURL": "serverless-patterns/multi-account-private-apigw",
       "projectFolder": "multi-account-private-apigw",
       "templateFile": "centralAccount/template.yaml"
