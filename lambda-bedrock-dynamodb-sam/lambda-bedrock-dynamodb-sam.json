@@ -1,0 +1,99 @@
+{
+    "title": "Amazon Bedrock to Amazon DynamoDB",
+    "description": "Invoke Amazon Bedrock with AWS Lambda and store results in Amazon DynamoDB.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates processing queries with  AWS Lambda and Amazon Bedrock's Claude 3 Haiku model then storing the results in Amazon DynamoDB.",
+            "The Lambda function is invoked with an event containing a query, which is processed using Bedrock. Both the query and the response are stored in a DynamoDB table.",
+            "This patterns forms the basis of persisting the conversation of user and model in a NoSQL database",
+            "This pattern deploys one Lambda function, one DynamoDB table, and the necessary IAM roles and permissions."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-dynamodb-sam-python",
+            "templateURL": "serverless-patterns/lambda-bedrock-dynamodb-sam",
+            "projectFolder": "lambda-bedrock-dynamodb-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon Bedrock - Foundation Models",
+                "link": "https://aws.amazon.com/bedrock/"
+            },
+            {
+                "text": "AWS Lambda - Serverless Computing",
+                "link": "https://aws.amazon.com/lambda/"
+            },
+            {
+                "text": "Amazon DynamoDB - NoSQL Database Service",
+                "link": "https://aws.amazon.com/dynamodb/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>",
+            "Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "SVVS KOUNDINYA",
+            "image": "https://drive.google.com/file/d/1kcAC_pg-r3yIJroR3lsLowF37mxxnwPV/view?usp=sharing",
+            "bio": " I am an Solutions Architect with AWS. I enjoy working with customers all across the Industries and help them to build efficient and scalable solutions on AWS.",
+            "linkedin": "svvs-koundinya-0a1652133"
+        },
+        {
+            "name": "MONALISA NATH",
+            "image": "https://drive.google.com/file/d/1s-PBpMtLtYHSNMcfnUKy42Xdx5W0qJIS/view?usp=drive_link",
+            "bio": " I am a Solutions Architect at AWS and help our strategic customers build and operate their key workloads on AWS.",
+            "linkedin": "monalisa-nath-577640180"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "bedrock",
+            "label": "Amazon Bedrock"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    }
+}
