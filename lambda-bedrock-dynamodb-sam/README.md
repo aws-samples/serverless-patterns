@@ -50,7 +50,7 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the model-id of your choice [Example : ```anthropic.claude-3-haiku-20240307-v1:0```](You'll need to have the model access as a pre-requiste)
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    After the first run of `sam deploy --guided` and saving the arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
