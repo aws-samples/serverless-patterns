@@ -552,7 +552,7 @@ Resources:
             aws ec2 authorize-security-group-ingress --region $AWS_REGION --group-id $SECURITY_GROUP --protocol tcp --port 22 --cidr $EC2_CONNECT_IP
             
           - security_group_id : !GetAtt KafkaClientInstanceSecurityGroup.GroupId
-            msk_cluster_arn : !GetAtt MSKCluster.Arn
+            msk_cluster_arn : !GetAtt ServerlessMSKCluster.Arn
             kafka_topic_for_lambda : !Ref KafkaTopicForLambda
             msk_kafka_version: !Ref MSKKafkaVersion
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
