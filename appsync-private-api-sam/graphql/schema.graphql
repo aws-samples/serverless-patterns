@@ -1,0 +1,57 @@
+input AddRestaurantInput {
+  name: String!
+  state: String
+  zip: String
+  cuisine: CuisineType!
+}
+
+enum CuisineType {
+  Multi
+  Indian
+  Chinese
+  Italian
+  Thai
+  American
+  Continental
+}
+
+input DeleteRestaurantInput {
+  restaurantId: ID!
+}
+
+type Restaurant {
+  restaurantId: ID!
+  name: String!
+  state: String
+  zip: String
+  cuisine: CuisineType
+}
+
+type RestaurantConnection {
+  items: [Restaurant]
+  nextToken: String
+}
+
+input UpdateRestaurantInput {
+  restaurantId: ID!
+  name: String
+  state: String
+  zip: String
+  cuisine: CuisineType
+}
+
+type Mutation {
+  addRestaurant(input: AddRestaurantInput!): Restaurant
+  updateRestaurant(input: UpdateRestaurantInput!): Restaurant
+  deleteRestaurant(input: DeleteRestaurantInput!): Restaurant
+}
+
+type Query {
+  listRestaurants(limit: Int, nextToken: String): RestaurantConnection
+  getRestaurant(restaurantId: ID!): Restaurant
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

@@ -1,0 +1,57 @@
+{
+  "title": "AWS AppSync Private API ",
+  "description": "Create an AWS AppSync Private API with a sample API to demonstrate how you can invoke Private API from resources in your private network",
+  "language": "Yaml",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how you can deploy an AWS AppSync Private API which can only be invoked by resources within your private network.",
+      "The SAM application will create AppSync Interface VPC Endpoint and a sample AppSync Private API backed with a DynamoDB data source.",
+      "Requests to AppSync Private APIs will go through AWS’s private network without going over the internet.",
+      "GraphQL requests from your application are routed via the interface VPC endpoint to AppSync Private API."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-private-api-sam",
+      "templateURL": "serverless-patterns/appsync-private-api-sam",
+      "projectFolder": "appsync-private-api-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AppSync Private API documentation:",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/using-private-apis.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ozioma Uzoegwu",
+      "image": "./Ouzoegwu.jpeg",
+      "bio": "I am a Principal Solutions Architect working at AWS",
+      "linkedin": "ouzoegwu",
+      "twitter": "iam_tessot"
+    }
+  ]
+}
+
