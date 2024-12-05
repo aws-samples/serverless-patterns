@@ -20,10 +20,6 @@ Parameters:
       - python3.11
       - python3.12
     Default: python3.12
-  EC2KeyPair:
-    Type: AWS::EC2::KeyPair::KeyName
-    Description: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html
-    Default: my-key-pair
   MSKKafkaVersion:
     Type: String
     Default: 3.5.1
@@ -288,7 +284,6 @@ Resources:
       SubnetId: !Ref PublicSubnetOne
       SecurityGroupIds: [!GetAtt KafkaClientInstanceSecurityGroup.GroupId]
       ImageId: !Ref LatestAmiId
-      KeyName: !Ref EC2KeyPair
       Tags:
         - Key: 'Name'
           Value: 'KafkaClientInstance'
