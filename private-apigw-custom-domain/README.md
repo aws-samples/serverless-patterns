@@ -11,7 +11,7 @@ Learn more about this pattern at [Serverless Land Patterns](https://serverlessla
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed.
 * An [execute-api VPC Endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/interface-endpoints.html).
-* A Route 53 [Private Hosted Zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-private.html).
+* A Route 53 [Private Hosted Zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-private.html). (*You can also use Public Hosted Zone but it is recommnded to use Private Hosted Zone to make sure that the Domain Name is only resolvable from within the VPC*)
 * An SSL/TLS certificate in [AWS Certificate Manager](https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-specify-certificate-for-custom-domain-name.html#how-to-specify-certificate-for-custom-domain-name-setup).
 
 ## Deployment Instructions
