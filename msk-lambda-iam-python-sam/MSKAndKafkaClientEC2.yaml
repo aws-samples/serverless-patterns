@@ -28,7 +28,7 @@ Parameters:
     Default: https://archive.apache.org/dist/kafka/3.5.1/kafka_2.13-3.5.1.tgz
   KafkaTopicForLambda:
     Type: String
-    Default: MskIamJavaLambdaTopic
+    Default: MskIamPythonLambdaTopic
   ServerlessLandGithubLocation:
     Type: String
     Default: https://github.com/aws-samples/serverless-patterns/
