@@ -1,4 +1,4 @@
-# Amazon Textract to Automatically Detect Text in Stored Files.
+# Automatically Detect Text with Amazon Textract and AWS Lambda
 
 This pattern explains how to deploy an AWS Sam application with Amazon S3, AWS Lambda, and Amazon DynamoDB to detect text stored within pdf or image files. When an image file is created in Amazon S3, the event-driven workflow begins, sending an event to AWS Lambda. This Lambda function, written in Python, invokes the Amazon Textract `DetectDocumentText` function using boto3. Once Textracts's function has returned it's response, Lambda stores the detected text in an Amazon DynamoDB table.
 
