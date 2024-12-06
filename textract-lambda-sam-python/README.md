@@ -40,7 +40,7 @@ Important: this application uses various AWS services and there are costs associ
 
 - This pattern is designed to create all services required to run this workflow.
 - The workflow begins with an Amazon S3 bucket. 
-- When an object is created within the S3 bucket, it sends an event to a AWS Lambda function.
+- When an object is created within the S3 bucket, it sends an event to an AWS Lambda function.
 - This Lambda function invokes Amazon Textracts's [DetectDocumentText](https://docs.aws.amazon.com/textract/latest/dg/API_DetectDocumentText.html) function, which synchronously analyses the newly stored file.
 - Once this task is complete, the Lambda function stores the results in an Amazon DynamoDB table.
 
