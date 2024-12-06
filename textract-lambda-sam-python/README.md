@@ -45,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 - Once this task is complete, the Lambda function stores the results in an Amazon DynamoDB table.
 
 ## Testing
-1. Upload a test image or pdf file which contains some text to the Amazon S3 bucket created during the deployment step. You can either do this via the console, or by running the following command. Replace `<your_file>` with your image or pdf file name. Replace `<S3BucketName>` with the name of the S3 bucket generated from the AWS SAM deployment outputs.
+1. Upload a test image, or pdf file, containing text to the Amazon S3 bucket created during the deployment step. You can either do this via the console, or by running the following command. Replace `<your_file>` with your image or pdf file name. Replace `<S3BucketName>` with the name of the S3 bucket generated from the AWS SAM deployment outputs.
     ```
     aws s3 cp <your_file> s3://<S3BucketName>
     ```
