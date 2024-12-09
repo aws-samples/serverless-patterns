@@ -16,7 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ![Configure Secrets](images/configure-secrets.png)
 
-Click next, then enter a name for your secret and click next. Click next on the following screen, and then store.
+    Click next, then enter a name for your secret and click next. Click next and then store on the following screens.
 
 
 ## Deployment Instructions
