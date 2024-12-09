@@ -7,23 +7,6 @@ Parameters:
   GoogleDriveSecretArn:
     Type: String
     Description: Enter the ARN of the AWS Secrets manager secret containing your Google Drive credentials.
-  # AdminAccountEmail:
-  #   Type: String
-  #   Description: Enter the Admin Account Email from your Google Drive Service Account credentials
-  #   # NoEcho: true
-  # ClientEmail:
-  #   Type: String
-  #   Description: Enter the client (service account) email from your Google Drive Service Account credentials.
-  #   # NoEcho: true
-  # PrivateKey:
-  #   Type: String
-  #   Description: Enter the private key from your Google Drive Service Account credentials.
-  #   MaxLength: 2000
-    # NoEcho: true
-  # RefreshToken:
-  #   Type: String
-  #   Description: Enter the refresh token from your Google Drive Service Account credentials.
-  #   NoEcho: true
 
 Resources:
   QBusinessApplication:
@@ -86,24 +69,6 @@ Resources:
                 Condition:
                   StringLike:
                     aws:CalledViaLast: 'qbusiness.amazonaws.com'
-
-  # QBusinessGoogleDriveSecret:
-  #   Type: 'AWS::SecretsManager::Secret'
-  #   Properties:
-  #     Description: Secret created to hold Google Drive admin account credentials
-  #     Name: QBusiness-Googledrive-serviceaccount
-  #     SecretString: 
-  #       !Join 
-  #         - ''
-  #         - - '{'
-  #           - '"clientEmail": "'
-  #           - !Ref ClientEmail
-  #           - '", "adminAccountEmail": "'
-  #           - !Ref AdminAccountEmail
-  #           - '", "privateKey": "'
-  #           - !Ref PrivateKey
-  #           - '"}'
-
 
   QBusinessWebExperience:
     Type: 'AWS::QBusiness::WebExperience'
