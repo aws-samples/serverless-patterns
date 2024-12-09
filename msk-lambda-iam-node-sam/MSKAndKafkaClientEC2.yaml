@@ -27,7 +27,7 @@ Parameters:
     Default: https://archive.apache.org/dist/kafka/3.5.1/kafka_2.13-3.5.1.tgz
   KafkaTopicForLambda:
     Type: String
-    Default: MskIamPythonLambdaTopic
+    Default: MskIamNodejsLambdaTopic
   ServerlessLandGithubLocation:
     Type: String
     Default: https://github.com/aws-samples/serverless-patterns/
@@ -305,19 +305,26 @@ Resources:
             yum install jq -y
             
             #install node.js
+            echo "#!/bin/bash" > nodejs_installer.sh
+            echo "touch ~/.bashrc" >> nodejs_installer.sh
+            echo "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash" >> nodejs_installer.sh
+            echo "source ~/.bashrc" >> nodejs_installer.sh
             NODEJS_VERSION=${nodejs_version}
-            if ["$NODEJS_VERSION" == "nodejs18.x"]
-                sudo dnf install nodejs
-            elif ["$NODEJS_VERSION" == "nodejs20.x"]
-                sudo dnf install nodejs20
-            elif ["$NODEJS_VERSION" == "nodejs22.x"]
-                sudo dnf install nodejs20
+            if ["$NODEJS_VERSION" == "nodejs18.x"]; then
+                echo "nvm install 18" >> nodejs_installer.sh
+            elif ["$NODEJS_VERSION" == "nodejs20.x"]; then
+                echo "nvm install 20" >> nodejs_installer.sh
+            elif ["$NODEJS_VERSION" == "nodejs22.x"]; then
+                echo "nvm install 22" >> nodejs_installer.sh
             else
-                sudo dnf install nodejs
+                echo "nvm install 18" >> nodejs_installer.sh
             fi
-            echo "export NODEJS_VERSION=$NODEJS_VERSION" >> /home/ec2-user/.bash_profile
-
-            
+            echo "source ~/.bashrc" >> nodejs_installer.sh
+            sudo chmod +x nodejs_installer.sh
+            cp ./nodejs_installer.sh /home/ec2-user/nodejs_installer.sh
+            cd cd /home/ec2-user
+            sudo -u ec2-user ./nodejs_installer.sh > nodejs_installer_output.txt
+           
             # install and start docker
             sudo yum install -y docker
             sudo service docker start
@@ -392,7 +399,7 @@ Resources:
             cd /home/ec2-user
             SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
             git clone $SERVERLESS_LAND_GITHUB_LOCATION
-            cd ./serverless-patterns/msk-lambda-iam-python-sam
+            cd ./serverless-patterns/msk-lambda-iam-node-sam
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
@@ -459,17 +466,25 @@ Resources:
             yum install jq -y
             
             #install node.js
+            echo "#!/bin/bash" > nodejs_installer.sh
+            echo "touch ~/.bashrc" >> nodejs_installer.sh
+            echo "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash" >> nodejs_installer.sh
+            echo "source ~/.bashrc" >> nodejs_installer.sh
             NODEJS_VERSION=${nodejs_version}
-            if ["$NODEJS_VERSION" == "nodejs18.x"]
-                sudo dnf install nodejs
-            elif ["$NODEJS_VERSION" == "nodejs20.x"]
-                sudo dnf install nodejs20
-            elif ["$NODEJS_VERSION" == "nodejs22.x"]
-                sudo dnf install nodejs20
+            if ["$NODEJS_VERSION" == "nodejs18.x"]; then
+                echo "nvm install 18" >> nodejs_installer.sh
+            elif ["$NODEJS_VERSION" == "nodejs20.x"]; then
+                echo "nvm install 20" >> nodejs_installer.sh
+            elif ["$NODEJS_VERSION" == "nodejs22.x"]; then
+                echo "nvm install 22" >> nodejs_installer.sh
             else
-                sudo dnf install nodejs
+                echo "nvm install 18" >> nodejs_installer.sh
             fi
-            echo "export NODEJS_VERSION=$NODEJS_VERSION" >> /home/ec2-user/.bash_profile
+            echo "source ~/.bashrc" >> nodejs_installer.sh
+            sudo chmod +x nodejs_installer.sh
+            cp ./nodejs_installer.sh /home/ec2-user/nodejs_installer.sh
+            cd cd /home/ec2-user
+            sudo -u ec2-user ./nodejs_installer.sh > nodejs_installer_output.txt
             
             # install and start docker
             sudo yum install -y docker
@@ -545,7 +560,7 @@ Resources:
             cd /home/ec2-user
             SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
             git clone $SERVERLESS_LAND_GITHUB_LOCATION
-            cd ./serverless-patterns/msk-lambda-iam-python-sam
+            cd ./serverless-patterns/msk-lambda-iam-node-sam
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
