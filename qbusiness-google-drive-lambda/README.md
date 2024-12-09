@@ -12,6 +12,12 @@ Important: this application uses various AWS services and there are costs associ
 * [Enable AWS IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html)
 * [Create Users in AWS IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/addusers.html). Note down the Instance ARN by going to the AWS IAM Identity Center console --> Settings --> Instance ARN. You will require it when deploying the stack. 
 <!-- * [Create an S3 Bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html) and [upload documents](https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html) that you want to be indexed. If you already have an S3 bucket with data that you want to crawl, you can skip this step. -->
+* [Create a Secret in AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html). Make sure to select "Other type of secret" and enter the below keys, with their corresponding values from your Google Drive Service Account connection credentials (more information regarding the preparation of this information can be found [here](https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/google-prereqs.html)). 
+
+![Configure Secrets](images/configure-secrets.png)
+
+Click next, then enter a name for your secret and click next. Click next on the following screen, and then store.
+
 
 ## Deployment Instructions
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -47,7 +53,7 @@ Here's a breakdown of the steps:
 
 **Amazon Q Business Application:** Amazon Q Business application created with Google Drive as the data source. 
 
-**Amazon S3:** S3 bucket that contains documents to be indexed. 
+**Google Drive:** The Google Drive repository that contains data to be indexed.
 
 **AWS Lambda:**  AWS Lambda function `DataSourceSync` crawls and indexes the content from the Google Drive repository. The Amazon Q Business application retrieves data from the indexed content and provides a generated response.
 

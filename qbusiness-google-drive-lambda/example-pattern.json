@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "Amazon Q Business Application: Amazon Q Business application created with S3 as the data source.",
-      "Amazon S3: S3 bucket that contains documents to be indexed.",
+      "Google Drive: The Google Drive repository that contains data to be indexed",
       "AWS Lambda: AWS Lambda function `DataSourceSync` crawls and indexes the content from Google Drive. The Amazon Q Business application retrieves data from the indexed content and provides a generated response."
     ]
   },
