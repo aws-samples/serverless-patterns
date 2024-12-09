@@ -1,6 +1,6 @@
 # Amazon Q Business to Amazon Simple Storage Service (Amazon S3)
 
-This pattern contains a sample AWS SAM stack that leverages Amazon Q Business to build a generative AI application to derive insights from content present in an S3 bucket. An AWS Lambda function initiates the crawling and indexing of the documents present in the specified S3 bucket. Users can then ask questions to the Amazon Q Business application to receive a generated response. 
+This pattern contains a sample AWS SAM stack that leverages Amazon Q Business to build a generative AI application to derive insights from content present in a Google Drive account. An AWS Lambda function initiates the crawling and indexing of the documents present in the specified Google Drive repository. Users can then ask questions to the Amazon Q Business application to receive a generated response. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Enable AWS IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html)
 * [Create Users in AWS IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/addusers.html). Note down the Instance ARN by going to the AWS IAM Identity Center console --> Settings --> Instance ARN. You will require it when deploying the stack. 
-* [Create an S3 Bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html) and [upload documents](https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html) that you want to be indexed. If you already have an S3 bucket with data that you want to crawl, you can skip this step.
+<!-- * [Create an S3 Bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html) and [upload documents](https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html) that you want to be indexed. If you already have an S3 bucket with data that you want to crawl, you can skip this step. -->
 
 ## Deployment Instructions
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -20,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd qbusiness-s3-lambda
+    cd qbusiness-google-drive-lambda
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -45,11 +45,11 @@ Please refer to the architecture diagram below:
 
 Here's a breakdown of the steps:
 
-**Amazon Q Business Application:** Amazon Q Business application created with S3 as the data source. 
+**Amazon Q Business Application:** Amazon Q Business application created with Google Drive as the data source. 
 
 **Amazon S3:** S3 bucket that contains documents to be indexed. 
 
-**AWS Lambda:**  AWS Lambda function `DataSourceSync` crawls and indexes the content from the S3 bucket. The Amazon Q Business application retrieves data from the indexed content and provides a generated response.
+**AWS Lambda:**  AWS Lambda function `DataSourceSync` crawls and indexes the content from the Google Drive repository. The Amazon Q Business application retrieves data from the indexed content and provides a generated response.
 
 ## Testing
 
@@ -68,7 +68,7 @@ Here's a breakdown of the steps:
     ![User subscription](images/subscription.png)
 1. Go back to your application. Under `Web experience settings`, copy the `Deployed URL` link.
     ![Deployed URL](images/deployed-url.png)
-1. Open the URL in a New Incognito Window. Login to the web experience with the credentials of the created user. Ask a question in the chat interface regarding the documents you have in the S3 bucket provided as a data source.
+1. Open the URL in a New Incognito Window. Login to the web experience with the credentials of the created user. Ask a question in the chat interface regarding the documents you have in the Google Drive account you have provided as a data source.
     ![Q Business Web Experience](images/chat-interface.png)
 
 ## Cleanup

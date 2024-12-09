@@ -1,23 +1,30 @@
 Transform: AWS::Serverless-2016-10-31
+
 Parameters:
-  S3DSBucketName:
-    Type: String
-    Description: Enter the S3 bucket name where the contents you want to be indexed are stored.
   IdentityCenterInstanceArn:
     Type: String
     Description: Enter the ARN of the Amazon Q Business Identity Center instance.
-  AdminAccountEmail:
+  GoogleDriveSecretArn:
     Type: String
-    Description: Enter the Admin Account Email from your Google Drive Service Account credentials
-    NoEcho: true
-  ClientEmail:
-    Type: String
-    Description: Enter the client (service account) email from your Google Drive Service Account credentials.
-    NoEcho: true
-  PrivateKey:
-    Type: String
-    Description: Enter the private key from your Google Drive Service Account credentials.
-    NoEcho: true
+    Description: Enter the ARN of the AWS Secrets manager secret containing your Google Drive credentials.
+  # AdminAccountEmail:
+  #   Type: String
+  #   Description: Enter the Admin Account Email from your Google Drive Service Account credentials
+  #   # NoEcho: true
+  # ClientEmail:
+  #   Type: String
+  #   Description: Enter the client (service account) email from your Google Drive Service Account credentials.
+  #   # NoEcho: true
+  # PrivateKey:
+  #   Type: String
+  #   Description: Enter the private key from your Google Drive Service Account credentials.
+  #   MaxLength: 2000
+    # NoEcho: true
+  # RefreshToken:
+  #   Type: String
+  #   Description: Enter the refresh token from your Google Drive Service Account credentials.
+  #   NoEcho: true
+
 Resources:
   QBusinessApplication:
     Type: AWS::QBusiness::Application
@@ -25,6 +32,7 @@ Resources:
       DisplayName: !Sub MyQBusinessApp-${AWS::StackName}
       Description: Amazon Q Business Application
       IdentityCenterInstanceArn: !Ref IdentityCenterInstanceArn
+
   QBusinessWebExperienceRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -78,29 +86,25 @@ Resources:
                 Condition:
                   StringLike:
                     aws:CalledViaLast: 'qbusiness.amazonaws.com'
-  #TODO: admin account email, client email (service account email), and private key
-  AdminAccountEmailSecret:
-    Type: 'AWS::SecretsManager::Secret'
-    Properties:
-      Description: Secret created to hold Google Drive admin account email
-      Name: QBusiness-Google-Drive-Admin-Account-Email
-      SecretString: !Ref AdminAccountEmail
 
-  ClientEmailSecret:
-    Type: 'AWS::SecretsManager::Secret'
-    Properties:
-      Description: Secret created to hold Google Drive client email
-      Name: QBusiness-Google-Drive-Client-Account-Email
-      SecretString: !Ref ClientEmail
-  
-  PrivateKeySecret:
-    Type: 'AWS::SecretsManager::Secret'
-    Properties:
-      Description: Secret created to hold Google Drive private key
-      Name: QBusiness-Google-Drive-Private-Key
-      SecretString: !Ref PrivateKey
+  # QBusinessGoogleDriveSecret:
+  #   Type: 'AWS::SecretsManager::Secret'
+  #   Properties:
+  #     Description: Secret created to hold Google Drive admin account credentials
+  #     Name: QBusiness-Googledrive-serviceaccount
+  #     SecretString: 
+  #       !Join 
+  #         - ''
+  #         - - '{'
+  #           - '"clientEmail": "'
+  #           - !Ref ClientEmail
+  #           - '", "adminAccountEmail": "'
+  #           - !Ref AdminAccountEmail
+  #           - '", "privateKey": "'
+  #           - !Ref PrivateKey
+  #           - '"}'
 
-  # Create a QBusiness Web Experience
+
   QBusinessWebExperience:
     Type: 'AWS::QBusiness::WebExperience'
     DependsOn:
@@ -129,7 +133,7 @@ Resources:
       DisplayName: MyQBusinessRetriever
       Type: 'NATIVE_INDEX'
 
-  S3DataSourceRole:
+  GoogleDriveDataSourceRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -143,28 +147,10 @@ Resources:
             Action:
               - sts:AssumeRole
       Policies:
-        - PolicyName: S3DataSourcePolicy
+        - PolicyName: GoogleDriveDataSourcePolicy
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Effect: Allow
-                Action:
-                  - s3:GetObject
-                Resource:
-                  - !Sub 'arn:aws:s3:::${S3DSBucketName}/*'
-                Condition:
-                  StringEquals:
-                    aws:ResourceAccount:
-                      - !Sub '${AWS::AccountId}'
-              - Effect: Allow
-                Action:
-                  - s3:ListBucket
-                Resource:
-                  - !Sub 'arn:aws:s3:::${S3DSBucketName}'
-                Condition:
-                  StringEquals:
-                    aws:ResourceAccount:
-                      - !Sub '${AWS::AccountId}'
               - Effect: Allow
                 Action:
                   - qbusiness:BatchPutDocument
@@ -181,36 +167,51 @@ Resources:
                 Resource:
                   - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}'
                   - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}/index/*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Ref GoogleDriveSecretArn
 
-  S3DataSource:
+  GoogleDriveDataSource:
     DependsOn:
       - QBusinessApplication
       - QBusinessIndex
     Type: AWS::QBusiness::DataSource
     Properties:
       ApplicationId: !Ref QBusinessApplication
-      DisplayName: MyS3DataSource
-      Description: S3 Data Source for Amazon Q Business
-      RoleArn: !GetAtt S3DataSourceRole.Arn
+      DisplayName: MyGoogleDriveDataSource
+      Description: Google Drive Data Source for Amazon Q Business
+      RoleArn: !GetAtt GoogleDriveDataSourceRole.Arn
       Configuration:
+        type: GOOGLEDRIVEV2
+        syncMode: FULL_CRAWL
+        secretArn: !Ref GoogleDriveSecretArn
         connectionConfiguration:
           repositoryEndpointMetadata:
-            BucketName: !Ref S3DSBucketName
+            authType: serviceAccount
         repositoryConfigurations:
-          document:
+          file:
             fieldMappings:
-              - indexFieldName: 's3_document_id'
-                indexFieldType: 'STRING'
-                dataSourceFieldName: 's3_document_id'
-        syncMode: 'FULL_CRAWL'
-        type: 'S3'
-        version: '1.0.0'
+              - indexFieldName: file_id
+                indexFieldType: STRING
+                dataSourceFieldName: id
+                dateFieldFormat: yyyy-MM-dd'T'HH:mm:ss'Z'
+          comment:
+            fieldMappings:
+              - indexFieldName: comment_id
+                indexFieldType: STRING
+                dataSourceFieldName: id
+                dateFieldFormat: yyyy-MM-dd'T'HH:mm:ss'Z'
+        additionalProperties:
+          enableDeletionProtection: false
       IndexId: !GetAtt QBusinessIndex.IndexId
+
   DataSourceSyncLambda:
     Type: AWS::Serverless::Function
     DependsOn:
       - QBusinessApplication
-      - S3DataSource
+      - GoogleDriveDataSource
     Properties:
       Description: !Sub
         - Stack ${AWS::StackName} Function ${ResourceName}
@@ -240,8 +241,9 @@ Resources:
       Environment:
         Variables:
           INDEX_ID: !GetAtt QBusinessIndex.IndexId
-          DS_ID: !GetAtt S3DataSource.DataSourceId
+          DS_ID: !GetAtt GoogleDriveDataSource.DataSourceId
           APP_ID: !GetAtt QBusinessApplication.ApplicationId
+
   DataSourceSync:
     Type: Custom::DataSourceSync
     DependsOn:
@@ -249,10 +251,11 @@ Resources:
       - DataSourceSyncLambda
     Properties:
       ServiceToken: !GetAtt DataSourceSyncLambda.Arn
+
 Outputs:
   QBusinessApplicationId:
     Description: Amazon Q Business Application ID
     Value: !Ref QBusinessApplication
-  S3DataSourceId:
-    Description: S3 Data Source ID
-    Value: !Ref S3DataSource
+  GoogleDriveDataSourceId:
+    Description: Google Drive Data Source ID
+    Value: !Ref GoogleDriveDataSource
