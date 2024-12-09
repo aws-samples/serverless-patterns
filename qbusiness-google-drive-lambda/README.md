@@ -14,7 +14,8 @@ Important: this application uses various AWS services and there are costs associ
 <!-- * [Create an S3 Bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html) and [upload documents](https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html) that you want to be indexed. If you already have an S3 bucket with data that you want to crawl, you can skip this step. -->
 * [Create a Secret in AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html). Make sure to select "Other type of secret" and enter the below keys, with their corresponding values from your Google Drive Service Account connection credentials (more information regarding the preparation of this information can be found [here](https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/google-prereqs.html)). 
 
-![Configure Secrets](images/configure-secrets.png) Click next, then enter a name for your secret and click next. Click next and then store on the following screens.
+![Configure Secrets](images/configure-secrets.png)
+&nbsp;Click next, then enter a name for your secret and click next. Click next and then store on the following screens.
 
 
 ## Deployment Instructions
