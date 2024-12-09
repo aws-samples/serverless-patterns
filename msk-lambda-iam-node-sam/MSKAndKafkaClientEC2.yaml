@@ -310,11 +310,12 @@ Resources:
             echo "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash" >> nodejs_installer.sh
             echo "source ~/.bashrc" >> nodejs_installer.sh
             NODEJS_VERSION=${nodejs_version}
-            if ["$NODEJS_VERSION" == "nodejs18.x"]; then
+            echo "NODEJS_VERSION=$NODEJS_VERSION" >> /home/ec2-user/bash_profile
+            if [ "$NODEJS_VERSION" == "nodejs18.x" ]; then
                 echo "nvm install 18" >> nodejs_installer.sh
-            elif ["$NODEJS_VERSION" == "nodejs20.x"]; then
+            elif [ "$NODEJS_VERSION" == "nodejs20.x" ]; then
                 echo "nvm install 20" >> nodejs_installer.sh
-            elif ["$NODEJS_VERSION" == "nodejs22.x"]; then
+            elif [ "$NODEJS_VERSION" == "nodejs22.x" ]; then
                 echo "nvm install 22" >> nodejs_installer.sh
             else
                 echo "nvm install 18" >> nodejs_installer.sh
@@ -471,11 +472,12 @@ Resources:
             echo "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash" >> nodejs_installer.sh
             echo "source ~/.bashrc" >> nodejs_installer.sh
             NODEJS_VERSION=${nodejs_version}
-            if ["$NODEJS_VERSION" == "nodejs18.x"]; then
+            echo "NODEJS_VERSION=$NODEJS_VERSION" >> /home/ec2-user/bash_profile
+            if [ "$NODEJS_VERSION" == "nodejs18.x" ]; then
                 echo "nvm install 18" >> nodejs_installer.sh
-            elif ["$NODEJS_VERSION" == "nodejs20.x"]; then
+            elif [ "$NODEJS_VERSION" == "nodejs20.x" ]; then
                 echo "nvm install 20" >> nodejs_installer.sh
-            elif ["$NODEJS_VERSION" == "nodejs22.x"]; then
+            elif [ "$NODEJS_VERSION" == "nodejs22.x" ]; then
                 echo "nvm install 22" >> nodejs_installer.sh
             else
                 echo "nvm install 18" >> nodejs_installer.sh
