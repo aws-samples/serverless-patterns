@@ -35,8 +35,8 @@ Important: this application uses various AWS services and there are costs associ
 
     * Enter a stack name.
     * Enter the desired AWS Region.
-    * Enter the S3 bucket name containing the contents you want to crawl. 
     * Enter the AWS IAM Identity Center Instance ARN noted from the instructions followed in Requirements.
+    * Enter the AWS Secrets Manager ARN noted from the instructions followed in Requirements.
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.*
