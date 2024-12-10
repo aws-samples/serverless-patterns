@@ -354,7 +354,7 @@ Resources:
             echo "#!/bin/bash" > kafka_topic_creator.sh
             sudo chmod +x kafka_topic_creator.sh
             echo "MSK_CLUSTER_ARN=$MSK_CLUSTER_ARN" >> kafka_topic_creator.sh
-            AWS_REGION=$(curl -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
+            AWS_REGION=${aws_region}
             echo "AWS_REGION=$AWS_REGION" >> kafka_topic_creator.sh
             echo "BOOTSTRAP_BROKERS_IAM=\$(aws kafka get-bootstrap-brokers --region \$AWS_REGION --cluster-arn \$MSK_CLUSTER_ARN --query 'BootstrapBrokerStringSaslIam' --output text)" >> kafka_topic_creator.sh
             echo "sleep 5" >> kafka_topic_creator.sh
@@ -392,7 +392,7 @@ Resources:
             cd ip_prefix
             git clone https://github.com/joetek/aws-ip-ranges-json.git
             cd aws-ip-ranges-json
-            AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
+            AWS_REGION=${aws_region}
             EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
             echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
             SECURITY_GROUP=${security_group_id}
@@ -405,6 +405,7 @@ Resources:
             msk_kafka_version: !Ref MSKKafkaVersion
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
+            aws_region: !Ref 'AWS::Region'
 
   KafkaClientEC2InstanceServerless:
     Condition: CreateServerlessCluster
@@ -499,7 +500,7 @@ Resources:
             echo "#!/bin/bash" > kafka_topic_creator.sh
             sudo chmod +x kafka_topic_creator.sh
             echo "MSK_CLUSTER_ARN=$MSK_CLUSTER_ARN" >> kafka_topic_creator.sh
-            AWS_REGION=$(curl -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
+            AWS_REGION=${aws_region}
             echo "AWS_REGION=$AWS_REGION" >> kafka_topic_creator.sh
             echo "BOOTSTRAP_BROKERS_IAM=\$(aws kafka get-bootstrap-brokers --region \$AWS_REGION --cluster-arn \$MSK_CLUSTER_ARN --query 'BootstrapBrokerStringSaslIam' --output text)" >> kafka_topic_creator.sh
             echo "sleep 5" >> kafka_topic_creator.sh
@@ -537,7 +538,7 @@ Resources:
             cd ip_prefix
             git clone https://github.com/joetek/aws-ip-ranges-json.git
             cd aws-ip-ranges-json
-            AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
+            AWS_REGION=${aws_region}
             EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
             echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
             SECURITY_GROUP=${security_group_id}
@@ -550,6 +551,7 @@ Resources:
             msk_kafka_version: !Ref MSKKafkaVersion
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
+            aws_region: !Ref 'AWS::Region'
 
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint
