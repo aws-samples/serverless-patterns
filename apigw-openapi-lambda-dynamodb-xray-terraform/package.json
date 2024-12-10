@@ -26,7 +26,7 @@
 		"@middy/http-router": "4.6.0",
 		"class-transformer": "0.5.1",
 		"dynamodb-toolbox": "0.8.5",
-		"nanoid": "3.3.4",
+		"nanoid": "3.3.8",
 		"reflect-metadata": "0.1.13"
 	}
 }
