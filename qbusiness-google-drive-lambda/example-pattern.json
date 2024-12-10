@@ -25,6 +25,10 @@
       {
         "text": "Amazon Q Business - AI Assistant for Enterprise",
         "link": "https://aws.amazon.com/q/business/"
+      },
+      {
+        "text": "Prerequisites for connecting Amazon Q Business to Google Drive",
+        "link": "https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/google-prereqs.html"
       }
     ]
   },
