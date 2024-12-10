@@ -1,0 +1,24 @@
+[package]
+name = "bedrock-streamer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aws_lambda_events = { version = "0.11.1", default-features = false, features = ["apigw"] }
+aws-config = "1.1.1"
+aws-sdk-bedrockruntime = "1.53.0"
+aws-sdk-apigatewaymanagement = "1.39.0"
+bytes = "1.5.0"
+http = "1.1.0"
+lambda_runtime = "0.9.1"
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
+tokio = { version = "1.34.0", features = ["full"] }
+tracing = { version = "0.1", features = ["log"] }
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt"] }
+
+[profile.release]
+opt-level = "z"
+strip = true
+lto = true
+codegen-units = 1
