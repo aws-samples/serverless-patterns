@@ -11,18 +11,9 @@ Parameters:
       - 'anthropic.claude-v2'
     Description: >-
       Enter the Model Id of the Anthropic LLM
-  GoogleDriveClientId:
+  GoogleDriveSecretArn:
     Type: String
-    Description: Google OAuth Client ID
-    NoEcho: true
-  GoogleDriveClientSecret:
-    Type: String
-    Description: Google OAuth Client Secret
-    NoEcho: true
-  GoogleDriveRefreshToken:
-    Type: String
-    Description: Google OAuth Refresh Token
-    NoEcho: true
+    Description: ARN of the pre-created Secrets Manager secret containing Google Drive credentials.
   KendraEdition:
     Type: String
     Description: Kendra edition (DEVELOPER_EDITION, ENTERPRISE_EDITION)
@@ -31,18 +22,7 @@ Parameters:
       - DEVELOPER_EDITION
       - ENTERPRISE_EDITION
 Resources:
-  #Create secrets manager for googlesecrets
-  GoogleDriveSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: !Sub ${AWS::StackName}-google-drive-secret
-      Description: Google Drive credentials for Kendra
-      SecretString: !Sub |
-        {
-          "ClientId": "${GoogleDriveClientId}",
-          "ClientSecret": "${GoogleDriveClientSecret}",
-          "RefreshToken": "${GoogleDriveRefreshToken}"
-        }
+
   # Creating role for Kendra index
   KendraIndexRole:
     Type: AWS::IAM::Role
@@ -111,7 +91,7 @@ Resources:
                   - kendra:BatchPutDocument
                   - kendra:BatchDeleteDocument
               - Effect: Allow
-                Resource: !Ref GoogleDriveSecret
+                Resource: !Ref GoogleDriveSecretArn
                 Action:
                   - secretsmanager:GetSecretValue
           PolicyName: !Sub ${AWS::StackName}-DocsDSPolicy
@@ -122,13 +102,14 @@ Resources:
     DependsOn:
       - KendraIndex
     Properties:
+      Name: !Sub ${AWS::StackName}-KendraGoogleDriveDS
+      IndexId: !GetAtt KendraIndex.Id
+      Type: GOOGLEDRIVE
       DataSourceConfiguration:
         GoogleDriveConfiguration:
           SecretArn: !Ref GoogleDriveSecret
-      IndexId: !GetAtt KendraIndex.Id
-      Name: !Sub ${AWS::StackName}-KendraGoogleDriveDS
       RoleArn: !GetAtt KendraDSRole.Arn
-      Type: GOOGLE_DRIVE
+
   # Lambda function for initiating crawling and indexing content from the GoogleDrive data source
   DataSourceSyncLambda:
     Type: AWS::Serverless::Function
