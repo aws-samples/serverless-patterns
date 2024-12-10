@@ -13,6 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS CDK installed](https://docs.aws.amazon.com/cdk/latest/guide/cli.html)
 - [Python 3 installed](https://www.python.org/downloads/)
+- [pipenv installed](https://pipenv.pypa.io/en/latest/installation.html)
 - [Create Redshift Serverless](https://docs.aws.amazon.com/redshift/latest/gsg/new-user-serverless.html#serverless-console-resource-creation)
 
 ## Deployment Instructions
@@ -30,7 +31,7 @@ Important: this application uses various AWS services and there are costs associ
    python3 -m venv venv
    source ./venv/bin/activate
    pipenv install
-   pipenv requirements > requirements.txt
+   pipenv install  -r requirements.txt
    ```
 1. Create .env file to include Redshift cluster environment variables:
    ```
@@ -54,7 +55,7 @@ This setup orchestrates exposing data from Redshift through API Gateway with Cog
 
 ## Testing
 
-1. Use an api client with oauth capability such as Postman or Rapid API to test the api. API url can be found from CDK stack deployment output. You will need to login to AWS Console, navigate to Cognito app client and retrieve the client id and secret to pass it in the api call.
+1. Use an api client with oauth capability such as Postman or Rapid API to test the api. API url can be found from CDK stack deployment output ApigwRedshiftDataApi.ApiUrl. You will need to login to AWS Console, navigate to Cognito app client and retrieve the client id and secret to pass it in the api call.
 
 ## Cleanup
 

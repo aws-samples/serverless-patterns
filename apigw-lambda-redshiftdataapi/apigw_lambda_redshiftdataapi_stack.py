@@ -222,11 +222,6 @@ def lambda_handler(event, context):
             ],
         )
 
-        # Grant API Gateway permission to assume the logging role
-        api_gateway_logging_role.grant_assume_role(
-            iam.ServicePrincipal("apigateway.amazonaws.com")
-        )
-
         # Create a log group for API Gateway
         api_log_group = logs.LogGroup(
             self, "ApiGatewayLogGroup", retention=logs.RetentionDays.ONE_WEEK
