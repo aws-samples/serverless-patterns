@@ -1,5 +1,5 @@
 {
-  "title": "East-West Communication in Multi-Account Setup with Private API Gateway",
+  "title": "Multi-Account Setup with Private API Gateway",
   "description": "Create Private REST API Gateway in multiple accounts and integrate with the central account",
   "language": "Python",
   "level": "300",
