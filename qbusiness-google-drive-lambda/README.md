@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Enable AWS IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html)
 * [Create Users in AWS IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/addusers.html). Note down the Instance ARN by going to the AWS IAM Identity Center console --> Settings --> Instance ARN. You will require it when deploying the stack. 
-* [Create a Secret in AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html). Make sure to select "Other type of secret" and enter the below keys, with their corresponding values from your Google Drive Service Account connection credentials (more information regarding the preparation of this information can be found [here](https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/google-prereqs.html)). 
+* [Create a Secret in AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html). Make sure to select "Other type of secret" and enter the below keys, with their corresponding values from your [Google Drive Service Account](https://cloud.google.com/iam/docs/keys-create-delete) connection credentials (more information regarding the preparation of this information can be found [here](https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/google-prereqs.html)). 
 
 ![Configure Secrets](images/configure-secrets.png)
 
