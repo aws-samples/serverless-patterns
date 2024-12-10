@@ -1,0 +1,61 @@
+{
+  "title": "Amazon Kendra With Confluence to AWS Lambda to Amazon Bedrock",
+  "description": "AWS Lambda function to retrieve relevant Confluence data from an Amazon Kendra index and pass it to Amazon Bedrock for a generated response.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "AWS Lambda: Two AWS Lambda functions are created. DataSourceSync Lambda function crawls and indexes the content. InvokeBedrockLambda AWS Lambda function that invokes the specified model by passing the retrieved content from Amazon Kendra as context to the generative AI model.",
+      "Amazon Kendra: An Amazon Kendra index is created with a Confluence data source. When a the InvokeBedrockLambda function is called, data is retrieved from the Amazon Kendra index.",
+      "Amazon Bedrock: Documents retrieved from the Amazon Kendra index are sent to Amazon Bedrock which responds with a generated response."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kendra-bedrock-confluence",
+      "templateURL": "serverless-patterns/kendra-bedrock-confluence",
+      "projectFolder": "kendra-bedrock-confluence",
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Kendra - Enterprise Search Engine",
+        "link": "https://aws.amazon.com/kendra/"
+      },
+      {
+        "text": "Amazon Bedrock - Generative AI",
+        "link": "https://aws.amazon.com/bedrock/"
+      },
+      {
+        "text": "Confluence Kendra Connector",
+        "link": "https://docs.aws.amazon.com/kendra/latest/dg/data-source-confluence.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy BedrockKendraStack --parameters ConfluenceUrl=${YourConfluenceUrl} --paramaters ConfluenceSecretArn=${YourConfluenceSecretArn}"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ragib Ahsan",
+      "bio": "AWS Partner Solutions Architect based in NYC that is passionate about AI/ML",
+      "linkedin": "https://media.licdn.com/dms/image/v2/D4E03AQHKVYkUoGROvA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1699650399893?e=2147483647&v=beta&t=Er98G1GNr7qUZG0lq9Owj97b_nJu_Mb9ze-3ZTcsCcw"
+    }
+  ]
+}
