@@ -107,7 +107,7 @@ Resources:
       Type: GOOGLEDRIVE
       DataSourceConfiguration:
         GoogleDriveConfiguration:
-          SecretArn: !Ref GoogleDriveSecret
+          SecretArn: !Ref GoogleDriveSecretArn
       RoleArn: !GetAtt KendraDSRole.Arn
 
   # Lambda function for initiating crawling and indexing content from the GoogleDrive data source

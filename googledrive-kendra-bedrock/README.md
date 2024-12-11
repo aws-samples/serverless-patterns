@@ -1,6 +1,6 @@
 # AWS Lambda to Amazon Kendra to Amazon Bedrock
 
-This pattern contains a sample AWS SAM stack that utilizes an AWS Lambda function to retrieve documents from an Amazon Kendra index and then pass it to Amazon Bedrock to generate a response. The pattern includes usage of the Amazon S3 data source connector. 
+This pattern contains a sample AWS SAM stack that utilizes an AWS Lambda function to retrieve documents from an Amazon Kendra index and then pass it to Amazon Bedrock to generate a response. The pattern includes usage of the Google Drive data source connector. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -10,7 +10,11 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Request Amazon Bedrock Model Access for Anthropic Claude models on Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)
-* [Create an S3 Bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html) and [upload documents](https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html) that you want to be indexed. If you already have an S3 bucket with data that you want to crawl, you can skip this step.
+* [Create a Secret in AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html). Make sure to select "Other type of secret" and enter the below keys, with their corresponding values from your [Google Drive Service Account](https://developers.google.com/identity/protocols/oauth2) connection credentials. 
+
+![Configure Secrets](images/configure-secrets.png)
+
+* Note down the Secret ARN by going to the AWS Secrets Manager console --> Secrets --> Your secret name. You will require it when deploying the stack. 
 
 ## Deployment Instructions
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -19,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd lambda-kendra-bedrock
+    cd googledrive-kendra-bedrock
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -30,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
     * Enter a stack name
     * Enter the desired AWS Region
     * Enter one of the supported model IDs for Anthropic Claude on Bedrock from: `'anthropic.claude-instant-v1'`, `'anthropic.claude-3-sonnet-20240229-v1:0'`, `'anthropic.claude-3-haiku-20240307-v1:0'`, `'anthropic.claude-v2'`
-    * Enter the S3 bucket name containing the contents you want to crawl. 
+    * Enter the AWS Secrets Manager ARN noted from the instructions followed in Requirements.
     * Enter Amazon Kendra edition: DEVELOPER_EDITION, ENTERPRISE_EDITION
     * Allow SAM CLI to create IAM roles with the required permissions.
 
@@ -47,7 +51,7 @@ Here's a breakdown of the steps:
 
 **AWS Lambda:** Two AWS Lambda functions are created. `DataSourceSync` crawls and indexes the content. `InvokeBedrockLambda` invokes the specified model by passing the retrieved content from Amazon Kendra as context to the generative AI model.
 
-**Amazon Kendra:** An Amazon Kendra index is created with a S3 data source connector. When a the `InvokeBedrockLambda` function is called, documents are retrieved from the Amazon Kendra index.
+**Amazon Kendra:** An Amazon Kendra index is created with a Google Drive data source connector. When a the `InvokeBedrockLambda` function is called, documents are retrieved from the Amazon Kendra index.
 
 **Amazon Bedrock:** Documents retrieved from the Amazon Kendra index are sent to Amazon Bedrock which responds with a generated response.
 
@@ -76,6 +80,6 @@ Example JSON Lambda test event:
     sam delete
     ```
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
