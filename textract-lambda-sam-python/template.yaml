@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   An Amazon S3 bucket for the storing of Image files. 
   Upon uploading a new object, triggers an AWS Lambda function which consumes the event and leverages Amazon Textract's DetectDocumentText function to find text within an image or file. 
-  The Lambda function then stores the result in Amazon DynamoDB. 
+  The Lambda function then stores the result in Amazon DynamoDB. (uksb-1tthgi812) (tag:textract-lambda-sam-python)
 
 Resources:
   # S3 bucket to store Image files from the user.
