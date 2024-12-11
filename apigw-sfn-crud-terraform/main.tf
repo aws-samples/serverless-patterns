@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "~> 5.0"
     }
   }
 
@@ -287,7 +287,7 @@ resource "aws_dynamodb_table" "API_SF_CRUD-DB" {
 resource "aws_sfn_state_machine" "API_SF_CRUD-tf_CF" {
   name     = "API_SF_CRUD-tf_CF"
   role_arn = aws_iam_role.API_SF_CRUD-tf_CFRole.arn
-  definition = file("./crud.asl.json")
+  definition = file("./crud-asl.json")
   type     = "EXPRESS"
 
   logging_configuration {

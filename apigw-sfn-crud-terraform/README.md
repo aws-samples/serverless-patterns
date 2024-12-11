@@ -37,13 +37,17 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Amazon API Gateway creates a direct integration with AWS Step Functions utilizing a synchronous call. Step functions evaluates the path and method to choose the proper action. The action steps can be modified to meet your needs.
+Amazon API Gateway creates a direct integration with AWS Step Functions utilizing a synchronous call. The Step Functions state machine evaluates the path and method to choose the proper action. The action steps can be modified to meet your needs.
 
 ## Testing
 
 *CRUD = Create, Read, Update, Delete*
 
-Once the application is deployed, use a tool like Postman or Curl to call the different CRUD endpoints. If you would like to import the Postman package, update the endpoint and import into Postman.
+Once your application is up and running, you can verify the CRUD operations in two ways:
+- Make a curl request directly to the endpoint shown in the Terraform output
+- Use Postman by importing the provided collection file (make sure to update the endpoint URLs to match your deployed environment)
+
+Both methods will allow you to test and interact with your API endpoints.
 
 ## Cleanup
 1. Change directory to the pattern directory:
