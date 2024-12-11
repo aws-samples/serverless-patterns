@@ -1,4 +1,4 @@
-# EventBridge Scheduler to invoke Step Functions to get the List of Inactive functions
+# EventBridge Scheduler to invoke Step Functions to get the List of Inactive Lambda functions
 
 This pattern will create a one time schedule in EventBridge Scheduler with State machine as Target & Invoke the Lambda ListFunctions & GetFunction API using the SDK integration in Step Functions and publish the List of Inactive functions to SNS Topic.
 
