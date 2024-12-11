@@ -281,9 +281,9 @@ resource "aws_dynamodb_table" "API_SF_CRUD-DB" {
 }
 
 #################################################################
-# Step Function - State Machine
+# Step Functions - State Machine
 #################################################################
-# Creating the Step Functions Machine
+# Creating the state machine
 resource "aws_sfn_state_machine" "API_SF_CRUD-tf_CF" {
   name     = "API_SF_CRUD-tf_CF"
   role_arn = aws_iam_role.API_SF_CRUD-tf_CFRole.arn

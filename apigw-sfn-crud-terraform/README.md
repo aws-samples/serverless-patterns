@@ -2,6 +2,8 @@
 
 This stack creates a fully functioning CRUD API powered by Amazon API Gateway direct integration to AWS Step Functions and backed by Amazon DynamoDB.
 
+*CRUD = Create, Read, Update, Delete*
+
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sfn-crud-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -40,8 +42,6 @@ Important: this application uses various AWS services and there are costs associ
 Amazon API Gateway creates a direct integration with AWS Step Functions utilizing a synchronous call. The Step Functions state machine evaluates the path and method to choose the proper action. The action steps can be modified to meet your needs.
 
 ## Testing
-
-*CRUD = Create, Read, Update, Delete*
 
 Once your application is up and running, you can verify the CRUD operations in two ways:
 - Make a curl request directly to the endpoint shown in the Terraform output

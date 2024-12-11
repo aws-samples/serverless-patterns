@@ -1,5 +1,5 @@
 {
-  "Comment" : "A description of my state machine",
+  "Comment" : "Definition of the checks and DynamoDB state machine workflow operations",
   "StartAt" : "Does ID exist?",
   "States" : {
     "Does ID exist?" : {
