@@ -7,12 +7,13 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [Create a Google Drive Service Account](https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/google-prereqs.html). You will need the credentials "clientEmail", "adminAccountEmail", and "privateKey" for Amazon Q to connect to your Google Drive repository.
+* **Optional:** [Configure Google Drive OAuth 2.0 connection credentials](https://developers.google.com/identity/protocols/oauth2) if you wish to authenticate via OAuth 2.0 rather than your service account credentials. You will need credentials "clientID", "clientSecret", and "refreshToken" for Amazon Q to connect to your Google Drive repository.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Enable AWS IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html)
 * [Create Users in AWS IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/addusers.html). Note down the Instance ARN by going to the AWS IAM Identity Center console --> Settings --> Instance ARN. You will require it when deploying the stack. 
-* [Create a Secret in AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html). Make sure to select "Other type of secret" and enter the below keys, with their corresponding values from your [Google Drive Service Account](https://cloud.google.com/iam/docs/keys-create-delete) connection credentials. 
+* [Create a Secret in AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html). Make sure to select "Other type of secret" and enter the below keys, with their corresponding values from your [Google Drive Service Account](https://cloud.google.com/iam/docs/keys-create-delete) connection credentials. **If using OAuth 2.0 connection,** replace the below values with those specified in the previous steps.
 
 ![Configure Secrets](images/configure-secrets.png)
 
