@@ -1,0 +1,226 @@
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  IdentityCenterInstanceArn:
+    Type: String
+    Description: Enter the ARN of the Amazon Q Business Identity Center instance.
+  GoogleDriveSecretArn:
+    Type: String
+    Description: Enter the ARN of the AWS Secrets manager secret containing your Google Drive credentials.
+
+Resources:
+  QBusinessApplication:
+    Type: AWS::QBusiness::Application
+    Properties:
+      DisplayName: !Sub MyQBusinessApp-${AWS::StackName}
+      Description: Amazon Q Business Application
+      IdentityCenterInstanceArn: !Ref IdentityCenterInstanceArn
+
+  QBusinessWebExperienceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - application.qbusiness.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:SetContext
+      Description: IAM role for Q Business Web Experience
+      RoleName: !Sub QBusinessWebExperienceRole-${AWS::StackName}
+      Policies:
+        - PolicyName:  WebExperiencePolicyIdC
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: QBusinessConversationPermission
+                Effect: Allow
+                Action:
+                  - qbusiness:Chat
+                  - qbusiness:ChatSync
+                  - qbusiness:ListMessages
+                  - qbusiness:ListConversations
+                  - qbusiness:DeleteConversation
+                  - qbusiness:PutFeedback
+                  - qbusiness:GetWebExperience
+                  - qbusiness:GetApplication
+                  - qbusiness:ListPlugins
+                  - qbusiness:GetChatControlsConfiguration
+                Resource:
+                  Fn::Sub:
+                    - 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${ApplicationId}'
+                    - ApplicationId: !GetAtt QBusinessApplication.ApplicationId
+              - Sid: QBusinessKMSDecryptPermissions
+                Effect: Allow
+                Action: kms:Decrypt
+                Resource:
+                  Fn::Sub: 'arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/*'
+                Condition:
+                  StringLike:
+                    kms:ViaService:
+                      Fn::Sub: 'qbusiness.${AWS::Region}.amazonaws.com'
+              - Sid: QBusinessSetContextPermissions
+                Effect: Allow
+                Action: sts:SetContext
+                Resource: 'arn:aws:sts::*:self'
+                Condition:
+                  StringLike:
+                    aws:CalledViaLast: 'qbusiness.amazonaws.com'
+
+  QBusinessWebExperience:
+    Type: 'AWS::QBusiness::WebExperience'
+    DependsOn:
+      - QBusinessApplication
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      RoleArn: !GetAtt QBusinessWebExperienceRole.Arn
+  
+  QBusinessIndex:
+    DependsOn:
+      - QBusinessApplication
+      - QBusinessWebExperience
+    Type: AWS::QBusiness::Index
+    Properties:
+      DisplayName: MyQBusinessIndex
+      Description: My Amazon Q Business Index
+      ApplicationId: !Ref QBusinessApplication
+  
+  QBusinessRetriever:
+    Type: AWS::QBusiness::Retriever
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      Configuration: 
+        NativeIndexConfiguration:
+          IndexId: !GetAtt QBusinessIndex.IndexId
+      DisplayName: MyQBusinessRetriever
+      Type: 'NATIVE_INDEX'
+
+  GoogleDriveDataSourceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service:
+                - qbusiness.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: GoogleDriveDataSourcePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - qbusiness:BatchPutDocument
+                  - qbusiness:BatchDeleteDocument
+                Resource:
+                  - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}/index/*'
+              - Effect: Allow
+                Action:
+                  - qbusiness:PutGroup
+                  - qbusiness:CreateUser
+                  - qbusiness:DeleteGroup
+                  - qbusiness:UpdateUser
+                  - qbusiness:ListGroups
+                Resource:
+                  - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}'
+                  - !Sub 'arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication.ApplicationId}/index/*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Ref GoogleDriveSecretArn
+
+  GoogleDriveDataSource:
+    DependsOn:
+      - QBusinessApplication
+      - QBusinessIndex
+    Type: AWS::QBusiness::DataSource
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      DisplayName: MyGoogleDriveDataSource
+      Description: Google Drive Data Source for Amazon Q Business
+      RoleArn: !GetAtt GoogleDriveDataSourceRole.Arn
+      Configuration:
+        type: GOOGLEDRIVEV2
+        syncMode: FULL_CRAWL
+        secretArn: !Ref GoogleDriveSecretArn
+        connectionConfiguration:
+          repositoryEndpointMetadata:
+            authType: serviceAccount
+        repositoryConfigurations:
+          file:
+            fieldMappings:
+              - indexFieldName: file_id
+                indexFieldType: STRING
+                dataSourceFieldName: id
+                dateFieldFormat: yyyy-MM-dd'T'HH:mm:ss'Z'
+          comment:
+            fieldMappings:
+              - indexFieldName: comment_id
+                indexFieldType: STRING
+                dataSourceFieldName: id
+                dateFieldFormat: yyyy-MM-dd'T'HH:mm:ss'Z'
+        additionalProperties:
+          enableDeletionProtection: false
+      IndexId: !GetAtt QBusinessIndex.IndexId
+
+  DataSourceSyncLambda:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - QBusinessApplication
+      - GoogleDriveDataSource
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: DataSourceSyncLambda
+      CodeUri: src/dataSourceSync/
+      Handler: dataSourceSyncLambda.lambda_handler
+      Runtime: python3.12
+      MemorySize: 1024
+      Timeout: 900
+      Tracing: Active
+      Policies:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - qbusiness:StartDataSourceSyncJob
+              - qbusiness:StopDataSourceSyncJob
+            Resource:
+              - !Sub arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}
+              - !Sub arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}/*
+      Environment:
+        Variables:
+          INDEX_ID: !GetAtt QBusinessIndex.IndexId
+          DS_ID: !GetAtt GoogleDriveDataSource.DataSourceId
+          APP_ID: !GetAtt QBusinessApplication.ApplicationId
+
+  DataSourceSync:
+    Type: Custom::DataSourceSync
+    DependsOn:
+      - QBusinessIndex
+      - DataSourceSyncLambda
+    Properties:
+      ServiceToken: !GetAtt DataSourceSyncLambda.Arn
+
+Outputs:
+  QBusinessApplicationId:
+    Description: Amazon Q Business Application ID
+    Value: !Ref QBusinessApplication
+  GoogleDriveDataSourceId:
+    Description: Google Drive Data Source ID
+    Value: !Ref GoogleDriveDataSource
