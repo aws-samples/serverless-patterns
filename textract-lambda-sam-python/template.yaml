@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  An Amazon S3 bucket for the storing of Image files. 
+  Upon uploading a new object, triggers an AWS Lambda function which consumes the event and leverages Amazon Textract's DetectDocumentText function to find text within an image or file. 
+  The Lambda function then stores the result in Amazon DynamoDB. (uksb-1tthgi812) (tag:textract-lambda-sam-python)
+
+Resources:
+  # S3 bucket to store Image files from the user.
+  ImageFileBucket:
+    Type: AWS::S3::Bucket
+
+  # Define the DynamoDB table
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "Image"
+          AttributeType: "S"
+        - AttributeName: "Bucket"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Image"
+          KeyType: HASH
+        - AttributeName: "Bucket"
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      TableName: "TextractResultsTable"
+
+  # Lambda Function to begin Amazon Rekognition's DetectLabels function.
+  StartProcessingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lambda-start-detect-document-text-textract
+      Runtime: python3.13
+      Handler: src/lambda-start-detect-document-text-textract.lambda_handler
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: 
+                - "s3:GetObject"
+                - "s3:PutObject"
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - "textract:DetectDocumentText"
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - "dynamodb:PutItem"
+              Resource: !GetAtt DynamoDBTable.Arn
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: ImageFileBucket
+            Events: s3:ObjectCreated:*
+      Environment:
+        Variables:
+          dynamoDBTableName: !Ref DynamoDBTable
+
+Outputs:
+  ImageFileBucket:
+    Value: !Ref ImageFileBucket
+    Description: S3 Bucket for object storage
+  DynamoDBTable:
+    Value: !Ref DynamoDBTable
+    Description: DynamoDB table containing Textract Results
