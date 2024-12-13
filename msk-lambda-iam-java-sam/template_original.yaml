@@ -16,7 +16,7 @@ Resources:
     Properties:
       CodeUri: kafka_event_consumer_function
       Handler: com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequest
-      Runtime: java11
+      Runtime: JAVA_VERSION
       Architectures:
         - x86_64
       MemorySize: 512

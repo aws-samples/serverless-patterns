@@ -10,10 +10,18 @@ Parameters:
     ConstraintDescription: Must specify Serverless or Provisioned.
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
   MSKKafkaVersion:
     Type: String
     Default: 3.5.1
+  JavaVersion:
+    Type: String
+    Description: Choose the version of Java. Lambda currently supports Java 11, 17 and 21
+    AllowedValues:
+      - java11
+      - java17
+      - java21
+    Default: java21
   ApacheKafkaInstallerLocation:
     Type: String
     Default: https://archive.apache.org/dist/kafka/3.5.1/kafka_2.13-3.5.1.tgz
@@ -290,17 +298,28 @@ Resources:
           - |
             #!/bin/bash
             yum update -y
-            yum install java-openjdk11-devel -y
+            # yum install java-openjdk11-devel -y
+            
+            # install Java
+            JAVA_VERSION=${java_version}
+            echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+            if [ "$JAVA_VERSION" == "java11" ]; then
+                sudo yum install java-11-amazon-corretto-devel -y
+            elif [ "$JAVA_VERSION" == "java17" ]; then
+                sudo yum install java-17-amazon-corretto-devel -y
+            elif [ "$JAVA_VERSION" == "java21" ]; then
+                sudo yum install java-21-amazon-corretto-devel -y
+            else
+                sudo yum install java-21-amazon-corretto-devel -y
+            fi
+            
             yum install nmap-ncat -y
             yum install git -y
             yum erase awscli -y
             yum install jq -y
-            amazon-linux-extras install docker -y
-            amazon-linux-extras install python3.8 -y
+            sudo yum install -y docker
             service docker start
             usermod -a -G docker ec2-user
-            unlink /usr/bin/python3
-            ln -s /usr/bin/python3.8 /usr/bin/python3
             sudo wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
             sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
             sudo yum install -y apache-maven
@@ -385,6 +404,7 @@ Resources:
             sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
+            sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -406,6 +426,7 @@ Resources:
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
+            java_version: !Ref JavaVersion
 
   KafkaClientEC2InstanceServerless:
     Condition: CreateServerlessCluster
@@ -436,17 +457,27 @@ Resources:
           - |
             #!/bin/bash
             yum update -y
-            yum install java-openjdk11-devel -y
+            
+            # install Java
+            JAVA_VERSION=${java_version}
+            echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+            if [ "$JAVA_VERSION" == "java11" ]; then
+                sudo yum install java-11-amazon-corretto-devel -y
+            elif [ "$JAVA_VERSION" == "java17" ]; then
+                sudo yum install java-17-amazon-corretto-devel -y
+            elif [ "$JAVA_VERSION" == "java21" ]; then
+                sudo yum install java-21-amazon-corretto-devel -y
+            else
+                sudo yum install java-21-amazon-corretto-devel -y
+            fi
+            
             yum install nmap-ncat -y
             yum install git -y
             yum erase awscli -y
             yum install jq -y
-            amazon-linux-extras install docker -y
-            amazon-linux-extras install python3.8 -y
+            sudo yum install -y docker
             service docker start
             usermod -a -G docker ec2-user
-            unlink /usr/bin/python3
-            ln -s /usr/bin/python3.8 /usr/bin/python3
             sudo wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
             sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
             sudo yum install -y apache-maven
@@ -531,6 +562,7 @@ Resources:
             sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
+            sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -552,6 +584,7 @@ Resources:
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
+            java_version: !Ref JavaVersion
 
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint
