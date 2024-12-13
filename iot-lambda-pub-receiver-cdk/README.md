@@ -1,6 +1,6 @@
 # AWS Lambda to AWS IoT Core
 
-This pattern deploys one publisher AWS Lambda, which publishes a message in AWS IoT Core topic. The topic is watch by a rule which triggers an action when the condition is met. The action calls a AWS Lambda.
+This pattern deploys an AWS Lambda function, which publishes a message to an AWS IoT Core topic. The topic is watched by a rule which will trigger an action when the condition is met. The action calls an AWS Lambda function.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
