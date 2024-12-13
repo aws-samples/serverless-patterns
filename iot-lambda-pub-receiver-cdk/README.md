@@ -2,7 +2,7 @@
 
 This pattern deploys an AWS Lambda function, which publishes a message to an AWS IoT Core topic. The topic is watched by a rule which will trigger an action when the condition is met. The action calls an AWS Lambda function.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-lambda-pub-receiver-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

@@ -10,16 +10,14 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "aws-cdk": "2.165.0",
+    "aws-cdk": "^2.173.0",
     "ts-node": "^10.9.2",
-    "typescript": "~5.6.3"
+    "typescript": "~5.7.2"
   },
   "dependencies": {
-    "@aws-cdk/aws-iam": "^1.203.0",
-    "@aws-cdk/aws-iot-actions-alpha": "^2.165.0-alpha.0",
-    "@aws-cdk/aws-iot-alpha": "^2.165.0-alpha.0",
-    "@aws-cdk/aws-lambda": "^1.203.0",
-    "aws-cdk-lib": "2.165.0",
+    "@aws-cdk/aws-iot-actions-alpha": "^2.173.0-alpha.0",
+    "@aws-cdk/aws-iot-alpha": "^2.173.0-alpha.0",
+    "aws-cdk-lib": "2.173.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }
