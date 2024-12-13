@@ -34,7 +34,7 @@ The EC2 machine that was created by running the Cloudformation template has all 
 
 The AWS SAM CLI is a serverless tool for building and testing Lambda applications. It uses Docker to locally test your functions in an Amazon Linux environment that resembles the Lambda execution environment. It can also emulate your application's build environment and API.
 
-* Java - On the EC2 machine, we have installed java-openjdk11-devel but you can also install Amazon Corretto by modifying the Cloudformation UserData script if you wish to (https://docs.aws.amazon.com/linux/al2/ug/java.html)
+* Java - On the EC2 machine, we have installed the version of Java that you selected. We have installed Amazon Corrretto JDK of the version that you had selected at the time of specifying the input parameters in the Cloudformation template. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
 * Maven - On the EC2 machine, we have installed Maven (https://maven.apache.org/install.html)
 * AWS SAM CLI - We have installed the AWS SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 * Docker - We have installed the Docker Community Edition on the EC2 machine (https://hub.docker.com/search/?type=edition&offering=community)
@@ -208,4 +208,4 @@ sam delete
 confirm by pressing y for both the questions
 You should see the lambda function getting deleted and a final confirmation "Deleted successfully" on the command-line
 
-Next you need to delete the Cloudformation template that created the MSK Server and the EC2 machine by going to the Cloudformation console and selecting the stack and then hitting the "Delete" button. It will run for sometime but eventually you should see the stack getting cleaned up.
+Next you need to delete the Cloudformation template that created the MSK Server and the EC2 machine by going to the Cloudformation console and selecting the stack and then hitting the "Delete" button. It will run for sometime but eventually you should see the stack getting cleaned up. If you get an error message that says the stack could not be deleted, please retry again and do a Force Delete. The reason this may happen is because ENIs created by the deplayed Lambda function in your VPC may prevent the VPC from being deleted even after deleting the lambda function.
