@@ -49,6 +49,18 @@ Important: This application uses various AWS Services and there are costs associ
     -  Allow SAM CLI to create IAM roles with the required permissions.
 3. Note the outputs from the SAM deployment process. This contains both the `Custom Domain Name` and `Custom Domain Name ARN`, which will be used as inputs for the second account's stack deployment.
 
+#### Accept the Resource Share Invitation
+Upon deploying the first template, you can get the invitation ARN from the AWS CLI by running the following command:
+    ```
+    aws ram get-resource-share-invitations --profile <target-account-profile>
+    ```
+
+Copy the invitation ARN, and paste it in the following command:
+    ```
+    aws ram accept-resource-share-invitation \
+    --resource-share-invitation-arn arn:aws:ram:region:account-id:resource-share-invitation/invitation-id \
+    --profile <target-account-profile>
+    ```
 
 #### AccountB
 1. In account B, where you would like to create the **Custom Domain Name Access Association** and the **Private Hosted Zone**, navigate to the `accountB` directory from the main directory and deploy using *(if you are in a different directory, then run `cd ..` before entering the below command)*:
