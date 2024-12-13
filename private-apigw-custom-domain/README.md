@@ -1,6 +1,6 @@
 # Private Amazon API Gateway with Private Custom Domain Name
 
-The SAM template deploys a Private Amazon API Gateway with a Private Custom Domain Name mapped to deployed stage. This template also create a Route53 CNAME record in a Private Hosted Zone to map the Private Custom Domain Name (e.g. private.mydomain.com) to the Target VPC Endpoint DNS Name. (e.g. vpce-abcdefgh123456789-abcd1234.execute-api.us-east-1.vpce.amazonaws.com).
+The SAM template deploys a Private Amazon API Gateway with a Private Custom Domain Name mapped to deployed stage. This template also create a Route53 A-Alias record in a Private Hosted Zone to map the Private Custom Domain Name (e.g. private.mydomain.com) to the Target VPC Endpoint DNS Name. (e.g. vpce-abcdefgh123456789-abcd1234.execute-api.us-east-1.vpce.amazonaws.com).
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/private-apigw-custom-domain)
 
@@ -31,9 +31,10 @@ Learn more about this pattern at [Serverless Land Patterns](https://serverlessla
 4. During the prompts:
     - Enter **stack name** and desired **AWS Region**.
     - Enter **DNS Name** of the **execute-api** VPC endpoint for the VpcEndpointDNSName parameter. (e.g. vpce-abcdefgh123456789-abcd1234.execute-api.us-east-1.vpce.amazonaws.com)
+    - Enter **Hosted Zone ID** of the **execute-api** VPC endpoint for the VPCEndpointHostedZoneID parameter. (This can be found along with the DNS Name of the VPC endpoing on the AWS Console.)
     - Enter **Private Custom Domain Name** (e.g. private.mydomain.com) for the CustomDomainName parameter.
     - Enter **ACM Certificate ARN** from the same region as Private Amazon API Gateway for the CertificateArn parameter. The certificate must cover the Private Custom Domain name entered in the previous step.
-    - Enter **Private Hosted Zone ID** that has the domain name you would like to use (e.g. mydomain.com) for the parameter PrivateHostedZoneId. 
+    - Enter **Private Hosted Zone ID** that has the domain name you would like to use for the parameter PrivateHostedZoneId. 
     - Allow SAM to create roles with the required permissions if needed.
 
     Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.

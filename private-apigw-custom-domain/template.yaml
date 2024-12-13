@@ -6,6 +6,8 @@ Description: >
 Parameters:
   VpcEndpointDNSName:
     Type: String
+  VPCEndpointHostedZoneID:
+    Type: String
   CustomDomainName:
     Type: String
   CertificateArn:
@@ -93,16 +95,16 @@ Resources:
       DomainNameArn: !GetAtt PrivateDomainName.DomainNameArn
       AccessAssociationSource: !Join ["-", [!Select [0, !Split ["-", !Select [0, !Split [".", !Ref VpcEndpointDNSName]]]], !Select [1, !Split ["-", !Select [0, !Split [".", !Ref VpcEndpointDNSName]]]]]]
       AccessAssociationSourceType: VPCE    
-
+  
   R53Alias:
     Type: AWS::Route53::RecordSet
     Properties:
       Name: !Ref CustomDomainName
       HostedZoneId: !Ref PrivateHostedZoneId
-      ResourceRecords: 
-        - !Ref VpcEndpointDNSName
-      Type: CNAME
-      TTL: 300
+      Type: A
+      AliasTarget:
+        DNSName: !Ref VpcEndpointDNSName
+        HostedZoneId: !Ref VPCEndpointHostedZoneID
 
 Outputs:
   CURLCommand:
