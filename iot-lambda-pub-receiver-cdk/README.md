@@ -16,6 +16,17 @@ Important: this application uses various AWS services and there are costs associ
 ## Architecture diagram
 ![Architecture diagram](./doc/architecture-diagram.png)
 
+This CDK stack creates an AWS IoT Core setup with a publisher-receiver pattern using Lambda functions. 
+Here's a breakdown of the main components:
+
+1. An IoT MQTT topic named "my/mqtt/topic"
+
+1. Publisher Lambda Function, written in Python and using ARM64 architecture, has permissions to publish messages to the specified MQTT topic (1). Its environment variables include the MQTT topic region and name.
+
+1. Receiver Lambda Function, also in Python and using ARM64 architecture, has permissions to receive messages from the MQTT topic.
+
+1. IoT Topic Rule, named "ProcessIoTMessages, uses SQL version 2016-03-23 to select all messages from the MQTT topic. It triggers the receiver Lambda function when messages arrive and it includes error logging to CloudWatch Logs.
+
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -37,10 +48,6 @@ Important: this application uses various AWS services and there are costs associ
 
 2. Note the outputs from the CDK deployment process. These contain the IoT endpoint address which is not relevant if you have only one account. However, in multi-accounts deployment, especially when the IoT resources are not in the same as the lambdas, then the endpoint address has to be specified in the functions' code.
 
-## How it works
-
-Explain how the service interaction works.
-
 ## Testing
 
 Provide steps to trigger the integration and show what should be observed if successful.
@@ -48,10 +55,10 @@ Provide steps to trigger the integration and show what should be observed if suc
 ## Cleanup
  
 Run the given command to delete the resources that were created. It might take some time for the CloudFormation stack to get deleted.
+
 ```bash
 cdk destroy
 ```
-    ```
 ----
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
