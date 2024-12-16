@@ -50,7 +50,16 @@ Here's a breakdown of the main components:
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+The following steps will help you test the pattern from the AWS Console:
+1. Trigger the publisher Lambda function
+   1. Navigate to AWS Lambda service and open the `LambdaIotCdkStack-iotPubHandler*` function.
+   1. From the `Test` tab, generate any event
+   1. A green notification should appears detailing that the execution has succeeded
+   1. Navigate to Amazon CloudWatch and open the Log group `/aws/lambda/pub-lambda`. The latest events will display the MQTT topic name and the AWS region where the message is sent.
+1. Verify receiver execution
+   1. Navigate to AWS Lambda service and open the `LambdaIotCdkStack-iotReceiverHandler*` function.
+   1. From the `Monitor` tab, look for the Invocations metrics. A data point should be displayed indicated the execution of the receiver Lambda function just after that the publisher Lambda function has been triggered.
+   1. Navigate to Amazon CloudWatch and open the Log group `/aws/lambda/receiver-lambda`. The latest events will display the input of the publisher Lambda function.
 
 ## Cleanup
  
