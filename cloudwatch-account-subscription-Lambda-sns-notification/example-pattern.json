@@ -1,0 +1,60 @@
+{
+  "title": "Sccount level alerting system using CloudWatch subscription filter, Lambda and SNS",
+  "description": "Creates alerting system at account level wich triggers Lambda function which can parse and publish a SNS notification",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates an alerting system using CloudWatch Logs Subscription filter to a Lambda function to trigger a SNS notification when the specified pattern is mateched across any of the CloudWatch loggroup",
+      "This allows a centralised alrteting system which can monitor and alert via SNS trigger, additionally allows the loggroups to be excluded",
+      "This pattern deploys one SNS topic with email subsciption, CloudWatch loggroup Account and subscription filter, notification Lambda [Is triggered by CloudWatch log Subscription and publish a SNS message]"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudwatch-account-subscription-Lambda-sns-notification",
+      "templateURL": "serverless-patterns/cloudwatch-account-subscription-Lambda-sns-notification",
+      "projectFolder": "cloudwatch-account-subscription-Lambda-sns-notification",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Account-level subscription filters",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters-AccountLevel.html#LambdaFunctionExample-AccountLevel"
+      },
+      {
+        "text": "Lambda function",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided --parameter-overrides 'EmailAddress="your-Exmaple-email@mail.com"'"
+    ]
+  },
+  "testing": {
+    "text": [
+      "This pattern depploys account level subscritption filter which is monitors all the existing and new loggroup with matching log pattern of Exception. Thus, can catch any event with pattern Excpetion across all application. Optionally, you can produce any Exception in any applciation logs",
+      "This pattern also creates a new SNS topic with email subscription for provided email address. Please confirm the subscription by clicking on the confirmation request mail sent by Amazon SNS to allow this pattern to send a SNS notification successfully"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shubham",
+      "image": "https://avatars.githubusercontent.com/u/150242047?s=400&u=aaa2db07529d3e1e82ec59daacb05b6abc7c3a5f&v=4",
+      "bio": "Cloud Support Engineer - SVLS",
+      "linkedin": "shubham-more-1b6aa185"
+    }
+  ]
+}

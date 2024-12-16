@@ -1,0 +1,60 @@
+{
+  "title": "Amazon CloudWatch Log Subscription filter to Lambda and SNS notification",
+  "description": "Creates alerting system for a time sensitive Lambda where a Notification is triggered to SNS topic when the original Lambda encounters timeout",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates an alerting system using CloudWatch Logs Subscription filter to a Lambda function to trigger a SNS notification when the original function encounters timeout",
+      "Currently we dont have out of box offering to alert the customer when there Lambda function encounters timeout. For time sensitive applciations Customer would like to get notification when their Lambda function is timedout",
+      "This pattern deploys one SNS topic with email subsciption, CloudWatch loggroup and subscription filter, two Lambda functions - sample Lambda [ to demonstrate timeout ] , notification Lambda [Is triggered by CloudWatch log Subscription and publish a SNS message]"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-cloudwatch-subscription-sns-notification",
+      "templateURL": "serverless-patterns/lambda-cloudwatch-subscription-sns-notification",
+      "projectFolder": "lambda-cloudwatch-subscription-sns-notification",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "CloudWatch Subscription Fileter",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Subscriptions.html"
+      },
+      {
+        "text": "Lambda function is timing out?",
+        "link": "https://repost.aws/knowledge-center/lambda-verify-invocation-timeouts"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided --parameter-overrides 'EmailAddress="your-Exmaple-email@mail.com"'"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Invoke the Sample Lambda to demonstrate the template. Sample lambda is hardcoded to timeout. Thus, triggering the CloudWatch log subscription filter with pattern matching. The notification Lambda publish a sns email notification with timeout function, loggroup and logstream details",
+      "This pattern also creates a new SNS topic with email subscription for provided email address. Please confirm the subscription by clicking on the confirmation request mail sent by Amazon SNS to allow this pattern to send a SNS notification successfully"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shubham",
+      "image": "https://avatars.githubusercontent.com/u/150242047?s=400&u=aaa2db07529d3e1e82ec59daacb05b6abc7c3a5f&v=4",
+      "bio": "Cloud Support Engineer - SVLS",
+      "linkedin": "shubham-more-1b6aa185"
+    }
+  ]
+}
