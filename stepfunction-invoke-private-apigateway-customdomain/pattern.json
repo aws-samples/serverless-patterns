@@ -1,0 +1,68 @@
+{
+  "title": "AWS Step Functions with direct integration with Private REST API Gateway Custom Domain",
+  "description": "The SAM template deploys a Step Functions Standard workflow that invokes a Private REST API Gateway Custom Domain.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Start the Standard Workflow using the start-execution api.",
+      "The Workflow invokes the Private REST API Gateway Custom Domain using the EventBridge Connection created using the SAM template.",
+      "EventBridge Connection is configured with the Amazon VPC Lattice and AWS PrivateLink to connect to Private API within AWS network."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunction-invoke-private-apigateway-customdomain",
+      "templateURL": "serverless-patterns/stepfunction-invoke-private-apigateway-customdomain",
+      "projectFolder": "stepfunction-invoke-private-apigateway-customdomain",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Step Functions - Call third-party APIs",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-third-party-apis.html"
+      },
+      {
+          "text": "External endpoints and testing of task states now available in AWS Step Functions",
+          "link": "https://aws.amazon.com/blogs/aws/external-endpoints-and-testing-of-task-states-now-available-in-aws-step-functions/"
+      },
+      {
+          "text": "Amazon EventBridge and AWS Step Functions announce integration with private APIs",
+          "link": "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-eventbridge-step-functions-integration-private-apis/"
+      },
+      {
+          "text": "Securely share AWS resources across VPC and account boundaries with PrivateLink, VPC Lattice",
+          "link": "https://aws.amazon.com/blogs/aws/securely-share-aws-resources-across-vpc-and-account-boundaries-with-privatelink-vpc-lattice-eventbridge-and-step-functions/"
+      },
+      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sahil Kapoor",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQHTVptga3RxcA/profile-displayphoto-shrink_800_800/B56ZO3ZfseHoAc-/0/1733948735068?e=1739404800&v=beta&t=FX6MFZ2JFH17KQc89u4gY6tQXGoMJLiLkB2qT3MtV2g",
+      "bio": "Cloud Support Engineer at AWS",
+      "linkedin": "sahil-kapoor-503391a7",
+      "twitter": ""
+    }
+  ]
+}

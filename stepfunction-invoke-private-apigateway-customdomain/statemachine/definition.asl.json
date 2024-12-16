@@ -1,0 +1,30 @@
+  {
+    "QueryLanguage": "JSONata",
+    "Comment": "A description of my state machine",
+    "StartAt": "Call HTTPS APIs",
+    "States": {
+      "Call HTTPS APIs": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::http:invoke",
+        "Arguments": {
+          "ApiEndpoint": "${InvokeURL}",
+          "Method": "GET",
+          "InvocationConfig": {
+            "ConnectionArn": "${ConnectionArn}"
+          }
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "BackoffRate": 2,
+            "IntervalSeconds": 1,
+            "MaxAttempts": 3,
+            "JitterStrategy": "FULL"
+          }
+        ],
+        "End": true
+      }
+    }
+  }
