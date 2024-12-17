@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sam template demonstrates how to create a Private Amazon API Gateway with a Private Custom Domain Name, configure secure access based on a specific VPC endpoint, and route traffic through Route 53 in a private hosted zone.",
+      "This AWS SAM template demonstrates how to create a private Amazon API Gateway with a private custom domain mame, configure secure access based on a specific VPC endpoint, and route traffic through Route 53 in a private hosted zone.",
       "Private Custom Domain name is only accessible from a VPC endpoint, which is mapped to a stage in private Amazon API Gateway. A custom domain name is configured with an SSL/TLS certificate to provide secure access, and an associated Route 53 A-Alias record ensures that traffic is routed to the API.",
       "As prerequisites for this pattern, you must have:"
       "* A DNS Name of execute-api VPC Endpoint",
