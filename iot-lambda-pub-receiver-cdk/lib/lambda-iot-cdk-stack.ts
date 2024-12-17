@@ -109,7 +109,6 @@ export class LambdaIotCdkStack extends Stack {
       policy: AwsCustomResourcePolicy.fromSdkCalls({resources: AwsCustomResourcePolicy.ANY_RESOURCE})
     })
     const IOT_ENDPOINT = ioTEndpoint.getResponseField('endpointAddress')
-    console.log(IOT_ENDPOINT)
     return ioTEndpoint
   }
 }
