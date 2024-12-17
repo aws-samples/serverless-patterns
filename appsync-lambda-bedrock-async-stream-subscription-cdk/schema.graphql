@@ -1,0 +1,35 @@
+type Subscription {
+  # Subscribe to specific conversation
+  onReceiveChunk(conversationId: ID): ChunkResponse
+    @aws_subscribe(mutations: ["sendChunk"])
+  
+  # Subscribe to all conversations
+  onReceiveChunkBroadcast: ChunkResponse
+    @aws_subscribe(mutations: ["sendChunk"])
+}
+
+type Mutation {
+  startConversation(input: String!): ConversationResponse!
+  sendChunk(conversationId: ID!, chunk: String!): ChunkResponse!
+  }
+
+type ConversationResponse {
+  conversationId: ID!
+  status: String!
+}
+
+type ChunkResponse {
+  conversationId: ID!
+  chunk: String!
+}
+
+type Query {
+  # Required but not used for this flow
+  dummy: String
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
