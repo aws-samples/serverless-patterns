@@ -246,5 +246,6 @@ def lambda_handler(event, context):
 
 if __name__ == "__main__":
     app = cdk.App()
-    ApigwRedshiftDataApi(app, "ApigwRedshiftDataApi")
+    description = "Serverlessland Pattern for Redshift Data API. (uksb-1tthgi812) (tag:apigw-lambda-redshiftdataapi)"
+    ApigwRedshiftDataApi(app, "ApigwRedshiftDataApi",description=description)
     app.synth()
