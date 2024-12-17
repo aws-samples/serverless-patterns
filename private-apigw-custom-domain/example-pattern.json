@@ -1,6 +1,6 @@
 {
   "title": "Private Amazon API Gateway with private custom domain name",
-  "description": "Create a Private API Gateway with a Private Custom Domain Name, configure access based on VPC endpoint, and set up DNS routing using Amazon Route 53 private hosted zone.",
+  "description": "Create a Private API Gateway with a private custom domain name, configure access based on VPC endpoint, and set up DNS routing using Amazon Route 53 private hosted zone.",
   "language": "",
   "level": "200",
   "framework": "SAM",
