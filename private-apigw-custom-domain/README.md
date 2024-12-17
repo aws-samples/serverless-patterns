@@ -1,4 +1,4 @@
-# Private Amazon API Gateway with Private Custom Domain Name
+# Private Amazon API Gateway with private custom domain name
 
 The SAM template deploys a Private Amazon API Gateway with a Private Custom Domain Name mapped to deployed stage. This template also create a Route53 A-Alias record in a Private Hosted Zone to map the Private Custom Domain Name (e.g. private.mydomain.com) to the Target VPC Endpoint DNS Name. (e.g. vpce-abcdefgh123456789-abcd1234.execute-api.us-east-1.vpce.amazonaws.com).
 
