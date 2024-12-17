@@ -22,7 +22,7 @@ Resources:
     Type: AWS::Serverless::Function
     Description: Invoked by EventBridge rule
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Events:
         Trigger:
           Type: EventBridgeRule 
@@ -31,10 +31,13 @@ Resources:
               source:
                 - custom.myApp
               detail-type:
-                - transaction                
+                - transaction
               detail:
                 location:
                   - "prefix": "EUR-"
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 
 Outputs:
   ConsumerFunction:
