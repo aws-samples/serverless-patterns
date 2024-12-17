@@ -24,20 +24,20 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
         excludeVerboseContent: false,
         retention: logs.RetentionDays.ONE_WEEK
       },
-      xrayEnabled: true
-    });    
+      xrayEnabled: false // Disable X-Ray tracing
+    });
 
     const invocationHandler = new NodejsFunction(this, 'InvocationHandler', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: path.join(__dirname, 'lambda/invocation/index.ts'),
-      timeout: cdk.Duration.seconds(300),
+      timeout: cdk.Duration.minutes(15), // Set Lambda timeout to the maximum (15 minutes)
       environment: {
         APPSYNC_ENDPOINT: api.graphqlUrl,
         APPSYNC_API_KEY: api.apiKey || '',
       },
       logRetention: logs.RetentionDays.ONE_WEEK,
-      tracing: lambda.Tracing.ACTIVE
+      tracing: lambda.Tracing.DISABLED // Disable X-Ray tracing for Lambda
     });
 
     // Add Bedrock permissions to Lambda
@@ -92,7 +92,6 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
         })
       `)
     });
-       
 
     noneDS.createResolver('SubscriptionResolver', {
       typeName: 'Subscription',

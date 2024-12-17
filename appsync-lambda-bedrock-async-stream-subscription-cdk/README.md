@@ -75,28 +75,23 @@ Outputs:
 AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack.GraphQLApiKey = da2-367hvetdp5f6flyii7xnlafgki
 AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack.GraphQLApiUrl = https://3xbko6bpk5awvahhtvo3htsfpm.appsync-api.us-east-1.amazonaws.com/graphql
 
-mutation StartGeneration {
-  startGeneration(prompt: "Tell me a short story about a robot learning to paint") {
-    id
+
+# Sample Queries to test from App Sync Console
+
+1. Trigger subscription:
+subscription OnReceiveChunkBroadcast {
+  onReceiveChunkBroadcast {
+    conversationId
+    chunk
+  }
+}
+
+2. 
+
+Mutation trigger
+mutation StartConversation {
+  startConversation(input: "tell me a long joke") {
+    conversationId
     status
   }
 }
-
-# For specific stream
-subscription OnSpecificStream {
-  onUpdateStream(id: "123") {
-    id
-    chunk
-  }
-}
-
-# For all streams
-subscription OnAllStreams {
-  onAnyStreamUpdate {
-    id
-    chunk
-  }
-}
-
-
-1734111451736
