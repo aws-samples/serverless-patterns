@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template to invoke Private API Custom Domain from Step functions
+
+Parameters:
+  Domainname:
+    Type: String
+    Description: Custom Domain name configured for Private REST API. 
+
+  PrivateAPIInvokeURL:
+    Type: String
+    Description: Complete Invocation url for the Private API Gateway resource. Eg - https://DOMAIN/<RESOURC>
+
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID to create Resource Gateway & Configuration
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs Resource Gateway & Configuration
+
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: SecurityGroups IDs for Resource Gateway.
+
+
+Resources:
+  ResourceGatewayVpcLattice:
+    Type: AWS::VpcLattice::ResourceGateway
+    Properties:
+      IpAddressType: IPV4
+      Name: resourcegateway-private-api
+      SecurityGroupIds: !Ref SecurityGroups
+      SubnetIds: !Ref SubnetIds
+      VpcIdentifier: !Ref VPCId
+
+  ResourceConfiguration:
+    Type: AWS::VpcLattice::ResourceConfiguration
+    Properties:
+      AllowAssociationToSharableServiceNetwork: True
+      Name: resource-config-private-api
+      PortRanges: 
+        - 443
+      ProtocolType: TCP
+      ResourceConfigurationAuthType: NONE
+      ResourceConfigurationDefinition: 
+        DnsResource: 
+          DomainName: !Ref Domainname
+          IpAddressType: IPV4
+      ResourceConfigurationType: SINGLE
+      ResourceGatewayId: !GetAtt ResourceGatewayVpcLattice.Arn
+
+  APIConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      Name: 'Private-API-Gateway-Connection'
+      InvocationConnectivityParameters:
+        ResourceParameters:
+            ResourceConfigurationArn: !GetAtt ResourceConfiguration.Arn
+      AuthorizationType: API_KEY
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: x-api-key
+          ApiKeyValue: 'test'
+
+  StepFunction:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name : StepFunction-PrivateAPI
+      Role : !GetAtt StepFunctionEventRole.Arn
+      DefinitionUri: statemachine/definition.asl.json
+      DefinitionSubstitutions:
+        InvokeURL: !Ref PrivateAPIInvokeURL
+        ConnectionArn : !GetAtt APIConnection.Arn
+
+  StepFunctionEventRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StepFunctionExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              
+              - Effect: Allow
+                Action:
+                  - events:RetrieveConnectionCredentials
+                Resource: !GetAtt APIConnection.Arn
+
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:DescribeSecret
+                Resource: !GetAtt APIConnection.SecretArn
+
+              - Effect: Allow
+                Action:
+                  - states:InvokeHTTPEndpoint
+                Resource: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*
+
+
+Outputs:
+  ResourceGatewayVpcLattice:
+    Description: "ResourceGatewayVpcLattice ARN"
+    Value: !GetAtt ResourceGatewayVpcLattice.Arn
+
+  ResourceConfiguration:
+    Description: "ResourceConfiguration ARN"
+    Value: !GetAtt ResourceConfiguration.Arn
+
+  APIConnection:
+    Description: "APIConnection Name"
+    Value: !GetAtt APIConnection.Arn
+
+  StepFunction:
+    Description: "Step Function Name"
+    Value: !GetAtt StepFunction.Name
+
+
+
