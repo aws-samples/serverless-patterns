@@ -1,0 +1,56 @@
+{
+    "title": "S3 to Lambda to DynamoDB",
+    "description": "Upload object data from S3 to DynamoDB via Lambda.",
+    "language": "Python",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern in Terraform offers a complete solution to load data from JSON files stored on S3. The following resources are created:",
+        "- S3 Bucket with event notification on object creates",
+        "- DynamoDB Table with on-demand billing mode",
+        "- Lambda function that runs python and takes environment variables of bucket name, and dynamodb table"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-dynamodb-terraform",
+        "templateURL": "serverless-patterns/s3-lambda-dynamodb-terraform",
+        "projectFolder": "s3-lambda-dynamodb-terraform",
+        "templateFile": "main.tf"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon S3 Event Notifications",
+          "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/NotificationHowTo.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "terraform init",
+        "terraform apply --auto-approve"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>terraform destroy --auto-approve</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Sarika Subramaniam",
+        "image": "link-to-your-photo.jpg",
+        "bio": "Sarika is a Solutions Architect at Amazon Web Services based in London.",
+        "linkedin": "sarika-subramaniam-9ba591118/"
+      }
+    ]
+  }
