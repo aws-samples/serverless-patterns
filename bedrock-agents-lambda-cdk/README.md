@@ -1,4 +1,4 @@
-# Serverlessland - Amazon Bedrock Agents with AWS Lambda
+# Amazon Bedrock Agents with AWS Lambda
 
 ![Architecture](image/architecture.png)
 
