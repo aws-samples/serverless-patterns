@@ -1,0 +1,40 @@
+# init cloudformation template
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+  EventsApi:
+    Type: AWS::AppSync::Api
+    Properties:
+      Name: demo
+      EventConfig:
+        AuthProviders:
+          - AuthType: API_KEY
+        ConnectionAuthModes:
+          - AuthType: API_KEY
+        DefaultPublishAuthModes:
+          - AuthType: API_KEY
+        DefaultSubscribeAuthModes:
+          - AuthType: API_KEY
+
+  Channel:
+    Type: AWS::AppSync::ChannelNamespace
+    Properties:
+      ApiId: !GetAtt EventsApi.ApiId
+      #CodeHandlers: String
+      #CodeS3Location: String
+      Name: BedrockChat
+      PublishAuthModes: 
+        - AuthType: API_KEY
+      SubscribeAuthModes: 
+        - AuthType: API_KEY
+
+
+  ApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt EventsApi.ApiId
+      Description: Api Key for Events Api
+      Expires: 1733989774
+
+
+

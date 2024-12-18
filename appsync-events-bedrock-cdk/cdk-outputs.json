@@ -1,0 +1,10 @@
+{
+  "AppsyncEventsBedrockCdkStack": {
+    "ApiKey": "da2-imdsnscd6jfa3fpyjv57db6zyu",
+    "ChannelName": "BedrockChat",
+    "Region": "eu-central-1",
+    "EventsApiHttp": "6fsvhbewzjbuziulxwuastj2hi.appsync-api.eu-central-1.amazonaws.com",
+    "EventsApiRealtime": "6fsvhbewzjbuziulxwuastj2hi.appsync-realtime-api.eu-central-1.amazonaws.com",
+    "ChatApiUrl": "https://tcv8ilbelj.execute-api.eu-central-1.amazonaws.com"
+  }
+}
