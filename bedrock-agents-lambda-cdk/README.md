@@ -1,6 +1,7 @@
 # Serverlessland - Amazon Bedrock Agents with AWS Lambda
 
-[Image: image/architecture.png]
+![Architecture](image/architecture.png)
+
 In this pattern, we show you how to use Amazon Bedrock Agents to call an API and get the results from it for a user. Bedrock Agents is helpful in various situations such as fetching real-time information from APIs, interacting with knowledge bases, and performing actions based on user inputs. For more information on Bedrock agents, see [Automate tasks in your application using AI agents](https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html).
 
 > [!Important]
@@ -23,19 +24,19 @@ In this pattern, we show you how to use Amazon Bedrock Agents to call an API and
 git clone https://github.com/aws-samples/serverless-patterns
 ```
 
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
 
 ```
 cd bedrock-agents-lambda-cdk
 ```
 
-1. Create a virtual environment for Python:
+3. Create a virtual environment for Python:
 
 ```
 python3 -m venv .venv
 ```
 
-1. Activate the virtual environment:
+4. Activate the virtual environment:
 
 ```
 source .venv/bin/activate
@@ -47,25 +48,25 @@ For a Windows platform, activate the virtualenv like this:
 .venv\Scripts\activate.bat
 ```
 
-1. Install the required Python dependencies:
+5. Install the required Python dependencies:
 
 ```
 pip install -r requirements.txt
 ```
 
-1. Bootstrap the AWS environment, if you haven't already done so:
+6. Bootstrap the AWS environment, if you haven't already done so:
 
 ```
 cdk bootstrap
 ```
 
-1. Review the CloudFormation template AWS CDK generates for the stack:
+7. Review the CloudFormation template AWS CDK generates for the stack:
 
 ```
 cdk synth
 ```
 
-1. Deploy the AWS resources:
+8. Deploy the AWS resources:
 
 ```
 cdk deploy
@@ -81,13 +82,13 @@ Bedrock agent processes user input through a foundation model to determine its n
 To test the Bedrock agent, we will need to use the AWS console. The Lambda function will call the International Space Station API to fetch its location, so it can answer questions such as “What is the current location of ISS'”, “Where is ISS?'”, “Where is the internation space station now”, etc
 
 1. Navigate to the Amazon Bedrock Agents page on the AWS console
-2. Selected the deployed agent ISSLocationAgent
+2. Selected the deployed agent **ISSLocationAgent**
 3. If you don’t see a Test section on the right pane, click on **Test**
 4. Enter a message similar to “What is the current location of ISS'” and notice that the results are returned
 
 ## Cleanup
 
-1. Run below script in the `bedrock-agents-lambda-cdk` directory to delete AWS resources created by this sample stack.
+Run below script in the `bedrock-agents-lambda-cdk` directory to delete AWS resources created by this sample stack.
 
 ```
 cdk destroy
