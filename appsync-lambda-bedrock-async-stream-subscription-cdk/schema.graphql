@@ -1,5 +1,4 @@
 type Mutation {
-  createConversation(conversationId: ID!): ConversationResponse!
   startConversation(input: StartConversationInput!): ConversationResponse!
   sendChunk(conversationId: ID!, chunk: String!): ChunkResponse!
   completeStream(conversationId: ID!): CompletionResponse!

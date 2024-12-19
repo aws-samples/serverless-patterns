@@ -20,24 +20,6 @@ Amplify.configure({
 // Generate Amplify client
 const client = generateClient();
 
-async function createConversation(conversationId: string) {
-  const mutation = `
-    mutation CreateConversation($conversationId: ID!) {
-      createConversation(conversationId: $conversationId) {
-        conversationId
-        status
-      }
-    }
-  `;
-
-  console.log('Creating conversation...');
-  const response = await client.graphql({
-    query: mutation,
-    variables: { conversationId }
-  });
-  console.log('CreateConversation response:', response);
-}
-
 async function startConversation(prompt: string, conversationId: string) {
   const mutation = `
     mutation StartConversation($input: StartConversationInput!) {
@@ -94,13 +76,10 @@ async function main() {
     const TEST_CONVERSATION_ID = '123e4567-e89b-12d3-a456-426614174000';
     const TEST_PROMPT = 'Tell me a joke';
 
-    // Step 1: Create a conversation
-    await createConversation(TEST_CONVERSATION_ID);
-
-    // Step 2: Subscribe to chunks
+    // Step 1: Subscribe to chunks
     const subscription = subscribeToChunks(TEST_CONVERSATION_ID);
 
-    // Step 3: Start the long-running invocation (start conversation)
+    // Step 2: Start the long-running invocation (start conversation)
     setTimeout(async () => {
       await startConversation(TEST_PROMPT, TEST_CONVERSATION_ID);
     }, 2000);
