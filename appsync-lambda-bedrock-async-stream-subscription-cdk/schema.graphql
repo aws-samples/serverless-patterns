@@ -28,8 +28,8 @@ type ConversationResponse {
 }
 
 type ChunkResponse {
-  conversationId: ID!
-  chunk: String!
+  conversationId: ID
+  chunk: String
 }
 
 type CompletionResponse {

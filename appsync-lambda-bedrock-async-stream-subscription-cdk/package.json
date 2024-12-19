@@ -12,10 +12,11 @@
     "deploy": "cdk deploy"
   },
   "devDependencies": {
+    "@types/cookie": "^0.6.0",
     "@types/jest": "^29.5.5",
     "@types/node": "^20.7.1",
-    "@types/ws": "^8.5.5",
     "aws-cdk": "^2.99.1",
+    "cookie": "^0.5.0",
     "esbuild": "^0.19.4",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1",
@@ -24,13 +25,12 @@
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.428.0",
-    "@aws-sdk/client-appsync": "^3.428.0",
+    "aws-amplify": "^6.0.12",
     "aws-cdk-lib": "^2.99.1",
     "constructs": "^10.0.0",
+    "cookie": "^0.5.0",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
-    "subscriptions-transport-ws": "^0.11.0",
-    "ws": "^8.14.2",
     "source-map-support": "^0.5.21"
   }
 }
