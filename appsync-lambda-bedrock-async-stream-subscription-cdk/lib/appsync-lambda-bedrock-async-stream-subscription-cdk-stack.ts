@@ -20,25 +20,32 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
         },
       },
       logConfig: {
-        fieldLogLevel: appsync.FieldLogLevel.ALL,
-        excludeVerboseContent: false,
+        fieldLogLevel: appsync.FieldLogLevel.ALL, // Change to ALL to see resolver details
+        excludeVerboseContent: false, // Include verbose content
         retention: logs.RetentionDays.ONE_WEEK
       },
-      xrayEnabled: false // Disable X-Ray tracing
+      xrayEnabled: false
     });
+    
+    
 
     const invocationHandler = new NodejsFunction(this, 'InvocationHandler', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: path.join(__dirname, 'lambda/invocation/index.ts'),
-      timeout: cdk.Duration.minutes(15), // Set Lambda timeout to the maximum (15 minutes)
+      timeout: cdk.Duration.minutes(15),
       environment: {
         APPSYNC_ENDPOINT: api.graphqlUrl,
         APPSYNC_API_KEY: api.apiKey || '',
       },
       logRetention: logs.RetentionDays.ONE_WEEK,
-      tracing: lambda.Tracing.DISABLED // Disable X-Ray tracing for Lambda
+      tracing: lambda.Tracing.DISABLED,
+      bundling: {
+        minify: true,
+        sourceMap: false // Disable source maps to reduce log size
+      }
     });
+    
 
     // Add Bedrock permissions to Lambda
     invocationHandler.addToRolePolicy(new iam.PolicyStatement({
@@ -63,13 +70,48 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
     }));
 
     const invocationDS = api.addLambdaDataSource('InvocationDataSource', invocationHandler);
-    const noneDS = api.addNoneDataSource('NoneDataSource');
+
 
     invocationDS.createResolver('StartConversationResolver', {
       typeName: 'Mutation',
       fieldName: 'startConversation',
+      requestMappingTemplate: appsync.MappingTemplate.fromString(`
+        {
+          "version": "2018-05-29",
+          "operation": "Invoke",
+          "invocationType": "Event",
+          "payload": $util.toJson($context.arguments)
+        }
+      `),
+      responseMappingTemplate: appsync.MappingTemplate.fromString(`
+        #if($context.error)
+          $util.error($context.error.message, $context.error.type)
+        #end
+        {
+          "conversationId": "$context.arguments.input.conversationId",
+          "status": "STARTED"
+        }
+      `)
     });
-
+    
+    const noneDS = api.addNoneDataSource('NoneDataSource');
+    noneDS.createResolver('CreateConversationResolver', {
+      typeName: 'Mutation',
+      fieldName: 'createConversation',
+      requestMappingTemplate: appsync.MappingTemplate.fromString(`
+        {
+          "version": "2018-05-29",
+          "payload": {
+            "conversationId": "$context.arguments.conversationId",
+            "status": "CREATED"
+          }
+        }
+      `),
+      responseMappingTemplate: appsync.MappingTemplate.fromString(`
+        $util.toJson($context.result)
+      `),
+    });
+    
     noneDS.createResolver('SendChunkResolver', {
       typeName: 'Mutation',
       fieldName: 'sendChunk',
@@ -106,6 +148,51 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
         '$util.toJson($context.result)'
       ),
     });
+
+    noneDS.createResolver('SendErrorResolver', {
+      typeName: 'Mutation',
+      fieldName: 'sendError',
+      requestMappingTemplate: appsync.MappingTemplate.fromString(`
+        #set($logMessage = "sendError invoked with arguments - Conversation ID: $context.arguments.conversationId, Error Message: $context.arguments.error")
+        $util.log($logMessage)
+        {
+          "version": "2018-05-29",
+          "payload": {
+            "conversationId": "$context.arguments.conversationId",
+            "error": "$context.arguments.error"
+          }
+        }
+      `),
+      responseMappingTemplate: appsync.MappingTemplate.fromString(`
+        #if($context.error)
+          $util.error($context.error.message, $context.error.type)
+        #end
+        $util.toJson($context.result)
+      `),
+    });
+
+    noneDS.createResolver('CompleteStreamResolver', {
+      typeName: 'Mutation',
+      fieldName: 'completeStream',
+      requestMappingTemplate: appsync.MappingTemplate.fromString(`
+        {
+          "version": "2017-02-28",
+          "payload": {
+            "conversationId": "$context.arguments.conversationId",
+            "status": "COMPLETED"
+          }
+        }
+      `),
+      responseMappingTemplate: appsync.MappingTemplate.fromString(`
+        #if($context.error)
+          $util.error($context.error.message, $context.error.type)
+        #end
+        $util.toJson($context.result)
+      `)
+    });
+    
+    
+    
 
     // Add CloudWatch dashboard for monitoring
     new cdk.CfnOutput(this, 'GraphQLAPIURL', {

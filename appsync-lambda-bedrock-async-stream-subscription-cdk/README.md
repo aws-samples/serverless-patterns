@@ -95,3 +95,29 @@ mutation StartConversation {
     status
   }
 }
+======
+
+Based on the search results and architecture diagram, I need to correct some misconceptions about AWS AppSync's Event mode Lambda invocations:
+The Issue
+The article's proposed solution won't work as intended because:
+
+    AppSync's Event mode invocation doesn't maintain the Lambda execution context after returning the initial response2
+
+    The Lambda function will still terminate after returning the response, regardless of any background processing attempts6
+
+Why It Doesn't Work
+The fundamental problems are:
+
+    AppSync's Event mode is designed for fire-and-forget scenarios, not for maintaining long-running connections3
+    The Lambda execution context cannot be kept alive after the initial response is sent back to AppSync10
+    The WebSocket connection through AppSync subscriptions needs a continuous execution context to send updates11
+
+Correct Implementation
+For long-running AI model invocations with streaming responses, you should instead use one of these patterns:
+
+    Split the process into two Lambda functions - one for immediate response and another for processing4
+    Use a queue-based architecture with SQS to handle the long-running process2
+
+    For streaming responses under 10 seconds, use AppSync's direct Bedrock integration9
+
+The article's proposed architecture, while theoretically sound, doesn't account for Lambda's execution context limitations in practice.

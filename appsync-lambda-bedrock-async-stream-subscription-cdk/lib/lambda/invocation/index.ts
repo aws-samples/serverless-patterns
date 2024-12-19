@@ -1,125 +1,168 @@
-import { BedrockRuntimeClient, InvokeModelWithResponseStreamCommand } from "@aws-sdk/client-bedrock-runtime";
+import { BedrockRuntimeClient, InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
 import { GraphQLClient } from 'graphql-request';
-import { v4 as uuidv4 } from 'uuid';
 
-interface AppSyncEvent {
-  arguments: {
-    input: string;
+interface Event {
+  input: {
+    conversationId: string;
+    prompt: string;
   };
 }
 
-export const handler = async (event: AppSyncEvent, context: any) => {
-  console.log('Step 2: Lambda received event:', JSON.stringify(event, null, 2));
+function sanitizeGraphQLString(text: string): string {
+  return text
+    .replace(/[\n\r]/g, ' ')    // Replace newlines with spaces
+    .replace(/\\/g, '\\\\')     // Escape backslashes
+    .replace(/"/g, '\\"')       // Escape double quotes
+    .replace(/\t/g, ' ')        // Replace tabs with spaces
+    .trim();                    // Remove leading/trailing whitespace
+}
 
-  // Prevent Lambda from terminating early
-  context.callbackWaitsForEmptyEventLoop = false;
+export const handler = async (event: Event) => {
+  console.log('Received event:', JSON.stringify(event));
 
-  const bedrockClient = new BedrockRuntimeClient();
+  const { conversationId, prompt } = event.input;
+
+  if (!conversationId || !prompt) {
+    console.error('Invalid input: Missing conversationId or prompt');
+    return;
+  }
+
+  console.log(`Starting Bedrock stream for conversationId: ${conversationId}`);
+
+  const bedrockClient = new BedrockRuntimeClient({});
   const graphQLClient = new GraphQLClient(process.env.APPSYNC_ENDPOINT!, {
-    headers: {
-      'x-api-key': process.env.APPSYNC_API_KEY!
-    },
+    headers: { 'x-api-key': process.env.APPSYNC_API_KEY! },
   });
 
   try {
-    const input = event.arguments.input;
-    if (!input) {
-      throw new Error('Input is required');
-    }
-
-    // Generate a unique conversationId
-    const conversationId = uuidv4();
-    console.log('Generated conversationId:', conversationId);
-
-    // Start processing Bedrock stream in the background
-    processBedrockStream(bedrockClient, graphQLClient, input, conversationId);
-
-    // Return immediate response to AppSync mutation caller
-    return {
-      conversationId,
-      status: "PROCESSING"
-    };
-
+    await processBedrockStream(bedrockClient, graphQLClient, prompt, conversationId);
+    console.log(`Successfully completed processing for conversationId: ${conversationId}`);
   } catch (error) {
-    console.error('Lambda execution error:', error);
-    if (error instanceof Error) {
-      return {
-        conversationId: 'error',
-        status: error.message
-      };
-    }
-    return {
-      conversationId: 'error',
-      status: 'Unknown error occurred'
-    };
+    console.error(`Error during processing for conversationId ${conversationId}:`, error);
+    await notifyError(graphQLClient, conversationId, error);
   }
 };
 
-// Function to handle Bedrock streaming in the background
 async function processBedrockStream(
   bedrockClient: BedrockRuntimeClient,
   graphQLClient: GraphQLClient,
   input: string,
   conversationId: string
-) {
-  try {
-    const params = {
-      modelId: "anthropic.claude-v2",
-      contentType: "application/json",
-      accept: "application/json",
-      body: JSON.stringify({
-        anthropic_version: "bedrock-2023-05-31",
-        max_tokens: 4096,
-        messages: [{
-          role: "user",
-          content: input
-        }]
-      })
-    };
+): Promise<void> {
+  const params = {
+    modelId: 'anthropic.claude-v2',
+    contentType: 'application/json',
+    accept: 'application/json',
+    body: JSON.stringify({
+      anthropic_version: 'bedrock-2023-05-31',
+      max_tokens: 4096,
+      messages: [{ role: 'user', content: input }],
+    }),
+  };
 
-    console.log('Invoking Bedrock with params:', JSON.stringify(params, null, 2));
-    const command = new InvokeModelWithResponseStreamCommand(params);
-    const stream = await bedrockClient.send(command);
+  const command = new InvokeModelWithResponseStreamCommand(params);
+  const stream = await bedrockClient.send(command);
 
-    if (stream.body) {
-      let accumulatedText = '';
-
-      for await (const chunk of stream.body) {
-        if (chunk.chunk?.bytes) {
-          const parsed = JSON.parse(
-            Buffer.from(chunk.chunk.bytes).toString("utf-8")
-          );
-          console.log('Received chunk from Bedrock:', parsed);
-
-          if (parsed.delta?.text) {
-            accumulatedText += parsed.delta.text;
-
-            // Send chunk update via AppSync mutation
-            const mutation = `
-              mutation SendChunk($conversationId: ID!, $chunk: String!) {
-                sendChunk(conversationId: $conversationId, chunk: $chunk) {
-                  conversationId
-                  chunk
-                }
-              }
-            `;
-
-            try {
-              await graphQLClient.request(mutation, {
-                conversationId,
-                chunk: parsed.delta.text
-              });
-              console.log('Chunk sent to subscription:', parsed.delta.text);
-            } catch (error) {
-              console.error('Error sending chunk to subscription:', error);
-            }
-          }
-        }
-      }
-
-      console.log('Completed streaming. Total accumulated text:', accumulatedText);
-    }
-  } catch (error) {
-    console.error('Error during Bedrock streaming:', error);
+  if (!stream.body) {
+    throw new Error('No response stream received from Bedrock');
   }
+
+  let buffer = '';
+  const chunkSize = 100; // Adjust based on your needs
+
+  try {
+    for await (const chunk of stream.body) {
+      if (!chunk.chunk?.bytes) continue;
+
+      const parsed = JSON.parse(Buffer.from(chunk.chunk.bytes).toString('utf-8'));
+      if (!parsed.delta?.text) continue;
+
+      buffer += parsed.delta.text;
+
+      // Send chunks when buffer reaches certain size or contains complete sentences
+      if (buffer.length >= chunkSize || buffer.match(/[.!?]\s/)) {
+        const sanitizedChunk = sanitizeGraphQLString(buffer);
+        if (sanitizedChunk) {
+          await sendChunkToAppSync(graphQLClient, conversationId, sanitizedChunk);
+        }
+        buffer = '';
+      }
+    }
+
+    // Send any remaining text in buffer
+    if (buffer) {
+      const sanitizedChunk = sanitizeGraphQLString(buffer);
+      if (sanitizedChunk) {
+        await sendChunkToAppSync(graphQLClient, conversationId, sanitizedChunk);
+      }
+    }
+
+    await completeStream(graphQLClient, conversationId);
+  } catch (error) {
+    console.error(`Error while processing stream for conversationId ${conversationId}:`, error);
+    throw error;
+  }
+}
+
+async function sendChunkToAppSync(
+  graphQLClient: GraphQLClient,
+  conversationId: string,
+  chunk: string
+): Promise<void> {
+  const mutation = `
+    mutation SendChunk($conversationId: ID!, $chunk: String!) {
+      sendChunk(conversationId: $conversationId, chunk: $chunk) {
+        conversationId
+        chunk
+      }
+    }
+  `;
+
+  try {
+    await graphQLClient.request(mutation, { conversationId, chunk });
+    console.log(`Sent chunk to AppSync for conversationId ${conversationId}`);
+  } catch (error) {
+    console.error(`Failed to send chunk to AppSync for conversationId ${conversationId}:`, error);
+    throw error;
+  }
+}
+
+async function completeStream(
+  graphQLClient: GraphQLClient,
+  conversationId: string
+): Promise<void> {
+  const mutation = `
+    mutation Complete($conversationId: ID!) {
+      completeStream(conversationId: $conversationId) {
+        conversationId
+        status
+      }
+    }
+  `;
+
+  await graphQLClient.request(mutation, { conversationId });
+  console.log(`Stream completed for conversationId ${conversationId}`);
+}
+
+async function notifyError(
+  graphQLClient: GraphQLClient,
+  conversationId: string,
+  error: unknown
+): Promise<void> {
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  const sanitizedError = sanitizeGraphQLString(errorMessage);
+
+  const mutation = `
+    mutation SendError($conversationId: ID!, $error: String!) {
+      sendError(conversationId: $conversationId, error: $error) {
+        conversationId
+        error
+      }
+    }
+  `;
+
+  await graphQLClient.request(mutation, {
+    conversationId,
+    error: sanitizedError,
+  });
 }
