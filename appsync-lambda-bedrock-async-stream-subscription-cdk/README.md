@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) (AWS CDK) installed
-* Make sure to enable the **Anthropic - Claude V2** model on the [Bedrock console](https://console.aws.amazon.com/bedrock/home#/modelaccess).
+* Make sure to enable the **Anthropic - Claude Sonnet 3.5 V2** model on the [Bedrock console](https://console.aws.amazon.com/bedrock/home#/modelaccess).
 
 ## How it works
 
