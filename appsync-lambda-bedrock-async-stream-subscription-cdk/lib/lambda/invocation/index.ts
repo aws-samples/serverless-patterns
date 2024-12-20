@@ -1,4 +1,4 @@
-import { BedrockRuntimeClient, InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
+import { BedrockRuntimeClient, ConverseStreamCommand, ConverseStreamCommandInput } from '@aws-sdk/client-bedrock-runtime';
 import { GraphQLClient } from 'graphql-request';
 
 interface Event {
@@ -10,11 +10,11 @@ interface Event {
 
 function sanitizeGraphQLString(text: string): string {
   return text
-    .replace(/[\n\r]/g, ' ')    // Replace newlines with spaces
-    .replace(/\\/g, '\\\\')     // Escape backslashes
-    .replace(/"/g, '\\"')       // Escape double quotes
-    .replace(/\t/g, ' ')        // Replace tabs with spaces
-    .trim();                    // Remove leading/trailing whitespace
+    .replace(/[\n\r]/g, ' ')
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\t/g, ' ')
+    .trim();
 }
 
 export const handler = async (event: Event) => {
@@ -49,47 +49,56 @@ async function processBedrockStream(
   input: string,
   conversationId: string
 ): Promise<void> {
-  const params = {
+  const params: ConverseStreamCommandInput = {
     modelId: 'us.anthropic.claude-3-5-sonnet-20240620-v1:0',
-    contentType: 'application/json',
-    accept: 'application/json',
-    body: JSON.stringify({
-      anthropic_version: 'bedrock-2023-05-31',
-      max_tokens: 4096,
-      messages: [{ role: 'user', content: input }],
-    }),
+    messages: [
+      {
+        role: 'user',
+        content: [
+          {
+            text: input
+          }
+        ]
+      }
+    ],
+    inferenceConfig: {
+      temperature: 0.7,
+      maxTokens: 4096,
+      topP: 1
+    }
   };
+  
 
-  const command = new InvokeModelWithResponseStreamCommand(params);
-  const stream = await bedrockClient.send(command);
+  const command = new ConverseStreamCommand(params);
+  const response = await bedrockClient.send(command);
 
-  if (!stream.body) {
+  if (!response.stream) {
     throw new Error('No response stream received from Bedrock');
   }
 
+
   let buffer = '';
-  const chunkSize = 100; // Adjust based on your needs
+  const chunkSize = 100;
 
   try {
-    for await (const chunk of stream.body) {
-      if (!chunk.chunk?.bytes) continue;
-
-      const parsed = JSON.parse(Buffer.from(chunk.chunk.bytes).toString('utf-8'));
-      if (!parsed.delta?.text) continue;
-
-      buffer += parsed.delta.text;
-
-      // Send chunks when buffer reaches certain size or contains complete sentences
-      if (buffer.length >= chunkSize || buffer.match(/[.!?]\s/)) {
-        const sanitizedChunk = sanitizeGraphQLString(buffer);
-        if (sanitizedChunk) {
-          await sendChunkToAppSync(graphQLClient, conversationId, sanitizedChunk);
+    for await (const event of response.stream) {
+      if (event.contentBlockDelta && event.contentBlockDelta.delta) {
+        const delta = event.contentBlockDelta.delta.text;
+        if (delta) {
+          buffer += delta;
+    
+          if (buffer.length >= chunkSize || buffer.match(/[.!?]\s/)) {
+            const sanitizedChunk = sanitizeGraphQLString(buffer);
+            if (sanitizedChunk) {
+              await sendChunkToAppSync(graphQLClient, conversationId, sanitizedChunk);
+            }
+            buffer = '';
+          }
         }
-        buffer = '';
       }
     }
+    
 
-    // Send any remaining text in buffer
     if (buffer) {
       const sanitizedChunk = sanitizeGraphQLString(buffer);
       if (sanitizedChunk) {
@@ -103,6 +112,7 @@ async function processBedrockStream(
     throw error;
   }
 }
+
 
 async function sendChunkToAppSync(
   graphQLClient: GraphQLClient,

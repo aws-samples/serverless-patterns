@@ -1,6 +1,6 @@
-# AppSync Lambda Bedrock Streaming Pattern
+# AppSync Lambda Bedrock Streaming Pattern for Long-running Invocations
 
-This pattern demonstrates how to implement long-running invocations with Amazon Bedrock using AWS AppSync subscriptions and AWS Lambda, following the official AWS AppSync documentation pattern.
+This pattern demonstrates how to implement [long-running invocations](https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-bedrock-js.html#long-running-invocations)  with Amazon Bedrock using AWS AppSync subscriptions and AWS Lambda, following the official AWS AppSync documentation pattern.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appsync-lambda-bedrock-async-stream-subscription-cdk
 
@@ -17,13 +17,15 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The pattern implements an asynchronous streaming architecture where:
+The pattern implements an asynchronous [streaming architecture](https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-bedrock-js.html#long-running-invocations) where:
 
 1. Client initiates a WebSocket subscription and makes a request to AppSync
 2. AppSync invokes Lambda function in Event mode
-3. Lambda function streams responses from Bedrock using InvokeModelWithResponseStream
+3. Lambda function streams responses from Bedrock using ConverseStream
 4. Lambda sends updates via mutations to AppSync
 5. Updates are delivered to client through WebSocket subscription
+
+![alt text](image.png)
 
 This pattern is ideal for:
 - Long-running AI model invocations
@@ -52,14 +54,40 @@ npm install
 npm run deploy
 ```
 
-
 ## Testing
 
-Run tests
+After deployment, you can test the Bedrock streaming integration using the provided test script. The script demonstrates:
+- WebSocket subscription initialization
+- Conversation start with Bedrock
+- Real-time streaming chunks display
+- Graceful cleanup on exit
+
+Run the test script using:
 ```sh
-npm run test
+ node test/test.js 
 ```
 
+You should see output similar to:
+```sh
+Starting subscription...
+Starting conversation...
+StartConversation response: {
+data: {
+startConversation: {
+conversationId: '123e4567-e89b-12d3-a456-426614174000',
+status: 'STARTED'
+}
+}
+}
+Received chunk: {
+conversationId: '123e4567-e89b-12d3-a456-426614174000',
+chunk: "Here's a joke for you: Why don't scientists trust atoms? Because they make"
+}
+Received chunk: {
+conversationId: '123e4567-e89b-12d3-a456-426614174000',
+chunk: 'up everything!'
+}
+```
 ## Cleanup
  
 1. Delete the stack
