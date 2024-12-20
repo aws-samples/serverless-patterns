@@ -297,32 +297,146 @@ Resources:
           !Sub
           - |
             #!/bin/bash
-            yum update -y
-            # yum install java-openjdk11-devel -y
+
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum update -y
+                # yum install java-openjdk11-devel -y
             
-            # install Java
-            JAVA_VERSION=${java_version}
-            echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
-            if [ "$JAVA_VERSION" == "java11" ]; then
-                sudo yum install java-11-amazon-corretto-devel -y
-            elif [ "$JAVA_VERSION" == "java17" ]; then
-                sudo yum install java-17-amazon-corretto-devel -y
-            elif [ "$JAVA_VERSION" == "java21" ]; then
-                sudo yum install java-21-amazon-corretto-devel -y
-            else
-                sudo yum install java-21-amazon-corretto-devel -y
-            fi
+                # install Java
+                JAVA_VERSION=${java_version}
+                echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+                if [ "$JAVA_VERSION" == "java11" ]; then
+                    sudo yum install java-11-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java17" ]; then
+                    sudo yum install java-17-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java21" ]; then
+                    sudo yum install java-21-amazon-corretto-devel -y
+                else
+                    sudo yum install java-21-amazon-corretto-devel -y
+                fi
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of Java succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
             
-            yum install nmap-ncat -y
-            yum install git -y
-            yum erase awscli -y
-            yum install jq -y
-            sudo yum install -y docker
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install nmap-ncat -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of nmap succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install git -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of git succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum erase awscli -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum erase of awscli succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install jq -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of jq succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y docker
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of docker succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
             service docker start
             usermod -a -G docker ec2-user
             sudo wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
             sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
-            sudo yum install -y apache-maven
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y apache-maven
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of maven succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
 
             cd /home/ec2-user
             su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
@@ -456,31 +570,146 @@ Resources:
           !Sub
           - |
             #!/bin/bash
-            yum update -y
+
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum update -y
+                # yum install java-openjdk11-devel -y
             
-            # install Java
-            JAVA_VERSION=${java_version}
-            echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
-            if [ "$JAVA_VERSION" == "java11" ]; then
-                sudo yum install java-11-amazon-corretto-devel -y
-            elif [ "$JAVA_VERSION" == "java17" ]; then
-                sudo yum install java-17-amazon-corretto-devel -y
-            elif [ "$JAVA_VERSION" == "java21" ]; then
-                sudo yum install java-21-amazon-corretto-devel -y
-            else
-                sudo yum install java-21-amazon-corretto-devel -y
-            fi
+                # install Java
+                JAVA_VERSION=${java_version}
+                echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+                if [ "$JAVA_VERSION" == "java11" ]; then
+                    sudo yum install java-11-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java17" ]; then
+                    sudo yum install java-17-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java21" ]; then
+                    sudo yum install java-21-amazon-corretto-devel -y
+                else
+                    sudo yum install java-21-amazon-corretto-devel -y
+                fi
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of Java succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
             
-            yum install nmap-ncat -y
-            yum install git -y
-            yum erase awscli -y
-            yum install jq -y
-            sudo yum install -y docker
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install nmap-ncat -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of nmap succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install git -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of git succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum erase awscli -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum erase of awscli succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install jq -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of jq succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y docker
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of docker succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
             service docker start
             usermod -a -G docker ec2-user
             sudo wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
             sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
-            sudo yum install -y apache-maven
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y apache-maven
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of maven succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
 
             cd /home/ec2-user
             su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
