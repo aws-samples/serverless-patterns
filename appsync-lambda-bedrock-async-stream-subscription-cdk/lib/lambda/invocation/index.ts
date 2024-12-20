@@ -96,8 +96,7 @@ async function processBedrockStream(
           }
         }
       }
-    }
-    
+    }    
 
     if (buffer) {
       const sanitizedChunk = sanitizeGraphQLString(buffer);

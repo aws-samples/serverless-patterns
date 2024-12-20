@@ -64,7 +64,7 @@ After deployment, you can test the Bedrock streaming integration using the provi
 
 Run the test script using:
 ```sh
- node test/test.js 
+npx tsx test/test.ts  
 ```
 
 You should see output similar to:
