@@ -191,6 +191,7 @@ Resources:
       EnableCloudwatchLogsExports: [ error, slowquery ]
       BacktrackWindow: 86400
       EnableIAMDatabaseAuthentication: true
+      DeletionProtection: false
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-mysql-cluster"
@@ -199,7 +200,6 @@ Resources:
   dbNode1:
     Type: "AWS::RDS::DBInstance"
     Properties:
-      DeletionProtection: false
       DBClusterIdentifier: !Ref dbCluster
       DBInstanceIdentifier: !Sub "${AWS::StackName}-mysql-node-1"
       CopyTagsToSnapshot: true
@@ -231,7 +231,6 @@ Resources:
       MonitoringRoleArn: !GetAtt roleEnhancedMonitoring.Arn
       PubliclyAccessible: false
       EnablePerformanceInsights: true
-      DeletionProtection: false
       StorageEncrypted: true
       PerformanceInsightsRetentionPeriod: 7
       Tags:
