@@ -1,6 +1,6 @@
-# AppSync Lambda Bedrock Streaming Pattern for Long-running Invocations
+# AppSync Async Bedrock Streaming with Lambda Event Mode
 
-This pattern demonstrates how to implement [long-running invocations](https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-bedrock-js.html#long-running-invocations)  with Amazon Bedrock using AWS AppSync subscriptions and AWS Lambda, following the official AWS AppSync documentation pattern.
+This pattern demonstrates how to implement [long-running invocations](https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-bedrock-js.html#long-running-invocations)  with Amazon Bedrock using AWS AppSync subscriptions and AWS Lambda in Event Mode, following the official AWS AppSync documentation pattern.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appsync-lambda-bedrock-async-stream-subscription-cdk
 
@@ -20,18 +20,18 @@ Important: this application uses various AWS services and there are costs associ
 The pattern implements an asynchronous [streaming architecture](https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-bedrock-js.html#long-running-invocations) where:
 
 1. Client initiates a WebSocket subscription and makes a request to AppSync
-2. AppSync invokes Lambda function in Event mode
+2. AppSync invokes Lambda function in Event mode, enabling asynchronous processing
 3. Lambda function streams responses from Bedrock using ConverseStream
 4. Lambda sends updates via mutations to AppSync
 5. Updates are delivered to client through WebSocket subscription
 
 ![alt text](image.png)
 
-This pattern is ideal for:
-- Long-running AI model invocations
-- Real-time streaming responses
-- Asynchronous processing patterns
-- Progressive UI updates
+**Key Benefits**
+- **Asynchronous Processing**: AppSync immediately returns a response while Lambda processes the request asynchronously, preventing timeouts for long-running operations
+- **Real-time Updates**: Clients receive progressive updates through WebSocket subscriptions as the model generates responses
+- **Scalable Architecture**: Event-driven design allows handling multiple concurrent requests without blocking
+- **Enhanced User Experience**: Progressive updates enable responsive interfaces even during lengthy AI model invocations
 
 ## Deployment Instructions
 
