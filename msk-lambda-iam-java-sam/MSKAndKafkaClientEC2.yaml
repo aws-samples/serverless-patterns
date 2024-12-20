@@ -1,0 +1,1234 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  EnvType:
+    Description: MSK Cluster Type.
+    Default: Provisioned
+    Type: String
+    AllowedValues:
+      - Serverless
+      - Provisioned
+    ConstraintDescription: Must specify Serverless or Provisioned.
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
+  MSKKafkaVersion:
+    Type: String
+    Default: 3.5.1
+  JavaVersion:
+    Type: String
+    Description: Choose the version of Java. Lambda currently supports Java 11, 17 and 21
+    AllowedValues:
+      - java11
+      - java17
+      - java21
+    Default: java21
+  ApacheKafkaInstallerLocation:
+    Type: String
+    Default: https://archive.apache.org/dist/kafka/3.5.1/kafka_2.13-3.5.1.tgz
+  KafkaTopicForLambda:
+    Type: String
+    Default: MskIamJavaLambdaTopic
+  ServerlessLandGithubLocation:
+    Type: String
+    Default: https://github.com/aws-samples/serverless-patterns/
+Conditions:
+  CreateProvisionedCluster: !Equals 
+    - !Ref EnvType
+    - Provisioned
+  CreateServerlessCluster: !Equals 
+    - !Ref EnvType
+    - Serverless    
+Mappings:
+  SubnetConfig:
+      VPC:
+        CIDR: '10.0.0.0/16'
+      PublicOne:
+        CIDR: '10.0.0.0/24'
+      PrivateSubnetMSKOne:
+        CIDR: '10.0.1.0/24'
+      PrivateSubnetMSKTwo:
+        CIDR: '10.0.2.0/24'
+      PrivateSubnetMSKThree:
+        CIDR: '10.0.3.0/24'
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+      Tags:
+        - Key: 'Name'
+          Value: 'MSKVPC'
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicOne', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: 'Name'
+          Value: 'PublicSubnet'
+  PrivateSubnetMSKOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetMSKOne', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetMSKOne'
+  PrivateSubnetMSKTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 1
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetMSKTwo', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetMSKTwo'
+  PrivateSubnetMSKThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 2
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetMSKThree', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetMSKThree'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+
+  NATEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachement
+    Properties: 
+      Domain: vpc
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NATEIP.AllocationId
+      SubnetId: !Ref 'PublicSubnetOne'
+      Tags: 
+        - Key: 'Name'
+          Value: 'ConfluentKafkaNATGateway'
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachement
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetOne
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway'
+
+  PrivateSubnetMSKOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetMSKOne
+  PrivateSubnetMSKTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetMSKTwo
+  PrivateSubnetMSKThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetMSKThree
+  
+  KafkaClientInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
+      GroupName: !Sub "${AWS::StackName} Security group attached to the kakfa client producer"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 10.0.0.0/24
+      - IpProtocol: tcp
+        FromPort: 3500
+        ToPort: 3500
+        CidrIp: 10.0.0.0/24
+      - IpProtocol: tcp
+        FromPort: 3600
+        ToPort: 3600
+        CidrIp: 10.0.0.0/24
+      - IpProtocol: tcp
+        FromPort: 3800
+        ToPort: 3800
+        CidrIp: 10.0.0.0/24
+      - IpProtocol: tcp
+        FromPort: 3900
+        ToPort: 3900
+        CidrIp: 10.0.0.0/24
+
+  MSKSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: [VPC,KafkaClientInstanceSecurityGroup]
+    Properties:
+      GroupDescription: MSK Security Group
+      GroupName: !Sub "${AWS::StackName} Security group for the MSK cluster"
+      VpcId: !Ref 'VPC'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2181
+          ToPort: 2181
+          SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+        - IpProtocol: tcp
+          FromPort: 9094
+          ToPort: 9094
+          SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+        - IpProtocol: tcp
+          FromPort: 9096
+          ToPort: 9096
+          SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+        - IpProtocol: tcp
+          FromPort: 9092
+          ToPort: 9092
+          SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+        - IpProtocol: tcp
+          FromPort: 9098
+          ToPort: 9098
+          SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+        - IpProtocol: tcp
+          FromPort: 8083
+          ToPort: 8083
+          SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId        
+        - IpProtocol: tcp
+          FromPort: 8081
+          ToPort: 8081
+          SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+
+  MSKSelfIngressAllowRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: MSKSecurityGroup
+    Properties:
+      GroupId: !GetAtt MSKSecurityGroup.GroupId
+      Description: Enable Self referencing Bootstrap servers
+      IpProtocol: tcp
+      FromPort: 9092
+      ToPort: 9098
+      SourceSecurityGroupId: !GetAtt MSKSecurityGroup.GroupId
+      
+  KafkaClientSelfIngressAllowRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: KafkaClientInstanceSecurityGroup
+    Properties:
+      GroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+
+  KafkaClientEC2InstanceProvisioned:
+    Condition: CreateProvisionedCluster
+    DependsOn: MSKCluster
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: {Ref: 'AWS::Region'}
+      SubnetId: !Ref PublicSubnetOne
+      SecurityGroupIds: [!GetAtt KafkaClientInstanceSecurityGroup.GroupId]
+      ImageId: !Ref LatestAmiId
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaClientInstance'
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp2
+            DeleteOnTermination: true    
+      UserData:
+        Fn::Base64:
+          !Sub
+          - |
+            #!/bin/bash
+
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum update -y
+                # yum install java-openjdk11-devel -y
+            
+                # install Java
+                JAVA_VERSION=${java_version}
+                echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+                if [ "$JAVA_VERSION" == "java11" ]; then
+                    sudo yum install java-11-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java17" ]; then
+                    sudo yum install java-17-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java21" ]; then
+                    sudo yum install java-21-amazon-corretto-devel -y
+                else
+                    sudo yum install java-21-amazon-corretto-devel -y
+                fi
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of Java succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install nmap-ncat -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of nmap succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install git -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of git succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum erase awscli -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum erase of awscli succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install jq -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of jq succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y docker
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of docker succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            service docker start
+            usermod -a -G docker ec2-user
+            sudo wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+            sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y apache-maven
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of maven succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+
+            cd /home/ec2-user
+            su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
+            su -c "pip3 install boto3 --user" -s /bin/sh ec2-user
+            su -c "pip3 install kafka-python --user" -s /bin/sh ec2-user
+
+            # install AWS CLI 2 - access with aws2
+            cd /home/ec2-user
+            mkdir -p awscli
+            cd awscli
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+            # Create dirs, get Apache Kafka and unpack it
+            cd /home/ec2-user
+            KAFKA_VERSION=${msk_kafka_version}
+            KAFKA_FOLDER_VERSION=$(echo "$KAFKA_VERSION" | tr -d '.')
+            KAFKA_FOLDER='Kafka'$KAFKA_FOLDER_VERSION
+            mkdir -p $KAFKA_FOLDER
+            mkdir -p /tmp/kafka
+            ln -s /home/ec2-user/$KAFKA_FOLDER /home/ec2-user/kafka
+            cd $KAFKA_FOLDER
+            APACHE_KAFKA_INSTALLER_LOCATION=${apache_kafka_installer_location}
+            wget $APACHE_KAFKA_INSTALLER_LOCATION
+            APACHE_KAFKA_INSTALLER_FILE=$(echo "$APACHE_KAFKA_INSTALLER_LOCATION" | awk -F "/" '{print $NF}')
+            tar -xzf $APACHE_KAFKA_INSTALLER_FILE --strip 1
+            cd libs
+            wget https://github.com/aws/aws-msk-iam-auth/releases/download/v2.2.0/aws-msk-iam-auth-2.2.0-all.jar
+            cd ../bin
+            echo "security.protocol=SASL_SSL" > client.properties
+            echo "sasl.mechanism=AWS_MSK_IAM" >> client.properties
+            echo "sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;" >> client.properties
+            echo "sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler" >> client.properties
+          
+            # Install AWS SAM CLI
+            cd /home/ec2-user
+            mkdir -p awssam
+            cd awssam
+            wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+            unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
+            sudo ./sam-installation/install
+            
+            # Create command files for creating Kafka Topic and Kafka Producer
+            cd /home/ec2-user
+            MSK_CLUSTER_ARN=${msk_cluster_arn}
+            KAFKA_TOPIC=${kafka_topic_for_lambda}
+            echo "#!/bin/bash" > kafka_topic_creator.sh
+            sudo chmod +x kafka_topic_creator.sh
+            echo "MSK_CLUSTER_ARN=$MSK_CLUSTER_ARN" >> kafka_topic_creator.sh
+            AWS_REGION=${aws_region}
+            echo "AWS_REGION=$AWS_REGION" >> kafka_topic_creator.sh
+            echo "BOOTSTRAP_BROKERS_IAM=\$(aws kafka get-bootstrap-brokers --region \$AWS_REGION --cluster-arn \$MSK_CLUSTER_ARN --query 'BootstrapBrokerStringSaslIam' --output text)" >> kafka_topic_creator.sh
+            echo "sleep 5" >> kafka_topic_creator.sh
+            echo "KAFKA_TOPIC=$KAFKA_TOPIC" >> kafka_topic_creator.sh
+            echo "/home/ec2-user/kafka/bin/kafka-topics.sh --create --bootstrap-server \$BOOTSTRAP_BROKERS_IAM --command-config /home/ec2-user/kafka/bin/client.properties --replication-factor 3 --partitions 3 --topic \$KAFKA_TOPIC" >> kafka_topic_creator.sh
+            echo "echo \"export MSK_CLUSTER_ARN=\$MSK_CLUSTER_ARN\" >> .bash_profile" >> kafka_topic_creator.sh
+            echo "echo \"export AWS_REGION=\$AWS_REGION\" >> .bash_profile" >> kafka_topic_creator.sh
+            echo "echo \"export BOOTSTRAP_BROKERS_IAM=\$BOOTSTRAP_BROKERS_IAM\" >> .bash_profile" >> kafka_topic_creator.sh
+            echo "echo \"export KAFKA_TOPIC=\$KAFKA_TOPIC\" >> .bash_profile" >> kafka_topic_creator.sh
+            echo "#!/bin/bash" > kafka_message_sender.sh
+            echo "source /home/ec2-user/.bash_profile" >> kafka_message_sender.sh
+            echo "/home/ec2-user/kafka/bin/kafka-console-producer.sh --bootstrap-server \$BOOTSTRAP_BROKERS_IAM --producer.config /home/ec2-user/kafka/bin/client.properties --topic $KAFKA_TOPIC" >> kafka_message_sender.sh
+            sudo chmod +x kafka_message_sender.sh
+            CLUSTER_NAME="$(echo $MSK_CLUSTER_ARN | cut -d '/' -f2)"
+            CLUSTER_ID="$(echo $MSK_CLUSTER_ARN | cut -d '/' -f3)"
+            echo "export CLUSTER_NAME=$CLUSTER_NAME" >> /home/ec2-user/.bash_profile
+            echo "export CLUSTER_ID=$CLUSTER_ID" >> /home/ec2-user/.bash_profile
+            ./kafka_topic_creator.sh > kafka_topic_creator_output.txt
+            
+            #Checkout Serverless Patterns from Github
+            cd /home/ec2-user
+            SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
+            git clone $SERVERLESS_LAND_GITHUB_LOCATION
+            cd ./serverless-patterns/msk-lambda-iam-java-sam
+            cp template_original.yaml template.yaml
+            sudo chown -R ec2-user .
+            source /home/ec2-user/.bash_profile
+            sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
+            sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
+            sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
+            sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
+            
+            # Get IP CIDR range for EC2 Instance Connect
+            cd /home/ec2-user
+            mkdir -p ip_prefix
+            cd ip_prefix
+            git clone https://github.com/joetek/aws-ip-ranges-json.git
+            cd aws-ip-ranges-json
+            AWS_REGION=${aws_region}
+            EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
+            echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
+            SECURITY_GROUP=${security_group_id}
+            echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
+            aws ec2 authorize-security-group-ingress --region $AWS_REGION --group-id $SECURITY_GROUP --protocol tcp --port 22 --cidr $EC2_CONNECT_IP
+            
+          - security_group_id : !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+            msk_cluster_arn : !GetAtt MSKCluster.Arn
+            kafka_topic_for_lambda : !Ref KafkaTopicForLambda
+            msk_kafka_version: !Ref MSKKafkaVersion
+            apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
+            serverless_land_github_location: !Ref ServerlessLandGithubLocation
+            aws_region: !Ref 'AWS::Region'
+            java_version: !Ref JavaVersion
+
+  KafkaClientEC2InstanceServerless:
+    Condition: CreateServerlessCluster
+    DependsOn: ServerlessMSKCluster
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: {Ref: 'AWS::Region'}
+      SubnetId: !Ref PublicSubnetOne
+      SecurityGroupIds: [!GetAtt KafkaClientInstanceSecurityGroup.GroupId]
+      ImageId: !Ref LatestAmiId
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaClientInstance'
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp2
+            DeleteOnTermination: true    
+      UserData:
+        Fn::Base64:
+          !Sub
+          - |
+            #!/bin/bash
+
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum update -y
+                # yum install java-openjdk11-devel -y
+            
+                # install Java
+                JAVA_VERSION=${java_version}
+                echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+                if [ "$JAVA_VERSION" == "java11" ]; then
+                    sudo yum install java-11-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java17" ]; then
+                    sudo yum install java-17-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java21" ]; then
+                    sudo yum install java-21-amazon-corretto-devel -y
+                else
+                    sudo yum install java-21-amazon-corretto-devel -y
+                fi
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of Java succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install nmap-ncat -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of nmap succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install git -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of git succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum erase awscli -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum erase of awscli succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install jq -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of jq succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y docker
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of docker succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            service docker start
+            usermod -a -G docker ec2-user
+            sudo wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+            sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y apache-maven
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of maven succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+
+            cd /home/ec2-user
+            su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
+            su -c "pip3 install boto3 --user" -s /bin/sh ec2-user
+            su -c "pip3 install kafka-python --user" -s /bin/sh ec2-user
+
+            # install AWS CLI 2 - access with aws2
+            cd /home/ec2-user
+            mkdir -p awscli
+            cd awscli
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+            # Create dirs, get Apache Kafka and unpack it
+            cd /home/ec2-user
+            KAFKA_VERSION=${msk_kafka_version}
+            KAFKA_FOLDER_VERSION=$(echo "$KAFKA_VERSION" | tr -d '.')
+            KAFKA_FOLDER='Kafka'$KAFKA_FOLDER_VERSION
+            mkdir -p $KAFKA_FOLDER
+            mkdir -p /tmp/kafka
+            ln -s /home/ec2-user/$KAFKA_FOLDER /home/ec2-user/kafka
+            cd $KAFKA_FOLDER
+            APACHE_KAFKA_INSTALLER_LOCATION=${apache_kafka_installer_location}
+            wget $APACHE_KAFKA_INSTALLER_LOCATION
+            APACHE_KAFKA_INSTALLER_FILE=$(echo "$APACHE_KAFKA_INSTALLER_LOCATION" | awk -F "/" '{print $NF}')
+            tar -xzf $APACHE_KAFKA_INSTALLER_FILE --strip 1
+            cd libs
+            wget https://github.com/aws/aws-msk-iam-auth/releases/download/v2.2.0/aws-msk-iam-auth-2.2.0-all.jar
+            cd ../bin
+            echo "security.protocol=SASL_SSL" > client.properties
+            echo "sasl.mechanism=AWS_MSK_IAM" >> client.properties
+            echo "sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;" >> client.properties
+            echo "sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler" >> client.properties
+          
+            # Install AWS SAM CLI
+            cd /home/ec2-user
+            mkdir -p awssam
+            cd awssam
+            wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+            unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
+            sudo ./sam-installation/install
+            
+            # Create command files for creating Kafka Topic and Kafka Producer
+            cd /home/ec2-user
+            MSK_CLUSTER_ARN=${msk_cluster_arn}
+            KAFKA_TOPIC=${kafka_topic_for_lambda}
+            echo "#!/bin/bash" > kafka_topic_creator.sh
+            sudo chmod +x kafka_topic_creator.sh
+            echo "MSK_CLUSTER_ARN=$MSK_CLUSTER_ARN" >> kafka_topic_creator.sh
+            AWS_REGION=${aws_region}
+            echo "AWS_REGION=$AWS_REGION" >> kafka_topic_creator.sh
+            echo "BOOTSTRAP_BROKERS_IAM=\$(aws kafka get-bootstrap-brokers --region \$AWS_REGION --cluster-arn \$MSK_CLUSTER_ARN --query 'BootstrapBrokerStringSaslIam' --output text)" >> kafka_topic_creator.sh
+            echo "sleep 5" >> kafka_topic_creator.sh
+            echo "KAFKA_TOPIC=$KAFKA_TOPIC" >> kafka_topic_creator.sh
+            echo "/home/ec2-user/kafka/bin/kafka-topics.sh --create --bootstrap-server \$BOOTSTRAP_BROKERS_IAM --command-config /home/ec2-user/kafka/bin/client.properties --replication-factor 3 --partitions 3 --topic \$KAFKA_TOPIC" >> kafka_topic_creator.sh
+            echo "echo \"export MSK_CLUSTER_ARN=\$MSK_CLUSTER_ARN\" >> .bash_profile" >> kafka_topic_creator.sh
+            echo "echo \"export AWS_REGION=\$AWS_REGION\" >> .bash_profile" >> kafka_topic_creator.sh
+            echo "echo \"export BOOTSTRAP_BROKERS_IAM=\$BOOTSTRAP_BROKERS_IAM\" >> .bash_profile" >> kafka_topic_creator.sh
+            echo "echo \"export KAFKA_TOPIC=\$KAFKA_TOPIC\" >> .bash_profile" >> kafka_topic_creator.sh
+            echo "#!/bin/bash" > kafka_message_sender.sh
+            echo "source /home/ec2-user/.bash_profile" >> kafka_message_sender.sh
+            echo "/home/ec2-user/kafka/bin/kafka-console-producer.sh --bootstrap-server \$BOOTSTRAP_BROKERS_IAM --producer.config /home/ec2-user/kafka/bin/client.properties --topic $KAFKA_TOPIC" >> kafka_message_sender.sh
+            sudo chmod +x kafka_message_sender.sh
+            CLUSTER_NAME="$(echo $MSK_CLUSTER_ARN | cut -d '/' -f2)"
+            CLUSTER_ID="$(echo $MSK_CLUSTER_ARN | cut -d '/' -f3)"
+            echo "export CLUSTER_NAME=$CLUSTER_NAME" >> /home/ec2-user/.bash_profile
+            echo "export CLUSTER_ID=$CLUSTER_ID" >> /home/ec2-user/.bash_profile
+            ./kafka_topic_creator.sh > kafka_topic_creator_output.txt
+            
+            #Checkout Serverless Patterns from Github
+            cd /home/ec2-user
+            SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
+            git clone $SERVERLESS_LAND_GITHUB_LOCATION
+            cd ./serverless-patterns/msk-lambda-iam-java-sam
+            cp template_original.yaml template.yaml
+            sudo chown -R ec2-user .
+            source /home/ec2-user/.bash_profile
+            sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
+            sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
+            sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
+            sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
+            
+            # Get IP CIDR range for EC2 Instance Connect
+            cd /home/ec2-user
+            mkdir -p ip_prefix
+            cd ip_prefix
+            git clone https://github.com/joetek/aws-ip-ranges-json.git
+            cd aws-ip-ranges-json
+            AWS_REGION=${aws_region}
+            EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
+            echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
+            SECURITY_GROUP=${security_group_id}
+            echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
+            aws ec2 authorize-security-group-ingress --region $AWS_REGION --group-id $SECURITY_GROUP --protocol tcp --port 22 --cidr $EC2_CONNECT_IP
+            
+          - security_group_id : !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+            msk_cluster_arn : !GetAtt ServerlessMSKCluster.Arn
+            kafka_topic_for_lambda : !Ref KafkaTopicForLambda
+            msk_kafka_version: !Ref MSKKafkaVersion
+            apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
+            serverless_land_github_location: !Ref ServerlessLandGithubLocation
+            aws_region: !Ref 'AWS::Region'
+            java_version: !Ref JavaVersion
+
+  EC2InstanceEndpoint:
+    Type: AWS::EC2::InstanceConnectEndpoint
+    Properties:
+      PreserveClientIp: true
+      SecurityGroupIds: 
+        - !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+      SubnetId: !Ref PublicSubnetOne
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonMSKFullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSCertificateManagerPrivateCAFullAccess
+        - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+      Policies:
+        - PolicyName: MSKConfigurationAccess
+          PolicyDocument: !Sub '{
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+                      "Sid": "VisualEditor0",
+                      "Effect": "Allow",
+                      "Action": "kafka:CreateConfiguration",
+                      "Resource": "*"
+                  }
+              ]
+          }'
+        - PolicyName: CloudformationDeploy
+          PolicyDocument: !Sub '{
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+            "Effect": "Allow",
+            "Action": [
+                "iam:*"
+            ],
+            "Resource": "*"
+        }
+              ]
+          }' 
+        - PolicyName: MSKProducerPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: SecretsAccess
+                Effect: Allow
+                Action:
+                  - 'secretsmanager:*'
+                  - 'kms:*'
+                  - 'glue:*Schema*'
+                  - 'iam:CreatePolicy'
+                  - 'iam:Tag*'
+                  - 'iam:AttachRolePolicy'
+                Resource: '*'
+        - PolicyName: MSKConnectAuthentication
+          PolicyDocument: !Sub '{
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "kafka-cluster:*Topic*",
+                        "kafka-cluster:Connect",
+                        "kafka-cluster:AlterCluster",
+                        "kafka-cluster:DescribeCluster",
+                        "kafka-cluster:DescribeClusterDynamicConfiguration"
+                    ],
+                    "Resource": [
+                        "arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:cluster/${AWS::StackName}-cluster/*"
+                    ]
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "kafka-cluster:*Topic*",
+                        "kafka-cluster:WriteData",
+                        "kafka-cluster:ReadData"
+                    ],
+                    "Resource": [
+                        "arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:topic/${AWS::StackName}-cluster/*"
+                  ]
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "kafka-cluster:AlterGroup",
+                        "kafka-cluster:DescribeGroup"
+                    ],
+                    "Resource": [
+                        "arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:group/${AWS::StackName}-cluster/*"
+                    ]
+                }
+            ]
+        }'
+        - PolicyName: SecurityGroupsPolicy
+          PolicyDocument: !Sub '{
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:DescribeSecurityGroups",
+                        "ec2:DescribeSecurityGroupRules",
+                        "ec2:DescribeTags"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:AuthorizeSecurityGroupIngress", 
+                        "ec2:RevokeSecurityGroupIngress", 
+                        "ec2:AuthorizeSecurityGroupEgress", 
+                        "ec2:RevokeSecurityGroupEgress", 
+                        "ec2:ModifySecurityGroupRules",
+                        "ec2:UpdateSecurityGroupRuleDescriptionsIngress", 
+                        "ec2:UpdateSecurityGroupRuleDescriptionsEgress"
+                    ],
+                    "Resource": [
+                        "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*"
+                    ]
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:ModifySecurityGroupRules"
+                    ],
+                    "Resource": [
+                        "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group-rule/*"
+                    ]
+                }
+            ]
+        }'         
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Join
+        - '-'
+        - - 'EC2MMMSKCFProfile'
+          - !Ref 'AWS::StackName'
+      Roles:
+        - !Ref EC2Role
+  
+  
+  MSKCertAuthority:
+    Type: AWS::ACMPCA::CertificateAuthority
+    Condition: CreateProvisionedCluster
+    Properties: 
+      KeyAlgorithm: "RSA_4096"
+      SigningAlgorithm: "SHA256WITHRSA"
+      Subject: 
+        Country: "US"
+      Type: "ROOT"
+
+  MSKCert:
+    Type: AWS::ACMPCA::Certificate
+    Condition: CreateProvisionedCluster
+    Properties: 
+      CertificateAuthorityArn: !Ref MSKCertAuthority
+      CertificateSigningRequest: !GetAtt
+        - MSKCertAuthority
+        - CertificateSigningRequest
+      SigningAlgorithm: "SHA256WITHRSA"
+      TemplateArn: arn:aws:acm-pca:::template/RootCACertificate/V1
+      Validity: 
+        Type: YEARS
+        Value: 10
+
+  RootCAActivation:
+    Type: AWS::ACMPCA::CertificateAuthorityActivation
+    Condition: CreateProvisionedCluster
+    Properties:
+      CertificateAuthorityArn:
+        Ref: MSKCertAuthority
+      Certificate:
+        Fn::GetAtt:
+        - MSKCert
+        - Certificate
+      Status: ACTIVE
+
+  RootCAPermission:
+    Type: AWS::ACMPCA::Permission
+    Condition: CreateProvisionedCluster
+    Properties:
+      Actions:
+        - IssueCertificate
+        - GetCertificate
+        - ListPermissions
+      CertificateAuthorityArn: !Ref MSKCertAuthority
+      Principal: acm.amazonaws.com
+
+  CredentialsKMSKey:
+    Type: AWS::KMS::Key
+    Condition: CreateProvisionedCluster
+    Properties: 
+      Description: "KMS key to use with credentials secret with KMS"
+      EnableKeyRotation: True
+      KeyPolicy: 
+        Version: "2012-10-17"
+        Id: key-default-1
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Join 
+                - ''
+                - - 'arn:aws:iam::'
+                  - !Ref 'AWS::AccountId'
+                  - ':root'
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: Enable Secret Manager Permissions
+            Effect: Allow
+            Principal:
+              AWS: "*"
+            Action: 
+              - "kms:Decrypt"
+              - "kms:ReEncrypt*"
+              - "kms:GenerateDataKey*"
+              - "kms:CreateGrant"
+              - "kms:DescribeKey"
+            Resource: '*'
+            Condition:
+              StringEquals:
+                kms:CallerAccount: !Ref 'AWS::AccountId'
+                kms:ViaService: !Join 
+                  - ''
+                  - - 'secretsmanager.'
+                    - !Ref 'AWS::Region'
+                    - '.amazonaws.com'
+      PendingWindowInDays: 7
+  
+  CredentialsKMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Condition: CreateProvisionedCluster
+    Properties: 
+      AliasName: alias/mskstack_secret_manager_key
+      TargetKeyId: !Ref 'CredentialsKMSKey'
+
+  CredentialsSecret:
+    Type: AWS::SecretsManager::Secret
+    Condition: CreateProvisionedCluster
+    Properties: 
+      Description: "Secret to use for SCRAM Auth"
+      Name: "AmazonMSK_Credentials"
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "test-user"}'
+        GenerateStringKey: "password"
+        PasswordLength: 30
+        ExcludeCharacters: '"@/\'
+      KmsKeyId: !Ref 'CredentialsKMSKey'
+
+  MSKConfiguration:
+    Type: AWS::MSK::Configuration
+    Condition: CreateProvisionedCluster
+    Properties: 
+      Description: "MSKConfiguration"
+      Name: "MSKConfiguration"
+      ServerProperties: |
+        auto.create.topics.enable=true
+        default.replication.factor=3
+        min.insync.replicas=2
+        num.io.threads=8
+        num.network.threads=5
+        num.partitions=1
+        num.replica.fetchers=2
+        replica.lag.time.max.ms=30000
+        socket.receive.buffer.bytes=102400
+        socket.request.max.bytes=104857600
+        socket.send.buffer.bytes=102400
+        unclean.leader.election.enable=true
+        zookeeper.session.timeout.ms=18000
+        delete.topic.enable=true
+        log.retention.hours=8
+
+  MSKCluster:
+    Type: AWS::MSK::Cluster
+    Condition: CreateProvisionedCluster
+    Properties: 
+      BrokerNodeGroupInfo: 
+        ClientSubnets:
+          - !Ref PrivateSubnetMSKOne
+          - !Ref PrivateSubnetMSKTwo
+          - !Ref PrivateSubnetMSKThree
+        SecurityGroups:
+          - !GetAtt MSKSecurityGroup.GroupId
+        InstanceType: "kafka.m5.large"
+        StorageInfo:
+          EBSStorageInfo:
+            VolumeSize: 100
+      ClientAuthentication: 
+        Unauthenticated: 
+          Enabled: False
+        Sasl:
+          Iam:
+            Enabled: True
+          Scram:
+            Enabled: True
+        Tls:
+          CertificateAuthorityArnList: 
+            - !Ref MSKCertAuthority
+          Enabled: True
+      ClusterName: !Sub "${AWS::StackName}-cluster"
+      ConfigurationInfo: 
+        Arn: !Ref MSKConfiguration
+        Revision: 1
+      EncryptionInfo: 
+        EncryptionInTransit: 
+          ClientBroker: TLS
+          InCluster: True
+      KafkaVersion: !Ref MSKKafkaVersion
+      NumberOfBrokerNodes: 3
+
+  SecretMSKAssociation:
+    Type: AWS::MSK::BatchScramSecret
+    Condition: CreateProvisionedCluster
+    Properties: 
+      ClusterArn: !Ref MSKCluster
+      SecretArnList: 
+        - !Ref CredentialsSecret
+
+  ServerlessMSKCluster:
+    Type: AWS::MSK::ServerlessCluster
+    Condition: CreateServerlessCluster
+    Properties: 
+      ClientAuthentication: 
+        Sasl:
+          Iam:
+            Enabled: True
+      ClusterName: !Sub "${AWS::StackName}-cluster"
+      VpcConfigs: 
+        - SubnetIds: 
+            - !Ref PrivateSubnetMSKOne
+            - !Ref PrivateSubnetMSKTwo
+            - !Ref PrivateSubnetMSKThree
+          SecurityGroups:
+              - !GetAtt MSKSecurityGroup.GroupId
+
+Outputs:
+  VPCId: 
+    Description: The ID of the VPC created
+    Value: !Ref 'VPC'
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCID"
+  PublicSubnetOne: 
+    Description: The name of the public subnet created
+    Value: !Ref 'PublicSubnetOne'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnetOne"
+  PrivateSubnetMSKOne: 
+    Description: The ID of private subnet one created
+    Value: !Ref 'PrivateSubnetMSKOne'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetMSKOne"
+  PrivateSubnetMSKTwo: 
+    Description: The ID of private subnet two created
+    Value: !Ref 'PrivateSubnetMSKTwo'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetMSKTwo"
+  PrivateSubnetMSKThree: 
+    Description: The ID of private subnet three created
+    Value: !Ref 'PrivateSubnetMSKThree'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetMSKThree"
+  VPCStackName: 
+    Description: The name of the VPC Stack
+    Value: !Ref 'AWS::StackName'
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCStackName"
+  MSKArn:
+    Description: Provisioned MSK Cluster ARN. 
+    Value: !Ref MSKCluster
+    Export:
+      Name: !Sub "${AWS::StackName}-MSKArn"
+    Condition: "CreateProvisionedCluster"
+  CredentialsSecretArn:
+    Description: ARN for secret manager secret with credentials. 
+    Value: !Ref CredentialsSecret
+    Export:
+      Name: !Sub "${AWS::StackName}-CredentialsSecret"
+    Condition: "CreateProvisionedCluster"
+  ServerlessMSKArn:
+    Description: Serverless MSK Cluster ARN. 
+    Value: !Ref ServerlessMSKCluster
+    Export:
+      Name: !Sub "${AWS::StackName}-Serverless"
+    Condition: "CreateServerlessCluster"
+  SecurityGroupId:
+    Description: ID of scurity group for MSK clients. 
+    Value: !GetAtt MSKSecurityGroup.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}-SecurityGroupId"
+  EC2InstanceEndpointID:
+    Description: The ID of the EC2 Instance Endpoint
+    Value: !Ref EC2InstanceEndpoint
+  KafkaTopicForLambda:
+    Description: The Topic to use for the Java Lambda Function
+    Value: !Ref KafkaTopicForLambda
+    Export:
+      Name: !Sub "${AWS::StackName}-KafkaTopicForLambda"
+    
