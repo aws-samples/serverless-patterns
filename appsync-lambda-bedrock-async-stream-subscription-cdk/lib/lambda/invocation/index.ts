@@ -50,7 +50,7 @@ async function processBedrockStream(
   conversationId: string
 ): Promise<void> {
   const params = {
-    modelId: 'anthropic.claude-v2',
+    modelId: 'us.anthropic.claude-3-5-sonnet-20240620-v1:0',
     contentType: 'application/json',
     accept: 'application/json',
     body: JSON.stringify({

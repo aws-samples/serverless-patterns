@@ -50,9 +50,16 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
     // Add Bedrock permissions to Lambda
     invocationHandler.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModelWithResponseStream'],
-      resources: ['arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-v2'],
+      resources: ['arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-5-sonnet-20240620-v1:0'],
     }));
-
+    invocationHandler.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['bedrock:InvokeModelWithResponseStream'],
+      resources: ['arn:aws:bedrock:us-east-1:275631959608:inference-profile/us.anthropic.claude-3-5-sonnet-20240620-v1:0'],
+    }));
+    invocationHandler.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['bedrock:InvokeModelWithResponseStream'],
+      resources: ['arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-sonnet-20240620-v1:0'],
+    }));
     // Add AppSync permissions to Lambda
     invocationHandler.addToRolePolicy(new iam.PolicyStatement({
       actions: ['appsync:GraphQL'],
