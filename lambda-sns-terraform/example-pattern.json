@@ -1,0 +1,55 @@
+{
+	"title": "Lambda to SNS",
+	"description": "Create a Lambda function that publishes to an SNS topic",
+	"language": "",
+	"level": "100",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"The template deploys a Lambda function, an SNS topic and the IAM permissions required to run the application. The Lambda function publishes a message to the SNS topic when invoked."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sns-terraform",
+			"templateURL": "serverless-patterns/lambda-sns-terraform",
+			"projectFolder": "lambda-sns-terraform",
+			"templateFile": "lambda-sns-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "Choosing between messaging services for serverless applications",
+				"link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+			},
+			{
+				"text": "Publishing Messages in Amazon SNS",
+				"link": "https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/sns-examples-publishing-messages.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the README in the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+	  "name": "Stephen Monaghan",
+	  "image": "",
+	  "bio": "Solutions Architect, AWS",
+	  "linkedin": "https://www.linkedin.com/in/stephen-monaghan-61873194/"
+	}]
+}

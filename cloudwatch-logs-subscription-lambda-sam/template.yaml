@@ -8,7 +8,7 @@ Globals:
   Function:
     Timeout: 3
     MemorySize: 128
-    Runtime: nodejs16.x
+    Runtime: nodejs20.x
     Architectures:
         - x86_64
 

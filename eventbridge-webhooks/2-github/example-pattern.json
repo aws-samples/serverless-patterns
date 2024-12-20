@@ -1,0 +1,55 @@
+{
+  "title": "GitHub to EventBridge Webhook",
+  "description": "Amazon EventBridge Inbound webhook for GitHub.",
+  "language": "python3.7",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This stack deploys an inbound webhook that subscribes to events from GitHub and receives them on an Amazon EventBridge event bus for further processing.",
+      "EventBridge is a serverless event bus that enables you to build scalable event-driven applications by routing events between your own applications, third-party SaaS applications, and other AWS services.",
+      "This pattern deploys one Lambda function with a fURL, one Secrets Manager secret, and a CloudWatch alarm."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-webhooks",
+      "templateURL": "serverless-patterns/eventbridge-webhooks/2-github",
+      "projectFolder": "eventbridge-webhooks",
+      "templateFile": "eventbridge-webhooks/2-github/template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge now supports receiving events from GitHub, Stripe and Twilio using Webhooks",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2022/08/amazon-eventbridge-supports-receiving-events-github-stripe-twilio-using-webhooks/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alseny Diallo",
+      "image": "https://phonetool.amazon.com/users/dialseny",
+      "bio": "Prototype Solution Architect @ AWS",
+      "linkedin": "https://www.linkedin.com/in/alseny-diallo-66b64080/",
+      "twitter": "twitter.com/alsenidiallo"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+    "title": "Step Function to Lambda to Lambda",
+    "description": "Create Step Functions Standard Workflow that orchestrates two Lambda functions",
+    "language": "NodeJS",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to use a state machine to orchestrate the execution of two Lambda functions",
+        "Once the state machine is executed the first Lambda function gets invoked. The output from this function is used as an event to trigger another Lambda function",
+        "This pattern deploys a State Machine and two Lambda Functions."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-lambda-lambda",
+        "templateURL": "serverless-patterns/sfn-lambda-lambda",
+        "projectFolder": "sfn-lambda-lambda",
+        "templateFile": "sfn-lambda-lambda/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Creating a Step Functions State Machine That Uses Lambda",
+          "link": "https://docs.aws.amazon.com/step-functions/latest/dg/tutorial-creating-lambda-state-machine.html"
+        },
+        {
+          "text": "Handling Error Conditions Using a Step Functions State Machine",
+          "link": "https://docs.aws.amazon.com/step-functions/latest/dg/tutorial-handling-error-conditions.html"
+        },
+        {
+          "text": "AWS CLI start-execution",
+          "link": "https://docs.aws.amazon.com/cli/latest/reference/stepfunctions/start-execution.html#start-execution"
+        },
+        {
+          "text": "Create a Step Functions State Machine Using AWS SAM",
+          "link": "https://docs.aws.amazon.com/step-functions/latest/dg/tutorial-state-machine-using-sam.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>same delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Saborni Bhattacharya",
+        "image": "https://drive.google.com/file/d/1AZFquOkafEQRUlrT4hKOtIbt4Cq66SHd/view?usp=sharing",
+        "bio": "I am Saborni Bhattacharya and I love making technical contents on my YouTube channel - https://www.youtube.com/channel/UCpYl6SiNRBfcZoi4EKqIwog. Here is my blog link as well - https://learnandexplorewithsab.blogspot.com/",
+        "linkedin": "https://www.linkedin.com/in/saborni-bhattacharya-5b523812a/"
+      }
+    ]
+  }

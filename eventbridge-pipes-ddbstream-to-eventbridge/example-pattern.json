@@ -1,0 +1,47 @@
+{
+  "title": "DynamoDB Stream to EventBridge Bus using EventBridge Pipes",
+  "description": "This pattern uses EventBridge pipe to connect DynamoDB Stream directly into EventBridge",
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["EventBridge Pipe used to connect DynamoDB stream (new and old images) directly into EventBridge with custom source and detail-type"]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/maineventbridge-pipes-ddbstream-to-eventbridge",
+      "templateURL": "serverless-patternseventbridge-pipes-ddbstream-to-eventbridge",
+      "projectFolder": "",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["Deploy the stack: <code>sam deploy</code>."]
+  },
+  "testing": {
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.png",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

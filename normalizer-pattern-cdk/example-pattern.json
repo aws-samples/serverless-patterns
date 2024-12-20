@@ -1,0 +1,52 @@
+{
+  "title": "SQS to EventBridge using EventBridge Pipes with normalizer pattern",
+  "description": "This pattern implementes the normalizer pattern using an EventBridge Pipe. This example uses SQS as source and EventBridge as target, but the pattern can be applied to other sources and targets as well.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The normalizer pattern routes each event type through its specific message translator, so that our downstream systems process messages with a unified structure. It is similar to a message translator, but with various source components, which all have different formats for events."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/normalizer-pattern-cdk",
+      "templateURL": "serverless-patterns/normalizer-pattern-cdk",
+      "projectFolder": "normalizer-pattern-cdk",
+      "templateFile": "src/lib/normalizer-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "More Enterprise Integration Patterns on AWS Samples",
+        "link": "https://github.com/aws-samples/amazon-eventbridge-pipes-architectural-patterns"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dominik Richter",
+      "image": "https://avatars.githubusercontent.com/u/29404931",
+      "bio": "Solutions Architect at AWS, passionate about event-driven architectures and Serverless.",
+      "linkedin": "do-richter"
+    }
+  ]
+}

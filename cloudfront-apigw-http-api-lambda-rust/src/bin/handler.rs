@@ -37,7 +37,7 @@ pub async fn function_handler(event: Request) -> Result<impl IntoResponse, Error
 fn get_ip_address(event: &Request) -> Option<String> {
     let header_ip_address = event.headers().get("x-forwarded-for");
     if let Some(header_ip_address) = header_ip_address {
-        let ips: Vec<&str> = header_ip_address.to_str().unwrap().split(",").collect();
+        let ips: Vec<&str> = header_ip_address.to_str().unwrap().split(',').collect();
         return Some(ips[0].to_string());
     }
     None

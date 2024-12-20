@@ -1,0 +1,56 @@
+{
+  "title": "Cloudwatch Alarm to SNS with Kinesis Firehose Fanout to Opensearch",
+  "description": "Analysing Cloudwatch Alarms in OpenSearch",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The purpose of this pattern is to deploy the infrastructure necessary to use Kinesis Data Firehose to fanout Cloudwatch Alarms using SNS to OpenSearch for analytics purposes."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-firehose-opensearch",
+      "templateURL": "serverless-patterns/sns-firehose-opensearch",
+      "projectFolder": "sns-firehose-opensearch",
+      "templateFile": "sns-firehose-opensearch/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Fanout to Kinesis Data Firehose delivery streams",
+          "link": "https://docs.amazonaws.cn/en_us/sns/latest/dg/sns-firehose-as-subscriber.html"
+      },
+      {
+        "text": "Introducing message archiving and analytics for Amazon SNS",
+          "link": "https://aws.amazon.com/blogs/compute/introducing-message-archiving-and-analytics-for-amazon-sns/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: aws cloudformation delete-stack --stack-name STACK_NAME"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abhishek Agawane",
+      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+      "bio": "I am a Cloud Support Engineer (Serverless) at AWS who loves baking pizzas",
+      "linkedin": "https://www.linkedin.com/in/agawabhi/"
+    }
+  ]
+}

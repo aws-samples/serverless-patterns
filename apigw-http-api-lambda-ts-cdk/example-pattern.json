@@ -1,0 +1,66 @@
+{
+    "title": "Amazon API Gateway HTTP API with AWS Lambda integration",
+    "description": "This pattern create an Amazon API Gateway HTTP API and a dummy Lambda function returning a simple 'Hello World'",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern creates an Amazon API Gateway HTTP API (v2) that integrates with an AWS Lambda function by using AWS Cloud Development Kit (AWS CDK).",
+        "The solution works as follow:",
+        "1. CDK will provision an Amazon API Gateway HTTP API and a sample Lambda function.",
+        "2. It will integrate the Lambda function to the  HTTP API using the route '/'",
+        "3. Finally, it will return the HTTP API URL in the console. (So you can test the deployment)"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda-ts-cdk",
+        "templateURL": "serverless-patterns/apigw-http-api-lambda-ts-cdk",
+        "projectFolder": "apigw-http-api-lambda-ts-cdk",
+        "templateFile": "lib/httpapi-lambda-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Working with the AWS CDK in TypeScript",
+          "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html"
+        },
+        {
+          "text": "Working with HTTP APIs",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+        },
+        {
+          "text": "Building Lambda functions with TypeScript",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-typescript.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "Deploy the stack: <code>cdk deploy</code> or <code>npm run deploy</code>"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Philippe Wanner",
+        "image": "https://media.licdn.com/dms/image/C4E03AQEX8VlCZ5oP2A/profile-displayphoto-shrink_200_200/0/1658749477233?e=1718236800&v=beta&t=CiLmp0EgKzD9_ysQAug0Zw4AAwFU9bIdT8D2jDsw4X8",
+        "bio": "Philippe is a Senior Specialist Solutions Architect at Amazon Web Services based in Zurich, Switzerland. His role is to spread the migration and modernization best practices for large organisations.",
+        "linkedin": "https://www.linkedin.com/in/philippe-wanner/",
+        "twitter": ""
+      }
+    ]
+  }
+  

@@ -1,0 +1,66 @@
+{
+  "title": "Kinesis Video Stream to Rekognition Stream Processor to Lambda",
+  "description": "Create a Rekognition Stream Processor to work on a Kinesis Video Stream and pass the generated events to Lambda for processing or analytics.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use Rekognition Stream Processors to analyse Kinesis Video Streams to search for faces and then pass the generated metadata to AWS Lambda for further processing/analytics. This pattern is leveraging the native integration between Kinesis Video and Rekognition Stream Processors which means we only need CDK to connect these components",
+      "For this sample project, we're going to develop a Rekognition Stream Processor that works to find connected home labels such as 'PERSON' or 'PET' or 'PACKAGE' for the demo, we're simply using 'PERSON' and 'PET' with a confidence threshold of 80.",
+      "This pattern deploys the following resources: 1 Kinesis Video Stream, 1 Kinesis Data Stream, 1 Rekogntion Stream Processor, 1 Lambda Function, 1 S3 Bucket and a Rekognition Collection"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/main/kinesis-video-rekognition-lambda",
+      "templateURL": "serverless-patterns/kinesis-video-rekognition-lambda",
+      "projectFolder": "kinesis-video-rekognition-lambda",
+      "templateFile": "kinesis-video-rekognition-lambda/src/lib/kvs-rekognition-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Rekognition Stream Processors",
+        "link": "https://docs.aws.amazon.com/rekognition/latest/dg/streaming-video.html"
+      },
+      {
+        "text": "Amazon Kinesis Video Streams",
+        "link": "https://aws.amazon.com/kinesis/video-streams"
+      },
+      {
+        "text": "Getting started with Rekognition",
+        "link": "https://docs.aws.amazon.com/rekognition/latest/dg/getting-started.html"
+      },
+      {
+        "text": "Connected Home Labels",
+        "link": "https://docs.aws.amazon.com/rekognition/latest/dg/streaming-video-detect-labels.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd src/ && cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cd src/ && cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shardul Vaidya",
+      "image": "https://media-exp1.licdn.com/dms/image/C4D03AQHzylyiG6DQkA/profile-displayphoto-shrink_800_800/0/1614623784713?e=1671667200&v=beta&t=hnWLZlw1kp38ZwBeLbHUiFkcnJznwmFqA5MGRLaz8kE",
+      "bio": "Partner Solutions Architect @ AWS. IoT x Serverless Enthusiast",
+      "linkedin": "shardul-vaidya"
+    }
+  ]
+}

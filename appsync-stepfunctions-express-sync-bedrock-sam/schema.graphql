@@ -1,0 +1,19 @@
+type Execution {
+	prompt_one: String
+	status: String
+	input: String
+	executionArn: String
+	startDate: String
+	stopDate: String
+	output: String
+}
+
+type Mutation {
+  startWorkflow (
+    prompt_one: String!
+  ): Execution
+}
+
+# Any Query you need for your application
+type QueryOutput { output: String! }
+type Query { myQuery(input: String!): QueryOutput }

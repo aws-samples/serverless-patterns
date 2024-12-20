@@ -1,0 +1,52 @@
+{
+    "title": "Lambda Secrets Manager Extension",
+    "description": "Create a Lambda function that uses the Secrets Manager Lambda Extension.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to use a Lambda function to retrieve secrets using the Secrets Manager Lambda extension in the us-east-1 region. Other regions may be used by swapping the Secrets Manager layer in the template.yaml file."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-secrets-manager-extension-python",
+        "templateURL": "serverless-patterns/lambda-secrets-manager-extension-python",
+        "projectFolder": "lambda-secrets-manager-extension-python",
+        "templateFile": "lambda-secrets-manager-extension-python/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AWS Secrets Manager Lambda Extension Documentation",
+          "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets_lambda.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Tim Pugh",
+        "image": "https://media-exp1.licdn.com/dms/image/C5603AQE_pcOIRvZiZw/profile-displayphoto-shrink_800_800/0/1599620216972?e=1671667200&v=beta&t=c9jJCkwElOTcMvmOmKeSnbfb7VhdR2Skt2EfoAD1yAw",
+        "bio": "I'm a Serverless Cloud Engineer specializing in serverless event driven systems at AWS and an avid backpacker.",
+        "linkedin": "www.linkedin.com/in/pugh"
+      }
+    ]
+  }

@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "serverless-apigateway-service-proxy": "^2.2.1",
+    "serverless-python-requirements": "^6.0.1"
+  }
+}

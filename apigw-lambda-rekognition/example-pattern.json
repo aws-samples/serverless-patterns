@@ -1,0 +1,62 @@
+{
+  "title": "Content safety image moderation using Amazon S3 and AWS Lambda",
+  "description": "Securely upload images to Amazon S3 and detect inappropriate content with Amazon Rekognition",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project utilizes API Gateway to generate an S3 Pre-signed URL via Lambda function, enabling users to upload images to an S3 bucket. Upon successful upload, an S3 event triggers another Lambda function to analyze the image using DetectModerationLabels API. If the image is deemed inappropriate, a notification is sent through SNS. This ensure secure uploads and automated content moderation. Use cases include user-generated content platforms and e-commerce websites, where secure image uploads and automated content moderation are essential."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-rekognition",
+      "templateURL": "serverless-patterns/apigw-lambda-rekognition",
+      "projectFolder": "apigw-lambda-rekognition",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Uploading objects with presigned URLs",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html"
+      },
+      {
+        "text": "Moderating content",
+        "link": "https://docs.aws.amazon.com/rekognition/latest/dg/moderation.html"
+      },
+      {
+        "text": "DetectModerationLabels",
+        "link": "https://docs.aws.amazon.com/rekognition/latest/APIReference/API_DetectModerationLabels.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Archana V",
+      "image": "https://media.licdn.com/dms/image/D5603AQF_QwVjCkS_UQ/profile-displayphoto-shrink_200_200/0/1670929520771?e=1724284800&v=beta&t=FFJJko4OO8h1tCFrxMyneTyRPAKmyEmIaDOYOeTaFEk",
+      "bio": "Cloud Support Engineer at AWS",
+      "linkedin": "archana-venkat-9b80b7184"
+    }
+  ]
+}

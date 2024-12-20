@@ -1,0 +1,54 @@
+{
+  "title": "AWS AppConfig integration with Lambda extensions",
+  "description": "AWS AppConfig integration with Lambda extensions.",
+  "language": "Rust",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The AppConfig extension takes care of calling the AWS AppConfig service, managing a local cache of retrieved data, tracking the configuration tokens needed for the next service calls, and periodically checking for configuration updates in the background. By default, you have 1000 TPS. After the first request, the profile is cached, so from now on, you hit the internal cache of AppConfig. We can use the Lambda Execution Context to avoid calling the AWS AppConfig cached service.",
+      "This pattern deploys one Lambda function with AppConfig extension in the Lambda layer."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appconfig-lambda-rust",
+      "templateURL": "serverless-patterns/appconfig-lambda-rust",
+      "projectFolder": "appconfig-lambda-rust",
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS AppConfig integration with Lambda extensions",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "make deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>make delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Daniele Frasca",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "linkedin": "daniele-frasca",
+      "twitter": "dfrasca80"
+    }
+  ]
+}

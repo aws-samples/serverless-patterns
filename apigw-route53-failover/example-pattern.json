@@ -1,0 +1,47 @@
+{
+  "title": "Amazon Route53 to Amazon API Gateway failover",
+  "description": "Creates a simple application with failover records in Route53",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The application exists in two seperate regions. One is a primary and the second is a secondary. Traffic will always be routed to the primary region unless there is an issue. If an issue with the primary region occurs, Route53 will route traffic to the secondary region. This example demonstrates the failover only and does not encompass authentication and data for the multiple regions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-route53-failover",
+      "templateURL": "serverless-patterns/apigw-route53-failovert",
+      "projectFolder": "apigw-route53-failover"
+    }
+  },
+  "resources": {
+    "bullets": []
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Eric Johnson",
+      "image": "https://serverlessland.com/assets/images/resources/ericdj.jpg",
+      "bio": "Eric Johnson is a Principal Developer Advocate for Serverless Applications at Amazon Web Services and is based in Northern Colorado. Eric is a fanatic about serverless and enjoys helping developers understand how serverless technologies introduces a major paradigm shift in how they approach building and running applications at massive scale with minimal administration overhead. Prior to this, Eric has worked as a developer, solutions architect and AWS Evangelist for an AWS partner company.",
+      "linkedin": "singledigit",
+      "twitter": "edjgeek"
+    }
+  ]
+}

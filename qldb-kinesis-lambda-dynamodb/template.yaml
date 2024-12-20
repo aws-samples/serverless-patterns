@@ -27,7 +27,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: qldb-streams-dynamodb.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       MemorySize: 1024
       Policies:
         - AWSLambdaBasicExecutionRole

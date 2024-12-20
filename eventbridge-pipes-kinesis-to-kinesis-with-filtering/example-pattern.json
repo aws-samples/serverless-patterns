@@ -1,0 +1,55 @@
+{
+  "title": "Kinesis to Kinesis with filtering using EventBridge Pipes",
+  "description": "This pattern will connect Kinesis streams together with EventBridge Pipes. The source stream is filtered into multiple Kinesis streams downstream.",
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": ["Kinesis stream is configured as the pipe source, and filters are created to filter records to downstream kinesis streams. This pattern allows you to filter kinesis streams into other kinesis streams."]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/eventbridge-pipes-kinesis-to-kinesis-with-filtering",
+      "templateURL": "serverless-patterns/eventbridge-pipes-kinesis-to-kinesis-with-filtering",
+      "projectFolder": "eventbridge-pipes-kinesis-to-kinesis-with-filtering",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy --guided"]
+  },
+  "testing": {
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.png",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

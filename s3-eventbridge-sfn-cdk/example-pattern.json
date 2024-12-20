@@ -1,0 +1,52 @@
+{
+  "title": "S3 to Step Functions",
+  "description": "This pattern demonstrates how to create an EventBridge rule with S3 as the event source and Step Functions as target.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how you can trigger an execution in Step Functions state machine when an object is created in an S3 bucket . ",
+      "When you uploads an object to the newly created S3 bucket, this will send an `Object Created` event to EventBridge, based on the EventBridge rule, the state machine is executed",
+      "This pattern deploys one Step Functions state machine, one S3 bucket, one EventBridge rule."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-sfn-cdk",
+      "templateURL": "serverless-patterns/s3-eventbridge-sfn-cdk",
+      "projectFolder": "s3-eventbridge-sfn-cdk",
+      "templateFile": "s3-eventbridge-sfn-cdk/src/lib/s3-eventbridge-sfn.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS S3 Event Notifications with EventBridge",
+        "link": "https://aws.amazon.com/blogs/aws/new-use-amazon-s3-event-notifications-with-amazon-eventbridge/"
+      },
+      {
+        "text": "Using EventBridge with S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "Trinh Vo",
+      "image": "https://media.licdn.com/dms/image/C5603AQF4Ke0jgSBcZA/profile-displayphoto-shrink_800_800/0/1658462515681?e=2147483647&v=beta&t=zgT3WKQkas7N1w98d-ToTCMqhRUDbWTjMaPowWH1JeE",
+      "bio": "Trinh is an Associate Solutions Architect at AWS Vietnam.",
+      "linkedin": "trinh-vo-095848185"
+    }
+  ]
+}

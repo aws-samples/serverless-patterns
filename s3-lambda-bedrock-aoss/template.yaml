@@ -1,0 +1,227 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Automating document vectorization using OpenSearch and Bedrock
+Parameters:
+  AmazonOpenSearchCollectionName:
+    Type: String
+    Description: "The collection name to create for storing vector embeedings"
+    ConstraintDescription: "Must be a valid name for Amazon OpenSearch Service Collection."
+    Default: "example-collection"
+  AmazonOpenSearchIndexName:
+    Type: String
+    Description: "The index name to store vector embeedings"
+    ConstraintDescription: "Must be a valid Amazon OpenSearch Service Vector Index."
+    Default: "example-index"
+  BedrockModelRegion:
+    Type: String
+    Description: Select the Bedrock service region from available options. Please make sure the model is access granted in the selected region Bedrock service. If your AOS service is in a region that is different than the bedrock service region, you may expect cross-region latency.
+    AllowedValues:
+      - us-east-1
+      - us-west-2
+      - eu-central-1
+      - ap-northeast-1
+      - ap-southeast-1
+    Default: us-west-2
+Resources:
+  #create a CloudFormation AWS Lambda-backed custom resources
+  LambdaInvokeIndexCreation:
+    Type: Custom::LambdaInvokeIndexCreation
+    Properties:
+      ServiceToken: !GetAtt IndexCreationLambdaFunction.Arn
+      AOSSIndexName: !Ref AmazonOpenSearchIndexName
+      AOSSHost: !Sub '${ExampleCollection.Id}.${AWS::Region}.aoss.amazonaws.com'
+
+  IndexCreationLambdaExecutionRole: 
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: LambdaAOSSAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+              - Effect: Allow
+                Action:
+                  - aoss:*
+                Resource: '*'
+
+  IndexCreationLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: index_creation.lambda_handler
+      Runtime: python3.11
+      MemorySize: 128
+      Timeout: 120
+      Role: !GetAtt IndexCreationLambdaExecutionRole.Arn
+      Layers:
+        - !Ref DependenciesLibrary
+
+ 
+  DocumentIngestionLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+          - Effect: Allow
+            Principal:
+              Service:
+                - s3.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: LambdaS3AoSSBedrockAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:GetObjectAcl
+                Resource:
+                  - !Sub "arn:aws:s3:::${SourceBucket}/*"
+                  - !Sub "arn:aws:s3:::${SourceBucket}"
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - aoss:*
+                Resource: '*'
+
+  DocumentIngestionLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: document_ingestion.lambda_handler
+      Runtime: python3.11
+      MemorySize: 128
+      Timeout: 120
+      Role: !GetAtt DocumentIngestionLambdaExecutionRole.Arn
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref SourceBucket
+      Environment:
+        Variables:
+          AOS_HOST: !Sub '${ExampleCollection.Id}.${AWS::Region}.aoss.amazonaws.com'
+          BEDROCK_MODEL_REGION: !Ref BedrockModelRegion
+          AOSS_INDEX_NAME:  !Ref AmazonOpenSearchIndexName
+      Layers:
+        - !Ref DependenciesLibrary
+      Events:
+        Trigger:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+                - aws.s3  
+              detail-type:
+                - Object Created
+  
+  DependenciesLibrary:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: document-ingestion-libs
+      Description: Dependencies for the document ingestion function
+      ContentUri: dependencies/.
+      CompatibleRuntimes:
+        - python3.11
+    Metadata:
+      BuildMethod: python3.11
+
+  SourceBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  SourceDocumentsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SourceBucket
+      PolicyDocument:
+        Statement:
+          - Action: s3:*
+            Effect: Deny
+            Principal: '*'
+            Resource:
+              - !Sub arn:aws:s3:::${SourceBucket}/*
+              - !Sub arn:aws:s3:::${SourceBucket}
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+  EncryptionPolicy:
+    Type: AWS::OpenSearchServerless::SecurityPolicy
+    Properties:
+      Name: example-encryption-policy
+      Type: encryption
+      Description: Encryption policy for example collection
+      Policy: !Sub '{"Rules":[{"ResourceType":"collection","Resource":["collection/${AmazonOpenSearchCollectionName}"]}],"AWSOwnedKey":true}'
+  SecurityPolicy:
+    Type: AWS::OpenSearchServerless::SecurityPolicy
+    Properties:
+      Name: example-network-policy
+      Type: network
+      Description: Network policy for example collections
+      Policy: !Sub '[{"Rules":[{"ResourceType":"collection","Resource":["collection/${AmazonOpenSearchCollectionName}"]}, {"ResourceType":"dashboard","Resource":["collection/${AmazonOpenSearchCollectionName}"]}],"AllowFromPublic":true}]'
+  AccessPolicy:
+    Type: AWS::OpenSearchServerless::AccessPolicy
+    Properties:
+      Name: example-access-policy
+      Type: data
+      Description: Access policy for example collection
+      Policy: !Sub '[{"Description":"Access for Users","Rules":[{"ResourceType":"index","Resource":["index/${AmazonOpenSearchCollectionName}/${AmazonOpenSearchIndexName}"],"Permission":["aoss:*"]}, {"ResourceType":"collection","Resource":["collection/${AmazonOpenSearchCollectionName}"],"Permission":["aoss:*"]}], "Principal":["${DocumentIngestionLambdaExecutionRole.Arn}","${IndexCreationLambdaExecutionRole.Arn}"]}]'
+  ExampleCollection:
+    Type: AWS::OpenSearchServerless::Collection
+    Properties:
+      Name: !Ref AmazonOpenSearchCollectionName
+      Description: Example collection for RAG applications
+      Type: VECTORSEARCH
+    DependsOn:
+      - EncryptionPolicy
+      - SecurityPolicy
+      - AccessPolicy
+Outputs:
+  SourceBucketName:
+    Value: !Ref SourceBucket
+    Description: S3 Bucket for object storage
+  DocumentIngestionLambdaFunctionName:
+    Value: !Ref DocumentIngestionLambdaFunction
+    Description: Document Ingestion Lambda Function Name

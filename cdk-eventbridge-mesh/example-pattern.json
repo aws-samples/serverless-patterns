@@ -1,0 +1,52 @@
+{
+    "title": "Meshing together EventBridge Custom Buses",
+    "description": "Meshing together EventBuses with EventBridge Rules and Event Patterns gives the features isolation and autonomy which drives producer and consumer clarity.  This pattern looks to demonstrate that using CDK and TypeScript.",
+    "language": "Go",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "By connecting two or more EventBuses together forming a mesh, the rules associated with the consumers and producers can be more isolated and closer to the features that are producing and consuming those messages. This layer of isolation gives a feature/service the ability to work more autonomously and reduces the risk of rules overlapping or permissions being too liberal."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-eventbridge-mesh",
+            "templateURL": "serverless-patterns/cdk-eventbridge-mesh",
+            "projectFolder": "cdk-eventbridge-mesh",
+            "templateFile": "lib/main-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "EventBridge CDK Documentation",
+                "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_events-readme.html"
+            },
+            {
+                "text": "AWS EventBridge Custom Bus",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-event-bus.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": ["make deploy"]
+    },
+    "testing": {
+        "text": ["See the GitHub repo for detailed testing instructions."]
+    },
+    "cleanup": {
+        "text": ["make destroy"]
+    },
+    "authors": [
+        {
+            "headline": "Presented by Benjamen Pyle",
+            "name": "Benjamen Pyle",
+            "image": "https://www.binaryheap.com/wp-content/uploads/2023/02/cropped-Photo-on-1-26-23-at-8.57-AM-2.png",
+            "bio": "Benjamen Pyle is an AWS Community Builder who loves building scalable and useful applications with Serverless and Event Driven Architectures",
+            "linkedin": "benjamenpyle",
+            "twitter": "benjamenpyle"
+        }
+    ]
+}

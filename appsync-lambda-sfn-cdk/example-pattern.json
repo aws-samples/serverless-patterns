@@ -1,0 +1,67 @@
+{
+  "title": "Invoke a Step functions workflow from Appsync",
+  "description": "Invoke a step functions workflow through a lambda resolver from Appsync",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to Invoke a Step functions workflow, using Appsync and a Lambda resolver.",
+      "This pattern deploys an Appsync Api, a lambda resolver, a DynamoDB and a Step Function workflow using CDK."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-lambda-sfn-cdk",
+      "templateURL": "serverless-patterns/appsync-lambda-sfn-cdk",
+      "projectFolder": "appsync-lambda-sfn-cdk",
+      "templateFile": "appsync-lambda-sfn-cdk/cdk_momo/cdk_momo_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+        {
+        "text": "AWS CDK- Define cloud infrastructure using familiar programming languages",
+        "link": "https://aws.amazon.com/cdk/"
+      },
+      {
+        "text": "AWS Appsync - Accelerate application development with serverless GraphQL and Pub/Sub APIs",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+
+      {
+        "text": "AWS Step functions- Visual workflows for modern applications",
+        "link": "https://aws.amazon.com/step-functions"
+      },
+        {
+        "text": "Amazon DynamoDB - Fast, flexible NoSQL database service for single-digit millisecond performance at any scale",
+        "link": "https://aws.amazon.com/dynamodb/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rosius Ndimofor",
+      "image": "https://rosius.s3.us-east-2.amazonaws.com/ro.jpeg",
+      "bio": "AWS Serverless Hero with a high affinity for building fullstack serverless apps.",
+      "linkedin": "rosius",
+      "twitter": "atehrosius"
+    }
+  ]
+}

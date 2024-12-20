@@ -1,0 +1,60 @@
+{
+    "title": "Lambda to Athena",
+    "description": "Create a Lambda function that queries a prefilled Athena table using boto3 library",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to a Lambda function to invoke a query execution to an Athena database table and fetch them from the same."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-athena-sam",
+        "templateURL": "serverless-patterns/lambda-athena-sam",
+        "projectFolder": "lambda-athena-sam",
+        "templateFile": "lambda-athena-sam/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "How can I schedule an Amazon Athena query?",
+          "link": "https://aws.amazon.com/premiumsupport/knowledge-center/schedule-query-athena/"
+        },
+        {
+          "text": "Boto3 client for Athena",
+          "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/athena.html#client"
+        },
+        {
+          "text": "Creating tables in Athena - Creating tables using AWS Glue or the Athena console",
+          "link": "https://docs.aws.amazon.com/athena/latest/ug/creating-tables.html#creating-tables-how-to"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>same delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Saborni Bhattacharya",
+        "image": "https://drive.google.com/file/d/1AZFquOkafEQRUlrT4hKOtIbt4Cq66SHd/view?usp=sharing",
+        "bio": "I am Saborni Bhattacharya and I love making technical contents on my YouTube channel - https://www.youtube.com/channel/UCpYl6SiNRBfcZoi4EKqIwog. Here is my blog link as well - https://learnandexplorewithsab.blogspot.com/",
+        "linkedin": "https://www.linkedin.com/in/saborni-bhattacharya-5b523812a/"
+      }
+    ]
+  }

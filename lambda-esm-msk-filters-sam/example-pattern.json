@@ -1,0 +1,58 @@
+{
+    "title": "Lambda event filtering using event source mapping for Amazon MSK",
+    "description": "Sample Lambda ESM Filter rules for Amazon Managed Streaming for Apache Kafka (Amazon MSK)",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "Use this code to test out different trigger filters for your Lambda functions. You can use event filtering to control which events Lambda sends to your function for processing. ",
+        "Use this template to explore and test how to configure event filtering for Amazon MSK messages triggering a lambda function. "
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-esm-msk-filters-sam/",
+        "templateURL": "serverless-patterns/lambda-esm-msk-filters-sam",
+        "projectFolder": "lambda-esm-msk-filters-sam",
+        "templateFile": "lambda-esm-msk-filters-sam/template.yaml"
+      }
+    },
+    "resources": {
+      "headline": "Additional resources",
+      "bullets": [
+        {
+          "text": "Lambda event filtering",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam build",
+        "sam deploy --stack-name lambda-msk-esm-stack --resolve-s3 --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides MSKStreamARN='ClusterARN' MSKTopicName='TopicName'"
+      ]
+    },
+    "testing": {
+      "headline": "Testing",
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "headline": "Cleanup",
+      "text": [
+        "1. Delete the stack: <code>sam delete --stack-name lambda-msk-esm-stack</code>."
+      ]
+    },
+    "authors": [
+        {
+          "name": "Nikhil Penmetsa",
+          "image": "https://avatars.githubusercontent.com/u/62526133?v=4",
+          "bio": "Nikhil Penmetsa is a Senior Solutions Architect based out of Portland, OR.",
+          "linkedin": "nikhilpenmetsa",
+          "twitter": "nikhilpen"
+        }
+    ]
+}

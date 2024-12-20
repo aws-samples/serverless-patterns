@@ -1,0 +1,66 @@
+{
+  "title": "AppConfig Feature Flag with CDK (Typescript)",
+  "description": "Set up AppConfig Feature Flag with CDK and read the status from Appconfig Extension for Lambda",
+  "language": "typescript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project demonstrates how to implement a feture flag into AppConfig using AWS CDK.",
+      "Also this demonstrates the usage of AppConfig extension for Lambda, to retrieve the status of the Feature Flag."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appconfig-feature-flag-cdk",
+      "templateURL": "serverless-patterns/appconfig-feature-flag-cdk",
+      "projectFolder": "appconfig-feature-flag-cdk",
+      "templateFile": "appconfig-feature-flag-cdk/app-config-feature-flag-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AppConfig",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html"
+      },
+      {
+        "text": "AppConfig Feature Flags",
+        "link": "https://aws.amazon.com/blogs/mt/using-aws-appconfig-feature-flags/"
+      },
+      {
+        "text": "AppConfig Lambda Extension",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions.html"
+      },
+      {
+        "text": "AppConfig region specific Lambda Extension versions",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions-versions.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all --parameters appConfigExtensionArn='[AppConfig Extension version ARN]'"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destory --all</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pubudu Jayawardana",
+      "image": "https://avatars.githubusercontent.com/u/1263087",
+      "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusisast.",
+      "linkedin": "pubudusj",
+      "twitter": "@pubudusj"
+    }
+  ]
+}

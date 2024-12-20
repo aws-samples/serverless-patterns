@@ -1,0 +1,54 @@
+{
+  "title": "Lambda Destinations to Lambda and SQS with SAM",
+  "description": "Lambda function that on success sends message to another function and on failure to SQS using Lambda destinations with SAM",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create a Lambda function that on success sends message to another function and on failure to SQS using Lambda destinations with SAM.",
+      "The AWS SAM template deploys the resources and the IAM permissions required to run the application."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-destinations-sam",
+      "templateURL": "serverless-patterns/lambda-destinations-sam",
+      "projectFolder": "lambda-destinations-sam",
+      "templateFile": "lambda-destinations-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Destinations",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-aws-lambda-destinations/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Omar Rosadio",
+      "image": "https://avatars.githubusercontent.com/u/10565035",
+      "bio": "Cloud Engineer / AWS Community Builder in Serverless category.",
+      "linkedin": "omaralonsorosadioportilla",
+      "twitter": "@omarrosadio"
+    }
+  ]
+}

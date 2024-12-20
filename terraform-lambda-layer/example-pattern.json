@@ -1,0 +1,75 @@
+{
+  "title": "Lambda Function and Lambda Layers",
+  "description": "Create a Lambda Function that has a Lambda Layer added to it",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform (with modules)",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda Function and attaches a Lambda Layer to it.",
+      "The function imports `mysql-connector-python` package that is provisioned using Lambda Layer and prints a list of files in `/opt` directory. `/opt` is a location where Lambda Layers attach content.",
+      "Using layers reduces the size of uploaded deployment archives and makes it faster to deploy your code."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-lambda-layer",
+      "templateURL": "serverless-patterns/terraform-lambda-layer",
+      "projectFolder": "terraform-lambda-layer",
+      "templateFile": "terraform-lambda-layer/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "test": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+      },
+      {
+        "test": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS Lambda Developer Guide - Creating and sharing Lambda layers",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html"
+      },
+      {
+        "text": "AWS Database Blog - IAM role-based authentication to Amazon Aurora from serverless applications. This blog uses the mysql-connector-python package",
+        "link": "https://aws.amazon.com/blogs/database/iam-role-based-authentication-to-amazon-aurora-from-serverless-applications/"
+      },
+      {
+        "text": "AWS Amazon Relational Database Service (RDS) User Guide - Using SSL/TLS to encrypt a connection to a DB instance",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anton Babenko",
+      "image": "https://avatars.githubusercontent.com/u/393243",
+      "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
+      "linkedin": "https://www.linkedin.com/in/antonbabenko",
+      "twitter": "antonbabenko"
+    }
+  ]
+}

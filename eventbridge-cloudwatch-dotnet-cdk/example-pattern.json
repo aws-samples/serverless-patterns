@@ -1,0 +1,57 @@
+{
+  "title": "EventBridge to CloudWatch Logs",
+  "description": "Create an EventBridge rule that sends events to CloudWatch Logs.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS CDK template to create an EventBridge Rule, as well as, a CloudWatch Logs Group.",
+      "The EventBridge Rule publishes matched events to CloudWatch Logs.",
+      "In this example, the rule filters for specific attributes in the event before sending to the CloudWatch Logs target."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-cloudwatch-dotnet-cdk",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-cloudwatch-dotnet-cdk/README.md"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Amir Khairalomoum",
+      "image": "https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/06/29/Amir-Khairalomoum.jpg",
+      "bio": "Amir is a Sr. Solutions Architect at AWS. He supports customers in their digital transformation and their cloud journey to AWS. He is passionate about serverless technologies.",
+      "linkedin": "amir-khairalomoum",
+      "twitter": "@mrark1361"
+    }
+  ]
+}

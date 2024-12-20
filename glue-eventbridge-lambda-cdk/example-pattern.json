@@ -1,0 +1,62 @@
+{
+  "title": "AWS Glue Job trigger a Lambda Function over Eventbridge Rule",
+  "description": "AWS Glue Job trigger a Lambda Function over Eventbridge Rule after change state to timed out",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Spark Streaming AWS Glue Job, an EventBridge Rule and a Lambda Function that is triggered whenever the Glue Job times out.",
+      "The CDK application contains the minimum IAM resources required to run the application."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/glue-eventbridge-lambda-cdk",
+      "templateURL": "serverless-patterns/glue-eventbridge-lambda-cdk",
+      "projectFolder": "glue-eventbridge-lambda-cdk",
+      "templateFile": "glue_eventbridge_lambda_cdk/glue_eventbridge_lambda_cdk_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting started with Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-get-started.html"
+      },
+      {
+        "text": "AWS Glue Immersion Day",
+        "link": "https://catalog.us-east-1.prod.workshops.aws/workshops/ee59d21b-4cb8-4b3d-a629-24537cf37bb5/en-US"
+      },
+      {
+        "text": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "José Albino Neto",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-jose-albino-neto.jpg",
+      "bio": "Cloud Application Architect @ AWS",
+      "linkedin": "https://www.linkedin.com/in/albinoneto/",
+      "twitter": "none"
+    }
+  ]
+}

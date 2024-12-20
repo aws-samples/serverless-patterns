@@ -1,0 +1,63 @@
+{
+    "title": "Amazon API Gateway to Amazon Kinesis Data Stream to AWS Lambda to Amazon DynamoDB",
+    "description": "This pattern explains how to deploy a SAM application with Amazon API Gateway, Amazon Kinesis Data Stream, AWS Lambda, and Amazon DynamoDB. When an HTTP POST request is made to the Amazon API Gateway endpoint, Gateway authorizes the request by checking Basic auth credentials and on valid credentials, request payload is sent to Amazon Kinesis Data Stream. This pattern is especially useful in cases of large payloads since Kinesis Data Stream can support upto 1MB paylod size. AWS Lambda function consumes event from the Data Stream and inserts the event/payload into the Amazon DynamoDB table. Amazon Lambda is also configured with a Dead Letter Queue where events are sent when retries to process those messages are repeatedly failed.",
+    "language": "Python",
+    "level": "300",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern deploys an Amazon API Gateway HTTP API with route /submit/{streamName}/{eventId} configured with basic authentication.",
+            "On receiving a request, API Gateway will invoke a Lambda authorizer which validates the request and returns a policy informing API Gateway to accept or deny the request.",
+            "When request is accepted, API Gateway sends the message payload to Kinesis Data Stream.",
+            "Messages from Kinesis Data Streams is posted to a lambda function to process them. Lambda uses a SQS queue as Dead Letter Queue to send the messages in case of continued failures to process the messages.",
+            "Lambda saves the received messages into a DynamoDB table."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-kinesis-lambda-ddb",
+            "templateURL": "serverless-patterns/apigw-kinesis-lambda-ddb",
+            "projectFolder": "apigw-kinesis-lambda-ddb",
+            "templateFile": "apigw-kinesis-lambda-ddb/template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Lambda Authorizers",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
+            },
+            {
+                "text": "Dead Letter Queues",
+                "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-deadletterqueue.html"
+            },
+            {
+                "text": "Amazon Kinesis Data Streams",
+                "link": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ravi Kiran Ganji",
+            "bio": "I am a Senior Cloud Application Architect at AWS Professional Services, and Serverless Enthusiast.",
+            "linkedin": "ravi-kiran-ganji"
+        }
+    ]
+}

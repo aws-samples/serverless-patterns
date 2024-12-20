@@ -1,0 +1,46 @@
+{
+  "title": "Notify consumers of schema changes with Schema Registry events",
+  "description": "Use schema registry and EventBridge to notify consumers of changes (Slack example)",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern will use a CDK abstraction to allow consumers to listen to for schema changes with Amazon EventBridge. Schema changes will be forward to Slack (as an example)"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schema-notifications",
+      "templateURL": "serverless-patterns/eventbridge-schema-notifications",
+      "projectFolder": "eventbridge-schema-notifications",
+      "templateFile": "cdk/lib/single-bus-enrichment-with-lambda.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Content rnricher messaging pattern",
+        "link": "https://www.enterpriseintegrationpatterns.com/DataEnricher.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "image": "../assets/images/resources/dboyne.png",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+    }
+  ]
+}

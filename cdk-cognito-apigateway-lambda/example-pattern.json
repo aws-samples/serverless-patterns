@@ -1,0 +1,53 @@
+{
+    "title": "API authentication using Cognito User Pool client credentials flow",
+    "description": "This pattern guides you to authenticate service calls using Cognito User Pool. Often, we come across scenarios where microservices need to communicate with each other in a secure manner using an established standard like OAuth2. The Cognito client_credentials grant type helps you create application client with a set of client credentials that can be used to generate access token. This token can be used to access APIs hosted on API Gateway secured by an authorizer that uses the Cognito User Pool.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "The sample project demonstrates how to use a Cognito User Pool as an Authorizer for an API hosted on API Gateway. The API is invoked using using an access token that is generated using the user pool app client credentials. If the token is valid, the returns a 200 response. For any invalid tokens, the API response with 401 error."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-cognito-apigateway-lambda",
+        "templateURL": "serverless-patterns/cdk-cognito-apigateway-lambda",
+        "projectFolder": "cdk-cognito-apigateway-lambda",
+        "templateFile": "cdk-cognito-apigateway-lambda/lib/cdk-cognito-apigateway-lambda.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Generate access token",
+          "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "See the GitHub repo for detailed deployment instructions."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "cdk destroy"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Suhasini Krishnan Udayar",
+        "image": "https://github.com/suhasini-udayar.png",
+        "bio": "Cloud Application Architect",
+        "linkedin": "https://www.linkedin.com/in/suhasini-udayar-54532a104/"
+      }
+    ]
+  }
+  

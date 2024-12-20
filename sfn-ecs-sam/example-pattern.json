@@ -1,0 +1,62 @@
+{
+    "title": "Step Functions workflow to invoke ECS tasks that read from S3",
+    "description": "Step Functions - ECS Integration to run multiple ECS tasks in parallel",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This project demonstrates how to implement a State Function State machine to invoke parallel ECS tasks in fargate with input parameters to read files from S3 in order to process them in parallel.",
+        "The template is implemented with SAM. The ECS task is implemented in python as a pattern reference but can be implemented in any language."
+      ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-ecs-sam",
+            "templateURL": "serverless-patterns/sfn-ecs-sam",
+            "projectFolder": "sfn-ecs-sam",
+            "templateFile": "template.yml"
+            }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AWS Step Functions",
+          "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+        },
+        {
+          "text": "Amazon Elastic Container Service",
+          "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html"
+        },
+        {
+          "text": "Amazon Simple Storage Service",
+          "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided'"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Praveen Koorse",
+        "image": "https://avatars.githubusercontent.com/u/124192288",
+        "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusiast.",
+        "linkedin": "praveenkoorse"
+      }
+    ]
+  }
+  

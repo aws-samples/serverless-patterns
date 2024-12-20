@@ -1,0 +1,64 @@
+{
+  "title": "Amazon EventBridge Scheduler to Run Amazon Elastic Container Service Task",
+  "description": "Simple pattern that create an Amazon EventBridge Scheduler to run task in Amazon Elastic Container Service cluster every 15 minutes.",
+  "language": "Go",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample pattern demonstrates how to use Amazon EventBridge Scheduler to run task in Amazon Elastic Container Service cluster every 15 minutes and deployed using the AWS CDK for Go."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-ecs-cdk-go",
+      "templateURL": "serverless-patterns/eventbridge-schedule-ecs-cdk-go",
+      "projectFolder": "eventbridge-schedule-ecs-cdk-go",
+      "templateFile": "eventbridge-schedule-ecs-cdk-go/eventbridge-schedule-ecs-cdk-go.go"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with the AWS CDK in Go",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-go.html"
+      },
+      {
+        "text": "AWS CLI start-execution",
+        "link": "https://docs.aws.amazon.com/cli/latest/reference/stepfunctions/start-execution.html#start-execution"
+      },
+      {
+        "text": "Getting Started with Amazon EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "Getting started with Amazon ECS",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/getting-started.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Stop all running tasks in ECS Cluster",
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Hoi Wing Chan",
+      "bio": "Hoi Wing is a Technical Account Manager at Amazon Web Services with a background of software development and architecture.",
+      "linkedin": "wing-chan-0943a344"
+    }
+  ]
+}

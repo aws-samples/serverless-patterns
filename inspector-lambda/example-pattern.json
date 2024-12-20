@@ -1,0 +1,59 @@
+{
+  "title": "Process Amazon Inspector Findings",
+  "description": "Process Amazon Inspector findings and initial scan results via AWS Lambda and send them to S3 for storage or analysis.",
+  "language": "Python",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an AWS Lambda to filter and process Amazon Inspector Findings, then send them to S3 for archiving or analysis.",
+      "Amazon Inspector is a vulnerability management service that continuously scans your AWS workloads for software vulnerabilities and unintended network exposure. Amazon Inspector automatically discovers and scans running Amazon EC2 instances, container images in Amazon Elastic Container Registry (Amazon ECR), and AWS Lambda functions for known software vulnerabilities and unintended network exposure.",
+      "Amazon Inspector creates a finding when it discovers a software vulnerability or network configuration issue. A finding describes the vulnerability, identifies the affected resource, rates the severity of the vulnerability, and provides remediation guidance.",
+      "This pattern deploys two Amazon EventBridge rules that forward Amazon Inspector Findings and Initial Scan events to Lambda functions. There are two Lambda functions, one that processes Amazon Inspector Findings, and one that processes Amazon Inspector initial scans. The Lambda functions send the processed events to a partitioned S3 Bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/inspector-lambda",
+      "templateURL": "serverless-patterns/inspector-lambda",
+      "projectFolder": "inspector-lambda",
+      "templateFile": "inspector-lambda/app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Understanding findings in Amazon Inspector",
+        "link": "https://docs.aws.amazon.com/inspector/latest/user/findings-understanding.html"
+      },
+      {
+        "text": "Scanning Amazon EC2 instances with Amazon Inspector",
+        "link": "https://docs.aws.amazon.com/inspector/latest/user/scanning-ec2.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Maya Flores",
+      "image": "https://media.licdn.com/dms/image/C4E03AQGFaDVfkIJi4g/profile-displayphoto-shrink_400_400/0/1620953260457?e=1683763200&v=beta&t=CeqBO-qqvohduG5G1godlrHJi6JF19sQ9SRhtvHEsLM",
+      "bio": "Partner Solutions Architect @ AWS. Serverless enthusiast.",
+      "linkedin": "maya-m-flores"
+    }
+  ]
+}
