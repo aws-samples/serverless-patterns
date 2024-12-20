@@ -55,10 +55,7 @@ aws lambda invoke \
   response.json
 ```
 2. Check the S3 bucket for failure redords:
-```bash
-aws s3 ls s3://[YOUR-BUCKET-NAME]
-```
-
+```aws s3 ls s3://[YOUR-BUCKET-NAME]```
 
 ## Cleanup
 
