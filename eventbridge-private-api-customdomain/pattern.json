@@ -1,0 +1,67 @@
+{
+  "title": "Invoke Private REST API gateway custom domain from EventBridge schedule",
+  "description": "The SAM template deploys a EventBridge schedule that invokes a Private REST API gateway custom domain.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Eventbridge schedule is created using the SAM template which will Invoke the Eventbridge API destinations every 5 minutes.",
+      "Eventbridge API destinations will invoke the Private REST API gateway custom domain using the EventBridge connection.",
+      "EventBridge connection is configured with the Amazon VPC Lattice and AWS PrivateLink to connect to Private API within AWS network."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-private-api-customdomain",
+      "templateURL": "serverless-patterns/eventbridge-private-api-customdomain",
+      "projectFolder": "eventbridge-private-api-customdomain",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Custom domain names for private APIs in API gateway ",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-custom-domains.html"
+      },
+      {
+          "text": "API destinations as targets in Amazon EventBridge",
+          "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-destinations.html"
+      },
+      {
+          "text": "Amazon EventBridge and AWS Step Functions announce integration with private APIs",
+          "link": "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-eventbridge-step-functions-integration-private-apis/"
+      },
+      {
+          "text": "Securely share AWS resources across VPC and account boundaries with PrivateLink, VPC Lattice",
+          "link": "https://aws.amazon.com/blogs/aws/securely-share-aws-resources-across-vpc-and-account-boundaries-with-privatelink-vpc-lattice-eventbridge-and-step-functions/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sahil Kapoor",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQHTVptga3RxcA/profile-displayphoto-shrink_800_800/B56ZO3ZfseHoAc-/0/1733948735068?e=1739404800&v=beta&t=FX6MFZ2JFH17KQc89u4gY6tQXGoMJLiLkB2qT3MtV2g",
+      "bio": "Cloud Support Engineer at AWS",
+      "linkedin": "sahil-kapoor-503391a7",
+      "twitter": ""
+    }
+  ]
+}

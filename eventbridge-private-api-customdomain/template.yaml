@@ -1,0 +1,139 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template to invoke Private API Custom Domain from EventBridge Schedule Expression
+
+Parameters:
+  Domainname:
+    Type: String
+    Description: Custom Domain name configured for Private REST API. 
+
+  PrivateAPIInvokeURL:
+    Type: String
+    Description: Complete Invocation url for the Private API Gateway resource. Eg - https://DOMAIN/<API-RESOURCE-PATH>
+
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID to create Resource Gateway & Configuration
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs Resource Gateway & Configuration
+
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: SecurityGroups IDs for Resource Gateway.
+
+Resources:
+  ResourceGatewayVpcLattice:
+    Type: AWS::VpcLattice::ResourceGateway
+    Properties:
+      IpAddressType: IPV4
+      Name: resourcegatewayeventbridgeprivateapi
+      SecurityGroupIds: !Ref SecurityGroups
+      SubnetIds: !Ref SubnetIds
+      VpcIdentifier: !Ref VPCId
+
+
+  ResourceConfiguration:
+    Type: AWS::VpcLattice::ResourceConfiguration
+    Properties:
+      AllowAssociationToSharableServiceNetwork: True
+      Name: resourceconfigebprivate
+      PortRanges: 
+        - 1-65535
+      ProtocolType: TCP
+      ResourceConfigurationAuthType: NONE
+      ResourceConfigurationDefinition: 
+        DnsResource: 
+          DomainName: !Ref Domainname
+          IpAddressType: IPV4
+      ResourceConfigurationType: SINGLE
+      ResourceGatewayId: !GetAtt ResourceGatewayVpcLattice.Arn
+
+  APIConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      Name: 'Private-APIGateway-Connection-Eventbridge'
+      InvocationConnectivityParameters:
+        ResourceParameters:
+            ResourceConfigurationArn: !GetAtt ResourceConfiguration.Arn
+      AuthorizationType: API_KEY
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: x-api-key
+          ApiKeyValue: 'test'
+
+
+  EventBridgeApiDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      ConnectionArn: !GetAtt APIConnection.Arn
+      HttpMethod: GET
+      InvocationEndpoint: !Ref PrivateAPIInvokeURL
+      Name: EventBridge-Private-API-Destination
+
+  EventBridgeRulePattern:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Invoke the API Gateway URL every 5 minutes. 
+      EventBusName: default
+      ScheduleExpression: rate(5 minutes)
+      Name: Invoke-Private-APIGW-Custom-Domain-Rule
+      State: ENABLED
+      Targets:
+        - Id: 123456-b0e6-4c9a-b5d6-123445
+          Arn: !GetAtt EventBridgeApiDestination.Arn
+          RoleArn: !GetAtt EventBridgeRulePatternRole.Arn
+          HttpParameters:
+            PathParameterValues: []
+            HeaderParameters:
+              invokedby: eventbridgeinvoke
+            QueryStringParameters: {}
+
+  EventBridgeRulePatternRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      MaxSessionDuration: 3600
+
+  EventBridgeRulePolicy:
+    Type: AWS::IAM::RolePolicy
+    Properties:
+      PolicyName: Amazon_EventBridge_Invoke_Api_Destination_66257085964cef766
+      RoleName: !Ref EventBridgeRulePatternRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - events:InvokeApiDestination
+            Resource:
+              - Fn::Sub: >-
+                  arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:api-destination/*
+
+
+Outputs:
+  ResourceGatewayVpcLattice:
+    Description: "ResourceGatewayVpcLattice ARN"
+    Value: !GetAtt ResourceGatewayVpcLattice.Arn
+
+  ResourceConfiguration:
+    Description: "ResourceConfiguration ARN"
+    Value: !GetAtt ResourceConfiguration.Arn
+
+  APIConnection:
+    Description: "APIConnection Name"
+    Value: !GetAtt APIConnection.Arn
+
+  EventBridge:
+    Description: "EventBridge ARN"
+    Value: !GetAtt EventBridgeRulePattern.Arn
+
+
+
