@@ -1,13 +1,13 @@
 {
-  "title": "Find Inactive lambda functions and Publish it to SNS topic using Step Functions.",
-  "description": "Simple pattern that creates a Step Functions & uses SDK integration to find Inactive functions and Publish it to SNS topic.",
+  "title": "Find list of Inactive lambda functions and publish it to SNS topic using Step Functions.",
+  "description": "Simple pattern that runs daily using eventbridge scheduler and invokes a state machine to find Inactive functions and publish it to SNS topic.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Creates a one time schedule in EventBridge Scheduler with Step Functions as target and uses SDK integration to find the Lambda function Status and return list of Inactive Functions and then publishing to the SNS Topic."
+      "Creates a one time schedule in eventBridge scheduler with state machine as target and uses SDK integration to find the lambda function status and returns the list of Inactive functions and which is then published to the SNS Topic."
     ]
   },
   "gitHub": {

@@ -124,9 +124,9 @@
           }
         }
       ],
-      "Default": "Pass (2)"
+      "Default": "Inactive function pass state"
     },
-    "Pass (2)": {
+    "Inactive function pass state": {
       "Type": "Pass",
       "Next": "SNS Publish"
     },
@@ -140,7 +140,7 @@
       "Arguments": {
         "TopicArn": "${TopicARN}",
         "Message": "{% $states.input.Inactive_Functions %}",
-        "Subject": "Inactive Lambda functions List"
+        "Subject": "Inactive Lambda functions list | ${region} | Account - ${accountID}"
       },
       "End": true
     }

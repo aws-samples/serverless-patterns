@@ -18,6 +18,8 @@ Resources:
       DefinitionSubstitutions:
         LambdaFunctionArn: !GetAtt LambdaFunction.Arn
         TopicARN : !GetAtt MySNSTopic.TopicArn
+        region : !Sub ${AWS::Region}
+        accountID : !Sub ${AWS::AccountId}
 
   DailyEventRule:
     Type: AWS::Events::Rule
@@ -28,10 +30,10 @@ Resources:
       Targets: 
         - Arn: !Ref StepFunction
           Id: "StepFunctionTarget"
-          RoleArn: !GetAtt EventBridgeRule.Arn
+          RoleArn: !GetAtt EventBridgeRulerole.Arn
           Input: '{ "Function_ARN_List_existing": {"lambda_arn_list_combined": []},"NextMarker": null}'
 
-  EventBridgeRule:
+  EventBridgeRulerole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
