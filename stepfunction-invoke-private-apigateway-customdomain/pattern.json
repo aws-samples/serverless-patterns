@@ -1,6 +1,6 @@
 {
-  "title": "AWS Step Functions with direct integration with Private REST API Gateway Custom Domain",
-  "description": "The SAM template deploys a Step Functions Standard workflow that invokes a Private REST API Gateway Custom Domain.",
+  "title": "Invoke Private REST API gateway custom domain from Step functions workflow",
+  "description": "The SAM template deploys a Step Functions Standard workflow that invokes a Private REST API Gateway custom domain using EventBridge connections toward private resources in VPC.",
   "language": "YAML",
   "level": "200",
   "framework": "SAM",
@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "Start the Standard Workflow using the start-execution api.",
-      "The Workflow invokes the Private REST API Gateway Custom Domain using the EventBridge Connection created using the SAM template.",
+      "The Workflow invokes the Private REST API gateway custom domain using the EventBridge Connection created using the SAM template.",
       "EventBridge Connection is configured with the Amazon VPC Lattice and AWS PrivateLink to connect to Private API within AWS network."
     ]
   },

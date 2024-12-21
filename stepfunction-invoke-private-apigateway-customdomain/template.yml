@@ -119,9 +119,11 @@ Outputs:
     Description: "APIConnection Name"
     Value: !GetAtt APIConnection.Arn
 
-  StepFunction:
+  StepFunctionName:
     Description: "Step Function Name"
     Value: !GetAtt StepFunction.Name
 
-
+  StepFunctionARN:
+    Description: "Step Function Name"
+    Value: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${StepFunction.Name}
 
