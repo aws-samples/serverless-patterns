@@ -1,0 +1,58 @@
+{
+  "title": "S3 to Textract using EventBridge ",
+  "description": "SAM template for an S3 object upload to invoke a Lambda function through EventBridge that detects the text in a document through Amazon Textract",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to creates two S3 buckets (source and destination) which when uploaded with an object invokes a Lambda function through EventBridge and detects the text in a document through Amazon Textract.",
+      "Once a file is uploaded to an S3 bucket, it is listened by the EventBridge which further invokes the lambda function",
+      "The lambda function writes the output of the textract text detection to another S3 bucket. "
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-lambda-textract",
+      "templateURL": "serverless-patterns/s3-eventbridge-lambda-textract",
+      "projectFolder": "s3-eventbridge-lambda-textract",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Detecting text with an AWS lambda function",
+        "link": "https://docs.aws.amazon.com/textract/latest/dg/lambda.html"
+      },
+      {
+        "text": "Amazon Textract",
+        "link": "https://docs.aws.amazon.com/textract/latest/dg/what-is.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abilashkumar P C",
+      "image": "https://drive.google.com/file/d/1bxOh_WBw8J_xEqvT-qRezH8WXqSBPI24/view?usp=sharing",
+      "bio": "Sr. Cloud Support Engineer @ AWS",
+      "linkedin": "abilashkumar-p-c"
+    }
+  ]
+}
