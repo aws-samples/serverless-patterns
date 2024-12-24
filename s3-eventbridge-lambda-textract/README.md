@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Amazon S3 to Amazon Textract through AWS EventBridge
 
 This pattern demonstrates how to create an S3 bucket which when uploaded with an object invokes a Lambda function through EventBridge and detects the text in a document through Amazon Textract.
 
