@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to create an S3 bucket which when uploaded with an object invokes a Lambda function through EventBridge. The function detect labels in an image through Amazon Rekognition. The lambda function is built using Python.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-eventbridge-rekognition-detectlabels-python
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/rekognition-s3-detectlabels-python
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
