@@ -14,9 +14,9 @@
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-rekognition-detectfaces-python",
-        "templateURL": "serverless-patterns/s3-eventbridge-rekognition-detectfaces-python",
-        "projectFolder": "s3-eventbridge-rekognition-detectfaces-python",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rekognition-s3-detectfaces-python",
+        "templateURL": "serverless-patterns/rekognition-s3-detectfaces-python,
+        "projectFolder": "rekognition-s3-detectfaces-python",
         "templateFile": "template.yaml"
       }
     },
