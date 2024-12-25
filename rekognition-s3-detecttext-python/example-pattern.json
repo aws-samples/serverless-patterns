@@ -14,9 +14,9 @@
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-rekognition-detecttext-python",
-        "templateURL": "serverless-patterns/s3-eventbridge-rekognition-detecttext-python",
-        "projectFolder": "s3-eventbridge-rekognition-detecttext-python",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rekognition-s3-detecttext-python",
+        "templateURL": "serverless-patterns/rekognition-s3-detecttext-python",
+        "projectFolder": "rekognition-s3-detecttext-python",
         "templateFile": "template.yaml"
       }
     },
