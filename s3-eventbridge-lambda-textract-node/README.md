@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to create an S3 bucket which when uploaded with an object invokes a Lambda function through EventBridge and detects the text in a document through Amazon Textract. The lambda function code uses NodeJs runtime.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-eventbridge-lambda-textract
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-eventbridge-lambda-textract-node
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
