@@ -117,6 +117,12 @@ Press Ctrl+C to terminate the process
 ```sh
 cdk destroy --all
 ```
+
+## Author bio
+Kaustav Dey,
+https://www.linkedin.com/in/kaustavbecs/
+Solution Architect
+
 ----
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
