@@ -1,6 +1,6 @@
-# EventBridge scheduler to invoke step function to get the list of inactive lambda functions
+# Amazon EventBridge Scheduler to invoke an AWS Step Function to get the list of inactive AWS Lambda functions
 
-This pattern will create a one time schedule in EventBridge scheduler with state machine as target & invoke the lambda ListFunctions & GetFunction API using the SDK integration in step functions and publish the list of inactive functions to SNS Topic.
+This pattern will create an Amazon EventBridge Scheduler rule targeting an AWS Step Function state machine. The Step Function invokes an AWS Lambda using `ListFunctions` and `GetFunctions` API using the SDK integration in Step Functions. It then publishes the list of inactive functions to an Amazon SNS Topic.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -41,14 +41,14 @@ Important: this application uses various AWS services and there are costs associ
 
 6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-7. **Imp** : Once the SNS topic & subscription is created, verify the subscription by clicking the 'Confirm subscription' link received on your email. 
+7. **Important** : Once the SNS topic & subscription is created, verify the subscription by clicking the 'Confirm subscription' link received on your email. 
 
 
 ## How it works
 
-1. When the stack is deployed it creates a state machine, an eventBridge scheduler,a SNS topic with email subscription, a Lambda Function and required IAM roles. 
+1. When the stack is deployed it creates a state machine, an Event Bridge Scheduler, an SNS topic with email subscription, a Lambda function and required IAM roles.
 
-2. Event Bridge scheduler invokes the State machine on defined schedule, Default schedule invokes the state machine daily at 00::00 UTC with the below mentioned payload. Modify the schedule as per your requirement.
+2. Event Bridge Scheduler invokes the state machine with a defined schedule. The default schedule invokes the state machine daily at 00:00 UTC with the below mentioned payload. Modify the schedule as per your requirement.
 
     ```json
     {
@@ -59,15 +59,15 @@ Important: this application uses various AWS services and there are costs associ
     }
     ```
 
-3) In state machine, the 1st step is to get the list of all lambda functions in the current region using the ListFunctions API, ListFunctions API is called multiple times as it returns max 50 functions list in a single API call along with NextMarker pagination parameter. Using NextMarker token state machine retrieves list of all the function ARN's.
+3) In state machine, the 1st step is to get the list of all lambda functions in the current region using the ListFunctions API, ListFunctions API is called multiple times as it returns max 50 functions list in a single API call along with NextMarker pagination parameter. Using NextMarker token state machine retrieves list of all the function ARNs.
 
-4) Lambda Invoke Combine data Step : This a custom lambda function python script to create a combined json array of Lambda function ARN's retrieved in step 1.
+4) Lambda Invoke Combine data Step : This a custom Lambda function python script to create a combined JSON array of Lambda function ARNs retrieved in step 1.
 
-5) Map - Loop Functions State : In this state, GetFunction API is called for each Lambda ARN taken as input from previous step & status of each function is checked and appended to the output.
+5) Map - loop functions state: In this state, the GetFunction API is called for each Lambda ARN taken as input from the previous step, and the status of each function is checked and appended to the output.
 
-6) Filter Inactive Functions State : This filters out the Active functions from the Json array and passes only the Inactive functions list to the next step.
+6) Filter inactive functions state: This filters out the active functions from the JSON array and passes only the list of inactive functions to the next step.
 
-7) SNS Publish : List of Inactive functions is published to the SNS Topic.
+7) SNS publish : List of inactive functions is published to the SNS Topic.
 
 
 ## Cleanup
@@ -80,6 +80,6 @@ Important: this application uses various AWS services and there are costs associ
 2. Also, you have to manually delete any schedules you created if required.
 
 ----
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
