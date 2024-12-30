@@ -1,0 +1,69 @@
+{
+  "networkPolicy": [
+    {
+      "Rules": [
+        {
+          "ResourceType": "collection",
+          "Resource": ["collection/${CollectionName}"]
+        },
+        {
+          "ResourceType": "dashboard",
+          "Resource": ["collection/${CollectionName}"]
+        }
+      ],
+      "AllowFromPublic": true
+    }
+  ],
+  "encryptionPolicy": {
+    "Rules": [
+      {
+        "ResourceType": "collection",
+        "Resource": ["collection/${CollectionName}"]
+      }
+    ],
+    "AWSOwnedKey": true
+  },
+  "dataAccessPolicy": [
+    {
+      "Rules": [
+        {
+          "ResourceType": "index",
+          "Resource": ["index/${CollectionName}/*"],
+          "Permission": [
+            "aoss:UpdateIndex",
+            "aoss:DescribeIndex",
+            "aoss:ReadDocument",
+            "aoss:WriteDocument",
+            "aoss:CreateIndex"
+          ]
+        },
+        {
+          "ResourceType": "collection",
+          "Resource": ["collection/${CollectionName}"],
+          "Permission": [
+            "aoss:DescribeCollectionItems",
+            "aoss:CreateCollectionItems",
+            "aoss:UpdateCollectionItems"
+          ]
+        }
+      ],
+      "Principal": ["${BedrockRoleArn}"]
+    },
+    {
+      "Rules": [
+        {
+          "ResourceType": "index",
+          "Resource": ["index/${CollectionName}/*"],
+          "Permission": [
+            "aoss:UpdateIndex",
+            "aoss:DescribeIndex",
+            "aoss:ReadDocument",
+            "aoss:WriteDocument",
+            "aoss:CreateIndex"
+          ]
+        }
+      ],
+      "Principal": ["${CreateIndexLambdaFunctionRoleArn}"]
+    }    
+  ]
+}

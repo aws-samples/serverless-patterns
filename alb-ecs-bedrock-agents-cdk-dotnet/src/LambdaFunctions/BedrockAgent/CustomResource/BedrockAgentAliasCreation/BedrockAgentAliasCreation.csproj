@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AWSProjectType>Lambda</AWSProjectType>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>    
+    <!-- This property makes the build directory similar to a publish directory and helps the AWS .NET Lambda Mock Test Tool find project dependencies. -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- Generate Native AOT image during publishing to improve cold start time. -->
+    <!-- <PublishAot>true</PublishAot> -->
+    <!-- StripSymbols tells the compiler to strip debugging symbols from the final executable if we're on Linux and put them into their own file. 
+    This will greatly reduce the final executable's size.-->
+    <StripSymbols>true</StripSymbols>
+    <!-- TrimMode partial will only trim assemblies marked as trimmable. To reduce package size make all assemblies trimmable and set TrimMode to full.
+    If there are trim warnings during build, you can hit errors at runtime.-->
+    <TrimMode>partial</TrimMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.RuntimeSupport" Version="1.11.0" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="2.3.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.4.3" />
+    <PackageReference Include="AWSSDK.BedrockAgent" Version="4.0.0-preview.2" />    
+  </ItemGroup>
+  <ItemGroup>
+    <TrimmerRootAssembly Include="AWSSDK.Core" />
+    <TrimmerRootAssembly Include="Amazon.Lambda.RuntimeSupport" />
+    <TrimmerRootAssembly Include="Amazon.Lambda.Serialization.SystemTextJson" />
+    <TrimmerRootAssembly Include="AWSSDK.BedrockAgent" />
+  </ItemGroup>
+</Project>
