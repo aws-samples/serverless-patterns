@@ -49,12 +49,13 @@ Important: this application uses various AWS services and there are costs associ
 7. **Important Note** : Once the stack is deployed, Create a 'A' record in your Public Route53 hosted zone for the 'Domainname' with below target:
         
         a) Target type - alias
-        b) Alis - VPC Endpoint
-        c) Endpoint - select the VPC Endpoint which is attached to your Private API. Eg: vpce-1123444556666-avx567.execute-api.<AWS-region>.vpce.amazonaws.com
+        b) Choose endpoint - Alias to VPC Endpoint
+        c) Choose region - select your AWS region
+        d) Choose Endpoint - select the VPC Endpoint which is attached to your Private REST API. Eg: vpce-1123444556666-avx567.execute-api.<AWS-region>.vpce.amazonaws.com
 
 ## Testing
 
-1. Amazon Event Bridge Scheduler will invoke the Private API every 5 minutes as configured in the scheduled expression. Modify the schedule as per your requirement.
+1. Amazon Event Bridge Scheduler will invoke the Private REST API every 5 minutes as configured in the scheduled expression. Modify the schedule as per your requirement.
 
 2. Check the Private API stage or integration logs to verify invocations. Invocations from Event Bridge Scheduler will contain a custom added header 'invokedby: eventbridgeinvoke' & 'User-Agent:Amazon/EventBridge/ApiDestinations'.
 
