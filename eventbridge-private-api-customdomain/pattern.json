@@ -1,15 +1,15 @@
 {
-  "title": "Invoke Private REST API gateway custom domain from EventBridge schedule",
-  "description": "The SAM template deploys a EventBridge schedule that invokes a Private REST API gateway custom domain.",
+  "title": "Invoke Private REST API gateway custom domain from Amazon EventBridge schedule",
+  "description": "The SAM template deploys a Amazon EventBridge schedule that invokes a Private REST API gateway custom domain.",
   "language": "YAML",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Eventbridge schedule is created using the SAM template which will Invoke the Eventbridge API destinations every 5 minutes.",
-      "Eventbridge API destinations will invoke the Private REST API gateway custom domain using the EventBridge connection.",
-      "EventBridge connection is configured with the Amazon VPC Lattice and AWS PrivateLink to connect to Private API within AWS network."
+      "Amazon EventBridge schedule is created using the SAM template which will Invoke the Eventbridge API destinations every 5 minutes.",
+      "Amazon EventBridge API destinations will invoke the Private REST API gateway custom domain using the EventBridge connection.",
+      "Amazon EventBridge connection is configured with the Amazon VPC Lattice and AWS PrivateLink to connect to Private API within AWS network."
     ]
   },
   "gitHub": {

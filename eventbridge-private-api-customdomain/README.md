@@ -1,6 +1,6 @@
-# Invoke Private REST API gateway custom domain from EventBridge schedule
+# Invoke Private REST API gateway custom domain from Amazon EventBridge schedule
 
-The SAM template deploys a EventBridge schedule that invokes a Private REST API gateway custom domain using Eventbridge connection, API destinations, Amazon VPC Lattice and AWS PrivateLink. The SAM template contains all the required resources with IAM permission to invoke the private endpoint.
+The SAM template deploys a Amazon EventBridge Scheduler rule that invokes a Private REST API gateway custom domain using Eventbridge connection, API destinations, Amazon VPC Lattice and AWS PrivateLink. The SAM template contains all the required resources with IAM permission to invoke the private endpoint.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-private-api-customdomain
 
@@ -36,28 +36,27 @@ Important: this application uses various AWS services and there are costs associ
     * Enter **stack name**.
     * Enter desired **AWS Region**.
     * Enter **Private Custom Domain Name** (e.g. private.mydomain.com) for the Domainname parameter.
-    * Enter **PrivateAPIInvokeURL**  (e.g. https://private.mydomain.com/<apigw-resource-path>) which is complete API invocation url.
-    * Enter **VPC Id** for the VPCId parameter to create VPC latticre resource gateway in VPC. Recommendation: use same VPC as of API Gateway VPC endpoint attached to private api gateway. 
+    * Enter **PrivateAPIInvokeURL**  (e.g. https://private.mydomain.com/<apigw-resource-path>) which is complete REST API invocation url.
+    * Enter **VPC Id** for the VPCId parameter to create VPC lattice resource gateway in VPC. Recommendation: use same VPC as of API Gateway VPC endpoint attached to private api gateway. 
     * Enter **Subnet Id's** for the SubnetIds parameter (comma seperated e.g. subnet1,subnet2) to create resource gateway. Recommendation: use same subnets as of API gateway VPC endpoint. 
     * Enter **SecurityGroup Id's** for the SecurityGroup parameter which allows inbound access on port 443 from your VPC's CIDR range.
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+6. Note the outputs from the SAM deployment process. These contain the resource names and ARNs which are used for testing.
 
-7. **Imp Note** : Once the stack is deployed, Create a 'A' record in your Public Route53 hosted zone for the 'Domainname' with below target:
+7. **Important Note** : Once the stack is deployed, Create a 'A' record in your Public Route53 hosted zone for the 'Domainname' with below target:
         
         a) Target type - alias
         b) Alis - VPC Endpoint
         c) Endpoint - select the VPC Endpoint which is attached to your Private API. Eg: vpce-1123444556666-avx567.execute-api.<AWS-region>.vpce.amazonaws.com
 
-
 ## Testing
 
-1. Eventbridge schedule will invoke the Private API every 5 minutes as configured in the scheduled expression.
+1. Amazon Event Bridge Scheduler will invoke the Private API every 5 minutes as configured in the scheduled expression. Modify the schedule as per your requirement.
 
-2. Check the Private API stage or integration logs to verify invocations, invocations from eventbridge will contain a custom added header 'invokedby: eventbridgeinvoke' & 'User-Agent:Amazon/EventBridge/ApiDestinations'.
+2. Check the Private API stage or integration logs to verify invocations. Invocations from Event Bridge Scheduler will contain a custom added header 'invokedby: eventbridgeinvoke' & 'User-Agent:Amazon/EventBridge/ApiDestinations'.
 
 
 ### Example output in API Gateway logs:
