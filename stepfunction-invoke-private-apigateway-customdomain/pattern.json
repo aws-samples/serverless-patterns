@@ -1,15 +1,15 @@
 {
-  "title": "Invoke Private REST API gateway custom domain from Step functions workflow",
-  "description": "The SAM template deploys a Step Functions Standard workflow that invokes a Private REST API Gateway custom domain using EventBridge connections toward private resources in VPC.",
+  "title": "Invoke Private REST API gateway custom domain from Step Function workflow",
+  "description": "The SAM template deploys a Step Function standard workflow that invokes a Private REST API gateway custom domain using EventBridge connections.",
   "language": "YAML",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Start the Standard Workflow using the start-execution api.",
-      "The Workflow invokes the Private REST API gateway custom domain using the EventBridge Connection created using the SAM template.",
-      "EventBridge Connection is configured with the Amazon VPC Lattice and AWS PrivateLink to connect to Private API within AWS network."
+      "Start the Step Function standard workflow using the start-execution api or using AWS Step Function console.",
+      "The Step Function invokes the Private REST API gateway custom domain using the EventBridge connection created using the SAM template.",
+      "EventBridge connection is configured with the Amazon VPC Lattice and AWS PrivateLink to connect to Private API within AWS network securely."
     ]
   },
   "gitHub": {
@@ -23,7 +23,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS Step Functions - Call third-party APIs",
+        "text": "AWS Step Function - Call third-party APIs",
         "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-third-party-apis.html"
       },
       {
