@@ -13,7 +13,7 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
 
     const api = new appsync.GraphqlApi(this, 'Api', {
       name: 'bedrock-streaming-api',
-      schema: appsync.SchemaFile.fromAsset('schema.graphql'),
+      definition: appsync.Definition.fromFile(path.join(__dirname, '..', 'schema.graphql')),
       authorizationConfig: {
         defaultAuthorization: {
           authorizationType: appsync.AuthorizationType.API_KEY,
@@ -100,22 +100,6 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
     });
     
     const noneDS = api.addNoneDataSource('NoneDataSource');
-    noneDS.createResolver('CreateConversationResolver', {
-      typeName: 'Mutation',
-      fieldName: 'createConversation',
-      requestMappingTemplate: appsync.MappingTemplate.fromString(`
-        {
-          "version": "2018-05-29",
-          "payload": {
-            "conversationId": "$context.arguments.conversationId",
-            "status": "CREATED"
-          }
-        }
-      `),
-      responseMappingTemplate: appsync.MappingTemplate.fromString(`
-        $util.toJson($context.result)
-      `),
-    });
     
     noneDS.createResolver('SendChunkResolver', {
       typeName: 'Mutation',

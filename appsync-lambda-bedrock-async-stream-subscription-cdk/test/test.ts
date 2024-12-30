@@ -2,15 +2,17 @@ import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 
 // AppSync API Configuration
-const APPSYNC_API_URL = 'https://utgypaxdjjcq3lo4y4jvk5v5pi.appsync-api.us-east-1.amazonaws.com/graphql';
-const APPSYNC_API_KEY = 'da2-qkexqqvs4bhhpigpaodgqdhgwu';
+
+const APPSYNC_API_URL = '<REPLACE THIS WITH THE DEPLOYED GRAPHQL URL>';
+const APPSYNC_API_KEY = '<REPLACE THIS WITH THE DEPLOYED GRAPHQL API KEY>';
+const REGION = '<REPLACE THIS WITH YOUR AWS ACCOUNT REGION>'
 
 // Configure Amplify
 Amplify.configure({
   API: {
     GraphQL: {
       endpoint: APPSYNC_API_URL,
-      region: 'us-east-1',
+      region: REGION,
       defaultAuthMode: 'apiKey',
       apiKey: APPSYNC_API_KEY
     }

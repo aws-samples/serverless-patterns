@@ -1,4 +1,4 @@
-# AppSync Async Bedrock Streaming with Lambda Event Mode
+# Long running invocations of Amazon Bedrock using Amazon AppSync and AWS Lambda streaming
 
 This pattern demonstrates how to implement [long-running invocations](https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-bedrock-js.html#long-running-invocations)  with Amazon Bedrock using AWS AppSync subscriptions and AWS Lambda in Event Mode, following the official AWS AppSync documentation pattern.
 
@@ -35,24 +35,32 @@ The pattern implements an asynchronous [streaming architecture](https://docs.aws
 
 ## Deployment Instructions
 
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+1. Clone the repository:
 ```sh
 git clone https://github.com/aws-samples/serverless-patterns
 ```
-2. Change directory to the pattern directory:
+2. Navigate to pattern directory:
 ```sh
 cd appsync-lambda-bedrock-async-stream-subscription-cdk
 ```
 
-3. Install the required dependencies:
+3. Install dependencies:
 ```sh
 npm install
 ```
 
-4. Deploy the stack to your default AWS account and region:
+4. Bootstrap CDK (if needed):
+```sh
+cdk bootstrap
+```
+
+5. Deploy stack:
 ```sh
 npm run deploy
 ```
+
+### Important: 
+Note the GraphQL API URL and API Key from the stack outputs - you'll need these for testing.
 
 ## Testing
 
@@ -62,12 +70,20 @@ After deployment, you can test the Bedrock streaming integration using the provi
 - Real-time streaming chunks display
 - Graceful cleanup on exit
 
-Run the test script using:
+1. Configure test credentials:
+```sh
+    Open test/test.ts
+    Replace APPSYNC_API_URL with the API URL from stack outputs
+    Replace APPSYNC_API_KEY with the API Key from stack outputs
+    Replace the REGION with your AWS Account Region
+```
+
+2.  Run the test:
 ```sh
 npx tsx test/test.ts  
 ```
 
-You should see output similar to:
+3. Expected Output:
 ```sh
 Starting subscription...
 Starting conversation...
@@ -88,6 +104,13 @@ conversationId: '123e4567-e89b-12d3-a456-426614174000',
 chunk: 'up everything!'
 }
 ```
+
+4. Stop the test:
+```sh
+Press Ctrl+C to terminate the process
+```
+
+
 ## Cleanup
  
 1. Delete the stack
