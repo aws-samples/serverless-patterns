@@ -12,6 +12,7 @@ Globals:
     MemorySize: 128
     Timeout: 10
     LoggingConfig:
+      LogGroup: !Sub /aws/lambda/${AWS::StackName}
       LogFormat: JSON
     Architectures:
       - arm64
