@@ -39,7 +39,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern creates an AWS Lambda function and an [Amazon Aurora PostgreSQL DB](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) in an [Aurora Serverless v2](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html) DB cluster with [RDS Data API](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html) and a Secrets Manager secret. The function creates an example table named "music", inserts a row with data from the event object, then returns the results of a select query.
+This pattern creates an AWS Lambda function and an [Amazon Aurora PostgreSQL DB](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) in an [Aurora Serverless v2](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html) DB cluster that scales to zero, with [RDS Data API](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html) and a Secrets Manager secret. The function creates an example table named "music", inserts a row with data from the event object, then returns the results of a select query.
 
 ## Testing
 
@@ -67,7 +67,14 @@ Response:
 }
 ```
 
+Aurora Serverless v2 DB instances can automatically pause after a period with no user connections, and automatically resume when a connection request arrives. If it was paused, it will automatically resume and accept the connection. You may see this error in the Lambda logs:
+```
+"An error occurred (DatabaseResumingException) when calling the ExecuteStatement operation: The Aurora DB instance arn:aws:rds:..... is resuming after being auto-paused. Please wait a few seconds and try again."
+```
+
+
 ## Documentation
+- [Amazon Aurora Serverless v2 supports scaling to zero capacity](https://aws.amazon.com/about-aws/whats-new/2024/11/amazon-aurora-serverless-v2-scaling-zero-capacity/)
 - [Using the Data API for Aurora Serverless](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html)
 - [Data API - ExecuteStatement](https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html)
 - [Data API - ExecuteStatement Response Elements](https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html#API_ExecuteStatement_ResponseElements)
