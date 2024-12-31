@@ -29,7 +29,10 @@ export const handler = async (event: Event) => {
 
   console.log(`Starting Bedrock stream for conversationId: ${conversationId}`);
 
-  const bedrockClient = new BedrockRuntimeClient({});
+  // Using the us-east-1 Bedrock Inference Profile for Claude Sonnet 3.5 V2
+  const bedrockClient = new BedrockRuntimeClient({
+    region: 'us-east-1'
+  });
   const graphQLClient = new GraphQLClient(process.env.APPSYNC_ENDPOINT!, {
     headers: { 'x-api-key': process.env.APPSYNC_API_KEY! },
   });

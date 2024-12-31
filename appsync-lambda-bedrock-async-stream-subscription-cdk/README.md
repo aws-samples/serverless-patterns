@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to implement [long-running invocations](https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-bedrock-js.html#long-running-invocations)  with Amazon Bedrock using AWS AppSync subscriptions and AWS Lambda in Event Mode, following the official AWS AppSync documentation pattern.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appsync-lambda-bedrock-async-stream-subscription-cdk
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/appsync-lambda-bedrock-async-stream-subscription-cdk).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) (AWS CDK) installed
-* Make sure to enable the **Anthropic - Claude Sonnet 3.5 V2** model on the [Bedrock console](https://console.aws.amazon.com/bedrock/home#/modelaccess).
+* Enable the **Anthropic - Claude Sonnet 3.5 V2** model in **us-east-1** region through the [Bedrock console](https://console.aws.amazon.com/bedrock/home#/modelaccess). This implementation uses the [cross-region inference profile](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html#inference-profiles-support-system) from us-east-1.
 
 ## How it works
 
@@ -75,7 +75,6 @@ After deployment, you can test the Bedrock streaming integration using the provi
     Open test/test.ts
     Replace APPSYNC_API_URL with the API URL from stack outputs
     Replace APPSYNC_API_KEY with the API Key from stack outputs
-    Replace the REGION with your AWS Account Region
 ```
 
 2.  Run the test:
@@ -105,6 +104,8 @@ chunk: 'up everything!'
 }
 ```
 
+If you do not receive any response, please check your Bedrock Model access for Claude Sonnet 3.5 V2 in us-east-1 region.
+
 4. Stop the test:
 ```sh
 Press Ctrl+C to terminate the process
@@ -127,3 +128,4 @@ Solution Architect
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
+

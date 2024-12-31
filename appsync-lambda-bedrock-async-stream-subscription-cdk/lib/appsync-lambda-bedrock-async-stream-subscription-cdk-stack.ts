@@ -9,7 +9,13 @@ import * as path from 'path';
 
 export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
+    super(scope, id, {
+      ...props,
+      env: {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+        region: process.env.CDK_DEFAULT_REGION,
+      },
+    });
 
     const api = new appsync.GraphqlApi(this, 'Api', {
       name: 'bedrock-streaming-api',
@@ -47,14 +53,14 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
     });
     
 
-    // Add Bedrock permissions to Lambda
+    // Add Bedrock permissions to Lambda. Add IAM policies for all regions covered under the Inference profile
     invocationHandler.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModelWithResponseStream'],
       resources: [
         'arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0',
         'arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0',
         'arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0',
-        'arn:aws:bedrock:us-east-1:275631959608:inference-profile/us.anthropic.claude-3-5-sonnet-20241022-v2:0'
+        `arn:aws:bedrock:us-east-1:${this.account}:inference-profile/us.anthropic.claude-3-5-sonnet-20241022-v2:0`
       ]
     }));
     
@@ -67,12 +73,14 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
     // Add CloudWatch Logs permissions to Lambda
     invocationHandler.addToRolePolicy(new iam.PolicyStatement({
       actions: [
-        'logs:CreateLogGroup',
         'logs:CreateLogStream',
         'logs:PutLogEvents'
       ],
-      resources: ['*']
+      resources: [
+        `arn:aws:logs:${this.region}:${this.account}:log-group:/aws/lambda/*`
+      ]
     }));
+    
 
     const invocationDS = api.addLambdaDataSource('InvocationDataSource', invocationHandler);
 
