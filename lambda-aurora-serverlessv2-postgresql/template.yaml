@@ -65,11 +65,12 @@ Resources:
       DatabaseName: !Ref DatabaseName
       Engine: aurora-postgresql
       EngineMode: provisioned
+      EngineVersion: '16.4'
       StorageEncrypted: true
       # Enable the Data API for Aurora Serverless
       EnableHttpEndpoint: true
       ServerlessV2ScalingConfiguration:
-        MinCapacity: 0.5
+        MinCapacity: 0 #auto-pause
         MaxCapacity: 1
   AuroraInstance:
     Type: 'AWS::RDS::DBInstance'
