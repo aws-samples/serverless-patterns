@@ -71,7 +71,7 @@
             "x": 80,
             "y": 50,
             "service": "lambda",
-            "label": "AWS Lambda URLs"
+            "label": "AWS Lambda Function URLs"
         },
         "line1": {
             "from": "icon1",
