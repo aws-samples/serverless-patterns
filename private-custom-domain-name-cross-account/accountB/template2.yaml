@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: > 
+  todo
+  
+Parameters:
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC where the hosted zone will be created
+
+  VpcEndpointDNSName:
+    Type: String
+    Description: DNS name of the VPC endpoint
+
+  CustomDomainName:
+    Type: String
+    Description: Domain name for the private hosted zone
+
+  CustomDomainNameARN:
+    Type: String
+    Description: Domain name ARN of the Private API Gateway
+
+  VpcEndpointHostedZoneId:
+    Type: String
+    Description: Hosted Zone ID of the VPC endpoint
+
+Resources:
+  PrivateHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref CustomDomainName
+      VPCs:
+        - VPCId: !Ref VPC
+          VPCRegion: !Ref AWS::Region
+      
+  DNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: !Ref CustomDomainName
+      HostedZoneId: !Ref PrivateHostedZone
+      Type: A
+      AliasTarget: 
+        DNSName: !Ref VpcEndpointDNSName
+        HostedZoneId: !Ref VpcEndpointHostedZoneId
+
+  DomainNameAccessAssociation: 
+    Type: AWS::ApiGateway::DomainNameAccessAssociation
+    Properties:
+      DomainNameArn: !Ref CustomDomainNameARN
+      AccessAssociationSource: !Join ["-", [!Select [0, !Split ["-", !Select [0, !Split [".", !Ref VpcEndpointDNSName]]]], !Select [1, !Split ["-", !Select [0, !Split [".", !Ref VpcEndpointDNSName]]]]]]
+      AccessAssociationSourceType: VPCE
