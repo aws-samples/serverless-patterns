@@ -47,6 +47,7 @@ Upload the file (document/image) to the input S3 <STACK_NAME>-input-bucket-<AWS_
 ```
 aws s3api put-object --bucket <INPUT_BUCKET_NAME>> --key <IMAGE_FILE> --body /path/to/your/<IMAGE_FILE>
 ```
+The output of the operation can be downloaded from the output S3 bucket <STACK_NAME>-output-bucket-<AWS_ACCOUNTID>.
 
 Replace the parameters in the above command appropriately.
 
@@ -54,11 +55,7 @@ Replace the parameters in the above command appropriately.
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
