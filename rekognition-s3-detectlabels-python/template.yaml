@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'SAM template for S3 trigger to Lambda for detecting labels in an image using Rekognition and EventBridge'
+
+Resources:
+  # Input S3 bucket
+  InputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${AWS::StackName}-input-bucket-${AWS::AccountId}'
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  # Output S3 bucket  
+  OutputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${AWS::StackName}-output-bucket-${AWS::AccountId}'
+
+  # Lambda function
+  RekognitionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-rekognition-function'
+      Handler: lambda_function.handler
+      Runtime: python3.8
+      Timeout: 30
+      Environment:
+        Variables:
+          OUTPUT_BUCKET: !Ref OutputBucket
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref InputBucket
+        - S3WritePolicy:
+            BucketName: !Ref OutputBucket
+        - Statement:
+            - Effect: Allow
+              Action: 
+                - rekognition:DetectLabels
+              Resource: '*'
+      CodeUri: src/
+        
+ 
+  # EventBridge Rule
+  S3ObjectCreatedRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Rule to capture S3 object created events"
+      EventPattern:
+        source:
+          - aws.s3
+        detail-type:
+          - Object Created
+        detail:
+          bucket:
+            name:
+              - !Ref InputBucket
+      State: "ENABLED"
+      Targets: 
+        - Arn: !GetAtt RekognitionFunction.Arn
+          Id: "RekognitionFunctionTarget"
+
+  # Permission for EventBridge to invoke Lambda
+  RekognitionFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref RekognitionFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt S3ObjectCreatedRule.Arn
+
+Outputs:
+  InputBucketName:
+    Description: 'Name of the input S3 bucket'
+    Value: !Ref InputBucket
+  OutputBucketName:
+    Description: 'Name of the output S3 bucket'
+    Value: !Ref OutputBucket
+  RekognitionFunctionName:
+    Description: 'Name of the Rekognition Lambda function'
+    Value: !Ref RekognitionFunction
+  RekognitionFunctionArn:
+    Description: 'ARN of the Rekognition Lambda function'
+    Value: !GetAtt RekognitionFunction.Arn
