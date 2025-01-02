@@ -1,6 +1,6 @@
 # Amazon S3 to Amazon Rekognition through AWS EventBridge
 
-This pattern demonstrates how to create an S3 bucket which when uploaded with an object invokes a Lambda function through EventBridge. The function detect labels in an image through Amazon Rekognition. The lambda function is built using Python.
+This pattern demonstrates how to create an Amazon S3 bucket that triggers an AWS Lambda function via Amazon EventBridge upon object upload. The Lambda function detects labels in an image using Amazon Rekognition. The Lambda function is built using Python.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/rekognition-s3-detectlabels-python
 
@@ -38,14 +38,14 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The Cloudformation template creates 2 S3 buckets (source and destination buckets) along with a Lambda function (Python) and an EventBridge event. The Lambda function is triggered by the EventBridge which listens to an object upload in the S3 bucket. The lambda function  makes a DetectLabels API call to detect the labels in an image and stores the output in the destination S3 bucket.
+The CloudFormation template creates two Amazon S3 buckets (source and destination) along with an AWS Lambda function (written in Python) and an Amazon EventBridge event. The Lambda function is triggered by EventBridge, which listens for object uploads in the S3 source bucket. The Lambda function makes a `DetectLabels` API call to Amazon Rekognition to detect labels in an image and stores the output in the destination S3 bucket.
 
 ## Testing
 
-Upload the file (document/image) to the input S3 <STACK_NAME>-input-bucket-<AWS_ACCOUNTID> bucket via the console or use the PutObject API call below:
+Upload the file (document/image) to the input S3 `<STACK_NAME>-input-bucket-<AWS_ACCOUNTID>` bucket via the console or use the `PutObject` API call below:
 
 ```
-aws s3api put-object --bucket <INPUT_BUCKET_NAME>> --key <IMAGE_FILE> --body /path/to/your/<IMAGE_FILE>
+aws s3api put-object --bucket <INPUT_BUCKET_NAME> --key <IMAGE_FILE> --body /path/to/your/<IMAGE_FILE>
 ```
 The output of the operation can be downloaded from the output S3 bucket <STACK_NAME>-output-bucket-<AWS_ACCOUNTID>.
 
