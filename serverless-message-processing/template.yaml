@@ -2,6 +2,68 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Serverless message processing architecture
 
+Parameters:
+  ProcessorMemorySize:
+    Type: Number
+    Default: 128
+    Description: |
+      Memory allocation for the ProcessMessages Lambda function (MB).
+      Consider increasing this value if:
+      - Processing complex/large messages
+      - Performing CPU-intensive operations
+      - Seeing timeout errors or slow processing
+      - Handling concurrent message processing
+      Recommended ranges:
+      - Light processing: 128-256 MB
+      - Medium processing: 256-512 MB
+      - Heavy processing: 512-1024 MB
+      - Very heavy processing: 1024-2048 MB
+    MinValue: 128
+    MaxValue: 10240
+    
+  DecisionMakerMemorySize:
+    Type: Number
+    Default: 128
+    Description: |
+      Memory allocation for the DecisionMaker Lambda function (MB).
+      Consider increasing this value if:
+      - Complex routing logic is implemented
+      - Processing message metadata
+      - Performing extensive error analysis
+      - Handling multiple concurrent decisions
+      Recommended ranges:
+      - Basic routing: 128-256 MB
+      - Complex routing: 256-512 MB
+      - Advanced analysis: 512-1024 MB
+    MinValue: 128
+    MaxValue: 10240
+
+  ProcessorTimeout:
+    Type: Number
+    Default: 29
+    Description: |
+      Timeout for the ProcessMessages Lambda function (seconds).
+      Consider increasing this value if:
+      - Processing takes longer than expected
+      - External API calls are involved
+      - Complex data transformations are needed
+      Note: Maximum value is 900 seconds (15 minutes)
+    MinValue: 1
+    MaxValue: 900
+
+  DecisionMakerTimeout:
+    Type: Number
+    Default: 29
+    Description: |
+      Timeout for the DecisionMaker Lambda function (seconds).
+      Consider increasing this value if:
+      - Complex routing logic requires more time
+      - Multiple external service checks are needed
+      - Batch processing of failed messages
+      Note: Maximum value is 900 seconds (15 minutes)
+    MinValue: 1
+    MaxValue: 900
+
 Resources:
   ApiGateway:
     Type: AWS::Serverless::Api
@@ -96,8 +158,9 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.9
       CodeUri: ./functions/processor/
-      MemorySize: 128
-      Timeout: 29  
+      MemorySize: !Ref ProcessorMemorySize
+      Timeout: !Ref ProcessorTimeout
+
       Events:
         SQSEvent:
           Type: SQS
@@ -115,8 +178,9 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.9
       CodeUri: ./functions/decision_maker/
-      MemorySize: 128
-      Timeout: 29
+      MemorySize: !Ref DecisionMakerMemorySize
+      Timeout: !Ref DecisionMakerTimeout
+
       Events:
         SQSEvent:
           Type: SQS
