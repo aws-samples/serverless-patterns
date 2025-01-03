@@ -1,0 +1,60 @@
+{
+    "title": "Step Functions to Athena",
+    "description": "Create a Step Functions workflow to query Amazon Athena.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to use a serverless solution for processing and fixing malformed messages using SQS queues and Lambda functions",
+        "The system automatically handles message validation, applies fixes where possible, and routes messages to appropriate queues based on their fixability.",
+        "It has built-in error handling and detailed logging, it provides a robust framework for message processing that can be easily extended for specific business needs.",
+        "This pattern uses AWS Lambda for processing, multiple SQS queues for message routing, and includes 2 dead-letter queue (DLQ) for messages requiring human intervention or for auto-remediation."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/serverless-messaging-processing",
+        "templateURL": "serverless-patterns/serverless-messaging-processing",
+        "projectFolder": "serverless-messaging-processing",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon SQS Docs",
+          "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+        },
+        {
+          "text": "Using dead-letter queues in Amazon SQS",
+          "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+      "sam build",
+      "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Ilias Ali",
+        "image": "link-to-your-photo.jpg",
+        "bio": "I am a Solutions Architect working at AWS based in the UK.",
+        "linkedin": "ilias-ali-0849991a4"
+      }
+    ]
+  }
