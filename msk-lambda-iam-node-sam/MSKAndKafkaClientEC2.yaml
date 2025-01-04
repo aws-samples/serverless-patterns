@@ -297,12 +297,92 @@ Resources:
           !Sub
           - |
             #!/bin/bash
-            yum update -y
-            sudo yum install ec2-instance-connect
-            sudo yum install java-11-amazon-corretto-devel -y
-            yum install nmap-ncat -y
-            yum install git -y
-            yum install jq -y
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum update -y
+                sudo yum install ec2-instance-connect
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of ec2-instance-connect succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install java-11-amazon-corretto-devel -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of java-11-amazon-corretto-devel succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install nmap-ncat -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of nmap-ncat succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install git -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of git succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install jq -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of jq succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
             
             #install node.js
             echo "#!/bin/bash" > nodejs_installer.sh
@@ -324,15 +404,63 @@ Resources:
             sudo chmod +x nodejs_installer.sh
             cp ./nodejs_installer.sh /home/ec2-user/nodejs_installer.sh
             cd cd /home/ec2-user
-            sudo -u ec2-user ./nodejs_installer.sh > nodejs_installer_output.txt
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo -u ec2-user ./nodejs_installer.sh > nodejs_installer_output.txt
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Install of nodejs succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
            
             # install and start docker
-            sudo yum install -y docker
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y docker
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Install of docker succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
             sudo service docker start
             sudo usermod -a -G docker ec2-user
 
             # install AWS CLI 2 - access with aws2
-            sudo yum remove awscli
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum remove awscli
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Removal of awscli succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+
             cd /home/ec2-user
             mkdir -p awscli
             cd awscli
@@ -459,12 +587,91 @@ Resources:
           !Sub
           - |
             #!/bin/bash
-            yum update -y
-            sudo yum install ec2-instance-connect
-            sudo yum install java-11-amazon-corretto-devel -y
-            yum install nmap-ncat -y
-            yum install git -y
-            yum install jq -y
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum update -y
+                sudo yum install ec2-instance-connect
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of ec2-instance-connect succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install java-11-amazon-corretto-devel -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of java-11-amazon-corretto-devel succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install nmap-ncat -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of nmap-ncat succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install git -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of git succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install jq -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of jq succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
             
             #install node.js
             echo "#!/bin/bash" > nodejs_installer.sh
@@ -486,15 +693,63 @@ Resources:
             sudo chmod +x nodejs_installer.sh
             cp ./nodejs_installer.sh /home/ec2-user/nodejs_installer.sh
             cd cd /home/ec2-user
-            sudo -u ec2-user ./nodejs_installer.sh > nodejs_installer_output.txt
             
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo -u ec2-user ./nodejs_installer.sh > nodejs_installer_output.txt
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Install of nodejs succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+           
             # install and start docker
-            sudo yum install -y docker
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y docker
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Install of docker succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
             sudo service docker start
             sudo usermod -a -G docker ec2-user
 
             # install AWS CLI 2 - access with aws2
-            sudo yum remove awscli
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum remove awscli
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Removal of awscli succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+
             cd /home/ec2-user
             mkdir -p awscli
             cd awscli

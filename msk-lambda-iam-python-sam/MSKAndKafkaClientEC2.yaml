@@ -13,10 +13,9 @@ Parameters:
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
   Python3Version:
     Type: String
-    Description: Choose the version of Python 3 between 3.9 and 3.12. Note that in Amazon Linux 2023, 3.9 is installed by default and maximum allowed version is 3.12
+    Description: Choose the version of Python 3 between 3.9 and 3.12. Note that in Amazon Linux 2023, 3.9 is installed by default and maximum allowed version is 3.12. Also Python 3.10 is not available to install on Amazon Linux 2023 so it is not being offered as an option
     AllowedValues:
       - python3.9
-      - python3.10
       - python3.11
       - python3.12
     Default: python3.12
@@ -298,25 +297,155 @@ Resources:
           !Sub
           - |
             #!/bin/bash
-            yum update -y
-            sudo yum install ec2-instance-connect
-            sudo yum install java-11-amazon-corretto-devel -y
-            yum install nmap-ncat -y
-            yum install git -y
-            yum install jq -y
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum update -y
+                sudo yum install ec2-instance-connect
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of ec2-instance-connect succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install java-11-amazon-corretto-devel -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of java-11-amazon-corretto-devel succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install nmap-ncat -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of nmap-ncat succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install git -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of git succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install jq -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of jq succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
             
             #install latest python3
             PYTHON3_VERSION=${python3_version}
-            sudo yum install $PYTHON3_VERSION -y
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install $PYTHON3_VERSION -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of $PYTHON3_VERSION succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
             echo "export PYTHON3_VERSION=$PYTHON3_VERSION" >> /home/ec2-user/.bash_profile
             
             # install and start docker
-            sudo yum install -y docker
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y docker
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of docker succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
             sudo service docker start
             sudo usermod -a -G docker ec2-user
 
             # install AWS CLI 2 - access with aws2
-            sudo yum remove awscli
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum remove awscli
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum remove of awscli succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+           
             cd /home/ec2-user
             mkdir -p awscli
             cd awscli
@@ -443,31 +572,162 @@ Resources:
           !Sub
           - |
             #!/bin/bash
-            yum update -y
-            sudo yum install ec2-instance-connect
-            sudo yum install java-11-amazon-corretto-devel -y
-            yum install nmap-ncat -y
-            yum install git -y
-            yum install jq -y
+ 
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum update -y
+                sudo yum install ec2-instance-connect
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of ec2-instance-connect succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install java-11-amazon-corretto-devel -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of java-11-amazon-corretto-devel succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install nmap-ncat -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of nmap-ncat succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install git -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of git succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install jq -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of jq succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
             
             #install latest python3
             PYTHON3_VERSION=${python3_version}
-            sudo yum install $PYTHON3_VERSION -y
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install $PYTHON3_VERSION -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of $PYTHON3_VERSION succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
             echo "export PYTHON3_VERSION=$PYTHON3_VERSION" >> /home/ec2-user/.bash_profile
             
             # install and start docker
-            sudo yum install -y docker
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y docker
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of docker succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
             sudo service docker start
             sudo usermod -a -G docker ec2-user
 
             # install AWS CLI 2 - access with aws2
-            sudo yum remove awscli
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum remove awscli
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum remove of awscli succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+           
             cd /home/ec2-user
             mkdir -p awscli
             cd awscli
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
+
 
             # Create dirs, get Apache Kafka and unpack it
             cd /home/ec2-user
