@@ -1,0 +1,62 @@
+{
+    "title": "EventBridge Pipes: SQS to Step Functions with Filtering and Transformation",
+    "description": "Connect Amazon SQS to AWS Step Functions using EventBridge Pipes with message filtering and transformation.",
+    "language": "",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates how to use Amazon EventBridge Pipes to connect an Amazon SQS queue with an AWS Step Functions state machine.",
+            "EventBridge Pipes receives messages from the SQS queue, applies a filter to process only specific messages, transforms the message format, and then invokes the Step Functions state machine. In this setup, the pipe filters messages with a status of 'COMPLETE', transforms the message structure, and triggers the Step Functions workflow using a 'FIRE_AND_FORGET' invocation type."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-stepfunctions-terraform",
+            "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-stepfunctions-terraform",
+            "projectFolder": "eventbridge-pipes-sqs-to-stepfunctions-terraform",
+            "templateFile": "eventbridge-pipes-sqs-to-stepfunctions-terraform/main.tf"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon EventBridge Pipes",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
+            },
+            {
+                "text": "Amazon SQS",
+                "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+            },
+            {
+                "text": "AWS Step Functions",
+                "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "terraform init",
+            "terraform plan",
+            "terraform apply"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the README in the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "terraform destroy",
+            "terraform show"
+        ]
+    },
+    "authors": [{
+		"name": "Naresh Rajaram",
+		"image": "",
+		"bio": "Sr. Partners Solutions Architect, AWS",
+		"linkedin": "https://www.linkedin.com/in/nareshrajaram/"
+	}]
+}
