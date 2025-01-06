@@ -1,0 +1,149 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "ListFunctions",
+  "States": {
+    "ListFunctions": {
+      "Type": "Task",
+      "Arguments": {
+        "Marker": "{% $states.input.NextMarker%}"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:lambda:listFunctions",
+      "Next": "Lambda Invoke - Combine data",
+      "Output": {
+        "ListFunctions_output": "{% $states.result%}",
+        "Function_ARN_List_existing": {
+          "lambda_arn_list_combined": "{% $states.input.Function_ARN_List_existing.lambda_arn_list_combined%}"
+        }
+      }
+    },
+    "Lambda Invoke - Combine data": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Output": "{% $states.result.Payload %}",
+      "Arguments": { 
+        "FunctionName": "${LambdaFunctionArn}",
+        "Payload": "{% $states.input %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "Check NextMarker"
+    },
+    "Check NextMarker": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Next": "ListFunctions",
+          "Condition": "{% $states.input.NextMarkercheck = 'true' %}",
+          "Output": "{% $states.input%}"
+        }
+      ],
+      "Default": "Map - Loop Functions"
+    },
+    "Map - Loop Functions": {
+      "Type": "Map",
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "INLINE"
+        },
+        "StartAt": "GetFunction",
+        "States": {
+          "GetFunction": {
+            "Type": "Task",
+            "Arguments": {
+              "FunctionName": "{% $states.input.ARN %}"
+            },
+            "Resource": "arn:aws:states:::aws-sdk:lambda:getFunction",
+            "Next": "Check Function Status"
+          },
+          "Check Function Status": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Next": "Inactive",
+                "Output": {
+                  "FunctionConfig": {
+                    "ARN": "{% $states.input.Configuration.FunctionArn %}",
+                    "State": "{% $states.input.Configuration.State %}",
+                    "StateReason": "{% $states.input.Configuration.StateReason %}",
+                    "StateReasonCode": "{% $states.input.Configuration.StateReasonCode %}",
+                    "LastModified": "{% $states.input.Configuration.LastModified %}"
+                  }
+                },
+                "Condition": "{% $states.input.Configuration.State = 'Inactive' %}"
+              }
+            ],
+            "Default": "Pass",
+            "Output": {
+              "FunctionConfig": {
+                "ARN": "{% $states.input.Configuration.FunctionArn %}",
+                "State": "{% $states.input.Configuration.State %}"
+              }
+            }
+          },
+          "Pass": {
+            "Type": "Pass",
+            "End": true
+          },
+          "Inactive": {
+            "Type": "Pass",
+            "End": true
+          }
+        }
+      },
+      "Items": "{% $states.input.Function_ARN_List_existing.lambda_arn_list_combined %}",
+      "Next": "Filter Inactive Functions",
+      "MaxConcurrency": 40
+    },
+    "Filter Inactive Functions": {
+      "Type": "Pass",
+      "Next": "Choice",
+      "Output": {
+        "Inactive_Functions": "{% $states.input.FunctionConfig[State='Inactive'] ?  $states.input.FunctionConfig[State='Inactive'] : false %}"
+      }
+    },
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $states.input.Inactive_Functions = false %}",
+          "Next": "No Inactivce Function",
+          "Output": {
+            "Inactive_Functions": " No Inactive Functions"
+          }
+        }
+      ],
+      "Default": "Inactive function pass state"
+    },
+    "Inactive function pass state": {
+      "Type": "Pass",
+      "Next": "SNS Publish"
+    },
+    "No Inactivce Function": {
+      "Type": "Pass",
+      "Next": "SNS Publish"
+    },
+    "SNS Publish": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Arguments": {
+        "TopicArn": "${TopicARN}",
+        "Message": "{% $states.input.Inactive_Functions %}",
+        "Subject": "Inactive Lambda functions list | ${region} | Account - ${accountID}"
+      },
+      "End": true
+    }
+  },
+  "QueryLanguage": "JSONata"
+}
