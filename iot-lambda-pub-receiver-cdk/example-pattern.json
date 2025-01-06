@@ -1,6 +1,6 @@
 {
-  "title": "Lambda to IoT Core to Lambda",
-  "description": "Create a Lambda publishing into IoT topic, triggering an action calling another Lambda.",
+  "title": "AWS Lambda to Amazon IoT Core to AWS Lambda",
+  "description": "Create a Lambda function publishing into an IoT topic, triggering an action calling another Lambda function.",
   "language": "Python",
   "level": "200",
   "framework": "CDK",
@@ -41,19 +41,13 @@
     ]
   },
   "deploy": {
-    "text": [
-      "cdk deploy"
-    ]
+    "text": ["cdk deploy"]
   },
   "testing": {
-    "text": [
-      "See the GitHub repo for detailed testing instructions."
-    ]
+    "text": ["See the GitHub repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": [
-      "Delete the stack: <code>cdk destroy</code>."
-    ]
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
   },
   "authors": [
     {
