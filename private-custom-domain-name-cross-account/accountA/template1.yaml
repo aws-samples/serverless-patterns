@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless patterns - Amazon Private API Gateway endpoint with Private Custom Domain Name
+  
+Parameters:
+  VpcEndpoint:
+    Type: String
+  CustomDomainName:
+    Type: String
+  CertificateArn:
+    Type: String
+  TargetAccountID:
+    Type: String
+
+Resources:
+  PrivateApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration: PRIVATE
+      StageName: Prod
+      AlwaysDeploy: true
+      DefinitionBody:
+        openapi: "3.0.1"
+        info:
+          version: "1.0"
+          title: !Sub "PrivateApi-${AWS::StackName}"
+        paths:
+          /:
+            get:
+              responses:
+                "200":
+                  description: "200 response"
+                  content:
+                    application/json:
+                      schema:
+                        $ref: "#/components/schemas/Empty"
+              x-amazon-apigateway-integration:
+                type: "mock"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseTemplates:
+                      application/json: '{\"message\":\"Hello from Amazon Private API Gateway\"\}'
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+        x-amazon-apigateway-policy:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Principal: "*"
+            Action: "execute-api:Invoke"
+            Resource: "execute-api:/*"
+            Condition:
+              StringEquals:
+                aws:sourceVpce: !Ref VpcEndpoint
+
+  PrivateDomainName:
+    Type: AWS::ApiGateway::DomainNameV2
+    Properties:
+      DomainName: !Ref CustomDomainName
+      CertificateArn: !Ref CertificateArn
+      EndpointConfiguration:
+        Types:
+          - PRIVATE
+      SecurityPolicy: TLS_1_2
+      Policy:
+        Statement:
+            - Action: 'execute-api:Invoke'
+              Effect: Allow
+              Principal: '*'
+              Resource: 'execute-api:/*'
+            - Action: 'execute-api:Invoke'
+              Condition:
+                StringNotEquals:
+                  aws:SourceVpce : !Ref VpcEndpoint
+              Effect: Deny
+              Principal: '*'
+              Resource: 'execute-api:/*'
+        Version: '2012-10-17'
+
+  BasePathMapping:
+    Type: AWS::ApiGateway::BasePathMappingV2
+    Properties:
+      RestApiId: !Ref PrivateApi
+      DomainNameArn: !GetAtt PrivateDomainName.DomainNameArn
+      Stage: !Ref PrivateApi.Stage
+
+  ResourceShare:
+    Type: "AWS::RAM::ResourceShare"
+    Properties:
+      Name: "Private Domain Name"
+      ResourceArns: 
+        - !GetAtt PrivateDomainName.DomainNameArn
+      Principals:
+        - !Ref TargetAccountID
+
+Outputs:
+  CustomDomainName:
+    Description: "Custom Domain Name"
+    Value: !Ref CustomDomainName
+
+  CustomDomainNameArn:
+    Description: "Custom Domain Name Arn"
+    Value: !GetAtt PrivateDomainName.DomainNameArn
