@@ -1,0 +1,85 @@
+{
+	"title": "Scheduled EventBridge rule for Lambda",
+	"description": "Create a scheduled EventBridge rule that invokes a Lambda function",
+	"language": "Python",
+	"level": "200",
+	"framework": "Terraform (with modules)",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This template deploys a Lambda function that is triggered by an EventBridge periodically. In this example, the Lambda function logs text to the console every minute."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-eventbridge-scheduled-lambda",
+			"templateURL": "serverless-patterns/terraform-eventbridge-scheduled-lambda",
+			"projectFolder": "terraform-eventbridge-scheduled-lambda",
+			"templateFile": "terraform-eventbridge-scheduled-lambda/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"test": "Terraform AWS Lambda module",
+				"link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+			},
+			{
+				"test": "Terraform AWS Lambda examples",
+				"link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+			},
+			{
+				"test": "Terraform AWS Lambda triggers examples",
+				"link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples/triggers"
+			},
+			{
+				"test": "Terraform AWS EventBridge module",
+				"link": "https://github.com/terraform-aws-modules/terraform-aws-eventbridge"
+			},
+			{
+				"test": "Terraform AWS EventBridge examples",
+				"link": "https://github.com/terraform-aws-modules/terraform-aws-eventbridge/tree/master/examples"
+			},
+			{
+				"text": "Using AWS Lambda with Amazon EventBridge (CloudWatch Events)",
+				"link": "https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents.html"
+			},
+			{
+				"text": "Amazon EventBridge User Guide",
+				"link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+			},
+			{
+				"test": "AWS Lambda Developer Guide",
+				"link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+			},
+			{
+				"text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+				"link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init && terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy"
+		]
+	},
+	"authors": [
+		{
+			"name": "Anton Babenko",
+			"image": "https://avatars.githubusercontent.com/u/393243",
+			"bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
+			"linkedin": "https://www.linkedin.com/in/antonbabenko",
+			"twitter": "antonbabenko"
+		}
+	]
+}

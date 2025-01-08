@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless patterns - Amazon Private API Gateway endpoint with Private Custom Domain Name
+  
+Parameters:
+  VpcEndpointDNSName:
+    Type: String
+  VPCEndpointHostedZoneID:
+    Type: String
+  CustomDomainName:
+    Type: String
+  CertificateArn:
+    Type: String
+  PrivateHostedZoneId:
+    Type: String
+    
+Resources:
+  PrivateApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration: PRIVATE
+      StageName: Prod
+      AlwaysDeploy: true
+      DefinitionBody:
+        openapi: "3.0.1"
+        info:
+          version: "1.0"
+          title: !Sub "PrivateApi-${AWS::StackName}"
+        paths:
+          /:
+            get:
+              responses:
+                "200":
+                  description: "200 response"
+                  content:
+                    application/json:
+                      schema:
+                        $ref: "#/components/schemas/Empty"
+              x-amazon-apigateway-integration:
+                type: "mock"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseTemplates:
+                      application/json: '{\"message\":\"Hello from Amazon Private API Gateway\"\}'
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+        x-amazon-apigateway-policy:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Principal: "*"
+            Action: "execute-api:Invoke"
+            Resource: "execute-api:/*"
+            Condition:
+              StringEquals:
+                aws:sourceVpce: !Join ["-", [!Select [0, !Split ["-", !Select [0, !Split [".", !Ref VpcEndpointDNSName]]]], !Select [1, !Split ["-", !Select [0, !Split [".", !Ref VpcEndpointDNSName]]]]]]
+
+  PrivateDomainName:
+    Type: AWS::ApiGateway::DomainNameV2
+    Properties:
+      DomainName: !Ref CustomDomainName
+      CertificateArn: !Ref CertificateArn
+      EndpointConfiguration:
+        Types:
+          - PRIVATE
+      SecurityPolicy: TLS_1_2
+      Policy:
+        Statement:
+            - Action: 'execute-api:Invoke'
+              Effect: Allow
+              Principal: '*'
+              Resource: 'execute-api:/*'
+            - Action: 'execute-api:Invoke'
+              Condition:
+                StringNotEquals:
+                  aws:SourceVpce : !Join ["-", [!Select [0, !Split ["-", !Select [0, !Split [".", !Ref VpcEndpointDNSName]]]], !Select [1, !Split ["-", !Select [0, !Split [".", !Ref VpcEndpointDNSName]]]]]]
+              Effect: Deny
+              Principal: '*'
+              Resource: 'execute-api:/*'
+        Version: 2012-10-17
+
+  BasePathMapping:
+    Type: AWS::ApiGateway::BasePathMappingV2
+    Properties:
+      RestApiId: !Ref PrivateApi
+      DomainNameArn: !GetAtt PrivateDomainName.DomainNameArn
+      Stage: !Ref PrivateApi.Stage
+  
+  DomainNameAccessAssociation: 
+    Type: AWS::ApiGateway::DomainNameAccessAssociation
+    Properties:
+      DomainNameArn: !GetAtt PrivateDomainName.DomainNameArn
+      AccessAssociationSource: !Join ["-", [!Select [0, !Split ["-", !Select [0, !Split [".", !Ref VpcEndpointDNSName]]]], !Select [1, !Split ["-", !Select [0, !Split [".", !Ref VpcEndpointDNSName]]]]]]
+      AccessAssociationSourceType: VPCE    
+  
+  R53Alias:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: !Ref CustomDomainName
+      HostedZoneId: !Ref PrivateHostedZoneId
+      Type: A
+      AliasTarget:
+        DNSName: !Ref VpcEndpointDNSName
+        HostedZoneId: !Ref VPCEndpointHostedZoneID
+
+Outputs:
+  CURLCommand:
+    Description: "Curl Command to test"
+    Value: !Sub "curl https://${CustomDomainName}/"

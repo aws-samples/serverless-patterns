@@ -1,0 +1,52 @@
+{
+    "title": "SNS to Step Functions with an EventBridge Pipe and Bus via CDK",
+    "description": "Creates a Step Function Wofklow that is triggered by a producer that is generating messages in SNS.  The messages are filtered via EventBridge Pipes and the Step Function is Triggered by a Custom EventBus and Rule",
+    "language": "TypeScript",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern is designed to help connect producers that are submitting messages into SNS with EventBridge as a way to deliver those same events in a more configuration driven and scalable way. It also helps reduce load and needless code downstream by leveraging AWS EventBridge Pipes to both filter and transform the data from the producer before attaching to an EventBus for further consumption."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-sns-sqs-eventbridge-pipes-stepfunctions",
+            "templateURL": "serverless-patterns/cdk-sns-sqs-eventbridge-pipes-stepfunctions",
+            "projectFolder": "cdk-sns-sqs-eventbridge-pipes-stepfunctions",
+            "templateFile": "lib/main-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS EventBridge Pipes",
+                "link": "https://aws.amazon.com/eventbridge/pipes/"
+            },
+            {
+                "text": "AWS EventBridge Pipes SQS Source",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": ["cdk deploy"]
+    },
+    "testing": {
+        "text": ["See the GitHub repo for detailed testing instructions."]
+    },
+    "cleanup": {
+        "text": ["Delete the stack: <code>cdk destroy</code>."]
+    },
+    "authors": [
+        {
+            "headline": "Presented by Benjamen Pyle",
+            "name": "Benjamen Pyle",
+            "image": "https://www.binaryheap.com/wp-content/uploads/2023/02/cropped-Photo-on-1-26-23-at-8.57-AM-2.png",
+            "bio": "Benjamen Pyle is an AWS Community Builder who loves building scalable and useful applications with Serverless and Event Drive Architectures",
+            "linkedin": "benjamenpyle",
+            "twitter": "benjamenpyle"
+        }
+    ]
+}

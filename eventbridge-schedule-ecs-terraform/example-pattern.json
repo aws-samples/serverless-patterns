@@ -1,0 +1,60 @@
+{
+  "title": "Amazon EventBridge Schedule to Amazon Elastic Container Service",
+  "description": "Creates an EventBridge schedule to invoke an Amazon Elastic Container Service task every 5 minutes",
+  "language": "",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to invoke an Amazon Elastic Container Service (ECS) task using EventBridge Scheduler and deployed with Terraform."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-ecs-terraform",
+      "templateURL": "serverless-patterns/eventbridge-schedule-ecs-terraform",
+      "projectFolder": "eventbridge-schedule-ecs-terraform",
+      "templateFile": "eventbridge-schedule-ecs-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting Started with EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "Getting started with Amazon ECS",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/getting-started.html"
+      },
+      {
+        "text": "AWS CLI start-execution",
+        "link": "https://docs.aws.amazon.com/cli/latest/reference/stepfunctions/start-execution.html#start-execution"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rajdeep Banerjee",
+      "image": "https://avatars.githubusercontent.com/u/106704318",
+      "bio": "AWS Sr. Solutions Architect",
+      "linkedin": "https://www.linkedin.com/in/rajdeep-banerjee/"
+    }
+  ]
+}

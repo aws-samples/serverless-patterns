@@ -1,0 +1,60 @@
+{
+  "title": "SQS to AWS Batch Job Queue using EventBridge Pipes",
+  "description": "This pattern uses SQS and triggers AWS Batch Job Queue directly with optional filtering supported.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "SQS queue is polled and messages are sent to AWS Batch Job Queue. SQS messages are filtered before reaching AWS Batch Job Queue, and custom events in AWS Batch Jobs are raised."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-aws-batch-with-filters",
+      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-aws-batch-with-filters",
+      "projectFolder": "eventbridge-pipes-sqs-to-aws-batch-with-filters",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "API for PipeTargetBatchJobParameters",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/pipes-reference/API_PipeTargetBatchJobParameters.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "Sayan Moitra",
+      "image": "./smoitra.png",
+      "bio": "Sayan is a Solutions Architect working with Amazon Web Services.",
+      "linkedin": "sayanmoitra"
+    }
+  ]
+}

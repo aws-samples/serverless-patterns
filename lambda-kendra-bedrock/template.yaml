@@ -1,0 +1,224 @@
+Transform: AWS::Serverless-2016-10-31
+Description: Bedrock sample pattern (uksb-1tthgi812) (tag:lambda-kendra-bedrock)
+Parameters:
+  ModelId:
+    Type: String
+    Default: 'anthropic.claude-instant-v1'
+    AllowedValues:
+      - 'anthropic.claude-instant-v1'
+      - 'anthropic.claude-3-sonnet-20240229-v1:0'
+      - 'anthropic.claude-3-haiku-20240307-v1:0'
+      - 'anthropic.claude-v2'
+    Description: >-
+      Enter the Model Id of the Anthropic LLM
+  S3DSBucketName:
+    Type: String
+    Description: Enter the S3 bucket name where the contents you want to be indexed are stored.
+  KendraEdition:
+    Type: String
+    Description: Kendra edition (DEVELOPER_EDITION, ENTERPRISE_EDITION)
+    Default: DEVELOPER_EDITION
+    AllowedValues:
+      - DEVELOPER_EDITION
+      - ENTERPRISE_EDITION
+Resources:
+  # Creating role for Kendra index
+  KendraIndexRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: kendra.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Resource: '*'
+                Condition:
+                  StringEquals:
+                    cloudwatch:namespace: Kendra
+                Action:
+                  - cloudwatch:PutMetricData
+              - Effect: Allow
+                Resource: '*'
+                Action: logs:DescribeLogGroups
+              - Effect: Allow
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/kendra/*
+                Action: logs:CreateLogGroup
+              - Effect: Allow
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/kendra/*:log-stream:*
+                Action:
+                  - logs:DescribeLogStreams
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+          PolicyName: !Sub ${AWS::StackName}-KendraIndexPolicy
+      RoleName: !Sub ${AWS::StackName}-KendraIndexRole
+  # Create a Kendra index with the Kendra index role
+  KendraIndex:
+    Type: AWS::Kendra::Index
+    Properties:
+      Edition: !Ref KendraEdition
+      Name: !Sub ${AWS::StackName}-KendraIndex
+      RoleArn: !GetAtt KendraIndexRole.Arn
+  # Create a role for the Kendra data source
+  KendraDSRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: kendra.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Resource: !Sub
+                  - arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${index}
+                  - index: !GetAtt KendraIndex.Id
+                Action:
+                  - kendra:BatchPutDocument
+                  - kendra:BatchDeleteDocument
+              - Effect: Allow
+                Resource: !Sub arn:aws:s3:::${S3DSBucketName}/*
+                Action:
+                  - s3:GetObject
+              - Effect: Allow
+                Resource: !Sub arn:aws:s3:::${S3DSBucketName}
+                Action:
+                  - s3:ListBucket
+          PolicyName: !Sub ${AWS::StackName}-DocsDSPolicy
+      RoleName: !Sub ${AWS::StackName}-DocsDSRole
+  # Kendra S3 data source
+  KendraDS:
+    Type: AWS::Kendra::DataSource
+    DependsOn:
+      - KendraIndex
+    Properties:
+      DataSourceConfiguration:
+        S3Configuration:
+          BucketName: !Ref S3DSBucketName
+      IndexId: !GetAtt KendraIndex.Id
+      Name: !Sub ${AWS::StackName}-KendraS3DS
+      RoleArn: !GetAtt KendraDSRole.Arn
+      Type: S3
+  # Lambda function for initiating crawling and indexing content from the S3 data source
+  DataSourceSyncLambda:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - KendraIndex
+      - KendraDS
+      - DataSourceSyncLambdaRole
+    Properties:
+      Description:
+        Fn::Sub:
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: DataSourceSyncLambda
+      CodeUri: src/dataSourceSync/
+      Handler: dataSourceSyncLambda.lambda_handler
+      Runtime: python3.12
+      MemorySize: 1024
+      Timeout: 900
+      Tracing: Active
+      Policies:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          Resource: "*"
+        - Effect: Allow
+          Action:
+          - kendra:StartDataSourceSyncJob
+          - kendra:StopDataSourceSyncJob
+          Resource:
+          - !Sub arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}
+          - !Sub arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}/*
+      Environment:
+        Variables:
+          INDEX_ID:
+            Fn::GetAtt:
+            - KendraIndex
+            - Id
+          DS_ID:
+            Fn::GetAtt:
+            - KendraDS
+            - Id
+  # Custom resource to initiates data source sync
+  DataSourceSync:
+    Type: 'Custom::DataSourceSync'
+    DependsOn:
+      - KendraIndex
+      - DataSourceSyncLambda
+    Properties:
+      ServiceToken: !GetAtt
+        - DataSourceSyncLambda
+        - Arn
+  # Lambda function for retrieving relevant documents and passing it to Bedrock
+  InvokeBedrockLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: InvokeBedrockLambda
+      CodeUri: src/invokeBedrockLambda.py
+      Handler: invokeBedrockLambda.lambda_handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 120
+      Tracing: Active
+      Policies:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: logs:CreateLogGroup
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
+          - Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/InvokeBedrockLambda:*
+          - Effect: Allow
+            Action:
+              - kendra:Retrieve
+            Resource: !Sub arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}
+          - Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+            Resource: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/${ModelId}
+      Environment:
+        Variables:
+          INDEX_ID:
+            Fn::GetAtt:
+            - KendraIndex
+            - Id
+          MODEL_ID: !Ref ModelId
+Outputs:
+  KendraIndexRoleArn:
+    Description: Kendra index role ARN
+    Value: !GetAtt KendraIndexRole.Arn
+  KendraIndexID:
+    Description: Kendra index ID
+    Value: !GetAtt KendraIndex.Id
+  KendraS3DataSourceArn:
+    Description: Kendra S3 data source ARN
+    Value: !GetAtt KendraDS.Arn
+  DataSourceSyncLambdaArn:
+    Description: Data source sync lambda function ARN
+    Value: !GetAtt DataSourceSyncLambda.Arn
+  InvokeBedrockLambdaArn:
+    Description: Invoke bedrock lambda function ARN
+    Value: !GetAtt InvokeBedrockLambda.Arn
+  

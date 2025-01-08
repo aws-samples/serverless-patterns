@@ -1,0 +1,52 @@
+{
+  "title": "Lambda function URL",
+  "description": "Create a Lambda Function with a Function URL",
+  "language": "Typescript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Bootstrap a Lambda fucntion with an function URL"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-function-url-cdk",
+      "templateURL": "serverless-patterns/lambda-function-url-cdk",
+      "projectFolder": "lambda-function-url-cdk"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda functions URLs",
+        "link": "https://aws.amazon.com/blogs/aws/announcing-aws-lambda-function-urls-built-in-https-endpoints-for-single-function-microservices/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Marcia Villalba",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Senior Developer Advocate",
+      "linkedin": "linked-in-ID",
+      "twitter": "@mavi888uy"
+    }
+  ]
+}

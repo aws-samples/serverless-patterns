@@ -1,0 +1,57 @@
+{
+    "title": "REST API Gateway to Kinesis",
+    "description": "Create a REST API Gateway that can perform PutRecords and GetRecords API Call to Kinesis Data stream",
+    "language": "Python",
+    "level": "300",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This Pattern creates a REST API Gateway and Kinesis Data Stream. The API Gateway endpoint uses service integration to directly connect to kinesis Data streams.",
+        "The API gateway exposes the GetRecords or PutRecords (including PutRecord) action in Kinesis."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/aws-kinesis",
+        "templateURL": "serverless-patterns/aws-kinesis",
+        "projectFolder": "aws-kinesis",
+        "templateFile": "aws-kinesis/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Create a REST API as an Amazon Kinesis proxy in API Gateway",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-kinesis.html"
+        },
+        {
+          "text": "Kinesis Data Stream API Actions List",
+          "link": "https://docs.aws.amazon.com/kinesis/latest/APIReference/API_Operations.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Vaidehi Patel",
+        "image": "https://avatars.githubusercontent.com/u/23283229?v=4",
+        "bio": "I'm a Solutions Architect at Amazon Web Services based in Dallas,TX. I'm a serverless enthusiast, I like to build and architect serverless applications",
+        "linkedin": "https://www.linkedin.com/in/vaidehi-patel08/"
+      }
+    ]
+  }

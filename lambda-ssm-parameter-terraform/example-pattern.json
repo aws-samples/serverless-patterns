@@ -1,0 +1,56 @@
+{
+	"title": "Lambda to SSM Parameter Store",
+	"description": "Creates an AWS Lambda function and an AWS Systems Manager Parameter Store parameter",
+	"language": "Node.js",
+	"level": "100",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This pattern creates an AWS Lambda function and an AWS Systems Manager Parameter Store parameter. The parameter is added as a function environment variable named \"SSMParameterName\".",
+			"The method can be either GET (retrieve current parameter value) or PUT (update parameter with new value). The body of the event is used to define the new value of the parameter."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ssm-parameter-terraform",
+			"templateURL": "serverless-patterns/lambda-ssm-parameter-terraform",
+			"projectFolder": "lambda-ssm-parameter-terraform",
+			"templateFile": "lambda-ssm-parameter-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "Sharing Secrets with AWS Lambda Using AWS Systems Manager Parameter Store",
+				"link": "https://aws.amazon.com/blogs/compute/sharing-secrets-with-aws-lambda-using-aws-systems-manager-parameter-store/"
+			},
+			{
+				"text": "Restricting access to Systems Manager parameters using IAM policies",
+				"link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the README in the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+	  "name": "Stephen Monaghan",
+	  "image": "",
+	  "bio": "Solutions Architect, AWS",
+	  "linkedin": "https://www.linkedin.com/in/stephen-monaghan-61873194/"
+	}]
+}

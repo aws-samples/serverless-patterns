@@ -1,0 +1,57 @@
+{
+	"title": "AWS Lambda to AWS IoT Core",
+	"description": "AWS Lambda function publishing to AWS IoT Core topic.",
+	"level": "200",
+    "services": {
+        "from": "lambda",
+        "to": "iot"
+    },
+  "language": "Node.js",
+	"framework": "SAM",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This pattern contains a sample AWS SAM stack with an AWS IoT Core thing and a Lambda function.",
+			"The Lambda function publishes a message to the IoT topic which you can view in the console."
+		]
+	},
+    "gitHub": {
+        "template": {
+            "repoURL": "ttps://github.com/aws-samples/serverless-patterns/tree/main/lambda-iot-sam",
+            "templateURL": "serverless-patterns/lambda-iot-sam",
+            "projectFolder": "lambda-iot-sam",
+            "templateFile": "template.yaml"
+        }
+    },    
+	"resources": {
+		"bullets": [
+      {
+        "text": "IoT Rule",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-rules.html"
+      }
+		]
+	},
+	"deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+	"authors": [{
+    "headline": "Presented by Daniele Frasca",
+		"name": "Daniele Frasca",
+    "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
+    "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+    "linkedin": "daniele-frasca",
+    "twitter": "dfrasca80"
+	}]
+}

@@ -1,0 +1,49 @@
+{
+  "title": "Amazon API Gateway to AWS Lambda",
+  "description": "Create an Amazon API Gateway to AWS Lambda REST API",
+  "language": ".NET",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK stack creates an Amazon API Gateway REST API endpoint with AWS Lambda function proxy integration.",
+      "Proxy integration creates a proxy resource with the greedy path `{proxy+}` and the method `ANY`.",
+      "This means that the REST API endpoint accepts any method and any path by default.",
+      "The Lambda used in this pattern is an ASP.NET Core Web API application that has been configured to allow Lambda and API Gateway to act as the web server instead of Kestrel."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-cdk-dotnet",
+      "projectFolder": "apigw-lambda-cdk-dotnet",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-cdk-dotnet/README.md",
+      "templateURL": "serverless-patterns/apigw-lambda-cdk-dotnet",
+      "templateFile": "src/cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ankush Jain",
+      "image": "https://avatars.githubusercontent.com/u/13661966?v=4",
+      "bio": "Application Development Consultant at AWS Professional Services.",
+      "linkedin": "ankush-jain-developer",
+      "twitter": "ankushjain358"
+    }
+  ]
+}

@@ -141,7 +141,7 @@ Resources:
       FunctionName: !Sub 'CustomSmsSender-${AWS::StackName}'
       Layers:
         - !Ref DependencyLayer
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       Architectures:
       - x86_64
       Environment:

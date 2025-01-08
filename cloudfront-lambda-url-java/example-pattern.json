@@ -1,0 +1,53 @@
+{
+  "title": "Amazon CloudFront to AWS Lambda URLs",
+  "description": "Front AWS Lamda Function URLs with Amazon CloudFront",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An Amazon CloudFront distribution is created that forwards requests to the domain name of the deployed AWS Lambda function URL.",
+      "Amazon CloudFront also allows for custom domain names, AWS Web Application Firewall (WAF) and AWS Shield Advanced to protect your endpoint from attacks."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-lambda-url-java",
+      "templateURL": "serverless-patterns/cloudfront-lambda-url-java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Amazon CloudFront with AWS Lambda as origin to accelerate your web applications",
+        "link": "https://aws.amazon.com/blogs/networking-and-content-delivery/using-amazon-cloudfront-with-aws-lambda-as-origin-to-accelerate-your-web-applications/"
+      },
+      {
+        "text": "Lambda function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Steven Cook",
+      "bio": "Senior Solutions Architect at AWS."
+    }
+  ]
+}

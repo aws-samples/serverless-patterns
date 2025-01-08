@@ -1,0 +1,58 @@
+{
+  "title": "Lambda to Glue to S3",
+  "description": "Create a lambda function to invoke a AWS Glue job to run the task and save the output file in S3",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application deploys a Lambda function, that takes in a payload and trigger a AWS Glue job synchronously.",
+      "The AWS glue job then performs the assigned task to convert a CSV file to Parquet and uploads the output file in S3. The application contains the minimum IAM permissions required to run the workflow and Glue job.",
+      "This pattern deploys one Lambda Functions, one S3 Buckets and one Glue ETL Job."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-glue-s3",
+      "templateURL": "serverless-patterns/lambda-glue-s3",
+      "projectFolder": "lambda-glue-s3",
+      "templateFile": "lambda-glue-s3/app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "About AWS Glue",
+        "link": "https://aws.amazon.com/glue"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Harshitha Shashidhar",
+      "image": "https://phonetool.amazon.com/users/harshihs",
+      "bio": "Harshitha Shashidhar is an Cloud Application architect who loves to build the serverless applications at scale."
+    },
+    {
+      "name": "Shruti Arora",
+      "image": "https://phonetool.amazon.com/users/sarora",
+      "bio": "Shruti is a Cloud Application Architect with AWS Professional Services Team and is passionate about serverless development in Cloud using Data Processing and AI/ML services."
+    }
+  ]
+}

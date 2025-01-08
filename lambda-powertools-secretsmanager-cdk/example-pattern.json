@@ -1,0 +1,60 @@
+{
+  "title": "Lambda Secrets Manager with PowerTools",
+  "description": "Lambda function that uses PowerTools to get Secrets Manager secret and call an API.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an AWS Lambda function to call a protected API endpoint. It is integrated with AWS SecretsManager via AWS PowerTools, and is deployed with the AWS Cloud Development Kit (AWS CDK) in Python."
+    ]
+  },
+  "gitHub": {
+    "template": {
+        "projectFolder": "lambda-powertools-secretsmanager-cdk/src",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-powertools-secretsmanager-cdk",
+        "templateURL": "serverless-patterns/lambda-powertools-secretsmanager-cdk",
+        "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Function PowerTools",
+        "link": "https://awslabs.github.io/aws-lambda-powertools-python/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy --all</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Luke Viens",
+      "image": "",
+      "bio": "Cloud application developer at AWS.",
+      "linkedin": "",
+      "twitter": ""
+    },
+    {
+      "name": "Sakthivel Chellapparimanam",
+      "image": "",
+      "bio": "AWS - Cloud Application Architect",
+      "linkedin": "https://www.linkedin.com/in/srcsakthivel",
+      "twitter": "@srcsakthivel"
+    }
+  ]
+}

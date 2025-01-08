@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Sam for Bedrock and Dynamodb pattern (uksb-1tthgi812) (tag:lambda-bedrock-dynamodb-sam)
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 180
+    MemorySize: 128
+
+    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
+    # LoggingConfig:
+    #   LogFormat: JSON
+Parameters:
+  tableName:
+    Type: String
+    Description: Dynamodb table name
+  modelID:
+    Type: String
+    Description: Bedrock model id
+    Default: anthropic.claude-3-haiku-20240307-v1:0
+Resources:
+  # Creates dynamodb table 
+  Outputtable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: !Sub "${tableName}"
+      AttributeDefinitions: 
+        - AttributeName: id
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+ 
+  # Creates Lambda function 
+
+  InvokeBedrock:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: lambda-processor
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Environment:
+        Variables:
+          table_name: !Ref Outputtable
+          model_ID: !Sub "${modelID}"
+         
+      Runtime: python3.12
+      Architectures:
+      - x86_64
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource: !GetAtt Outputtable.Arn
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource: !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/${modelID}'
+        
+              
+        
+
+
+Outputs:
+
+  InvokeBedrock:
+    Description: response evaluation Lambda ARN
+    Value: !Ref  InvokeBedrock
+  
+
+  Outputtable:
+    Description:  output table
+    Value: !Ref  Outputtable
+  
+
+

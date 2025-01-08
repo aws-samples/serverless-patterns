@@ -1,0 +1,70 @@
+{
+  "title": "Split SQS Messages into multiple SQS queus using EventBridge Pipe with CDK Python",
+  "description": "Simple pattern that split messages in a SQS queue into multiple SQS queues using EventBridge Pipe and Event Bus. Implemented using CDK using Python. ",
+  "language": "Python",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "EventBridge Pipe polls messages in source SQS queue. Then using enrichment Lambda function, it extract the original payload.",
+      "Then the messages is sent to the Event Bus. Two SQS queues are set as targets and based on the 'type' value on the orignial message, it will be delivered to the respective target queue."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-multiple-sqs",
+      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-multiple-sqs",
+      "projectFolder": "eventbridge-pipes-sqs-to-multiple-sqs",
+      "templateFile": "eventbridge-pipes-sqs-to-multiple-sqs/eventbridge_pipes_sqs_to_multiple_sqs_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Pipes Documentation for CDK v2 Python",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_pipes/CfnPipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pubudu Jayawardana",
+      "image": "https://avatars.githubusercontent.com/u/1263087",
+      "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusiast.",
+      "linkedin": "pubudusj",
+      "twitter": "@pubudusj"
+    }
+  ]
+}

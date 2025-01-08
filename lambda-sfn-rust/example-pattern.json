@@ -1,0 +1,56 @@
+{
+  "title": "Invoke an AWS Step Functions workflow from AWS Lambda",
+  "description": "The SAM template deploys a Lambda function, a Step Functions Express workflow, a Log group and the IAM resources required to run the application. A Lambda function uses the AWS SDK to asyncronously invoke the Express workflow, passing the event body as a string. The Express Workflow results are logged in Amazon CloudWatch Logs. The Lambda function returns the Express Workflow execution ARN and startDate.",
+  "language": "Rust",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A Lambda function uses the AWS SDK to asyncronously invoke the Express workflow, passing the event body as a string.",
+      "The Express Workflow results are logged in Amazon CloudWatch Logs.",
+      "The Lambda function returns the Express Workflow execution ARN and startDate."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sfn-rust",
+      "templateURL": "serverless-patterns/lambda-sfn-rust",
+      "projectFolder": "lambda-sfn-rust",
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Step Functions",
+        "link": "https://aws.amazon.com/step-functions/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "headline": "Presented by Daniele Frasca",
+      "name": "Daniele Frasca",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "linkedin": "daniele-frasca",
+      "twitter": "dfrasca80"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "title": "Lambda function with ECR Image",
+  "description": "Create a Lambda function with a container image",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template will create a lambda function running with an ECR container image.",
+      "You will need to already have the ECR image created in your account"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ecr",
+      "templateURL": "serverless-patterns/lambda-ecr",
+      "projectFolder": "lambda-ecr",
+      "templateFile": "lambda-ecr/template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with Lambda container images",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/images-create.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Enter the Image URI in the parameters of the template. Once deployed, you can invoke the Lambda function."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alice Goumain",
+      "image": "https://media.licdn.com/dms/image/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_800_800/0/1662636936708?e=1686182400&v=beta&t=9RZra4EtrGWhcWVYZZtP_W9yrUR_XZ9ued70sTnkCgg",
+      "bio": "Cloud Support Engineer in Serverless @ AWS",
+      "linkedin": "https://www.linkedin.com/in/alice-goumain/"
+    }
+  ]
+}

@@ -17,7 +17,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambdaHandler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       # SAM Managed Policy for inserting custom CloudWatch Metrics
       Policies:
         - CloudWatchPutMetricPolicy: {}

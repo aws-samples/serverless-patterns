@@ -1,0 +1,83 @@
+{
+    "title": "Amazon CloudFront and Amazon S3 for Single Page Application Hosting",
+    "description": "This project hosts a Single-Page App using Amazon CloudFront & S3, where CloudFront serves the SPA from an S3 bucket for static hosting.",
+    "language": "YAML",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Here's how hosting a static website using Amazon CloudFront and Amazon S3 works:",
+            "- An Amazon S3 bucket is created and configured for static website hosting",
+            "- A CloudFront web distribution is created, with the S3 bucket configured as the origin server. CloudFront acts as a content delivery network (CDN) for the website",
+            "- When a user requests a file from the website, CloudFront first checks if the file is cached at one of its edge locations (data centers) closest to the user. If the file is cached, CloudFront serves it directly to the user.",
+            "- If the requested file is not cached at an edge location, CloudFront fetches the file from the S3 bucket origin. It then caches the file at the edge location for subsequent requests",
+            "- For subsequent requests, CloudFront serves the cached files from the nearest edge location to the user, providing low latency and fast content delivery.",
+            "- When website files are updated in the S3 bucket, CloudFront automatically detects the changes and retrieves the updated files from the origin. Cache invalidation can also be manually triggered to force CloudFront to fetch the latest versions."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-cloudfront-spa",
+            "templateURL": "serverless-patterns/s3-cloudfront-spa",
+            "projectFolder": "s3-cloudfront-spa",
+            "templateFile": "template.tf"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon S3 bucket to host the website",
+                "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html"
+            },
+            {
+                "text": "Amazon CloudFront uses Amazon S3 as the origin server to host and serve static websites.",
+                "link": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/getting-started-cloudfront-overview.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "<code>terraform init</code>",
+            "<code>terraform plan</code>",
+            "<code>terraform apply</code>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Refer to README"
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>terraform destroy</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Junaid Ansari",
+            "image": "https://media.licdn.com/dms/image/v2/C4E03AQEekYWyjMINfg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1659715539214?e=1728518400&v=beta&t=HVpwkCvJ_QdUYDW2YXbCabZDcWKWv3VpTBKmnCS5uVg",
+            "bio": "Cloud Application Architect at AWS.",
+            "linkedin": "junaid-ansari-2734a912"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "cloudfront-edge",
+            "label": "Amazon CloudFront distribution"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3 bucket"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": ""
+        }
+    }
+}

@@ -1,0 +1,50 @@
+{
+	"title": "AWS API Gateway HTTP API to AWS Lambda to RDS Proxy",
+	"description": "This pattern sets up an API Gateway HTTP API using AWS Lambda function as an integration that connects to an RDS Proxy endpoint.",
+	"language": "Python",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"When an HTTP POST request is sent to the Amazon API Gateway endpoint, the AWS Lambda function is invoked to issue a database query against an RDS proxy endpoint.",
+			"The lambda function retrieves a temporary token from IAM to authenticate instead of using native database credentials.",
+			"The RDS proxy will then establish a connection to the database, the lambda function will borrow this database connection for the next query/transaction."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda-rds-proxy-terraform",
+			"templateURL": "serverless-patterns/apigw-http-api-lambda-rds-proxy-terraform",
+			"projectFolder": "apigw-http-api-lambda-rds-proxy-terraform",
+			"templateFile": "apigw-http-api-lambda-rds-proxy-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+			"text": "Storage first integrations",
+			"link": "https://aws.amazon.com/blogs/compute/building-storage-first-applications-with-http-apis-service-integrations/"
+		}]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+		"name": "Carlos Bauer",
+		"bio": "I am Technical Account Manager at AWS"
+	}]
+}

@@ -1,0 +1,68 @@
+{
+	"title": "API Gateway to Lambda to QLDB",
+	"description": "Create an API Gateway REST API that uses a Lambda function to call QLDB",
+	"language": "",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This pattern shows how to deploy a Terraform template with Amazon API Gateway, AWS Lambda and Amazon Quantum Ledger Database (QLDB). The API Gateway exposes a REST API with a number of methods. Each API method uses a Lambda proxy integration to invoke a separate AWS Lambda function that interacts with a ledger in Amazon QLDB. This allows you to create a new Person record, update the record, delete the record, view the current state of the record, and view the entire revision history.",
+			"Each Lambda function is configured with the minimum set of permissions necessary. For example, only the Get Person History function has the qldb:PartiQLHistoryFunction permission needed to query the full revision history."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-qldb-terraform",
+			"templateURL": "serverless-patterns/apigw-lambda-qldb-terraform",
+			"projectFolder": "apigw-lambda-qldb-terraform",
+			"templateFile": "apigw-lambda-qldb-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "Amazon QLDB documentation",
+				"link": "https://docs.aws.amazon.com/qldb/latest/developerguide/getting-started-driver.html"
+			},
+			{
+				"text": "Real world cryptographic verification with Amazon QLDB",
+				"link": "https://aws.amazon.com/blogs/database/real-world-cryptographic-verification-with-amazon-qldb/"
+			},
+			{
+				"text": "QLDB Shell",
+				"link": "https://github.com/awslabs/amazon-qldb-shell"
+			},
+			{
+				"text": "AWS re:Invent 2020 - Building out a serverless application with Amazon QLDB",
+				"link": "https://www.youtube.com/watch?v=dtBpwCBlz6M"
+			},
+			{
+				"text": "QLDB Guide",
+				"link": "https://qldbguide.com/"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the README in the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+	  "name": "Stephen Monaghan",
+	  "image": "",
+	  "bio": "Solutions Architect, AWS",
+	  "linkedin": "https://www.linkedin.com/in/stephen-monaghan-61873194/"
+	}]
+}

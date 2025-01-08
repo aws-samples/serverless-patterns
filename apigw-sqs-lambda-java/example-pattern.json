@@ -1,0 +1,58 @@
+{
+  "title": "API Gateway HTTP API to SQS",
+  "description": "Create an Amazon API Gateway HTTP API that integrates with an Amazon SQS queue.",
+  "language": "Java",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "Create an Amazon API Gateway HTTP API that integrates with an Amazon SQS queue.",
+    "text": [
+      "In this pattern, called Queue based leveling, a serverless queue is introduced between your API Gateway and your workers, a Lambda function in this case.",
+      "The queue acts as a buffer to alleviate traffic spikes and ensure your workload can sustain the arriving load by buffering all the requests durably.",
+      "It also helps downstream consumers to process the incoming requests at a consistent pace."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sqs-lambda-java",
+      "templateURL": "serverless-patterns/apigw-sqs-lambda-java",
+      "projectFolder": "apigw-sqs-lambda-java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>.",
+      "Confirm the stack has been deleted: aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\""
+    ]
+  },
+  "authors": [
+    {
+      "name": "lLyas Bakouch",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ilyas-bakouch.jpg",
+      "bio": "Senior Solutions Architect, AWS.",
+      "twitter": "@isbkch"
+    },
+    {
+      "name": "Steven Cook",
+      "bio": "Senior Solutions Architect, AWS."
+    }
+  ]
+}

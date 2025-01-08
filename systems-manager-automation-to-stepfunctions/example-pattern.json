@@ -1,0 +1,74 @@
+{
+    "title": "Amazon Systems Manager automation to AWS Step Functions",
+    "description": "Create SSM automation document that invokes Step functions.",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern demonstrates how to invoke a Step Function from a Systems Manager automation document ",
+        "It pass's the document run time execution parameters as input payload for the Step Functions. ",
+        "This pattern creates the Snapshot of RDS database"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/cd serverless-patterns/systems-manager-automation-to-stepfunctions",
+        "templateURL": "systems-manager-automation-to-stepfunctions",
+        "projectFolder": "src",
+        "templateFile": "src/create-snapshot-lamda-function.py"
+        
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AWS Systems Manager Documentation",
+          "link": "https://docs.aws.amazon.com/systems-manager/index.html"
+        },
+        {
+          "text": "Run AWS Systems Manager automation tasks synchronously from AWS Step Functions",
+          "link": "https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/run-aws-systems-manager-automation-tasks-synchronously-from-aws-step-functions.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Lalit Sahu",
+        "image": "https://github.com/lalit21984/profile-pic/blob/main/hyperbadge_lksahu.png",
+        "bio": "Associate DevOps Consultant on the AWS Professional Services Team Serving Customers in the East Cost and Central region of United States.",
+        "linkedin": "https://www.linkedin.com/in/lalit-kumar-sahu-3152a210b/",
+        "twitter": "twitter-handle"
+      },
+      {
+        "name": "Revanth Reddy",
+        "image": "https://avatars.githubusercontent.com/u/20147266?s=400&u=a818d4774c69a221d1f9bd58963aa804c44f572e&v=4",
+        "bio": "DevOps Architect on the AWS Professional Services Team Serving Customers in the South Central region of United States.",
+        "linkedin": "https://www.linkedin.com/in/revanth-t-reddy-792aa2162/",
+        "twitter": "twitter-handle"
+      },
+      {
+        "name": "Zukhra Salieva",
+        "image": "https://github.com/zsalieva/profile_picture/blob/main/Zukhra_Salieva_profile_pic.png",
+        "bio": "Associate DevOps Consultant on the AWS Professional Services Team Serving Customers in the East Cost and Central region of United States.",
+        "linkedin": "https://www.linkedin.com/in/zukhra-s-513328191",
+        "twitter": "twitter-handle"
+      }
+    ]
+  }

@@ -1,0 +1,53 @@
+{
+  "title": "Amazon API Gateway throttle configuration usign AWS SAM",
+  "description": "Create an Amazon API Gateway application with throttling set in multiple places.",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern configures the default throttling for this API endpoint to be less than the regional default. It also sets granular throttling at the resource and method level."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-throttle-sam",
+      "templateURL": "serverless-patterns/apigw-throttle-sam",
+      "projectFolder": "apigw-throttle-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "API Gateway Throttling",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Eric Johnson",
+      "image": "https://serverlessland.com/assets/images/resources/ericdj.jpg",
+      "bio": "Eric Johnson is a Principal Developer Advocate for Serverless Applications at Amazon Web Services and is based in Northern Colorado. Eric is a fanatic about serverless and enjoys helping developers understand how serverless technologies introduces a major paradigm shift in how they approach building and running applications at massive scale with minimal administration overhead. Prior to this, Eric has worked as a developer, solutions architect and AWS Evangelist for an AWS partner company.",
+      "linkedin": "singledigit",
+      "twitter": "edjgeek"
+    }
+  ]
+}

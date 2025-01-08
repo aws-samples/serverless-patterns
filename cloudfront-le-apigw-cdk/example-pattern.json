@@ -1,0 +1,59 @@
+{
+    "title": "Secure AWS Api Gateway Requests with Signature Version 4 by using Lambda@Edge",
+    "description": "This pattern demonstrates how to secure an API by blocking any direct access and allowing only the access through the CloudFront distribution deployed in front of the API.",
+    "language": "nodejs",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "* When accessing the CloudFront distribution domain name the Lambda@Edge is triggered and signs the request with AWS Signature Version 4.",
+        "* The HTTP API is secured by using IAM authorization.",
+        "* The role attached to the Lambda@Edge has the permission to invoke the API, so by signing the request an unauthenticated user is able to get the response from the backend Lambda through the HTTP API.",
+        "* This pattern demonstrates how to secure an HTTP API but with small changes in Lambda@Edge it can be adapted to secure other AWS services.",
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-le-apigw-cdk",
+        "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-le-apigw-cdk/README.md"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Serving SSE-KMS encrypted content from S3 using CloudFront",
+          "link": "https://aws.amazon.com/blogs/networking-and-content-delivery/serving-sse-kms-encrypted-content-from-s3-using-cloudfront/"
+        },
+        {
+            "text": "How to Use Lambda@Edge and JSON Web Tokens to Enhance Web Application Security",
+            "link": "https://aws.amazon.com/blogs/networking-and-content-delivery/authorizationedge-how-to-use-lambdaedge-and-json-web-tokens-to-enhance-web-application-security/"
+          }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "authors": [
+      {
+        "headline": "Presented by Corneliu Croitoru, Prototyping Architect",
+        "name": "Corneliu Croitoru",
+        "image": "https://serverlessland.com/assets/images/resources/contributors/ext-corneliu-croitoru.jpg",
+        "bio": "Developer at heart, in 2018 joined AWS as a Solution Architect and since 2021 building, jointly with customers, the most exciting and innovative prototypes on AWS.",
+        "linkedin": "corneliucroitoru",
+        "twitter": "@cornel_croi"
+      }
+    ]
+  }

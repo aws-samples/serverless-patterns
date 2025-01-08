@@ -1,0 +1,51 @@
+{
+	"title": "Event Bridge Global Endpoints - Active Acttive",
+	"description": "Creates an EventBridge Global Endpoint and all the infra needed to set it up",
+	"language": "TypeScript",
+	"level": "200",
+	"framework": "CDK",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This pattern showscase the usage of EventBridge Global Endpoints. It will create 2 event buses in two regions (a main region and secondary region) and the buses each bus is connected to a CloudWatch Log. The client that is a Lambda function will put messages to the Global Endpoint and depending on the health of the main region bus it will shift the traffic to the correct region. This pattern also creates an alarm and health check to validate the health of the main region event bus."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbrigde-global-endpoint-cdk",
+			"templateURL": "serverless-patterns/eventbrigde-global-endpoint-cdk/cdk",
+			"projectFolder": "eventbrigde-global-endpoint-cdk",
+			"templateFile": "lib/global-endpoint-stack.ts"
+		}
+	},
+	"resources": {
+		"bullets": [
+			{
+				"text": "Global Event Driven Applications",
+				"link": "https://blog.marcia.dev/global-event-driven-applications"
+			},
+			{
+				"text": "EventBridge Global Endpoints docs",
+				"link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-global-endpoints.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": ["cdk deploy --all"]
+	},
+	"testing": {
+		"text": ["See the GitHub repo for detailed testing instructions."]
+	},
+	"cleanup": {
+		"text": ["Delete the stack: <code>cdk destroy --all</code>."]
+	},
+	"authors": [
+		{
+			"name": "Marcia Villalba",
+			"image": "link-to-your-photo.jpg",
+			"bio": "Your bio.",
+			"linkedin": "linked-in-ID",
+			"twitter": "twitter-handle"
+		}
+	]
+}

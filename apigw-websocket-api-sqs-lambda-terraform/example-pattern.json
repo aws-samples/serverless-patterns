@@ -1,0 +1,62 @@
+{
+	"title": "API Gateway WebSocket API to SQS to AWS Lambda",
+	"description": "This pattern creates an Amazon API Gateway WebSocket API which sends inbound messages to an Amazon SQS FIFO queue. The queue is processed by an AWS Lambda function to return a result.",
+	"language": "Python",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"The API Gateway handles websocket message events by putting the message into a SQS FIFO (First-In-First-Out) queue.",
+			"The SQS FIFO queue is used to ensure processing order of the websocket messages.",
+			"The message payload must contain a MessageGroupId field which is used by SQS FIFO queue.",
+			"If message order is not required, a standard SQS queue can also be used and the message payload would not require the MessageGroupId field.",
+			"The API Gateway websocket request integration passes the connectionId and requestId as metadata and the message body as the payload.",
+			"The Lambda function can now process the SQS FIFO requests in a batch manner (10 requests at a time) and send a response back to the websocket connection."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-sqs-lambda-terraform",
+			"templateURL": "serverless-patterns/apigw-websocket-api-sqs-lambda-terraform",
+			"projectFolder": "apigw-websocket-api-sqs-lambda-terraform",
+			"templateFile": "apigw-websocket-api-sqs-lambda-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "Working with WebSocket APIs",
+				"link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html"
+			},
+			{
+				"text": "Announcing WebSocket APIs in Amazon API Gateway",
+				"link": "https://aws.amazon.com/blogs/compute/announcing-websocket-apis-in-amazon-api-gateway/"
+			},
+			{
+				"text": "Lambda Function Handler",
+				"link": "https://docs.aws.amazon.com/whitepapers/latest/serverless-architectures-lambda/the-handler.html"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+		"name": "Carlos Bauer",
+		"bio": "I am Technical Account Manager at AWS"
+	}]
+}

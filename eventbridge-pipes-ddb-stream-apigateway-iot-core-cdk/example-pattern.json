@@ -1,0 +1,75 @@
+{
+  "title": "EventBridge Pipe targets IoT Core Topic",
+  "description": "Create an EventBridge pipe that publish data to an IoT Core topic",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "services": {
+    "from": "eventbridge",
+    "to": "iot-data"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an AWS EventBridge Pipe to publish data to an AWS IoT Core Topic. This pattern is leveraging the native integration between the following services: DynamoDB Stream -> EventBridge Pipes -> Api Gateway -> IoT Core.",
+      "This pattern deploys one DynamoDB Table, one EventBridge Pipe and one Api Gateway REST Api."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-ddb-stream-apigateway-iot-core-cdk",
+      "templateURL": "serverless-patterns/eventbridge-pipes-ddb-stream-apigateway-iot-core-cdk",
+      "projectFolder": "eventbridge-pipes-ddb-stream-apigateway-iot-core-cdk",
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs"
+      },
+      {
+        "text": "AWS IoT HTTPS",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/http.html"
+      },
+      {
+        "text": "AWS Solutions Constructs for API Gateway integration to IoT Core",
+        "link": "https://github.com/awslabs/aws-solutions-constructs/tree/58e726ff2050a4d6ff4734a6b556e1f81d97e9aa/source/patterns/%40aws-solutions-constructs/aws-apigateway-iot"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "Mohamad Soufan",
+      "image": "https://pbs.twimg.com/profile_images/1467593280896450562/jRZ4fMWb_400x400.jpg",
+      "bio": "Mohamad is an AWS 5x Certified Cloud Enthusiast who love building solutions with focus on Serverless and Networking. (Majd's twin brother)",
+      "linkedin": "/mohamad-soufan",
+      "twitter": "@MohamadSoufan4"
+    },
+    {
+      "name": "Majd Soufan",
+      "image": "https://pbs.twimg.com/profile_images/1467263476473090048/JmklQbC8_400x400.jpg",
+      "bio": "Majd is an AWS 5x Certified Cloud Enthusiast who love building solutions with focus on Serverless and Database. (Mohamad's twin brother)",
+      "linkedin": "/majd-soufan",
+      "twitter": "@Majd95RF"
+    }
+  ]
+}

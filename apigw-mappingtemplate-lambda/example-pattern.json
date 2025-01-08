@@ -1,0 +1,53 @@
+{
+    "title": "Amazon API Gateway REST API with Mapping templates for status code and parameter mapping.",
+    "description": "Using mapping template to over-ride status, status code and body returned from the Lambda function.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to map status codes and over-ride parameters in a REST API - Lambda integration."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-mappingtemplate-lambda",
+        "templateURL": "serverless-patterns/apigw-mappingtemplate-lambda",
+        "projectFolder": "apigw-mappingtemplate-lambda",
+        "templateFile": "apigw-mappingtemplate-lambda/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Usage of mapping templates",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-override-request-response-parameters.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "D Surya Sai",
+        "image": "https://photos.app.goo.gl/m4om6YSqu7Q2yKqw8",
+        "bio": "A Serverless Cloud Engineer and technical writer, who works on building efficient and scalable solutions using AWS services.",
+        "linkedin": "https://www.linkedin.com/in/d-surya-sai-64920416a"
+      }
+    ]
+  }
+  

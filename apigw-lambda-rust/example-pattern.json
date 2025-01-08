@@ -1,0 +1,54 @@
+{
+  "title": "Amazon API Gateway REST API to AWS Lambda",
+  "description": "This pattern creates an Amazon API Gateway REST API and an AWS Lambda function.",
+  "language": "Rust",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway REST API API with a default route and basic CORS configuration. The default route is integrated with an AWS Lambda function written in Rust. The function logs the incoming API event and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-rust",
+      "templateURL": "serverless-patterns/apigw-lambda-rust",
+      "projectFolder": "apigw-lambda-rust",
+      "templateFile": "apigw-lambda-rust/template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon API Gateway",
+        "link": "https://aws.amazon.com/api-gateway/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "headline": "Presented by Daniele Frasca",
+      "name": "Daniele Frasca",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "linkedin": "daniele-frasca",
+      "twitter": "dfrasca80"
+    }
+  ]
+}
