@@ -1,6 +1,7 @@
 {
     "title": "Cross Account Private Domain Name Access",
     "description": "Create ",
+    "language": "Python",
     "level": "300",
     "framework": "SAM",
     "introBox": {
