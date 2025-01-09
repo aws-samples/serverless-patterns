@@ -21,10 +21,10 @@ Important: this application uses various AWS services and there are costs associ
 
 ### Installation
 
-1. Clone the repository:
+1. Clone the repository and change directory to pattern directory:
    ```
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/aws-samples/serverless-patterns
+   cd serverless-patterns/waf-cloudfront-websocket-apigw-cdk-python
    ```
 
 2. Create and activate a virtual environment:
