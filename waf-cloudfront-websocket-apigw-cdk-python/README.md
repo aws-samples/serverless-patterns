@@ -6,6 +6,11 @@ The WebSocket API provides real-time communication capabilities, while CloudFron
 
 ![Alt text](images/architecturediagram.png?raw=true "Architecture Diagram for WebSocket API with CloudFront and WAF Integration")
 
+
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/waf-cloudfront-websocket-apigw-cdk-python).
+
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+
 ### Prerequisites
 
 - Python 3.9 or later
@@ -73,18 +78,13 @@ The main configuration for the WebSocket API and related services is defined in 
 The WebSocket API handles data flow as follows:
 
 1. Client initiates a WebSocket connection to the CloudFront distribution URL.
-2. CloudFront forwards the request to the API Gateway WebSocket API with the "x-api-key" as custom header.
-3. Websocket API validates the API key and routes the request based on the route selection expression.
-4. The Lambda function is invoked to handle the WebSocket event.
+2. WAF validates the request against the configured rules
+3. CloudFront forwards the request to the API Gateway WebSocket API with the "x-api-key" as custom header.
+4. Websocket API validates the API key and routes the request based on the route selection expression.
 
-```
-[Client] <-> [CloudFront] <-> [API Gateway WebSocket API] <-> [Lambda Function]
-   ^                                                               |
-   |                                                               |
-   +---------------------------------------------------------------+
-```
+![Alt text](images/RequestFlow.png?raw=true "Request Flow for WebSocket API with CloudFront and WAF Integration")
 
-##Testing
+## Testing
 
 Copy the "DistributionURL" value from the Cloudformation Stack's output section. Use it to connect to your Webosocket API. When you connect to your API, API Gateway invokes the $connect route. 
 ```

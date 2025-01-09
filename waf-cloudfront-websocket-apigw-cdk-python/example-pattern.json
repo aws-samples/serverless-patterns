@@ -12,10 +12,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/<>",
-      "templateURL": "serverless-patterns/<>",
-      "projectFolder": "<>",
-      "templateFile": "my_websocket_api_stack.py"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/waf-cloudfront-websocket-apigw-cdk-python",
+      "templateURL": "serverless-patterns/waf-cloudfront-websocket-apigw-cdk-python",
+      "projectFolder": "waf-cloudfront-websocket-apigw-cdk-python",
+      "templateFile": "my_websocket_api/my_websocket_api_stack.py"
     }
   },
   "resources": {
