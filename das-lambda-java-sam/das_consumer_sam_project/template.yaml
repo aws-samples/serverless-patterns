@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  database_activity_streams_event_consumer_function
+
+  Sample SAM Template for database-activity-streams-consumer-with-sam
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  LambdaDatabaseActivityStreamsConsumerJavaFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: java-database-activity-streams-consumer-function
+      CodeUri: database_activity_streams_event_consumer_function
+      Handler: com.amazonaws.services.lambda.samples.events.das.HandlerAuroraStream::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          DATABASE_TYPE: postgres
+          S3_BUCKET: !Ref DasS3Bucket
+          S3_PREFIX: !Ref DasS3Prefix
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
+      Events:
+        Stream:
+          Type: Kinesis
+          Properties:
+            Stream: !Join ['', ["arn:", "aws:", "kinesis:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "stream/aws-rds-das-cluster-", !Ref DasKinesisStream]]
+            BatchSize: 10
+            StartingPosition: LATEST
+            Enabled: true
+            MaximumBatchingWindowInSeconds: 300
+            MaximumRecordAgeInSeconds: 7200
+            MaximumRetryAttempts: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambda_ReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonS3FullAccess
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Join ['', ["arn:", "aws:", "secretsmanager:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "secret:aws-access-key-id-", !Ref AccessKeyIDUniqueString]]
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Join ['', ["arn:", "aws:", "secretsmanager:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "secret:aws-secret-access-key-", !Ref SecretAccessKeyUniqueString]]
+
+Parameters:  
+  DasKinesisStream:
+    Type: String
+    Description: Enter the unique name of the Kinesis Data Stream created by Database Activity Streams (only string after aws-rds-das-cluster-)
+    Default: DAS_KINESIS_STREAM_NAME
+  DasS3Bucket:
+    Type: String
+    Description: Enter the name of the S3 bucket where Database Activity Streams records will be posted
+    Default: S3_BUCKET_NAME
+  DasS3Prefix:
+    Type: String
+    Description: Enter the name of the S3 bucket prefix where Database Activity Streams records will be posted
+    Default: das
+  AccessKeyIDUniqueString:
+    Type: String
+    Description: The Unique String at the end of the ARN of the aws-access-key-id secret. For example if the ARN of this secret is arn:aws:secretsmanager:us-west-2:123456789012:secret:aws-access-key-id-3oqLQE then the value of the paramerter is 3oqLQE
+    Default: AWS_ACCESS_KEY_UNIQUE_STRING
+  SecretAccessKeyUniqueString:
+    Type: String
+    Description: The Unique String at the end of the ARN of the aws-secret-access-key secret. For example if the ARN of this secret is arn:aws:secretsmanager:us-west-2:123456789012:secret:aws-secret-access-key-z1hqI6 then the value of the paramerter is z1hqI6
+    Default: AWS_SECRET_ACCESS_KEY_UNIQUE_STRING
+    
