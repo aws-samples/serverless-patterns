@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
 2. The client chooses a namespace or a channel (or a segment) and subscribes to it. [Additional info the documentation](https://docs.aws.amazon.com/appsync/latest/eventapi/event-api-websocket-protocol.html);
 3. The client performs a request towards the Amazon API Gateway that exposes a `/chat` route passing the `userId` and `prompt` parameters. The `userId` will be used as a segment for the channel. The prompt will be used for GenAI completions on Bedrock;
 4. The triggered Lambda function receives payload;
-5. The Lambda proceeds to invoke a Bedrock model using the streaming API;
+5. The Lambda function proceeds to invoke a Bedrock model using the streaming API;
 6. The Lambda will receive the completion `chunks` as soon as they are available;
 7. For each completion chunk, the Lambda will publish them through the [Publish HTTP API on AppSync Events](https://docs.aws.amazon.com/appsync/latest/eventapi/publish-http.html);
 8. The Client is now able to retrieve the completion chunks from AppSync Events;
