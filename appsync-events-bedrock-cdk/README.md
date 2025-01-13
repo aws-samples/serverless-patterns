@@ -70,7 +70,7 @@ npm run test
 ```
 
 From the demo app it's possible to see all connection events and data events in a structured way.
-First of all connect to the Websocket
+First of all connect to the WebSocket
 ![step1](step1.png)
 
 Then subscribe to the namespace. Please note: The default namespace is `BedrockChat`. By inserting `BedrockChat/*` you will be able to receive all the messages in the sub-segments.
