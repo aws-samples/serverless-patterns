@@ -19,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 ![diagram](diagram.png)
 1. The client connects to the WebSocket using the AWS Amplify client or a custom made library following the [instructions described in the documentation](https://docs.aws.amazon.com/appsync/latest/eventapi/event-api-websocket-protocol.html);
-2. The Client chooses a namespace or a channel (or a segment) and subscribes to it. [Additional info the documentation](https://docs.aws.amazon.com/appsync/latest/eventapi/event-api-websocket-protocol.html);
+2. The client chooses a namespace or a channel (or a segment) and subscribes to it. [Additional info the documentation](https://docs.aws.amazon.com/appsync/latest/eventapi/event-api-websocket-protocol.html);
 3. The Client performs a request towards the API Gateway that exposes a `/chat` route passing the `userId` and `prompt` parameters. The `userId` will be used as a segment for the channel. The prompt will be used for GenAI completions on Bedrock;
 4. The triggered Lambda receives payload;
 5. The Lambda proceeds to invoke a Bedrock model using the streaming API;
