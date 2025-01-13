@@ -26,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
 6. The Lambda function will receive the completion `chunks` as soon as they are available;
 7. For each completion chunk, the Lambda function will publish them through the [Publish HTTP API on AppSync Events](https://docs.aws.amazon.com/appsync/latest/eventapi/publish-http.html);
 8. The client is now able to retrieve the completion chunks from AppSync Events;
-9. The Client can finally unsubscribe from the channel and close the Websocket connection.
+9. The client can finally unsubscribe from the channel and close the Websocket connection.
 
 ### Permissions and Security
 In this demo the Client is only able to subscribe to the AppSync Event Websocket via the API_KEY. The same API_KEY will be used by the Lambda to perform Publish requests.
