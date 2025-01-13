@@ -20,5 +20,3 @@ VITE_EVENTS_API_REAL_TIME=${cdkOutputs[stackName].EventsApiRealtime}
 VITE_CHAT_API_URL=${cdkOutputs[stackName].ChatApiUrl}`,
     'utf8',
 );
-
-

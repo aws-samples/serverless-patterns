@@ -1,7 +1,6 @@
 import { HttpRequest } from '@aws-sdk/protocol-http'
 import * as https from 'https'
 
-
 export interface RequestParamsEvent {
   config: Config
   channelName: String
@@ -14,7 +13,6 @@ export interface Config {
   region: string,
 }
 
-
 export const AppSyncEventsRequestApiKey = async (params: RequestParamsEvent) => {
   let endpoint: URL
 
@@ -24,7 +22,6 @@ export const AppSyncEventsRequestApiKey = async (params: RequestParamsEvent) => 
   } else {
     endpoint = new URL(params.config.url)
   }
-
 
   const request = new HttpRequest({
     hostname: endpoint.host,
@@ -40,7 +37,6 @@ export const AppSyncEventsRequestApiKey = async (params: RequestParamsEvent) => 
       "events": params.events.map(e => JSON.stringify(e))
     })
   })
-
 
   return new Promise<any>((resolve, reject) => {
     const httpRequest = https.request({ ...request, host: endpoint.hostname }, (result) => {
@@ -63,6 +59,5 @@ export const AppSyncEventsRequestApiKey = async (params: RequestParamsEvent) => 
     httpRequest.write(request.body)
     httpRequest.end()
   })
-
 
 }

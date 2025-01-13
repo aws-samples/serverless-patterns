@@ -19,16 +19,9 @@ export interface ChatRequest {
     prompt: string
 }
 
-
 export const handler = async (event: APIGatewayProxyEventV2) => {
 
-    // log event
-    console.log(JSON.stringify(event))
-
     const body = JSON.parse(event.body ?? "") as ChatRequest
-
-    // log env vars
-    //console.log(process.env)
 
     // filter requests by checking if prompt is present
     if (!body.prompt) {
@@ -42,7 +35,6 @@ export const handler = async (event: APIGatewayProxyEventV2) => {
     const channelName = `/${CHANNEL_NAME}/${body.userId}`
 
     console.log("Final channel name: " + channelName)
-
 
     const command = new ConverseStreamCommand({
         modelId: modelId,
@@ -98,16 +90,3 @@ export const handler = async (event: APIGatewayProxyEventV2) => {
     }
 
 }
-
-
-
-/*
-TEST EVENT
-
-
-{
-  "prompt": "what is the capital of paris",
-  "userId": "gbiagini"
-}
-
-*/

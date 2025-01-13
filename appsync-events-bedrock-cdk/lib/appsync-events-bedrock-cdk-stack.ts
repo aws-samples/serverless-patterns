@@ -1,28 +1,47 @@
 import * as cdk from 'aws-cdk-lib';
-import { CfnInclude } from 'aws-cdk-lib/cloudformation-include';
 import { Construct } from 'constructs';
 import { CfnApiKey } from 'aws-cdk-lib/aws-appsync';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import { PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { CfnApi, CfnChannelNamespace } from "aws-cdk-lib/aws-appsync"
 import { CorsHttpMethod, HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
+import { Duration, Expiration } from 'aws-cdk-lib';
 
 export class AppsyncEventsBedrockCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // L1 constructs not available yet
-    const template = new CfnInclude(this, "EventsApiCfnTemplate", {
-      templateFile: './lib/events-api-cfn.yaml'
+    const eventsApi = new CfnApi(this, 'Events', {
+      name: 'bedrock-failover',
+
+      eventConfig: {
+        authProviders: [{
+          authType: 'API_KEY',
+        }],
+        connectionAuthModes: [{
+          authType: 'API_KEY',
+        }],
+        defaultPublishAuthModes: [{
+          authType: 'API_KEY'
+        }],
+        defaultSubscribeAuthModes: [{
+          authType: 'API_KEY',
+        }],
+      },
+    });
+
+    const channel = new CfnChannelNamespace(this, 'DefaultChannel', {
+      name: 'BedrockChat',
+      apiId: eventsApi.attrApiId
     })
 
-    const eventsApi = template.getResource('EventsApi') as cdk.CfnResource
-
-    const channel = template.getResource('Channel') as cdk.CfnResource
-    const channelName = "BedrockChat"
-
-    const apiKey = template.getResource('ApiKey') as CfnApiKey
+    const apiKey = new CfnApiKey(this, "AppsyncApiKey", {
+        apiId: eventsApi.attrApiId,
+        description: "Default API Key",
+        expires: Expiration.after(Duration.days(30)).toEpoch(),
+       });
 
     const lambda = new NodejsFunction(this, 'Chat', {
       entry: "src/chat.ts",
@@ -33,7 +52,7 @@ export class AppsyncEventsBedrockCdkStack extends cdk.Stack {
         REGION: this.region,
         EVENTS_API_URL: eventsApi.getAtt('Dns.Http').toString(),
         API_KEY: apiKey.attrApiKey,
-        CHANNEL_NAME: channelName
+        CHANNEL_NAME: channel.name
       },
       role: new Role(this, 'ChatRole', {
         assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
@@ -69,7 +88,6 @@ export class AppsyncEventsBedrockCdkStack extends cdk.Stack {
       )
     })
 
-
     const api = new HttpApi(this, 'ChatApi', {
       apiName: "chat-api",
       corsPreflight: {
@@ -86,18 +104,15 @@ export class AppsyncEventsBedrockCdkStack extends cdk.Stack {
       },
     })
 
-
     api.addRoutes({
       path: '/chat',
       methods: [HttpMethod.POST],
       integration: new HttpLambdaIntegration('LambdaIntegration', lambda)
     })
 
-
     new cdk.CfnOutput(this, "EventsApiHttp", {
       value: eventsApi.getAtt('Dns.Http').toString()
     })
-
 
     new cdk.CfnOutput(this, "EventsApiRealtime", {
       value: eventsApi.getAtt('Dns.Realtime').toString()
@@ -108,7 +123,7 @@ export class AppsyncEventsBedrockCdkStack extends cdk.Stack {
     })
 
     new cdk.CfnOutput(this, "ChannelName", {
-      value: channelName
+      value: channel.name
     })
 
     new cdk.CfnOutput(this, "Region", {

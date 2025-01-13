@@ -1,6 +1,5 @@
 import https from 'https'
 
-
 export interface RequestParams {
     url: string;
     method: string;
@@ -16,7 +15,6 @@ export interface RequestParams {
     prompt?: string;
     userId?: string;
   }
-
 
 export const makeRequest = async (params: RequestParams, body: ChatRequest): Promise<ApiResponse> => {
     const endpoint = new URL(params.url);

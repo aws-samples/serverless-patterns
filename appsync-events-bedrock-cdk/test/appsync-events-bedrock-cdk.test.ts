@@ -2,13 +2,11 @@ import { AppSyncEventsRequestApiKey } from "../utils/appsyncRequest"
 import { readFileSync } from "fs"
 import { makeRequest } from "../utils/apigwRequest";
 
-
 describe("AppSync Event API with API_KEY auth mode", () => {
 
     const file = readFileSync("cdk-outputs.json");
     const data = JSON.parse(file.toString())
     const stackName = "AppsyncEventsBedrockCdkStack"
-
 
     process.env.API_KEY = data[stackName].ApiKey
     process.env.EVENTS_API_HTTP = data[stackName].EventsApiHttp
@@ -16,9 +14,6 @@ describe("AppSync Event API with API_KEY auth mode", () => {
     process.env.REGION = data[stackName].Region
     process.env.CHANNEL_NAME = data[stackName].ChannelName
     process.env.CHAT_API_URL = data[stackName].ChatApiUrl
-
-
-
 
     test("The user is able to publish a message", async () => {
 
