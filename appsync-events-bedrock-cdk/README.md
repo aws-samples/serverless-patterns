@@ -29,7 +29,7 @@ Important: this application uses various AWS services and there are costs associ
 9. The client can finally unsubscribe from the channel and close the Websocket connection.
 
 ### Permissions and Security
-In this demo the Client is only able to subscribe to the AppSync Event Websocket via the API_KEY. The same API_KEY will be used by the Lambda to perform Publish requests.
+In this demo the client is only able to subscribe to the AppSync Event WebSocket via the API_KEY. The same API_KEY will be used by the Lambda function to perform publish requests.
 
 
 ## Deployment Instructions
