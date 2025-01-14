@@ -46,19 +46,21 @@ After the application is deployed try the following scenarios.
 
 ### Create a new vehicle entering valid data:
 ```
-curl --location --request POST 'https://qap9jh21xk.execute-api.us-west-2.amazonaws.com/Prod/' \
+curl --location --request POST 'https://qap9jh21xk.execute-api.us-west-2.amazonaws.com/Prod/123?order=ORD12345' \
 --header 'Content-Type: application/json' \
+--header 'custom-agent: MyMobileApp/1.0' \
 --data-raw '{
     "make":"MINI",
     "model":"Countryman",
     "year": 2010
 }'
 ```
-Expected response: `{"message": "Data vbalidation succeded", "data": {"make": "MINI", "model": "Countryman", "year": 2010}}`
+Expected response: `{"message": "Data validation succeded", "data": {"make": "MINI", "model": "Countryman", "year": 2010}}`
 ### Now enter a year less than 2010
 ```
-curl --location --request POST 'https://qap9jh21xk.execute-api.us-west-2.amazonaws.com/Prod/' \
+curl --location --request POST 'https://qap9jh21xk.execute-api.us-west-2.amazonaws.com/Prod/123?order=ORD12345' \
 --header 'Content-Type: application/json' \
+--header 'custom-agent: MyMobileApp/1.0' \
 --data-raw '{
     "make":"MINI",
     "model":"Countryman",
