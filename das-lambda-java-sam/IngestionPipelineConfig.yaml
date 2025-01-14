@@ -1,0 +1,82 @@
+###
+  ## Relevant Documentation for this blueprint
+    # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/use-cases-overview.html
+    # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/configure-client.html#configure-client-s3
+    # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/pipeline-domain-access.html
+  ##
+###
+###
+  # s3-log-pipeline:
+    # This pipeline receives logs from an SQS queue, extracts important values from the logs by
+    # matching the value in the 'request' key against a grok pattern for ALB logs, and then
+    # sends the grokked logs into an opensearch index named 'uncompressed_logs'.
+###
+
+version: "2"
+s3-log-pipeline:
+  source:
+    s3:
+      # Prevent data loss by only considering logs to be processed successfully after they are received by the opensearch sink
+      acknowledgments: true
+      notification_type: "sqs"
+      # Uncomment the line below if the sqs Event is generated via EventBridge
+      # notification_source: "eventbridge"
+      # Provide compression property, can be "none", "gzip", or "automatic"
+      compression: "none"
+      codec:
+        json:
+      sqs:
+        # Provide a SQS Queue URL to read from
+        queue_url: "SQS_QUEUE_URL"
+        # Lower maximum_messages depending on the size of your S3 objects
+        maximum_messages: 10
+        # Modify the visibility_timeout of the sqs messages depending on the size of your access log S3 objects.
+        # Objects that are small (< 0.5 GB) and evenly distributed in size will result in the best performance
+        # It is recommended to allocate a minimum of 30 seconds, and to add 30 seconds for every 0.25 GB of data in each S3 Object
+        visibility_timeout: "60s"
+        # Prevents duplicates while processing high load when sink is overwhelmed if enabled
+        visibility_duplication_protection: false
+      aws:
+        # Provide the region to use for aws credentials
+        region: "AWS_REGION"
+        # Provide the role to assume for requests to SQS and S3
+        sts_role_arn: "OSI_ROLE"
+  # processor:
+    # - grok:
+        # match:
+          # Update the grok processor with a grok pattern based on the type of logs
+          # For reference please visit: https://opensearch.org/docs/latest/data-prepper/data-prepper-reference/#grok
+          # Here is a sample grok pattern for classic elb logs:
+          # message: ["%{ELB_ACCESS_LOG}"]
+    # - delete_entries:
+        # with_keys: [ "s3", "message" ]
+  sink:
+    - opensearch:
+        # Provide an AWS OpenSearch Service domain endpoint
+        hosts: [ "OPENSEARCH_DOMAIN_ENDPOINT" ]
+        aws:
+          # Provide a Role ARN with access to the domain. This role should have a trust relationship with osis-pipelines.amazonaws.com
+          sts_role_arn: "OSI_ROLE"
+          # Provide the region of the domain.
+          region: "AWS_REGION"
+          # Enable the 'serverless' flag if the sink is an Amazon OpenSearch Serverless collection
+          # serverless: true
+          # serverless_options:
+            # Specify a name here to create or update network policy for the serverless collection
+            # network_policy_name: "network-policy-name"
+        index: "das-records"
+        # Enable the 'distribution_version' setting if the AWS OpenSearch Service domain is of version Elasticsearch 6.x
+        # distribution_version: "es6"
+        # Enable and switch the 'enable_request_compression' flag if the default compression setting is changed in the domain. See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/gzip.html
+        # enable_request_compression: true/false
+        # Enable the S3 DLQ to capture any failed requests in an S3 bucket
+        # dlq:
+          # s3:
+            # Provide an S3 bucket
+            # bucket: "your-dlq-bucket-name"
+            # Provide a key path prefix for the failed requests
+            # key_path_prefix: "s3-log-pipeline/dlq"
+            # Provide the region of the bucket.
+            # region: "us-east-1"
+            # Provide a Role ARN with access to the bucket. This role should have a trust relationship with osis-pipelines.amazonaws.com
+            # sts_role_arn: "arn:aws:iam::123456789012:role/Example-Role"

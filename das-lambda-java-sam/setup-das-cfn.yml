@@ -88,10 +88,6 @@ Parameters:
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
 
-  LatestAmiId:
-    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
-
   JavaVersion:
     Type: String
     Description: Choose the version of Java. Lambda currently supports Java 11, 17 and 21
@@ -112,7 +108,8 @@ Parameters:
 
   DASLambdaCodeGithubLocation:
     Type: String
-    Default: https://github.com/awsbloggersfo28/das-lambda.git
+    Description: Github Location from where the code is to be checked out. For testing use https://github.com/awsbloggersfo28/serverless-patterns/
+    Default: https://github.com/aws-samples/serverless-patterns/
 
   ######## Kinesis Data generator Variables ########
 
@@ -187,35 +184,6 @@ Metadata:
         Parameters:
           - Username
           - Password
-Mappings:
-  AWSInstanceType2Arch:
-    t1.micro:
-      Arch: HVM64
-    t2.small:
-      Arch: HVM64
-    t2.medium:
-      Arch: HVM64
-    t2.large:
-      Arch: HVM64
-    m1.small:
-      Arch: HVM64
-    m1.medium:
-      Arch: HVM64
-    c1.medium:
-      Arch: HVM64
-    c3.large:
-      Arch: HVM64
-    c3.xlarge:
-      Arch: HVM64
-  AWSRegionArch2AMI:
-    us-east-1:
-      HVM64: ami-067d1e60475437da2
-    us-east-2:
-      HVM64: ami-036f5574583e16426
-    us-west-2:
-      HVM64: ami-00b7cc7d7a9f548ea
-    sa-east-1:
-      HVM64: ami-0c9a3a14d80ebcf8e
 
 Resources:
   ######## Amazon VPC ########
@@ -791,6 +759,24 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
 
+  OSIIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub OSI-SQS-OS-ROLE-${AWS::StackName}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: osis-pipelines.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonOpenSearchIngestionFullAccess
+        - arn:aws:iam::aws:policy/AmazonOpenSearchServiceFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -805,6 +791,8 @@ Resources:
       - Database
       - SAMBucket
       - SourceBucket
+      - CredentialsKMSKey
+      - OSIIAMRole
     Properties:
       ImageId: !Ref LatestAmiId
       InstanceType: !Ref ReverseProxyInstanceType
@@ -871,7 +859,7 @@ Resources:
 
             cat << EOF > /etc/nginx/conf.d/nginx_opensearch.conf
             server {
-                listen 443;
+                listen 443 ssl;
                 server_name \$host;
                 rewrite ^/$ https://\$host/_dashboards redirect;
 
@@ -879,7 +867,7 @@ Resources:
                 ssl_certificate           /etc/nginx/cert.crt;
                 ssl_certificate_key       /etc/nginx/cert.key;
 
-                ssl on;
+                # ssl on;
                 ssl_session_cache  builtin:1000  shared:SSL:10m;
                 ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
                 ssl_ciphers HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
@@ -906,8 +894,8 @@ Resources:
             }          
             EOF
             sed -i -e "s/DOMAIN_ENDPOINT/${OpenSearchServiceDomain.DomainEndpoint}/g" /etc/nginx/conf.d/nginx_opensearch.conf
-            systemctl restart nginx.service
-            systemctl enable nginx.service
+            sudo systemctl restart nginx.service
+            sudo systemctl enable nginx.service
           
             max_attempts=5
             attempt_num=1
@@ -915,7 +903,7 @@ Resources:
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
                 echo "Trying yum install"
                 JAVA_VERSION=${java_version}
-                echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+                echo "export JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
                 if [ "$JAVA_VERSION" == "java11" ]; then
                     sudo yum install java-11-amazon-corretto-devel -y
                 elif [ "$JAVA_VERSION" == "java17" ]; then
@@ -1059,7 +1047,21 @@ Resources:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-          
+
+            # Get IP CIDR range for EC2 Instance Connect
+            cd /home/ec2-user
+            mkdir -p ip_prefix
+            cd ip_prefix
+            git clone https://github.com/joetek/aws-ip-ranges-json.git
+            cd aws-ip-ranges-json
+            AWS_REGION=${aws_region}
+            echo "export AWS_REGION=$AWS_REGION" >> /home/ec2-user/.bash_profile
+            EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
+            echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
+            SECURITY_GROUP=${security_group_id}
+            echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
+            aws ec2 authorize-security-group-ingress --region $AWS_REGION --group-id $SECURITY_GROUP --protocol tcp --port 22 --cidr $EC2_CONNECT_IP
+
             # Install AWS SAM CLI
             cd /home/ec2-user
             mkdir -p awssam
@@ -1069,10 +1071,14 @@ Resources:
             sudo ./sam-installation/install
             
             #Enable DAS and wait to get the ARN of the Kinesis Stream
-            KMS_KEY = ${kms_key}
-            DATABASE_ARN = ${database_arn}
+            KMS_KEY=${kms_key}
+            echo "KMS_KEY=$KMS_KEY"
+            echo "export KMS_KEY=$KMS_KEY" >> /home/ec2-user/.bash_profile 
+            DATABASE_ARN=${database_arn}
+            echo "DATABASE_ARN=$DATABASE_ARN"
+            echo "export DATABASE_ARN=$DATABASE_ARN" >> /home/ec2-user/.bash_profile
             
-            aws rds start-activity-stream --mode async --kms-key-id $KMS_KEY --resource-arn DATABASE_ARN --apply-immediately
+            aws rds start-activity-stream --mode async --kms-key-id $KMS_KEY --resource-arn $DATABASE_ARN --apply-immediately
             
             max_attempts=25
             attempt_num=1
@@ -1080,7 +1086,7 @@ Resources:
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
                 echo "Getting Status of Database Activity Stream"
                 
-                DAS_STATUS=$(aws rds --region us-west-2 describe-db-clusters | jq '.DBClusters[0].Status')
+                DAS_STATUS=$(aws rds --region us-west-2 describe-db-clusters | jq -r '.DBClusters[0].Status')
                
                 # Check the exit code of the command
                 if [ $DAS_STATUS == "available" ]; then
@@ -1095,56 +1101,139 @@ Resources:
                 fi
             done
 
-            DAS_KINESIS_STREAM_FULL_NAME=$(aws rds --region us-west-2 describe-db-clusters | jq '.DBClusters[0].ActivityStreamKinesisStreamName')
+            DAS_KINESIS_STREAM_FULL_NAME=$(aws rds --region us-west-2 describe-db-clusters | jq -r '.DBClusters[0].ActivityStreamKinesisStreamName')
             
             DAS_KINESIS_STREAM_NAME="$(echo $DAS_KINESIS_STREAM_FULL_NAME | cut -d '-' -f5)"
             
-            S3_BUCKET_NAME=${s3_bucket_name}
+            echo "export DAS_KINESIS_STREAM_NAME=$DAS_KINESIS_STREAM_NAME" >> /home/ec2-user/.bash_profile
             
-            AWS_ACCESS_KEY_ARN=$(aws secretsmanager list-secrets | jq '.SecretList[] | select (.Name=="aws-access-key-id")'.ARN)
+            S3_BUCKET_NAME=${s3_bucket_name}
+            echo "export S3_BUCKET_NAME=$S3_BUCKET_NAME" >> /home/ec2-user/.bash_profile
+            
+            AWS_ACCESS_KEY_ARN=$(aws secretsmanager list-secrets | jq -r '.SecretList[] | select (.Name=="aws-access-key-id")'.ARN)
             
             AWS_ACCESS_KEY="$(echo $AWS_ACCESS_KEY_ARN | cut -d ':' -f7)"
             
-            AWS_ACCESS_KEY_UNIQUE_STRING="$(echo $AWS_ACCESS_KEY | cut -d '-' -f5)"
+            ACCESS_KEY_UNIQUE="$(echo $AWS_ACCESS_KEY | cut -d '-' -f5)"
             
-            AWS_SECRET_ACCESS_KEY_ARN=$(aws secretsmanager list-secrets | jq '.SecretList[] | select (.Name=="aws-secret-access-key")'.ARN)
+            echo "ACCESS_KEY_UNIQUE=$ACCESS_KEY_UNIQUE"
+            
+            echo "export ACCESS_KEY_UNIQUE=$ACCESS_KEY_UNIQUE" >> /home/ec2-user/.bash_profile
+            
+            AWS_SECRET_ACCESS_KEY_ARN=$(aws secretsmanager list-secrets | jq -r '.SecretList[] | select (.Name=="aws-secret-access-key")'.ARN)
             
             AWS_SECRET_ACCESS_KEY="$(echo $AWS_SECRET_ACCESS_KEY_ARN | cut -d ':' -f7)"
             
-            AWS_SECRET_ACCESS_KEY_UNIQUE_STRING="$(echo $AWS_SECRET_ACCESS_KEY | cut -d '-' -f5)"
+            SECRET_KEY_UNIQUE="$(echo $AWS_SECRET_ACCESS_KEY | cut -d '-' -f5)"
+            
+            echo "SECRET_KEY_UNIQUE=$SECRET_KEY_UNIQUE"
+            
+            echo "export SECRET_KEY_UNIQUE=$SECRET_KEY_UNIQUE" >> /home/ec2-user/.bash_profile
           
             #Checkout Serverless Patterns from Github
             cd /home/ec2-user
             DAS_LAMBDA_CODE_GITHUB_LOCATION=${das_lambda_code_github_location}
             git clone $DAS_LAMBDA_CODE_GITHUB_LOCATION
-            cd ./das-lambda/das_consumer_sam_project
+            cd serverless-patterns
+            cd ./das-lambda-java-sam/das_consumer_sam_project
             sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
             sed -i "s/DAS_KINESIS_STREAM_NAME/$DAS_KINESIS_STREAM_NAME/g" template.yaml
             sed -i "s/S3_BUCKET_NAME/$S3_BUCKET_NAME/g" template.yaml
-            sed -i "s/AWS_ACCESS_KEY_UNIQUE_STRING/$AWS_ACCESS_KEY_UNIQUE_STRING/g" template.yaml
-            sed -i "s/AWS_SECRET_ACCESS_KEY_UNIQUE_STRING/$AWS_SECRET_ACCESS_KEY_UNIQUE_STRING/g" template.yaml
+            sed -i "s/AWS_ACCESS_KEY_UNIQUE_STRING/$ACCESS_KEY_UNIQUE/g" template.yaml
+            sed -i "s/AWS_SECRET_ACCESS_KEY_UNIQUE_STRING/$SECRET_KEY_UNIQUE/g" template.yaml
             
             SAM_BUCKET_NAME=${sam_bucket_name}
             AWS_REGION=${aws_region}
             
             sam build
-            sam package --s3-bucket $SAM_BUCKET_NAME --template ./template.yaml --region $AWS_REGION --output-template-file packaged.yaml
-            sam deploy --template-file packaged.yaml --region $AWS_REGION --capabilities CAPABILITY_IAM --stack-name das-lambda-stack --no-confirm-changeset --no-disable-rollback --config-env default --config-file samconfig.toml --parameter-overrides DasKinesisStream=$DAS_KINESIS_STREAM_NAME,DasS3Bucket=$S3_BUCKET_NAME,DasS3Prefix=das,AccessKeyIDUniqueString=$AWS_ACCESS_KEY_UNIQUE_STRING,SecretAccessKeyUniqueString=$AWS_SECRET_ACCESS_KEY_UNIQUE_STRING
-          
-            # Get IP CIDR range for EC2 Instance Connect
-            cd /home/ec2-user
-            mkdir -p ip_prefix
-            cd ip_prefix
-            git clone https://github.com/joetek/aws-ip-ranges-json.git
-            cd aws-ip-ranges-json
-            AWS_REGION=${aws_region}
-            EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
-            echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
-            SECURITY_GROUP=${security_group_id}
-            echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
-            aws ec2 authorize-security-group-ingress --region $AWS_REGION --group-id $SECURITY_GROUP --protocol tcp --port 22 --cidr $EC2_CONNECT_IP
+            sleep 60
+            sam deploy --capabilities CAPABILITY_IAM --stack-name das-lambda-stack --no-confirm-changeset --no-disable-rollback --resolve-s3 --region $AWS_REGION
+            
+            #Install PostgresSql client
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install postgresql15.x86_64 postgresql15-server -y
+               
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of postgressql client succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            # Create script to log into postgres database
+            
+            DB_SECRET=${db_secret}
+            
+            echo "DB_SECRET=$DB_SECRET"
+            echo "export DB_SECRET=$DB_SECRET" >> /home/ec2-user/.bash_profile
+            
+            DBHOST=$(aws secretsmanager get-secret-value --secret-id $DB_SECRET | jq -r '.SecretString' | jq -r '.' | jq -r '.host')
+            
+            DBPORT=$(aws secretsmanager get-secret-value --secret-id $DB_SECRET | jq -r '.SecretString' | jq -r '.' | jq -r '.port')
+            
+            DBUSERNAME=$(aws secretsmanager get-secret-value --secret-id $DB_SECRET | jq -r '.SecretString' | jq -r '.' | jq -r '.username')
+            
+            DBPASSWORD=$(aws secretsmanager get-secret-value --secret-id $DB_SECRET | jq -r '.SecretString' | jq -r '.' | jq -r '.password')
+            
+            echo "DBHOST=$DBHOST"
+            echo "DBPORT=$DBPORT"
+            echo "DBUSERNAME=$DBUSERNAME"
+            echo "DBPASSWORD=$DBPASSWORD"
+            
+            echo "export DBHOST=$DBHOST" >> /home/ec2-user/.bash_profile
+            echo "export DBPORT=$DBPORT" >> /home/ec2-user/.bash_profile
+            echo "export DBUSERNAME=$DBUSERNAME" >> /home/ec2-user/.bash_profile
+            echo "export DBPASSWORD=$DBPASSWORD" >> /home/ec2-user/.bash_profile
+            
+            echo "#!/bin/bash" > /home/ec2-user/db_connect.sh
+            echo "export PGPASSWORD=$DBPASSWORD; psql -h $DBHOST -d postgres -U $DBUSERNAME -p $DBPORT" >> /home/ec2-user/db_connect.sh
+            sudo chmod +x /home/ec2-user/db_connect.sh
+            
+            
+            # Create sample SQL commands file
+            
+            echo "create table persons(firstname varchar(25) not null, lastname varchar(25) not null, middle_initial varchar(1) null, street_address varchar(100) not null, unit_number varchar(10) null, city varchar(25) not null, state varchar(2) not null, zip varchar(10) not null);" > /home/ec2-user/db_commands.txt
 
+            echo "insert into persons values ('John', 'Cummins', 'M', '1320 Hollywood Blvd.', 'Apt - 213', 'London', 'KY', '40740')" >> /home/ec2-user/db_commands.txt
+
+            echo "insert into persons values ('Bryan', 'Starc', 'M', '89075 Parkwood Dr.', 'Unit-M', 'Paris', 'TX', '75461')" >> /home/ec2-user/db_commands.txt
+
+            echo "select * from persons" >> /home/ec2-user/db_commands.txt
+            
+            
+            # Creating OpenSearch Ingestion Pipeline
+            
+            SQS_QUEUE_URL=${sqs_queue_url}
+            echo "SQS_QUEUE_URL=$SQS_QUEUE_URL"
+            echo "export SQS_QUEUE_URL=$SQS_QUEUE_URL" >> /home/ec2-user/.bash_profile
+            
+            OPENSEARCH_DOMAIN_ENDPOINT=${opensearch_domain_endpoint}
+            echo "OPENSEARCH_DOMAIN_ENDPOINT=$OPENSEARCH_DOMAIN_ENDPOINT"
+            echo "export OPENSEARCH_DOMAIN_ENDPOINT=$OPENSEARCH_DOMAIN_ENDPOINT" >> /home/ec2-user/.bash_profile
+            
+            OSI_IAM_ROLE=${osi_iam_role}
+            echo "OSI_IAM_ROLE=$OSI_IAM_ROLE"
+            echo "export OSI_IAM_ROLE=$OSI_IAM_ROLE" >> /home/ec2-user/.bash_profile
+            
+            cd /home/ec2-user/serverless-patterns/das-lambda-java-sam
+            source /home/ec2-user/.bash_profile
+            sed -i "s/SQS_QUEUE_URL/$SQS_QUEUE_URL/g" IngestionPipelineConfig.yaml
+            sed -i "s/OPENSEARCH_DOMAIN_ENDPOINT/$OPENSEARCH_DOMAIN_ENDPOINT/g" IngestionPipelineConfig.yaml
+            sed -i "s/OSI_ROLE/$OSI_IAM_ROLE/g" IngestionPipelineConfig.yaml
+            sed -i "s/AWS_REGION/$AWS_REGION/g" IngestionPipelineConfig.yaml
+            
+            aws osis create-pipeline --pipeline-name das-osi-pipeline --min-units 1 --max-units 4 --pipeline-configuration-body file://IngestionPipelineConfig.yaml --no-cli-pager
+ 
           - security_group_id : !GetAtt ReverseProxyInstanceSecurityGroup.GroupId
             das_lambda_code_github_location: !Ref DASLambdaCodeGithubLocation
             python3_version: !Ref Python3Version
@@ -1153,7 +1242,11 @@ Resources:
             database_arn: !GetAtt Database.DBClusterArn
             s3_bucket_name: !Ref SourceBucket
             sam_bucket_name: !Ref SAMBucket
-
+            java_version: !Ref JavaVersion
+            db_secret: !Ref DbActivityStreamsStackDatabaseSecret
+            sqs_queue_url: !Ref StandardQueue
+            opensearch_domain_endpoint: !GetAtt OpenSearchServiceDomain.DomainEndpoint
+            osi_iam_role: !GetAtt OSIIAMRole.Arn
 
   ReverseProxyInstanceSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -1177,6 +1270,17 @@ Resources:
           IpProtocol: "-1"
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
+
+  ReverseProxyInstanceSelfIngressAllowRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: ReverseProxyInstanceSecurityGroup
+    Properties:
+      GroupId: !GetAtt ReverseProxyInstanceSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      SourceSecurityGroupId: !GetAtt ReverseProxyInstanceSecurityGroup.GroupId
+
 
 
   ######## Lambda Get PublicIP Information ########
@@ -1257,6 +1361,7 @@ Resources:
       Timeout: 600
       Role: !GetAtt "LambdaRole.Arn"
       Runtime: python3.11
+      
   Lambdatrigger:
     Type: "Custom::GetEC2PublicIP"
     DependsOn: ReverseProxyInstance
@@ -1723,6 +1828,26 @@ Resources:
                   - 'iam:CreatePolicy'
                   - 'iam:Tag*'
                   - 'iam:AttachRolePolicy'
+                Resource: '*'
+        - PolicyName: OSIPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: OSIAccess
+                Effect: Allow
+                Action:
+                  - 'osis:CreatePipeline',
+                  - 'osis:ListPipelineBlueprints',
+                  - 'osis:ValidatePipeline'
+                Resource: '*'
+        - PolicyName: OSIPermissions2
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: OSIAccess2
+                Effect: Allow
+                Action:
+                  - 'iam:PassRole'
                 Resource: '*'
         - PolicyName: SecurityGroupsPolicy
           PolicyDocument: !Sub '{
