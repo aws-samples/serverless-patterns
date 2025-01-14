@@ -1,0 +1,65 @@
+{
+  "title": "API Gateway - Lambda - Bedrock - DynamoDB - S3",
+  "description": "Generate and store reels using Amazon Bedrock from a lambda function fronted with an API Gateway, track metadata in DynamoDB, and save reels to S3",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project demonstrates integration between API Gateway, AWS Lambda, Amazon Bedrock, DynamoDB and Amazon S3",
+      "The architecture exposes two API endpoints via API Gateway:",
+      "1. POST /reel_gen - Accepts a prompt and generates a reel using Bedrock's Nova Reel Model",
+      "2. GET /status/{id} - Retrieves metadata about previously generated images",
+      "When a generation request is received, the Lambda function invokes Bedrock, stores the image in S3, and saves metadata to DynamoDB"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-dynamodb-s3-cdk-python",
+      "templateURL": "serverless-patterns/apigw-lambda-bedrock-dynamodb-s3-cdk-python",
+      "projectFolder": "apigw-lambda-bedrock-dynamodb-s3-cdk-python",
+      "templateFile": "apigw_lambda_bedrock_dynamodb_s3/apigw_lambda_bedrock_dynamodb_s3_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock API Reference",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html"
+      },
+      {
+        "text": "AWS CDK Python Reference",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/python/index.html"
+      },
+      {
+        "text": "Working with DynamoDB",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+     "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sanjay Chaudhari",
+      "image": "https://avatars.githubusercontent.com/u/9101436?v=4",
+      "bio": "Lead Consultant at AWS Professional Services.",
+      "linkedin": "sanjay-chaudhari-it",
+      "twitter": "sanjaypc"
+    }
+  ]
+}
