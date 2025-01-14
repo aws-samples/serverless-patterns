@@ -1,0 +1,14 @@
+{
+    "Records": [
+        {
+            "s3": {
+                "bucket": {
+                    "name": "s3-lambda-dynamodb-terraform-json-store"
+                },
+                "object": {
+                    "key": "test.json"
+                }
+            }
+        }
+    ]
+}
