@@ -1,0 +1,45 @@
+{
+  "region": "",
+  "cidrs": {
+    "serviceA": "10.10.0.0/16",
+    "serviceB": "10.11.0.0/16",
+    "centralAPI": "10.12.0.0/16"
+  },
+  "params": {
+    "interfaceEp": {
+      "paramId": "InterfaceEp",
+      "param": "/network/iep"
+    },
+    "svcAUri": {
+      "paramId": "ServiceAUriParam",
+      "param": "/network/servicea/uri"
+    },
+    "svcBUri": {
+      "paramId": "ServiceBUriParam",
+      "param": "/network/serviceb/uri"
+    }
+  },
+  "tags": [
+    {
+      "key": "application",
+      "value": "central-api-private-targets"
+    }
+  ],
+  "stacks": {
+    "serviceA": {
+      "account": "",
+      "stage": "prod",
+      "apiDescription": "Service A Private API Gateway proxying requests to Fargate"
+    },
+    "serviceB": {
+      "account": "",
+      "stage": "prod",
+      "apiDescription": "Service B Private API Gateway proxying requests to Fargate"
+    },
+    "centralAPI": {
+      "account": "",
+      "stage": "prod",
+      "apiDescription": "Central API for two private API Gateways"
+    }
+  }
+}
