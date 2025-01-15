@@ -1,0 +1,69 @@
+{
+  "title": "Multi-Account centralized API Gateway with Private APIs as integration targets",
+  "description": "Create Private REST API Gateway in multiple accounts and integrate with the central account's API Gateway",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to enable secure, centralized API communications across multiple AWS accounts using a centralized Amazon API Gateway. It facilitates east/west communication between services while keeping traffic within the AWS network.",
+      "The architecture utilizes key AWS services such as Amazon API Gateway (Private), VPC links, Network Load Balancers (NLBs), and Execute-API VPC Endpoints. These services work together to securely route requests between multiple AWS accounts and their respective APIs.",
+      "This pattern deploys three separate AWS accounts: a central account hosting the main API Gateway and routing components, and two other accounts with an ECS Fargate service behind a private API Gateway. One of the Fargate services is fronted by an NLB and the other is fronted by an Application Load Balancer (ALB)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/multi-account-central-api-private-apigw-targets-cdk-typescript",
+      "templateURL": "serverless-patterns/multi-account-central-api-private-apigw-targets-cdk-typescript",
+      "projectFolder": "multi-account-central-api-private-apigw-targets-cdk-typescript",
+      "templateFile": "src/bin/central-api-private-targets.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon API Gateway (Private)",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html"
+      },
+      {
+        "text": "Execute-API VPC Endpoint",
+        "link": "https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html"
+      },
+      {
+        "text": "VPC Links",
+        "link": "https://docs.aws.amazon.com/vpc/latest/userguide/endpoint-services-overview.html"
+      },
+      {
+        "text": "Network Load Balancer (NLB)",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html"
+      },
+      {
+        "text": "Application Load Balancer (ALB)",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+      },
+      {
+        "text": "Amazon ECS Fargate",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "Jevon Liburd",
+      "image": "https://media.licdn.com/dms/image/v2/C5603AQGQeKZyhyvcpw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1605745311041?e=1742428800&v=beta&t=zYr5hwUCsfljHyeDSMrWTmIrrfMu7LJpV0qD_nsjVYc",
+      "bio": "Jevon is a Technical Account Manager at Amazon Web Services.",
+      "linkedin": "jevon-liburd-a436b315",
+      "twitter": "Jevon_EL"
+    }
+  ]
+}
