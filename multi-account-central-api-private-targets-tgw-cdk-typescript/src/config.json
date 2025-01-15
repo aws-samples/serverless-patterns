@@ -1,0 +1,44 @@
+{
+  "region": "",
+  "cidrs": {
+    "serviceA": "10.5.0.0/16",
+    "serviceB": "10.6.0.0/16",
+    "centralAPI": "10.7.0.0/16"
+  },
+  "params": {
+    "tgw": {
+      "paramId": "TGWParam",
+      "param": "/network/tgwId"
+    },
+    "svcANLB": {
+      "paramId": "ServiceANLBParam",
+      "param": "/network/servicea/nlb"
+    },
+    "svcBNLB": {
+      "paramId": "ServiceBNLBParam",
+      "param": "/network/serviceb/nlb"
+    }
+  },
+  "tags": [
+    {
+      "key": "application",
+      "value": "central-api-with-tgw"
+    }
+  ],
+  "stacks": {
+    "serviceA": {
+      "account": ""
+    },
+    "serviceB": {
+      "account": ""
+    },
+    "centralAPI": {
+      "account": "",
+      "stage": "prod",
+      "apiDescription": "Central API for two cross account services"
+    },
+    "tgw": {
+      "account": ""
+    }
+  }
+}

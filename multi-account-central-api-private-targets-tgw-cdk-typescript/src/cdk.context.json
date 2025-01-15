@@ -1,0 +1,17 @@
+{
+  "availability-zones:account=239641027929:region=ca-central-1": [
+    "ca-central-1a",
+    "ca-central-1b",
+    "ca-central-1d"
+  ],
+  "availability-zones:account=211125558039:region=ca-central-1": [
+    "ca-central-1a",
+    "ca-central-1b",
+    "ca-central-1d"
+  ],
+  "availability-zones:account=785168607513:region=ca-central-1": [
+    "ca-central-1a",
+    "ca-central-1b",
+    "ca-central-1d"
+  ]
+}
