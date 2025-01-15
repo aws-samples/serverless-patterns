@@ -1,0 +1,75 @@
+{
+  "title": "Multi-account centralized API Gateway with private targets via Transit Gateway",
+  "description": "Create a multi-account setup with a centralized REST API Gateway with private integrations via Transit Gateway",
+  "language": "Typescript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to enable secure, centralized API communications across multiple AWS accounts using Amazon API Gateway and AWS Transit Gateway. It facilitates east/west communication between services while keeping traffic within the AWS network.",
+      "The architecture utilizes key AWS services such as Amazon API Gateway, VPC links, Network Load Balancers (NLBs) and Transit Gateway. These services work together to securely route requests between multiple AWS accounts and their respective applications.",
+      "This pattern deploys four separate AWS accounts: one account hosting the central API Gateway, 2 workload accounts hosting private ECS Fargate applications, and a network account hosting the Transit Gateway."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/multi-account-central-api-private-targets-tgw-cdk-typescript",
+      "templateURL": "serverless-patterns/multi-account-central-api-private-targets-tgw-cdk-typescript",
+      "projectFolder": "multi-account-central-api-private-targets-tgw-cdk-typescript",
+      "templateFile": "src/bin/central-api-tgw.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+      },
+      {
+        "text": "VPC Links",
+        "link": "https://docs.aws.amazon.com/vpc/latest/userguide/endpoint-services-overview.html"
+      },
+      {
+        "text": "Network Load Balancer (NLB)",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html"
+      },
+      {
+        "text": "Application Load Balancer (ALB)",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+      },
+      {
+        "text": "Amazon ECS Fargate",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html"
+      },
+      {
+        "text": "AWS Tranist Gateway",
+        "link": "https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jevon Liburd",
+      "image": "https://media.licdn.com/dms/image/v2/C5603AQGQeKZyhyvcpw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1605745311041?e=1742428800&v=beta&t=zYr5hwUCsfljHyeDSMrWTmIrrfMu7LJpV0qD_nsjVYc",
+      "bio": "Jevon is a Technical Account Manager at Amazon Web Services.",
+      "linkedin": "jevon-liburd-a436b315",
+      "twitter": "Jevon_EL"
+    }
+  ]
+}
