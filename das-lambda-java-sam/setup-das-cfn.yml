@@ -1203,12 +1203,18 @@ Resources:
             # Create sample SQL commands file
             
             echo "create table persons(firstname varchar(25) not null, lastname varchar(25) not null, middle_initial varchar(1) null, street_address varchar(100) not null, unit_number varchar(10) null, city varchar(25) not null, state varchar(2) not null, zip varchar(10) not null);" > /home/ec2-user/db_commands.txt
+            
+            echo "" >> /home/ec2-user/db_commands.txt
 
-            echo "insert into persons values ('John', 'Cummins', 'M', '1320 Hollywood Blvd.', 'Apt - 213', 'London', 'KY', '40740')" >> /home/ec2-user/db_commands.txt
+            echo "insert into persons values ('John', 'Cummins', 'M', '1320 Hollywood Blvd.', 'Apt - 213', 'London', 'KY', '40740');" >> /home/ec2-user/db_commands.txt
+            
+            echo "" >> /home/ec2-user/db_commands.txt
 
-            echo "insert into persons values ('Bryan', 'Starc', 'M', '89075 Parkwood Dr.', 'Unit-M', 'Paris', 'TX', '75461')" >> /home/ec2-user/db_commands.txt
+            echo "insert into persons values ('Bryan', 'Starc', 'M', '89075 Parkwood Dr.', 'Unit-M', 'Paris', 'TX', '75461');" >> /home/ec2-user/db_commands.txt
+            
+            echo "" >> /home/ec2-user/db_commands.txt
 
-            echo "select * from persons" >> /home/ec2-user/db_commands.txt
+            echo "select * from persons;" >> /home/ec2-user/db_commands.txt
             
             
             # Creating OpenSearch Ingestion Pipeline
@@ -1226,13 +1232,14 @@ Resources:
             echo "export OSI_IAM_ROLE=$OSI_IAM_ROLE" >> /home/ec2-user/.bash_profile
             
             cd /home/ec2-user/serverless-patterns/das-lambda-java-sam
+            cp ./IngestionPipelineConfig.yaml ./IngestionPipelineConfigSubstituted.yaml
             source /home/ec2-user/.bash_profile
-            sed -i "s/SQS_QUEUE_URL/$SQS_QUEUE_URL/g" IngestionPipelineConfig.yaml
-            sed -i "s/OPENSEARCH_DOMAIN_ENDPOINT/$OPENSEARCH_DOMAIN_ENDPOINT/g" IngestionPipelineConfig.yaml
-            sed -i "s/OSI_ROLE/$OSI_IAM_ROLE/g" IngestionPipelineConfig.yaml
-            sed -i "s/AWS_REGION/$AWS_REGION/g" IngestionPipelineConfig.yaml
+            sed -i "s/SQS_QUEUE_URL/$SQS_QUEUE_URL/g" IngestionPipelineConfigSubstituted.yaml
+            sed -i "s/OPENSEARCH_DOMAIN_ENDPOINT/$OPENSEARCH_DOMAIN_ENDPOINT/g" IngestionPipelineConfigSubstituted.yaml
+            sed -i "s/OSI_ROLE/$OSI_IAM_ROLE/g" IngestionPipelineConfigSubstituted.yaml
+            sed -i "s/AWS_REGION/$AWS_REGION/g" IngestionPipelineConfigSubstituted.yaml
             
-            aws osis create-pipeline --pipeline-name das-osi-pipeline --min-units 1 --max-units 4 --pipeline-configuration-body file://IngestionPipelineConfig.yaml --no-cli-pager
+            aws osis create-pipeline --pipeline-name das-osi-pipeline --min-units 1 --max-units 4 --pipeline-configuration-body file://IngestionPipelineConfigSubstituted.yaml --no-cli-pager
  
           - security_group_id : !GetAtt ReverseProxyInstanceSecurityGroup.GroupId
             das_lambda_code_github_location: !Ref DASLambdaCodeGithubLocation
@@ -1836,9 +1843,12 @@ Resources:
               - Sid: OSIAccess
                 Effect: Allow
                 Action:
-                  - 'osis:CreatePipeline',
-                  - 'osis:ListPipelineBlueprints',
+                  - 'osis:CreatePipeline'
+                  - 'osis:ListPipelineBlueprints'
                   - 'osis:ValidatePipeline'
+                  - 'osis:GetPipeline'
+                  - 'osis:StopPipeline'
+                  - 'osis:StartPipeline'
                 Resource: '*'
         - PolicyName: OSIPermissions2
           PolicyDocument:
@@ -2008,12 +2018,11 @@ Outputs:
         - DashboardEndpoint
     Export:
       Name: AOSServerlessDashboardsEndpoint
-  KinesisDataGeneratorUrl:
-    Description: 'The URL for your Kinesis Data Generator.'
-    Value:
-      Fn::Join:
-        - ""
-        - - https://awslabs.github.io/amazon-kinesis-data-generator/web/producer.html?
-          - Fn::GetAtt:
-            - SetupCognitoCustom
-            - Querystring
+  OpenSearchIngestionPipelineIAMRoleARN:
+    Value: !GetAtt OSIIAMRole.Arn
+    Export:
+      Name: OpenSearchIngestionPipelineIAMRoleARN
+  SNSTopicARN:
+    Value: !GetAtt SNSTopicForOpenSearchNotification.TopicArn
+    Export:
+      Name: SNSTopicARN
