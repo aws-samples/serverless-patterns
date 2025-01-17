@@ -1,13 +1,13 @@
 {
     "title": "Cross Account Private Domain Name Access",
-    "description": "Create ",
+    "description": "Setting up Cross-Account Private API Gateway with Custom Domain",
     "language": "Python",
     "level": "300",
     "framework": "SAM",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This patterns enables the invocation of a Private Custom Domain Name deployed for a Private API Gateway cross-account."
+        "This pattern demonstrates how to implement cross-account access to a Private API Gateway using Custom Domain Names. Learn how to configure, deploy, and invoke private APIs across AWS accounts"
       ]
     },
     "gitHub": {
