@@ -1,0 +1,43 @@
+type Mutation {
+  startConversation(input: StartConversationInput!): ConversationResponse!
+  sendChunk(conversationId: ID!, chunk: String!): ChunkResponse!
+  completeStream(conversationId: ID!): CompletionResponse!
+  
+  # Add this missing mutation
+  sendError(conversationId: ID!, error: String!): ErrorResponse!
+}
+
+type Subscription {
+  onReceiveChunk(conversationId: ID!): ChunkResponse
+    @aws_subscribe(mutations: ["sendChunk"])
+}
+
+type Query {
+  dummyField: String
+}
+
+input StartConversationInput {
+  prompt: String!
+  conversationId: ID!
+}
+
+type ConversationResponse {
+  conversationId: ID!
+  status: String!
+}
+
+type ChunkResponse {
+  conversationId: ID
+  chunk: String
+}
+
+type CompletionResponse {
+  conversationId: ID!
+  status: String!
+}
+
+# Add this type for errors
+type ErrorResponse {
+  conversationId: ID!
+  error: String!
+}
