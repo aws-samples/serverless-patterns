@@ -8,7 +8,7 @@ success=false
 while [ $success = false ] && [ $attempt_num -le \$max_attempts ]; do 
     echo "Getting Status of OSI Pipeline 
                 
-    PIPELINE_STATUS=$(aws osis get-pipeline --pipeline-name my-osi-pipeline | jq -r '.Pipeline.Status')
+    PIPELINE_STATUS=$(aws osis get-pipeline --pipeline-name das-osi-pipeline | jq -r '.Pipeline.Status')
                
     # Check the exit code of the command 
     if [ $PIPELINE_STATUS == "STOPPED" ]; then 
@@ -32,7 +32,7 @@ success=false
 while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do 
     echo "Getting Status of OSI Pipeline" 
                 
-    PIPELINE_STATUS=$(aws osis get-pipeline --pipeline-name my-osi-pipeline | jq -r '.Pipeline.Status') 
+    PIPELINE_STATUS=$(aws osis get-pipeline --pipeline-name das-osi-pipeline | jq -r '.Pipeline.Status') 
                
     # Check the exit code of the command" 
     if [ $PIPELINE_STATUS == "ACTIVE" ]; then 

@@ -580,7 +580,7 @@ Resources:
           !Join ["", ['{"username": "', !Ref OpenSearchMasterUserName, '"}']]
         GenerateStringKey: "password"
         PasswordLength: 10
-        ExcludeCharacters: "\" ' ( ) * + , - . / : ; < = > ! # ? @ [ \\ ] ^ _ ` { | } ~"
+        ExcludeCharacters: "\" ' ( ) $ * + , - . / : ; < = > ! # ? @ [ \\ ] ^ _ ` { | } ~"
 
   RetrieveAOSPasswordLambdaPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -1227,19 +1227,46 @@ Resources:
             echo "OPENSEARCH_DOMAIN_ENDPOINT=$OPENSEARCH_DOMAIN_ENDPOINT"
             echo "export OPENSEARCH_DOMAIN_ENDPOINT=$OPENSEARCH_DOMAIN_ENDPOINT" >> /home/ec2-user/.bash_profile
             
+            OPENSEARCH_DOMAIN_URL='https://'$OPENSEARCH_DOMAIN_ENDPOINT
+            echo "OPENSEARCH_DOMAIN_URL=$OPENSEARCH_DOMAIN_URL"
+            echo "export OPENSEARCH_DOMAIN_URL=$OPENSEARCH_DOMAIN_URL" >> /home/ec2-user/.bash_profile
+            
             OSI_IAM_ROLE=${osi_iam_role}
             echo "OSI_IAM_ROLE=$OSI_IAM_ROLE"
             echo "export OSI_IAM_ROLE=$OSI_IAM_ROLE" >> /home/ec2-user/.bash_profile
             
             cd /home/ec2-user/serverless-patterns/das-lambda-java-sam
             cp ./IngestionPipelineConfig.yaml ./IngestionPipelineConfigSubstituted.yaml
+            sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
-            sed -i "s/SQS_QUEUE_URL/$SQS_QUEUE_URL/g" IngestionPipelineConfigSubstituted.yaml
-            sed -i "s/OPENSEARCH_DOMAIN_ENDPOINT/$OPENSEARCH_DOMAIN_ENDPOINT/g" IngestionPipelineConfigSubstituted.yaml
-            sed -i "s/OSI_ROLE/$OSI_IAM_ROLE/g" IngestionPipelineConfigSubstituted.yaml
+            sed -i "s|SQS_QUEUE_URL|$SQS_QUEUE_URL|g" IngestionPipelineConfigSubstituted.yaml
+            sed -i "s|OPENSEARCH_DOMAIN_ENDPOINT|$OPENSEARCH_DOMAIN_URL|g" IngestionPipelineConfigSubstituted.yaml
+            sed -i "s|OSI_ROLE|$OSI_IAM_ROLE|g" IngestionPipelineConfigSubstituted.yaml
             sed -i "s/AWS_REGION/$AWS_REGION/g" IngestionPipelineConfigSubstituted.yaml
             
             aws osis create-pipeline --pipeline-name das-osi-pipeline --min-units 1 --max-units 4 --pipeline-configuration-body file://IngestionPipelineConfigSubstituted.yaml --no-cli-pager
+            
+            # Adding OSI IAM Role as backend role to all_access role in OpenSearch
+            
+            OS_MASTER_USERNAME=${os_master_username}
+            OS_MASTER_PASSWORD=${os_master_password}
+            echo "OS_MASTER_USERNAME=$OS_MASTER_USERNAME"
+            echo "OS_MASTER_PASSWORD=$OS_MASTER_PASSWORD"
+            echo "export OS_MASTER_USERNAME=$OS_MASTER_USERNAME" >> /home/ec2-user/.bash_profile
+            echo "export OS_MASTER_PASSWORD=$OS_MASTER_PASSWORD" >> /home/ec2-user/.bash_profile
+            
+            BASE64_USERNAME_PWD=$(echo -n $OS_MASTER_USERNAME:$OS_MASTER_PASSWORD | base64)
+            echo "BASE64_USERNAME_PWD=$BASE64_USERNAME_PWD"
+            echo "export BASE64_USERNAME_PWD=$BASE64_USERNAME_PWD" >> /home/ec2-user/.bash_profile
+
+            curl -XPUT "$OPENSEARCH_DOMAIN_URL/_plugins/_security/api/rolesmapping/all_access" -H 'Content-Type: application/json' -H "Authorization: Basic $BASE64_USERNAME_PWD" -d'
+            {
+              "backend_roles" : [ "'"${OSI_IAM_ROLE}"'" ],
+              "users" : ["'"${OS_MASTER_USERNAME}"'"]
+
+            }
+            '
+            
  
           - security_group_id : !GetAtt ReverseProxyInstanceSecurityGroup.GroupId
             das_lambda_code_github_location: !Ref DASLambdaCodeGithubLocation
@@ -1254,6 +1281,9 @@ Resources:
             sqs_queue_url: !Ref StandardQueue
             opensearch_domain_endpoint: !GetAtt OpenSearchServiceDomain.DomainEndpoint
             osi_iam_role: !GetAtt OSIIAMRole.Arn
+            os_master_username: !Ref OpenSearchMasterUserName
+            os_master_password: !GetAtt RetrieveAOSPassword.OpenSearchMasterPassword
+            
 
   ReverseProxyInstanceSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
