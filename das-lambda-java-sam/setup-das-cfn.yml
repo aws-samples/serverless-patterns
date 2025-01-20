@@ -1258,15 +1258,10 @@ Resources:
             BASE64_USERNAME_PWD=$(echo -n $OS_MASTER_USERNAME:$OS_MASTER_PASSWORD | base64)
             echo "BASE64_USERNAME_PWD=$BASE64_USERNAME_PWD"
             echo "export BASE64_USERNAME_PWD=$BASE64_USERNAME_PWD" >> /home/ec2-user/.bash_profile
-
-            curl -XPUT "$OPENSEARCH_DOMAIN_URL/_plugins/_security/api/rolesmapping/all_access" -H 'Content-Type: application/json' -H "Authorization: Basic $BASE64_USERNAME_PWD" -d'
-            {
-              "backend_roles" : [ "'"${OSI_IAM_ROLE}"'" ],
-              "users" : ["'"${OS_MASTER_USERNAME}"'"]
-
-            }
-            '
             
+            source /home/ec2-user/.bash_profile
+            sudo chmod +x /home/ec2-user/serverless-patterns/das-lambda-java-sam/UpdateOSIRole.sh
+            sh /home/ec2-user/serverless-patterns/das-lambda-java-sam/UpdateOSIRole.sh > /home/ec2-user/UpdateOSIRoleOutput.txt
  
           - security_group_id : !GetAtt ReverseProxyInstanceSecurityGroup.GroupId
             das_lambda_code_github_location: !Ref DASLambdaCodeGithubLocation
