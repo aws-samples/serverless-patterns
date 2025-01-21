@@ -6,7 +6,7 @@ max_attempts=25
 attempt_num=1 
 success=false 
 while [ $success = false ] && [ $attempt_num -le \$max_attempts ]; do 
-    echo "Getting Status of OSI Pipeline 
+    echo "Getting Status of OSI Pipeline" 
                 
     PIPELINE_STATUS=$(aws osis get-pipeline --pipeline-name das-osi-pipeline | jq -r '.Pipeline.Status')
                
@@ -46,4 +46,4 @@ while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
         ((attempt_num++)) 
     fi
 done
-echo "Pipeline has restarted." 
+echo "Pipeline has restarted."

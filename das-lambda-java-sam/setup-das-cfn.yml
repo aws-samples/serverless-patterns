@@ -793,6 +793,7 @@ Resources:
       - SourceBucket
       - CredentialsKMSKey
       - OSIIAMRole
+      - RetrieveAOSPassword
     Properties:
       ImageId: !Ref LatestAmiId
       InstanceType: !Ref ReverseProxyInstanceType
@@ -1216,8 +1217,8 @@ Resources:
 
             echo "select * from persons;" >> /home/ec2-user/db_commands.txt
             
-            
-            # Creating OpenSearch Ingestion Pipeline
+            # Adding OSI IAM Role as backend role to all_access role in OpenSearch
+            # and Creating OpenSearch Ingestion Pipeline
             
             SQS_QUEUE_URL=${sqs_queue_url}
             echo "SQS_QUEUE_URL=$SQS_QUEUE_URL"
@@ -1235,19 +1236,6 @@ Resources:
             echo "OSI_IAM_ROLE=$OSI_IAM_ROLE"
             echo "export OSI_IAM_ROLE=$OSI_IAM_ROLE" >> /home/ec2-user/.bash_profile
             
-            cd /home/ec2-user/serverless-patterns/das-lambda-java-sam
-            cp ./IngestionPipelineConfig.yaml ./IngestionPipelineConfigSubstituted.yaml
-            sudo chown -R ec2-user .
-            source /home/ec2-user/.bash_profile
-            sed -i "s|SQS_QUEUE_URL|$SQS_QUEUE_URL|g" IngestionPipelineConfigSubstituted.yaml
-            sed -i "s|OPENSEARCH_DOMAIN_ENDPOINT|$OPENSEARCH_DOMAIN_URL|g" IngestionPipelineConfigSubstituted.yaml
-            sed -i "s|OSI_ROLE|$OSI_IAM_ROLE|g" IngestionPipelineConfigSubstituted.yaml
-            sed -i "s/AWS_REGION/$AWS_REGION/g" IngestionPipelineConfigSubstituted.yaml
-            
-            aws osis create-pipeline --pipeline-name das-osi-pipeline --min-units 1 --max-units 4 --pipeline-configuration-body file://IngestionPipelineConfigSubstituted.yaml --no-cli-pager
-            
-            # Adding OSI IAM Role as backend role to all_access role in OpenSearch
-            
             OS_MASTER_USERNAME=${os_master_username}
             OS_MASTER_PASSWORD=${os_master_password}
             echo "OS_MASTER_USERNAME=$OS_MASTER_USERNAME"
@@ -1262,7 +1250,18 @@ Resources:
             source /home/ec2-user/.bash_profile
             sudo chmod +x /home/ec2-user/serverless-patterns/das-lambda-java-sam/UpdateOSIRole.sh
             sh /home/ec2-user/serverless-patterns/das-lambda-java-sam/UpdateOSIRole.sh > /home/ec2-user/UpdateOSIRoleOutput.txt
- 
+            
+            cd /home/ec2-user/serverless-patterns/das-lambda-java-sam
+            cp ./IngestionPipelineConfig.yaml ./IngestionPipelineConfigSubstituted.yaml
+            sudo chown -R ec2-user .
+            source /home/ec2-user/.bash_profile
+            sed -i "s|SQS_QUEUE_URL|$SQS_QUEUE_URL|g" IngestionPipelineConfigSubstituted.yaml
+            sed -i "s|OPENSEARCH_DOMAIN_ENDPOINT|$OPENSEARCH_DOMAIN_URL|g" IngestionPipelineConfigSubstituted.yaml
+            sed -i "s|OSI_ROLE|$OSI_IAM_ROLE|g" IngestionPipelineConfigSubstituted.yaml
+            sed -i "s/AWS_REGION/$AWS_REGION/g" IngestionPipelineConfigSubstituted.yaml
+            
+            aws osis create-pipeline --pipeline-name das-osi-pipeline --min-units 1 --max-units 4 --pipeline-configuration-body file://IngestionPipelineConfigSubstituted.yaml --no-cli-pager
+
           - security_group_id : !GetAtt ReverseProxyInstanceSecurityGroup.GroupId
             das_lambda_code_github_location: !Ref DASLambdaCodeGithubLocation
             python3_version: !Ref Python3Version
@@ -1278,7 +1277,6 @@ Resources:
             osi_iam_role: !GetAtt OSIIAMRole.Arn
             os_master_username: !Ref OpenSearchMasterUserName
             os_master_password: !GetAtt RetrieveAOSPassword.OpenSearchMasterPassword
-            
 
   ReverseProxyInstanceSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
