@@ -1,13 +1,13 @@
 # Creating script for bootstrapping of secrets needed for DAS to work
 #!/bin/bash
 
-aws iam create-user --user-name $0 --output json --no-cli-pager
+aws iam create-user --user-name $1 --output json --no-cli-pager
 
-aws iam create-login-profile --user-name $0 --password $1 --password-reset-required --output json --no-cli-pager
+aws iam create-login-profile --user-name $1 --password $2 --password-reset-required --output json --no-cli-pager
 
-aws iam attach-user-policy --user-name $0 --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --output json --no-cli-pager
+aws iam attach-user-policy --user-name $1 --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --output json --no-cli-pager
 
-ACCESSKEY=$(aws iam create-access-key --user-name $0 --output json --no-cli-pager)
+ACCESSKEY=$(aws iam create-access-key --user-name $1 --output json --no-cli-pager)
 
 ACCESSKEYID=$(echo $ACCESSKEY | jq -r '.AccessKey.AccessKeyId')
 

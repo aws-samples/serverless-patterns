@@ -1,0 +1,83 @@
+{
+    "title": "AWS Lambda function subscribed to an Aurora Postgres Database Activity Stream and sending the output to an OpenSearch domain",
+    "description": "Creates a Lambda function that uses a Kinesis Data Stream from an Aurora Postgres Database Activity Stream as its event sources, parses heartbeat events and then sends the records to an Amazon OpenSearch domain using an OpenSearch Pipeline",
+    "language": "Java",
+    "level": "300",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern provides a Lambda function along with an Event Source Mapping to a Kinesis Data Stream created when Database Activity Streams is enabled on an Aurora Postgres database.",
+            "The AWS Lambda function is built and deployed using AWS SAM.",
+            "The AWS Lambda function decrypts the encrypted Kinesis Data Stream records and filters out heartbeat events and writes the database activity records to an Amazon S3 bucket. The objects created in Amazon S3 trigger Amazon S3 Event Notifications to an Amazon SQS target. An Amazon OpenSearch Ingestion Pipeline then moves the S3 objects to an Amazon OpenSearch domain.",
+            "The pattern provides a Cloudformation template that sets up all the AWS resources required to make the end-to-end scenario work",
+            "For detailed deployment instructions instructions see the README.md file."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/das-lambda-java-sam",
+            "templateURL": "serverless-patterns/das-lambda-java-sam",
+            "projectFolder": "das-lambda-java-sam/das_consumer_sam_project",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Monitoring Amazon RDS with Database Activity Streams",
+                "link": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/DBActivityStreams.html"
+            },
+            {
+                "text": "AWS SAM Resources",
+                "link": "https://aws.amazon.com/serverless/sam/resources/"
+            },
+            {
+                "text": "Amazon OpenSearch Ingestion",
+                "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ingestion.html"
+            },
+            {
+                "text": "Amazon S3 Event Notifications",
+                "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the template: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+      {
+        "name": "Indranil Banerjee",
+        "bio": "AWS - Senior Solutions Architect",
+        "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
+      },
+      {
+        "name": "Arnab Sinha",
+        "bio": "AWS - Senior Solutions Architect",
+        "linkedin": "https://www.linkedin.com/in/arnab-sinha-1735772/"
+      },
+      {
+        "name": "Ajjay Govindaram",
+        "bio": "AWS - Senior Solutions Architect",
+        "linkedin": "https://www.linkedin.com/in/ajjaykumar/"
+      }, 
+      {
+        "name": "Akhilesh Dube",
+        "bio": "AWS - Senior Analytics Solutions Architect",
+        "linkedin": "https://www.linkedin.com/in/akhilesh-d-12baa4b/"
+      }
+    ]
+  }
+  
