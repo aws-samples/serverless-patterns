@@ -51,6 +51,27 @@ Parameters:
     AllowedValues:
       - "Yes"
 
+  AuroraPostgresVersion:
+    Description: The Version of Aurora Postgres
+    Default: "15.4"
+    Type: String
+    AllowedValues:
+      - "11.21"
+      - "12.16"
+      - "13.12"
+      - "14.9"
+      - "15.4"
+      - "15.5"
+      - "15.6"
+      - "15.7"
+      - "15.8"
+      - "15.10"
+      - "16.1"
+      - "16.2"
+      - "16.3"
+      - "16.4"
+      - "16.6"
+
   ######## Amazon OpenSearch Variables ########
   DomainName:
     Type: String
@@ -1670,7 +1691,7 @@ Resources:
       DBSubnetGroupName:
         Ref: DatabaseSubnets
       Engine: aurora-postgresql
-      EngineVersion: '15.2'
+      EngineVersion: !Ref AuroraPostgresVersion
       MasterUserPassword:
         Fn::Join:
         - ''

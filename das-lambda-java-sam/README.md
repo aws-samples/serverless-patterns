@@ -34,17 +34,35 @@ git checkout
 
 ```
 
-* [Execute the BootStrapFromCloudShell.sh script to create an IAM user and store keys in Secrets Manager] - Once the BootStrapFromCloudShell.sh script has been checked out from Github, execute the following commands in your CloudShell. Substitute the <username> and <password> with values for the IAM user you want to create. The password needs to be at least 8 characters long
+* [Execute the BootStrapFromCloudShell.sh script to create an IAM user and store keys in Secrets Manager] - Once the BootStrapFromCloudShell.sh script has been checked out from Github, execute the following commands in your CloudShell. Substitute the <username> and <password> with values for the IAM user you want to create. The password needs to be at least 8 characters long. 
 
 ```
 cd das-lambda-java-sam
-sh ./
+sh ./BootStrapFromCloudShell.sh <username> <password>
 
 ```
 
-## Run the Cloudformation template to create the MSK Cluster and Client EC2 machine
+Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new <username> and <password>. You will be asked to change the password upon first login. Once you are logged in as the IAM user, follow the next step.
 
-* [Run the Cloudformation template using the file MSKAndKafkaClientEC2.yaml] - You can go to the AWS Cloudformation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the Cloudformation stack to be created. This Cloudformation template will create an MSK cluster (Provisioned or Serverless based on your selection). It will also create an EC2 machine that you can use as a client.
+
+## Run the CloudFormation template to create the AWS resources
+
+* [Checkout from Github on your local machine] - Type the following commands from any folder on your local machine to get the CloudFormation template from Github
+
+```
+git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git
+cd serverless-patterns
+git sparse-checkout set --no-cone /das-lambda-java-sam
+git checkout
+cd das-lambda-java-sam
+
+```
+
+The current folder should now contain the CloudFormation template file setup-das-cfn.yaml
+
+* [Run the CloudFormation template using the file setup-das-cfn.yaml] - You can go to the AWS CloudFormation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the Cloudformation stack to be created. This can take a very long time. Even after the CloudFormation template shows a status of "Create Complete", wait at least another 15 minutes, as the UserData scripts inside the CloudFormation tempate continue running.
+
+This Cloudformation template will create multiple AWS resources such as an Amazon Aurora Postgres Database, an Amazon OpenSearch domain, an AWS Lambda function that will process the Database Activity Streams (DAS) events, an S3 bucket to which the Lambda function will write the DAS events records, an OpenSearch Ingestion Pipeline, an SQS queue for triggering the OpenSearch Ingestion Pipeline and other supporting resources. It will also create an EC2 machine that you can use as a client.
 
 * [Connect to the EC2 machine] - Once the Cloudformation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
 Note: You may need to wait for some time after the Cloudformation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.
