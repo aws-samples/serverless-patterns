@@ -1,7 +1,7 @@
 # Running Cloudformation Stack to create AWS resources for end-to-end DAS processing
 #!/bin/bash
 
-RANDOM_STRING=$(tr -dc 'a-z0-9' </dev/urandom | head -c 10 ; echo '')
+RANDOM_STRING=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 10 ; echo '')
 AWS_ACCOUNT_NUMBER=$(aws sts get-caller-identity --profile $1 | jq -r '.Account')
 aws s3 mb s3://cft-bucket-$AWS_ACCOUNT_NUMBER-$RANDOM_STRING --no-cli-pager
 sleep 30
