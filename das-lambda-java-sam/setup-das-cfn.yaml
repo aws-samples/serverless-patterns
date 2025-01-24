@@ -102,6 +102,10 @@ Parameters:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
 
+  KeyName:
+    Type: String
+    Default: DASKeyPair
+
   ReverseProxySSHLocation:
     Description: Allow SSH into Proxy instance
     Type: String
@@ -601,7 +605,7 @@ Resources:
           !Join ["", ['{"username": "', !Ref OpenSearchMasterUserName, '"}']]
         GenerateStringKey: "password"
         PasswordLength: 10
-        ExcludeCharacters: "\" ' ( ) $ * + , - . / : ; < = > ! # ? @ [ \\ ] ^ _ ` { | } ~"
+        ExcludeCharacters: "\" ' ( ) $ % & * + , - . / : ; < = > ! # ? @ [ \\ ] ^ _ ` ~ { | } ~"
 
   RetrieveAOSPasswordLambdaPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -818,6 +822,7 @@ Resources:
     Properties:
       ImageId: !Ref LatestAmiId
       InstanceType: !Ref ReverseProxyInstanceType
+      KeyName: !Ref KeyName
       IamInstanceProfile: !Ref EC2InstanceProfile
       SecurityGroupIds:
         - !Ref ReverseProxyInstanceSecurityGroup
@@ -2070,3 +2075,7 @@ Outputs:
     Value: !GetAtt SNSTopicForOpenSearchNotification.TopicArn
     Export:
       Name: SNSTopicARN
+  ReverseProxyEC2PublicIP:
+    Value: !GetAtt ReverseProxyInstance.PublicIp
+    Export:
+      Name: ReverseProxyEC2PublicIP

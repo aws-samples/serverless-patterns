@@ -43,7 +43,39 @@ sh ./BootStrapFromCloudShell.sh <username> <password>
 ```
 
 Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new <username> and <password>. You will be asked to change the password upon first login. Once you are logged in as the IAM user, follow the next step.
+    
+** Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh <username> as shown below ** 
 
+```
+cd das-lambda-java-sam
+sh ./BootStrapFromCloudShellNoConsoleAccess.sh <username>
+
+```
+
+Once the above command is done running, it is recommended to create an AWS CLI profile on your local machine from where you can deploy the CloudFormation template. In order to do that, you need to run the following commands
+
+```
+On the AWS CloudShell, run the following and note down the values of the outputs of each of the commands below
+
+aws configure get aws_access_key_id --profile <username> - where <username> is the same as the <username> parameter that was passed to the BootStrapFromCloudShellNoConsoleAccess.sh command above
+
+aws configure get aws_secret_access_key --profile <username>
+
+aws configure get region --profile <username>
+
+On your local machine, run the following
+
+aws configure set aws_access_key_id <ACCESSKEYID> --profile <username> - where <ACCESSKEYID> is the output of the first command above
+
+aws configure set aws_secret_access_key <SECRETKEYID> --profile <username> - where <SECRETKEYID> is the output of the second command above
+
+aws configure set region <AWS_REGION> --profile <username> - where <AWS_REGION> is the output of the third command above
+
+Once you have configured the AWS profile on your local machine, run the following command to verify the profile has been created correctly
+
+aws sts get-caller-identity --profile <username>
+
+```
 
 ## Run the CloudFormation template to create the AWS resources
 
@@ -60,12 +92,53 @@ cd das-lambda-java-sam
 
 The current folder should now contain the CloudFormation template file setup-das-cfn.yaml
 
-* [Run the CloudFormation template using the file setup-das-cfn.yaml] - You can go to the AWS CloudFormation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the Cloudformation stack to be created. This can take a very long time. Even after the CloudFormation template shows a status of "Create Complete", wait at least another 15 minutes, as the UserData scripts inside the CloudFormation tempate continue running.
+You can log in to the AWS console using the new user that was just created and run CloudFormation using the template file setup-das-cfn.yaml
 
-This Cloudformation template will create multiple AWS resources such as an Amazon Aurora Postgres Database, an Amazon OpenSearch domain, an AWS Lambda function that will process the Database Activity Streams (DAS) events, an S3 bucket to which the Lambda function will write the DAS events records, an OpenSearch Ingestion Pipeline, an SQS queue for triggering the OpenSearch Ingestion Pipeline and other supporting resources. It will also create an EC2 machine that you can use as a client.
+Accept defaults for all the input parameters or modify them as needed.
+
+** Note: If you do not have AWS console access, you can deploy the CloudFormation from your local machine or CloudShell.
+
+Execute the following commands from a terminal on your local machine or CloudShell **
+
+```
+aws ec2 create-key-pair --key-name DASKeyPair --key-format pem --key-type rsa --query 'KeyMaterial' --output text > DASKeyPair.pem - Make sure to save this .pem file in a secure location as you will need it later to ssh into the EC2 machine that will be created as part of the CloudFormation stack
+
+chmod 400 DASKeyPair.pem
+
+** If you modify the name of the key-name from DASKeyPair, then make sure to replace it in the CloudFormation template as well **
+
+AWS_REGION=$(aws configure get region --profile <username>)
+
+cd <folder where you had checked out the https://github.com/aws-samples/serverless-patterns.git>
+
+cd /serverless-patterns/das-lambda-java-sam
+
+Now deploy the CloudFormation stack by running the RunCloudformationStack.sh file as follows
+
+sh ./RunCloudformationStack.sh <username> <stackname> - replace the value of <username> and provide a value for the name of the CloudFormation stack by replacing <stackname>
+
+```
+
+** If you need to replace the values of any input parameters to the CloudFormation stack, then add those in the --parameter-overrides section of the RunCloudformationStack.sh **
+
+Wait for the Cloudformation stack to be created. This can take a very long time. Even after the CloudFormation template shows a status of "Create Complete", wait at least another 15 minutes, as the UserData scripts inside the CloudFormation tempate continue running.
+
+This Cloudformation template will create multiple AWS resources such as an Amazon Aurora Postgres Database, an Amazon OpenSearch domain, an AWS Lambda function that will process the Database Activity Streams (DAS) events, an S3 bucket to which the Lambda function will write the DAS events records, an OpenSearch Ingestion Pipeline, an SQS queue for triggering the OpenSearch Ingestion Pipeline and other supporting resources. It will also create an EC2 machine that already has the Postgres client installed for you to run SQL commands on the Aurora Postgres database.
 
 * [Connect to the EC2 machine] - Once the Cloudformation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
 Note: You may need to wait for some time after the Cloudformation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.
+
+** If you are not allowed AWS console access as an IAM user, you can ssh into the EC2 machine by running the command below to get the Public IP address of the EC2 machine **
+
+```
+EC2_PUBLIC_IP=$(aws cloudformation describe-stacks --stack-name <stackname> --query "Stacks[*].Outputs[?OutputKey=='ReverseProxyEC2PublicIP'].OutputValue" --output text)
+
+echo $EC2_PUBLIC_IP
+
+To ssh you will need the DASKeyPair.pem file that you had created in an earlier step
+
+
+```
 
 * [Check if Kafka Topic has been created] - Once you are inside the EC2 machine, you should be in the /home/ec2-user folder. Check to see the contents of the file kafka_topic_creator_output.txt by running the command cat kafka_topic_creator_output.txt. You should see an output such as "Created topic MskIamJavaLambdaTopic."
 
