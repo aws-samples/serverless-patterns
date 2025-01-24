@@ -40,7 +40,7 @@ You must request access to Amazon Nova Reel model before you can use it. If you 
 
     ![Model Access View](bedrock_setup/model-access-view.png)
 
-6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Save changes** to activate the models in your account. For this pattern we only need Nova Reel /  model id: samazon.nova-reel-v1:0.
+6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Save changes** to activate the models in your account. For this pattern we only need Nova Reel /  model id: amazon.nova-reel-v1:0.
 
 ## Deployment Instructions
 
@@ -104,7 +104,7 @@ Follow the example below and replace `{your-api-url}` with your api url from ste
     curl -X POST \
     {your-api-url}/prod/generateVideo \
     -H "Content-Type: application/json" \
-    -d '{"prompt": "zoom in of Niagara waterfalls"}'
+    -d '{"prompt": "video of a car made up of fruits"}'
     ```
 
 ## Review results
