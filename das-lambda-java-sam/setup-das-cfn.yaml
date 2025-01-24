@@ -605,7 +605,7 @@ Resources:
           !Join ["", ['{"username": "', !Ref OpenSearchMasterUserName, '"}']]
         GenerateStringKey: "password"
         PasswordLength: 10
-        ExcludeCharacters: "\" ' ( ) $ % & * + , - . / : ; < = > ! # ? @ [ \\ ] ^ _ ` ~ { | } ~"
+        ExcludeCharacters: "\" ' ( ) $ % & * + , - . / : ; < = > ! # ? [ \\ ] ^ _ ` ~ { | } ~"
 
   RetrieveAOSPasswordLambdaPolicy:
     Type: AWS::IAM::ManagedPolicy

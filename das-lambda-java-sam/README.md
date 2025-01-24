@@ -101,7 +101,7 @@ Accept defaults for all the input parameters or modify them as needed.
 Execute the following commands from a terminal on your local machine or CloudShell **
 
 ```
-aws ec2 create-key-pair --key-name DASKeyPair --key-format pem --key-type rsa --query 'KeyMaterial' --output text > DASKeyPair.pem - Make sure to save this .pem file in a secure location as you will need it later to ssh into the EC2 machine that will be created as part of the CloudFormation stack
+aws ec2 create-key-pair --key-name DASKeyPair --key-format pem --key-type rsa --profile <username> --query 'KeyMaterial' --output text > DASKeyPair.pem - Make sure to save this .pem file in a secure location as you will need it later to ssh into the EC2 machine that will be created as part of the CloudFormation stack
 
 chmod 400 DASKeyPair.pem
 
@@ -115,7 +115,7 @@ cd /serverless-patterns/das-lambda-java-sam
 
 Now deploy the CloudFormation stack by running the RunCloudformationStack.sh file as follows
 
-sh ./RunCloudformationStack.sh <username> <stackname> - replace the value of <username> and provide a value for the name of the CloudFormation stack by replacing <stackname>
+sh ./RunCloudformationStack.sh <username> <stackname> <a short unique random string> - replace the value of <username> and provide a value for the name of the CloudFormation stack by replacing <stackname>
 
 ```
 
