@@ -1,4 +1,4 @@
-# Certificate-Bound Access Tokens using API Gateway and Cognito
+# Certificate-Bound Access Tokens using Amazon API Gateway and Amazon Cognito
 
 This pattern makes use of API Gateway and Cognito to implement certificate-bound access tokens. For more on certificate-boud access tokens, review the [RFC](https://datatracker.ietf.org/doc/html/rfc8705). This solution has some manual steps which will be discussed later.
 
@@ -6,9 +6,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Requirements
 
-* ~[Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html)~ if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* ~[Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)~
-* ~[AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)~ (AWS SAM) installed
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html)~ if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)~
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)~ (AWS SAM) installed
 * [Docker installed](https://docs.docker.com/engine/install/).
 * A domain that you own.
 * A certificate issued under the domain you own.
@@ -23,10 +23,10 @@ git clone https://github.com/aws-samples/serverless-patterns
 
 2. Change directory to the pattern directory:
 ```
-cd apigw-certificate-bound-access-tokens
+cd apigw-cognito-certificate-bound-access-token
 ```
 
-3. Ensure that you add the relevant parameters to `samconfig.toml`.
+3. Ensure that you add the relevant parameters to `samconfig.toml`:
 * stack_name
 * s3_bucket
 * s3_prefix
@@ -40,7 +40,7 @@ cd apigw-certificate-bound-access-tokens
 
 4. Build the solution:
 ```
-sam build
+sam build --use-container
 ```
 
 5. Deploy the solution:
@@ -50,7 +50,7 @@ sam deploy
 
 ## How it works
 
-This pattern creates an Amazon API Gateway REST API as well as a custom domain name and enables mTLS. Further, it creates a Cognito User Pool. The Cognito User Pool is used to issue certificate-bound access tokens. The REST API makes use of an authorizer to compare the "cnf" claim in the access token to the fingerprint of the client certificate sent as part of the mutual authentication TLS handshake. 
+This pattern creates an Amazon API Gateway REST API with a custom domain name and enables mTLS. Further, it creates a Cognito User Pool. The Cognito User Pool is used to issue certificate-bound access tokens. The REST API makes use of an authorizer to compare the "cnf" claim in the access token to the fingerprint of the client certificate sent as part of the mutual authentication TLS handshake. 
 
 ## Testing
 
@@ -67,6 +67,41 @@ openssl x509 -in client-cert.crt -noout -fingerprint -sha256 | cut -d'=' -f2 | t
 
 5. [Get an access token](https://docs.aws.amazon.com/cognito/latest/developerguide/authentication-flows-public-server-side.html) from Cognito.
 
+Example of getting an access token using boto3:
+```
+class CognitoAuth(AuthBase):
+    def __init__(self, user_pool_id, client_id, username, password):
+        self.user_pool_id = user_pool_id
+        self.client_id = client_id
+        self.username = username
+        self.password = password
+        self.token = self.authenticate_user()
+
+    def authenticate_user(self):
+        client = boto3.client('cognito-idp', region_name='us-east-1')
+        try:
+            response = client.admin_initiate_auth(
+                UserPoolId=self.user_pool_id,
+                ClientId=self.client_id,
+                AuthFlow='ADMIN_USER_PASSWORD_AUTH',
+                AuthParameters={
+                    'USERNAME': self.username,
+                    'PASSWORD': self.password,
+                }
+            )
+            return response['AuthenticationResult']['AccessToken']
+        except client.exceptions.NotAuthorizedException:
+            raise Exception("The username or password is incorrect")
+        except Exception as e:
+            raise Exception(f"An error occurred: {str(e)}")
+
+    def __call__(self, r):
+        r.headers['Authorization'] = f'Bearer {self.token}'
+        return r
+```
+
+Notes that this requires the `ADMIN_USER_PASSWORD_AUTH` auth flow which is not enabled by default by this solution. You will need to do it on the console.
+
 6. Test the solution:
 
 ```
@@ -77,7 +112,7 @@ curl -v https://<your_custom_domain>/example --cert client-cert.crt --key client
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete
     ```
 1. Confirm the stack has been deleted
     ```bash
