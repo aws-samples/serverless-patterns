@@ -1,5 +1,7 @@
 Amazon EventBridge triggers an AWS Lambda function to replicate FSx for OpenZFS volumes across file systems located in the same account and region, or across different accounts and regions.
 
+![Architecture diagram](./ArchDiagram.png)
+
 The AWS SAM template deploys an Amazon EventBridge Scheduler to trigger an AWS Lambda function based on a user-defined schedule. This function copies the snapshot of a volume and transfers it to the target FSx system, which can be located in the same or a different AWS account and/or region.
 
 For FSx-OpenZFS periodic volume replication in same account and same region, please refer to the Serverless Land Pattern <https://serverlessland.com/patterns/eventbridge-lambda-fsx-openzfs-periodic-replication>
