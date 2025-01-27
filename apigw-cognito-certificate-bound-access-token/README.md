@@ -84,6 +84,11 @@ Notes that this requires the `ADMIN_USER_PASSWORD_AUTH` auth flow which is not e
 curl -v https://<your_custom_domain>/example --cert client-cert.crt --key client-cert.key -H "Authorization: <certificate_bound_access_token>"
 ```
 
+You should see output as follows:
+```
+{"message": "Hello from the example function!", "event": {"resource": "/example", "path": "/example"...
+```
+
 ## Cleanup
  
 1. Delete the stack
