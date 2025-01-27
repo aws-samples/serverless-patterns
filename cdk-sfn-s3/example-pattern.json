@@ -45,10 +45,9 @@
   },
   "authors": [
     {
-      "name": "Gary Sassano",
-      "image": "https://avatars.githubusercontent.com/u/10464497",
-      "bio": "Cloud architect and DevOps enthusiast specializing in serverless solutions.",
-      "linkedin": "garysassano"
+      "name": "Harshitha Shashidhar",
+      "image": "../assets/images/resources/harshihs.jpg",
+      "bio": "Harshitha Shashidhar is an Cloud Application architect who loves to build the serverless applications at scale."
     }
   ]
 }
