@@ -8,7 +8,7 @@ Description: >
   - A Lambda-based custom authorizer for API requests
   - A Cognito User Pool with a pre-token generation Lambda trigger to bind the certificate to the access token
   
-  The infrastructure implements Certificate-Bound Access Tokens within AWS.
+  The infrastructure implements Certificate-Bound Access Tokens within AWS. (uksb-1tthgi812) (tag:apigw-cognito-certificate-bound-access-token)
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
