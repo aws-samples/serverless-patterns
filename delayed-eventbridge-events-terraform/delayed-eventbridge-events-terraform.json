@@ -1,13 +1,13 @@
 {
-    "title": "Delayed EventBridge events with EventBridge Scheduler",
-    "description": "Setup future EventBridge events with EventBridge Scheduler",
+    "title": "Delayed Amazon EventBridge events with Amazon EventBridge Scheduler",
+    "description": "Setup future Amazon EventBridge events with Amazon EventBridge Scheduler",
     "language": "Node.js",
     "level": "200",
     "framework": "Terraform",
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This pattern listens for EventBridge events, processes them and creates schedules for every user. 24 hours after user has been created a schedule is run that publishes events directly into EventBridge."
+            "This pattern listens for Amazon EventBridge events, processes them and creates schedules for every user. 24 hours after user has been created a schedule is run that publishes events directly into Amazon EventBridge."
         ]
     },
     "gitHub": {
