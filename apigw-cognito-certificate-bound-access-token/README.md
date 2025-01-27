@@ -14,6 +14,8 @@ Important: this application uses various AWS services and there are costs associ
 * A certificate issued under the domain you own.
 * Create client certificate as per the [mTLS blogpost](https://aws.amazon.com/blogs/compute/introducing-mutual-tls-authentication-for-amazon-api-gateway/).
 
+Place the trust store in the S3 bucket that you will specfiy when deploying in the solution.
+
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -26,27 +28,22 @@ git clone https://github.com/aws-samples/serverless-patterns
 cd apigw-cognito-certificate-bound-access-token
 ```
 
-3. Ensure that you add the relevant parameters to `samconfig.toml`:
-* stack_name
-* s3_bucket
-* s3_prefix
-* region
-* parameter_overrides.
+3. Build the solution:
+```
+sam build --use-container
+```
+
+3. Deploy the solution:
+```
+sam deploy --guided
+```
+
+Parameter_overrides:
   * BucketName - to store client certificate and trust store.
   * CACertKey - trust store.
   * ClientCertKey - client certificate Amazon S3 object key.
   * CustomDomainCertArn - custom domain AWS Certificate Manager certficate ARN.
   * CustomDomainName - custom domain name for API Gateway. Must match CustomDomainCertArn.
-
-4. Build the solution:
-```
-sam build --use-container
-```
-
-5. Deploy the solution:
-```
-sam deploy
-```
 
 ## How it works
 
@@ -67,40 +64,19 @@ openssl x509 -in client-cert.crt -noout -fingerprint -sha256 | cut -d'=' -f2 | t
 
 5. [Get an access token](https://docs.aws.amazon.com/cognito/latest/developerguide/authentication-flows-public-server-side.html) from Cognito.
 
-Example of getting an access token using boto3:
+Example of getting an access token using the AWSCLI:
 ```
-class CognitoAuth(AuthBase):
-    def __init__(self, user_pool_id, client_id, username, password):
-        self.user_pool_id = user_pool_id
-        self.client_id = client_id
-        self.username = username
-        self.password = password
-        self.token = self.authenticate_user()
-
-    def authenticate_user(self):
-        client = boto3.client('cognito-idp', region_name='us-east-1')
-        try:
-            response = client.admin_initiate_auth(
-                UserPoolId=self.user_pool_id,
-                ClientId=self.client_id,
-                AuthFlow='ADMIN_USER_PASSWORD_AUTH',
-                AuthParameters={
-                    'USERNAME': self.username,
-                    'PASSWORD': self.password,
-                }
-            )
-            return response['AuthenticationResult']['AccessToken']
-        except client.exceptions.NotAuthorizedException:
-            raise Exception("The username or password is incorrect")
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
-
-    def __call__(self, r):
-        r.headers['Authorization'] = f'Bearer {self.token}'
-        return r
+aws cognito-idp admin-initiate-auth \
+    --user-pool-id YOUR_USER_POOL_ID \
+    --client-id YOUR_CLIENT_ID \
+    --auth-flow ADMIN_USER_PASSWORD_AUTH \
+    --auth-parameters 'USERNAME=YOUR_USERNAME,PASSWORD=YOUR_PASSWORD' \
+    --region us-east-1 \
+    --query 'AuthenticationResult.AccessToken' \
+    --output text
 ```
 
-Notes that this requires the `ADMIN_USER_PASSWORD_AUTH` auth flow which is not enabled by default by this solution. You will need to do it on the console.
+Notes that this requires the `ADMIN_USER_PASSWORD_AUTH` auth flow which is not enabled by default by this solution. You will need to do it on the console. This is only for testing purposes. 
 
 6. Test the solution:
 
