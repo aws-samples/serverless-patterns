@@ -16,8 +16,20 @@ Important: This application uses various AWS Services and there are costs associ
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed and configured.
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)  (AWS SAM) installed.
 - Setup .aws/credentials [named profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) namely **accountA** and **accountB** so you can run CLI and AWS SAM commands against them.
-- An [Amazon Execute-API VPC Endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html)
-- A [Public ACM Certificate issued](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html)
+- An [Amazon Execute-API VPC Endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html) needed to invoke your private custom domain name.
+- A [Public ACM Certificate issued](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html) so that API Gateway can prove its identity to clients establishing secure HTTPS connections
+
+### How it works
+
+This pattern utilizes two AWS Sccounts and their respective templates. 
+
+1. **Account A** : Hosts the Private API Gateway and the Private Custom Domain Name:
+    -  **Amazon API Gateway (Private)**: Receives requests from the Account B via the Execute VPC Endpoint deployed in Account B
+    - **Custom Domain Name** which is hit by the client in Account B to invoke the API Gateway
+    - The **Custom Domain Name** is then shared with Account B via AWS Resource Access Manager (AWS RAM)
+
+2. **Account B** : Hosts the Private Hosted Zone, the Execute API VPC Endpoint and creates the Domain Name Access association. A client in the VPC where the VPC Endpoint is deployed can then send requests to the Private API Gateway in Account A using the Custom Domain Name
+
 
 ### Deployment Instructions
 
@@ -77,17 +89,6 @@ Copy the invitation ARN, and paste it in the following command:
     -  Enter the **Custom Domain Name ARN** created in the first template
     -  Enter the **VPC Endpoint Hosted Zone ID**
     -  Allow SAM CLI to create IAM roles with the required permissions.
-
-# How it works
-
-This pattern utilizes two AWS Sccounts and their respective templates. 
-
-1. **Account A** : Hosts the Private API Gateway and the Private Custom Domain Name:
-    -  **Amazon API Gateway (Private)**: Receives requests from the Account B via the Execute VPC Endpoint deployed in Account B
-    - **Custom Domain Name** which is hit by the client in Account B to invoke the API Gateway
-    - The **Custom Domain Name** is then shared with Account B via AWS Resource Access Manager (AWS RAM)
-
-2. **Account B** : Hosts the Private Hosted Zone, the Execute API VPC Endpoint and creates the Domain Name Access association. A client in the VPC where the VPC Endpoint is deployed can then send requests to the Private API Gateway in Account A using the Custom Domain Name
 
 
 ## Cleanup
