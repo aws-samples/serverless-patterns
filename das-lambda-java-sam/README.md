@@ -20,7 +20,11 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
-## Run the BootStrapFromCloudShell.sh script
+## Run the BootStrapFromCloudShell.sh or the BootStrapFromCloudShellNoConsoleAccess.sh script
+
+** Note that in the instructions below, you will need to run the BootStrapFromCloudShell.sh only if you allow AWS console access for IAM users.
+
+If not, then you will need to run the BootStrapFromCloudShellNoConsoleAccess.sh, so please look at the instructions in the relevant section**
 
 * [Log in to the AWS Account as Admin User] - You need to log in to the AWS Account as either root or as an user with Admin privileges
 
@@ -34,6 +38,8 @@ git checkout
 
 ```
 
+### If IAM users are allowed AWS console access
+
 * [Execute the BootStrapFromCloudShell.sh script to create an IAM user and store keys in Secrets Manager] - Once the BootStrapFromCloudShell.sh script has been checked out from Github, execute the following commands in your CloudShell. Substitute the <username> and <password> with values for the IAM user you want to create. The password needs to be at least 8 characters long. 
 
 ```
@@ -44,6 +50,8 @@ sh ./BootStrapFromCloudShell.sh <username> <password>
 
 Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new <username> and <password>. You will be asked to change the password upon first login. Once you are logged in as the IAM user, follow the next step.
     
+### If IAM users are not allowed AWS console access
+    
 ** Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh <username> as shown below ** 
 
 ```
@@ -52,30 +60,38 @@ sh ./BootStrapFromCloudShellNoConsoleAccess.sh <username>
 
 ```
 
-Once the above command is done running, it is recommended to create an AWS CLI profile on your local machine from where you can deploy the CloudFormation template. In order to do that, you need to run the following commands
+Once the above command is done running, it is recommended to create an AWS CLI profile on your local machine from where you can deploy the CloudFormation template. In order to do that, you need to run the following commands:
 
-```
 On the AWS CloudShell, run the following and note down the values of the outputs of each of the commands below
 
-aws configure get aws_access_key_id --profile <username> - where <username> is the same as the <username> parameter that was passed to the BootStrapFromCloudShellNoConsoleAccess.sh command above
+```
+aws configure get aws_access_key_id --profile <username> # where <username> is the same as the <username> parameter that was passed to the BootStrapFromCloudShellNoConsoleAccess.sh command above
 
 aws configure get aws_secret_access_key --profile <username>
 
 aws configure get region --profile <username>
 
-On your local machine, run the following
+```
 
-aws configure set aws_access_key_id <ACCESSKEYID> --profile <username> - where <ACCESSKEYID> is the output of the first command above
+On your local machine, run the following:
 
-aws configure set aws_secret_access_key <SECRETKEYID> --profile <username> - where <SECRETKEYID> is the output of the second command above
+```
 
-aws configure set region <AWS_REGION> --profile <username> - where <AWS_REGION> is the output of the third command above
+aws configure set aws_access_key_id <ACCESSKEYID> --profile <username> # where <ACCESSKEYID> is the output of the first command above
+
+aws configure set aws_secret_access_key <SECRETKEYID> --profile <username> # where <SECRETKEYID> is the output of the second command above
+
+aws configure set region <AWS_REGION> --profile <username> # where <AWS_REGION> is the output of the third command above
+
+```
 
 Once you have configured the AWS profile on your local machine, run the following command to verify the profile has been created correctly
 
+```
 aws sts get-caller-identity --profile <username>
 
 ```
+
 
 ## Run the CloudFormation template to create the AWS resources
 
@@ -90,22 +106,30 @@ cd das-lambda-java-sam
 
 ```
 
+* [Deploy the CloudFormation stack using the AWS console or AWS CLI] - 
+
+
 The current folder should now contain the CloudFormation template file setup-das-cfn.yaml
+
+### If IAM users are allowed AWS console access
 
 You can log in to the AWS console using the new user that was just created and run CloudFormation using the template file setup-das-cfn.yaml
 
 Accept defaults for all the input parameters or modify them as needed.
 
+
+### If IAM users are not allowed AWS console access
+
 ** Note: If you do not have AWS console access, you can deploy the CloudFormation from your local machine or CloudShell.
 
-Execute the following commands from a terminal on your local machine or CloudShell **
+Execute the following commands from a terminal on your local machine or CloudShell (preferably from your local machine) **
 
 ```
-aws ec2 create-key-pair --key-name DASKeyPair --key-format pem --key-type rsa --profile <username> --query 'KeyMaterial' --output text > DASKeyPair.pem - Make sure to save this .pem file in a secure location as you will need it later to ssh into the EC2 machine that will be created as part of the CloudFormation stack
+aws ec2 create-key-pair --key-name DASKeyPair --key-format pem --key-type rsa --profile <username> --query 'KeyMaterial' --output text > DASKeyPair.pem # - Make sure to save this .pem file in a secure location as you will need it later to ssh into the EC2 machine that will be created as part of the CloudFormation stack
 
 chmod 400 DASKeyPair.pem
 
-** If you modify the name of the key-name from DASKeyPair, then make sure to replace it in the CloudFormation template as well **
+# ** If you modify the name of the key-name from DASKeyPair, then make sure to replace it in the CloudFormation template as well **
 
 AWS_REGION=$(aws configure get region --profile <username>)
 
@@ -113,9 +137,9 @@ cd <folder where you had checked out the https://github.com/aws-samples/serverle
 
 cd /serverless-patterns/das-lambda-java-sam
 
-Now deploy the CloudFormation stack by running the RunCloudformationStack.sh file as follows
+# Now deploy the CloudFormation stack by running the RunCloudformationStack.sh file as follows
 
-sh ./RunCloudformationStack.sh <username> <stackname> <a short unique random string> - replace the value of <username> and provide a value for the name of the CloudFormation stack by replacing <stackname>
+sh ./RunCloudformationStack.sh <username> <stackname> <a short unique random string> # - replace the value of <username> and provide a value for the name of the CloudFormation stack by replacing <stackname>. Also provide a random short string such as "uniqueib01 that you keep changing if you run the CloudFormation stack mutiple times"
 
 ```
 
@@ -128,200 +152,159 @@ This Cloudformation template will create multiple AWS resources such as an Amazo
 * [Connect to the EC2 machine] - Once the Cloudformation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
 Note: You may need to wait for some time after the Cloudformation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.
 
-** If you are not allowed AWS console access as an IAM user, you can ssh into the EC2 machine by running the command below to get the Public IP address of the EC2 machine **
+** If you are not allowed AWS console access as an IAM user, you can ssh into the EC2 machine by running the command below to get the Public DNS Name of the EC2 machine. Before that you will have to open an inbound rule allowing SSH from your local machine's IP address **
 
 ```
-EC2_PUBLIC_IP=$(aws cloudformation describe-stacks --stack-name <stackname> --query "Stacks[*].Outputs[?OutputKey=='ReverseProxyEC2PublicIP'].OutputValue" --output text)
+You need to first get the public IP address of your local machine. For example, on Mac you can use a command such as:
 
-echo $EC2_PUBLIC_IP
+MY_LOCAL_IP=$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d \")
+echo $MY_LOCAL_IP
+
+Note: The command will vary depending on your OS, so use the relevant command for your own OS to get your machine's public IP address
+
+To get the security group of the EC2 instance, use the following command and replace the values of <stackname> and <username>
+
+EC2_SECURITY_GROUP_ID=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='ReverseProxySecurityGroupName'].OutputValue" --output text)
+
+Now execute the below command to add ssh from your local machine to the EC2 instance. Replace the value of <username>
+
+aws ec2 authorize-security-group-ingress --profile <username> --region $AWS_REGION --group-id $EC2_SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $EC2_CONNECT_IP/32
+
+Next determin the public DNS name of the EC2 instance using the command below. Replace the value of <username>
+
+EC2_PUBLIC_DNS=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='ReverseProxyEC2PublicDNSName'].OutputValue" --output text)
+
+echo $EC2_PUBLIC_DNS
 
 To ssh you will need the DASKeyPair.pem file that you had created in an earlier step
 
+ssh -i "DASKeyPair.pem" $EC2_PUBLIC_DNS
 
 ```
-
-* [Check if Kafka Topic has been created] - Once you are inside the EC2 machine, you should be in the /home/ec2-user folder. Check to see the contents of the file kafka_topic_creator_output.txt by running the command cat kafka_topic_creator_output.txt. You should see an output such as "Created topic MskIamJavaLambdaTopic."
-
-If you are not able to find the file kafka_topic_creator_output.txt or if it is blank or you see an error message, then you need to run the file ./kafka_topic_creator.sh. This file runs a script that goes and creates the Kafka topic that the Lambda function will subscribe to.
 
 ## Pre-requisites to Deploy the sample Lambda function
 
-The EC2 machine that was created by running the Cloudformation template has all the software that will be needed to deploy the Lambda function.
+** Note - As part of the CloudFormation template, we have already built and deployed the Lambda Function that will process the incoming Database Activity Streams records from the Kinesis Data Stream. However, in case you want to understand how that was done or want to do it yourself, you can uncomment the commands for building and deploying the Lambda function, from the UserData section of the CloudFormation template before executing it and then run the same commands yourself from the EC2 instance, or even from your own local machine after installing all the pre-requisite software.
 
-The AWS SAM CLI is a serverless tool for building and testing Lambda applications. It uses Docker to locally test your functions in an Amazon Linux environment that resembles the Lambda execution environment. It can also emulate your application's build environment and API.
+The EC2 instance that was created by running the CloudFormation template has all the software that is needed to deploy the Lambda function.
 
-* Java - On the EC2 machine, we have installed the version of Java that you selected. We have installed Amazon Corrretto JDK of the version that you had selected at the time of specifying the input parameters in the Cloudformation template. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
+The AWS SAM CLI is a serverless tool for building and testing Lambda applications.
+
+* Java - On the EC2 instance, we have installed the version of Java that you selected. We have installed Amazon Corrretto JDK of the version that you had selected at the time of specifying the input parameters in the Cloudformation template. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
 * Maven - On the EC2 machine, we have installed Maven (https://maven.apache.org/install.html)
 * AWS SAM CLI - We have installed the AWS SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-* Docker - We have installed the Docker Community Edition on the EC2 machine (https://hub.docker.com/search/?type=edition&offering=community)
 
 We have also cloned the Github repository for serverless-patterns on the EC2 machine already by running the below command
-    ``` 
-    git clone https://github.com/aws-samples/serverless-patterns.git
-    ```
-Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/msk-lambda-iam-java-sam
-    ```
-
-## Use the SAM CLI to build and test locally
-
-Build your application with the `sam build` command.
-
-```bash
-sam build
-```
-
-The SAM CLI installs dependencies defined in `kafka_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
-
-Test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
-
-Run functions locally and invoke them with the `sam local invoke` command.
-
-```bash
-sam local invoke --event events/event.json
-```
-
-You should see a response such as the below:
 
 ```
-***** Begin sam local invoke response *****
+git clone https://github.com/aws-samples/serverless-patterns.git
 
-Invoking com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequest (java11)                                                           
-Local image is up-to-date                                                                                                                              
-Using local image: public.ecr.aws/lambda/java:11-rapid-x86_64.                                                                                         
-                                                                                                                                                       
-Mounting /home/ec2-user/serverless-patterns/msk-lambda-iam-java-sam/.aws-sam/build/LambdaMSKConsumerJavaFunction as /var/task:ro,delegated, inside     
-runtime container                                                                                                                                      
-START RequestId: 4484bb15-6749-4307-92d1-8ba2221e2218 Version: $LATEST
-START RequestId: 4484bb15-6749-4307-92d1-8ba2221e2218 Version: $LATEST
-Picked up JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
-Received this message from Kafka - KafkaMessage [topic=myTopic, partition=0, timestamp=1678072110111, timestampType=CREATE_TIME, key=null, value=Zg==, decodedKey=null, decodedValue=f, headers=[]]Message in JSON format : {
-  "topic": "myTopic",
-  "partition": 0,
-  "offset": 250,
-  "timestamp": 1678072110111,
-  "timestampType": "CREATE_TIME",
-  "value": "Zg\u003d\u003d",
-  "decodedKey": "null",
-  "decodedValue": "f",
-  "headers": []
-}Received this message from Kafka - KafkaMessage [topic=myTopic, partition=0, timestamp=1678072111086, timestampType=CREATE_TIME, key=null, value=Zw==, decodedKey=null, decodedValue=g, headers=[]]Message in JSON format : {
-  "topic": "myTopic",
-  "partition": 0,
-  "offset": 251,
-  "timestamp": 1678072111086,
-  "timestampType": "CREATE_TIME",
-  "value": "Zw\u003d\u003d",
-  "decodedKey": "null",
-  "decodedValue": "g",
-  "headers": []
-}All Messages in this batch = [
-  {
-    "topic": "myTopic",
-    "partition": 0,
-    "offset": 250,
-    "timestamp": 1678072110111,
-    "timestampType": "CREATE_TIME",
-    "value": "Zg\u003d\u003d",
-    "decodedKey": "null",
-    "decodedValue": "f",
-    "headers": []
-  },
-  {
-    "topic": "myTopic",
-    "partition": 0,
-    "offset": 251,
-    "timestamp": 1678072111086,
-    "timestampType": "CREATE_TIME",
-    "value": "Zw\u003d\u003d",
-    "decodedKey": "null",
-    "decodedValue": "g",
-    "headers": []
-  }
-]END RequestId: fc96203d-e0c0-4c30-b332-d16708b25d3e
-REPORT RequestId: fc96203d-e0c0-4c30-b332-d16708b25d3e  Init Duration: 0.06 ms  Duration: 474.31 ms     Billed Duration: 475 ms Memory Size: 512 MB   Max Memory Used: 512 MB
-"200 OK"
-
-***** End sam local invoke response *****
 ```
 
+* [Build and Deployment of Lambda Function] - The Lambda Function gets built and deployed as part of the CloudFormation template automatically. However, if you need to know how that was done, we make use of AWS SAM.
 
-## Deploy the sample application
+You can take a look at the below commands that are included in the UserData section of the CloudFormation template to understand how the Lambda Function was deployed. The code for the Lambda Function is also included in Github and checked out into the EC2 instance:
 
-
-To deploy your application for the first time, run the following in your shell:
-
-```bash
-sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name msk-lambda-iam-java-sam --guided
 ```
-
-The sam deploy command will package and deploy your application to AWS, with a series of prompts. You can accept all the defaults by hitting Enter:
-
-* **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
-* **AWS Region**: The AWS region you want to deploy your app to.
-* **Parameter MSKClusterName**: The name of the MSKCluster
-* **Parameter MSKClusterId**: The unique ID of the MSKCluster
-* **Parameter MSKTopic**: The Kafka topic on which the lambda function will listen on
-* **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
-* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
-* **Disable rollback**: Defaults to No and it preserves the state of previously provisioned resources when an operation fails
-* **Save arguments to configuration file**: If set to yes, your choices will be saved to a configuration file inside the project, so that in the future you can just re-run `sam deploy` without parameters to deploy changes to your application.
-* **SAM configuration file [samconfig.toml]**: Name of the configuration file to store configuration information locally
-* **SAM configuration environment [default]**: Environment for storing deployment information locally
-
-You should get a message "Successfully created/updated stack - <StackName> in <Region>" if all goes well
-
-
-## Test the sample application
-
-Once the lambda function is deployed, send some Kafka messages on the topic that the lambda function is listening on, on the MSK server.
-
-For your convenience, a script has been created on the EC2 machine that was provisioned using Cloudformation.
-
+# Building and Deploying Lambda Function
 cd /home/ec2-user
-
-You should see a script called kafka_message_sender.sh. Run that script and you should be able to send a new Kafka message in every line as shown below
+cd serverless-patterns
+cd ./das-lambda-java-sam/das_consumer_sam_project
+source /home/ec2-user/.bash_profile
+sam build
+sleep 60
+sam deploy --capabilities CAPABILITY_IAM --stack-name das-lambda-stack --no-confirm-changeset --no-disable-rollback --resolve-s3 --region $AWS_REGION
 
 ```
-[ec2-user@ip-10-0-0-126 ~]$ sh kafka_message_sender.sh
->My first message
->My second message
->My third message
->My fourth message
->My fifth message
->My sixth message
->My seventh message
->My eigth message
->My ninth message
->My tenth message
->Ctrl-C
+
+Once the Lambda Function gets deployed, you can go to the AWS Lambda console and you should see the function deployed and running - 
+java-database-activity-streams-consumer-function
+
+In case you do not have AWS console access for IAM users, you can list all the Lambda functions in the AWS account and AWS region by running the below command
+
+```
+aws lambda list-functions --profile <username> --region <$AWS_REGION> --no-cli-pager | jq -r '.Functions[].FunctionName'
+
+You should see java-database-activity-streams-consumer-function listed as one of the functions in the account
+
+You can get more details about this function by using the following command:
+
+aws lambda list-functions --profile jonathan --region us-west-2 --no-cli-pager | jq -r '.Functions[] | select (.FunctionName=="java-database-activity-streams-consumer-function")'
+
 ```
 
-Either send at least 10 messages or wait for 300 seconds (check the values of BatchSize: 10 and MaximumBatchingWindowInSeconds: 300 in the template.yaml file)
+## Generate Database Activity
 
-Then check Cloudwatch logs and you should see messages for the Cloudwatch Log Group with the name of the deployed Lambda function.
+In order to generate activity on the Aurora Postgres database, you can make use of the Postgres Client that is already installed for your convenience on the EC2 instance that was deployed as part of the CloudFormation stack.
 
-The lambda code parses the Kafka messages and outputs the fields in the Kafka messages to Cloudwatch logs
+We have even created a script file that will help you connect to the Aurora Postgres database.
 
-A single lambda function receives a batch of messages. The messages are received as a map with each key being a combination of the topic and the partition, as a single batch can receive messages from multiple partitions.
+We have also provided a SQL file that has some sample SQL commands that show you how to create a new table, insert some records and query the records in the database.
 
-Each key has a list of messages. Each Kafka message has the following properties - Topic, Partition, Offset, TimeStamp, TimeStampType, Key and Value
+These files can be found under the folder /home/ec2-user
 
-The Key and Value are base64 encoded and have to be decoded. A message can also have a list of headers, each header having a key and a value.
+To connect to the Aurora Postgres database use sh /home/ec2-user/db_connect.sh
 
-The code in this example prints out the fields in the Kafka message and also decrypts the key and the value and logs them in Cloudwatch logs.
+Sample SQL commands can be found in the file /home/ec2-user/db_commands.sql
+
+
+## Test that the Database Activity Streams are flowing
+
+When the Lambda function gets a Database Activity Streams event, it parses the event, filters out heartbeat events and write out the unfiltered events to an S3 bucket. S3 Object Notifications get triggered when a new object is created and generates a new message in an SQS queue. An OpenSearch Ingestion Pipeline gets triggered whenever there are new messages in the SQS queue. The OSI pipeline then reads the object from the S3 bucket and writes out the records to an OpenSearch domain in an index called "das-records". In order to validate that the Database Activity Streams records are being written to OpenSearch, you need to log in to the OpenSearch domain.
+
+If you have access to the AWS console for IAM users, you can take a look at the outputs tab of the CloudFormation stack. You will need the following output parameters - AOSDashboardsPublicIP, AOSDomainUserName and AOSDomainPassword.
+
+If you don't have access to the AWS console for IAM users, you can find out the values of the above output parameters using AWS CLI commands:
+
+```
+
+AOS_DASHBOARD_IP=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='AOSDashboardsPublicIP'].OutputValue" --output text)
+
+AOS_DASHBOARD_USERNAME=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='AOSDomainUserName'].OutputValue" --output text)
+
+AOS_DASHBOARD_PASSWORD=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='AOSDomainPassword'].OutputValue" --output text)
+
+```
+
+Use the values of the above parameters to log in to the OpenSearch Dashboard. Ignore any SSL certificate related warnings and follow the steps 4-6 on this workshop link - https://catalog.us-east-1.prod.workshops.aws/workshops/f0213896-4dd9-494a-89c5-f7886b45ed4a/en-US/search
+
+Once you are inside the OpenSearch dashboard, follow instructions similar to the ones mentioned in https://catalog.us-east-1.prod.workshops.aws/workshops/f0213896-4dd9-494a-89c5-f7886b45ed4a/en-US/search/visualsearch/discover-setup. Replace the my-movie* with das-records* to discover the records in the OpenSearch dashboard.
+
 
 ## Cleanup
 
-You can first clean-up the Lambda function by running the sam delete command
+You can first clean-up the Lambda function by running the sam delete command from the EC2 instance
 
 ```
-cd /home/ec2-user/serverless-patterns/msk-lambda-iam-java-sam
-sam delete
+cd /home/ec2-user/serverless-patterns/das-lambda-java-sam/das_consumer_sam_project
+sam delete --stack-name das-lambda-stack --region $AWS_REGION --no-prompts
 
 ```
 confirm by pressing y for both the questions
 You should see the lambda function getting deleted and a final confirmation "Deleted successfully" on the command-line
 
-Next you need to delete the Cloudformation template that created the MSK Server and the EC2 machine by going to the Cloudformation console and selecting the stack and then hitting the "Delete" button. It will run for sometime but eventually you should see the stack getting cleaned up. If you get an error message that says the stack could not be deleted, please retry again and do a Force Delete. The reason this may happen is because ENIs created by the deplayed Lambda function in your VPC may prevent the VPC from being deleted even after deleting the lambda function.
+Next you need to empty the contents of the S3 bucket that was being used to store the Database Activity Streams events by first getting the name of the bucket and then empty its contents:
+
+```
+DAS_BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='S3BucketName'].OutputValue" --output text)
+
+aws s3 rm s3://$DAS_BUCKET_NAME --recursive --profile <username>
+
+```
+
+
+Next you need to delete the Cloudformation template by going to the Cloudformation console and selecting the stack and then hitting the "Delete" button. It will run for sometime but eventually you should see the stack getting cleaned up. If you get an error message that says the stack could not be deleted, please retry again and do a Force Delete. The reason this may happen is because ENIs created by the deplayed Lambda function in your VPC may prevent the VPC from being deleted even after deleting the lambda function.
+
+If your IAM users do not have access to the AWS console, you can also use the AWS CLI to delete the CloudFormation stack by using the command below
+
+```
+aws cloudformation delete-stack --stack-name <Stack Name> --deletion-mode STANDARD --no-verify-ssl --region <AWS_REGION> --profile <username>
+
+```
+
+If the deletion fails the first time, do a force delete using the command
+
+```
+aws cloudformation delete-stack --stack-name <Stack Name> --deletion-mode FORCE_DELETE_STACK --no-verify-ssl --region <AWS_REGION> --profile <username>
+
+```

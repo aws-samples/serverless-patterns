@@ -1157,7 +1157,7 @@ Resources:
             
             echo "export SECRET_KEY_UNIQUE=$SECRET_KEY_UNIQUE" >> /home/ec2-user/.bash_profile
           
-            #Checkout Serverless Patterns from Github
+            #Checkout Serverless Patterns from Github and prepare template.yaml file for lambda deployment
             cd /home/ec2-user
             DAS_LAMBDA_CODE_GITHUB_LOCATION=${das_lambda_code_github_location}
             git clone $DAS_LAMBDA_CODE_GITHUB_LOCATION
@@ -1170,13 +1170,9 @@ Resources:
             sed -i "s/AWS_ACCESS_KEY_UNIQUE_STRING/$ACCESS_KEY_UNIQUE/g" template.yaml
             sed -i "s/AWS_SECRET_ACCESS_KEY_UNIQUE_STRING/$SECRET_KEY_UNIQUE/g" template.yaml
             
-            SAM_BUCKET_NAME=${sam_bucket_name}
-            AWS_REGION=${aws_region}
-            
-            sam build
-            sleep 60
-            sam deploy --capabilities CAPABILITY_IAM --stack-name das-lambda-stack --no-confirm-changeset --no-disable-rollback --resolve-s3 --region $AWS_REGION
-            
+            #SAM_BUCKET_NAME=${sam_bucket_name}
+            #AWS_REGION=${aws_region}
+           
             #Install PostgresSql client
             
             max_attempts=5
@@ -1229,19 +1225,19 @@ Resources:
             
             # Create sample SQL commands file
             
-            echo "create table persons(firstname varchar(25) not null, lastname varchar(25) not null, middle_initial varchar(1) null, street_address varchar(100) not null, unit_number varchar(10) null, city varchar(25) not null, state varchar(2) not null, zip varchar(10) not null);" > /home/ec2-user/db_commands.txt
+            echo "create table persons(firstname varchar(25) not null, lastname varchar(25) not null, middle_initial varchar(1) null, street_address varchar(100) not null, unit_number varchar(10) null, city varchar(25) not null, state varchar(2) not null, zip varchar(10) not null);" > /home/ec2-user/db_commands.sql
             
-            echo "" >> /home/ec2-user/db_commands.txt
+            echo "" >> /home/ec2-user/db_commands.sql
 
-            echo "insert into persons values ('John', 'Cummins', 'M', '1320 Hollywood Blvd.', 'Apt - 213', 'London', 'KY', '40740');" >> /home/ec2-user/db_commands.txt
+            echo "insert into persons values ('John', 'Cummins', 'M', '1320 Hollywood Blvd.', 'Apt - 213', 'London', 'KY', '40740');" >> /home/ec2-user/db_commands.sql
             
-            echo "" >> /home/ec2-user/db_commands.txt
+            echo "" >> /home/ec2-user/db_commands.sql
 
-            echo "insert into persons values ('Bryan', 'Starc', 'M', '89075 Parkwood Dr.', 'Unit-M', 'Paris', 'TX', '75461');" >> /home/ec2-user/db_commands.txt
+            echo "insert into persons values ('Bryan', 'Starc', 'M', '89075 Parkwood Dr.', 'Unit-M', 'Paris', 'TX', '75461');" >> /home/ec2-user/db_commands.sql
             
-            echo "" >> /home/ec2-user/db_commands.txt
+            echo "" >> /home/ec2-user/db_commands.sql
 
-            echo "select * from persons;" >> /home/ec2-user/db_commands.txt
+            echo "select * from persons;" >> /home/ec2-user/db_commands.sql
             
             # Adding OSI IAM Role as backend role to all_access role in OpenSearch
             # and Creating OpenSearch Ingestion Pipeline
@@ -1287,6 +1283,15 @@ Resources:
             sed -i "s/AWS_REGION/$AWS_REGION/g" IngestionPipelineConfigSubstituted.yaml
             
             aws osis create-pipeline --pipeline-name das-osi-pipeline --min-units 1 --max-units 4 --pipeline-configuration-body file://IngestionPipelineConfigSubstituted.yaml --no-cli-pager
+            
+            # Building and Deploying Lambda Function
+            cd /home/ec2-user
+            cd serverless-patterns
+            cd ./das-lambda-java-sam/das_consumer_sam_project
+            source /home/ec2-user/.bash_profile
+            sam build
+            sleep 60
+            sam deploy --capabilities CAPABILITY_IAM --stack-name das-lambda-stack --no-confirm-changeset --no-disable-rollback --resolve-s3 --region $AWS_REGION
 
           - security_group_id : !GetAtt ReverseProxyInstanceSecurityGroup.GroupId
             das_lambda_code_github_location: !Ref DASLambdaCodeGithubLocation
@@ -2079,3 +2084,15 @@ Outputs:
     Value: !GetAtt ReverseProxyInstance.PublicIp
     Export:
       Name: ReverseProxyEC2PublicIP
+  ReverseProxyEC2PublicDNSName:
+    Value: !GetAtt ReverseProxyInstance.PublicDnsName
+    Export:
+      Name: ReverseProxyEC2PublicDNSName
+  ReverseProxySecurityGroupName:
+    Value: !GetAtt ReverseProxyInstanceSecurityGroup.GroupId
+    Export:
+      Name: ReverseProxySecurityGroupName
+  S3BucketName:
+    Value: !Ref SourceBucket
+    Export:
+      Name: S3BucketName

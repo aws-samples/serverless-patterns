@@ -154,10 +154,14 @@ public class HandlerAuroraStream implements RequestHandler<KinesisEvent, String>
 								}
 							}
 							logger.log(correlationId + "Finished Printing Incoming Record");
-							// Invoke method in AuroraStreamsS3Inserter class to insert each Aurora
-							// DAS event into S3 as a separate object in S3
-							String s3Record = getOpenSearchRecordAsJsonString(requestId, recordNumber * 100 + eventNumber, postgresActivityRecord.getClusterId(), postgresActivityRecord.getInstanceId(), postgresActivityRecord.getType(), databaseActivityEvent);
-							auroraStreamsS3Inserter.insertIntoS3(s3Record);
+							//log only events that are not by the rdsamin user
+							if (databaseActivityEvent.getDbUserName().strip().toLowerCase() != "rdsamdin") {
+								// Invoke method in AuroraStreamsS3Inserter class to insert each Aurora
+								// DAS event into S3 as a separate object in S3
+								String s3Record = getOpenSearchRecordAsJsonString(requestId, recordNumber * 100 + eventNumber, postgresActivityRecord.getClusterId(), postgresActivityRecord.getInstanceId(), postgresActivityRecord.getType(), databaseActivityEvent);
+								auroraStreamsS3Inserter.insertIntoS3(s3Record);
+							}
+							
 						}
 						eventNumber++;
 					}
