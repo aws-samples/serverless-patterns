@@ -1169,10 +1169,7 @@ Resources:
             sed -i "s/S3_BUCKET_NAME/$S3_BUCKET_NAME/g" template.yaml
             sed -i "s/AWS_ACCESS_KEY_UNIQUE_STRING/$ACCESS_KEY_UNIQUE/g" template.yaml
             sed -i "s/AWS_SECRET_ACCESS_KEY_UNIQUE_STRING/$SECRET_KEY_UNIQUE/g" template.yaml
-            
-            #SAM_BUCKET_NAME=${sam_bucket_name}
-            #AWS_REGION=${aws_region}
-           
+                       
             #Install PostgresSql client
             
             max_attempts=5
@@ -1206,12 +1203,7 @@ Resources:
             
             DBUSERNAME=$(aws secretsmanager get-secret-value --secret-id $DB_SECRET | jq -r '.SecretString' | jq -r '.' | jq -r '.username')
             
-            DBPASSWORD=$(aws secretsmanager get-secret-value --secret-id $DB_SECRET | jq -r '.SecretString' | jq -r '.' | jq -r '.password')
-            
-            echo "DBHOST=$DBHOST"
-            echo "DBPORT=$DBPORT"
-            echo "DBUSERNAME=$DBUSERNAME"
-            echo "DBPASSWORD=$DBPASSWORD"
+            DBPASSWORD=$(aws secretsmanager get-secret-value --secret-id $DB_SECRET | jq -r '.SecretString' | jq -r '.' | jq -r '.password')     
             
             echo "export DBHOST=$DBHOST" >> /home/ec2-user/.bash_profile
             echo "export DBPORT=$DBPORT" >> /home/ec2-user/.bash_profile
@@ -1221,7 +1213,6 @@ Resources:
             echo "#!/bin/bash" > /home/ec2-user/db_connect.sh
             echo "export PGPASSWORD=$DBPASSWORD; psql -h $DBHOST -d postgres -U $DBUSERNAME -p $DBPORT" >> /home/ec2-user/db_connect.sh
             sudo chmod +x /home/ec2-user/db_connect.sh
-            
             
             # Create sample SQL commands file
             
@@ -1243,30 +1234,23 @@ Resources:
             # and Creating OpenSearch Ingestion Pipeline
             
             SQS_QUEUE_URL=${sqs_queue_url}
-            echo "SQS_QUEUE_URL=$SQS_QUEUE_URL"
             echo "export SQS_QUEUE_URL=$SQS_QUEUE_URL" >> /home/ec2-user/.bash_profile
             
             OPENSEARCH_DOMAIN_ENDPOINT=${opensearch_domain_endpoint}
-            echo "OPENSEARCH_DOMAIN_ENDPOINT=$OPENSEARCH_DOMAIN_ENDPOINT"
             echo "export OPENSEARCH_DOMAIN_ENDPOINT=$OPENSEARCH_DOMAIN_ENDPOINT" >> /home/ec2-user/.bash_profile
             
             OPENSEARCH_DOMAIN_URL='https://'$OPENSEARCH_DOMAIN_ENDPOINT
-            echo "OPENSEARCH_DOMAIN_URL=$OPENSEARCH_DOMAIN_URL"
             echo "export OPENSEARCH_DOMAIN_URL=$OPENSEARCH_DOMAIN_URL" >> /home/ec2-user/.bash_profile
             
             OSI_IAM_ROLE=${osi_iam_role}
-            echo "OSI_IAM_ROLE=$OSI_IAM_ROLE"
             echo "export OSI_IAM_ROLE=$OSI_IAM_ROLE" >> /home/ec2-user/.bash_profile
             
             OS_MASTER_USERNAME=${os_master_username}
             OS_MASTER_PASSWORD=${os_master_password}
-            echo "OS_MASTER_USERNAME=$OS_MASTER_USERNAME"
-            echo "OS_MASTER_PASSWORD=$OS_MASTER_PASSWORD"
             echo "export OS_MASTER_USERNAME=$OS_MASTER_USERNAME" >> /home/ec2-user/.bash_profile
             echo "export OS_MASTER_PASSWORD=$OS_MASTER_PASSWORD" >> /home/ec2-user/.bash_profile
             
             BASE64_USERNAME_PWD=$(echo -n $OS_MASTER_USERNAME:$OS_MASTER_PASSWORD | base64)
-            echo "BASE64_USERNAME_PWD=$BASE64_USERNAME_PWD"
             echo "export BASE64_USERNAME_PWD=$BASE64_USERNAME_PWD" >> /home/ec2-user/.bash_profile
             
             source /home/ec2-user/.bash_profile
