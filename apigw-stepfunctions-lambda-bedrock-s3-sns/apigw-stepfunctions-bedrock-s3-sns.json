@@ -29,7 +29,7 @@
                 "link": "https://www.aboutamazon.com/news/aws/amazon-nova-artificial-intelligence-bedrock-aws"
             },
             {
-                "text": "Packaging custom boto3 version in deployment zip",
+                "text": "Packaging custom version of boto3 in deployment zip",
                 "link": "https://repost.aws/knowledge-center/lambda-python-runtime-errors"
             }
         ]
