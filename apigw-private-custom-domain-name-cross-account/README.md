@@ -4,7 +4,7 @@ Invoking a Private Custom Domain Name cross-account
 
 This architecture enables the invocation of a Private Custom Domain Name deployed for a Private API Gateway cross-account. The solution leverages [Amazon Private API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html), [Execute-API VPC Endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html), and the Private Custom Domain N [Private Custom Domain name](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-custom-domains.html). 
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/private-custom-domain-name-cross-account).
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-private-custom-domain-name-cross-account).
 
 You can update the template to add AWS resources through the same deployment process that updates your application code.
 
@@ -41,7 +41,7 @@ This pattern utilizes two AWS Sccounts and their respective templates.
     ```
 2. Change directory to the pattern directory:
     ```bash
-    cd serverless-patterns/private-custom-domain-name-cross-account
+    cd serverless-patterns/apigw-private-custom-domain-name-cross-account
     ```
 
 #### AccountA
