@@ -13,7 +13,7 @@ ACCESSKEYID=$(echo $ACCESSKEY | jq -r '.AccessKey.AccessKeyId')
 
 SECRETKEYID=$(echo $ACCESSKEY | jq -r '.AccessKey.SecretAccessKey')
 
-aws secretsmanager delete-secret --secret-id aws-access-key-id-non --force-delete-without-recovery --region $AWS_REGION
+aws secretsmanager delete-secret --secret-id aws-access-key-id --force-delete-without-recovery --region $AWS_REGION
 
 aws secretsmanager delete-secret --secret-id aws-secret-access-key --force-delete-without-recovery --region $AWS_REGION
 
