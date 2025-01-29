@@ -17,7 +17,7 @@
   "dependencies": {
     "@aws-cdk/aws-iot-actions-alpha": "^2.173.0-alpha.0",
     "@aws-cdk/aws-iot-alpha": "^2.173.0-alpha.0",
-    "aws-cdk-lib": "2.173.0",
+    "aws-cdk-lib": "2.177.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }
