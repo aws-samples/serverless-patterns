@@ -18,9 +18,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in as root or an user that has Administrative privileges. We will create a new IAM user for the purpose of setting up the Database Activity Streams end-to-end flow. The IAM user that you will create must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
-## Run the BootStrapFromCloudShell.sh or the BootStrapFromCloudShellNoConsoleAccess.sh script
+### Run the BootStrapFromCloudShell.sh or the BootStrapFromCloudShellNoConsoleAccess.sh script
 
 **Note that in the instructions below, you will need to run the BootStrapFromCloudShell.sh only if you allow AWS console access for IAM users.**
 
@@ -28,34 +28,45 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Log in to the AWS Account as Admin User] - You need to log in to the AWS Account as either root or as an user with Admin privileges
 
-* [Open AWS CloudShell and checkout BootStrapFromCloudShell.sh script from Github] - Once you are inside AWS Cloudshell in the AWS console, type the following commands. In case you are using a fork of the aws-samples github repository, then please replace the github URL with your own fork.
+* [Open AWS CloudShell and checkout files from Github] - Once you are inside AWS Cloudshell in the AWS console, type the following commands. In case you are using a fork of the aws-samples github repository, then please replace the github URL with your own fork.
 
 ```
 git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git
 cd serverless-patterns
 git sparse-checkout set --no-cone /das-lambda-java-sam
 git checkout
+cd das-lambda-java-sam
 
 ```
 
-### If IAM users are allowed AWS console access
+### Option 1 - If IAM users are allowed AWS console access
 
 * [Execute the BootStrapFromCloudShell.sh script to create an IAM user and store keys in Secrets Manager] - Once the BootStrapFromCloudShell.sh script has been checked out from Github, execute the following commands in your CloudShell. Substitute the <username> and <password> with values for the IAM user you want to create. The password needs to be at least 8 characters long. 
 
 ```
-cd das-lambda-java-sam
 sh ./BootStrapFromCloudShell.sh <username> <password>
 
 ```
 
-Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new <username> and <password>. You will be asked to change the password upon first login. Once you are logged in as the IAM user, follow the next step.
+Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new <username> and <password>. You will be asked to change the password upon first login. Once you are logged in as the IAM user, move to the next step - "Run the CloudFormation template to create the AWS resources"
     
-### If IAM users are not allowed AWS console access
-    
+
+### Option 2 - If IAM users are not allowed AWS console access
+
+* [Checkout from Github on your local machine in case you haven't done so already] - Type the following commands from any folder on your local machine to get the CloudFormation template from Github
+
+```
+git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git
+cd serverless-patterns
+git sparse-checkout set --no-cone /das-lambda-java-sam
+git checkout
+cd das-lambda-java-sam
+
+```
+
 **Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh <username> as shown below** 
 
 ```
-cd das-lambda-java-sam
 sh ./BootStrapFromCloudShellNoConsoleAccess.sh <username>
 
 ```
@@ -92,21 +103,10 @@ aws sts get-caller-identity --profile <username>
 
 ## Run the CloudFormation template to create the AWS resources
 
-* [Checkout from Github on your local machine] - Type the following commands from any folder on your local machine to get the CloudFormation template from Github
-
-```
-git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git
-cd serverless-patterns
-git sparse-checkout set --no-cone /das-lambda-java-sam
-git checkout
-cd das-lambda-java-sam
-
-```
-
 * [Deploy the CloudFormation stack using the AWS console or AWS CLI] - 
 
-
 The current folder should now contain the CloudFormation template file setup-das-cfn.yaml
+
 
 ### If IAM users are allowed AWS console access
 
@@ -158,8 +158,17 @@ Wait for the Cloudformation stack to be created. This can take a very long time.
 
 This Cloudformation template will create multiple AWS resources such as an Amazon Aurora Postgres Database, an Amazon OpenSearch domain, an AWS Lambda function that will process the Database Activity Streams (DAS) events, an S3 bucket to which the Lambda function will write the DAS events records, an OpenSearch Ingestion Pipeline, an SQS queue for triggering the OpenSearch Ingestion Pipeline and other supporting resources. It will also create an EC2 machine that already has the Postgres client installed for you to run SQL commands on the Aurora Postgres database.
 
-* [Connect to the EC2 machine] - Once the Cloudformation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
-Note: You may need to wait for some time after the Cloudformation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.
+* [Connect to the EC2 machine] - 
+
+### If IAM users are allowed AWS console access
+
+Once the Cloudformation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
+
+**Note: You may need to wait for some time after the Cloudformation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.**
+
+Now jump to the section "Pre-requisites to Deploy the sample Lambda function"
+
+### If IAM users are not allowed AWS console access
 
 **If you are not allowed AWS console access as an IAM user, you can ssh into the EC2 machine by running the command below to get the Public DNS Name of the EC2 machine. Before that you will have to open an inbound rule allowing SSH from your local machine's IP address**
 
@@ -205,15 +214,25 @@ ssh -i "DASKeyPair.pem" $EC2_PUBLIC_DNS
 
 ## Pre-requisites to Deploy the sample Lambda function
 
-**Note - As part of the CloudFormation template, we have already built and deployed the Lambda Function that will process the incoming Database Activity Streams records from the Kinesis Data Stream. However, in case you want to understand how that was done or want to do it yourself, you can uncomment the commands for building and deploying the Lambda function, from the UserData section of the CloudFormation template before executing it and then run the same commands yourself from the EC2 instance, or even from your own local machine after installing all the pre-requisite software.**
+### If you want to understand and deploy the Lambda function yourself
+
+If you do not want to build and deploy the lambda function yourself, you can jump to the step - "Generate Database Activity"
+
+If you are interested to understand more details of how the lambda function was built and deployed, or if you want to do it yourself, read the below sections before the "Generate Database Activity" step
+
+* [Install Pre-requisites]
+
+**Note - As part of the CloudFormation template, we have already built and deployed the Lambda Function that will process the incoming Database Activity Streams records from the Kinesis Data Stream.**
+
+**However, in case you want to understand how that was done or want to do it yourself, you can uncomment the commands for building and deploying the Lambda function, from the UserData section of the CloudFormation template before executing it and then run the same commands yourself from the EC2 instance, or even from your own local machine after installing all the pre-requisite software.**
+
+**The following are the software that need to be installed if you are planning to try it out on your own machine**
+
+* Java - On the EC2 instance, we have installed the version of Java that you selected. We have installed Amazon Corretto JDK of the version that you had selected at the time of specifying the input parameters in the Cloudformation template. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
+* Maven - On the EC2 machine, we have installed Maven (https://maven.apache.org/install.html)
+* AWS SAM CLI - We have installed the AWS SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html). The AWS SAM CLI is a serverless tool for building and testing Lambda applications.
 
 The EC2 instance that was created by running the CloudFormation template has all the software that is needed to deploy the Lambda function.
-
-The AWS SAM CLI is a serverless tool for building and testing Lambda applications.
-
-* Java - On the EC2 instance, we have installed the version of Java that you selected. We have installed Amazon Corrretto JDK of the version that you had selected at the time of specifying the input parameters in the Cloudformation template. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
-* Maven - On the EC2 machine, we have installed Maven (https://maven.apache.org/install.html)
-* AWS SAM CLI - We have installed the AWS SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 
 We have also cloned the Github repository for serverless-patterns on the EC2 machine already by running the below command
 
