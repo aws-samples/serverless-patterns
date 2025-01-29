@@ -22,13 +22,13 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Run the BootStrapFromCloudShell.sh or the BootStrapFromCloudShellNoConsoleAccess.sh script
 
-**Note that in the instructions below, you will need to run the BootStrapFromCloudShell.sh only if you allow AWS console access for IAM users.**
+** Note that in the instructions below, you will need to run the BootStrapFromCloudShell.sh only if you allow AWS console access for IAM users.
 
-**If not, then you will need to run the BootStrapFromCloudShellNoConsoleAccess.sh, so please look at the instructions in the relevant section**
+If not, then you will need to run the BootStrapFromCloudShellNoConsoleAccess.sh, so please look at the instructions in the relevant section**
 
 * [Log in to the AWS Account as Admin User] - You need to log in to the AWS Account as either root or as an user with Admin privileges
 
-* [Open AWS CloudShell and checkout BootStrapFromCloudShell.sh script from Github] - Once you are inside AWS Cloudshell in the AWS console, type the following commands. In case you are using a fork of the aws-samples github repository, then please replace the github URL with your own fork.
+* [Open AWS CloudShell and checkout BootStrapFromCloudShell.sh script from Github] - Once you are inside AWS Cloudshell in the AWS console, type the following commands
 
 ```
 git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git
@@ -52,7 +52,7 @@ Once the above command is done executing, log out of the AWS account and log in 
     
 ### If IAM users are not allowed AWS console access
     
-**Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh <username> as shown below** 
+** Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh <username> as shown below ** 
 
 ```
 cd das-lambda-java-sam
@@ -65,22 +65,25 @@ Once the above command is done running, it is recommended to create an AWS CLI p
 On the AWS CloudShell, run the following and note down the values of the outputs of each of the commands below
 
 ```
-sh ./GetAWSCLIProfileDetailsFromCloudshell.sh <username>
+aws configure get aws_access_key_id --profile <username> # where <username> is the same as the <username> parameter that was passed to the BootStrapFromCloudShellNoConsoleAccess.sh command above
+
+aws configure get aws_secret_access_key --profile <username>
+
+aws configure get region --profile <username>
 
 ```
-
-The above command will generate three outputs, the access key, the secret access key and the default AWS region. Note down the above values
 
 On your local machine, run the following:
 
 ```
-sh ./CreateAWSCLIProfileOnLocalMachine.sh <username> <access key> <secret access key> <aws region>
+
+aws configure set aws_access_key_id <ACCESSKEYID> --profile <username> # where <ACCESSKEYID> is the output of the first command above
+
+aws configure set aws_secret_access_key <SECRETKEYID> --profile <username> # where <SECRETKEYID> is the output of the second command above
+
+aws configure set region <AWS_REGION> --profile <username> # where <AWS_REGION> is the output of the third command above
 
 ```
-
-where the <access key> <secret access key> <aws region> need to be replaced with the values of the three outputs from CloudShell noted above.
-    
-The above command will create an AWS profile for <username> on your local machine.
 
 Once you have configured the AWS profile on your local machine, run the following command to verify the profile has been created correctly
 
@@ -117,42 +120,30 @@ Accept defaults for all the input parameters or modify them as needed.
 
 ### If IAM users are not allowed AWS console access
 
-**Note: If you do not have AWS console access, you can deploy the CloudFormation from your local machine or CloudShell.**
+** Note: If you do not have AWS console access, you can deploy the CloudFormation from your local machine or CloudShell.
 
-**Execute the following commands from a terminal on your local machine or CloudShell (preferably from your local machine)**
-
-```
-aws ec2 create-key-pair --key-name DASKeyPair --key-format pem --key-type rsa --profile <username> --query 'KeyMaterial' --output text > DASKeyPair.pem
+Execute the following commands from a terminal on your local machine or CloudShell (preferably from your local machine) **
 
 ```
+aws ec2 create-key-pair --key-name DASKeyPair --key-format pem --key-type rsa --profile <username> --query 'KeyMaterial' --output text > DASKeyPair.pem # - Make sure to save this .pem file in a secure location as you will need it later to ssh into the EC2 machine that will be created as part of the CloudFormation stack
 
-Make sure to save this .pem file in a secure location as you will need it later to ssh into the EC2 machine that will be created as part of the CloudFormation stack
-
-```
 chmod 400 DASKeyPair.pem
 
-```
+# ** If you modify the name of the key-name from DASKeyPair, then make sure to replace it in the CloudFormation template as well **
 
-**If you modify the name of the key-name from DASKeyPair, then make sure to replace it in the CloudFormation template as well.**
-
-```
 AWS_REGION=$(aws configure get region --profile <username>)
 
 cd <folder where you had checked out the https://github.com/aws-samples/serverless-patterns.git>
 
 cd /serverless-patterns/das-lambda-java-sam
 
-```
+# Now deploy the CloudFormation stack by running the RunCloudformationStack.sh file as follows
 
-Now deploy the CloudFormation stack by running the RunCloudformationStack.sh file as follows
-
-```
-sh ./RunCloudformationStack.sh <username> <stackname> <a short unique random string> 
+sh ./RunCloudformationStack.sh <username> <stackname> <a short unique random string> # - replace the value of <username> and provide a value for the name of the CloudFormation stack by replacing <stackname>. Also provide a random short string such as "uniqueib01 that you keep changing if you run the CloudFormation stack mutiple times"
 
 ```
-In the above command, replace the value of <username> and provide a value for the name of the CloudFormation stack by replacing <stackname>. Also provide a random short string such as "uniqueib01 that you keep changing if you run the CloudFormation stack mutiple times"
 
-**If you need to replace the values of any input parameters to the CloudFormation stack, then add those in the --parameter-overrides section of the RunCloudformationStack.sh**
+** If you need to replace the values of any input parameters to the CloudFormation stack, then add those in the --parameter-overrides section of the RunCloudformationStack.sh **
 
 Wait for the Cloudformation stack to be created. This can take a very long time. Even after the CloudFormation template shows a status of "Create Complete", wait at least another 15 minutes, as the UserData scripts inside the CloudFormation tempate continue running.
 
@@ -161,51 +152,39 @@ This Cloudformation template will create multiple AWS resources such as an Amazo
 * [Connect to the EC2 machine] - Once the Cloudformation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
 Note: You may need to wait for some time after the Cloudformation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.
 
-**If you are not allowed AWS console access as an IAM user, you can ssh into the EC2 machine by running the command below to get the Public DNS Name of the EC2 machine. Before that you will have to open an inbound rule allowing SSH from your local machine's IP address**
+** If you are not allowed AWS console access as an IAM user, you can ssh into the EC2 machine by running the command below to get the Public DNS Name of the EC2 machine. Before that you will have to open an inbound rule allowing SSH from your local machine's IP address **
 
+```
 You need to first get the public IP address of your local machine. For example, on Mac you can use a command such as:
 
-```
 MY_LOCAL_IP=$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d \")
 echo $MY_LOCAL_IP
-
-```
 
 Note: The command will vary depending on your OS, so use the relevant command for your own OS to get your machine's public IP address
 
 To get the security group of the EC2 instance, use the following command and replace the values of <stackname> and <username>
 
-```
 EC2_SECURITY_GROUP_ID=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='ReverseProxySecurityGroupName'].OutputValue" --output text)
-
-```
 
 Now execute the below command to add ssh from your local machine to the EC2 instance. Replace the value of <username>
 
-```
 aws ec2 authorize-security-group-ingress --profile <username> --region $AWS_REGION --group-id $EC2_SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $EC2_CONNECT_IP/32
 
-```
+Next determin the public DNS name of the EC2 instance using the command below. Replace the value of <username>
 
-Next determine the public DNS name of the EC2 instance using the command below. Replace the value of <username>
-
-```
 EC2_PUBLIC_DNS=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='ReverseProxyEC2PublicDNSName'].OutputValue" --output text)
 
 echo $EC2_PUBLIC_DNS
 
-```
-
 To ssh you will need the DASKeyPair.pem file that you had created in an earlier step
 
-```
 ssh -i "DASKeyPair.pem" $EC2_PUBLIC_DNS
 
 ```
 
 ## Pre-requisites to Deploy the sample Lambda function
 
-**Note - As part of the CloudFormation template, we have already built and deployed the Lambda Function that will process the incoming Database Activity Streams records from the Kinesis Data Stream. However, in case you want to understand how that was done or want to do it yourself, you can uncomment the commands for building and deploying the Lambda function, from the UserData section of the CloudFormation template before executing it and then run the same commands yourself from the EC2 instance, or even from your own local machine after installing all the pre-requisite software.**
+** Note - As part of the CloudFormation template, we have already built and deployed the Lambda Function that will process the incoming Database Activity Streams records from the Kinesis Data Stream. However, in case you want to understand how that was done or want to do it yourself, you can uncomment the commands for building and deploying the Lambda function, from the UserData section of the CloudFormation template before executing it and then run the same commands yourself from the EC2 instance, or even from your own local machine after installing all the pre-requisite software.
 
 The EC2 instance that was created by running the CloudFormation template has all the software that is needed to deploy the Lambda function.
 
@@ -246,13 +225,10 @@ In case you do not have AWS console access for IAM users, you can list all the L
 ```
 aws lambda list-functions --profile <username> --region <$AWS_REGION> --no-cli-pager | jq -r '.Functions[].FunctionName'
 
-```
-
 You should see java-database-activity-streams-consumer-function listed as one of the functions in the account
 
 You can get more details about this function by using the following command:
 
-```
 aws lambda list-functions --profile jonathan --region us-west-2 --no-cli-pager | jq -r '.Functions[] | select (.FunctionName=="java-database-activity-streams-consumer-function")'
 
 ```
@@ -330,28 +306,5 @@ If the deletion fails the first time, do a force delete using the command
 
 ```
 aws cloudformation delete-stack --stack-name <Stack Name> --deletion-mode FORCE_DELETE_STACK --no-verify-ssl --region <AWS_REGION> --profile <username>
-
-```
-
-You will also need to clean-up the OpenSearch Ingestion Pipeline that was created from the UserData of the CloudFormation templation using AWS CLI as follows:
-
-```
-aws osis delete-pipeline --pipeline-name "das-osi-pipeline"
-
-```
-
-You will also need to clean-up the two secrets for storing the credentials of the IAM user in SecretsManager:
-
-```
-aws secretsmanager delete-secret --secret-id aws-access-key-id --force-delete-without-recovery --region $AWS_REGION
-
-aws secretsmanager delete-secret --secret-id aws-secret-access-key --force-delete-without-recovery --region $AWS_REGION 
-
-```
-
-Now log in to the AWS Cloudshell as the root user and then run the following command to delete the IAM user that was created for running this project:
-
-```
-aws iam delete-user --user-name <username>
 
 ```
