@@ -98,7 +98,7 @@ If you don't put the header and its value, you will get `Unauthorized`
 
 You can then send the Json Payload to the `sendmessage` route
 
-    ```
+    ```bash
     > {"action": "sendmessage","message" : "hey queen"}
     < good job on deploying this template, keep slaying!!
     ```
