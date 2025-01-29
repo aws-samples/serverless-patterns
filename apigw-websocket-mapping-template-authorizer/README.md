@@ -69,7 +69,7 @@ The Mapping Template used is this one :
           }
 ```
 So it will pass a bunch of important information like the `Body` and the `connectionId`. You can add and remove as many variables as you want. 
-To make it as independant as I could, the back-end Lambda "SendMessageFunction" does not need any of these information to run successfully, because it is getting the `@connection` URL from its environment variables and the `connectionId` from the DynamoDB which name is also in the environment variables.
+To make it as independant as I could, the back-end Lambda "SendMessageFunction" does not need any of these information to run successfully, because it is getting the endpoint from its environment variables and the `connectionId` from the DynamoDB which name is also in the environment variables.
 
 Only the stage name `stage` is hard-codeded in the environment variable of the Lambda, so if you want to change it you would need to change the environment variable or get it from the Mapping Template in the event sent to Lambda. 
 
