@@ -15,7 +15,7 @@
     "@types/cookie": "^0.6.0",
     "@types/node": "^20.7.1",
     "aws-cdk": "^2.99.1",
-    "cookie": "^0.5.0",
+    "cookie": "^1.0.2",
     "esbuild": "^0.19.4",
     "ts-node": "^10.9.1",
     "typescript": "~5.2.2",
@@ -26,7 +26,7 @@
     "aws-amplify": "^6.0.12",
     "aws-cdk-lib": "^2.99.1",
     "constructs": "^10.0.0",
-    "cookie": "^0.5.0",
+    "cookie": "^1.0.2",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
     "source-map-support": "^0.5.21"
