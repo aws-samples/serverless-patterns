@@ -1,4 +1,4 @@
-# AWS Wesocket API to Lambda 
+# AWS Websocket API to Lambda non-proxy
 
 This pattern will create a websocket API protected by a Lambda authorizer. The websocket is integrated with a Lambda function through a mapping template that passes the main informations of the request.
 

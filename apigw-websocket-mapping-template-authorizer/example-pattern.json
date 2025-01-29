@@ -9,7 +9,7 @@
     "text": [
       "This projects demonstrates how to use a WebSocket API with a Lambda Authorizer",
       "The WebSocket API does not have a Proxy integration with the back-end Lambda written NodeJs 22, instead it is using a mapping template that forwards the main information of the request.",
-      "The Connection ID is stored in a DynamoDB table and the Lambda sends a response to the websocket API through the @connections URL"
+      "The Connection ID is stored in a DynamoDB table and the Lambda sends a response to the websocket API through the endpoint URL"
     ]
   },
   "gitHub": {
