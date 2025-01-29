@@ -101,7 +101,6 @@ You can then send the Json Payload to the `sendmessage` route
     ```
     > {"action": "sendmessage","message" : "hey queen"}
     < good job on deploying this template, keep slaying!!
-
     ```
 
 ## Cleanup
