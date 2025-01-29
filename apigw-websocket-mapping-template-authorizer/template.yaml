@@ -96,7 +96,7 @@ Resources:
               "routeKey": "$context.routeKey",
               "messageId": "$context.messageId",
               "auth": "$context.authorizer.principalId",
-              "test": "$context.authorizer.token",
+              "token": "$context.authorizer.token",
               "eventType": "$context.eventType",
               "extendedRequestId": "$context.extendedRequestId",
               "requestTime": "$context.requestTime",
@@ -104,9 +104,7 @@ Resources:
               "stage": "$context.stage",
               "connectedAt": "$context.connectedAt",
               "requestTimeEpoch": "$context.requestTimeEpoch",
-              "identity": {
-                "sourceIp": "$context.identity.sourceIp"
-              },
+              "sourceIp": "$context.identity.sourceIp",
               "requestId": "$context.requestId",
               "domainName": "$context.domainName",
               "connectionId": "$context.connectionId",
@@ -129,7 +127,7 @@ Resources:
   Stage:
     Type: AWS::ApiGatewayV2::Stage
     Properties:
-      StageName: slay
+      StageName: stage
       DeploymentId:
         Ref: Deployment
       ApiId:
@@ -211,7 +209,7 @@ Resources:
         Variables:
           TABLE_NAME: !Ref ConnectionsTable
           API_ID: !Ref WebsocketApi
-          STAGE: "slay"
+          STAGE: "stage"
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ConnectionsTable
@@ -228,6 +226,13 @@ Resources:
     - WebsocketApi
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName:
-        Ref: SendMessageFunction
+      FunctionName: !Ref SendMessageFunction
       Principal: apigateway.amazonaws.com
+
+Outputs:
+  WebSocketCommand:
+    Description: "The WSS command to use to connect"
+    Value: !Join [ '', [ 'wscat --header token:hello -c wss://', !Ref WebSocketApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+  PayloadJson:
+    Description: "The Json payload you can send to try the sendmessage route"
+    Value: '{"action": "sendmessage","message" : "hey queen"}'

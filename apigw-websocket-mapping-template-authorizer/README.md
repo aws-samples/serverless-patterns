@@ -1,6 +1,6 @@
-# AWS Service 1 to AWS Service 2
+# AWS Wesocket API to Lambda 
 
-This pattern << explain usage >>
+This pattern will create a websocket API protected by a Lambda authorizer. The websocket is integrated with a Lambda function through a mapping template that passes the main informations of the request.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -38,11 +38,69 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+Websocket APIs are commonly used for 2-ways communications between a client and a server (like a chatbot for instance).
+I once came across a scenario where a mapping template was needed, so I thought it could help other people if I published it here. 
+
+The routes $connect and $disconnect have a proxy integration with their Lambdas. 
+The integration for the "sendmessage" route is non-proxy with a Lambda function in the back-end. 
+The Mapping Template used is this one : 
+```
+          {
+            "requestContext": {
+              "routeKey": "$context.routeKey",
+              "messageId": "$context.messageId",
+              "auth": "$context.authorizer.principalId",
+              "token": "$context.authorizer.token",
+              "eventType": "$context.eventType",
+              "extendedRequestId": "$context.extendedRequestId",
+              "requestTime": "$context.requestTime",
+              "messageDirection": "$context.messageDirection",
+              "stage": "$context.stage",
+              "connectedAt": "$context.connectedAt",
+              "requestTimeEpoch": "$context.requestTimeEpoch",
+              "sourceIp": "$context.identity.sourceIp",
+              "requestId": "$context.requestId",
+              "domainName": "$context.domainName",
+              "connectionId": "$context.connectionId",
+              "apiId": "$context.apiId"
+            },
+              "body": "$util.escapeJavaScript($input.body)",
+              "isBase64Encoded": "$context.isBase64Encoded"
+          }
+```
+So it will pass a bunch of important information like the Body and the connectionId. You can add and remove as many variables as you want. 
+To make it as independant as I could, the back-end Lambda "SendMessageFunction" does not need any of these information to run successfully, because it is getting the @connection URL from its environment variables and the connectionId from the DynamoDB which name is also in the environment variables.
+
+Only the stage name "stage" is hardcodeded in the environment variable of the Lambda, so if you want to change it you would need to change the environment variable or get it from the Mapping Template in the event sent to Lambda. 
+
+The Websocket API is also protected by a Lambda REQUEST Authorizer. This Lambda function will look for the header "token" and will only allow the request if its value is "hello" - else it will throw a 401 Unauthorized response to the client. 
+
+All Lambda functions are written in Node.js 22 with ".mjs" files and implement the ES module import syntax. 
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+Once the template deployed, you would need to use a websocket client, I would recommend either Postman ior wscat.
+
+1. [Install NPM](https://www.npmjs.com/get-npm).
+
+1. Install wscat:
+    ```
+    $ npm install -g wscat
+    ```
+
+1. Connect to the WebSocket with the following command:
+    ```
+    $ wscat --header token:hello -c wss://<websocket_url>
+    ```
+If you don't put the header and its value, you will get `Unauthorized`
+
+You can then send the Json Payload to the `sendmessage` route
+
+    ```
+    > {"action": "sendmessage","message" : "hey queen"}
+    < good job on deploying this template, keep slaying!!
+
+    ```
 
 ## Cleanup
  
