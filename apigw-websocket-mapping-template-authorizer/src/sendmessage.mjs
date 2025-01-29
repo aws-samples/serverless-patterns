@@ -32,7 +32,7 @@
             //parameters to post response to the connectionId
             const postParams = {
               ConnectionId: connectionId,
-              Data: Buffer.from("good job on deploying this template, keep slaying!!"),
+              Data: "good job on deploying this template, keep slaying!!",
             };
             try{
             const postCommand = new PostToConnectionCommand(postParams);
@@ -41,6 +41,5 @@
           } catch (err) {
             return { statusCode: 500, body: "Failed to connect: " + JSON.stringify(err) };
           }
-            //response returned to API GW
             return { statusCode: 200, body: "Data sent" };
         };
