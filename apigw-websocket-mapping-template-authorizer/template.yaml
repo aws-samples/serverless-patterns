@@ -43,7 +43,7 @@ Resources:
   ConnectInteg:
     Type: AWS::ApiGatewayV2::Integration
     Properties:
-      ApiId: Ref! WebsocketApi
+      ApiId: !Ref WebsocketApi
       IntegrationType: AWS_PROXY
       IntegrationUri:
         Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnConnectFunction.Arn}/invocations
@@ -232,7 +232,7 @@ Resources:
 Outputs:
   WebSocketCommand:
     Description: "The WSS command to use to connect"
-    Value: !Join [ '', [ 'wscat --header token:hello -c wss://', !Ref WebSocketApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+    Value: !Join [ '', [ 'wscat --header token:hello -c wss://', !Ref WebsocketApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
   PayloadJson:
     Description: "The Json payload you can send to try the sendmessage route"
     Value: '{"action": "sendmessage","message" : "hey queen"}'
