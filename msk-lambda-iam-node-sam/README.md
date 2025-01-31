@@ -132,6 +132,8 @@ The sam deploy command will package and deploy your application to AWS, with a s
 * **SAM configuration environment [default]**: Environment for storing deployment information locally
 
 You should get a message "Successfully created/updated stack - <StackName> in <Region>" if all goes well
+    
+**Note: In case you want to deploy the Lambda function by pointing to an existing MSK Cluster and not the one created by running the CloudFormation template provided in this pattern, you will need to modify the values of the parameters MSKClusterName and MSKClusterId accordingly**
 
 Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
