@@ -102,7 +102,7 @@ Follow the example below and replace `{your-api-url}` with your api url from ste
 
     ```
     curl -X POST \
-    {your-api-url}/prod/generateVideo \
+    {your-api-url}/generateVideo \
     -H "Content-Type: application/json" \
     -d '{"prompt": "video of a car made up of fruits"}'
     ```
