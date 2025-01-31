@@ -64,7 +64,9 @@ cd das-lambda-java-sam
 
 ```
 
-**Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh <username> as shown below** 
+**Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh <username> as shown below**
+
+**Make sure to run the BootStrapFromCloudShellNoConsoleAccess.sh <username> command from the CloudShell and not from your local machine**
 
 ```
 sh ./BootStrapFromCloudShellNoConsoleAccess.sh <username>
@@ -73,7 +75,7 @@ sh ./BootStrapFromCloudShellNoConsoleAccess.sh <username>
 
 Once the above command is done running, it is recommended to create an AWS CLI profile on your local machine from where you can deploy the CloudFormation template. In order to do that, you need to run the following commands:
 
-On the AWS CloudShell, run the following and note down the values of the outputs of each of the commands below
+**On the AWS CloudShell**, run the following and note down the values of the outputs of each of the commands below
 
 ```
 sh ./GetAWSCLIProfileDetailsFromCloudshell.sh <username>
@@ -82,7 +84,7 @@ sh ./GetAWSCLIProfileDetailsFromCloudshell.sh <username>
 
 The above command will generate three outputs, the access key, the secret access key and the default AWS region. Note down the above values
 
-On your local machine, run the following:
+**On your local machine**, run the following:
 
 ```
 sh ./CreateAWSCLIProfileOnLocalMachine.sh <username> <access key> <secret access key> <aws region>
