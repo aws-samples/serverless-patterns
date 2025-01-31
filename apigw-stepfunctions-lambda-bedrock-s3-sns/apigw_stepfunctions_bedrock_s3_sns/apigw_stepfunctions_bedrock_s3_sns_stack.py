@@ -50,7 +50,7 @@ class ApigwStepFunctionBedrockSns(Stack):
         bedrock_invoke_lambda_function = _lambda.Function(self, "InvokeModelFunction",
             runtime=_lambda.Runtime.PYTHON_3_12,
             handler="invoke.handler",
-            code=_lambda.Code.from_asset("./functions"),
+            code=_lambda.Code.from_asset("./functions/functioncode.zip"),
             timeout=Duration.seconds(900),
             environment={"BUCKET_NAME": my_bucket.bucket_name}
             )
@@ -61,7 +61,7 @@ class ApigwStepFunctionBedrockSns(Stack):
         fetch_status_lambda_function = _lambda.Function(self, "FetchStatusFunction",
             runtime=_lambda.Runtime.PYTHON_3_12,
             handler="fetchstatus.handler",
-            code=_lambda.Code.from_asset("./functions"),
+            code=_lambda.Code.from_asset("./functions/functioncode.zip"),
             timeout=Duration.seconds(900),
             environment={"BUCKET_NAME": my_bucket.bucket_name}
             )
