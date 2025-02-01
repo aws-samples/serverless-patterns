@@ -41,14 +41,14 @@ cd das-lambda-java-sam
 
 ### Option 1 - If IAM users are allowed AWS console access
 
-* [Execute the BootStrapFromCloudShell.sh script to create an IAM user and store keys in Secrets Manager] - Once the BootStrapFromCloudShell.sh script has been checked out from Github, execute the following commands in your CloudShell. Substitute the <<username>> and <<password>> with values for the IAM user you want to create. The password needs to be at least 8 characters long. 
+* [Execute the BootStrapFromCloudShell.sh script to create an IAM user and store keys in Secrets Manager] - Once the BootStrapFromCloudShell.sh script has been checked out from Github, execute the following commands in your CloudShell. Substitute the \<username\> and \<password\> with values for the IAM user you want to create. The password needs to be at least 8 characters long. 
 
 ```
 sh ./BootStrapFromCloudShell.sh <username> <password>
 
 ```
 
-Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new <<username>> and <<password>>. You will be asked to change the password upon first login. Once you are logged in as the IAM user, move to the next step - "Run the CloudFormation template to create the AWS resources"
+Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new \<username\> and \<password\>. You will be asked to change the password upon first login. Once you are logged in as the IAM user, move to the next step - "Run the CloudFormation template to create the AWS resources"
     
 
 ### Option 2 - If IAM users are not allowed AWS console access
@@ -64,9 +64,9 @@ cd das-lambda-java-sam
 
 ```
 
-**Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh <<username>> as shown below**
+**Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh \<username\> as shown below**
 
-**Make sure to run the BootStrapFromCloudShellNoConsoleAccess.sh <<username>> command from the CloudShell and not from your local machine**
+**Make sure to run the BootStrapFromCloudShellNoConsoleAccess.sh \<username\> command from the CloudShell and not from your local machine**
 
 ```
 sh ./BootStrapFromCloudShellNoConsoleAccess.sh <username>
@@ -91,9 +91,9 @@ sh ./CreateAWSCLIProfileOnLocalMachine.sh <username> <access key> <secret access
 
 ```
 
-where the <<access key>> <<secret access key>> <<aws region>> need to be replaced with the values of the three outputs from CloudShell noted above.
+where the \<access key\> \<secret access key\> \<aws region\> need to be replaced with the values of the three outputs from CloudShell noted above.
     
-The above command will create an AWS profile for <<username>> on your local machine.
+The above command will create an AWS profile for \<username\> on your local machine.
 
 Once you have configured the AWS profile on your local machine, run the following command to verify the profile has been created correctly
 
@@ -152,7 +152,7 @@ Now deploy the CloudFormation stack by running the RunCloudformationStack.sh fil
 sh ./RunCloudformationStack.sh <username> <stackname> <a short unique random string> 
 
 ```
-In the above command, replace the value of <<username>> and provide a value for the name of the CloudFormation stack by replacing <<stackname>>. Also provide a random short string such as "uniqueib01 that you keep changing if you run the CloudFormation stack mutiple times"
+In the above command, replace the value of \<username\> and provide a value for the name of the CloudFormation stack by replacing \<stackname\>. Also provide a random short string such as "uniqueib01 that you keep changing if you run the CloudFormation stack mutiple times"
 
 **If you need to replace the values of any input parameters to the CloudFormation stack, then add those in the --parameter-overrides section of the RunCloudformationStack.sh**
 
@@ -184,21 +184,21 @@ echo $MY_LOCAL_IP
 
 Note: The command will vary depending on your OS, so use the relevant command for your own OS to get your machine's public IP address
 
-To get the security group of the EC2 instance, use the following command and replace the values of <<stackname>> and <<username>>
+To get the security group of the EC2 instance, use the following command and replace the values of \<stackname\> and \<username\>
 
 ```
 EC2_SECURITY_GROUP_ID=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='ReverseProxySecurityGroupName'].OutputValue" --output text)
 
 ```
 
-Now execute the below command to add ssh from your local machine to the EC2 instance. Replace the value of <<username>>
+Now execute the below command to add ssh from your local machine to the EC2 instance. Replace the value of \<username\>
 
 ```
 aws ec2 authorize-security-group-ingress --profile <username> --region $AWS_REGION --group-id $EC2_SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $EC2_CONNECT_IP/32
 
 ```
 
-Next determine the public DNS name of the EC2 instance using the command below. Replace the value of <<username>>
+Next determine the public DNS name of the EC2 instance using the command below. Replace the value of \<username\>
 
 ```
 EC2_PUBLIC_DNS=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='ReverseProxyEC2PublicDNSName'].OutputValue" --output text)
