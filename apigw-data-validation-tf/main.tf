@@ -3,6 +3,30 @@ provider "aws" {
   region = "us-east-1"  # Change this to your desired region
 }
 
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.0"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.0"
+    }
+  }
+}
+
+# Archive the Lambda function code
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/src"
+  output_path = "${path.module}/lambda.zip"
+}
+
 # API Gateway REST API
 resource "aws_api_gateway_rest_api" "main_api" {
   name = "validation-api"
@@ -43,18 +67,23 @@ resource "aws_api_gateway_rest_api" "main_api" {
 
 # Lambda Function
 resource "aws_lambda_function" "process_function" {
-  filename         = "lambda.zip"  # Make sure to create this zip file with your Lambda code
+  filename         = data.archive_file.lambda_zip.output_path
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   function_name    = "process-function"
   role            = aws_iam_role.lambda_role.arn
   handler         = "app.lambda_handler"
   runtime         = "python3.9"
   architectures   = ["arm64"]
   timeout         = 3
+
+  depends_on = [
+    data.archive_file.lambda_zip
+  ]
 }
 
 # IAM Role for Lambda
 resource "aws_iam_role" "lambda_role" {
-  name = "process_function_rolde"
+  name = "process_function_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -112,7 +141,7 @@ resource "aws_api_gateway_request_validator" "validator" {
 # Vehicle Model
 resource "aws_api_gateway_model" "vehicle_model" {
   rest_api_id  = aws_api_gateway_rest_api.main_api.id
-  name         = "Vehicledd"
+  name         = "Vehicle"
   description  = "Vehicle model for validation"
   content_type = "application/json"
 
