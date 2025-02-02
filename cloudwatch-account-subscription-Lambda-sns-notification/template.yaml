@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM template to demonstrate alerting with CloudWatch Subscription Filter
+
+Parameters:
+  EmailAddress:
+    Type: String
+    Description: Email address to receive notifications
+
+  LambdaFunctionName:
+    Type: String
+    Description: Name of the Lambda function to be invoked by CloudWatch Logs
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  # SNS Topic for notifications
+  NotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: AccountLevelNotificationTopic
+  # SNS Topic Subscription for Email Notifications
+
+  EmailSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !Ref EmailAddress
+      Protocol: email
+      TopicArn: !Ref NotificationTopic
+
+  CloudWatchLogSubscriptionLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt NotificationLambda.Arn
+      Principal: logs.amazonaws.com
+      Action: 'lambda:InvokeFunction'
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+      SourceAccount: !Ref AWS::AccountId
+
+
+  CloudWatchLogSubscriptionPolicy:
+    Type: AWS::Logs::AccountPolicy
+    Properties:
+      PolicyName: CloudWatchLogsAccountLevelSubscriptionPolicy
+      PolicyDocument: !Sub "{\"DestinationArn\":\"arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaFunctionName}\", \"FilterPattern\": \"Exception\", \"Distribution\": \"Random\"}"
+      SelectionCriteria: !Sub "LogGroupName NOT IN [\"/aws/lambda/example\", \"/custom/lambda/print\"]" #All the loggroups [Make sure to give valid loggroups] you would like to exclude this helps with log recursion prevention - https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Subscriptions-recursion-prevention.html
+      PolicyType: "SUBSCRIPTION_FILTER_POLICY"
+      Scope: "ALL"
+    DependsOn: CloudWatchLogSubscriptionLambdaPermission
+
+  # Notification Lambda function
+  NotificationLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Ref LambdaFunctionName
+      Handler: index.lambda_handler
+      Runtime: python3.13
+      CodeUri: notification-lambda/
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref NotificationTopic
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt NotificationTopic.TopicName
+
+
+Outputs:
+  NotificationLambdaArn:
+    Description: ARN of the Notification Lambda function
+    Value: !GetAtt NotificationLambda.Arn
+  NotificationTopicArn:
+    Description: ARN of the SNS Topic for notifications
+    Value: !Ref NotificationTopic
