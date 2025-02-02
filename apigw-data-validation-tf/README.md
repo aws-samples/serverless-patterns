@@ -33,6 +33,18 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Note the outputs from the deployment process. These contain the resource names and/or ARNs which are used for testing.
 
+## API Endpoint
+
+After running `terraform apply`, you will see outputs including the API endpoint URL. You'll need this URL for testing. The output will look similar to:
+```
+api_endpoint = "https://xxxxx.execute-api.us-east-1.amazonaws.com/Prod"
+```
+
+Note: When testing, append `/123?order=ORD12345` to this base URL. For example, if your API endpoint is `https://xxxxx.execute-api.us-east-1.amazonaws.com/Prod`, your full testing URL would be:
+```
+`https://xxxxx.execute-api.us-east-1.amazonaws.com/Prod/123?order=ORD12345`
+```
+
 ## How it works
 
 The data model is declared in the API Gateway resource. The Lambda function then requires the request body to be validated against this model.
