@@ -1,6 +1,6 @@
 {
   "title": "API Gateway data validation",
-  "description": "This pattern creates an Amazon API Gateway that handles simple data validation at the endpoint without invoking the Lambda function when the data validation fails.",
+  "description": "Creates an API Gateway with request validation, rejecting invalid requests before Lambda invocation using model schema validation.",
   "language": "YAML",
   "level": "300",
   "framework": "Terraform",
