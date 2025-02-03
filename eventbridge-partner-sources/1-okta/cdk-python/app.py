@@ -105,7 +105,7 @@ class OktaIntegrationStack(Stack):
 
 app = cdk.App()
 description = (
-    "Okta EventBridge Integration (uksb-1tthgi812) (tag:okta-eventbridge-lambda)"
+    "Okta EventBridge Integration (uksb-1tthgi812) (tag:eventbridge-partner-sources-okta-cdk-python)"
 )
 OktaIntegrationStack(app, "OktaIntegrationStack", description=description)
 app.synth()
