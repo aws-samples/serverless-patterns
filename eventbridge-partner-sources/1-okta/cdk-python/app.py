@@ -56,7 +56,7 @@ class OktaIntegrationStack(Stack):
         okta_process_user_login_unusual_location_events_lambda = _lambda.Function(
             self,
             id='OktaProcessUserLoginUnusualLocation',
-            runtime=_lambda.Runtime.PYTHON_3_8,
+            runtime=_lambda.Runtime.PYTHON_3_12,
             code=_lambda.Code.from_asset('src'),
             handler='OktaProcessUserLoginUnusualLocation.handler',
             role=lambda_role,

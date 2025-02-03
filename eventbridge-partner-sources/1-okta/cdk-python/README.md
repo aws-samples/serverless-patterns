@@ -24,9 +24,9 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd okta-eventbridge-lambda
+    cd eventbridge-partner-sources/1-okta/cdk-python
     ```
-3. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the app.py file. A command-line argument is needed to deploy the CDK stack, "oktaEventBusName". This argument should be the name of the **SaaS event bus** associated with your Okta [partner event source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html).
+3. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the app.py file. A command-line argument is needed to deploy the CDK stack, "oktaEventBusName". This argument is the name of the **SaaS event bus** associated with your Okta [partner event source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html).
     ```
     cdk deploy --parameters oktaEventBusName=SAAS_EVENT_BUS_NAME_HERE
     ```
@@ -70,11 +70,11 @@ You should receive a response that looks like:
 }
 ```
 
-The command should have create a response.json file in your directory. If you open this file, you see the output of the Lambda function.  
+The command creates a response.json file in your directory. If you open this file, you see the output of the Lambda function.  
 
 ### Test the EventBridge Rule
 
-You cannot put events on the Okta event bus, only Okta can publish events to this event bus. To test that the EventBridge rules deployed by this pattern were successfully deployed, follow these instructions: 
+Only Okta can publish events to the event bus. To test the EventBridge rules deployed by this pattern, follow these instructions: 
 
 1. Navigate to the Amazon EventBridge console. Select "Rules". 
 
@@ -96,7 +96,7 @@ You cannot put events on the Okta event bus, only Okta can publish events to thi
 
 ![EventBridge Console](./img/TestEvent.png)
 
-You should see a green box appear that says "Sample event matched the event pattern." This means that the rule will successfully route incoming events to the AWS Lambda function. 
+A successful test results in a  "Sample event matched the event pattern." message. This means that the rule will successfully route incoming events to the AWS Lambda function. 
 
 ![EventBridge Console](./img/TestEventSuccessful.png)
 
