@@ -7,6 +7,18 @@ Eventbridge rule is configured to look for CreateSecret events to invoke a Lambd
 
 # Deployment Instructions
 
+Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+
+``` 
+git clone https://github.com/aws-samples/serverless-patterns
+```
+
+Change directory to the pattern directory:
+
+```
+cd automate-secrets-manager-tags
+```
+    
 To manually create a virtualenv on MacOS and Linux:
 
 ```
@@ -50,3 +62,18 @@ command.
  * `cdk diff`        compare deployed stack with current state
  * `cdk docs`        open CDK documentation
 
+## Testing
+
+To test the automated tagging of secrets in AWS Secrets Manager, we will need to use the AWS console. 
+
+1. Login to AWS Console using AWS IAM Identity Center.
+2. Navigate to AWS Secrets Manager and create a secret.
+3. Open the "Tags" tab of the newly created secret to see the automated tag key=LoginUserName and value=<Username>.
+
+## Cleanup
+
+Run below script in the `automate-secrets-manager-tags` directory to delete AWS resources created by this sample stack.
+
+```
+cdk destroy
+```
