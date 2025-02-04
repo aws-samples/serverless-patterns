@@ -1,4 +1,4 @@
-# Delayed EventBridge events with EventBridge Scheduler
+# Delayed Amazon EventBridge events with Amazon EventBridge Scheduler
 
 This pattern listens for EventBridge events, processes them and creates schedules for every user. 24 hours after user has been created a schedule is run that publishes events directly into EventBridge. The pattern is deployed using Terraform.
 

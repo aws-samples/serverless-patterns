@@ -1,6 +1,6 @@
 {
-  "title": "Delayed EventBridge events with EventBridge Scheduler",
-  "description": "Setup future EventBridge events with EventBridge Scheduler",
+  "title": "Delayed Amazon EventBridge events with Amazon EventBridge Scheduler",
+  "description": "Setup future Amazon EventBridge events with Amazon EventBridge Scheduler",
   "language": "Node.js",
   "level": "200",
   "framework": "Terraform",
