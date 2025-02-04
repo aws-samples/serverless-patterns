@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for API Gateway with SQS Integration'
+
+Resources:
+  # API Gateway Resources
+  MyRestApi:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: 'SQS queue mapping template'
+      Description: 'REST API with SQS Integration'
+
+  # IAM Role for API Gateway
+  ApiGatewayRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: ApiGatewaySQSAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:SendMessage'
+                Resource: 
+                  - !GetAtt LowQueue.Arn
+                  - !GetAtt DefaultQueue.Arn
+                  - !GetAtt HighQueue.Arn
+
+  RootPostMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      RestApiId: !Ref MyRestApi
+      ResourceId: !GetAtt MyRestApi.RootResourceId
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:sqs:path//'
+        Credentials: !GetAtt ApiGatewayRole.Arn
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        RequestParameters:
+          integration.request.header.Content-Type: "'application/x-amz-json-1.0'"
+          integration.request.header.X-Amz-Target: "'AmazonSQS.SendMessage'"
+        RequestTemplates:
+          application/json: |
+            #set($priority = "default-queue")
+            #if($input.params('priority') == "low")
+                #set($priority = "low-queue")
+            #elseif($input.params('priority') == "high")
+                #set($priority = "high-queue")
+            #end
+            
+            {
+            "QueueUrl": "https://sqs.${context.region}.amazonaws.com/${context.accountId}/$priority",
+            "MessageBody":  "$util.escapeJavaScript($input.json('$'))"
+            }
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: '{"message": "Message sent successfully"}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: 'Empty'
+
+  # SQS Queue Resources
+  LowQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: 'low-queue'
+      MessageRetentionPeriod: 345600
+      VisibilityTimeout: 30
+      DelaySeconds: 0
+
+  DefaultQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: 'default-queue'
+      MessageRetentionPeriod: 345600
+      VisibilityTimeout: 30
+      DelaySeconds: 0
+
+  HighQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: 'high-queue'
+      MessageRetentionPeriod: 345600
+      VisibilityTimeout: 30
+      DelaySeconds: 0
+
+  ApiDeployment:
+    Type: 'AWS::ApiGateway::Deployment'
+    DependsOn: RootPostMethod
+    Properties:
+      RestApiId: !Ref MyRestApi
+
+  ApiStage:
+    Type: 'AWS::ApiGateway::Stage'
+    Properties:
+      DeploymentId: !Ref ApiDeployment
+      RestApiId: !Ref MyRestApi
+      StageName: 'prod'
+
+Outputs:
+  ApiEndpoint:
+    Description: 'API Gateway endpoint URL for Prod stage'
+    Value: !Sub 'https://${MyRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/'
+  
+  LowQueueURL:
+    Description: 'URL of low-queue Queue'
+    Value: !Ref LowQueue
+  
+  DefaultQueueURL:
+    Description: 'URL of default-queue Queue'
+    Value: !Ref DefaultQueue
+  
+  HighQueueURL:
+    Description: 'URL of high-queue Queue'
+    Value: !Ref HighQueue
