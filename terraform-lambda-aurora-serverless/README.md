@@ -1,0 +1,35 @@
+# AWS Lambda function to Amazon Aurora Serverless
+
+The pattern creates a Lambda function and a Amazon Aurora Serverless cluster, a Log group and the IAM resources required to run the application.
+
+The Lambda function is written in Python that uses pymysql client to establish connectivity with the serverless database.
+
+## Getting started with Terraform Serverless Patterns
+
+Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md).
+
+## Testing
+
+After deployment, invoke Lambda function with multiple inputs, and go to the Step Function Console and view the different invocations to note the different behavior with the different inputs.
+
+To do this, you can run these commands in the terminal (replace `<function-name>` with the value returned in `lambda_function_name`):
+
+```shell
+aws lambda invoke --function-name <function-name> --payload '{"key": "value"}' response.json
+```
+## Output
+
+Upon successful invocation, the function returns the following response -
+
+```json
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Successfully connected to the database\", \"database\": \"mydb\", \"host\": \"aurora-serverless-cluster.cluster-cna4c0mg426r.us-east-1.rds.amazonaws.com\"}"
+}
+```
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= "5.84.0" |
