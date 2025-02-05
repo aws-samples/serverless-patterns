@@ -8,8 +8,8 @@
         "headline": "How it works",
         "text": [
             "This pattern provides a Lambda function along with an Event Source Mapping to a Kafka topic.",
-            "It requires that you already have an Amazon Managed Streaming for Kafka (Amazon MSK) cluster setup with a topic created. ",
-            "If you don't already have an MSK cluster, you can use the example in this pattern https://serverlessland.com/patterns/msk-cfn-sasl-lambda (linked in the resources) to deploy a cluster.",
+            "The Lambda function requires that you already have an Amazon Managed Streaming for Kafka (Amazon MSK) cluster setup with a Kafka topic created. ",
+            "In this pattern, an AWS CloudFormation template is provided, that installs an Amazon MSK cluster and also creates a Kafka topic.",
             "This pattern works with either a Provisioned or Serverless MSK cluster as long as the cluster is configured to use IAM authentication. ",
             "For detailed deployment instructions instructions see the README."
         ]
@@ -24,10 +24,6 @@
     },
     "resources": {
         "bullets": [
-            {
-                "text": "Amazon MSK cluster pattern",
-                "link": "https://serverlessland.com/patterns/msk-cfn-sasl-lambda"
-            },
             {
                 "text": "Using AWS Lambda with Amazon MSK",
                 "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
