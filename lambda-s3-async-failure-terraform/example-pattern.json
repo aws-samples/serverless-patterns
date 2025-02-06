@@ -1,0 +1,79 @@
+{
+  "title": "Asynchronous Lambda with S3 Destination for Failed Invocations",
+  "description": "This pattern demonstrates how to set up an AWS Lambda function with asynchronous invocation and S3 destination for failed executions. It includes configuration for zero concurrency to test failure handling, and uses a random UUID for unique S3 bucket naming.",
+  "language": "HCL",
+  "level": "200",
+  "framework": "Terraform",
+  "platform": "AWS",
+  "services": {
+    "primary": "Lambda",
+    "secondary": [
+      "S3"
+    ]
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a Lambda function configured for asynchronous invocation with an S3 bucket as the destination for failed executions.",
+      "The Lambda function is configured with zero reserved concurrency, ensuring all asynchronous invocations are immediately sent to the failure destination.",
+      "The pattern includes proper IAM roles and policies, S3 bucket configuration with random UUID suffix, and a Lambda function that can simulate failures through an input parameter."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-async-failure-terraform",
+      "templateURL": "serverless-patterns/lambda-s3-async-failure-terraform",
+      "projectFolder": "lambda-s3-async-failure-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Asynchronous Invocation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html"
+      },
+      {
+        "text": "AWS Lambda Function Configuration",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-common.html"
+      },
+      {
+        "text": "Lambda Destinations",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#invocation-async-destinations"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "After deployment, you can test the pattern by invoking the Lambda function asynchronously with the AWS CLI:",
+      "aws lambda invoke --function-name async_function --invocation-type Event --payload '{ \"forceError\": true }' --region us-east-1 --cli-binary-format raw-in-base64-out response.json",
+      "Check the S3 bucket for the failure record that will be created."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the created resources by emptying the bucket and then running:",
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jon Loinaz",
+      "bio": "AWS Solutions Architect II",
+      "linkedin": "jonloinaz"
+    }
+  ],
+  "tags": [
+    "lambda",
+    "s3",
+    "async",
+    "terraform",
+    "serverless"
+  ]
+}
