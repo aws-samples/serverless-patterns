@@ -1,7 +1,7 @@
 # das-lambda-java-sam
 # Java AWS Lambda Database Activity Streams Processing, using AWS SAM
 
-This pattern is an example of a Lambda function that consumes messages from an Amazon Kinesis Data Stream created when Database Activity Streams is enabled on an Amazon Aurora Postgres database. This pattern also demonstrates how the records are decrypted, filtered for heartbeat events and then how an OpenSearch Ingestion Pipeline is set-up to send the Database Activity Stream events are sent to an Amazon OpenSearch domain
+This pattern is an example of a Lambda function that consumes messages from an Amazon Kinesis Data Stream created when Database Activity Streams is enabled on an Amazon Aurora Postgres database. This pattern also demonstrates how the records are decrypted, filtered for heartbeat events and then how an OpenSearch Ingestion Pipeline is set-up to send the Database Activity Stream events to an Amazon OpenSearch domain.
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
@@ -38,6 +38,22 @@ git checkout
 cd das-lambda-java-sam
 
 ```
+
+You also need a service linked role for the Amazon OpenSearch service to be created in the AWS account. In order to create that, run the following command from the AWS CloudShell
+
+```
+aws iam create-service-linked-role --aws-service-name opensearchservice.amazonaws.com
+
+```
+
+For the above command, you will either get back a JSON response indicating that the service linked role has been successfully created, or you will get an exception like below:
+
+```
+An error occurred (InvalidInput) when calling the CreateServiceLinkedRole operation: Service role name AWSServiceRoleForAmazonOpenSearchService has been taken in this account, please try a different suffix.
+
+```
+If you get the above error, it is harmless. Please ignore it and move ahead.
+
 
 ### Option 1 - If IAM users are allowed AWS console access
 
@@ -112,7 +128,11 @@ The current folder should now contain the CloudFormation template file setup-das
 
 ### If IAM users are allowed AWS console access
 
-You can log in to the AWS console using the new user that was just created and run CloudFormation using the template file setup-das-cfn.yaml
+You can log in to the AWS console using the new user that was just created.
+
+Before you deploy the CloudFormation template, you will need to create a key-pair from the EC2 console, under "Network and Security". Name the key-pair "DASKeyPair" and choose RSA as the Key pair type. Choose .pem or .ppk as the Private key file format, depending on how you want to connect to the EC2 instance that will get created by the CloudFormation template. 
+
+Once you have created the key-pair, you can run CloudFormation using the template file setup-das-cfn.yaml
 
 Accept defaults for all the input parameters or modify them as needed.
 
