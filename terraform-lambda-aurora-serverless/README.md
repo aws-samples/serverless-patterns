@@ -8,6 +8,14 @@ The Lambda function is written in Python that uses pymysql client to establish c
 
 Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md).
 
+## Requirements
+
+First of all, you will need to install the 'pymysql' client depedency which is used in the Lambda function code.
+```shell
+cd src/function
+pip3 install -r requirements.txt -t .
+```
+
 ## Testing
 
 After deployment, invoke Lambda function with multiple inputs, and go to the Step Function Console and view the different invocations to note the different behavior with the different inputs.
