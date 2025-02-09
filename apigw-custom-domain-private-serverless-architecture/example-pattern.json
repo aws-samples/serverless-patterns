@@ -1,0 +1,59 @@
+{
+  "title": "Fully Private Serverless Architecture with API Gateway Private Custom Domain",
+  "description": "Create a fully private serverless architecture using API Gateway Private Custom Domain, Lambda, SQS, DynamoDB, and SNS, ensuring secure communication within a VPC and eliminating public internet exposure.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This fully private serverless architecture leverages AWS services such as API Gateway, Lambda, SQS, DynamoDB, and SNS to create a secure and isolated environment. The API Gateway is configured with a private custom domain secured by an ACM certificate and accessible only through a VPC endpoint. Route 53's private hosted zone ensures that DNS resolution for the custom domain occurs exclusively within the VPC. Incoming client requests are routed through the API Gateway and queued in Amazon SQS for asynchronous processing by AWS Lambda. The Lambda function processes messages by either inserting data into DynamoDB or sending notifications via SNS in case of errors or specific conditions.",
+      "The architecture also includes VPC endpoints for DynamoDB and SNS to ensure that all interactions with these services occur privately within the VPC. DynamoDB serves as a fully managed NoSQL database for storing processed data with attributes like unique IDs, timestamps, and random values. SNS is used to send notifications securely based on specific triggers or conditions.",
+      "This setup is ideal for use cases such as e-commerce applications that require secure order processing, monitoring systems that collect logs and trigger alerts privately, or IoT applications that ingest sensor data and send threshold-based notifications. By maintaining all communication within the VPC and avoiding public exposure, this architecture provides enhanced security, scalability, and reliability."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-custom-domain-private-serverless-architecture",
+      "templateURL": "serverless-patterns/apigw-custom-domain-private-serverless-architecture",
+      "projectFolder": "apigw-custom-domain-private-serverless-architecture",
+      "templateFile": "apigw-custom-domain-private-serverless-architecture/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Serverless Architecture",
+        "link": "https://aws.amazon.com/lambda/serverless-architectures-learn-more/"
+      },
+      {
+        "text": "API gateway Private Custom Domain",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-custom-domains.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "headline" :"Presented by Junho Jung, Cloud Engineer",
+      "name": "JunhoJung",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQEkLLnZnqnw-Q/profile-displayphoto-shrink_800_800/B56ZTrjjKyHEAg-/0/1739118752944?e=1744848000&v=beta&t=HCpeq9SK4xwJEwqDPPv96Th7otGowN2deQdZ2lIfMEo",
+      "bio": "Junho is a cloud engineer at Amazon Web Services based in Korea. He is passionate about serverless architecture and enjoys designing automated processes and scalable solutions. His work focuses on creating efficient, secure, and innovative architectures that leverage the power of serverless technologies.",
+      "linkedin": "JunhoJung"
+    }
+  ]
+}

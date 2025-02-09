@@ -1,0 +1,369 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless architecture with Private API Gateway, Custom Domain, SQS integration, Lambda, DynamoDB, and SNS.
+
+
+############Parameter Part#############
+
+Parameters:
+
+  # VPC configurations 
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: The ID of the VPC where resources will be deployed.
+
+  RouteTableId:
+    Type: String
+    Description: The ID of the route table for the DynamoDB Gateway Endpoint.
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of Subnet IDs for the Lambda function.
+
+  # For API gateawy Private custom domain and route53
+  CustomDomainName:
+    Type: String
+    Description: "The custom domain name for the private API Gateway."
+
+  CertificateArn:
+    Type: String
+    Description: "The ARN of the ACM certificate for the custom domain."
+
+  PrivateHostedZoneId:
+    Type: String
+    Description: "The hosted zone ID for the private Route53 domain."
+
+
+  # Other service
+  SQSQueueName:
+    Type: String
+    Default: "MyCustomQueue"
+    Description: "The name of the SQS queue."
+
+  DynamoDBTableName:
+    Type: String
+    Default: "MyCustomTable"
+    Description: "The name of the DynamoDB table."
+
+  SNSTopicName:
+    Type: String
+    Default: "MyCustomTopic"
+    Description: "The name of the SNS topic."
+
+
+  # Email information for SNS 
+  SubscriptionEmail:
+    Type: String
+    Description: The email address to subscribe to the SNS topic.
+    AllowedPattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
+    ConstraintDescription: Must be a valid email address.
+
+##################END####################
+
+
+Resources:
+  # creating SQS Queue
+  SQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref SQSQueueName
+      VisibilityTimeout: 120 # higher than lambda time out setting.
+      
+  # Security Group
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Lambda, VPC endpoint
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443 # Allow inbound HTTPS traffic
+          ToPort: 443
+          CidrIp: 0.0.0.0/0 # Open to all IPs (use cautiously in production)
+      SecurityGroupEgress:
+        - IpProtocol: -1 # Allow all outbound traffic
+          CidrIp: 0.0.0.0/0
+
+
+  # creating DynamoDB Table
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DynamoDBTableName
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH # Partition key only (no sort key)
+      BillingMode: PAY_PER_REQUEST
+
+  # creating SNS Topic
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+          TopicName: MySNSTopic
+          Subscription:
+            - Protocol: email
+              Endpoint: !Ref SubscriptionEmail
+
+  # Creating each VPC Endpoint
+  DynamoDBVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.dynamodb"
+      VpcId: !Ref VpcId # Specify the VPC ID as a parameter
+      VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref RouteTableId # Specify the Route Table ID as a parameter
+
+  SNSVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.sns"
+      VpcId: !Ref VpcId # Specify the VPC ID as a parameter
+      VpcEndpointType: Interface
+      SubnetIds: !Ref SubnetIds # Apply the same Subnets used by Lambda
+      SecurityGroupIds: 
+        - !Ref SecurityGroup # Apply the same Security Groups used by Lambda
+      PrivateDnsEnabled: true
+  
+
+
+
+
+  ApiGatewayVpcEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.execute-api"
+      VpcId: !Ref VpcId # Specify the VPC ID as a parameter
+      SubnetIds: !Ref SubnetIds # Specify the Subnet IDs as a parameter
+      SecurityGroupIds:
+        - !Ref SecurityGroup # Specify the Security Group IDs as a parameter
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+
+
+############API Gateway Part#############
+
+  # Private API Gateway with Integration to SQS
+  PrivateApi:
+      Type: AWS::Serverless::Api
+      Properties:
+        EndpointConfiguration: PRIVATE
+        StageName: Prod
+        AlwaysDeploy: true
+        DefinitionBody:
+          openapi: "3.0.1"
+          info:
+            version: "1.0"
+            title: !Sub "PrivateApi-${AWS::StackName}"
+          paths:
+            /send-message:
+              post:
+                responses:
+                  "200":
+                    description: "Message sent to SQS successfully."
+                    content:
+                      application/json:
+                        schema:
+                          type: object
+                x-amazon-apigateway-integration:
+                  type: aws
+                  httpMethod: ANY
+                  uri: !Sub "arn:${AWS::Partition}:apigateway:${AWS::Region}:sqs:path/${AWS::AccountId}/${SQSQueue.QueueName}"
+                  credentials:
+                    Fn::GetAtt:
+                      - ApiGatewayExecutionRole
+                      - Arn
+                  requestParameters:
+                    integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+                  requestTemplates:
+                    application/json: "Action=SendMessage&MessageBody=$util.urlEncode($input.body)"
+                  responses:
+                    default:
+                      statusCode: "200"
+                      responseTemplates:
+                        application/json: |
+                          {
+                            "message": "Message sent successfully.",
+                            "requestId": "$input.path('$.SendMessageResponse.ResponseMetadata.RequestId')"
+                          }
+          x-amazon-apigateway-policy:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Principal: "*"
+                Action: "execute-api:Invoke"
+                Resource: "execute-api:/*"
+                Condition:
+                  StringEquals:
+                    aws:sourceVpce: !Join 
+                    - "-"
+                    - 
+                      - !Select 
+                        - 0
+                        - !Split ["-", !Select [0, !Split [".", !Select [1, !Split [":", !Select [0, !GetAtt ApiGatewayVpcEndpoint.DnsEntries]]]]]]
+                      - !Select 
+                        - 1
+                        - !Split ["-", !Select [0, !Split [".", !Select [1, !Split [":", !Select [0, !GetAtt ApiGatewayVpcEndpoint.DnsEntries]]]]]]
+
+  ApiGatewayExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SQSPublishPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:GetQueueUrl
+                  - sqs:GetQueueAttributes
+                  - sqs:SetQueueAttributes
+                  - sqs:AddPermission
+                  - sqs:SendMessage # Added permission for sending messages to SQS.
+                Resource: !GetAtt SQSQueue.Arn
+
+# Custom Domain Name for Private API Gateway 
+  PrivateDomainName:
+    Type: AWS::ApiGateway::DomainNameV2
+    Properties:
+      DomainName: private.example.com
+      CertificateArn: !Ref CertificateArn
+      EndpointConfiguration:
+        Types:
+          - PRIVATE
+      SecurityPolicy: TLS_1_2
+      Policy:
+        Statement:
+          - Action: 'execute-api:Invoke'
+            Effect: Allow
+            Principal: '*'
+            Resource: 'execute-api:/*'
+          - Action: 'execute-api:Invoke'
+            Condition:
+              StringNotEquals:
+                aws:SourceVpce: !Join 
+                  - "-"
+                  - 
+                    - !Select 
+                      - 0
+                      - !Split ["-", !Select [0, !Split [".", !Select [1, !Split [":", !Select [0, !GetAtt ApiGatewayVpcEndpoint.DnsEntries]]]]]]
+                    - !Select 
+                      - 1
+                      - !Split ["-", !Select [0, !Split [".", !Select [1, !Split [":", !Select [0, !GetAtt ApiGatewayVpcEndpoint.DnsEntries]]]]]]
+            Effect: Deny
+            Principal: '*'
+            Resource: 'execute-api:/*'
+        Version: 2012-10-17
+
+  # Base Path Mapping for Custom Domain to API Gateway Stage
+  BasePathMapping:
+    Type: AWS::ApiGateway::BasePathMappingV2
+    Properties:
+      RestApiId: !Ref PrivateApi
+      DomainNameArn: !GetAtt PrivateDomainName.DomainNameArn
+      Stage: !Ref PrivateApi.Stage
+
+  # Domain Name Access Association for VPC Endpoint and API Gateway
+  DomainNameAccessAssociation:
+    Type: AWS::ApiGateway::DomainNameAccessAssociation
+    Properties:
+      DomainNameArn: !GetAtt PrivateDomainName.DomainNameArn
+      AccessAssociationSource: 
+        !Join 
+          - "-"
+          - 
+            - !Select 
+              - 0
+              - !Split ["-", !Select [0, !Split [".", !Select [1, !Split [":", !Select [0, !GetAtt ApiGatewayVpcEndpoint.DnsEntries]]]]]]
+            - !Select 
+              - 1
+              - !Split ["-", !Select [0, !Split [".", !Select [1, !Split [":", !Select [0, !GetAtt ApiGatewayVpcEndpoint.DnsEntries]]]]]]
+      AccessAssociationSourceType: VPCE
+##################END####################
+
+
+
+################ Route53 ################
+  # Route53 Alias Record for API gateway Private Custom Domain pointing to VPC Endpoint DNS Name 
+  R53Alias:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: !Ref CustomDomainName
+      HostedZoneId: !Ref PrivateHostedZoneId
+      Type: A
+      AliasTarget:
+        DNSName: 
+          Fn::Select:
+            - 1
+            - !Split [":", !Select [0, !GetAtt ApiGatewayVpcEndpoint.DnsEntries]]
+        HostedZoneId: 
+          Fn::Select:
+            - 0
+            - !Split [":", !Select [0, !GetAtt ApiGatewayVpcEndpoint.DnsEntries]]
+##################END####################
+
+
+
+################ Lambda ################
+  # Configuring Lambda Function (Triggered by SQS)
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      CodeUri: src/
+      Timeout: 60
+      VpcConfig:
+        SubnetIds: !Ref SubnetIds
+        SecurityGroupIds: 
+          - !Ref SecurityGroup
+      Policies:
+        - AmazonDynamoDBFullAccess # Full access to DynamoDB table.
+        - SQSPollerPolicy:
+            QueueName: !Ref SQSQueueName # Access to SQS queue.
+        - Statement:
+            Effect: Allow
+            Action:
+              - sns:Publish # Allow publishing to SNS topic.
+            Resource: !Ref SNSTopic
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref SQSQueue # Pass the SQS Queue URL as an environment variable.
+          TABLE_NAME: !Ref DynamoDBTableName # Pass the DynamoDB table name as an environment variable.
+          TOPIC_ARN: !Ref SNSTopic # Pass the SNS topic ARN as an environment variable.
+      Events:
+        SQSEventSource:
+          Type: SQS # Trigger Lambda from SQS messages.
+          Properties:
+            Queue: !GetAtt SQSQueue.Arn
+##################END####################
+
+
+
+Outputs:
+  SuccessfulRequestCurlCommand:
+    Description: "Curl Command to test a successful request (DynamoDB insertion)"
+    Value: !Sub |
+      curl -X POST \
+      -H "Content-Type: application/json" \
+      -d '{"Insert": "DynamoDB"}' \
+      https://${CustomDomainName}/send-message -k
+  InvalidInsertValueCurlCommand:
+    Description: "Curl Command to test an invalid request (SNS notification due to invalid Insert value 'Dynamoooo')"
+    Value: !Sub |
+      curl -X POST \
+      -H "Content-Type: application/json" \
+      -d '{"Insert": "Dynamoooo"}' \
+      https://${CustomDomainName}/send-message -k
+
