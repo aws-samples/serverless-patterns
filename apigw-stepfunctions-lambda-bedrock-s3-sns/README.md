@@ -1,4 +1,4 @@
-# Video generation via ApiGateway -> StepFunctions -> Lambda -> Bedrock -> S3 -> SNS
+# Serverless video generation
 
 ![architecture](architecture/architecture.png)
 
