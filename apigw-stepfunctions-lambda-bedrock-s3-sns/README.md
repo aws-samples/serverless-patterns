@@ -80,7 +80,7 @@ You must request access to Amazon Nova Reel model before you can use it. If you 
     ```
     cdk deploy --parameters EmailParameter=replace-your-email-here@example.com
     ```
-1. After deployment completes, you will receive an email to the Inbox of email provided in above step. This email is to confirm the subscription of this email to the SNS Topic. Click on the confirm subscription link and you will receive a message that subscription is successful as below.
+1. After deployment completes, a message is delivered to the email address provided. This email is to confirm the subscription of this email to the SNS Topic. Click on the confirm subscription link to confirm your subscription. The following image shows a successful subscription.
     
     ![Email Subscription Success](sns_subscription/subscription-successful-view.png)
 
