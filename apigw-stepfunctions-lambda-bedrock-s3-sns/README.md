@@ -84,7 +84,7 @@ You must request access to Amazon Nova Reel model before you can use it. If you 
     
     ![Email Subscription Success](sns_subscription/subscription-successful-view.png)
 
-1. Take a look at the Outputs section after the CDK deployment completes. There will be an entry containing the URL of the API Gateway resource you just created. Copy that URL as you'll need it for your tests.
+1. Take a look at the Outputs section after the CDK deployment completes. There will be an entry containing the URL of the Amazon API Gateway resource you just created. Copy that URL as you'll need it for your tests.
 
     The format of the URL will be something like `https://{id}.execute-api.{region}.amazonaws.com/prod`
 
