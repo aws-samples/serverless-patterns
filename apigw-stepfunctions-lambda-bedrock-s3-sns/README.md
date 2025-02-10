@@ -109,7 +109,7 @@ Follow the example below and replace `{your-api-url}` with your api url from ste
 
 ## Review results
 
-Within 4-5 minutes, you would be receiving an email with S3 Pre-Signed URL. Enter the complete Pre-Signed URL into browser to download the generated Video. Additionally, you can also go to Amazon S3 bucket to view the newly upload Video. 
+Within 4-5 minutes, you would be receiving an email with Amazon S3 Pre-Signed URL. Enter the complete Pre-Signed URL into browser to download the generated Video. Additionally, you can also access the video from the Amazon S3 bucket.
 
 ## Cleanup
  
