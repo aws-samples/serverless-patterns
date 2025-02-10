@@ -2,7 +2,7 @@
 
 ![architecture](architecture/architecture.png)
 
-This pattern demonstrates how to generate state-of-art videos with a serverless workflow using Amazon Bedrock [Nova Reel model](https://www.aboutamazon.com/news/aws/amazon-nova-artificial-intelligence-bedrock-aws) and uploads the videos to Amazon S3. The pattern also publishes an email to user with the Pre-Signed URL once the generated video is ready in S3 bucket. The user email address needs to be provided while deploying the application through parameter.
+This pattern demonstrates how to generate state-of-art videos with a serverless workflow using Amazon Bedrock [Nova Reel model](https://www.aboutamazon.com/news/aws/amazon-nova-artificial-intelligence-bedrock-aws) and upload the videos to Amazon S3. The pattern also publishes an email with the Pre-Signed URL once the generated video is ready in the S3 bucket. The user email address needs to be provided through a parameter while deploying the pattern.
 
 Note: this pattern includes lambda function deployment package with a custom version of boto3. Using an outdated boto3 version will result in an API not supported error.
 
