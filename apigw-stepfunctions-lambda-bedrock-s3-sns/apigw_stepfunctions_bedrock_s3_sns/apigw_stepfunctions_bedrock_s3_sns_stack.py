@@ -113,14 +113,15 @@ class ApigwStepFunctionBedrockSns(Stack):
         # Create Step Functions state machine
         state_machine = sfn.StateMachine(
             self, "VideoGenerationStateMachine",
-            definition=invoke_task
+            definition_body=sfn.DefinitionBody.from_chainable(
+                invoke_task
                 .next(wait_task)
                 .next(fetch_status_task)
                 .next(choice_state
                     .when(completed_condition, send_message_task)
                     .when(in_progress_condition, wait_task)
                     .otherwise(send_message_task)
-                ),
+                )),
             role=sfn_role,
             timeout=Duration.minutes(15)
         )
