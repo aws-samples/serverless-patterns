@@ -7,7 +7,7 @@ from apigw_stepfunctions_bedrock_s3_sns.apigw_stepfunctions_bedrock_s3_sns_stack
 description="Amazon Reel Sample Pattern. (uksb-1tthgi812) (tag:apigw-stepfunctions-lambda-bedrock-s3-sns))"
 
 app = cdk.App()
-ApigwStepFunctionBedrockSns(app, "ApigwStepFunctionBedrockSns",
+ApigwStepFunctionBedrockSns(app, "ApigwStepFunctionBedrockSns",description=description,
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
