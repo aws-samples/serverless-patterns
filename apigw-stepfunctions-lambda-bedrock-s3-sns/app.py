@@ -4,7 +4,7 @@ import os
 import aws_cdk as cdk
 
 from apigw_stepfunctions_bedrock_s3_sns.apigw_stepfunctions_bedrock_s3_sns_stack import ApigwStepFunctionBedrockSns
-
+description="Amazon Reel Sample Pattern. (uksb-1tthgi812) (tag:apigw-stepfunctions-lambda-bedrock-s3-sns))"
 
 app = cdk.App()
 ApigwStepFunctionBedrockSns(app, "ApigwStepFunctionBedrockSns",
