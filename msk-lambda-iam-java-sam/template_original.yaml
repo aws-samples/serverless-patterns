@@ -1,25 +1,29 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  (uksb-1tthgi812) (tag:msk-lambda-iam-python-sam)
-  simple_kafka_consumer_sam
+  kafka_event_consumer_function
 
-  Sample SAM Template for simple_kafka_consumer_sam
-  
+  Sample SAM Template for simple-kafka-consumer-with-sam
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 15
 
 Resources:
-  LambdaMSKConsumerPythonFunction:
+  LambdaMSKConsumerJavaFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: HandlerKafka/
-      Handler: app.lambda_handler
-      Runtime: python3.9
+      CodeUri: kafka_event_consumer_function
+      Handler: com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequest
+      Runtime: JAVA_VERSION
       Architectures:
         - x86_64
+      MemorySize: 512
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          PARAM1: VALUE
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
       Events:
         MSKEvent:
           Type: MSK
@@ -71,13 +75,16 @@ Parameters:
   MSKClusterName:
     Type: String
     Description: Enter the name of the MSK Cluster
+    Default: CLUSTER_NAME
   MSKClusterId:
     Type: String
     Description: Enter the ID of the MSK Cluster
+    Default: CLUSTER_ID
   MSKTopic:
     Type: String
     Description: Enter the name of the MSK Topic
+    Default: KAFKA_TOPIC
 Outputs:
-  LambdaMSKConsumerPythonFunction:
+  HelloWorldKafkaJavaFunction:
     Description: "Topic Consumer Lambda Function ARN"
-    Value: !GetAtt LambdaMSKConsumerPythonFunction.Arn
+    Value: !GetAtt LambdaMSKConsumerJavaFunction.Arn
