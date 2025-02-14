@@ -35,7 +35,7 @@ This pattern in [Terraform](https://www.terraform.io/) offers a complete solutio
 1. Once deployment has completed, look for S3 Bucket Name and DynamoDB table name in the output, for example:
 ```module.s3_event.aws_s3_bucket.json_bucket: Creation complete after 2s [id=s3-lambda-dynamodb-terraform-json-store]```
 ```module.dynamodb.aws_dynamodb_table.basic-dynamodb-table: Creation complete after 7s [id=dev-test]```
-2. Upload a json file to the S3 bucket. Make sure the json file is contains the key 'UserId'.
+2. Upload a json file to the S3 bucket. Make sure the json file contains the key 'UserId'.
 3. Check the DynamoDB table and see the item inserted.
 
 ## Documentation
