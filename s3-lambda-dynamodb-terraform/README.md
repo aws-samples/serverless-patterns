@@ -36,7 +36,7 @@ This pattern in [Terraform](https://www.terraform.io/) offers a complete solutio
 ```module.s3_event.aws_s3_bucket.json_bucket: Creation complete after 2s [id=s3-lambda-dynamodb-terraform-json-store]```
 ```module.dynamodb.aws_dynamodb_table.basic-dynamodb-table: Creation complete after 7s [id=dev-test]```
 2. Upload a json file to the S3 bucket. Make sure the json file contains the key 'UserId'.
-3. Check the DynamoDB table and see the item inserted.
+3. Check the DynamoDB table to verify that the item has been inserted.
 
 ## Documentation
 - [Amazon S3 Event Notifications](https://docs.aws.amazon.com/AmazonS3/latest/userguide/NotificationHowTo.html)
