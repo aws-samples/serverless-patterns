@@ -10,7 +10,7 @@ This pattern in [Terraform](https://www.terraform.io/) offers a complete solutio
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Terraform installed](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) with version 1.x installed (this pattern has been tested with version 1.9.8)
+* [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) version 1.x (this pattern has been tested with version 1.9.8)
 
 ## Deployment Instructions
 
@@ -32,11 +32,34 @@ This pattern in [Terraform](https://www.terraform.io/) offers a complete solutio
 ## Testing
 
 ### Initiate the data load process
-1. Once deployment has completed, look for S3 Bucket Name and DynamoDB table name in the output, for example:
-```module.s3_event.aws_s3_bucket.json_bucket: Creation complete after 2s [id=s3-lambda-dynamodb-terraform-json-store]```
-```module.dynamodb.aws_dynamodb_table.basic-dynamodb-table: Creation complete after 7s [id=dev-test]```
-2. Upload a json file to the S3 bucket. Make sure the json file contains the key 'UserId'.
-3. Check the DynamoDB table to verify that the item has been inserted.
+1. Once deployment has completed, locate the S3 Bucket Name and DynamoDB table name in the output, for example:
+    ``` bash
+    module.s3_event.aws_s3_bucket.json_bucket: Creation complete after 2s [id=s3-lambda-dynamodb-terraform-json-store]
+
+    module.dynamodb.aws_dynamodb_table.basic-dynamodb-table: Creation complete after 7s [id=dev-test]
+    ```
+
+2. A sample JSON file is provided in the `samples` folder. You can upload it using AWS CLI:
+    ``` bash
+    aws s3 cp ./samples/test.json s3://s3-lambda-dynamodb-terraform-json-store
+    ```
+
+    > **Important**: When uploading your own JSON files, ensure they contain the following mandatory field:
+    > - `UserId`: Unique identifier for the record
+
+    Example JSON format:
+    ```json
+    {
+        "UserId": "user123",
+        "name": "John Doe",
+        "email": "john@example.com"
+    }
+    ```
+
+3. Verify the data in DynamoDB:
+    ```bash
+    aws dynamodb scan --table-name dev-test
+    ```
 
 ## Documentation
 - [Amazon S3 Event Notifications](https://docs.aws.amazon.com/AmazonS3/latest/userguide/NotificationHowTo.html)
