@@ -30,7 +30,7 @@ This pattern in [Terraform](https://www.terraform.io/) offers a complete solutio
 
 ## Testing
 
-### Initiate the data load process [TODO: change]
+### Initiate the data load process
 1. Once deployment has completed, look for S3 Bucket Name and DynamoDB table name in the output, for example:
 ```module.s3_event.aws_s3_bucket.json_bucket: Creation complete after 2s [id=s3-lambda-dynamodb-terraform-json-store]```
 ```module.dynamodb.aws_dynamodb_table.basic-dynamodb-table: Creation complete after 7s [id=dev-test]```
