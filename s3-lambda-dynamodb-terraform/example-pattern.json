@@ -1,5 +1,5 @@
 {
-    "title": "S3 to Lambda to DynamoDB",
+    "title": "Amazon S3 to AWS Lambda to Amazon DynamoDB",
     "description": "Upload object data from S3 to DynamoDB via Lambda.",
     "language": "Python",
     "level": "200",
