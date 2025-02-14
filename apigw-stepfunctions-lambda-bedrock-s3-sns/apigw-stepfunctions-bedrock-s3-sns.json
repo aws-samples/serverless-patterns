@@ -1,17 +1,17 @@
 {
-    "title": "Generate video with Amazon Bedrock, AWS Step Functions, AWS Lambda, and API Gateway",
-    "description": "Generate videos from text prompt using Amazon Bedrock Nova Reel model from an AWS Lambda function trigerred by StepFunctions workflow fronted with API Gateway and email Amazon S3 Pre-Signed URL of video for provided email",
+    "title": "Generate video with Amazon Bedrock Nova Reel and AWS Step Functions",
+    "description": "Orchestrate asynchronous video generation with AWS Step Functions and Amazon Bedrock Nova Reel.",
     "language": "Python",
     "level": "300",
     "framework": "CDK",
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This project aims to build an integration between API Gateway, AWS Step Functions, AWS Lambda, Amazon Bedrock, Amazon S3 and Amazon SNS",
-            "The core functionality revolves around building an end-to-end application where a user can send a prompt to an API endpoint via API Gateway REST API that accepts a user-defined prompt.",
-            "When a prompt is received, API Gateway triggers StateMachine workflow. This workflow execution is resposnible for triggerring the lambda function which interacts with Amazon Bedrock to generate video for the given prompt using Amazon Nova Reel model, and ulpoads it to Amazon S3. The workflow also sends the Pre-Signed URL for generated video to the user's email address via Amazon SNS. This S3 Pre-Signed URL is valid for the timeout specified.", 
-            "With the help of StateMachine workflow, asynchronous interactions with Bedrock model are acheived as Nova Reel model takes few minutes to generate the video. This asynchronous approach helps not to let Lambda function execution running idle",
-            "To ensure compatibility with newly released Nova Reel model in Bedrock, latest version of Boto3 is utilized in lambda deployment zip, as only the most recent Boto3 version includes a client for Amazon Bedrock accepting Nova models and new Asynchronous inference API calls."
+            "This project aims to build an integration between Amazon API Gateway, AWS Step Functions, AWS Lambda, Amazon Bedrock, Amazon S3, and Amazon SNS",
+            "The user sends a prompt to an API Gateway REST API endpoint. Then, API Gateway invokes a Step Functions State Machine which orchestrates generating the video.",
+            "A Lambda function invokes Amazon Bedrock Reel to produce the video and uploads the result to an S3 Bucket. Then, the function creates a pre-signed URL for the video, and publishes a message with the link to the SNS topic.",
+            "This asynchronous approach optimizes Lambda function run time",
+            "To ensure compatibility with the newly released Nova Reel model in Bedrock, the latest version of Boto3, supporting Amazon Bedrock Nova models and asynchronous inference API calls, is utilized in the Lambda deployment zip."
         ]
     },
     "gitHub": {
@@ -52,7 +52,7 @@
     "authors": [
         {
             "name": "Sahithi Ginjupalli",
-            "bio": "Sahithi Ginjupalli is a Cloud Engineer with a passion for continuous learning and in-depth exploration of her field. She helps optimizing client applications through strategic implementation of AWS services, enhancing their efficiency and performance.",
+            "bio": "Sahithi Ginjupalli is a Cloud Engineer with a passion for continuous learning and in-depth exploration of her field. She helps optimize client applications through strategic implementation of AWS services, enhancing their efficiency and performance.",
             "linkedin": "ginjupalli-sahithi-37460a18b"
         }
     ],
@@ -64,32 +64,20 @@
             "label": "API Gateway REST API"
         },
         "icon2": {
-            "x": 40,
+            "x": 50,
             "y": 50,
-            "service": "stepfunctions",
+            "service": "sfn",
             "label": "AWS Step Functions"
         },
-        "icon3": {
-            "x": 40,
-            "y": 50,
-            "service": "lambda",
-            "label": "AWS Lambda"
-        },
-        "icon4": {
-            "x": 65,
-            "y": 50,
-            "service": "bedrock",
-            "label": "Amazon Bedrock"
-        },
         "icon5": {
-            "x": 90,
-            "y": 50,
+            "x": 80,
+            "y": 20,
             "service": "s3",
             "label": "Amazon S3"
         },
         "icon6": {
-            "x": 90,
-            "y": 50,
+            "x": 80,
+            "y": 70,
             "service": "sns",
             "label": "Amazon SNS"
         },
@@ -99,20 +87,11 @@
         },
         "line2": {
             "from": "icon2",
-            "to": "icon3"
-        },
-        "line3": {
-            "from": "icon3",
-            "to": "icon4"
-        },
-        "line4": {
-            "from": "icon4",
             "to": "icon5"
         },
-        "line5": {
-            "from": "icon5",
+        "line3": {
+            "from": "icon2",
             "to": "icon6"
         }
-
     }
 }
