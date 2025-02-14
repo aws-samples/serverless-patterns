@@ -27,7 +27,7 @@ This pattern in [Terraform](https://www.terraform.io/) offers a complete solutio
     terraform init
     terraform apply --auto-approve
     ```
-4. Note the outputs from the Terraform deployment process. These contain the resource names and/or ARNs which are used for testing.
+4. Note the outputs from the Terraform deployment process. These contain the resource names which are used for testing.
 
 ## Testing
 
