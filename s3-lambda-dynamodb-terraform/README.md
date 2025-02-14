@@ -1,4 +1,4 @@
-# Load data from JSON files in S3 into DynamoDB using S3 Event Notification and Lambda
+# Load data from JSON files in Amazon S3 into Amazon DynamoDB using S3 Event Notification and AWS Lambda
 
 This pattern in [Terraform](https://www.terraform.io/) offers a complete solution to load data from JSON files uploaded to S3. The following resources are created:
 1. S3 Bucket with event notification on object created
