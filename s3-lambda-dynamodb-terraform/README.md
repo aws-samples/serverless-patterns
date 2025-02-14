@@ -23,7 +23,8 @@ This pattern in [Terraform](https://www.terraform.io/) offers a complete solutio
     cd s3-lambda-dynamodb-terraform/
     ```
 3. From the command line, use Terraform to deploy the AWS resources for the pattern as specified in the main.tf file::
-    ```terraform init
+    ```
+    terraform init
     terraform apply --auto-approve
     ```
 4. Note the outputs from the Terraform deployment process. These contain the resource names and/or ARNs which are used for testing.
