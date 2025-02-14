@@ -1113,7 +1113,7 @@ Resources:
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
                 echo "Getting Status of Database Activity Stream"
                 
-                DAS_STATUS=$(aws rds --region us-west-2 describe-db-clusters | jq -r '.DBClusters[0].Status')
+                DAS_STATUS=$(aws rds --region $AWS_REGION describe-db-clusters | jq -r '.DBClusters[0].Status')
                
                 # Check the exit code of the command
                 if [ $DAS_STATUS == "available" ]; then
@@ -1128,7 +1128,7 @@ Resources:
                 fi
             done
 
-            DAS_KINESIS_STREAM_FULL_NAME=$(aws rds --region us-west-2 describe-db-clusters | jq -r '.DBClusters[0].ActivityStreamKinesisStreamName')
+            DAS_KINESIS_STREAM_FULL_NAME=$(aws rds --region $AWS_REGION describe-db-clusters | jq -r '.DBClusters[0].ActivityStreamKinesisStreamName')
             
             DAS_KINESIS_STREAM_NAME="$(echo $DAS_KINESIS_STREAM_FULL_NAME | cut -d '-' -f5)"
             
