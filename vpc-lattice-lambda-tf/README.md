@@ -55,15 +55,11 @@ Invoke Demo Lambda function using CLI/Console and observe traffic shift from VPC
 
 ## Cleanup
 
-1. Change directory to the pattern directory:
-    ```
-    cd vpc-lattice-lambda-tf
-    ```
-2. Delete all created resources by Terraform
+1. Delete all created resources by Terraform
     ```bash
     terraform destroy
     ```
-3. Confirm all created resources has been deleted
+2. Confirm all created resources has been deleted
     ```bash
     terraform show
     ```
