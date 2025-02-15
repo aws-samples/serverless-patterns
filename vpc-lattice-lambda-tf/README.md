@@ -41,7 +41,7 @@ This pattern creates below resources:
 2. A private subnet
 3. Security Group allowing inbound traffic from VPC CIDR 10.0.0.0/16
 4. VPC Lattice service
-5. VPC Lattice Listner
+5. VPC Lattice Listener
 6. VPC Lattice Service Network
 7. VPC Lattice Network Association and Service Association
 8. Two Lambda functions (Primary and Secondary) to demonstrate traffic shift.
