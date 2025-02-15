@@ -51,7 +51,7 @@ This pattern uses Lambda as weighted targets. VPC Lattice service shifts traffic
 
 ## Testing
 
-Invoke Demo Lambda function using CLI/Console and observe traffice shift from VPC Lattice service.
+Invoke Demo Lambda function using CLI/Console and observe traffic shift from VPC Lattice service.
 
 ## Cleanup
 
