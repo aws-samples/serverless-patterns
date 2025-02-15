@@ -17,19 +17,19 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
     cd serverless-patterns/vpc-lattice-lambda-tf
     ```
-1. From the command line, initialize Terraform to downloads and install the providers defined in the configuration:
+3. From the command line, initialize Terraform to downloads and install the providers defined in the configuration:
     ```
     terraform init
     ```
-1. From the command line, apply the configuration in the main.tf file:
+4. From the command line, apply the configuration in the main.tf file:
     ```
     terraform apply
     ```
-1. Note the outputs from the deployment process. These contain the resource names and/or ARNs which are used for testing.
+5. Note the outputs from the deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
@@ -59,15 +59,15 @@ Invoke Demo Lambda function using CLI/Console and observe traffice shift from VP
     ```
     cd vpc-lattice-lambda-tf
     ```
-1. Delete all created resources by Terraform
+2. Delete all created resources by Terraform
     ```bash
     terraform destroy
     ```
-1. Confirm all created resources has been deleted
+3. Confirm all created resources has been deleted
     ```bash
     terraform show
     ```
 ----
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
