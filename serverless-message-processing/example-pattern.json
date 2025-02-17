@@ -1,6 +1,6 @@
 {
     "title": "Serverless Messaging Redrive",
-    "description": "Create a Step Functions workflow to query Amazon Athena.",
+    "description": "Automate the redrive and fixing of queue messages using AWS Lambda.",
     "language": "Python",
     "level": "200",
     "framework": "SAM",
