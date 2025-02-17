@@ -11,16 +11,21 @@ An adaptable pattern for message processing using AWS serverless services, featu
 ## Basic Flow
 1. Messages enter through API Gateway
 2. Main queue receives messages
-3. Processor Lambda handles messages
-4. Failed messages route to DLQs
-5. Decision maker attempts an automated recovery
+3. Lambda function polls the main queue using Event Source Mappings (ESMs) and handles the messages. 
+   Read more about how Lambda synchronously processes queue messages in this [documentation.](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html)
+4. Failed messages route to DLQs -In this case a failed message would be a malformed email, however this can be adapted to other use cases.
+5. Decision maker attempts an automated recovery -In this sample, we remediate common email malform issues including whitespace and typos in domain extensions.
 
 ## Deployment
 # Build the SAM application
+The ```sam build ``` command prepares an application for subsequent steps in the developer workflow, such as local testing or deploying to AWS.
+
    ```
 sam build
    ```
 # Deploy the application
+The ```sam deploy``` command deploys an application to the AWS Cloud using AWS CloudFormation. The ```--guided``` option is to have the AWS SAM CLI use prompts to guide you through the deployment.
+
    ```
 sam deploy --guided
    ```
@@ -28,21 +33,25 @@ sam deploy --guided
 ## Key Features
 - Automatic retry mechanism
 - Segregation of recoverable/fatal errors
-- Extensible processing logic
+- Processing logic with the potential for points of adaptation
 
 ## API Reference
 # Send Message
+
+The following is an example API call that you can try with your own endpoint.
+
    ```
 
-POST /message
-Content-Type: application/json
-   ```
-   ```
-{
-    "messageType": "TYPE_A|TYPE_B|TYPE_C",
-    "payload": {},
-    "timestamp": "ISO8601_TIMESTAMP"
-}
+curl -X POST \
+  'https://\${endpoint}/prod/message' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "messageType": "TYPE_A",
+    "body": {
+        "email": "user@@example.com"
+    },
+    "timestamp": "2023-11-22T10:30:00Z"
+}'
    ```
 
 
@@ -54,5 +63,12 @@ Content-Type: application/json
 - Monitoring requirements
 - API Design
 
-## Note
-This is a sample pattern. Adapt security, scaling, and processing logic according to your requirements.
+## Cleanup
+1. Delete the SAM template
+```
+sam delete
+```
+2. Confirm the stack has been deleted
+```
+aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+```

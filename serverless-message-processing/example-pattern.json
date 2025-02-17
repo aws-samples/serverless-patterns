@@ -1,5 +1,5 @@
 {
-    "title": "Step Functions to Athena",
+    "title": "Serverless Messaging Redrive",
     "description": "Create a Step Functions workflow to query Amazon Athena.",
     "language": "Python",
     "level": "200",
@@ -7,11 +7,7 @@
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This sample project demonstrates how to use a serverless solution for processing and fixing malformed messages using SQS queues and Lambda functions",
-        "The system automatically handles message validation, applies fixes where possible, and routes messages to appropriate queues based on their fixability.",
-        "It has built-in error handling and detailed logging, it provides a robust framework for message processing that can be easily extended for specific business needs.",
-        "This pattern uses AWS Lambda for processing, multiple SQS queues for message routing, and includes 2 dead-letter queue (DLQ) for messages requiring human intervention or for auto-remediation."
-      ]
+        "This sample project demonstrates how to use a serverless solution for processing and fixing malformed messages using SQS queues and Lambda functions"      ]
     },
     "gitHub": {
       "template": {

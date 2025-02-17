@@ -1,9 +1,24 @@
 import json
 import logging
+import re
 
 # Set up logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+def validate_email(email):
+    """
+    Validate email format
+    Args:
+        email: Email string to validate
+    Returns:
+        bool: True if valid email format, False otherwise
+    """
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$'
+    if not bool(re.match(email_pattern, email)):
+        logger.error(f"Invalid email format: {email}")
+        return False
+    return True
 
 def validate_message_structure(message):
     """
@@ -11,58 +26,32 @@ def validate_message_structure(message):
     Args:
         message: Dictionary containing message data
     Returns:
-        bool: True if valid message structure, False otherwise
+        tuple: (bool, str) - (is_valid, error_message)
     """
     required_fields = ['messageType', 'payload', 'timestamp']
-    return all(field in message for field in required_fields)
-
-def process_message(message):
-    """
-    Process the message content.
-    Args:
-        message: Dictionary containing message data
-    Returns:
-        bool: True if processing successful, False otherwise
-    """
-    try:
-        # Validate message structure
-        if not validate_message_structure(message):
-            logger.error("Message missing required fields")
-            raise ValueError("Invalid message structure")
-
-        message_type = message['messageType']
-        payload = message['payload']
+    
+    # Check required fields
+    if not all(field in message for field in required_fields):
+        return False, "Missing required fields"
+    
+    # Validate message type
+    valid_types = ['TYPE_A', 'TYPE_B', 'TYPE_C']
+    if message['messageType'] not in valid_types:
+        return False, f"Invalid message type: {message['messageType']}"
+    
+    # Validate payload structure
+    if 'email' not in message['payload']:
+        return False, "Missing email in payload"
         
-        # Validate message type
-        valid_types = ['TYPE_A', 'TYPE_B', 'TYPE_C']
-        if message_type not in valid_types:
-            logger.error(f"Invalid message type: {message_type}")
-            raise ValueError(f"Invalid message type: {message_type}")
-
-        # Check for downstream system status
-        if 'systemStatus' in message and message['systemStatus'].lower() == 'unavailable':
-            logger.error("Target system is unavailable")
-            raise ValueError("DOWNSTREAM_ERROR: Target system unavailable")
-
-        # Process the message based on type
-        logger.info(f"Processing message type: {message_type}")
+    # Validate email format
+    if not validate_email(message['payload']['email']):
+        return False, f"Invalid email format: {message['payload']['email']}"
+    
+    # Check system status if present
+    if 'systemStatus' in message and message['systemStatus'].lower() == 'unavailable':
+        return False, "DOWNSTREAM_ERROR: Target system unavailable"
         
-        # Add type-specific processing logic here
-        if message_type == 'TYPE_A':
-            # Process TYPE_A messages
-            pass
-        elif message_type == 'TYPE_B':
-            # Process TYPE_B messages
-            pass
-        elif message_type == 'TYPE_C':
-            # Process TYPE_C messages
-            pass
-
-        return True
-
-    except Exception as e:
-        logger.error(f"Error processing message: {str(e)}")
-        raise
+    return True, ""
 
 def lambda_handler(event, context):
     """
@@ -77,38 +66,44 @@ def lambda_handler(event, context):
     
     processed_count = 0
     failed_count = 0
-    downstream_errors = 0
+    validation_errors = []
 
     for record in event['Records']:
         try:
             # Parse the message body
             message = json.loads(record['body'])
+            message_id = message.get('messageId', 'unknown')
             
-            # Process the message
-            if process_message(message):
+            # Validate message
+            is_valid, error_message = validate_message_structure(message)
+            
+            if is_valid:
+                # Process valid message
+                logger.info(f"Successfully validated message: {message_id}")
                 processed_count += 1
-                logger.info(f"Successfully processed message: {message.get('messageId', 'unknown')}")
+                
+                # Add your processing logic here
+                # process_valid_message(message)
+                
             else:
+                # Track validation failure
                 failed_count += 1
-                logger.warning(f"Message processing returned False: {message.get('messageId', 'unknown')}")
+                validation_errors.append({
+                    'messageId': message_id,
+                    'error': error_message
+                })
+                logger.warning(f"Validation failed for message {message_id}: {error_message}")
+                # Message will automatically go to DLQ due to raised exception
+                raise ValueError(error_message)
 
         except json.JSONDecodeError as e:
             failed_count += 1
             logger.error(f"Invalid JSON in message: {str(e)}")
             raise
 
-        except ValueError as e:
-            if "DOWNSTREAM_ERROR" in str(e):
-                downstream_errors += 1
-                logger.error("Downstream error detected")
-                raise
-            failed_count += 1
-            logger.error(f"Validation error: {str(e)}")
-            raise
-
         except Exception as e:
             failed_count += 1
-            logger.error(f"Unexpected error processing message: {str(e)}")
+            logger.error(f"Error processing message: {str(e)}")
             raise
 
     return {
@@ -116,6 +111,6 @@ def lambda_handler(event, context):
         'body': json.dumps({
             'processed': processed_count,
             'failed': failed_count,
-            'downstream_errors': downstream_errors
+            'validation_errors': validation_errors
         })
     }

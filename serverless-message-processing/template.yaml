@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless message processing architecture
+Description: Automated Serverless Messaging Redrive
 
 Parameters:
   ProcessorMemorySize:
@@ -8,16 +8,11 @@ Parameters:
     Default: 128
     Description: |
       Memory allocation for the ProcessMessages Lambda function (MB).
-      Consider increasing this value if:
-      - Processing complex/large messages
-      - Performing CPU-intensive operations
-      - Seeing timeout errors or slow processing
-      - Handling concurrent message processing
-      Recommended ranges:
-      - Light processing: 128-256 MB
-      - Medium processing: 256-512 MB
-      - Heavy processing: 512-1024 MB
-      - Very heavy processing: 1024-2048 MB
+      Default of 128 MB is suitable for demo purposes.
+      For production workloads, consider:
+      - Using AWS Lambda Power Tuning tool to determine optimal memory settings
+      - Testing with your specific workload characteristics
+      - Monitoring performance metrics and costs
     MinValue: 128
     MaxValue: 10240
     
@@ -25,24 +20,20 @@ Parameters:
     Type: Number
     Default: 128
     Description: |
-      Memory allocation for the DecisionMaker Lambda function (MB).
-      Consider increasing this value if:
-      - Complex routing logic is implemented
-      - Processing message metadata
-      - Performing extensive error analysis
-      - Handling multiple concurrent decisions
-      Recommended ranges:
-      - Basic routing: 128-256 MB
-      - Complex routing: 256-512 MB
-      - Advanced analysis: 512-1024 MB
+      Memory allocation for the ProcessMessages Lambda function (MB).
+      Default of 128 MB is suitable for demo purposes.
+      For production workloads, consider:
+      - Using AWS Lambda Power Tuning tool to determine optimal memory settings
+      - Testing with your specific workload characteristics
+      - Monitoring performance metrics and costs
     MinValue: 128
     MaxValue: 10240
 
-  ProcessorTimeout:
+  LambdaTimeout:
     Type: Number
     Default: 29
     Description: |
-      Timeout for the ProcessMessages Lambda function (seconds).
+      Timeout for the Lambda functions (seconds).
       Consider increasing this value if:
       - Processing takes longer than expected
       - External API calls are involved
@@ -51,18 +42,7 @@ Parameters:
     MinValue: 1
     MaxValue: 900
 
-  DecisionMakerTimeout:
-    Type: Number
-    Default: 29
-    Description: |
-      Timeout for the DecisionMaker Lambda function (seconds).
-      Consider increasing this value if:
-      - Complex routing logic requires more time
-      - Multiple external service checks are needed
-      - Batch processing of failed messages
-      Note: Maximum value is 900 seconds (15 minutes)
-    MinValue: 1
-    MaxValue: 900
+  
 
 Resources:
   ApiGateway:
@@ -156,10 +136,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.10
       CodeUri: ./functions/processor/
       MemorySize: !Ref ProcessorMemorySize
-      Timeout: !Ref ProcessorTimeout
+      Timeout: !Ref LambdaTimeout
 
       Events:
         SQSEvent:
@@ -176,10 +156,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.10
       CodeUri: ./functions/decision_maker/
       MemorySize: !Ref DecisionMakerMemorySize
-      Timeout: !Ref DecisionMakerTimeout
+      Timeout: !Ref LambdaTimeout
 
       Events:
         SQSEvent:
