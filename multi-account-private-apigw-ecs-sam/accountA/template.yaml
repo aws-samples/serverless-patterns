@@ -306,8 +306,7 @@ Outputs:
   ECSClusterName:
     Description: ECS Cluster Name
     Value: !Ref ECSCluster
-
-
+    
 #Outputs:                                                                                                                                                                                    
 #ecs-provider.dognamesLoadBalancerDNS803DE242 = ecs-p-dogna-QDCHDX3AQF0V-xxxxxxxxxxxxxxxx.elb.us-west-2.amazonaws.com
 #ecs-provider.ecsvpcendpointservicename = com.amazonaws.vpce.us-west-2.vpce-svc-00511039988fe3e47

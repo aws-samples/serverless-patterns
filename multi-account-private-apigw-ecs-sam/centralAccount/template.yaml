@@ -192,7 +192,7 @@ Resources:
                 - ec2:DescribeNetworkInterfaces
               Resource: '*'
 
-  ########### Custom Resource to Fetch Private IPs ###############
+  ########### Custom Resource to Fetch VPC Endpoint IPs ###############
   GetPrivateIPs:
     DependsOn:
       - VPCEndpoint

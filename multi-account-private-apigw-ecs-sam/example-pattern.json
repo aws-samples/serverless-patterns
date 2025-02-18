@@ -9,7 +9,7 @@
     "text": [
       "This sample project demonstrates how to enable secure, centralized API communications across multiple AWS accounts that contains ECS clusters using a private AWS PrivateLink. It facilitates east/west communication between services while keeping traffic within the AWS network.",
       "The architecture utilizes key AWS services such as Amazon API Gateway (Private), VPC links, Network Load Balancers (NLBs), and Execute-API VPC Endpoints. These services work together to securely route requests between multiple AWS accounts and their respective private APIs.",
-      "This pattern deploys three separate AWS accounts: a central account hosting the main API Gateway and routing components, an account A and B with an ECS Fargate services behind a NLB. Each account contains its own AWS resources to ensure proper communication and isolation."
+      "This pattern deploys three separate AWS accounts: a central account hosting the main API Gateway and routing components, an account A and B with an ECS Fargate services behind a NLB. Each account contains its own AWS resources to ensure proper communication and isolation. "
     ]
   },
   "gitHub": {

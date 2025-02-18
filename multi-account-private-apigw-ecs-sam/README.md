@@ -6,7 +6,7 @@
 
 This pattern demonstates how to use API Gateway with resources that exist in a different AWS accounts. This allows to expose multiple backend microservices running on various compute services such as Amazon EC2, Amazon Elastic Container Service (ECS), or Amazon Elastic Kubernetes Service.  It integrates securely with different backend services using VPC endpoints powered by AWS PrivateLink.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >> 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
