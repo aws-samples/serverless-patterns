@@ -4,5 +4,5 @@ pydantic==2.4.0
 pyhumps==3.8.0
 uvicorn==0.23.1
 python-ulid==1.1.0
-python-jose==3.3.0
+python-jose==3.4.0
 boto3==1.28.57
