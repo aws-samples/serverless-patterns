@@ -292,12 +292,13 @@ Resources:
           ContainerPort: 80
           TargetGroupArn: !Ref LoadBalancerTargetGroup
     DependsOn:
+      - LoadBalancerListener
       - LoadBalancerTargetGroup
 
 Outputs:
-  VPCEndpointServiceName:
-    Description: VPC Endpoint Service Name
-    Value: !GetAtt VPCEndpointService.ServiceName
+  VPCEndpointServiceId:
+    Description: VPC Endpoint Service ID
+    Value: !Ref VPCEndpointService
 
   NetworkLoadBalancerDNS:
     Description: Network Load Balancer DNS Name

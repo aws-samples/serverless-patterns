@@ -3,10 +3,9 @@ Transform: AWS::Serverless-2016-10-31
 Description: Public API Gateway connecting to private backend via VPC Endpoint
 
 Parameters:
-  VPCEndpointServiceName:
+  VPCEndpointServiceId:
     Type: String
-    Description: VPC Endpoint Service Name from the backend account (e.g.
-      com.amazonaws.vpce.region.vpce-svc-xxxxxx)
+    Description: VPC Endpoint Service ID from the backend account (e.g. vpce-svc-xxxxxx)
 
 Resources:
   PublicApiGateway:
@@ -20,7 +19,7 @@ Resources:
   VPCEndpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
-      ServiceName: !Ref VPCEndpointServiceName
+      ServiceName: !Sub com.amazonaws.vpce.${AWS::Region}.${VPCEndpointServiceId}
       VpcId: !Ref VPC
       VpcEndpointType: Interface
       PrivateDnsEnabled: false
@@ -85,7 +84,7 @@ Resources:
       Integration:
         Type: HTTP_PROXY
         IntegrationHttpMethod: ANY
-        Uri: !Sub http://${VPCEndpoint}.execute-api.${AWS::Region}.amazonaws.com/prod/api
+        Uri: !Sub http://${VPCEndpoint}.execute-api.${AWS::Region}.amazonaws.com
         ConnectionType: VPC_LINK
         ConnectionId: !Ref VPCLink
         TimeoutInMillis: 29000

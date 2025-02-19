@@ -42,11 +42,8 @@ Important: this application uses various AWS services and there are costs associ
     - Enter **Central ApiGateway Account ID**. This will be used to allow Central API Gateway account to access VPC Endpoint Service in this account
 
     -  Enter **stack name** and desired **AWS Region**.
-    -  Enter **current account's VPC ID** where NLB and ECS Fargate will be created. 
-    -  Enter **1st and 2nd Private Subnet IDs**.
-    -  Enter **Central Account's VPC ID**. This will be used in the Private API's resource policy. 
     -  Allow SAM CLI to create IAM roles with the required permissions.
-3. Note the outputs from the SAM deployment process. This contains the `API Gateway Invoke URL`, which will be used as inputs for central account's stack deployment.
+3. Note the outputs from the SAM deployment process. This contains the `VPCEndpointServiceId`, which will be used as inputs for central account's stack deployment.
 
 <!-- #### AccountB
 1. In account B, where you would like to create **private API Gateway** with **Lambda** integration, navigate to the `accountB` directory from the main directory and deploy using *(if you are in a different directory, then run `cd ..` before entering the below command)*:
@@ -70,17 +67,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. During the prompts:
     -  Enter **stack name** and desired **AWS Region**.
-    -  Enter **Instance type** either `t2.micro` or `t2.small`
-    -  Enter **unique [Amazon Linux 2023 AMI Id](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)** from AMI Catalog in the chosen region.
-    -  Enter **Allowed IP** from where you can SSH into the EC2 Instance. If left empty, the default CIDR range will be **0.0.0.0/0**
-    -  Enter **current account's VPC ID** where NLB and VPC Endpoint will be created.
-    -  Enter **Public Subnet ID**.
-    -  Enter **1st and 2nd Private Subnet IDs**.
-    -  Enter **Account A's Api Gateway URL**. e.g. `https://abcdefghij.execute-api.eu-west-1.amazonaws.com/Prod/`
-    -  Enter **Account B's Api Gateway URL**. e.g. `https://abcdefghij.execute-api.eu-west-1.amazonaws.com/Prod/`
+    -  Enter **VPCEndpointServiceId** from AccountA
+   
     -  Allow SAM CLI to create IAM roles with the required permissions.
-3. Note the outputs from the SAM deployment process. This contains `two API Gateway's Invoke URLs`, `EC2KeyPairName` to download key material and `EC2 Public IP` address. 
-4. Follow the instructions to [store the key material from AWS System Manager parameter](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html#create-key-pair-cloudformation) into your local machine. 
+3. Note the outputs from the SAM deployment process. This contains `Public API Gateway Endpoint`, 
 
 ## How it works
 TODO: Update
@@ -113,7 +103,7 @@ This pattern utilizes three accounts and their respective templates.
 ## Testing
 1. Once you have deployed all the Stacks, [connect to your EC2 instance using SSH](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-to-linux-instance.html) or [using EC2 Instance Connect](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-eic.html) in **Central Account**.
 
-2. After connecting to the EC2 instance, run the following `curl` command to test the **/fargate** and **/lambda** path (*replace the URL with your own API GW URL*):
+2. Once you have deployed all the Stacks, open URLs in browser, or run the following `curl` command to test the **/fargate** and **/lambda** path (*replace the URL with your own API GW URL*):
     ```bash
     curl --location 'https://abcdefghij.execute-api.eu-west-1.amazonaws.com/Prod/fargate'
     
@@ -124,16 +114,17 @@ This pattern utilizes three accounts and their respective templates.
 
 To avoid incurring future charges, it's important to delete the resources in the correcct order. Follow these steps to clean up the resources created by the four templates *(Make sure to navigate to the directory containing the template before running the below commands)*:
 
-1. Delete Account A template 
-    ```bash
-    sam delete --stack-name STACK_NAME --profile PROFILE_NAME
-    ```
-2. Delete Account B template 
-    ```bash
-    sam delete --stack-name STACK_NAME_ACCOUNT_B --profile accountB
-    ```
-3. Delete Central Account template
+1. Delete Central Account template
     ```bash
     sam delete --stack-name STACK_NAME_CENTRAL_ACCOUNT --profile centralAccount
     ```
+2. Delete Account A template 
+    ```bash
+    sam delete --stack-name STACK_NAME --profile PROFILE_NAME
+    ```
+3. Delete Account B template 
+    ```bash
+    sam delete --stack-name STACK_NAME_ACCOUNT_B --profile accountB
+    ```
+
 
