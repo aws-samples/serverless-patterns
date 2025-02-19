@@ -2,21 +2,21 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  # VpcCIDR:
-  #   Type: String
-  #   Default: "10.0.0.0/16"
-  # PublicSubnet1CIDR:
-  #   Type: String
-  #   Default: "10.0.10.0/24"
-  # PublicSubnet2CIDR:
-  #   Type: String
-  #   Default: "10.0.11.0/24"
-  # PrivateSubnet1CIDR:
-  #   Type: String
-  #   Default: "10.0.1.0/24"
-  # PrivateSubnet2CIDR:
-  #   Type: String
-  #   Default: "10.0.2.0/24"
+  VpcCIDR:
+    Type: String
+    Default: "10.0.0.0/16"
+  PublicSubnet1CIDR:
+    Type: String
+    Default: "10.0.10.0/24"
+  PublicSubnet2CIDR:
+    Type: String
+    Default: "10.0.11.0/24"
+  PrivateSubnet1CIDR:
+    Type: String
+    Default: "10.0.1.0/24"
+  PrivateSubnet2CIDR:
+    Type: String
+    Default: "10.0.2.0/24"
   CentralApiGatewayAccount:
     Type: String
 
@@ -295,18 +295,10 @@ Resources:
       - LoadBalancerTargetGroup
 
 Outputs:
-  VPCEndpointServiceId:
-    Description: VPC Endpoint Service ID
-    Value: !Ref VPCEndpointService
+  VPCEndpointServiceName:
+    Description: VPC Endpoint Service Name
+    Value: !GetAtt VPCEndpointService.ServiceName
 
   NetworkLoadBalancerDNS:
     Description: Network Load Balancer DNS Name
     Value: !GetAtt NetworkLoadBalancer.DNSName
-
-  ECSClusterName:
-    Description: ECS Cluster Name
-    Value: !Ref ECSCluster
-    
-#Outputs:                                                                                                                                                                                    
-#ecs-provider.dognamesLoadBalancerDNS803DE242 = ecs-p-dogna-QDCHDX3AQF0V-xxxxxxxxxxxxxxxx.elb.us-west-2.amazonaws.com
-#ecs-provider.ecsvpcendpointservicename = com.amazonaws.vpce.us-west-2.vpce-svc-00511039988fe3e47
