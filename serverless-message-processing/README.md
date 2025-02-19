@@ -46,12 +46,14 @@ curl -X POST \
   'https://\${endpoint}/prod/message' \
   -H 'Content-Type: application/json' \
   -d '{
-    "messageType": "TYPE_A",
-    "body": {
-        "email": "user@@example.com"
-    },
-    "timestamp": "2023-11-22T10:30:00Z"
-}'
+                "messageId": "test-456",
+                "messageType": "TYPE_A",
+                "payload": {
+                    "email": "user@example.com",
+                    "data": "some data"
+                },
+                "timestamp": "2023-11-22T12:00:00Z"
+            }'
    ```
 
 

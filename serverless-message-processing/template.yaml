@@ -136,7 +136,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.11
       CodeUri: ./functions/processor/
       MemorySize: !Ref ProcessorMemorySize
       Timeout: !Ref LambdaTimeout
@@ -156,7 +156,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.11
       CodeUri: ./functions/decision_maker/
       MemorySize: !Ref DecisionMakerMemorySize
       Timeout: !Ref LambdaTimeout
