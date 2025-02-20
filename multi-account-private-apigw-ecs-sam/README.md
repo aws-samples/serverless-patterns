@@ -73,32 +73,27 @@ Important: this application uses various AWS services and there are costs associ
 3. Note the outputs from the SAM deployment process. This contains `Public API Gateway Endpoint`, 
 
 ## How it works
-TODO: Update
 This pattern utilizes three accounts and their respective templates. 
 
 2. **Central API Account** : Hosts the central components required to manage and route API requests securely across multiple AWS accounts. This template contains:
 
-    - **EC2 Instance**: Serves as an API client to initiate test requests.
-    - **Amazon API Gateway (Private)**: A private API Gateway serves as the entry point for API requests.
+    - **Amazon API Gateway**: A public API Gateway serves as the entry point for API requests.
     - **VPC Link(Private Link)**: Connects the API Gateway to an NLB within the Central Account's VPC, ensuring secure, private connectivity.
+    
     - **Network Load Balancer (NLB)**: Routes incoming traffic from the VPC link to Elastic Network Interfaces (ENIs), forwarding requests to the target VPC Endpoint.
-    - **VPC Endpoint**: The endpoint for routing/resolving incoming API requests and provides connectivity to downstream Private API Gateways in other AWS accounts (e.g., Account A and Account B).
+    - **VPC Endpoint**: The endpoint for routing/resolving incoming API requests and provides connectivity to private resources in other AWS accounts (e.g., Account A and Account B).
 
-3. **Account A** : Hosts a service that provides a simple HTTP response from an NGINX server running on ECS Fargate. This template contains:
-
-    -  **Amazon API Gateway (Private)**: Receives requests from the Central API Account and forwards them as per configured paths and integration.
-    -  **VPC Link**: Connects the API Gateway to an internal NLB within Account A.
-    -  **Network Load Balancer (NLB)**: Routes traffic from the VPC link to the ECS Fargate service.
+3. **Account A** : Hosts a service A that provides a simple HTTP response from an NGINX server running on ECS Fargate. This template contains:
+    -  **VPC Endpoint Service**: Allows to share your service with other accounts through AWS Privatelink
+    -  **VPC**: Creates a VPC with two public and two private subnets across different availability zones. Provides private subnet internet access via a NAT Gateway. Internet access only needed for ECS Fargatet to download docker image from ECR
+    -  **Network Load Balancer (NLB)**: The load balancer receives requests from service consumers and routes them to the ECS Fargate service.
     -  **Elastic Container Service (ECS) Fargate**: A containerized NGINX application on ECS Fargate returns a basic HTTP response. This verifies the connectivity and functionality of the architecture.
 
-4. **Account B** : Hosts a Lambda function that return a simple text response to the client. This template contains:
-    
-    -  **Amazon API Gateway (Private)**: Receives requests from the Central API Account and forwards them as per configured paths and integration.
-    -  **AWS Lambda**: The Lambda function processes requests from the API Gateway and returns a simple text response to the client. 
-
-5. **VPC (Optional)**: Creates a VPC with CIDR Range `10.1.0.0/16` with 1 Public subnet and 2 Private subnets. This template contains:
-    -  **1 Public Subnet**: The subnet has a direct route to an [internet gateway](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html). Resources in a public subnet can access the public internet.
-    -  **2 Private subnets**: Resources in a private subnet use a [NAT gateway](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat.html) to access the public internet.
+3. **Account B** : Hosts a service B that provides a simple HTTP response from an NGINX server running on ECS Fargate. This template contains:
+    -  **VPC Endpoint Service**: Allows to share your service with other accounts through AWS Privatelink
+    -  **VPC**: Creates a VPC with two public and two private subnets across different availability zones. Provides private subnet internet access via a NAT Gateway. Internet access only needed for ECS Fargatet to download docker image from ECR
+    -  **Network Load Balancer (NLB)**: The load balancer receives requests from service consumers and routes them to the ECS Fargate service.
+    -  **Elastic Container Service (ECS) Fargate**: A containerized NGINX application on ECS Fargate returns a basic HTTP response. This verifies the connectivity and functionality of the architecture.
 
 ## Testing
 1. Once you have deployed all the Stacks, [connect to your EC2 instance using SSH](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-to-linux-instance.html) or [using EC2 Instance Connect](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-eic.html) in **Central Account**.
