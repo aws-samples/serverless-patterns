@@ -126,7 +126,7 @@ Resources:
     Properties:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 30
-      HealthCheckProtocol: HTTPS
+      HealthCheckProtocol: HTTP
       Port: 80
       Protocol: TCP
       TargetType: ip

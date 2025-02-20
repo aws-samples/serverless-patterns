@@ -27,7 +27,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```bash
-    cd aws-samples/serverless-patterns/multi-account-private-apigw
+    cd aws-samples/serverless-patterns/multi-account-private-apigw-ecs-sam
     ```
 
 #### AccountA
@@ -39,38 +39,55 @@ Important: this application uses various AWS services and there are costs associ
     sam deploy --guided --profile accountA
     ```
 2. During the prompts:
-    - Enter **Central ApiGateway Account ID**. This will be used to allow Central API Gateway account to access VPC Endpoint Service in this account
+    - Enter the following parameters when prompted:
+        - **stack name**: Name for the CloudFormation stack
+        - **AWS Region**: Region where resources will be deployed
+        - **Central ApiGateway Account ID**: This will be used to allow Central API Gateway account to access VPC Endpoint Service in this account
+        - **VpcCIDR**: VPC CIDR range (default: 10.0.0.0/16)
+        - **PublicSubnet1CIDR**: Public subnet 1 CIDR range (default: 10.0.10.0/24)
+        - **PublicSubnet2CIDR**: Public subnet 2 CIDR range (default: 10.0.20.0/24)
 
-    -  Enter **stack name** and desired **AWS Region**.
-    -  Allow SAM CLI to create IAM roles with the required permissions.
+    - Allow SAM CLI to create IAM roles with the required permissions.
 3. Note the outputs from the SAM deployment process. This contains the `VPCEndpointServiceId`, which will be used as inputs for central account's stack deployment.
 
-<!-- #### AccountB
-1. In account B, where you would like to create **private API Gateway** with **Lambda** integration, navigate to the `accountB` directory from the main directory and deploy using *(if you are in a different directory, then run `cd ..` before entering the below command)*:
+#### AccountB
+1. In account B, navigate to the accountB directory:
     ```bash
-    cd accountB
+    cd ../accountB
     
     sam deploy --guided --profile accountB
     ```
 2. During the prompts:
-    -  Enter **stack name** and desired **AWS Region**.
-    -  Enter **Central Account's VPC ID**. This will be used in the Private API's resource policy. 
-    -  Allow SAM CLI to create IAM roles with the required permissions.
-3. Note the outputs from the SAM deployment process. This contains the `API Gateway's Invoke URL`, which will be used as inputs for central account's stack deployment. -->
+    - Enter the following parameters when prompted:
+        - **stack name**: Name for the CloudFormation stack
+        - **AWS Region**: Region where resources will be deployed
+        - **Central ApiGateway Account ID**: This will be used to allow Central API Gateway account to access VPC Endpoint Service in this account
+        - **VpcCIDR**: VPC CIDR range (default: 10.0.0.0/16)
+        - **PublicSubnet1CIDR**: Public subnet 1 CIDR range (default: 10.0.10.0/24)
+        - **PublicSubnet2CIDR**: Public subnet 2 CIDR range (default: 10.0.20.0/24)
+
+    - Allow SAM CLI to create IAM roles with the required permissions.
+3. Note the outputs from the SAM deployment process. This contains the `VPCEndpointServiceId`, which will be used as inputs for central account's stack deployment.
 
 #### Central Account
-1. In Central Account, where you would like to create central ** API Gateway**, navigate to the `centralAccount` directory from the main directory and deploy using (if you are in different directory, then run `cd ..` before entering the below command):
+1. In Central Account, where you would like to create central **API Gateway**, navigate to the central account directory:
     ```bash
-    cd centralAccount
+    cd ../centralAccount
+    
+    sam deploy --guided --profile centralAccount
+    ```
+2. During the prompts:
+    - Enter the following parameters when prompted:
+        - **stack name**: Name for the CloudFormation stack
+        - **AWS Region**: Region where resources will be deployed
+        - **VPCEndpointServiceId1**: VPC Endpoint Service ID from AccountA deployment
+        - **VPCEndpointServiceId2**: VPC Endpoint Service ID from AccountB deployment
+
+    - Allow SAM CLI to create IAM roles with the required permissions.
     
     sam deploy --guided --profile CentralAccount
     ```
-2. During the prompts:
-    -  Enter **stack name** and desired **AWS Region**.
-    -  Enter **VPCEndpointServiceId** from AccountA
-   
-    -  Allow SAM CLI to create IAM roles with the required permissions.
-3. Note the outputs from the SAM deployment process. This contains `Public API Gateway Endpoint`, 
+3. Note the outputs from the SAM deployment process. This contains `ApiEndpoint1` and `ApiEndpoint2`. 
 
 ## How it works
 This pattern utilizes three accounts and their respective templates. 
@@ -96,13 +113,11 @@ This pattern utilizes three accounts and their respective templates.
     -  **Elastic Container Service (ECS) Fargate**: A containerized NGINX application on ECS Fargate returns a basic HTTP response. This verifies the connectivity and functionality of the architecture.
 
 ## Testing
-1. Once you have deployed all the Stacks, [connect to your EC2 instance using SSH](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-to-linux-instance.html) or [using EC2 Instance Connect](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-eic.html) in **Central Account**.
-
-2. Once you have deployed all the Stacks, open URLs in browser, or run the following `curl` command to test the **/fargate** and **/lambda** path (*replace the URL with your own API GW URL*):
+1. Once you have deployed all the Stacks, open URLs in browser, or run the following `curl` command to test the **/api** and **/api2** path (*replace the URL with your own ApiEndpoint Urls from Central Account Outputs):
     ```bash
-    curl --location 'https://abcdefghij.execute-api.eu-west-1.amazonaws.com/Prod/fargate'
+    curl --location 'https://abcdefghij.execute-api.us-west-2.amazonaws.com/prod/api'
     
-    curl --location 'https://abcdefghij.execute-api.eu-west-1.amazonaws.com/Prod/lambda'
+    curl --location 'https://abcdefghij.execute-api.us-west-2.amazonaws.com/prod/api2'
     ```
 
 ## Cleanup
