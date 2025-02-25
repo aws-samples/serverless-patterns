@@ -1,4 +1,4 @@
-Invoking a Private Custom Domain Name cross-account
+# Invoking a Private Custom Domain Name cross-account
 
 ## Architecture Overview
 
@@ -21,7 +21,7 @@ Important: This application uses various AWS Services and there are costs associ
 
 ### How it works
 
-This pattern utilizes two AWS Sccounts and their respective templates. 
+This pattern utilizes two AWS Accounts and their respective templates. 
 
 1. **Account A** : Hosts the Private API Gateway and the Private Custom Domain Name:
     -  **Amazon API Gateway (Private)**: Receives requests from the Account B via the Execute VPC Endpoint deployed in Account B
