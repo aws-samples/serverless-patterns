@@ -17,7 +17,7 @@ resource "aws_lambda_function" "translate_text" {
   handler         = "index.lambda_handler"
   runtime         = "python3.13"
   memory_size     = 128
-  timeout         = 60
+  timeout         = 10
 
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 }
