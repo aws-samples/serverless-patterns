@@ -35,9 +35,12 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Use the AWS CLI to invoke the Lambda function.
+The pattern uses an AWS Lambda function that integrates with Amazon Translate service to perform real-time text translation. When invoked via AWS CLI, the Lambda function takes three parameters (source text, source language, and target language) and uses Amazon Translate to convert the text from one language to another (e.g., English to German in the example provided).
 
-The example provided  performs Translation from English to German language. The following languages are [supported](https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html).
+This is a simple yet powerful serverless solution for real-time text translation without having to manage any servers or infrastructure.
+
+"The example demonstrates translation from English to German language. For a complete list of supported languages, please refer to the [Amazon Translate documentation](https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html)."
+
 
 ## Testing
 
@@ -47,7 +50,7 @@ Replace "{LambdaFunctionName}" with the function name as seen in the output of t
 aws lambda invoke  --function-name {LambdaFunctionName} --invocation-type RequestResponse --cli-binary-format raw-in-base64-out --payload "{\"text\":\"I am very happy\", \"sl\":\"en\",\"tl\":\"de\"}" response.json
 ```
 
-The command above returns the following output:
+After running the command, open the generated response.json file to see the translated output:
 ```
 das ist schlecht
 ```
