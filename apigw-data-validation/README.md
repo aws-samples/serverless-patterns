@@ -52,7 +52,7 @@ curl --location --request POST 'https://{api-id}.execute-api.{region}.amazonaws.
     "make": "MINI",
     "model": "Countryman",
     "year": 2020
-}
+}'
 ```
 Expected response: `{"message": "Data validation succeded", "data": {"make": "MINI", "model": "Countryman", "year": 2020}}`
 ### Now enter a year less than 2010
