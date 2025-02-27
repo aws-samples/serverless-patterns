@@ -1,20 +1,19 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: API Gateway data validation (uksb-1tthgi812) (tag:apigw-data-validation)
+Description: API Gateway data validation example (uksb-1tthgi812) (tag:apigw-data-validation)
 
 Globals:
   Function:
     Timeout: 3
 
 Resources:
-
-  # REST API Configuration. Creates models available for validation at each endpoint.
+  # REST API Configuration
   MainApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Models:
-        Vehicle: # Data model for vehicles to be validated against
+        Vehicle:
           type: object
           required:
             - make
@@ -40,7 +39,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.13
       Architectures:
         - arm64
       Events:
@@ -48,24 +47,14 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref MainApi
-            Path: /{id}
+            Path: /vehicle
             Method: post
-            RequestParameters:
-              - method.request.querystring.order:
-                  Required: true
-                  Caching: true
-              # - method.request.path.id:
-              #     Required: true
-              - method.request.header.custom-agent:
-                  Required: true
             RequestModel:
-              Model: Vehicle # Links available model
-              Required: true # requires validation
-              ValidateBody: true #Validates the request body.
-              ValidateParameters: true #Validates the request header
+              Model: Vehicle
+              Required: true
+              ValidateBody: true
 
-            
 Outputs:
   ProcessApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Description: "API Gateway endpoint URL for Prod stage"
     Value: !Sub "https://${MainApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

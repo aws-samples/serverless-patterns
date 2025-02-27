@@ -46,23 +46,23 @@ After the application is deployed try the following scenarios.
 
 ### Create a new vehicle entering valid data:
 ```
-curl --location --request POST 'https://qap9jh21xk.execute-api.us-west-2.amazonaws.com/Prod/' \
+curl --location --request POST 'https://{api-id}.execute-api.{region}.amazonaws.com/Prod/vehicle' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "make":"MINI",
-    "model":"Countryman",
-    "year": 2010
+    "make": "MINI",
+    "model": "Countryman",
+    "year": 2020
 }'
 ```
-Expected response: `{"message": "Data vbalidation succeded", "data": {"make": "MINI", "model": "Countryman", "year": 2010}}`
+Expected response: `{"message": "Data validation succeded", "data": {"make": "MINI", "model": "Countryman", "year": 2020}}`
 ### Now enter a year less than 2010
 ```
-curl --location --request POST 'https://qap9jh21xk.execute-api.us-west-2.amazonaws.com/Prod/' \
+curl --location --request POST 'https://{api-id}.execute-api.{region}.amazonaws.com/Prod/vehicle' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "make":"MINI",
-    "model":"Countryman",
-    "year": 2002
+    "make": "MINI",
+    "model": "Countryman",
+    "year": 2009
 }'
 ```
 Expected response: `{"message": "Invalid request body"}`
