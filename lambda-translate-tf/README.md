@@ -1,4 +1,4 @@
-# Translate Text in real-time using Lambda function and Amazon Translate
+# Translate Text in real-time using AWS Lambda function and Amazon Translate
 
 This pattern contains source code and supporting files for a serverless application deployable with Terraform. The pattern demonstrates how to create a Lambda function that integrates with Amazon Translate service to perform real-time text translation between languages.
 
