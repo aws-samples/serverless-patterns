@@ -1,3 +1,6 @@
+# Get current AWS account ID
+data "aws_caller_identity" "current" {}
+
 # IAM role for Lambda
 resource "aws_iam_role" "lambda_role" {
   name = "translate_text_lambda_role"
@@ -28,7 +31,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Sid      = "LambdatranslateText"
         Effect   = "Allow"
         Action   = ["translate:TranslateText"]
-        Resource = "*"
+        Resource = "arn:aws:translate:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*"
       }
     ]
   })
