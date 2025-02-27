@@ -1,5 +1,5 @@
 {
-  "title": "Text translation with Lambda and Translate",
+  "title": "Text translation with AWS Lambda and Amazon Translate",
   "description": "Create a Lambda function that calls Translate service for text translation via the Boto3 SDK.",
   "language": "python",
   "level": "200",
