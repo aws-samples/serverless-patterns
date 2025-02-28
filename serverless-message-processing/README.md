@@ -8,6 +8,12 @@ An adaptable pattern for message processing using AWS serverless services, featu
 - SQS Queues (main + DLQs)
 - Lambda Functions (processing + recovery)
 
+
+## Architecture Diagram
+
+![Architecture Diagram](architecture.jpeg)
+
+
 ## Basic Flow
 1. Messages enter through API Gateway
 2. Main queue receives messages
