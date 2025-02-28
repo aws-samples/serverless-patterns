@@ -62,6 +62,7 @@ OR
 
 2. When Queue has Messages:
 To send messages to queue, Please use below commands:
+
 Note: queueURL can be found as part of Stack Output.
 ```
 chmod +x send_message_to_queue.sh
@@ -69,7 +70,7 @@ chmod +x send_message_to_queue.sh
 ```
 Eg: ``` ./send_message_to_queue.sh https://sqs.us-east-1.amazonaws.com/210987654321/myQueue 3 ```
 
-Now use below Command to get messages from the queue utilising MazNumberOfMessages, VisibilityTiemout and AtrributeName Parameters. Behaviour of each parameter can be found in [AWS API Reference Dcoumentation](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html)
+Now use below Command to get messages from the queue utilising MaxNumberOfMessages, VisibilityTimeout and AttributeName Parameters. Behaviour of each parameter can be found in [AWS API Reference Documentation](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html)
 
 ```
 curl --location --request GET '{ApiEndpoint output value}?MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All'
