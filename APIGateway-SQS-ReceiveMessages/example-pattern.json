@@ -9,7 +9,9 @@
     "text": [
       "This pattern creates an Amazon API gateway REST API endpoint. The endpoint uses service integrations to directly connect to Amazon SQS that reads messages from the SQS.",
       "Users can simply call the GET Method of invoke URL( API Gateway) that is returned as part of the Stack Output.",
-      "Invoke URL can also be used with query string parameters like MaxNumberOfMessages=5 VisibilityTimeout=15 AttributeName=All to get the desired output."
+      "Invoke URL can also be used with query string parameters like MaxNumberOfMessages=5 VisibilityTimeout=15 AttributeName=All to get the desired output.",
+      "Useful with Frontend application that would like to interact with sqs via https protocol  to read messages from the SQS queue Avoid any useage of AWS SDK since request to SQS can be made via simple http request.",
+      "Please also consider looking at AWS API Gateway and AWS SQS quotas for different limits supported by the services when working with this pattern."
     ]
   },
   "gitHub": {
@@ -33,6 +35,14 @@
       {
         "text":"AWS SQS Documentation",
 	"link":"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+      },
+      {
+        "text":"AWS API Gateway Quotas",
+	"link":"https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html"
+      },
+      {
+        "text":"AWS SQS Quotas",
+	"link":"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-quotas.html"
       }
     ]
   },

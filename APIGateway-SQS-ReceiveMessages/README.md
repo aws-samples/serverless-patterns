@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd APIGateway-SQS-ReceiveMessages
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -42,25 +42,45 @@ This pattern creates an Amazon API gateway REST API endpoint. The endpoint uses 
 Users can simply call the GET Method of invoke URL( API Gateway) that is returned as part of the Stack Output.
 Invoke URL can also be used with query string parameters like MaxNumberOfMessages=5 VisibilityTimeout=15 AttributeName=All to get the desired output.
 
-## Testing
+Usage and defination of each parameter can be found in [AWS API Reference Dcoumentation](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html)
 
+## Usage Example and Consideration:
+Useful with Frontend application that would like to interact with sqs via https protocol  to read messages from the SQS queue
+Avoid any useage of AWS SDK since request to SQS can be made via simple http request.
+
+Please also consider looking at [API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html) and [SQS Quotas](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-quotas.html) for different limits supported by the services when working with this pattern.
+
+## Testing
+1. When Queue is Empty:
 Sending a new test message to API Gateway endpoint
 
-To test the endpoint first send data using the following command. Be sure to update the endpoint with endpoint of your stack.
+To test the endpoint first send HTTP request using the following command. Be sure to update the endpoint with endpoint of your stack.
 ```
 curl --location --request GET 'ApiEndpoint output value'
 ```
 OR
+
+2. When Queue has Messages:
+To send messages to queue, Please use below commands:
+Note: queueURL can be found as part of Stack Output.
+```
+chmod +x send_message_to_queue.sh
+./send_message_to_queue.sh {queueURL} {number of messages}
+```
+Eg: ``` ./send_message_to_queue.sh https://sqs.us-east-1.amazonaws.com/210987654321/myQueue 3 ```
+
+Now use below Command to get messages from the queue utilising MazNumberOfMessages, VisibilityTiemout and AtrributeName Parameters. Behaviour of each parameter can be found in [AWS API Reference Dcoumentation](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html)
+
 ```
 curl --location --request GET '{ApiEndpoint output value}?MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All'
 ```
 
 ## Expected Output:
-
+When Queue is Empty
 ```
 {"ReceiveMessageResponse":{"ReceiveMessageResult":{"messages":null},"ResponseMetadata":{"RequestId":"RequestId"}}}
 ```
-
+When Queue has Messages:
 ```
 {"ReceiveMessageResponse":{"ReceiveMessageResult":{"messages":[{"Attributes":null,"Body":"messageBody","MD5OfBody":"MD5OfBody","MD5OfMessageAttributes":null,"MessageAttributes":null,"MessageId":"Queue Message ID","ReceiptHandle":"ReceiptHandle"}]},"ResponseMetadata":{"RequestId":"requestID"}}}
 ```
