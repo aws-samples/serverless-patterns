@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern shows how to deploy a Terraform template that create a Lambda function which calls Translate for text translation."
+      "This pattern shows how to deploy a Terraform template that creates a Lambda function which calls Amazon Translate for text translation."
     ]
   },
   "gitHub": {
