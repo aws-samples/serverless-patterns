@@ -37,8 +37,6 @@ Important: this application uses various AWS services and there are costs associ
 
 The pattern uses an AWS Lambda function that integrates with Amazon Translate to perform real-time text translation. When invoked via the AWS CLI, the Lambda function takes three parameters (source text, source language, and target language) and uses Amazon Translate to convert the text from one language to another (for example English to German).
 
-This is a simple yet powerful serverless solution for real-time text translation without having to manage any servers or infrastructure.
-
 "The example demonstrates translation from English to German language. For a complete list of supported languages, please refer to the [Amazon Translate documentation](https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html)."
 
 
