@@ -50,7 +50,7 @@ aws lambda invoke  --function-name {LambdaFunctionName} --invocation-type Reques
 
 After running the command, open the generated response.json file to see the translated output:
 ```
-das ist schlecht
+Ich freue mich sehr
 ```
 
 ## Cleanup
