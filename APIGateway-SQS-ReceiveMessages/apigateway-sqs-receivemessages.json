@@ -46,7 +46,7 @@
     },
     "deploy": {
         "text": [
-            "sam deploy"
+            "sam deploy --guided"
         ]
     },
     "testing": {
