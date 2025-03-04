@@ -53,21 +53,22 @@ Follow these steps to test the integration:
 
 1. First, send test messages to the queue:
     ```chmod +x send_message_to_queue.sh```
+   
     ```./send_message_to_queue.sh {queueURL} {number of messages}```
 
-Example:
-```./send_message_to_queue.sh https://sqs.us-east-1.amazonaws.com/210987654321/myQueue 3```
+    Example:
+    ```./send_message_to_queue.sh https://sqs.us-east-1.amazonaws.com/210987654321/myQueue 3```
 
 2. Then, retrieve messages using the API Gateway endpoint:
 
-Basic retrieval:
-```curl --location --request GET '{ApiEndpoint output value}'```
+    Basic retrieval:
+    ```curl --location --request GET '{ApiEndpoint output value}'```
 
-Advanced retrieval with parameters:
-```curl --location --request GET '{ApiEndpoint output value}?MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All'```
+    Advanced retrieval with parameters:
+    ```curl --location --request GET '{ApiEndpoint output value}?MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All'```
 
-Parameter details are available in the [AWS API Reference Documentation](
-https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html).
+    Parameter details are available in the [AWS API Reference Documentation](
+    https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html).
 
 ## Expected Output
 
