@@ -1,6 +1,6 @@
 {
   "title": "Text translation with AWS Lambda and Amazon Translate",
-  "description": "Create a Lambda function that calls Translate service for text translation via the Boto3 SDK.",
+  "description": "Create an AWS Lambda function that calls Amazon Translate for text translation via the Boto3 SDK.",
   "language": "python",
   "level": "200",
   "framework": "Terraform",
