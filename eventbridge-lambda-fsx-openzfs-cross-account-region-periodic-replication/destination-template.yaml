@@ -104,7 +104,9 @@ Resources:
                   - fsx:TagResource
                   - fsx:ListTagsForResource
                   - fsx:CopySnapshotAndUpdateVolume
-                Resource: "*"
+                Resource:
+                  - !Sub "arn:aws:fsx:${AWS::Region}:${AWS::AccountId}:*"
+                  - !Sub "arn:aws:fsx:*:${SourceAWSAcctId}:*"
   #
   # Lambda function that will make CopySnapshotAndUpdateVolume API call.
   #
@@ -120,7 +122,7 @@ Resources:
           COPY_STRATEGY: !Ref CopyStrategy
       Handler: CopySnapshotAndUpdateVolume.lambda_handler
       Role: !GetAtt CopySnapshotAndUpdateVolumeLambdaRole.Arn
-      CodeUri: src/
+      CodeUri: src/CopySnapshotAndUpdateVolume.py
       Runtime: python3.13
       Timeout: 600
 

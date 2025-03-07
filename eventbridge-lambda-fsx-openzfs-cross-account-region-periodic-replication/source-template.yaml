@@ -121,8 +121,7 @@ Resources:
                   - fsx:DeleteSnapshot
                   - fsx:TagResource
                   - fsx:ListTagsForResource
-                  - fsx:CopySnapshotAndUpdateVolume
-                Resource: "*"
+                Resource: !Sub "arn:aws:fsx:${AWS::Region}:${AWS::AccountId}:*"
               - Effect: Allow
                 Action:
                   - lambda:InvokeFunction
@@ -156,7 +155,7 @@ Resources:
           DEST_LAMBDA_REGION: !Ref DestinationRegion
       Handler: PeriodicReplication.lambda_handler
       Role: !GetAtt SnapshotLambdaRole.Arn
-      CodeUri: src/
+      CodeUri: src/PeriodicReplication.py
       Runtime: python3.13
       Timeout: 900
 

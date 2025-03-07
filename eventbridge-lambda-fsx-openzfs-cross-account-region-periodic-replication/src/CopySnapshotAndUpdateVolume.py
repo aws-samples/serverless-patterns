@@ -4,9 +4,12 @@ import time
 import datetime
 import boto3
 import botocore
+import logging
+logger = logging.getLogger()
+logger.setLevel("INFO")
 
-print("boto3 version: " + boto3.__version__)
-print("botocore version: " + botocore.__version__)
+logger.info("boto3 version: " + boto3.__version__)
+logger.info("botocore version: " + botocore.__version__)
 
 session = boto3.session.Session()
 fsx_client = session.client(service_name='fsx')
@@ -20,48 +23,67 @@ def deleteSnapshotIfOlderThanRetention(snapshot, retain_days):
     delta = now_date - created_date
 
     try:
-        print("Examining OpenZFS volume snapshot " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
+        logger.info("Examining OpenZFS volume snapshot " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
         if delta.days > retain_days:
             fsx_client.delete_snapshot(SnapshotId=snapshot_id)
-            print("Deleted FSx for OpenZFS volume snapshot " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
+            logger.info("Deleted FSx for OpenZFS volume snapshot " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
         else:
-            print("Skipping (retaining) FSx for OpenZFS volume " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
+            logger.info("Skipping (retaining) FSx for OpenZFS volume " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
     except Exception as e:
-        print("The error is: ", e)
+        logger.info("The error is: " + str(e))
 
 def deleteSnapshots(retain_days, snapshot_name):
-    print ("deleting snapshots")
-
+    logger.info ("deleting snapshots")
+    
     # query the FSx API for existing snapshots
-    print ("Getting snapshots for volume id = " + volId)
-    snapshots = fsx_client.describe_snapshots(
-            Filters=[{'Name': 'volume-id', 'Values': [volId]}],
-            MaxResults=20
-        )
-    print(snapshots)
+    logger.info ("Getting snapshots for volume id = " + volId)
+    next_token = None
+    while True:
+        # Prepare the base request parameters
+        params = {
+            'Filters':[{'Name': 'volume-id', 'Values': [volId]}],
+            'MaxResults': 2  # 20 snapshots per API call
+        }
 
-    # loop thru the results, checking the snapshot date-time and call Fsx API to remove those older than x hours/days
-    print("Starting purge of snapshots older than " + str(retain_days) + " days for volume " + volId)
-    for snapshot in snapshots['Snapshots']:
-        if snapshot['Name'].startswith(snapshot_name):
-            deleteSnapshotIfOlderThanRetention(snapshot, retain_days)
+        # Add NextToken if it exists
+        if next_token:
+            params['NextToken'] = next_token
+
+        # Make the API call
+        response = fsx_client.describe_snapshots(**params)
+        
+        # Process snapshots in current response
+        snapshots = response.get('Snapshots', [])
+        logger.info(snapshots)
+
+        # loop thru the results, checking the snapshot date-time and call Fsx API to remove those older than x hours/days
+        logger.info("Starting purge of snapshots older than " + str(retain_days) + " days for volume " + volId)
+    
+        for snapshot in snapshots:
+            if snapshot['Name'].startswith(snapshot_name):
+                deleteSnapshotIfOlderThanRetention(snapshot, retain_days)
+
+        # Check if there are more results
+        next_token = response.get('NextToken')
+        if not next_token:
+            break
 
 def lambda_handler(event, context):
-    print(event)
+    logger.info(event)
     src_snapshot_arn = event["src_snapshot_ResourceARN"]
     retain_days = event["snapshot_retain_days"]
     snapshot_name = event["snapshot_name"]
 
     rspJson = {}
     try:
-        print ("Starting copy snapshot operation ...")
+        logger.info ("Starting copy snapshot operation ...")
         options_string = os.environ.get("OPTIONS")
         options = [] if len(options_string) == 0 else list(options_string.split(", "))
         option_list = []
         for item in options:
             option_list.append(item.strip())
-        print ("CopySnapshotAndUpdateVolume Options: ")
-        print (option_list)
+        logger.info ("CopySnapshotAndUpdateVolume Options: ")
+        logger.info (option_list)
 
         response = fsx_client.copy_snapshot_and_update_volume(
                 VolumeId=volId,
@@ -69,24 +91,24 @@ def lambda_handler(event, context):
                 Options=option_list,
                 CopyStrategy=os.environ.get("COPY_STRATEGY")
             )
-        print (response)
+        logger.info (response)
         msg = "Started CopySnapshotAndUpdateVolume operation\n\n"
         msg += "Destination Volume ID : " + os.environ.get("DEST_VOLUME_ID") + "\n"
         msg += "Source Snapshot ARN : " + src_snapshot_arn
-        print (msg)
+        logger.info (msg)
         rspJson["Message"] = msg
         rspJson["Subject"] = 'Success Notification: CopySnapshotAndUpdateVolume'
 
     except Exception as e:
-        print("The error is: ", e)
+        logger.info("The error is: " +  str(e))
         msg = "Error while initiating CopySnapshotAndUpdateVolume operation\n\n"
         msg += "Destination Volume ID = " + os.environ.get("DEST_VOLUME_ID") + "\n"
         msg += "Source Snapshot ARN = " + src_snapshot_arn + "\n" + str(e)
-        print (msg)
+        logger.info (msg)
         rspJson["Message"] = msg
         rspJson["Subject"] = 'Error Notification: CopySnapshotAndUpdateVolume'
 
-    print (rspJson)
+    logger.info (rspJson)
     deleteSnapshots(retain_days, snapshot_name)
-    print ("function completed")
+    logger.info ("function completed")
     return rspJson

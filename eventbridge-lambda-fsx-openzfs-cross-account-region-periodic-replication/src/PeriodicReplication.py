@@ -4,9 +4,12 @@ import time
 import datetime
 import boto3
 import botocore
+import logging
+logger = logging.getLogger()
+logger.setLevel("INFO")
 
-print("boto3 version: " + boto3.__version__)
-print("botocore version: " + botocore.__version__)
+logger.info("boto3 version: " + boto3.__version__)
+logger.info("botocore version: " + botocore.__version__)
 
 session = boto3.session.Session()
 fsx_client = session.client(service_name='fsx')
@@ -31,47 +34,66 @@ def deleteSnapshotIfOlderThanRetention(snapshot):
     delta = now_date - created_date
 
     try:
-        print("Examining OpenZFS volume snapshot " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
+        logger.info("Examining OpenZFS volume snapshot " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
         if delta.days > retain_days:
             fsx_client.delete_snapshot(SnapshotId=snapshot_id)
-            print("Deleted FSx for OpenZFS volume snapshot " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
+            logger.info("Deleted FSx for OpenZFS volume snapshot " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
         else:
-            print("Skipping (retaining) FSx for OpenZFS volume " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
+            logger.info("Skipping (retaining) FSx for OpenZFS volume " + snapshot['Name'] + " with Sanpshot ID = " + snapshot_id)
     except Exception as e:
-        print("The error is: ", e)
+        logger.info("The error is: %s", str(e))
 
 def deleteSnapshots():
-    print ("deleting snapshots")
+    logger.info ("deleting snapshots")
     volId = os.environ.get("SRC_VOLUME_ID")
 
     # query the FSx API for existing snapshots
-    print ("Getting snapshots for volume id = " + volId)
-    snapshots = fsx_client.describe_snapshots(
-            Filters=[{'Name': 'volume-id', 'Values': [volId]}],
-            MaxResults=20
-        )
-    print(snapshots)
+    logger.info ("Getting snapshots for volume id = " + volId)
+    next_token = None
+    while True:
+        # Prepare the base request parameters
+        params = {
+            'Filters':[{'Name': 'volume-id', 'Values': [volId]}],
+            'MaxResults': 20  # 20 snapshots per API call
+        }
 
-    # loop thru the results, checking the snapshot date-time and call Fsx API to remove those older than x hours/days
-    print("Starting purge of snapshots older than " + str(retain_days) + " days for volume " + volId)
-    for snapshot in snapshots['Snapshots']:
-        if snapshot['Name'].startswith(snapshot_name):
-            deleteSnapshotIfOlderThanRetention(snapshot)
+        # Add NextToken if it exists
+        if next_token:
+            params['NextToken'] = next_token
+
+        # Make the API call
+        response = fsx_client.describe_snapshots(**params)
+        
+        # Process snapshots in current response
+        snapshots = response.get('Snapshots', [])
+        logger.info(snapshots)
+
+        # loop thru the results, checking the snapshot date-time and call Fsx API to remove those older than x hours/days
+        logger.info("Starting purge of snapshots older than " + str(retain_days) + " days for volume " + volId)
+    
+        for snapshot in snapshots:
+            if snapshot['Name'].startswith(snapshot_name):
+                deleteSnapshotIfOlderThanRetention(snapshot)
+
+        # Check if there are more results
+        next_token = response.get('NextToken')
+        if not next_token:
+            break
 
 def lambda_handler(event, context):
     try:
         # call the FSx snapshot API
-        print ("Creating a snapshot for the volume = " + os.environ.get("SRC_VOLUME_ID"))
+        logger.info ("Creating a snapshot for the volume = " + os.environ.get("SRC_VOLUME_ID"))
         response = fsx_client.create_snapshot(
             # append datetime to ensure snap name is unique
             Name=os.environ.get("SNAPSHOT_NAME") + datetime.datetime.utcnow().strftime("_%Y-%m-%d_%H:%M:%S.%f")[:-3],
             VolumeId=os.environ.get("SRC_VOLUME_ID"),
             Tags=[{'Key': 'CreatedBy','Value': os.environ.get("SNAPSHOT_TAG_VALUE") },]
         )
-        print(response)
+        logger.info(response)
         src_snapshot = response["Snapshot"]
         if sns_notification:
-            print ("Sending SNS notification for successful snapshot creation")
+            logger.info ("Sending SNS notification for successful snapshot creation")
             msg = "Snapshot Created Successfully\n\n"
             msg += "Snapshot ID : " + src_snapshot["SnapshotId"] + "\n"
             msg += "ResourceARN : " + src_snapshot["ResourceARN"] + "\n"
@@ -81,7 +103,7 @@ def lambda_handler(event, context):
             send_sns_notification (msg, 'Success Notification: CreateSnapshot')
 
     except Exception as e:
-        print("The error is: ", e)
+        logger.info("The error is: " + str(e))
         errMessage = "Error while creating a snapshot from the Source VolumeId = " + os.environ.get("SRC_VOLUME_ID") + "\n"
         errMessage += "Error = " + str(e)
         send_sns_notification (errMessage, 'Error Notification: CreateSnapshot')
@@ -92,22 +114,22 @@ def lambda_handler(event, context):
     copy_snapshot = False
     for i in range(1, 10):
         time.sleep(10)
-        print ("Describe Snapshot - Attempt=" + str(i))
+        logger.info ("Describe Snapshot - Attempt=" + str(i))
         ret = fsx_client.describe_snapshots(SnapshotIds=[src_snapshot["SnapshotId"]])
-        print("Snapshot = " + src_snapshot["SnapshotId"] + " is in " + ret["Snapshots"][0]["Lifecycle"] +" state.")
+        logger.info("Snapshot = " + src_snapshot["SnapshotId"] + " is in " + ret["Snapshots"][0]["Lifecycle"] +" state.")
         if ret["Snapshots"][0]["Lifecycle"] == "AVAILABLE":
             copy_snapshot = True
             break
 
     if not copy_snapshot:
-        print ("ERROR - The snapshot does not transition to AVAILABLE state for some reason - Snapshot ID : " + src_snapshot["SnapshotId"])
+        logger.info ("ERROR - The snapshot does not transition to AVAILABLE state for some reason - Snapshot ID : " + src_snapshot["SnapshotId"])
         msg = "ERROR - The snapshot does not transition to AVAILABLE state for some reason !!\n\n"
         msg += "Snapshot ID : " + src_snapshot["SnapshotId"] + "\n"
         msg += "Snapshot Name : " + src_snapshot["Name"] + "\n"
         send_sns_notification (msg, 'Error Notification: CreateSnapshot')
     else:
         try:
-            print ("Assuming role in target ...")
+            logger.info ("Assuming role in target ...")
             sts_connection = boto3.client('sts')
             target_role = sts_connection.assume_role(
                 RoleArn=os.environ.get("DEST_IAM_ROLE"),
@@ -131,24 +153,24 @@ def lambda_handler(event, context):
             }
             payload = json.dumps(payload)
 
-            print ("Invoking target lambda function ...")
+            logger.info ("Invoking target lambda function ...")
             response = lambda_client.invoke(
                 FunctionName=os.environ.get("DEST_LAMBDA_ARN"),
                 InvocationType='RequestResponse',
                 Payload=payload
             )
 
-            print ("Received response from a target lambda function ...")
+            logger.info ("Received response from a target lambda function ...")
             lambda_rsp = json.load(response["Payload"])
-            print(lambda_rsp)
+            logger.info(lambda_rsp)
             send_sns_notification (lambda_rsp["Message"], lambda_rsp["Subject"])
 
         except Exception as e:
-            print("The error is: ", e)
+            logger.info("The error is: " + str(e))
             errMessage = "Error while invoking target lambda function\n\n"
             errMessage += "Source Snapshot ARN = " + src_snapshot["ResourceARN"] + "\n" + str(e)
-            print(errMessage)
+            logger.info(errMessage)
             send_sns_notification (errMessage, 'Error Notification: Invoke Lambda Function')
 
     deleteSnapshots()
-    print ("function completed")
+    logger.info ("function completed")
