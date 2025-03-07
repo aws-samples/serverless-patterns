@@ -2,13 +2,13 @@
 
 This patterns shows how to process Amazon SQS messages using AWS Lambda. The AWS SAM template deploys an AWS Lambda function, an Amazon SQS queue, a dead-letter SQS queue, and the IAM permissions required to run the application. Lambda polls the SQS queue and invokes the Lambda function when new messages are available.
 
-- To demonstrate error handling, each message has a 20% chance of random failure (remove this functionality for your own application).
+- To demonstrate error handling, any message containing the text "error" will be reported as a failure.
 - Failed messages are automatically returned to the queue for retry using `batchItemFailures`.
 - After 3 failed processing attempts, messages are moved to the DLQ.
 - You should implement additional functionality to process messages that are sent to the DLQ.
 - Processing results are logged to Amazon CloudWatch Logs
 
-Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sql-lambda](https://serverlessland.com/patterns/sqs-lambda-nodejs-sam)
+Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sql-lambda](https://serverlessland.com/patterns/sqs-lambda-dotnet-sam)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Download Instructions
 
-1. If you download this pattern as part of the AWS Toolkit for your IDE, the toolkit downloads the files into the directory you specify.
+If you download this pattern as part of the AWS Toolkit for your IDE, the toolkit downloads the files into the directory you specify.
 
 To download the patterns yourself: 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -30,7 +30,7 @@ To download the patterns yourself:
     ```
 1. Change directory to the pattern directory:
     ```
-    cd sqs-lambda-nodejs-sam
+    cd sqs-lambda-dotnet-sam
     ```
 
 ## Deployment Instructions
@@ -41,14 +41,20 @@ To download the patterns yourself:
     ```
     sam deploy --guided
     ```
-1. During the prompts:
+
+* You can also use `--use-container` to build your function inside a Lambda-like Docker container:
+    ```
+    sam deploy --guided --use-container
+    ```
+
+2. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow AWS SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file `samconfig.toml`, you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the AWS SAM deployment process. These contain the resource names and/or ARNs to use for testing.
+3. Note the outputs from the AWS SAM deployment process. These contain the resource names and/or ARNs to use for testing.
    
 ## Example event payload from SQS to Lambda
 
@@ -75,7 +81,7 @@ To download the patterns yourself:
 }
 
 ```
-There is also a sample file `\events\sqs-test-event.json` which contains a sample event payload with 10 items.
+There is also a sample file `\events\test-event.json` which contains a sample event payload with 10 items.
 
 ### Testing
 

@@ -10,47 +10,35 @@
         "The AWS SAM template deploys an AWS Lambda function, an Amazon SQS queue, a dead-letter SQS queue, and the IAM permissions required to run the application. Lambda polls the SQS queue and invokes the Lambda function when new messages are available."
       ]
     },
+    "AWS":"",
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/awslabs/sqs-lambda-java-sam",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-java-sam",
         "templateURL": "serverless-patterns/sqs-lambda-java-sam",
         "projectFolder": "sqs-lambda-java-sam"
       }
     },
     "resources": {
       "bullets": [
-        (https://aws.amazon.com/blogs/compute/introducing-an-enhanced-local-ide-experience-for-aws-lambda-developers/).*
-
+        {
+          "text": "Using Lambda with Amazon SQS",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html?trk=2dd77e51-cb93-4970-a61a-5993781e5576&sc_channel=el"        
+        },
         {
           "text": "Introducing an enhanced local IDE experience for AWS Lambda developers",
-          "link": "https://aws.amazon.com/blogs/compute/introducing-an-enhanced-local-ide-experience-for-aws-lambda-developers/"
+          "link": "https://aws.amazon.com/blogs/compute/introducing-an-enhanced-local-ide-experience-for-aws-lambda-developers?trk=2dd77e51-cb93-4970-a61a-5993781e5576&sc_channel=el"
         }
       ]
     },
     "deploy": {
-      "text": [
-        "sam build",
-        "sam deploy --guided"
-      ]
+      "text": ["sam build", "sam deploy --guided"]
     },
     "testing": {
-      "text": [
-        "See the GitHub repo for detailed testing instructions."
-      ]
+      "text": ["See the GitHub repo for detailed testing instructions."]
     },
     "cleanup": {
-      "text": [
-        "Delete the stack: <code>sam delete</code>."
-      ]
+      "text": ["Delete the stack: <code>sam delete</code>."]
     },
-    "authors": [
-      {
-          "name": "Julian Wood",
-          "image": "/assets/images/resources/jrwood.jpg",
-          "bio": "Julian Wood helps developers and builders learn about and love how serverless technologies can transform the way they build and run applications. I was an infrastructure architect and manager in global enterprises and start-ups for more than 25 years before going all in on serverless at AWS.",
-          "linkedin": "woodjulian",
-          "twitter": "@julian_wood"
-        }
-    ]
+    "contributor": "content/contributors/jrwood.json"
   }
   
