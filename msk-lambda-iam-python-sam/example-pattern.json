@@ -7,11 +7,11 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern provides a Lambda function along with an Event Source Mapping to a Kafka topic.",
-      "It requires that you already have an Amazon Managed Streaming for Kafka(Amazon MSK) cluster setup with a topic created. If you don't already have an MSK cluster ",
-      "you can use the example in this pattern https://serverlessland.com/patterns/msk-cfn-sasl-lambda (linked in the resources) to deploy a cluster.",
-      "This pattern works with either a Provisioned or Serverless MSK cluster as long as the cluster is configured to use IAM authentication. ",
-      "For detailed deployment instructions instructions see the README "
+        "This pattern provides a Lambda function along with an Event Source Mapping to a Kafka topic.",
+        "It requires that you already have an Amazon Managed Streaming for Kafka(Amazon MSK) cluster setup with a Kafka topic created.",
+        "The CloudFormation template provided in this pattern installs an MSK Cluster and creates a Kafka topic.",
+        "This pattern works with either a Provisioned or Serverless MSK cluster as long as the cluster is configured to use IAM authentication. ",
+        "For detailed deployment instructions instructions see the README.md"
     ]
   },
   "gitHub": {
@@ -24,10 +24,6 @@
   },
   "resources": {
     "bullets": [
-      {
-        "text": "Amazon MSK Cluster pattern",
-        "link": "https://serverlessland.com/patterns/msk-cfn-sasl-lambda"
-      },
       {
         "text": "Using AWS Lambda with Amazon MSK",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
@@ -59,6 +55,11 @@
   },
   "authors": [
     {
+      "name": "Indranil Banerjee",
+      "bio": "AWS - Senior Solutions Architect",
+      "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
+    },
+    {
       "name": "Vaibhav Jain",
       "bio": "AWS - Sr. Application Architect",
       "image": "https://media.licdn.com/dms/image/C4E03AQEqzZWHGT4dBQ/profile-displayphoto-shrink_800_800/0/1580165399872?e=1687392000&v=beta&t=zdxENLnqCpqCz9i1Uf5Yx4YXlR9EYvgxP8N5UTsy6J8",
@@ -70,7 +71,7 @@
       "image": "https://www.fintail.me/images/pa.jpg",
       "linkedin": "https://www.linkedin.com/in/pallam/"
     }, 
-     {
+    {
       "name": "Suraj Tripathi",
       "bio": "AWS - AppDev Cloud Consultant",
       "linkedin": "https://www.linkedin.com/in/suraj-tripathi-01b49a140/"
@@ -79,11 +80,6 @@
       "name": "Adam Wagner",
       "bio": "AWS - Principal Serverless Solutions Architect",
       "linkedin": "https://www.linkedin.com/in/adam-wagner-4bb412/"
-    },
-    {
-      "name": "Indranil Banerjee",
-      "bio": "AWS - Senior Solutions Architect",
-      "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
     }
   ]
 }

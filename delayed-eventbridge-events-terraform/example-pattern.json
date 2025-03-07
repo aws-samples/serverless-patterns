@@ -1,0 +1,51 @@
+{
+  "title": "Delayed Amazon EventBridge events with Amazon EventBridge Scheduler",
+  "description": "Setup future Amazon EventBridge events with Amazon EventBridge Scheduler",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern listens for EventBridge events, processes them and creates schedules for every user. 24 hours after user has been created a schedule is run that publishes events directly into EventBridge."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/delayed-eventbridge-events-terraform",
+      "templateURL": "serverless-patterns/delayed-eventbridge-events-terraform",
+      "templateFile": "delayed-eventbridge-events-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "What is Amazon EventBridge Scheduler?",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Farrukh Jamal",
+      "image": "https://media.licdn.com/dms/image/C5103AQHH_uSeGxOlZw/profile-displayphoto-shrink_400_400/0/1570698220038?e=1726099200&v=beta&t=7HUDKvPyM5GbBA1eOhVGB9POwFhXC3v87-vrqCIk1d0",
+      "bio": "Cloud Engineer at AWS based in the Australia.",
+      "linkedin": "farrukhjamal"
+    }
+  ]
+}

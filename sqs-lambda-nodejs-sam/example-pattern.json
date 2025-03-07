@@ -1,0 +1,56 @@
+{
+    "title": "Process Amazon SQS records with AWS Lambda (Node.js)",
+    "description": "This pattern shows how to process Amazon SQS messages using AWS Lambda.",
+    "language": "nodejs",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "The AWS SAM template deploys an AWS Lambda function, an Amazon SQS queue, a dead-letter SQS queue, and the IAM permissions required to run the application. Lambda polls the SQS queue and invokes the Lambda function when new messages are available."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/awslabs/sqs-lambda-nodejs-sam",
+        "templateURL": "serverless-patterns/sqs-lambda-nodejs-sam",
+        "projectFolder": "sqs-lambda-nodejs-sam"
+      }
+    },
+    "resources": {
+      "bullets": [
+        (https://aws.amazon.com/blogs/compute/introducing-an-enhanced-local-ide-experience-for-aws-lambda-developers/).*
+
+        {
+          "text": "Introducing an enhanced local IDE experience for AWS Lambda developers",
+          "link": "https://aws.amazon.com/blogs/compute/introducing-an-enhanced-local-ide-experience-for-aws-lambda-developers/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam build",
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+          "name": "Julian Wood",
+          "image": "/assets/images/resources/jrwood.jpg",
+          "bio": "Julian Wood helps developers and builders learn about and love how serverless technologies can transform the way they build and run applications. I was an infrastructure architect and manager in global enterprises and start-ups for more than 25 years before going all in on serverless at AWS.",
+          "linkedin": "woodjulian",
+          "twitter": "@julian_wood"
+        }
+    ]
+  }
+  
