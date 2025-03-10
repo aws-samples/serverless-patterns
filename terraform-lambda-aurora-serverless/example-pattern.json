@@ -1,13 +1,14 @@
 {
   "title": "AWS Lambda function to Amazon Aurora Serverless",
-  "description": "The pattern creates a Lambda function and an Amazon Aurora Cluster with Serverless instance.",
+  "description": "The pattern creates a Lambda function and an Amazon Aurora Cluster with Serverless instance. The Database credentials are stored and accessed from AWS Secrets Manager.",
   "language": "Python",
-  "level": "200",
+  "level": "300",
   "framework": "Terraform",
   "introBox": {
     "headline": "How it works",
     "text": [
       "The pattern creates a Lambda function and an Amazon Aurora Cluster with Serverless instance.",
+      "The Database credentials are stored and accessed from AWS Secrets Manager.",
       "It also guides how to invoke the function to access the database."
     ]
   },

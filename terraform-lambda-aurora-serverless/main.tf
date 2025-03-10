@@ -142,6 +142,24 @@ resource "aws_security_group" "aurora_sg" {
   }
 }
 
+# Secrets Manager Configuration - stores db credentials
+
+resource "aws_secretsmanager_secret" "aurora_secret" {
+  name = "aurora-db-credentials"
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "aurora_secret_version" {
+  secret_id = aws_secretsmanager_secret.aurora_secret.id
+  secret_string = jsonencode({
+    username = var.db_username
+    password = var.db_password
+  })
+}
+
+
 # Aurora Configuration
 resource "aws_db_subnet_group" "aurora_subnet_group" {
   name       = "aurora-subnet-group"
@@ -159,8 +177,8 @@ resource "aws_rds_cluster" "aurora_cluster" {
   engine_version         = "8.0.mysql_aurora.3.04.1"
   engine_mode            = "provisioned"
   database_name          = var.database_name
-  master_username        = var.db_username
-  master_password        = var.db_password
+  master_username        = jsondecode(aws_secretsmanager_secret_version.aurora_secret_version.secret_string)["username"]
+  master_password        = jsondecode(aws_secretsmanager_secret_version.aurora_secret_version.secret_string)["password"]
   storage_encrypted      = true
   skip_final_snapshot    = true
   db_subnet_group_name   = aws_db_subnet_group.aurora_subnet_group.name
@@ -230,7 +248,8 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "logs:PutLogEvents",
           "ec2:CreateNetworkInterface",
           "ec2:DescribeNetworkInterfaces",
-          "ec2:DeleteNetworkInterface"
+          "ec2:DeleteNetworkInterface",
+          "secretsmanager:GetSecretValue"
         ]
         Resource = "*"
       }
@@ -268,8 +287,7 @@ resource "aws_lambda_function" "aurora_lambda" {
     variables = {
       DB_ENDPOINT = aws_rds_cluster.aurora_cluster.endpoint
       DB_NAME     = var.database_name
-      DB_USERNAME = var.db_username
-      DB_PASSWORD = var.db_password
+      SECRET_ARN  = aws_secretsmanager_secret.aurora_secret.arn
     }
   }
 

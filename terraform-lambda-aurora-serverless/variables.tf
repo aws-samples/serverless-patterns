@@ -22,6 +22,7 @@ variable "db_username" {
   default     = "admin"
 }
 
+# Example of valid password: "MyDBPassword123!"
 variable "db_password" {
   description = "Database administrator password, please change it"
   type        = string

@@ -1,6 +1,6 @@
 # AWS Lambda function to Amazon Aurora Serverless
 
-The pattern creates a Lambda function and a Amazon Aurora Serverless cluster, a Log group and the IAM resources required to run the application.
+The pattern creates an AWS Lambda function and an Amazon Aurora Serverless cluster, a Log group and the IAM resources required to run the application. The database credentials are stored in AWS Secrets Manager secret.
 
 The Lambda function is written in Python that uses pymysql client to establish connectivity with the serverless database.
 
@@ -21,6 +21,13 @@ Then perform the following terraform commands to deploy the stack
 terraform init
 terrform deploy
 ```
+
+Naming constraints with Amazon Aurora for Master password:
+- The password for the database master user can include any printable ASCII character except /, ', ", @, or a space.
+- The password can contain the following number of printable ASCII characters depending on the DB engine: Aurora MySQL: 8–41 and Aurora PostgreSQL: 8–99.
+For more information, please refer to [this](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_Limits.html#RDS_Limits.Constraints)
+
+
 
 ## Testing
 
