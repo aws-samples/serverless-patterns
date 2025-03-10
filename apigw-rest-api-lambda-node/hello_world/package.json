@@ -7,10 +7,10 @@
     "author": "SAM CLI",
     "license": "MIT",
     "dependencies": {
-      "axios": ">=1.6.0"
+      "axios": ">=1.8.2"
     },
     "devDependencies": {
-      "chai": "^4.3.6",
-      "mocha": "^10.2.0"
+      "chai": "^5.2.0",
+      "mocha": "^11.1.0"
     }
   }
