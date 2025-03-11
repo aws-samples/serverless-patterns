@@ -1,8 +1,8 @@
-# Amazon API Gateway to AWS Lambda to Amazon Transcribe using AWS SAM
+# Amazon AS3 to AWS Lambda to Amazon Transcribe using AWS SAM
 
-This pattern facilitates audio transcription by using Amazon Transcribe service through a serverless API endpoint. When audio files are uploaded to S3, they can be transcribed using Amazon Transcribe via an API Gateway endpoint backed by Lambda.
+This pattern facilitates automatic audio transcription by using the Amazon Transcribe service through a serverless event-driven architecture. When audio files are uploaded to S3, they are automatically transcribed using Amazon Transcribe via a Lambda function triggered by S3 events.
 
-This pattern enables speech-to-text transcription use cases by providing a serverless API endpoint that can process audio files stored in S3. The pattern uses AWS Lambda to coordinate with Amazon Transcribe service, making it easy to integrate transcription capabilities into your applications.
+This pattern enables speech-to-text transcription use cases by providing a serverless event-based pipeline that can process audio files uploaded to S3. The pattern uses AWS Lambda to coordinate with the Amazon Transcribe service, making it easy to integrate transcription capabilities into your applications without the need to manage infrastructure or manually initiate transcription jobs.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigw-lambda-transcribe-sam-js
+    cd lambda-transcribe-sam-js
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```
@@ -54,21 +54,12 @@ To test the deployed API endpoint:
 aws s3 cp audio.mp3 s3://your-bucket-name/
 ```
 2. Get the S3 URL of the uploaded audio file
-3. Make a POST request to the API Gateway endpoint with the following JSON payload:
+3. You can list all transcription jobs using:
 
 ```bash
-curl -X POST https://your-api-endpoint/Prod/transcribe \
-  -H "Content-Type: application/json" \
-  -d '{"audio_url": "s3://your-bucket-name/audio.mp3"}'
+aws transcribe list-transcription-jobs
 ```
-4. The API will return a response with the transcription job name and status
-```json
-{
-    "job_name": "transcribe-12345678-1234-5678-1234-567812345678",
-    "status": "IN_PROGRESS"
-}
-```
-5. You can check the transcription results in the S3 bucket once the job is complete:
+4. You can check the transcription results in the S3 bucket once the job is complete:
 
 ```bash
 aws transcribe get-transcription-job --transcription-job-name "job-name-from-response"
