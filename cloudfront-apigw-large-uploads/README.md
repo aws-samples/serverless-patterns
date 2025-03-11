@@ -35,6 +35,7 @@ A Cloudfront distribution is created with 2 origins:
 * Custom Origin - A mock HTTP endpoint which sends a response with information from the request. We are using echo.free.beeceptor.com but you can substitue this with other endpoint URLs.
 
 When a HTTP POST request is handled by CloudFront, a Lambda@Edge function is invoked as an Origin Request. This Lambda@Edge function uses the method and `ceontent-length` HTTP headers from the client request to determine whether the request should go to a custom origin. 
+![diagram](diagram.png)
 
 
 ## Testing

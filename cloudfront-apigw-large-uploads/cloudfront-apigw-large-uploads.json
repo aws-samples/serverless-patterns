@@ -15,7 +15,7 @@
             "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-apigw-large-uploads",
             "templateURL": "serverless-patterns/cloudfront-apigw-large-uploads",
             "projectFolder": "cloudfront-apigw-large-uploads",
-            "templateFile": "large_uploads_test/test_stack.py"
+            "templateFile": "app.py"
         }
     },
     "deploy": {
