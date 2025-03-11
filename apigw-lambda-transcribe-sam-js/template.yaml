@@ -1,50 +1,96 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Audio transcription using Amazon Transcribe
+Description: S3 to Lambda to Transcription Job
 
 Resources:
-  TranscribeFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/
-      Handler: app.lambda_handler
-      Runtime: nodejs20.x
-      Timeout: 900
-      MemorySize: 128
-      Policies:
-        - Statement:
-            - Effect: Allow
-              Action:
-                - transcribe:StartTranscriptionJob
-                - transcribe:GetTranscriptionJob
-              Resource: '*'
-        - Statement:
-            - Effect: Allow
-              Action:
-                - s3:GetObject
-                - s3:PutObject
-              Resource: !Sub 'arn:aws:s3:::${AudioBucket}/*'
-      Environment:
-        Variables:
-          BUCKET_NAME: !Ref AudioBucket
-      Events:
-        TranscribeAPI:
-          Type: Api
-          Properties:
-            Path: /transcribe
-            Method: post
-
   AudioBucket:
     Type: AWS::S3::Bucket
+    DependsOn: LambdaInvokePermission
     Properties:
-      CorsConfiguration:
-        CorsRules:
-          - AllowedHeaders: ['*']
-            AllowedMethods: [GET, PUT, POST]
-            AllowedOrigins: ['*']
-            MaxAge: 3000
+      BucketName: !Sub "${AWS::StackName}-audio-uploads"
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .mp3
+            Function: !GetAtt TranscriptionFunction.Arn
+          - Event: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .wav
+            Function: !GetAtt TranscriptionFunction.Arn
+          - Event: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .flac
+            Function: !GetAtt TranscriptionFunction.Arn
+
+  TranscriptionFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: S3AndTranscribeAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource: 
+                  - !Sub "arn:aws:s3:::${AWS::StackName}-audio-uploads"
+                  - !Sub "arn:aws:s3:::${AWS::StackName}-audio-uploads/*"
+              - Effect: Allow
+                Action:
+                  - transcribe:StartTranscriptionJob
+                  - transcribe:GetTranscriptionJob
+                Resource: "*"
+
+  TranscriptionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/
+      Handler: app.handler
+      Runtime: nodejs20.x
+      Timeout: 30
+      MemorySize: 128
+      Role: !GetAtt TranscriptionFunctionRole.Arn
+      Environment:
+        Variables:
+          BUCKET_NAME: !Sub "${AWS::StackName}-audio-uploads"
+          REGION: !Ref AWS::Region
+
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref TranscriptionFunction
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Sub "arn:aws:s3:::${AWS::StackName}-audio-uploads"
 
 Outputs:
-  TranscribeApi:
-    Description: API Gateway endpoint URL
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/transcribe"
+  AudioBucketName:
+    Description: "S3 bucket for audio uploads"
+    Value: !Sub "${AWS::StackName}-audio-uploads"
+  
+  TranscriptionFunctionName:
+    Description: "Lambda function name"
+    Value: !Ref TranscriptionFunction
