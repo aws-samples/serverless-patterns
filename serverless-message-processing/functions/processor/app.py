@@ -14,7 +14,7 @@ def validate_email(email):
     Returns:
         bool: True if valid email format, False otherwise
     """
-    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$'
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
     if not bool(re.match(email_pattern, email)):
         logger.error(f"Invalid email format: {email}")
         return False

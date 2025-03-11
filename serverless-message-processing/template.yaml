@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Automated Serverless Messaging Redrive
+Description: Automated Serverless Messaging Redrive (uksb-1tthgi812) (tag:serverless-message-processing)
 
 Parameters:
   ProcessorMemorySize:
@@ -136,7 +136,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.13
       CodeUri: ./functions/processor/
       MemorySize: !Ref ProcessorMemorySize
       Timeout: !Ref LambdaTimeout
@@ -147,6 +147,9 @@ Resources:
           Properties:
             Queue: !GetAtt MainQueue.Arn
             BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
       Environment:
         Variables:
           MAIN_QUEUE_URL: !Ref MainQueue
@@ -156,7 +159,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.13
       CodeUri: ./functions/decision_maker/
       MemorySize: !Ref DecisionMakerMemorySize
       Timeout: !Ref LambdaTimeout
@@ -167,9 +170,11 @@ Resources:
           Properties:
             Queue: !GetAtt AutomatedDLQ.Arn
             BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+
       Policies:
-        - SQSPollerPolicy:
-            QueueName: !GetAtt MainQueue.QueueName
         - SQSPollerPolicy:
             QueueName: !GetAtt FatalDLQ.QueueName
         - SQSSendMessagePolicy:

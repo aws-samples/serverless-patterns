@@ -66,7 +66,7 @@ def validate_fixed_email(email):
     Returns:
         bool: True if valid email format, False otherwise
     """
-    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$'
     return bool(re.match(email_pattern, email))
 
 def lambda_handler(event, context):
@@ -93,15 +93,17 @@ def lambda_handler(event, context):
         event: Lambda event object containing SQS messages
         context: Lambda context object
     Returns:
-        dict: Processing summary with counts
+        dict: Processing summary with counts and batchItemFailures
     """
     processed_count = 0
     fixed_count = 0
     fatal_count = 0
+    failed_message_ids = []
 
     logger.info(f"Starting to process batch of {len(event['Records'])} messages")
     
     for record in event['Records']:
+        original_message_id = "unknown"
         try:
             # Parse the failed message
             message = json.loads(record['body'])
@@ -158,6 +160,8 @@ def lambda_handler(event, context):
             
         except Exception as e:
             logger.error(f"Error processing message {original_message_id}: {str(e)}")
+            # Add message ID to failed messages list
+            failed_message_ids.append(record['messageId'])
             try:
                 error_message = {
                     'originalMessage': record['body'],
@@ -171,7 +175,6 @@ def lambda_handler(event, context):
                 fatal_count += 1
             except Exception as fatal_e:
                 logger.critical(f"Could not send to fatal DLQ: {str(fatal_e)}")
-                raise
 
     # Execution summary
     logger.info(f"""
@@ -179,14 +182,18 @@ def lambda_handler(event, context):
     Messages Processed: {processed_count}
     Messages Fixed: {fixed_count}
     Messages Fatal: {fatal_count}
+    Messages Failed: {len(failed_message_ids)}
     ========================
     """)
 
-    return {
-        'statusCode': 200,
-        'body': json.dumps({
+    # Return both the processing info and the batch failures for SQS
+    result = {
+        'batchItemFailures': [{"itemIdentifier": message_id} for message_id in failed_message_ids],
+        'processingInfo': {
             'processed': processed_count,
             'fixed': fixed_count,
             'fatal': fatal_count
-        })
+        }
     }
+    
+    return result

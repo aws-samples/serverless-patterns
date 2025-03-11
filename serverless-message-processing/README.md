@@ -4,8 +4,8 @@
 An adaptable pattern for message processing using AWS serverless services, featuring error handling and automatic recovery mechanisms.
 
 ## Core Components
-- API Gateway (message ingestion)
-- SQS Queues (main + DLQs)
+- Amazon API Gateway (message ingestion)
+- Amazon SQS Queues (main + DLQs)
 - Lambda Functions (processing + recovery)
 
 
@@ -23,6 +23,17 @@ An adaptable pattern for message processing using AWS serverless services, featu
 5. Decision maker attempts an automated recovery -In this sample, we remediate common email malform issues including whitespace and typos in domain extensions.
 
 ## Deployment
+# Build the SAM application
+
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+2. Change directory to the pattern directory:
+    ```
+    cd serverless-patterns/serverless-messaging-redrive
+    ```
+
 # Build the SAM application
 The ```sam build ``` command prepares an application for subsequent steps in the developer workflow, such as local testing or deploying to AWS.
 
