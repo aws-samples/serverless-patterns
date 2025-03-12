@@ -19,7 +19,7 @@ cd ../..
 Then perform the following terraform commands to deploy the stack
 ```shell
 terraform init
-terrform deploy
+terrform apply
 ```
 
 Naming constraints with Amazon Aurora for Master password:
