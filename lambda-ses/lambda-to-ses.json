@@ -5,7 +5,7 @@
   "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-ses.png",
   "videoId": "",
   "level":"100",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "services": {
     "from": "lambda",
     "to": "SES"

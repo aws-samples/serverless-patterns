@@ -3,7 +3,7 @@
   "description": "Create an application to create ECS tasks based on SQS messages pushed through EventBridge.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

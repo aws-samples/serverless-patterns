@@ -3,7 +3,7 @@
   "description": "Create an AWS Lambda function and an AWS Systems Manager Parameter Store parameter.",
   "language": "Java",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

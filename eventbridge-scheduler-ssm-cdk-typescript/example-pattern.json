@@ -3,7 +3,7 @@
   "description": "Create an Amazon EventBridge Scheduler event to run AWS Systems Manager State Manager associations",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

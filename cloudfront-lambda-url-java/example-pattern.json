@@ -3,7 +3,7 @@
   "description": "Front AWS Lamda Function URLs with Amazon CloudFront",
   "language": "Java",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

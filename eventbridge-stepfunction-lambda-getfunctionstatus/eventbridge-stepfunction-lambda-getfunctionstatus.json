@@ -3,7 +3,7 @@
   "description": "Daily running Amazon EventBridge scheduler and invokes a state machine to find Inactive Lambda functions and publish the list to a SNS topic.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
   "description": "This AWS CDK application demonstrates how to attach, configure and access Amazon EFS from AWS Lambda function.",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

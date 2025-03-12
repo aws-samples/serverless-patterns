@@ -3,7 +3,7 @@
     "description": "SAM template for S3 trigger to Lambda for detecting labels in an image using Rekognition and EventBridge",
     "language": "python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

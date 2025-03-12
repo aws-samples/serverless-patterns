@@ -3,7 +3,7 @@
   "description": "This pattern shows how to ingest data into Amazon Timestream from an SQS queue via EventBridge Pipes.",
   "language": "YAML",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

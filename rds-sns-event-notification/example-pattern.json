@@ -3,7 +3,7 @@
 	"description": "RDS Event Subscriptions allow users to configure notifications for RDS Events (provided through an SNS topic). This template configures an event subscription for failure, low storage, and availability event categories for RDS Instances.",
 	"language": "Python",
 	"level": "200",
-	"framework": "SAM",
+	"framework": "AWS SAM",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

@@ -3,7 +3,7 @@
   "description": "This pattern uses Amazon EventBridge Pipes to connect DynamoDB Stream directly to Amazon SNS with filtering option.",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

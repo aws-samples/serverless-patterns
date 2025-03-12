@@ -3,7 +3,7 @@
   "description": "Create a IoT Rule with a S3 action that puts messages in a S3 bucket and triggers a Lambda function to extract the S3 object key.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

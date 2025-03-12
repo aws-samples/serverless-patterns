@@ -3,7 +3,7 @@
   "description": "Create a serverless web application using S3, CloudFront, API Gateway, Lambda, DynamoDB and Cognito.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

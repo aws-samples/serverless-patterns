@@ -3,7 +3,7 @@
     "description": "Using SNS to forward EventBridge rule trigger to AWS Lambda Function",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

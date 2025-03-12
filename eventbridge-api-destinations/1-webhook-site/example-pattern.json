@@ -3,7 +3,7 @@
     "description": "Create an EventBridge rule and API destination to route events to an external API",
     "language": "Node.js",
     "level": "100",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "services": {
         "from": "eventbridge",
         "to": "eventbridge"

@@ -3,7 +3,7 @@
     "description": "Create an AWS Lambda function inside private subnet and access AWS Secrets Manager privately.",
     "language": ".NET",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

@@ -4,7 +4,7 @@
   "architectureURL": "https://dobeerman-assets.s3.eu-central-1.amazonaws.com/APIGateway-2-EventBridge.png",
   "videoId": "",
   "level":"300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "services": {
     "from": "apigateway",
     "to": "eventbridge"

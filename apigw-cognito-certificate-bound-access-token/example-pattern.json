@@ -3,7 +3,7 @@
   "description": "Creating an API Gateway and Cognito to implement certificate-bound access tokens",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
     "description": "Create a Lambda publishing into IoT topic, triggering an action calling another Lambda.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

@@ -3,7 +3,7 @@
   "description": "This AWS CDK application demonstrates how to Schedule AWS Lambda to add items to DynamoDB.",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

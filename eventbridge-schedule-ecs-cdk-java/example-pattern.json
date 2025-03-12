@@ -3,7 +3,7 @@
   "description": "Simple pattern that run task in Amazon Elastic Container Service cluster every 15 minutes.",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

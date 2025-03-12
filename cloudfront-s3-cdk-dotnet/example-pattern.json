@@ -3,7 +3,7 @@
   "description": "Serving private content from CloudFront with signed URLs and signed cookies",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
   "description": "Access your Lambda Function URLs securely using Amazon CloudFront Origin Access Control",
   "language": "Nodejs",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
       "headline": "How it works",
       "text": [

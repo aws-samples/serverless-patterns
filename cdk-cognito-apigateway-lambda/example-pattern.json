@@ -3,7 +3,7 @@
     "description": "This pattern guides you to authenticate service calls using Cognito User Pool. Often, we come across scenarios where microservices need to communicate with each other in a secure manner using an established standard like OAuth2. The Cognito client_credentials grant type helps you create application client with a set of client credentials that can be used to generate access token. This token can be used to access APIs hosted on API Gateway secured by an authorizer that uses the Cognito User Pool.",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

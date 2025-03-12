@@ -3,7 +3,7 @@
     "description": "Create a CRUD API with AWS Step Functions",
     "language": "OpenAPI",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

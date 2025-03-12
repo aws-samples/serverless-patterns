@@ -3,7 +3,7 @@
   "description": "Use Amazon EventBridge Scheduler to trigger an Ingestion Job periodically to keep the Knowledge Bases vector store up-to-date",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

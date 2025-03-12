@@ -3,7 +3,7 @@
   "description": "Simple pattern that create an Amazon EventBridge Scheduler to run task in Amazon Elastic Container Service cluster every 15 minutes.",
   "language": "Go",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
     "description": "This pattern creates an Application Load Balancer with route-based listener rules, paired with an AWS Lambda function as the target.",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

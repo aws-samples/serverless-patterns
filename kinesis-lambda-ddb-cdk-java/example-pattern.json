@@ -3,7 +3,7 @@
   "description": "This pattern creates an Amazon Kinesis Data Stream and an AWS Lambda function which then sends the records to DynamoDB, using the AWS Cloud Development Kit (AWS CDK) in Java.",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

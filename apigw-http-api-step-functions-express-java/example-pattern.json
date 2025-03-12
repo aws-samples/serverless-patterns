@@ -3,7 +3,7 @@
   "description": "Create an API Gateway HTTP API endpoint that starts a Step Functions synchronous Express Workflow.",
   "language": "Java",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

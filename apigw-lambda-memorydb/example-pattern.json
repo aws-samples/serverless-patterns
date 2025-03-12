@@ -3,7 +3,7 @@
   "description": "Create Lambda Functions to interact with MemoryDB.",
   "language": "Java",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

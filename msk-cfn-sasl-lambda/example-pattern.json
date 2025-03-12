@@ -3,7 +3,7 @@
   "description": "Create a Lambda function that uses an Amazon MSK Topic as an event source.",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

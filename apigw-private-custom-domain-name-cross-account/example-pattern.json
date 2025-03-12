@@ -3,7 +3,7 @@
   "description": "Setting up cross-account Private Amazon API Gateway with custom domain",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

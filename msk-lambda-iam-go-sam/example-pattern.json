@@ -3,7 +3,7 @@
     "description": "Creates a Lambda function that uses an Amazon MSK topic as an event source with IAM authentication.",
     "language": "Go",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

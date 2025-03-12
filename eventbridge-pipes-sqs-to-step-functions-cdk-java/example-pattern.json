@@ -3,7 +3,7 @@
   "description": "This pattern uses SQS and triggers a Step Functions workflow directly with optional filtering supported.",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": ["SQS queue is polled and a Step Functions workflow execution is started for each batch of messages."]

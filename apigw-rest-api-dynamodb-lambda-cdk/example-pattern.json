@@ -3,7 +3,7 @@
     "description": "API Gateway to DynamoDB to Lambda function using streams.",
     "language": "Python",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

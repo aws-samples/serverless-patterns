@@ -3,7 +3,7 @@
   "description": "Amazon API Gateway to S3 direct proxy - File upload triggers .NET 8.0 Lambda function",
   "language": ".NET",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

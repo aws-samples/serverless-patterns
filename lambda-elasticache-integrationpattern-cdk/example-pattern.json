@@ -3,7 +3,7 @@
   "description": "Create a Redis Cluster in Amazon ElastiCache and read write with a Lambda function.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

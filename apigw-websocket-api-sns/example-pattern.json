@@ -2,7 +2,7 @@
   "title": "API WebSocket to SNS with request validation",
   "description": "Create a WebSocket API to send notification via SNS topic with request validation",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
   "description": "Amazon Q Business to build a generative AI application to derive insights from content present in an S3 bucket.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

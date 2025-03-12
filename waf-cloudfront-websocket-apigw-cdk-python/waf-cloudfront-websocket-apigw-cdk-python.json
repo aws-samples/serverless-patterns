@@ -3,7 +3,7 @@
     "description": "Protecting an  Amazon API Gateway WebSocket API with Amazon CloudFront, AWS WAF Integration and API Keys",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

@@ -3,7 +3,7 @@
   "description": "REST API backed by a Lambda function that invokes the Comprehend DetectSentiment API.",
   "language": "Python",
   "level": "100",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

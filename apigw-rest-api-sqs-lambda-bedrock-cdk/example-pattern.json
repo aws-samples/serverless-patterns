@@ -3,7 +3,7 @@
   "description": "This pattern invokes a model in Amazon Bedrock through API Gateway and Lambda by asynchrnously sending messages through SQS",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

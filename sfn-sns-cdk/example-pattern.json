@@ -3,7 +3,7 @@
   "description": "Creates a Step Functions workflow to convert milliseconds to seconds and waits a period of time before sending an SNS message.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

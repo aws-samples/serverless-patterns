@@ -3,7 +3,7 @@
   "description": "Create a serverless app using API Gateway and Lambda.",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

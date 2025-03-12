@@ -3,7 +3,7 @@
   "description": "This pattern triggers a Lambda function from a DynamoDB Stream with Step functions enrichment in between them using EventBridge Pipes.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

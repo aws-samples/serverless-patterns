@@ -3,7 +3,7 @@
   "description":  "Prompt chaining no-code example with AWS AppSync, AWS Step Functions and Amazon Bedrock.",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

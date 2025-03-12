@@ -3,7 +3,7 @@
   "description": "Create a Lambda extension to send Lambda logs to S3",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

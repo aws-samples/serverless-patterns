@@ -3,7 +3,7 @@
     "description": "Secret rotation in AWS Secrets Manager using Amazon EventBridge Scheduler and AWS Lambda",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

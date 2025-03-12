@@ -3,7 +3,7 @@
     "description": "This SAM template deploys a Step Functions workflow that invokes Amazon Bedrock Anthropic Claude Model v2.1 to generate content for a given prompt.",
     "language": "YAML",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

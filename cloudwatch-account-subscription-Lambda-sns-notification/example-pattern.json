@@ -3,7 +3,7 @@
   "description": "Creates alerting system at account level which triggers Lambda function which can parse and publish a SNS notification",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

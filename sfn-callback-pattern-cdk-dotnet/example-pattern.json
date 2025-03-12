@@ -3,7 +3,7 @@
 	"description": "AWS Step Functions callback pattern sample in .NET",
 	"language": ".NET",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "AWS Step functions callback pattern to implement approval through external API step",
 		"text": [

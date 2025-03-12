@@ -3,7 +3,7 @@
     "description": "Create a Rest API to send message to Lambda, then to SQS",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

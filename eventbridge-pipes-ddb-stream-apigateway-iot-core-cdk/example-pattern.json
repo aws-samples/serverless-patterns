@@ -3,7 +3,7 @@
   "description": "Create an EventBridge pipe that publish data to an IoT Core topic",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "services": {
     "from": "eventbridge",
     "to": "iot-data"

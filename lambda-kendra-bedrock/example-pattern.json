@@ -3,7 +3,7 @@
   "description": "AWS Lambda function to retrieve documents from an Amazon Kendra index and pass it to Amazon Bedrock for a generated response.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

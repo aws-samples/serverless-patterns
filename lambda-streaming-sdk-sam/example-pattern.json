@@ -3,7 +3,7 @@
     "description": "Invoking a function with response streaming using the AWS SDK.",
     "language": "Node.js",
     "level": "300",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

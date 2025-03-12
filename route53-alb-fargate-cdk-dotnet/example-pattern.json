@@ -3,7 +3,7 @@
   "description": "This pattern shows how to deploy a containerized Web API as an ECS fargate service, and expose it with a custom domain using Route53",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

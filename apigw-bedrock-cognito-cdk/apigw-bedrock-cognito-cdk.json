@@ -3,7 +3,7 @@
     "description": "Create an AWS CDK Python application for Bedrock API with Cognito user management, domain restriction, API request throttling, and quota limits.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

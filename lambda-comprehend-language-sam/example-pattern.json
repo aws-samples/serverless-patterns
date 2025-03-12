@@ -3,7 +3,7 @@
   "description": "AWS Lambda function that calls Amazon Comprehend service to detect text language using Boto3 SDK.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "services": {
     "from": "Lambda",
     "to": "Comprehend"

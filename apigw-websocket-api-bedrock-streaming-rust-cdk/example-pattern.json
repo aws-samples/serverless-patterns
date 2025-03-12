@@ -3,7 +3,7 @@
   "description": "Create an API Gateway WebSocket API to Lambda function that streams a response from an Amazon Bedrock LLM.",
   "language": "Rust",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

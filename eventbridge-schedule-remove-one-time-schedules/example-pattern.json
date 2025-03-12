@@ -3,7 +3,7 @@
   "description": "Simple pattern to remove one-time schedules after 2 days of their execution.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": ["Creates a schedule that is run every day at 00:00 that checks for one-time schedules. If any schedules are found it removes them"]

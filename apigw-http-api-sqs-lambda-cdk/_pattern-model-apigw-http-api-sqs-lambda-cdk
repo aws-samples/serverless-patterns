@@ -3,7 +3,7 @@
   "description": "This pattern creates an HTTP API endpoint that send message to SQS and trigger a Lambda function to process the message",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
   "description": "Simple pattern that split messages in a SQS queue into multiple SQS queues using EventBridge Pipe and Event Bus. Implemented using CDK using Python. ",
   "language": "Python",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

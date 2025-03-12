@@ -3,7 +3,7 @@
     "description": "This pattern shows how to process Amazon SQS messages using AWS Lambda.",
     "language": "nodejs",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [
