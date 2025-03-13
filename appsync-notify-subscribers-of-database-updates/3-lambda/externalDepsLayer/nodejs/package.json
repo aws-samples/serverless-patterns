@@ -9,10 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-appsync": "^4.1.2",
-    "axios": "^0.28.0",
-    "graphql": "^15.3.0",
-    "graphql-tag": "^2.12.5",
+    "aws-appsync": "^4.1.10",
+    "axios": "^1.8.2",
+    "graphql": "^16.10.0",
+    "graphql-tag": "^2.12.6",
     "isomorphic-fetch": "^3.0.0"
   }
 }
