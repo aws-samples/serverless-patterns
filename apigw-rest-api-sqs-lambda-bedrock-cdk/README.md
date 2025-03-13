@@ -27,7 +27,7 @@ The following diagram illustrates the solutions architecture
     cd apigw-rest-api-sqs-lambda-bedrock-cdk.
     ```
 
-1. Deploy the stack to your default AWS account and region. The output of this command should give you the REST API URL.
+1. Deploy the stack to your default AWS account and region with Amazon Bedrock availability. The output of this command should give you the REST API URL.
     ```
 	cd cdk
     cdk deploy
@@ -35,9 +35,9 @@ The following diagram illustrates the solutions architecture
 
 ## How it works
 
-This pattern creates an Amazon API Gateway REST API, an Amazon SQS queue and an AWS Lambda function. AWS Lambda function consumes messages from SQS using [AWS lambda event source mapping](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html). The lambda function then calls Bedrock using the request from SQS. The Lambda function is set with the max concurrency of 10 (configurable through [cdk.context.json](./cdk/cdk.context.json)). This setting is enabled to make sure the requests does not overwhelm Amazon Bedrock.
+This pattern creates an Amazon API Gateway REST API, an Amazon SQS queue and an AWS Lambda function. AWS Lambda function consumes messages from SQS using [AWS lambda event source mapping](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html). The lambda function then calls Amazon Bedrock using the request from SQS. The Lambda function is set with the max concurrency of 10 (configurable through [cdk.context.json](./cdk/cdk.context.json)). This setting is enabled to make sure the requests does not overwhelm Amazon Bedrock.
 
-To achieve full functionality with this pattern, you must send the response from Lambda function to client using techniques such as websocket or GraphQL subscriptions. This pattern is an asynchronous pattern. For a simple pattern that synchronously call Bedrock, explore this [synchronous pattern](../apigw-lambda-bedrock-cdk-python). 
+To achieve full functionality with this pattern, you must send the response from Lambda function to client using techniques such as websocket or GraphQL subscriptions. This pattern is an asynchronous pattern. For a simple pattern that synchronously call Amazon Bedrock, explore this [synchronous pattern](../apigw-lambda-bedrock-cdk-python). 
 
 ## Testing
 
@@ -46,7 +46,7 @@ Upon deployment, you will see the API endpoint URL in the output. It will take t
 `https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/`
 
 
-1. [Enable the model](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html#manage-model-access) in Bedrock if you have not done before. The model used by the sample is "anthropic.claude-v2"
+1. [Enable the model](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html#manage-model-access) in Amazon Bedrock if you have not done before. The model used by the sample is "anthropic.claude-3-5-sonnet-20240620-v1:0".
 
 2. Post the request to the api
 ```bash
@@ -63,6 +63,7 @@ curl -X POST https://${API_ID}.execute-api.${REGION_NAME}.amazonaws.com/prod/inv
 - [Tutorial: Build an API Gateway REST API with AWS integration](https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html)
 - [How do I use API Gateway as a proxy for another AWS service?](https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-proxy-integrate-service/)
 - [Amazon Bedrock documentation](https://aws.amazon.com/bedrock)
+- [Anthropic Claude Messages API](https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages.html)
 - [API Gateway websocket](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html)
 - [Publishing message to IoT Topic](https://serverlessland.com/patterns/apigw-lambda-iot-cdk)
 
