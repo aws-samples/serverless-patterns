@@ -1,0 +1,59 @@
+{
+  "title": "Text translation with AWS Lambda and Amazon Translate",
+  "description": "Create an AWS Lambda function that calls Amazon Translate for text translation via the Boto3 SDK.",
+  "language": "python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to deploy a Terraform template that creates a Lambda function which calls Amazon Translate for text translation."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-translate-tf",
+      "templateURL": "serverless-patterns/lambda-translate-tf",
+      "projectFolder": "lambda-translate-tf",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Translation processing modes",
+        "link": "https://docs.aws.amazon.com/translate/latest/dg/processing.html"
+      },
+      {
+        "text": "Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+	"deploy": {
+		"text": [
+		          "terraform init",
+		          "terraform apply"
+		        ]
+	},
+	"testing": {
+		"text": [
+		"See the Github repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+		          "<code>terraform destroy</code>",
+		          "<code>terraform show</code>"
+		        ]
+	},
+	"authors": [
+		{
+			"name": "Makendran G",
+			"image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
+			"bio": "Cloud Support Engineer @ AWS",
+			"linkedin": "makendran",
+			"twitter": "@MakendranG"
+		}
+	]
+}
