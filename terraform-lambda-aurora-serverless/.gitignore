@@ -1,0 +1,8 @@
+builds/*
+.terraform
+.terraform.*
+function.zip
+src/function/pymysql
+src/function/pymysql/*
+src/function/PyMySQL-1.1.0.dist-info
+src/function/PyMySQL-1.1.0.dist-info/*
