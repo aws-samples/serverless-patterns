@@ -1,6 +1,6 @@
 # AWS Service 1 to AWS Service 2
 
-This pattern << explain usage >>
+This pattern creates a REST API Gateway that can perform POST API Call to Amazon Translate's TranslateText API
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
