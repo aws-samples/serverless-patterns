@@ -1,4 +1,4 @@
-# AWS Service 1 to AWS Service 2
+# Amazon API Gateway to Amazon Translate Integration
 
 This pattern creates a REST API Gateway that can perform POST API Call to Amazon Translate's TranslateText API
 
