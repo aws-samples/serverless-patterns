@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <!-- Roll forward to future major versions of the netcoreapp as needed -->
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- CDK Construct Library dependencies -->
+    <PackageReference Include="Amazon.CDK.Lib" Version="2.155.0" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="2.3.0" />
+    <PackageReference Include="Amazon.Lambda.KinesisEvents" Version="2.2.0" />
+    <PackageReference Include="AWSSDK.Kinesis" Version="3.7.401.15" />
+    <PackageReference Include="AWSSDK.Lambda" Version="4.0.0-preview.2" />
+    <PackageReference Include="Constructs" Version="[10.0.0,11.0.0)" />
+    <PackageReference Include="Amazon.Jsii.Analyzers" Version="*" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
