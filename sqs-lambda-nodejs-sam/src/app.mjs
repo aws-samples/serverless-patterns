@@ -1,6 +1,6 @@
 ﻿// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
-// Node.js 20.x Lambda runtime, AWS SDK for Javascript V3
+// Node.js 22.x Lambda runtime, AWS SDK for Javascript V3
 export const handler = async (event, context) => {
     const batchItemFailures = [];
     for (const record of event.Records) {

@@ -22,7 +22,7 @@
       "bullets": [
         {
           "text": "Using Lambda with Amazon SQS",
-          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html?trk=2dd77e51-cb93-4970-a61a-5993781e5576&sc_channel=el"        
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html?trk=2dd77e51-cb93-4970-a61a-5993781e5576&sc_channel=el"
         },
         {
           "text": "Introducing an enhanced local IDE experience for AWS Lambda developers",

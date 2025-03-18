@@ -24,9 +24,9 @@ Resources:
   ProcessorFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
-      Handler: com.example.processor.SQSMessageProcessor::handleRequest
-      Runtime: java21
+      CodeUri: ProcessSQSMessageBatchFunction
+      Handler: ProcessSQSMessageBatch::handleRequest
+      Runtime: java21      
       Timeout: 30
       MemorySize: 512
       Architectures:
