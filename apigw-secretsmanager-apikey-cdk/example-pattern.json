@@ -1,0 +1,65 @@
+{
+  "title": "API Gateway with Lambda Authorizer and Secrets Manager for API Key Authentication",
+  "description": "Implement a secure API key-based authorization system using Amazon API Gateway, Lambda Authorizer, and AWS Secrets Manager.",
+
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to implement a secure API key-based authorization system using Amazon API Gateway, Lambda Authorizer, and AWS Secrets Manager.",
+      "Each user/tenant has their own unique API key stored in Secrets Manager, which is validated by a Lambda authorizer when requests are made to protected API endpoints.",
+      "The Lambda authorizer checks if the API key exists in Secrets Manager. If the key is valid, the associated tenant information is retrieved and included in the authorization context.",
+      "The API Gateway then allows or denies access to the protected endpoint based on the policy returned by the authorizer."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-secretsmanager-apikey-cdk",
+      "templateURL": "serverless-patterns/apigw-secretsmanager-apikey-cdk",
+      "projectFolder": "apigw-secretsmanager-apikey-cdk",
+      "templateFile": "lib/apigw-secretsmanager-apikey-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Authorizers for Amazon API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
+      },
+      {
+        "text": "AWS Secrets Manager User Guide",
+        "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
+      },
+      {
+        "text": "Amazon API Gateway - REST APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["npm install", "cdk deploy"]
+  },
+  "testing": {
+    "text": [
+      "Create an API key using the provided script: './create_api_key.sh sample-tenant'",
+      "Make a request to the protected endpoint using the valid API key: 'curl -H \"x-api-key: CREATED_API_KEY\" https://REPLACE_WITH_CREATED_API_URL.amazonaws.com/prod/protected'",
+      "If successful, you should receive a response: { \"message\": \"Access granted\" }"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the CDK stack: 'cdk destroy'",
+      "Delete created SecretManager keys using the provided script: './remove_secrets.sh'"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Marco Jahn",
+      "image": "https://sessionize.com/image/e99b-400o400o2-pqR4BacUSzHrq4fgZ4wwEQ.png",
+      "bio": "Senior Solutions Architect - ISV, Amazon Web Services",
+      "linkedin": "https://www.linkedin.com/in/marcojahn/"
+    }
+  ]
+}
