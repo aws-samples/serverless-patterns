@@ -1,6 +1,6 @@
 {
-  "title": "APIGateway-SQS-ReceiveMessages",
-  "description": "Create a REST API Gateway to receive Messages from SQS queue.",
+  "title": "Amazon API Gateway to Amazon SQS",
+  "description": "Create a REST API Gateway to receive messages from SQS queue.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",

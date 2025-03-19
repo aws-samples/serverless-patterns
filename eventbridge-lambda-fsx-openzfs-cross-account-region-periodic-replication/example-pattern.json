@@ -1,9 +1,9 @@
 {
-  "title": "Replicate FSx-OpenZFS volumes across file systems",
+  "title": "Replicate Amazon FSx-OpenZFS volumes across file systems",
   "description": "Periodic Amazon FSx for OpenZFS volume replication across AWS Regions and accounts using Amazon EventBridge Scheduler and AWS Lambda",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
