@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: API Gateway with direct integration to Amazon Translate's TranslateText API.
+
+Resources:
+  TranslateApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: TranslateAPI
+      StageName: Prod
+      OpenApiVersion: 3.0.2
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title: TranslateAPI
+          version: 1.0
+        paths:
+          /translate:
+            post:
+              x-amazon-apigateway-integration:
+                type: aws
+                uri:
+                  Fn::Sub: >-
+                    arn:aws:apigateway:${AWS::Region}:translate:action/TranslateText
+                httpMethod: POST
+                credentials:
+                  Fn::GetAtt: [ApiGatewayIAMRole, Arn]
+                requestParameters:
+                  integration.request.header.Content-Type: "'application/x-amz-json-1.1'"
+                  integration.request.header.X-Amz-Target: "'AWSShineFrontendService_20170701.TranslateText'"
+                requestTemplates:
+                  application/json: |
+                    {
+                      "Text": $input.json('$.text'),
+                      "SourceLanguageCode": $input.json('$.sourceLanguageCode'),
+                      "TargetLanguageCode": $input.json('$.targetLanguageCode')
+                    }
+                responses:
+                  default:
+                    statusCode: 200
+              responses:
+                "200":  # Wrapped in quotes to avoid YAML parsing errors
+                  description: Translate API response
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          TranslatedText:
+                            type: string
+
+  ApiGatewayIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ApiGatewayTranslatePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: "translate:TranslateText"
+                Resource: "*"
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway Endpoint URL
+    Value: !Sub "https://${TranslateApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/translate"
+
+
