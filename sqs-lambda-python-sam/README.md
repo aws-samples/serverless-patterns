@@ -9,7 +9,7 @@ This patterns shows how to process Amazon SQS messages using AWS Lambda. The AWS
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/sqs-lambda-python-sam](https://serverlessland.com/patterns/sqs-lambda-python-sam)
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+:heavy_exclamation_mark: Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
