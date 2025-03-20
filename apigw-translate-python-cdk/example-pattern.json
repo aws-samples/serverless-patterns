@@ -1,0 +1,52 @@
+{
+  "title": "Amazon API Gateway to Amazon Translate",
+  "description": "Create a REST API Gateway that can perform POST API Call to Amazon Translate's TranslateText API",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This Pattern creates a REST API Gateway. The API Gateway endpoint uses service integration to directly connect to Amazon Translate."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-translate",
+      "templateURL": "serverless-patterns/apigw-translate",
+      "projectFolder": "apigw-translate",
+      "templateFile": "apigw-translate/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [ 
+      {
+        "text": "Amazon Translate API Actions List",
+        "link": "https://docs.aws.amazon.com/translate/latest/APIReference/API_TranslateText.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vaidehi Patel",
+      "image": "https://avatars.githubusercontent.com/u/23283229?v=4",
+      "bio": "I'm a Solutions Architect at Amazon Web Services based in Dallas,TX. I'm a serverless enthusiast, I like to build and architect serverless applications",
+      "linkedin": "https://www.linkedin.com/in/vaidehi-patel08/"
+    }
+  ]
+}
