@@ -1,0 +1,322 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Public API Gateway connecting to private backend via VPC Endpoint
+
+Parameters:
+  VPCEndpointServiceId1:
+    Type: String
+    Description: VPC Endpoint Service ID from the backend account (e.g. vpce-svc-xxxxxx)
+
+  VPCEndpointServiceId2:
+    Type: String
+    Description: VPC Endpoint Service ID from the backend account (e.g. vpce-svc-xxxxxx)
+
+Resources:
+  PublicApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub ${AWS::StackName}-public-api
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  VPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub com.amazonaws.vpce.${AWS::Region}.${VPCEndpointServiceId1}
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: false
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs ''
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select
+        - 1
+        - !GetAZs ''
+
+  VPCEndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for VPC Endpoint
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 10.0.0.0/16
+
+  ApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt PublicApiGateway.RootResourceId
+      PathPart: api
+      RestApiId: !Ref PublicApiGateway
+
+  ApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: ANY
+      ResourceId: !Ref ApiResource
+      RestApiId: !Ref PublicApiGateway
+      AuthorizationType: NONE
+      RequestParameters:
+        method.request.header.Host: true
+      Integration:
+        Type: HTTP_PROXY
+        IntegrationHttpMethod: ANY
+        Uri: !Sub http://${VPCEndpoint}.execute-api.${AWS::Region}.amazonaws.com
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref VPCLink
+        TimeoutInMillis: 29000
+        RequestParameters:
+          integration.request.header.Host: method.request.header.Host
+
+  VPCLink:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: !Sub ${AWS::StackName}-vpclink
+      TargetArns:
+        - !Ref NetworkLoadBalancer
+
+  NetworkLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: network
+      Scheme: internal
+      Subnets:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  NLBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !Ref NetworkLoadBalancer
+      Port: 80
+      Protocol: TCP
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 30
+      HealthCheckProtocol: HTTP
+      Port: 80
+      Protocol: TCP
+      TargetType: ip
+      VpcId: !Ref VPC
+      Targets:
+        - Id: !GetAtt GetPrivateIPs.IP0
+        - Id: !GetAtt GetPrivateIPs.IP1
+
+  ApiGatewayDeployment20250219:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: 
+      - ApiMethod
+      - ApiMethod2
+    Properties:
+      RestApiId: !Ref PublicApiGateway
+      Description: "Version 1.0.2" 
+
+  ApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref ApiGatewayDeployment20250219
+      RestApiId: !Ref PublicApiGateway
+      StageName: prod
+
+
+
+  
+
+
+
+
+  ########### Lambda Function to Fetch VPC Endpoint IPs ###############
+  FetchVPCEndpointIPsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.9
+      Timeout: 10
+      Architectures:
+        - arm64
+      PackageType: Zip
+      InlineCode: |
+        import cfnresponse
+        import json
+        import boto3
+        def handler(event, context):
+            print('REQUEST RECEIVED:\n' + json.dumps(event))
+            responseData = {}
+            # Handle Delete requests
+            if event['RequestType'] == 'Delete':
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+                return
+            # Handle Create or Update requests
+            if event['RequestType'] == 'Create' or event['RequestType'] == 'Update':
+                try:
+                    ec2 = boto3.resource('ec2')
+                    enis = event['ResourceProperties']['NetworkInterfaceIds']
+                    # Fetch private IPs of the network interfaces
+                    for index, eni in enumerate(enis):
+                        network_interface = ec2.NetworkInterface(eni)
+                        responseData[f'IP{index}'] = network_interface.private_ip_address
+                        print(responseData)
+                    # Send success response back to CloudFormation
+                    cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+                except Exception as e:
+                    # Send failure response to CloudFormation with the error message
+                    responseData = {'error': str(e)}
+                    cfnresponse.send(event, context, cfnresponse.FAILED, responseData)
+                    return
+      Policies:
+        - AWSLambdaExecute
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ec2:DescribeNetworkInterfaces
+              Resource: '*'
+
+  ########### Custom Resource to Fetch VPC Endpoint IPs ###############
+  GetPrivateIPs:
+    DependsOn:
+      - VPCEndpoint
+    Type: Custom::NLBTargets
+    Properties:
+      ServiceToken: !GetAtt FetchVPCEndpointIPsFunction.Arn
+      NetworkInterfaceIds: !GetAtt VPCEndpoint.NetworkInterfaceIds
+
+  
+  ###### 2nd endpoint
+  # Second VPC Endpoint
+  VPCEndpoint2:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub com.amazonaws.vpce.${AWS::Region}.${VPCEndpointServiceId2}
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: false
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  # Second API Resource
+  ApiResource2:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt PublicApiGateway.RootResourceId
+      PathPart: api2
+      RestApiId: !Ref PublicApiGateway
+
+  # Second API Method
+  ApiMethod2:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: ANY
+      ResourceId: !Ref ApiResource2
+      RestApiId: !Ref PublicApiGateway
+      AuthorizationType: NONE
+      RequestParameters:
+        method.request.header.Host: true
+      Integration:
+        Type: HTTP_PROXY
+        IntegrationHttpMethod: ANY
+        Uri: !Sub http://${VPCEndpoint2}.execute-api.${AWS::Region}.amazonaws.com
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref VPCLink2
+        TimeoutInMillis: 29000
+        RequestParameters:
+          integration.request.header.Host: method.request.header.Host
+
+  # Second VPC Link
+  VPCLink2:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: !Sub ${AWS::StackName}-vpclink2
+      TargetArns:
+        - !Ref NetworkLoadBalancer2
+
+  # Second Network Load Balancer
+  NetworkLoadBalancer2:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: network
+      Scheme: internal
+      Subnets:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  # Second NLB Listener
+  NLBListener2:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup2
+      LoadBalancerArn: !Ref NetworkLoadBalancer2
+      Port: 80
+      Protocol: TCP
+
+  # Second Target Group
+  TargetGroup2:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 30
+      HealthCheckProtocol: HTTPS
+      Port: 80
+      Protocol: TCP
+      TargetType: ip
+      VpcId: !Ref VPC
+      Targets:
+        - Id: !GetAtt GetPrivateIPs2.IP0
+        - Id: !GetAtt GetPrivateIPs2.IP1
+
+  # Second Custom Resource for IP fetching
+  GetPrivateIPs2:
+    DependsOn:
+      - VPCEndpoint2
+    Type: Custom::NLBTargets
+    Properties:
+      ServiceToken: !GetAtt FetchVPCEndpointIPsFunction.Arn
+      NetworkInterfaceIds: !GetAtt VPCEndpoint2.NetworkInterfaceIds
+
+
+Outputs:
+  ApiEndpoint1:
+    Description: URL for API endpoint 1
+    Value: !Sub https://${PublicApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/api
+
+  ApiEndpoint2:
+    Description: URL for API endpoint 2
+    Value: !Sub https://${PublicApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/api2
