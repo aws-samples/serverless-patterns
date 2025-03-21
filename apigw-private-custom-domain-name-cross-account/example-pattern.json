@@ -1,0 +1,55 @@
+{
+  "title": "Invoking Amazon API Gateway private custom domain name cross-account",
+  "description": "Setting up cross-account Private Amazon API Gateway with custom domain",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to implement cross-account access to a Private API Gateway using Custom Domain Names. Learn how to configure, deploy, and invoke private APIs across AWS accounts"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-private-custom-domain-name-cross-account",
+      "templateURL": "serverless-patterns/apigw-private-custom-domain-name-cross-account",
+      "projectFolder": "apigw-private-custom-domain-name-cross-account",
+      "templateFile": "accountA/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Private API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html"
+      },
+      {
+        "text": "Execute-API VPC Endpoint",
+        "link": "https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html"
+      },
+      {
+        "text": "Private Custom Domain name",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-custom-domains.html"
+      }
+    ]
+  },
+  "build": {
+    "text": ["sam build"]
+  },
+  "deploy": {
+    "text": ["sam deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "Luigi Napoleone Capasso",
+      "bio": "Luigi Napoleone Capasso is a Technical Account Manager at Amazon Web Services."
+    }
+  ]
+}

@@ -3,7 +3,7 @@
   "description": "Process Amazon Inspector findings and initial scan results via AWS Lambda and send them to S3 for storage or analysis.",
   "language": "Python",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

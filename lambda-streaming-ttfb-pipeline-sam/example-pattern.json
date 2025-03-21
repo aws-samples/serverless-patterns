@@ -3,7 +3,7 @@
     "description": "Lambda functions showing how to use Lambda response streaming to improve time-to-first byte using the pipeline() method.",
     "language": "Node.js",
     "level": "300",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

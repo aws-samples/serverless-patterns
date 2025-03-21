@@ -3,7 +3,7 @@
   "description": "Track API Gateway WebSocket API connections using AWS Service integration with DynamoDB",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

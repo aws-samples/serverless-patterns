@@ -3,7 +3,7 @@
   "description": "AWS Glue Job trigger a Lambda Function over Eventbridge Rule after change state to timed out",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

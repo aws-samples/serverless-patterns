@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for Step Function with daily EventBridge trigger
+
+
+Parameters:
+  EmailAddress:
+    Type: String
+    Description: Email address to subscribe to the SNS topic
+
+
+Resources:
+  StepFunction:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Role : !GetAtt StepFunctionEventRole.Arn
+      DefinitionUri: statemachine/definition.asl.json
+      DefinitionSubstitutions:
+        LambdaFunctionArn: !GetAtt LambdaFunction.Arn
+        TopicARN : !GetAtt MySNSTopic.TopicArn
+        region : !Sub ${AWS::Region}
+        accountID : !Sub ${AWS::AccountId}
+
+  DailyEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Trigger Step Function daily at midnight UTC"
+      ScheduleExpression: "cron(0 0 * * ? *)"
+      State: "ENABLED"
+      Targets: 
+        - Arn: !Ref StepFunction
+          Id: "StepFunctionTarget"
+          RoleArn: !GetAtt EventBridgeRulerole.Arn
+          Input: '{ "Function_ARN_List_existing": {"lambda_arn_list_combined": []},"NextMarker": null}'
+
+  EventBridgeRulerole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StepFunctionExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - states:StartExecution
+                Resource: !Ref StepFunction
+
+
+  StepFunctionEventRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StepFunctionExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              
+              - Effect: Allow
+                Action:
+                  - lambda:ListFunctions
+                  - lambda:GetFunction
+                Resource: "*"
+
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !GetAtt MySNSTopic.TopicArn
+
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt LambdaFunction.Arn
+
+
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: GetFunction
+      Handler: lambda_function.lambda_handler
+      CodeUri: src/lambda_function.zip
+      Runtime: python3.13
+
+
+  MySNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: Notify-inactive-functions
+
+  MySNSSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref MySNSTopic
+      Protocol: email
+      Endpoint: !Ref EmailAddress
+
+
+Outputs:
+  StepFunctionArn:
+    Description: "ARN of the Step Function"
+    Value: !Ref StepFunction
+  EventRuleName:
+    Description: "Name of the EventBridge Rule"
+    Value: !Ref DailyEventRule
+  LambdaFunction:
+    Description: "LambdaFunction ARN"
+    Value: !GetAtt LambdaFunction.Arn
+

@@ -3,7 +3,7 @@
     "description": "This pattern explains how to deploy a AWS CDK application with Amazon API Gateway, Amazon SQS, AWS Lambda, and Amazon DynamoDB. When an HTTP POST request is made to the Amazon API Gateway endpoint, Gateway authorizes the request by checking Basic auth credentials and on valid credentials, request payload is sent to Amazon Simple Queue Service. AWS Lambda function consumes event from the Queue and inserts the event/payload into the Amazon DynamoDB table. Amazon Simple Queue Service is also configured with a Dead Letter Queue where events are sent when retries to process those messages are repeatedly failed.",
     "language": "Python",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

@@ -3,7 +3,7 @@
   "description": "Stream Amazon Bedrock responses with AWS AppSync",
   "language": "YAML",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

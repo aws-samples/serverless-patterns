@@ -3,7 +3,7 @@
     "description": "Meshing together EventBuses with EventBridge Rules and Event Patterns gives the features isolation and autonomy which drives producer and consumer clarity.  This pattern looks to demonstrate that using CDK and TypeScript.",
     "language": "Go",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

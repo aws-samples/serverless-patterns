@@ -5,7 +5,7 @@
 	"architectureURL": "architecture-appsync-stepfunctions-express-cdk.png",
 	"videoId": "",
 	"level": "100",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"services": {
 		"from": "appsync",
 		"to": "stepfunctions"

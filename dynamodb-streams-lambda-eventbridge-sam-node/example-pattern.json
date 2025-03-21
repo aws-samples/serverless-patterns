@@ -3,7 +3,7 @@
   "description": "TThe AWS SAM template deploys a Lambda function, a DynamoDB table and an Amazon EventBridge bus, and the minimum IAM resources required to run the application.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

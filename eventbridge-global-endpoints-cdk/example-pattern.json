@@ -3,7 +3,7 @@
 	"description": "Creates an EventBridge Global Endpoint and all the infra needed to set it up",
 	"language": "TypeScript",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

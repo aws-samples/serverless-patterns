@@ -1,0 +1,73 @@
+{
+  "title": "Find list of Inactive lambda functions and publish it to SNS topic using Step Functions.",
+  "description": "Simple pattern that runs daily using eventbridge scheduler and invokes a state machine to find Inactive functions and publish it to SNS topic.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Creates a one time schedule in eventBridge scheduler with state machine as target and uses SDK integration to find the lambda function status and returns the list of Inactive functions and which is then published to the SNS Topic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-stepfunction-lambda-getfunctionstatus",
+      "templateURL": "serverless-patterns/eventbridge-stepfunction-lambda-getfunctionstatus",
+      "projectFolder": "eventbridge-stepfunction-lambda-getfunctionstatus",
+      "templateFile": "eventbridge-stepfunction-lambda-getfunctionstatus/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "Amazon EventBridge Scheduler Docs",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "Amazon EventBridge Scheduler Docs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/api/API_ListFunctions.html"
+      },
+      {
+        "text": "Lambda ListFunctions API",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "Lambda GetFunction API",
+        "link": "https://docs.aws.amazon.com/lambda/latest/api/API_GetFunction.html"
+      },
+      {
+        "text": "SNS Publish API",
+        "link": "https://docs.aws.amazon.com/sns/latest/api/API_Publish.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sahil Kapoor",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQHTVptga3RxcA/profile-displayphoto-shrink_800_800/B56ZO3ZfseHoAc-/0/1733948735068?e=1739404800&v=beta&t=FX6MFZ2JFH17KQc89u4gY6tQXGoMJLiLkB2qT3MtV2g",
+      "bio": "AWS Cloud Support Engineer",
+      "linkedin": "sahil-kapoor-503391a7",
+      "twitter": ""
+    }
+  ]
+}

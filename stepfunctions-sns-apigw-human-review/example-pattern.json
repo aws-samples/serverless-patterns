@@ -3,7 +3,7 @@
     "description": "Integrate a human review process into your workflow.",
     "language": "",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "diagram": "/resources/statemachine.png",
     "introBox": {
         "headline": "How it works",

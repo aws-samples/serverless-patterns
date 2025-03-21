@@ -3,7 +3,7 @@
   "description": "Read the Parameter Store value using Parameter Store Extension for Lambda",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

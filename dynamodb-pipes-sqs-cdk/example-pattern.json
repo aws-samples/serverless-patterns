@@ -3,7 +3,7 @@
   "description": "This pattern demonstrates a low code way to send DynamoDB stream records to an SQS queue using EventBridge Pipes.",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -1,0 +1,63 @@
+{
+  "title": "Okta EventBridge Integration to AWS Lambda",
+  "description": "Use Amazon EventBridge Okta integration to process unusual login locations with Lambda, notify users via SES or store data elsewhere.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use the Okta integration with Amazon EventBridge and AWS Lambda to process login events from Okta. This pattern is leveraging the Okta Amazon EventBridge integration to send login events from the customer's Okta organization to their AWS account, via an Amazon EventBridge Partner event bus.",
+      "Once the Okta log events are in the customer's account, an Amazon EventBridge rule routes unusual login location events to a downstream Lambda function. The Lambda function could transform the event, send it to a downstream application, archive it in a warehouse service, or send a notification email to a customer using SES.",
+      "Amazon CloudWatch Log Groups are provisioned for debugging and auditing.",
+      "This pattern deploys two EventBridge Rules, one Lambda function, and two CloudWatch Log Groups."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/okta-eventbridge-lambda",
+      "templateURL": "serverless-patterns/okta-eventbridge-lambda",
+      "projectFolder": "okta-eventbridge-lambda",
+      "templateFile": "app.py"
+    }
+},
+"resources": {
+  "bullets": [
+    {
+      "text": "Amazon EventBridge SaaS Integrations",
+      "link": "https://aws.amazon.com/eventbridge/integrations/"
+    },
+    {
+      "text": "Amazon EventBridge SaaS Integrations Documentation",
+      "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html"
+    },
+    {
+      "text": "Okta's Amazon EventBridge Integration",
+      "link":"https://help.okta.com/en-us/content/topics/reports/log-streaming/add-aws-eb-log-stream.htm"
+    }
+  ]
+},
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ragib Ahsan",
+      "image": "https://media.licdn.com/dms/image/D4E03AQHKVYkUoGROvA/profile-displayphoto-shrink_800_800/0/1699650399893?e=1723680000&v=beta&t=A08_HJD38AAs5NdDzBsWzZksHIfztFW1ong3EJJodWA",
+      "bio": "AWS Partner Solutions Architect based in NYC. Huge advocate for serverless architectures!",
+      "linkedin": "ragibmahsan"
+    }
+  ]
+}

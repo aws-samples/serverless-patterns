@@ -3,7 +3,7 @@
   "description": "Simple pattern that triggers a Lambda function every 5 minutes using Amazon EventBridge Scheduler and CDK",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": ["Creates a scheulde that runs every 5 minutes to trigger a given Lambda function."]

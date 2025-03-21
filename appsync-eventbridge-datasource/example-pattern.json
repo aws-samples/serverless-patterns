@@ -3,7 +3,7 @@
   "description": "The AWS AppSync resolver function request and response used with the EventBridge data source allows you to send custom events to the Amazon EventBridge bus.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

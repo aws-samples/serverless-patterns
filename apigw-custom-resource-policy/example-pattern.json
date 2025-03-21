@@ -3,7 +3,7 @@
   "description": "Creates an API Gateway REST endpoint with a resource policy. The resource policy contains a custom policy that limits access to the endpoint to certain date ranges.",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

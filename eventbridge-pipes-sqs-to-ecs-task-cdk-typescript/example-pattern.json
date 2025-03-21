@@ -3,7 +3,7 @@
     "description": "Invoke ECS Fargate Tasks using SQS messages using EventBridge Pipes",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

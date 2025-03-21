@@ -3,7 +3,7 @@
     "description": "Copy and manipulate an object between Amazon S3 buckets using Amazon SQS, Amazon EventBridge Pipes and AWS Step Functions",
     "language": "",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

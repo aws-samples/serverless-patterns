@@ -3,7 +3,7 @@
   "description": "Create a Cloudwatch Logs subscription to Kinesis Firehose to S3 bucket",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

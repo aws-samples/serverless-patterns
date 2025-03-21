@@ -3,7 +3,7 @@
   "description": "This pattern shows how to use EventBridge Pipes to launch a StepFunctions state machine with a message coming from SQS Queue.",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

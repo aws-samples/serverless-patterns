@@ -3,7 +3,7 @@
   "description": "Creates a Lambda function that keep tracks of single messages using DynamoDB and forward a single aggregate message to a different SQS queue.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

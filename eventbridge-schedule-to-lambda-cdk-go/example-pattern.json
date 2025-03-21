@@ -3,7 +3,7 @@
     "description": "Creates an EventBridge schedule to invoke a Go based Lambda function every 5 minutes",
     "language": "Go",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

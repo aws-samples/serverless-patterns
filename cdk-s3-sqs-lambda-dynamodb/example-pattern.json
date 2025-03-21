@@ -3,7 +3,7 @@
   "description": "Creates a serverless pattern to store and process csv data using Amazon S3, Amazon SQS, AWS Lambda and Amazon DynamoDB services",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

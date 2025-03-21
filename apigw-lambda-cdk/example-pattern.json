@@ -5,7 +5,7 @@
   "architectureURL": "https://ibrahimcesar-github.s3.amazonaws.com/patterns-apigw-lambda-cdk.png",
   "videoId": "",
   "level":"100",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "services": {
     "from": "apigateway",
     "to": "lambda"

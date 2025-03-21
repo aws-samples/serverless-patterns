@@ -3,7 +3,7 @@
     "description": "Configure Cloudfront to point to an AWS Lambda function via a Lambda URL with IAM authentication",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

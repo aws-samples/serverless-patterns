@@ -3,7 +3,7 @@
   "description": "This pattern creates a Lambda function that publishes an event to EventBridge. ",
   "language": "Rust",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

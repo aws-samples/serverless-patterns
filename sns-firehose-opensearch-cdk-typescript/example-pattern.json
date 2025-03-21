@@ -3,7 +3,7 @@
   "description": "This pattern deploys infrastructure that utilizes Kinesis Firehose to deliver messages sent to an SNS topic to Amazon OpenSearch.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

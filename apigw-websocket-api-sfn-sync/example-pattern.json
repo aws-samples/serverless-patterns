@@ -3,7 +3,7 @@
   "description": "Start Step Functions Express Workflow synchronous execution via WebSocket API",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

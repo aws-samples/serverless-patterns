@@ -3,7 +3,7 @@
   "description": "Create an EventBridge rule that invokes a SQS queue.",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

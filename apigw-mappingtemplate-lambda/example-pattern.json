@@ -3,7 +3,7 @@
     "description": "Using mapping template to over-ride status, status code and body returned from the Lambda function.",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

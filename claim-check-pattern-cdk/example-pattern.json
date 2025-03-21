@@ -3,7 +3,7 @@
   "description": "To reduce the size of the events in your event-driven application, you can temporarily remove attributes. This approach is known as the claim check pattern.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

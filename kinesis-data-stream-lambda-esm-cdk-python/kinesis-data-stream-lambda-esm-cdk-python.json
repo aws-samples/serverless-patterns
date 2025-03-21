@@ -3,7 +3,7 @@
     "description": "Process filtered events from a Kinesis data stream with AWS Lambda",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

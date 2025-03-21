@@ -3,7 +3,7 @@
     "description": "Simple pattern that triggers Step Function execution every 5 minutes using EventBridge Scheduler with CDK/Python. ",
     "language": "Python",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

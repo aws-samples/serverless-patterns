@@ -3,7 +3,7 @@
   "description": "Create an Amazon API Gateway HTTP API to invoke a Lambda function to read and write to DocumentDB.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

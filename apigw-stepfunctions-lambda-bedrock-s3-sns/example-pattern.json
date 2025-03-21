@@ -1,0 +1,60 @@
+{
+    "title": "API Gateway - Step Functions - Lambda - Bedrock - S3 - SNS",
+    "description": "Generate videos from text prompt using Amazon Bedrock Nova models from an AWS Lambda function trigerred by StepFunctions workflow fronted with API Gateway and email Amazon S3 Pre-Signed URL for generated email",
+    "language": "Python",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+            "This project aims to build an integration between API Gateway, AWS Step Functions, AWS Lambda, Amazon Bedrock, Amazon S3 and Amazon SNS",
+            "The core functionality revolves around building an end-to-end application where a user can send a prompt to an API endpoint via API Gateway REST API that accepts a user-defined prompt.",
+            "When a prompt is received, API Gateway triggers StateMachine workflow. This workflow execution is resposnible for triggerring the lambda function which interacts with Amazon Bedrock to generate video for the given prompt using Amazon Nova Reel model, and ulpoads it to Amazon S3. The workflow also sends the Pre-Signed URL for generated video to the user's email address via Amazon SNS. This S3 Pre-Signed URL is valid for the timeout specified.", 
+            "With the help of StateMachine workflow, asynchronous interactions with Bedrock model are acheived as Nova Reel model takes few minutes to generate the video. This asynchronous approach helps not to let Lambda function execution running idle",
+            "To ensure compatibility with newly released Nova Reel model in Bedrock, latest version of Boto3 is utilized in lambda deployment zip, as only the most recent Boto3 version includes a client for Amazon Bedrock accepting Nova models and new Asynchronous inference API calls."
+        ]
+    },
+    "gitHub": {
+        "template": {
+          "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-stepfunctions-lambda-bedrock-s3-sns",
+          "templateURL": "serverless-patterns/apigw-stepfunctions-lambda-bedrock-s3-sns",
+          "projectFolder": "apigw-stepfunctions-lambda-bedrock-s3-sns",
+          "templateFile": "apigw_stepfunctions_bedrock_s3_sns/apigw_stepfunctions_bedrock_s3_sns_stack.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+            "text": "Amazon Bedrock Nova Model",
+            "link": "https://www.aboutamazon.com/news/aws/amazon-nova-artificial-intelligence-bedrock-aws"
+        },
+        {
+          "text": "Packaging custom boto3 version in deployment zip",
+          "link": "https://repost.aws/knowledge-center/lambda-python-runtime-errors"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+        {
+            "name": "Sahithi Ginjupalli",
+            "image": "https://drive.google.com/file/d/1YcKYuGz3LfzSxiwb2lWJfpyi49SbvOSr/view?usp=sharing",
+            "bio": "Sahithi Ginjupalli is a Cloud Engineer with a passion for continuous learning and in-depth exploration of her field. She helps optimizing client applications through strategic implementation of AWS services, enhancing their efficiency and performance.",
+            "linkedin": "ginjupalli-sahithi-37460a18b"
+        }
+    ]
+  }

@@ -3,7 +3,7 @@
   "description": "POST data received by Kinesis Data Streams to an HTTP endpoint securely using Kinesis Data Firehose",
   "level": "200",
   "language": "Python",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

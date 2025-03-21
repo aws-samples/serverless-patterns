@@ -3,7 +3,7 @@
   "description": "Create an Amazon API Gateway HTTP API as a proxy to AWS AppSync GraphQL API with Amazon DynamoDB as the API data source",
   "language": "Yaml",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

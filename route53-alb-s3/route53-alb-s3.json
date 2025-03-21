@@ -3,7 +3,7 @@
     "description": "This pattern hosts an internal static website on an Amazon S3 bucket that can only be accessed from private network.",
     "language": "YAML",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

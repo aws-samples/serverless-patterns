@@ -3,7 +3,7 @@
     "description": "Integration of Amazon API Gateway REST API with Amazon Lambda to publish to Amazon SNS",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

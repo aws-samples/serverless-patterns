@@ -3,7 +3,7 @@
     "description": "Simple pattern that rasies an EventBridge event (Lambda as target) every 5 minutes using Amazon EventBridge Scheduler and CDK using Python. ",
     "language": "Python",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": ["Creates a scheulde that runs every 5 minutes to raise an EventBridge event. Additionally a Labmda function is configured as EventBrige rule target."]

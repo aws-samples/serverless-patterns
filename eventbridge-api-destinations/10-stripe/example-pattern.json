@@ -3,7 +3,7 @@
     "description": "Create an API destination in EventBridge for Stripe APIs.",
     "language": "",
     "level": "300",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

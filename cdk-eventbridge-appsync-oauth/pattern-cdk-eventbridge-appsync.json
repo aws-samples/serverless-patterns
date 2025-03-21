@@ -4,7 +4,7 @@
   "language": "Node.js",
   "architectureURL": "pattern-cdk-eventbridge-appsync.png",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "services": {
     "from": "eventbridge",
     "to": "appsync"

@@ -3,7 +3,7 @@
     "description": "Secured REST API that expose a Lambda function to generate S3 pre-signed URLs",
     "language": "TypeScript",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

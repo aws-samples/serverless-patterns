@@ -3,7 +3,7 @@
   "description": "Create an AWS Lambda function to infer foundation models in Amazon Bedrock.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

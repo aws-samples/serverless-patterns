@@ -3,7 +3,7 @@
     "description": "This pattern explains how to deploy a SAM application with Amazon API Gateway, Amazon Kinesis Data Stream, AWS Lambda, and Amazon DynamoDB. When an HTTP POST request is made to the Amazon API Gateway endpoint, Gateway authorizes the request by checking Basic auth credentials and on valid credentials, request payload is sent to Amazon Kinesis Data Stream. This pattern is especially useful in cases of large payloads since Kinesis Data Stream can support upto 1MB paylod size. AWS Lambda function consumes event from the Data Stream and inserts the event/payload into the Amazon DynamoDB table. Amazon Lambda is also configured with a Dead Letter Queue where events are sent when retries to process those messages are repeatedly failed.",
     "language": "Python",
     "level": "300",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

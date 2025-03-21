@@ -3,7 +3,7 @@
   "description": "This pattern uses AWS Lambda response streaming to incrementally retrieve and stream Amazon DynamoDB results in batches, reducing time-to-first-byte (TTFB) by sending data as it's retrieved.",
   "language": "nodejs",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

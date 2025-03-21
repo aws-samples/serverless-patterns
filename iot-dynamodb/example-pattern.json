@@ -2,7 +2,7 @@
   "title": "AWS IoT to DynamoDB",
   "description": "Create IoT Topic Rules to put event data to DynamoDB table",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

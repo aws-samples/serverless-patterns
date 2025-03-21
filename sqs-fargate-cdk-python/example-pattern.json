@@ -3,7 +3,7 @@
   "description": "This pattern show how to scale an ECS cluster task that is connected to SQS queue.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

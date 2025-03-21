@@ -3,7 +3,7 @@
   "description": "This pattern implementes the normalizer pattern using an EventBridge Pipe. This example uses SQS as source and EventBridge as target, but the pattern can be applied to other sources and targets as well.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

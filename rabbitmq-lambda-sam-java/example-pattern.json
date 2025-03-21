@@ -3,7 +3,7 @@
   "description": "This sample project demonstrates event driven message processing from an Amazon MQ for RabbitMQ queue using an AWS Lambda function written in Java.",
   "language": "Java",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

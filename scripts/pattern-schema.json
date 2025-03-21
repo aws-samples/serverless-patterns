@@ -6,11 +6,11 @@
     "description": { "type": "string", "maxLength": 150 },
     "language": {
       "type": "string",
-      "enum": ["TypeScript", "Node.js", "Python", "Java", "Go", "Rust", ".NET", "OpenAPI", "YAML", ""]
+      "enum": ["TypeScript", "Node.js", "Python", "Java", "Go", "PowerShell","Rust", ".NET", "OpenAPI", "YAML", ""]
     },
     "framework": {
       "type": "string",
-      "enum": ["CDK", "CDK for Terraform", "SAM", "Terraform", "Serverless Framework", "Terraform (with modules)", "Pulumi"]
+      "enum": ["AWS CDK", "AWS CDK for Terraform", "AWS SAM", "Terraform", "Serverless Framework", "Terraform (with modules)", "Pulumi"]
     },
     "introBox": {
       "type": "object",

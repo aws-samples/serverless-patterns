@@ -3,7 +3,7 @@
   "description": "The SAM template deploys a Step Functions Express workflow that invokes Amazon Comprehend and returns the sentiment analysis done by Comprehend in the response. The SAM template contains the required resouces with IAM permission to run the application with logging enabled.",
   "language": "YAML",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

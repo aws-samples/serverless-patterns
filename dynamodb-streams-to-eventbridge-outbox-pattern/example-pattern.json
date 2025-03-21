@@ -3,7 +3,7 @@
   "description": "Outbox pattern example with DynamoDB streams and EventBridge. Listen for new inserts and raise domain events into your architecture.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
   "description": "Simple pattern that publishes a message to an SQS queue every 5 minutes",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

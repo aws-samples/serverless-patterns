@@ -3,7 +3,7 @@
   "description": "Create a Step Functions workflow to Send Failure event to SQS for operational needs.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

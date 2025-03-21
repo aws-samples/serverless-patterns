@@ -3,7 +3,7 @@
   "description": "This template deploys a Lambda function that is triggered by an EventBridge rule. In this example, the rule filters for specific attributes in the event before invoking the function.",
   "language": "Rust",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

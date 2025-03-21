@@ -3,7 +3,7 @@
     "description": "Create an HTTP API to AWS Lambda w/ ASP.NET 6.0",
     "language": ".NET",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

@@ -3,7 +3,7 @@
   "description": "Creates CloudFront Distributions to server the static site from S3.",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -2,7 +2,7 @@
 	"title": "IoT Core to DynamoDB",
 	"description": "Create an DynamoDBv2 IoT rule action to ingest data over AWS IoT core and publish to Amazon DynamoDB table.",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

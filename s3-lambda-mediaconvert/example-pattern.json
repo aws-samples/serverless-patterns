@@ -3,7 +3,7 @@
   "description": "Automate the trans-codification of new video files on Amazon S3, leveraging AWS Lambda and AWS Elemental MediaConvert. The transcoded video will go to another S3 bucket for future streaming or further processing.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

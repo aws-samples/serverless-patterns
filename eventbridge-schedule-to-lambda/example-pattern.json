@@ -3,7 +3,7 @@
   "description": "Simple pattern that triggers a Lambda function every 5 minutes using Amazon EventBridge Scheduler",
   "language": "TypeScript",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": ["Creates a scheulde that runs every 5 minutes to trigger a given Lambda function."]

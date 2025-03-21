@@ -3,7 +3,7 @@
     "description": "Create a REST API which acts as a proxy for a NGINX server hosted on a Amazon Elastic Compute Cloud (Amazon EC2)",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

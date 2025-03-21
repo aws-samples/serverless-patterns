@@ -3,7 +3,7 @@
     "description": "Create an Application Load Balancer with Lambda as target using CDK",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

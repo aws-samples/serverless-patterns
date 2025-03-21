@@ -1,0 +1,57 @@
+{
+    "title": "Amazon Bedrock Agents with AWS Lambda",
+    "description": "Create a agent with Amazon Bedrock with a Lambda function action group",
+    "language": "Python",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "In this pattern, we show you how to use Amazon Bedrock Agents to call an API and get the results from it for a user. Bedrock Agents is helpful in various situations such as fetching real-time information from APIs, interacting with knowledge bases, and performing actions based on user inputs.",
+        "It processes user input through a foundation model to determine its next steps. It then decides whether to invoke an action or query a knowledge base. For performing an action it has action groups defined, in this example we are using a Lambda function which invokes an API. It then either executes the action or it gathers more information from its knowledge base or the user. The agent generates an observation from these results, which it uses to update its understanding. This cycle continues until the agent can provide a final response or needs more user input, allowing for dynamic and context-aware interactions."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-agents-lambda-cdk",
+        "templateURL": "serverless-patterns/bedrock-agents-lambda-cdk",
+        "projectFolder": "bedrock-agents-lambda-cdk",
+        "templateFile": "stacks/bedrock_agents_lambda_cdk_stack.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Bedrock Agents",
+          "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html"
+        },
+        {
+          "text": "Creating Bedrock Agent Action Groups",
+          "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/agents-action-create.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Reethi Joseph",
+        "image": "https://drive.google.com/file/d/1fthW0WuTMx8dKt3EPoh6NHFdj-jBrtvf/view",
+        "bio": "Reethi is a Senior Cloud Engineer at AWS.",
+        "linkedin": "https://www.linkedin.com/in/reethi-joseph/"
+      }
+    ]
+  }
