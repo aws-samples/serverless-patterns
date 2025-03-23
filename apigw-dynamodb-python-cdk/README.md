@@ -2,7 +2,7 @@
 # API Gateway direct integration to DynamoDB
 
 This pattern shows how to create an API Gateway with direct integration to DynamoDB. 
-The pettern showcase transformation of request/response using VTL and CDK and implement examples for using Cognito, Lambda authorizer and API keys. 
+The pattern showcase transformation of request/response using VTL and CDK and implement examples for using Cognito, Lambda authorizer and API keys. 
 
 Learn more about this pattern at Serverless Land Patterns: [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-dynamodb-python-cdk).
 
@@ -44,7 +44,7 @@ cd src; pip install pyjwt --target .
 ```
 8. Zip the Lambda function and dependencies 
 ```
-zip -r lambda.zip .
+zip -r lambda.zip . ; cd
 ```
 9. To generate a cloudformation templates (optional)
 ```
