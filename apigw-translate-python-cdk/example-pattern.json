@@ -3,7 +3,7 @@
   "description": "Create a REST API Gateway that can perform POST API Call to Amazon Translate's TranslateText API",
   "language": "Python",
   "level": "200",
-  "framework": "AWS AWS CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
