@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: S3 to Lambda to Transcription Job
+Description: S3 to Lambda to Transcription Job (uksb-1tthgi812) (tag:lambda-transcribe-sam-js)
 
 Resources:
   AudioBucket:
