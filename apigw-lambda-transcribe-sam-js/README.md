@@ -31,7 +31,7 @@ Important: this application uses various AWS services and there are costs associ
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
-
+    * Allow TranscribeFunction to operate without authentication.
     After running `sam deploy --guided` mode once and savings arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 2. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
@@ -48,7 +48,7 @@ When an object is uploaded to S3:
 
 To test the deployed API endpoint:
 
-1. Upload an audio file to the created S3 bucket:
+1. Upload an audio file to the created S3 bucket(Note: Bucket name would be {AWS::StackName}-audio-uploads):
 ```
 aws s3 cp audio.mp3 s3://your-bucket-name/
 ```
@@ -64,8 +64,12 @@ aws transcribe list-transcription-jobs
 aws transcribe get-transcription-job --transcription-job-name "job-name-from-response"
 ```
 ## Cleanup
- 
-1. Delete the stack
+
+1. Delete the audio.mp3 file from the S3 bucket. This is because the bucket must be empty before it can be deleted.
+   ```bash
+    aws s3 rm "s3://your-bucket-name/audio.mp3"
+    ```
+2. Delete the stack
     ```bash
     sam delete
     ```
