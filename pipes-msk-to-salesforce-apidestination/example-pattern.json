@@ -3,7 +3,7 @@
   "description": "Send events from MSK to Salesforce using EventBridge Pipes and API Destination",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

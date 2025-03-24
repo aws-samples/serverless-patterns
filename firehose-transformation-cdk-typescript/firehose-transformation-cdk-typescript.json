@@ -3,7 +3,7 @@
     "description": "Transform incoming source data and deliver the transformed data to S3.",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

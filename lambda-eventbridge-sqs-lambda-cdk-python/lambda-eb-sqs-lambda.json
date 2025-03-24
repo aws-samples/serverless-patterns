@@ -3,7 +3,7 @@
     "description": "The pattern sends custom events to EventBridge, routes them using content-based rules to rate-controlled SQS queues and Lambda functions",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

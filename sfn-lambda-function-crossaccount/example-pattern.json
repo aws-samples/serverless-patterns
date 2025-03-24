@@ -3,7 +3,7 @@
   "description": "Create a Step function which invokes cross account Lambda function",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

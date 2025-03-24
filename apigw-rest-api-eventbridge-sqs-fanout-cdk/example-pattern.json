@@ -3,7 +3,7 @@
   "description": "This pattern creates an Amazon API Gateway REST API and Amazon Eventbridge with CDK in Python.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

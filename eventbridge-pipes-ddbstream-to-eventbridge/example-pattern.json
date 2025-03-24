@@ -3,7 +3,7 @@
   "description": "This pattern uses EventBridge pipe to connect DynamoDB Stream directly into EventBridge",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": ["EventBridge Pipe used to connect DynamoDB stream (new and old images) directly into EventBridge with custom source and detail-type"]

@@ -3,7 +3,7 @@
 	"description": "Perform a write and list operation from AWS AppSync to Amazon DynamoDB that is protected with an idenity pool and userpool from Amazon Cognito.",
 	"language": "TypeScript",
 	"level": "300",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

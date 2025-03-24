@@ -3,7 +3,7 @@
     "description": "This pattern connect a public API Gateway to a private Network Load Balancer to ECS Fargate cluster. It keeps the private subnet resources safe.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

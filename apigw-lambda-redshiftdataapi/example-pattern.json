@@ -3,7 +3,7 @@
   "description": "Expose data from Redshift through API using API Gateway, Lambda and Redshift Data API",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

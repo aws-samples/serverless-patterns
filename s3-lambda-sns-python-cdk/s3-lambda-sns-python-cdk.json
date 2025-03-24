@@ -3,7 +3,7 @@
     "description": "S3 upload events trigger Lambda functions to process new objects. After processing the Lambda function publishes an SNS notification.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

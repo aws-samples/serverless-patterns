@@ -3,7 +3,7 @@
     "description": "This sample project demonstrates how to send an email with pre-signed Amazon S3 bucket URL whenever a file is uploaded into the bucket.",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

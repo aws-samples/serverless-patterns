@@ -1,0 +1,66 @@
+{
+  "title": "AWS Lambda function to Amazon Aurora Serverless",
+  "description": "The pattern creates a Lambda function and an Amazon Aurora Cluster with Serverless instance. The Database credentials are stored and accessed from AWS Secrets Manager.",
+  "language": "Python",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The pattern creates a Lambda function and an Amazon Aurora Cluster with Serverless instance.",
+      "The Database credentials are stored and accessed from AWS Secrets Manager.",
+      "It also guides how to invoke the function to access the database."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-lambda-aurora-serverless",
+      "templateURL": "serverless-patterns/terraform-lambda-aurora-serverless",
+      "projectFolder": "terraform-lambda-aurora-serverless",
+      "templateFile": "terraform-lambda-aurora-serverless/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "test": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "test": "Terraform Registry - RDS (Relational Database)",
+        "link": "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster.html"
+      },
+      {
+        "text": "Amazon Aurora User Guide",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html"
+      },
+      {
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Saborni Bhattacharya",
+      "image": "https://drive.google.com/file/d/1AZFquOkafEQRUlrT4hKOtIbt4Cq66SHd/view?usp=sharing",
+      "bio": "AWS SA, Cloud Enthusiast",
+      "linkedin": "https://www.linkedin.com/in/saborni-bhattacharya-5b523812a/"
+    }
+  ]
+}

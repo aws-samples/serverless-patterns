@@ -3,7 +3,7 @@
   "description": "This pattern demonstrates how to create a synchronous REST API using API Gateway, AWS Lambda and RDS.",
   "language": "Java",
   "level": "400",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

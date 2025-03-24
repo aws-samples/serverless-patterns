@@ -3,7 +3,7 @@
     "description": "Create a REST API Gateway which performs PutRecords API call to Kinesis Data stream and the stream is consumed by a Lambda function",
     "language": "Python",
     "level": "300",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

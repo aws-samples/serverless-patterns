@@ -3,7 +3,7 @@
     "description": "Create a REST API with proxy integration to a Lambda function to keep the size of resource-based policy within the allowed hard limit.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

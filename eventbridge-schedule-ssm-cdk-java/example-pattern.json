@@ -3,7 +3,7 @@
   "description": "This pattern will create an EventBridge Scheduler to start State Manager Association once in AWS Systems Manager every 5 minutes.",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
   "description": "Creates CloudFront, WAF Web ACL, and S3 bucket for UI code. Then WAF Web ACL gets applied to CloudFront distribution to restrict Website access based on source IP address.",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

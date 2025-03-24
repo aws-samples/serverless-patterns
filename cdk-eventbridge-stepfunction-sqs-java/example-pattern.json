@@ -3,7 +3,7 @@
     "description": "This pattern creates a Step Functions workflow to send failure events to SQS",
     "language": "Java",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

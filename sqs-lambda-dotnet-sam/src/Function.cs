@@ -1,93 +1,53 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
+using static Amazon.Lambda.SQSEvents.SQSBatchResponse;
+
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
-namespace SqsLambdaProcessor;
+namespace SqsIntegration;
 
 public class Function
 {
-    private readonly Random _random;
-    private readonly ILogger<Function> _logger;
-
-    public Function()
-    {
-        _random = new Random();
-        _logger = LoggerFactory.Create(builder =>
-        {
-            builder.AddLambdaLogger();
-            builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
-        }).CreateLogger<Function>();
-    }
-
-    /// <summary>
-    /// Process SQS messages
-    /// </summary>
-    /// <param name="evnt">The SQS event containing messages</param>
-    /// <param name="context">Lambda context</param>
-    /// <returns>Response containing batch item failures</returns>
     public async Task<SQSBatchResponse> FunctionHandler(SQSEvent evnt, ILambdaContext context)
     {
-        _logger.LogInformation($"Received event: {JsonSerializer.Serialize(evnt)}");
-        var batchItemFailures = new List<SQSBatchResponse.BatchItemFailure>();
+        List<BatchItemFailure> _batchItemFailures = new();
 
-        foreach (var record in evnt.Records)
+        if (evnt.Records.Count == 0)
         {
-            try
+            context.Logger.LogLine("Empty SQS Event received");
+            return new SQSBatchResponse();
+        }
+
+        foreach (var message in evnt.Records)
+        {
+            BatchItemFailure? result = await ProcessMessageAsync(message, context);
+            if (result != null)
             {
-                var result = await ProcessSqsMessageAsync(record);
-                if (!result.Success)
-                {
-                    batchItemFailures.Add(new SQSBatchResponse.BatchItemFailure
-                    {
-                        ItemIdentifier = record.MessageId
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error processing record {record.MessageId}");
-                batchItemFailures.Add(new SQSBatchResponse.BatchItemFailure
-                {
-                    ItemIdentifier = record.MessageId
-                });
+                _batchItemFailures.Add(result);
             }
         }
 
-        return new SQSBatchResponse { BatchItemFailures = batchItemFailures };
+        return new SQSBatchResponse(_batchItemFailures);
     }
 
-    private async Task<ProcessingResult> ProcessSqsMessageAsync(SQSEvent.SQSMessage record)
+    private async Task<BatchItemFailure?> ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
     {
         try
         {
-            // Randomly fail some messages for demonstration
-            if (_random.NextDouble() < 0.2)
-            {
-                _logger.LogInformation($"Randomly failing message: {record.Body}");
-                throw new Exception("Random processing failure");
-            }
+            context.Logger.LogInformation($"Processed message {message.Body}");
+            // TODO: Do interesting work based on the new message
+            await Task.CompletedTask; // Placeholder for actual async work
+            return null;
 
-            _logger.LogInformation($"Processing message: {record.MessageId}");
-            
-            // Simulate some processing, add your business logic here
-            await Task.Delay(100); // equivalent to time.sleep(0.1)
-
-            _logger.LogInformation($"Successfully processed message: {record.Body}");
-            return new ProcessingResult { Success = true };
         }
-        catch (Exception error)
+        catch (Exception e)
         {
-            _logger.LogError(error, $"Failed to process record {record.MessageId}");
-            return new ProcessingResult { Success = false };
+            context.Logger.LogError($"An error occurred - {e.Message}");
+            return new BatchItemFailure { ItemIdentifier = message.MessageId };
         }
     }
-
-    private class ProcessingResult
-    {
-        public bool Success { get; set; }
-    }
-} 
+}

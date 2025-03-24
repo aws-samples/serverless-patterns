@@ -3,7 +3,7 @@
   "description": "Creates an EventBridge schedule to run a Lambda every 5 minutes",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

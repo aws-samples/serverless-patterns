@@ -2,7 +2,7 @@
     "title": "EventBridge Scheduler to send messages to Amazon SQS",
     "description": "Simple pattern that publishes a message to an SQS queue every 5 minutes",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

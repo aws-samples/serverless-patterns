@@ -3,7 +3,7 @@
   "description": "This pattern demonstrates sending SQS messages to another SQS queue with a Lambda function to enrich the data.",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": ["SQS queue is polled, the Lambda enricher is invoked and the response of the Lambda function is passed to SQS."]

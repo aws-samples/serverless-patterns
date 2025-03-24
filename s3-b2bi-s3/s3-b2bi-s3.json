@@ -3,7 +3,7 @@
     "description": "This sample project demonstrates how AWS B2B Data Interchange can transform EDI Files into JSON as per the transformation logic.",
     "language": "YAML",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

@@ -3,7 +3,7 @@
   "description": "The SAM template deploys an Amazon S3 bucket that publishes events to Amazon EventBridge, and sets up an AWS Step Functions workflow to show how to consume these events via an EventBridge rule. It deploys the the IAM resources required to run the application. It also deploys a Lambda function, SNS topic and DynamoDB table. EventBridge consumes events directly from S3 buckets when the NoticationConfiguration is enabled, as shown in the template.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

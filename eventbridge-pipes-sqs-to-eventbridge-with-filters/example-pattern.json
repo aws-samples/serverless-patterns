@@ -3,7 +3,7 @@
   "description": "This pattern uses SQS and triggers EventBridge events directly with optional filtering supported.",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": ["SQS queue is polled and messages are sent to EventBridge. SQS messages are filtered before reaching EventBridge, and custom events in EventBridge are raised."]

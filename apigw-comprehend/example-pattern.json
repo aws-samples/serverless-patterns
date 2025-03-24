@@ -3,7 +3,7 @@
   "description": "Create a REST API that acts as a proxy to Amazon Comprehend DetectSentiment API operation.",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
     "description": "This AWS CDK application demonstrates how to deploy a application on Windows based Amazon Elastic Container Service (Amazon ECS) Cluster.",
     "language": ".NET",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

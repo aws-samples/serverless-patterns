@@ -3,7 +3,7 @@
     "description": "This pattern shows how to use EventBridge Pipes with data coming in from Amazon MSK cluster with IAM Authentication enabled and process these messages using Lambda function",
     "language": "Node.js",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": ["Amazon MSK with IAM Auth is configured as the pipe source with Lambda function. This patterns allows EventBridge pipes to integrate with Amazon MSK deployed in a private subnet and Lambda function to process the messages"]

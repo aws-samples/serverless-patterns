@@ -3,7 +3,7 @@
   "description": "Setup future EventBridge events with EventBridge Scheduler",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

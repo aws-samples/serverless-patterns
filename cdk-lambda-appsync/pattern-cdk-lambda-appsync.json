@@ -4,7 +4,7 @@
   "language": "Node.js",
   "architectureURL": "pattern-cdk-lambda-appsync.png",
   "level": "100",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "services": {
     "from": "lambda",
     "to": "appsync"

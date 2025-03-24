@@ -3,7 +3,7 @@
 	"description": "Creates one Lambda function that sends a message to an SNS topic. That topic sends the message to a SQS queue and finally another Lambda picks the message.",
 	"language": "Typescript",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

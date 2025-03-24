@@ -3,7 +3,7 @@
     "description": "Creates a Step Function Wofklow that is triggered by a producer that is generating messages in SNS.  The messages are filtered via EventBridge Pipes and the Step Function is Triggered by a Custom EventBus and Rule",
     "language": "TypeScript",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

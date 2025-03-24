@@ -3,7 +3,7 @@
   "description": "Create a WebSocket API integration with CloudFront and WAF using API Keys",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

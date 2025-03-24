@@ -5,7 +5,7 @@
 	"architectureURL": "patterns-appsync-direct-lambda-resolver.png",
 	"videoId": "",
 	"level": "100",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"services": {
 		"from": "appsync",
 		"to": "lambda"

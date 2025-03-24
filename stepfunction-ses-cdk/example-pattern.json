@@ -3,7 +3,7 @@
     "description": "Step Functions - SES SDK integration to send email.",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

@@ -3,7 +3,7 @@
     "description": "Create a serverless AI-powered ChatBot using Amazon Bedrock agent, Amazon OpenSearch Serverless, AWS Lambda, and Amazon ECS with Application Load Balancer",
     "language": ".NET",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

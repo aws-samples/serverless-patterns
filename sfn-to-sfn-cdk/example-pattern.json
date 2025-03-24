@@ -3,7 +3,7 @@
     "description": "Start a Step Function execution as a step in another Step Function.",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

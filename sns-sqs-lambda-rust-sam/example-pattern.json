@@ -3,7 +3,7 @@
   "description": "The SAM template deploys a SNS topic and an SQS queue a. The SQS queue is subscribed to the SNS topic. SNS invokes the SQS queue when new messages are available. When messages are sent to the SNS topic, they are delivered as a JSON event payload to the SQS queue. SQS invokes the Lambda function when new messages are available.",
   "language": "Rust",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

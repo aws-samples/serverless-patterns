@@ -3,7 +3,7 @@
   "description": "This project shows how to use AWS B2B Data Interchange to transform EDI files into JSON format. It also demonstrates tracking transformation completion via Amazon EventBridge rules that integrate with Amazon SQS queues.",
   "language": "YAML",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
     "description": "S3 sends PUT event to SQS, message is handled by Lambda with Bedrock extracts summary & sentiment then stores in S3. Ideal for conversation summaries.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

@@ -3,7 +3,7 @@
     "description": "Create a REST API Gateway that can perform PutRecords and GetRecords API Call to Kinesis Data stream",
     "language": "Python",
     "level": "300",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

@@ -2,7 +2,7 @@
 	"title": "API Gateway to Lambda to AWS IoT",
 	"description": "Create an API Gateway REST API to invoke a Lambda function that will publish to AWS IoT Core.",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

@@ -3,7 +3,7 @@
   "description": "This pattern demonstrates a seamless integration between an SQS queue and AWS Step Functions using Amazon EventBridge Pipes. It enables direct routing of messages from an SQS queue into a Step Functions state machine, which orchestrates the processing flow and manages AWS Lambda invocation errors. When Lambda encounters an error, the erroneous message is directed to an SQS Dead Letter Queue (DLQ) for further inspection or reprocessing.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

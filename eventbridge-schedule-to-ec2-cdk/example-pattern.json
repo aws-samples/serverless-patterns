@@ -3,7 +3,7 @@
   "description": "Simple pattern that starts and stops given EC2 instances based on time of day, timezone and days of week",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": ["Creates a scheulde that turns on instances at 7:00am and turns them off at 18:00pm Monday to Friday using Europe/London timezone."]

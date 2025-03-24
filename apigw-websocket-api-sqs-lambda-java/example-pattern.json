@@ -3,7 +3,7 @@
   "description": "Create an API Gateway websocket API that sends events to SQS and then to Lambda",
   "language": "Java",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "Create an API Gateway websocket API that sends events to SQS and then to Lambda",
     "text": [

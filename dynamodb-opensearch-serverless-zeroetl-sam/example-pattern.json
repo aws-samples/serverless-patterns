@@ -3,7 +3,7 @@
   "description": "Create a zero-ETL integration from Amazon DynamoDB to Amazon OpenSearch Serverless.",
   "language": "YAML",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -2,7 +2,7 @@
 	"title": "IoT Core to Timestream",
 	"description": "Create an IoT rule action to ingest data over AWS IoT core and publish to Amazon Timestream database table.",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

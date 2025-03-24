@@ -3,7 +3,7 @@
   "description": "This project deploys Amazon API Gateway with AWS Lambda integration to showcase how to upload a file to Amazon S3 bucket using a presigned S3 URL.",
   "language": "Java",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

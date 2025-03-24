@@ -3,7 +3,7 @@
   "description": "This pattern demonstrates the content filter pattern between two Kinesis streams, implemented using an EventBridge Pipe.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

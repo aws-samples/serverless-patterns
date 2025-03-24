@@ -3,7 +3,7 @@
 	"description": "Creates a Lambda function that sends a message to a SNS and then another function gets triggered when there is a new notification in the topic.",
 	"language": "TypeScript",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

@@ -3,7 +3,7 @@
     "description": "How to use AWS HealthScribe API to automatically generate clinical notes from patient-clinician conversations in a serverless architecture.",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

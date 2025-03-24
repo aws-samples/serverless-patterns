@@ -3,7 +3,7 @@
   "description": "Set up AppConfig Feature Flag with CDK and read the status from Appconfig Extension for Lambda",
   "language": "typescript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
   "description": "Create a Lambda Function with a Function URL",
   "language": "Typescript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

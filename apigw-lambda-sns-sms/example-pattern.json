@@ -3,7 +3,7 @@
   "description": "Validate phone number and send SMS from SNS via API Gateway and Lambda",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
   "description": "Invoke a step functions workflow through a lambda resolver from Appsync",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

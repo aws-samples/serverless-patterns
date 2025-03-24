@@ -3,7 +3,7 @@
     "description": "Create an EventBridge rule and API destination to route events to PagerDuty",
     "language": "YAML",
     "level": "100",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

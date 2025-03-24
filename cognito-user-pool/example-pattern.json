@@ -3,7 +3,7 @@
     "description": "Create a Cognito User Pool with its associated User, App Client, Domain and Resource Server",
     "language": "",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

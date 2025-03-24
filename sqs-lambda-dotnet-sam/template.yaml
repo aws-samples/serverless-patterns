@@ -23,7 +23,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Handler: SqsLambdaProcessor::SqsLambdaProcessor.Function::FunctionHandler
+      Handler: SqsIntegration::SqsIntegration.Function::FunctionHandler
       Runtime: dotnet8
       Timeout: 30
       MemorySize: 256

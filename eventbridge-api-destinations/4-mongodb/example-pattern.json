@@ -2,7 +2,7 @@
     "title": "EventBridge API Destinations configuration for MongoDB",
     "description": "Create an EventBridge rule and API destination to route events to MongoDB",
     "language": "YAML",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

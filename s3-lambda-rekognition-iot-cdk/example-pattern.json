@@ -3,7 +3,7 @@
     "description": "Send a IoT Core message when a worker is not in PPE (Personal Protective Equipment) compliance.",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

@@ -3,7 +3,7 @@
   "description": "Create a Managed Service for Apache Flink application with an Amazon Kinesis Data Stream source and Amazon Kinesis Firehose sink.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

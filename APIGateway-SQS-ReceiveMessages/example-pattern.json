@@ -1,0 +1,72 @@
+{
+  "title": "Amazon API Gateway to Amazon SQS",
+  "description": "Create a REST API Gateway to receive messages from SQS queue.",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API gateway REST API endpoint. The endpoint uses service integrations to directly connect to Amazon SQS that reads messages from the SQS.",
+      "Users can simply call the GET Method of invoke URL( API Gateway) that is returned as part of the Stack Output.",
+      "Invoke URL can also be used with query string parameters like MaxNumberOfMessages=5 VisibilityTimeout=15 AttributeName=All to get the desired output.",
+      "Useful with Frontend application that would like to interact with sqs via https protocol  to read messages from the SQS queue Avoid any useage of AWS SDK since request to SQS can be made via simple http request.",
+      "Please also consider looking at AWS API Gateway and AWS SQS quotas for different limits supported by the services when working with this pattern."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/APIGateway-SQS-ReceiveMessages",
+      "templateURL": "serverless-patterns/APIGateway-SQS-ReceiveMessages",
+      "projectFolder": "APIGateway-SQS-ReceiveMessages",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working on integration of AWS Services with API Gateway",
+        "link": "https://repost.aws/knowledge-center/api-gateway-proxy-integrate-service"
+      },
+      {
+        "text": "API Gateway Documentation",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
+      },
+      {
+        "text":"AWS SQS Documentation",
+	"link":"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+      },
+      {
+        "text":"AWS API Gateway Quotas",
+	"link":"https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html"
+      },
+      {
+        "text":"AWS SQS Quotas",
+	"link":"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-quotas.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Yogesh Nain",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Yogesh is Cloud Support Engineer and SME of Lambda, API Gateway at Amazon Web Services.",
+      "linkedin": "https://www.linkedin.com/in/yogesh-nain-a54133170/"
+    }
+  ]
+}

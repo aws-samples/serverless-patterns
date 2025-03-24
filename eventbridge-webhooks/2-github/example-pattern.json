@@ -3,7 +3,7 @@
   "description": "Amazon EventBridge Inbound webhook for GitHub.",
   "language": "python3.7",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

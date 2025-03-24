@@ -3,7 +3,7 @@
   "description": "This SAM template creates an Amazon EventBus, EventRule with target as AWS Batch and IAM Role with required permission to invoke AWS Batch from Amazon EventBridge.",
   "language": "YAML",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

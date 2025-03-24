@@ -3,7 +3,7 @@
     "description": "Interact with Bedrock models from a lambda function fronted with an API Gateway",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

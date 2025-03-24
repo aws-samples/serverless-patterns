@@ -3,7 +3,7 @@
   "description": "This pattern uses SQS and triggers EventBridge events directly with optional filtering supported.",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": ["SQS queue is polled and messages are sent to EventBridge. Custom events in EventBridge are raised."]

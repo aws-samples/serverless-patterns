@@ -3,7 +3,7 @@
   "description": "Create a LLM Streaming Response API with Lambda Function URL Streaming write",
   "language": "nodejs",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

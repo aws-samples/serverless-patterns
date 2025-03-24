@@ -3,7 +3,7 @@
     "description": "Handling failure when consuming a Kinesis Data Stream can keep your iterator healthy and allow your consumer to retry attempts that are likely to recover or abandon messages that are inherentl bad",
     "language": "Go",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

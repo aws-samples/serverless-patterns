@@ -3,7 +3,7 @@
   "description": "Create a Lambda function to process queries using Amazon Bedrock and store results in Amazon DynamoDB.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

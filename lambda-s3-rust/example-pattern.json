@@ -3,7 +3,7 @@
   "description": "This SAM template creates a Lambda function that writes to an S3 bucket when invoked.",
   "language": "Rust",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

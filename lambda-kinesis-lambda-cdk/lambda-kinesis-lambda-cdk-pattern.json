@@ -3,7 +3,7 @@
     "description": "Create a Lambda function to push record to a Kinesis Data Stream and create another function to process those events from the stream.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

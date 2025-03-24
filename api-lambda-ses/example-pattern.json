@@ -3,7 +3,7 @@
   "description": "This sample project demonstrates publishing an email through SES by invoking a Lambda function through a REST API.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "Create an Amazon API Gateway REST API that invokes a Lambda function to send email through SES.",
     "text": ["This pattern deploys a Amazon API Gateway REST API with Lambda Function integration and SES"]

@@ -1,16 +1,15 @@
-# Processing Amazon SQS records with AWS Lambda (Java)
+# Process Amazon SQS records with AWS Lambda (Java)
 
-This patterns shows how to process Amazon SQS messages using AWS Lambda. The AWS SAM template deploys an AWS Lambda function, an Amazon SQS queue, a dead-letter SQS queue, and the IAM permissions required to run the application. Lambda polls the SQS queue and invokes the Lambda function when new messages are available.
+This pattern shows how to process Amazon SQS messages using AWS Lambda. The AWS SAM template deploys an AWS Lambda function, an Amazon SQS queue, a dead-letter SQS queue, and the IAM permissions required to run the application. Lambda polls the SQS queue and invokes the Lambda function when new messages are available.
 
-- To demonstrate error handling, each message has a 20% chance of random failure (remove this functionality for your own application).
 - Failed messages are automatically returned to the queue for retry using `batchItemFailures`.
 - After 3 failed processing attempts, messages are moved to the DLQ.
 - You should implement additional functionality to process messages that are sent to the DLQ.
 - Processing results are logged to Amazon CloudWatch Logs
 
-Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sql-lambda](https://serverlessland.com/patterns/sqs-lambda-nodejs-sam)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/sqs-lambda-java-sam](https://serverlessland.com/patterns/sqs-lambda-java-sam)
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+:heavy_exclamation_mark: Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
@@ -21,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Download Instructions
 
-1. If you download this pattern as part of the AWS Toolkit for your IDE, the toolkit downloads the files into the directory you specify.
+If you download this pattern as part of the AWS Toolkit for your IDE, the toolkit downloads the files into the directory you specify.
 
 To download the patterns yourself: 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -30,17 +29,30 @@ To download the patterns yourself:
     ```
 1. Change directory to the pattern directory:
     ```
-    cd sqs-lambda-nodejs-sam
+    cd sqs-lambda-java-sam
+    ```
+
+## Build Instructions
+
+*For additional information on features to help you author, build, debug, test, and deploy Lambda applications more efficiently when using Visual Studio Code, see [Introducing an enhanced local IDE experience for AWS Lambda developers](https://aws.amazon.com/blogs/compute/introducing-an-enhanced-local-ide-experience-for-aws-lambda-developers?trk=2dd77e51-cb93-4970-a61a-5993781e5576&sc_channel=el).*
+
+1. From the command line, use AWS SAM to build the AWS resources for the pattern as specified in the template.yml file:
+    ```
+    sam build
+    ```
+* You can also use `--use-container` to build your function inside a Lambda-like Docker container:
+    ```
+    sam build --guided --use-container
     ```
 
 ## Deployment Instructions
 
-*For additional information on features to help you author, build, debug, test, and deploy Lambda applications more efficiently when using Visual Studio Code, see [Introducing an enhanced local IDE experience for AWS Lambda developers](https://aws.amazon.com/blogs/compute/introducing-an-enhanced-local-ide-experience-for-aws-lambda-developers/).*
-
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```
     sam deploy --guided
     ```
+1. During the prompts:
+
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
@@ -56,32 +68,32 @@ To download the patterns yourself:
 {
     "Records": [
         {
-            "messageId": "fa2012345678e816-0a49-4681-ba8f-1234567890",
-            "receiptHandle": "1234567890NmjC1234567890qODTr1234567890/XPPk/f0qU4tJtQ1234567890ihWDp8YHKhDr3V1234567890e9amjZhgg1234567890RodR1234567890lwDGpf6oLa8/B/1234567890/Pq+xP/1234567890/1234567890fIV6nFUGs71234567890zsj616CBx912M12345678908rxtUEj1234567890J8d1234567890yDcI9E12345678905mTyYZ41S2cP01NCA1234567890jcalHD1234567890Kio+HFQp1234567890OI7bTs5I7pZJ4pu+BnM8Bcki1234567890aNML5B7S12345678904eYKKcrunp1234567890Qhz7BUWPG41",
-            "body": "Test message",
+            "messageId": "059f36b4-87a3-44ab-83d2-661975830a7d",
+            "receiptHandle": "AQEBwJnKyrHigUMZj6rYigCgxlaS3SLy0a...",
+            "body": "test",
             "attributes": {
                 "ApproximateReceiveCount": "1",
-                "SentTimestamp": "1612966720445",
+                "SentTimestamp": "1545082649183",
                 "SenderId": "AIDAIENQZJOLO23YVJ4VO",
-                "ApproximateFirstReceiveTimestamp": "1612966720455"
+                "ApproximateFirstReceiveTimestamp": "1545082649185"
             },
             "messageAttributes": {},
-            "md5OfBody": "82dfa5549ebc91234567890ece5f",
+            "md5OfBody": "098f6bcd4621d373cade4e832627b4f6",
             "eventSource": "aws:sqs",
-            "eventSourceARN": "arn:aws:sqs:us-east-1:123456789012:patterns-sqs-to-lambda-MySqsQueue-1234567890",
+            "eventSourceARN": "arn:aws:sqs:us-east-1:111122223333:my-queue",
             "awsRegion": "us-east-1"
         }
     ]
 }
 
 ```
-There is also a sample file `\events\sqs-test-event.json` which contains a sample event payload with 10 items.
+There is also a sample file `\events\test-event.json` which contains a sample event payload with 10 items.
 
 ### Testing
 
 Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queue and observe the event delivered to the Lambda function:
 
-1. Send 10 messages to the SQS message:
+1. Send 10 messages to the SQS queue:
 
 #### Bash
 ```bash

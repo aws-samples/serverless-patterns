@@ -3,7 +3,7 @@
     "description": "Deployment of an AWS Lambda function in private and isolated subnets, along with allowing communication with selected AWS service API endpoints using AWS PrivateLink VPC interface endpoints.",
     "language": "TypeScript",
     "level": "400",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

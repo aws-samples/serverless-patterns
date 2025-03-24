@@ -3,7 +3,7 @@
     "description": "Create a CloudFront Distribution to upload files to an S3 bucket. Uses Lambda@Edge for authentication.",
     "language": "Typescript",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

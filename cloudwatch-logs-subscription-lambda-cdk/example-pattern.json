@@ -3,7 +3,7 @@
   "description": "Create a Cloudwatch Logs subscription to Lambda function",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
