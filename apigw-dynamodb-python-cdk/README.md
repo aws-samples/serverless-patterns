@@ -1,5 +1,5 @@
 
-# API Gateway direct integration to DynamoDB
+# Amazon API Gateway direct integration to Amazon DynamoDB
 
 This pattern shows how to create an API Gateway with direct integration to DynamoDB. 
 The pattern showcase transformation of request/response using VTL and CDK and implement examples for using Cognito, Lambda authorizer and API keys. 

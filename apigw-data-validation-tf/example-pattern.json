@@ -1,6 +1,6 @@
 {
-  "title": "API Gateway data validation",
-  "description": "Creates an API Gateway with request validation, rejecting invalid requests before Lambda invocation using model schema validation.",
+  "title": "Amazon API Gateway data validation",
+  "description": "Creates an Amazon API Gateway with request validation, rejecting invalid requests before AWS Lambda invocation using model schema validation.",
   "language": "YAML",
   "level": "300",
   "framework": "Terraform",
@@ -21,7 +21,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "API Gateway model example",
+        "text": "Amazon API Gateway model example",
         "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-models"
       },
       {
