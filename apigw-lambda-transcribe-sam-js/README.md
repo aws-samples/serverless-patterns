@@ -1,6 +1,6 @@
-# Amazon AS3 to AWS Lambda to Amazon Transcribe using AWS SAM
+# Amazon S3 to AWS Lambda to Amazon Transcribe using AWS SAM
 
-This pattern facilitates automatic audio transcription by using the Amazon Transcribe service through a serverless event-driven architecture. When audio files are uploaded to S3, they are automatically transcribed using Amazon Transcribe via a Lambda function triggered by S3 events.
+This pattern facilitates automatic audio transcription by using the Amazon Transcribe service through a serverless event-driven architecture. When audio files are uploaded to S3, they are automatically transcribed using Amazon Transcribe via a Lambda function invoked by S3 events.
 
 This pattern enables speech-to-text transcription use cases by providing a serverless event-based pipeline that can process audio files uploaded to S3. The pattern uses AWS Lambda to coordinate with the Amazon Transcribe service, making it easy to integrate transcription capabilities into your applications without the need to manage infrastructure or manually initiate transcription jobs.
 
@@ -32,15 +32,14 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    After running `sam deploy --guided` mode once and savings arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 2. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
-The pattern creates an API Gateway endpoint that accepts POST requests with JSON payloads containing an S3 URL of an audio file. When a request is received:
+When an object is uploaded to S3:
 
-1. API Gateway forwards the request to AWS Lambda
 2. Lambda function starts a transcription job using Amazon Transcribe
 3. Amazon Transcribe processes the audio file and generates the transcription
 4. The transcription results are stored in the specified S3 bucket
