@@ -61,7 +61,7 @@ Each API key in Secrets Manager should follow the naming convention `api-key-{ke
     ```
 1. Make a request to the protected endpoint with a valid API key:
     ```
-    curl -H "x-api-key: CREATED_API_KEY" https://REPLACE_WITH_URL_FROM_CDK_OUTPUT.amazonaws.com/prod/protected
+    curl -H "x-api-key: CREATED_API_KEY" https://REPLACE_WITH_URL_FROM_CDK_OUTPUT/protected
     ```
     If successful, you should receive a response like:
     ```
