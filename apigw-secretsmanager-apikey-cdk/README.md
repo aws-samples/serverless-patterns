@@ -1,6 +1,6 @@
 # Amazon API Gateway with AWS Lambda Authorizer and AWS Secrets Manager for API Key Authentication
 
-This pattern demonstrates how to implement a secure API key-based authorization system using Amazon API Gateway, Lambda Authorizer, and AWS Secrets Manager. Each user/tenant has their own unique API key stored in Secrets Manager, which is validated by a Lambda authorizer when requests are made to protected API endpoints.
+This pattern demonstrates how to implement a secure API key-based authorization system using Amazon API Gateway, AWS Lambda Authorizer, and AWS Secrets Manager. Each user/tenant has their own unique API key stored in Secrets Manager, which is validated by a Lambda authorizer when requests are made to protected API endpoints.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-secretsmanager-apikey-cdk](https://serverlessland.com/patterns/apigw-secretsmanager-apikey-cdk)
 
