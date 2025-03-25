@@ -18,7 +18,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rest-api-alb-integration-workaround",
       "templateURL": "serverless-patterns/rest-api-alb-integration-workaround",
       "projectFolder": "rest-api-alb-integration-workaround",
-      "templateFile": "rest-api-alb-integration-workaround/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -41,14 +41,13 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+       "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
     {
       "name": "Vamsi Pulikonda",
       "image": "https://raw.githubusercontent.com/vamsipulikonda/my-photo/main/vamsi-photo.jpg",
-      "bio": "I am a cloud computing enthusiast working as a Cloud Engineer at Amazon Web Services.",
       "linkedin": "https://www.linkedin.com/in/vamsipulikonda/"
     }
   ]
