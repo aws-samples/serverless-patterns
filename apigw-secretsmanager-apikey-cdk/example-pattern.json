@@ -1,10 +1,10 @@
 {
-  "title": "API Gateway with Lambda Authorizer and Secrets Manager for API Key Authentication",
+  "title": "API Gateway, Lambda Authorizer & Secrets Manager for API Key Authentication",
   "description": "Implement a secure API key-based authorization system using Amazon API Gateway, Lambda Authorizer, and AWS Secrets Manager.",
 
   "language": "TypeScript",
   "level": "200",
-  "framework": "AWS CDK",
+  "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -43,15 +43,15 @@
   },
   "testing": {
     "text": [
-      "Create an API key using the provided script: './create_api_key.sh sample-tenant'",
-      "Make a request to the protected endpoint using the valid API key: 'curl -H \"x-api-key: CREATED_API_KEY\" https://REPLACE_WITH_CREATED_API_URL.amazonaws.com/prod/protected'",
-      "If successful, you should receive a response: { \"message\": \"Access granted\" }"
+      "Create an API key using the provided script: <code>./create_api_key.sh sample-tenant</code>",
+      "Make a request to the protected endpoint using the valid API key: <code>curl -H \"x-api-key: CREATED_API_KEY\" https://REPLACE_WITH_CREATED_API_URL.amazonaws.com/prod/protected</code>",
+      "If successful, you should receive a response: <code>{ \"message\": \"Access granted\" }</code>"
     ]
   },
   "cleanup": {
     "text": [
-      "Delete the CDK stack: 'cdk destroy'",
-      "Delete created SecretManager keys using the provided script: './remove_secrets.sh'"
+      "Delete the CDK stack: <code>cdk destroy</code>",
+      "Delete created SecretManager keys using the provided script: <code>./remove_secrets.sh</code>"
     ]
   },
   "authors": [
