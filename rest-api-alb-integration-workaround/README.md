@@ -66,7 +66,7 @@ Once the application is deployed, retrieve the API URL provided as output and op
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete --stack-name STACK_NAME
     ```
 1. Confirm the stack has been deleted
     ```bash
