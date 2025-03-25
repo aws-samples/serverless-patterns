@@ -69,7 +69,7 @@ Each API key in Secrets Manager should follow the naming convention `api-key-{ke
     ```
 1. Try with an invalid API key:
     ```
-    curl -H "x-api-key: invalid-key" https://REPLACE_WITH_URL_FROM_CDK_OUTPUT.amazonaws.com/prod/protected
+    curl -H "x-api-key: invalid-key" https://REPLACE_WITH_URL_FROM_CDK_OUTPUT/protected
     ```
     You should receive an unauthorized error.
 1. Try without an API key:
