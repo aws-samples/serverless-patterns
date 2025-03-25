@@ -94,6 +94,6 @@ Each API key in Secrets Manager should follow the naming convention `api-key-{ke
     ```
 
 ----
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
