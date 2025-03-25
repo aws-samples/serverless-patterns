@@ -28,7 +28,7 @@
   },
   "deploy": {
     "text": [
-      "sam deploy --guided"
+      "cdk deploy"
     ]
   },
   "testing": {
@@ -38,7 +38,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "Delete the stack: <code>cdk destroy</code>."
     ]
   },
   "authors": [
