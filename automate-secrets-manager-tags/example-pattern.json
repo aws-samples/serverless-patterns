@@ -3,7 +3,7 @@
   "description": "Automate tagging of AWS Secrets Manager secrets with the creator's username",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
