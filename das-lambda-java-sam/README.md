@@ -214,7 +214,7 @@ EC2_SECURITY_GROUP_ID=$(aws cloudformation describe-stacks --stack-name <stackna
 Now execute the below command to add ssh from your local machine to the EC2 instance. Replace the value of \<username\>
 
 ```
-aws ec2 authorize-security-group-ingress --profile <username> --region $AWS_REGION --group-id $EC2_SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $EC2_CONNECT_IP/32
+aws ec2 authorize-security-group-ingress --profile <username> --region $AWS_REGION --group-id $EC2_SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $MY_LOCAL_IP/32
 
 ```
 
@@ -230,7 +230,7 @@ echo $EC2_PUBLIC_DNS
 To ssh you will need the DASKeyPair.pem file that you had created in an earlier step
 
 ```
-ssh -i "DASKeyPair.pem" $EC2_PUBLIC_DNS
+ssh -i "DASKeyPair.pem" ec2-user@$EC2_PUBLIC_DNS
 
 ```
 
@@ -285,7 +285,7 @@ java-database-activity-streams-consumer-function
 In case you do not have AWS console access for IAM users, you can list all the Lambda functions in the AWS account and AWS region by running the below command
 
 ```
-aws lambda list-functions --profile <username> --region <$AWS_REGION> --no-cli-pager | jq -r '.Functions[].FunctionName'
+aws lambda list-functions --profile <username> --region $AWS_REGION --no-cli-pager | jq -r '.Functions[].FunctionName'
 
 ```
 
@@ -294,7 +294,7 @@ You should see java-database-activity-streams-consumer-function listed as one of
 You can get more details about this function by using the following command:
 
 ```
-aws lambda list-functions --profile jonathan --region us-west-2 --no-cli-pager | jq -r '.Functions[] | select (.FunctionName=="java-database-activity-streams-consumer-function")'
+aws lambda list-functions --profile <username> --region $AWS_REGION --no-cli-pager | jq -r '.Functions[] | select (.FunctionName=="java-database-activity-streams-consumer-function")'
 
 ```
 
@@ -325,9 +325,15 @@ If you don't have access to the AWS console for IAM users, you can find out the 
 
 AOS_DASHBOARD_IP=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='AOSDashboardsPublicIP'].OutputValue" --output text)
 
+echo $AOS_DASHBOARD_IP
+
 AOS_DASHBOARD_USERNAME=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='AOSDomainUserName'].OutputValue" --output text)
 
+echo $AOS_DASHBOARD_USERNAME
+
 AOS_DASHBOARD_PASSWORD=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='AOSDomainPassword'].OutputValue" --output text)
+
+echo $AOS_DASHBOARD_PASSWORD
 
 ```
 
