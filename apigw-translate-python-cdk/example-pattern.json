@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-translate-python-cdk",
       "templateURL": "serverless-patterns/apigw-translate-python-cdk",
       "projectFolder": "apigw-translate-python-cdk",
-      "templateFile": "apigw-translate-python-cdk/template.yaml"
+      "templateFile": "apigw-translate-python-cdk/translate_api/translate_api_stack.py"
     }
   },
   "resources": {
