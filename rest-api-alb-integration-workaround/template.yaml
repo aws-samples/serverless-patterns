@@ -1,0 +1,254 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Amazon API Gateway REST API with VPC Link integration with NLB -> ALB Integration
+Parameters:
+  VPCCIDR:
+    Description: Enter CIDR for new VPC
+    Type: String
+    Default: '10.0.0.0/16'
+  Subnet1CIRD:
+    Description: Enter CIDR for new Private subnet 1
+    Type: String
+    Default: '10.0.0.0/24'
+  Subnet2CIRD:
+    Description: Enter CIDR for new Private subnet 2
+    Type: String
+    Default: '10.0.1.0/24'
+  AlbCertificateArn:
+    Description: ARN of the ACM certificate for ABL HTTPS listener
+    Type: String
+  AlbInternalCertificateDns:
+    Description: DNS name for the certificate
+    Type: String
+
+Resources:
+  EC2VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !Ref VPCCIDR
+      InstanceTenancy: "default"
+      
+  PrivateSubnet1:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: !Sub "${AWS::Region}a"
+      CidrBlock: !Ref Subnet1CIRD
+      VpcId: !Ref EC2VPC
+      MapPublicIpOnLaunch: false
+      Tags: 
+        - 
+          Key: "Name"
+          Value: "Private-new-availability-1"
+
+  PrivateSubnet2:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: !Sub "${AWS::Region}b"
+      CidrBlock: !Ref Subnet2CIRD
+      VpcId: !Ref EC2VPC
+      MapPublicIpOnLaunch: false
+      Tags: 
+        - 
+          Key: "Name"
+          Value: "Private-new-availability-2"
+  
+  EC2SecurityGroup:
+        Type: "AWS::EC2::SecurityGroup"
+        Properties:
+            GroupDescription: "Allow VPC CIDR"
+            GroupName: "PrivateLoadBalancerSG"
+            VpcId: !Ref EC2VPC
+            SecurityGroupIngress: 
+              - 
+                CidrIp: !Ref VPCCIDR
+                FromPort: 443
+                IpProtocol: "tcp"
+                ToPort: 443
+              - 
+                CidrIp: !Ref VPCCIDR
+                FromPort: 80
+                IpProtocol: "tcp"
+                ToPort: 80
+            SecurityGroupEgress: 
+              - 
+                CidrIp: !Ref VPCCIDR
+                FromPort: 443
+                IpProtocol: "tcp"
+                ToPort: 443
+              - 
+                CidrIp: !Ref VPCCIDR
+                FromPort: 80
+                IpProtocol: "tcp"
+                ToPort: 80
+
+  IAMRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/"
+            RoleName: "LambdaRole"
+            AssumeRolePolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+            Description: "Allows Lambda functions to call AWS services on your behalf."
+            
+  LambdaFunction:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Description: "AWS Lambda target for ALB"
+            FunctionName: "ALBTargetLambda"
+            Handler: "index.lambda_handler"
+            Architectures: 
+              - "x86_64"
+            Code:
+              ZipFile: |
+                import json
+                
+                def lambda_handler(event, context):
+                    return {
+                        'statusCode': 200,
+                        'body': json.dumps('Hello from Lambda behind NLB -> ALB Integration!')
+                    }
+            MemorySize: 128
+            Role: !GetAtt IAMRole.Arn
+            Runtime: "python3.11"
+            Timeout: 15
+            TracingConfig: 
+                Mode: "PassThrough"
+            EphemeralStorage: 
+                Size: 512
+  
+  LambdaALBPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com                
+                    
+  PrivateALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: internal
+      Name: PrivateALB
+      Subnets:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      SecurityGroups: [!Ref EC2SecurityGroup]
+      
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: LambdaALBPermission
+    Properties:
+      TargetType: lambda
+      Targets:
+        - Id: !GetAtt LambdaFunction.Arn
+        
+  ALBHttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref PrivateALB
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref AlbCertificateArn
+      DefaultActions:
+        - TargetGroupArn: !Ref ALBTargetGroup
+          Type: forward
+          
+  PrivateNLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: network
+      Scheme: internal
+      Name: PrivateNLB
+      Subnets:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      
+  NLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      TargetType: alb
+      Protocol: TCP
+      Port: 443
+      VpcId: !Ref EC2VPC
+      Targets:
+        - Id: !GetAtt PrivateALB.LoadBalancerArn
+
+  NLBHttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref PrivateNLB
+      Port: 443
+      Protocol: TCP
+      DefaultActions:
+        - TargetGroupArn: !Ref NLBTargetGroup
+          Type: forward
+
+# REST API Part
+  PrivateIntApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: apigw-with-alb
+      Description: VPC Link integration REST API with NLB ALB as backend
+
+  RootMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PrivateIntApi
+      ResourceId: !GetAtt PrivateIntApi.RootResourceId
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: HTTP
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref VPCLinkRest
+        IntegrationHttpMethod: ANY
+        Uri: !Sub "https://${AlbInternalCertificateDns}"
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+          ResponseModels:
+            application/json: 'Empty'
+      OperationName: 'RootOperation'
+
+
+
+  Deployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+    - RootMethodGet
+    Properties:
+      RestApiId: !Ref PrivateIntApi
+  
+  Stage:  
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: Prod
+      RestApiId: !Ref PrivateIntApi
+      DeploymentId: !Ref Deployment
+
+  VPCLinkRest:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: VPCLinkRest
+      TargetArns:
+        - !Ref PrivateNLB
+
+Outputs:
+  PrivateIntApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub "https://${PrivateIntApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
