@@ -31,7 +31,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Open AWS CloudShell and checkout files from Github] - Once you are inside AWS Cloudshell in the AWS console, type the following commands. In case you are using a fork of the aws-samples github repository, then please replace the github URL with your own fork.
 
 ```
-git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git
+git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git 
 cd serverless-patterns
 git sparse-checkout set --no-cone /das-lambda-java-sam
 git checkout
@@ -57,14 +57,14 @@ If you get the above error, it is harmless. Please ignore it and move ahead.
 
 ### Option 1 - If IAM users are allowed AWS console access
 
-* [Execute the BootStrapFromCloudShell.sh script to create an IAM user and store keys in Secrets Manager] - Once the BootStrapFromCloudShell.sh script has been checked out from Github, execute the following commands in your CloudShell. Substitute the \<username\> and \<password\> with values for the IAM user you want to create. The password needs to be at least 8 characters long. 
+* [Execute the BootStrapFromCloudShell.sh script to create an IAM user and store keys in Secrets Manager] - Once the BootStrapFromCloudShell.sh script has been checked out from Github, execute the following commands in your CloudShell. Substitute the \<username\> with value for the IAM user you want to create. You will be prompted for a password, which needs to be at least 8 characters long, it needs to include minimum of three of the following mix of character types: uppercase, lowercase, numbers, and non-alphanumeric character and it should not be identical to your AWS account name or email address. 
 
 ```
-sh ./BootStrapFromCloudShell.sh <username> <password>
+sh ./BootStrapFromCloudShell.sh <username>
 
 ```
 
-Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new \<username\> and \<password\>. You will be asked to change the password upon first login. Once you are logged in as the IAM user, move to the next step - "Run the CloudFormation template to create the AWS resources"
+Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new \<username\> and password you just created. You will be asked to change the password upon first login. Once you are logged in as the IAM user, move to the next step - "Run the CloudFormation template to create the AWS resources"
     
 
 ### Option 2 - If IAM users are not allowed AWS console access
@@ -80,50 +80,48 @@ cd das-lambda-java-sam
 
 ```
 
-**Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh \<username\> as shown below**
-
-**Make sure to run the BootStrapFromCloudShellNoConsoleAccess.sh \<username\> command from the CloudShell and not from your local machine**
-
+* [Set environment variables on your local machine] - To facilitate commands below, we'll create a couple of environment variables.
+Substitute the values between the brackets "" below as you like.
 ```
-sh ./BootStrapFromCloudShellNoConsoleAccess.sh <username>
-
-```
-
-Once the above command is done running, it is recommended to create an AWS CLI profile on your local machine from where you can deploy the CloudFormation template. In order to do that, you need to run the following commands:
-
-**On the AWS CloudShell**, run the following and note down the values of the outputs of each of the commands below
-
-```
-sh ./GetAWSCLIProfileDetailsFromCloudshell.sh <username>
-
+export AWS_USER="das-user"
+export AWS_REGION="us-east-1"
+export STACK_NAME="das-lambda-serverless-patterns"
 ```
 
-The above command will generate three outputs, the access key, the secret access key and the default AWS region. Note down the above values
+**Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh script as shown below**
+
+**Make sure to run the BootStrapFromCloudShellNoConsoleAccess.sh command from the CloudShell and not from your local machine**
+
+```
+sh ./BootStrapFromCloudShellNoConsoleAccess.sh $AWS_USER
+
+```
+
+The above script will generate three outputs, the access key, the secret access key and the default AWS region. Note down the above values
 
 **On your local machine**, run the following:
 
 ```
-sh ./CreateAWSCLIProfileOnLocalMachine.sh <username> <access key> <secret access key> <aws region>
+sh ./CreateAWSCLIProfileOnLocalMachine.sh $AWS_USER <access key> <secret access key> $AWS_REGION
 
 ```
 
-where the \<access key\> \<secret access key\> \<aws region\> need to be replaced with the values of the three outputs from CloudShell noted above.
-    
-The above command will create an AWS profile for \<username\> on your local machine.
+where the \<access key\> \<secret access key\> need to be replaced with the values of the three outputs from CloudShell noted above.
+
+The above command will create an AWS profile for $AWS_USER on your local machine.
 
 Once you have configured the AWS profile on your local machine, run the following command to verify the profile has been created correctly
 
 ```
-aws sts get-caller-identity --profile <username>
+aws sts get-caller-identity --no-cli-pager --profile $AWS_USER
 
 ```
-
 
 ## Run the CloudFormation template to create the AWS resources
 
 * [Deploy the CloudFormation stack using the AWS console or AWS CLI] - 
 
-The current folder should now contain the CloudFormation template file setup-das-cfn.yaml
+On your local machine, the current folder should now contain the CloudFormation template file setup-das-cfn.yaml
 
 
 ### If IAM users are allowed AWS console access
@@ -144,7 +142,7 @@ Accept defaults for all the input parameters or modify them as needed.
 **Execute the following commands from a terminal on your local machine or CloudShell (preferably from your local machine)**
 
 ```
-aws ec2 create-key-pair --key-name DASKeyPair --key-format pem --key-type rsa --profile <username> --query 'KeyMaterial' --output text > DASKeyPair.pem
+aws ec2 create-key-pair --key-name DASKeyPair --key-format pem --key-type rsa --profile $AWS_USER --query 'KeyMaterial' --output text > DASKeyPair.pem
 
 ```
 
@@ -157,26 +155,22 @@ chmod 400 DASKeyPair.pem
 
 **If you modify the name of the key-name from DASKeyPair, then make sure to replace it in the CloudFormation template as well.**
 
+Verify your identify by running
 ```
-AWS_REGION=$(aws configure get region --profile <username>)
-
-cd <folder where you had checked out the https://github.com/aws-samples/serverless-patterns.git>
-
-cd /serverless-patterns/das-lambda-java-sam
-
+aws sts get-caller-identity --profile $AWS_USER --no-cli-pager
 ```
 
 Now deploy the CloudFormation stack by running the RunCloudformationStack.sh file as follows
 
 ```
-sh ./RunCloudformationStack.sh <username> <stackname> <a short unique random string> 
+sh ./RunCloudformationStack.sh $AWS_USER $STACK_NAME
 
 ```
-In the above command, replace the value of \<username\> and provide a value for the name of the CloudFormation stack by replacing \<stackname\>. Also provide a random short string such as "uniqueib01 that you keep changing if you run the CloudFormation stack mutiple times"
+The script will add some random numbers at the end of the s3 bucket, to allow the CloudFormation stack to run multiple times.
 
 **If you need to replace the values of any input parameters to the CloudFormation stack, then add those in the --parameter-overrides section of the RunCloudformationStack.sh**
 
-Wait for the Cloudformation stack to be created. This can take a very long time. Even after the CloudFormation template shows a status of "Create Complete", wait at least another 15 minutes, as the UserData scripts inside the CloudFormation tempate continue running.
+Wait for the Cloudformation stack to be created. This can take a very long time. Even after the CloudFormation template shows a status of "Create Complete", wait at least another 15 minutes, as the UserData scripts inside the CloudFormation template continues running.
 
 This Cloudformation template will create multiple AWS resources such as an Amazon Aurora Postgres Database, an Amazon OpenSearch domain, an AWS Lambda function that will process the Database Activity Streams (DAS) events, an S3 bucket to which the Lambda function will write the DAS events records, an OpenSearch Ingestion Pipeline, an SQS queue for triggering the OpenSearch Ingestion Pipeline and other supporting resources. It will also create an EC2 machine that already has the Postgres client installed for you to run SQL commands on the Aurora Postgres database.
 
@@ -197,7 +191,7 @@ Now jump to the section "Pre-requisites to Deploy the sample Lambda function"
 You need to first get the public IP address of your local machine. For example, on Mac you can use a command such as:
 
 ```
-MY_LOCAL_IP=$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d \")
+MY_LOCAL_IP=$(curl http://checkip.amazonaws.com | tr -d \")
 echo $MY_LOCAL_IP
 
 ```
@@ -207,21 +201,21 @@ Note: The command will vary depending on your OS, so use the relevant command fo
 To get the security group of the EC2 instance, use the following command and replace the values of \<stackname\> and \<username\>
 
 ```
-EC2_SECURITY_GROUP_ID=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='ReverseProxySecurityGroupName'].OutputValue" --output text)
+EC2_SECURITY_GROUP_ID=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='ReverseProxySecurityGroupName'].OutputValue" --output text)
 
 ```
 
 Now execute the below command to add ssh from your local machine to the EC2 instance. Replace the value of \<username\>
 
 ```
-aws ec2 authorize-security-group-ingress --profile <username> --region $AWS_REGION --group-id $EC2_SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $MY_LOCAL_IP/32
+aws ec2 authorize-security-group-ingress --profile $AWS_USER --region $AWS_REGION --group-id $EC2_SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $MY_LOCAL_IP/32
 
 ```
 
 Next determine the public DNS name of the EC2 instance using the command below. Replace the value of \<username\>
 
 ```
-EC2_PUBLIC_DNS=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='ReverseProxyEC2PublicDNSName'].OutputValue" --output text)
+EC2_PUBLIC_DNS=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='ReverseProxyEC2PublicDNSName'].OutputValue" --output text)
 
 echo $EC2_PUBLIC_DNS
 
@@ -285,7 +279,7 @@ java-database-activity-streams-consumer-function
 In case you do not have AWS console access for IAM users, you can list all the Lambda functions in the AWS account and AWS region by running the below command
 
 ```
-aws lambda list-functions --profile <username> --region $AWS_REGION --no-cli-pager | jq -r '.Functions[].FunctionName'
+aws lambda list-functions --profile $AWS_USER --region $AWS_REGION --no-cli-pager | jq -r '.Functions[].FunctionName'
 
 ```
 
@@ -294,7 +288,7 @@ You should see java-database-activity-streams-consumer-function listed as one of
 You can get more details about this function by using the following command:
 
 ```
-aws lambda list-functions --profile <username> --region $AWS_REGION --no-cli-pager | jq -r '.Functions[] | select (.FunctionName=="java-database-activity-streams-consumer-function")'
+aws lambda list-functions --profile $AWS_USER --region $AWS_REGION --no-cli-pager | jq -r '.Functions[] | select (.FunctionName=="java-database-activity-streams-consumer-function")'
 
 ```
 
@@ -315,7 +309,7 @@ Sample SQL commands can be found in the file /home/ec2-user/db_commands.sql
 
 ## Test that the Database Activity Streams are flowing
 
-When the Lambda function gets a Database Activity Streams event, it parses the event, filters out heartbeat events and write out the unfiltered events to an S3 bucket. S3 Object Notifications get triggered when a new object is created and generates a new message in an SQS queue. An OpenSearch Ingestion Pipeline gets triggered whenever there are new messages in the SQS queue. The OSI pipeline then reads the object from the S3 bucket and writes out the records to an OpenSearch domain in an index called "das-records". In order to validate that the Database Activity Streams records are being written to OpenSearch, you need to log in to the OpenSearch domain.
+When the Lambda function gets a Database Activity Streams event, it parses the event, filters out heartbeat events and write out the unfiltered events to an S3 bucket. S3 Object Notifications get triggered when a new object is created and generates a new message in an SQS queue. An OpenSearch Ingestion (OSI) Pipeline gets triggered whenever there are new messages in the SQS queue. The OSI pipeline then reads the object from the S3 bucket and writes out the records to an OpenSearch domain in an index called "das-records". In order to validate that the Database Activity Streams records are being written to OpenSearch, you need to log in to the OpenSearch domain.
 
 If you have access to the AWS console for IAM users, you can take a look at the outputs tab of the CloudFormation stack. You will need the following output parameters - AOSDashboardsPublicIP, AOSDomainUserName and AOSDomainPassword.
 
@@ -323,17 +317,11 @@ If you don't have access to the AWS console for IAM users, you can find out the 
 
 ```
 
-AOS_DASHBOARD_IP=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='AOSDashboardsPublicIP'].OutputValue" --output text)
+AOS_DASHBOARD_IP=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='AOSDashboardsPublicIP'].OutputValue" --output text)
 
-echo $AOS_DASHBOARD_IP
+AOS_DASHBOARD_USERNAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='AOSDomainUserName'].OutputValue" --output text)
 
-AOS_DASHBOARD_USERNAME=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='AOSDomainUserName'].OutputValue" --output text)
-
-echo $AOS_DASHBOARD_USERNAME
-
-AOS_DASHBOARD_PASSWORD=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='AOSDomainPassword'].OutputValue" --output text)
-
-echo $AOS_DASHBOARD_PASSWORD
+AOS_DASHBOARD_PASSWORD=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='AOSDomainPassword'].OutputValue" --output text)
 
 ```
 
@@ -351,54 +339,59 @@ cd /home/ec2-user/serverless-patterns/das-lambda-java-sam/das_consumer_sam_proje
 sam delete --stack-name das-lambda-stack --region $AWS_REGION --no-prompts
 
 ```
-confirm by pressing y for both the questions
 You should see the lambda function getting deleted and a final confirmation "Deleted successfully" on the command-line
 
-Next you need to empty the contents of the S3 bucket that was being used to store the Database Activity Streams events by first getting the name of the bucket and then empty its contents:
+Next, you need to empty the contents of the S3 bucket that was being used to store the Database Activity Streams events by first getting the name of the bucket and then empty its contents. Run the following commands from your local machine.
 
 ```
-DAS_BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name <stackname> --profile <username> --query "Stacks[*].Outputs[?OutputKey=='S3BucketName'].OutputValue" --output text)
+DAS_BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='S3BucketName'].OutputValue" --output text)
 
-aws s3 rm s3://$DAS_BUCKET_NAME --recursive --profile <username>
-
-```
-
-
-Next you need to delete the Cloudformation template by going to the Cloudformation console and selecting the stack and then hitting the "Delete" button. It will run for sometime but eventually you should see the stack getting cleaned up. If you get an error message that says the stack could not be deleted, please retry again and do a Force Delete. The reason this may happen is because ENIs created by the deplayed Lambda function in your VPC may prevent the VPC from being deleted even after deleting the lambda function.
-
-If your IAM users do not have access to the AWS console, you can also use the AWS CLI to delete the CloudFormation stack by using the command below
-
-```
-aws cloudformation delete-stack --stack-name <Stack Name> --deletion-mode STANDARD --no-verify-ssl --region <AWS_REGION> --profile <username>
+aws s3 rm s3://$DAS_BUCKET_NAME --recursive --profile $AWS_USER
 
 ```
 
-If the deletion fails the first time, do a force delete using the command
+Now, you need to delete the Cloudformation template by going to the Cloudformation console and selecting the stack and then hitting the "Delete" button. It will run for sometime but eventually you should see the stack getting cleaned up. If you get an error message that says the stack could not be deleted, please retry again and do a Force Delete. The reason this may happen is because ENIs created by the deployed Lambda function in your VPC may prevent the VPC from being deleted even after deleting the lambda function.
+
+If your IAM users do not have access to the AWS console, you can also use the AWS CLI to delete the CloudFormation stack by using the command below on your local machine.
 
 ```
-aws cloudformation delete-stack --stack-name <Stack Name> --deletion-mode FORCE_DELETE_STACK --no-verify-ssl --region <AWS_REGION> --profile <username>
-
-```
-
-You will also need to clean-up the OpenSearch Ingestion Pipeline that was created from the UserData of the CloudFormation templation using AWS CLI as follows:
-
-```
-aws osis delete-pipeline --pipeline-name "das-osi-pipeline"
+aws cloudformation delete-stack --stack-name $STACK_NAME --deletion-mode STANDARD --region $AWS_REGION --profile $AWS_USER
 
 ```
 
-You will also need to clean-up the two secrets for storing the credentials of the IAM user in SecretsManager:
+If the deletion fails the first time, do a force delete using the command.
 
 ```
-aws secretsmanager delete-secret --secret-id aws-access-key-id --force-delete-without-recovery --region $AWS_REGION
+aws cloudformation delete-stack --stack-name $STACK_NAME --deletion-mode FORCE_DELETE_STACK --region $AWS_REGION --profile $AWS_USER
 
-aws secretsmanager delete-secret --secret-id aws-secret-access-key --force-delete-without-recovery --region $AWS_REGION 
+```
+In our tests this usually took 15 to 20 minutes.
+
+Once done, we need to delete the "aws-sam-cli-managed-default" CloudFormation stack. Run the command below from your local machine.
+
+```
+aws cloudformation delete-stack --stack-name aws-sam-cli-managed-default --deletion-mode STANDARD --region $AWS_REGION --profile $AWS_USER
+
+```
+
+Lastly, there are some resources that don't get deleted, so we have made a script to complete the cleanup, you can find it in the repo you cloned. The script will remove the DAS s3 bucket, OpenSearch Pipeline, IAM access key secrets, SAM, CFT and CF template s3 buckets. Run the command below from your local machine.
+
+```
+sh ./cleanup-script.sh
 
 ```
 
 Now log in to the AWS Cloudshell as the root user and then run the following command to delete the IAM user that was created for running this project:
 
 ```
-aws iam delete-user --user-name <username>
+USER_POLICY_ARN=$(aws iam list-attached-user-policies --user-name $AWS_USER | jq -r '.AttachedPolicies[].PolicyArn')
+
+aws iam detach-user-policy --policy-arn $USER_POLICY_ARN --user-name $AWS_USER
+
+ACCESS_KEY_ID=$(aws iam list-access-keys --user-name $AWS_USER | jq -r '.AccessKeyMetadata[].AccessKeyId')
+
+aws iam delete-access-key --access-key-id $ACCESS_KEY_ID --user-name $AWS_USER
+
+aws iam delete-user --user-name $AWS_USER
 
 ```
