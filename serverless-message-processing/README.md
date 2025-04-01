@@ -31,7 +31,7 @@ An adaptable pattern for message processing using AWS serverless services, featu
     ```
 2. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/serverless-messaging-redrive
+    cd serverless-patterns/serverless-message-redrive
     ```
 
 # Build the SAM application
