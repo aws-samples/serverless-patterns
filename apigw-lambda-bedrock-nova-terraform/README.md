@@ -46,7 +46,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The pattern creates an API Gateway endpoint that accepts POST requests containing prompts. These requests are forwarded to a Lambda function that processes the input and interacts with Amazon Bedrock's Nova Micro model.
+The pattern creates an API Gateway endpoint that accepts POST requests containing prompts. These requests are forwarded to a Lambda function which processes the input and interacts with Amazon Bedrock's Nova Micro model.
 
 Key components:
 
