@@ -2,7 +2,7 @@
 
 ## Overview
 
-This pattern demonstrates how to create a serverless API that leverages Amazon Bedrock's Nova Micro model through AWS Lambda for generating AI responses. The solution uses API Gateway to create a REST endpoint that processes requests and returns AI-generated responses using Nova Micro's text-to-text capabilities.
+This pattern demonstrates how to create a serverless API leveraging Amazon Bedrock Nova Micro through AWS Lambda. The solution uses an Amazon API Gateway REST endpoint to process requests and return AI-generated responses using Nova Micro's text-to-text capabilities.
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-lambda-bedrock-nova-terraform).
 
