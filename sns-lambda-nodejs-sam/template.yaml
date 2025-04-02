@@ -23,6 +23,9 @@ Outputs:
   ProcessingTopicArn:
     Description: "SNS Topic ARN"
     Value: !Ref ProcessingTopic
-  ProcessorFunction:
+  ProcessorFunctionName:
+    Description: "Lambda Function Name"
+    Value: !Ref ProcessorFunction    
+  ProcessorFunctionARN:
     Description: "Lambda Function ARN"
     Value: !GetAtt ProcessorFunction.Arn
