@@ -1,0 +1,26 @@
+{
+    "app": "python3 app.py",
+    "watch": {
+        "include": [
+          "**"
+        ],
+        "exclude": [
+          "README.md",
+          "cdk*.json",
+          "requirements*.txt",
+          "**/__init__.py",
+          "python/__pycache__",
+          "tests"
+        ]
+    },
+    "context": {
+        "@aws-cdk/core:target-partitions": [
+          "aws",
+          "aws-cn"
+        ],
+        "@aws-cdk/aws-cloudfront:defaultSecurityPolicyTLSv1.2_2021": true,
+        "@aws-cdk/aws-apigateway:requestValidatorUniqueId": true,
+        "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
+        "@aws-cdk/core:checkSecretUsage": true
+    }
+}
