@@ -40,18 +40,22 @@ Resources:
         TargetArn: !GetAtt ProcessingDLQ.Arn                     
 
 Outputs:
-  ProcessorFunction:
+  ProcessorFunctionName:
+    Description: "Lambda Function Name"
+    Value: !Ref ProcessorFunction
+
+  ProcessorFunctionARN:
     Description: "Lambda Function ARN"
     Value: !GetAtt ProcessorFunction.Arn
-  
-  ProcessingQueue:
+
+  ProcessingQueueARN:
     Description: "Processing SQS Queue ARN"
     Value: !GetAtt ProcessingQueue.Arn
-  
+
   ProcessingQueueURL:
     Description: "SQS Queue URL"
     Value: !Ref ProcessingQueue
-  
-  ProcessingDLQ:
+
+  ProcessingDLQARN:
     Description: "Dead Letter Queue ARN"
     Value: !GetAtt ProcessingDLQ.Arn
