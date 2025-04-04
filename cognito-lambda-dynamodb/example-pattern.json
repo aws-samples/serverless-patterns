@@ -1,59 +1,58 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
-  "language": "Python",
+  "title": "Amazon Cognito to AWS Lambda to Amazon DynamoDB",
+  "description": "Create a user in Amazon Cognito, handle a Post Confirmation trigger with AWS Lambda, and store user details in Amazon DynamoDB.",
+  "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
+      "This sample project demonstrates how to create a user in an Amazon Cognito User Pool, then automatically insert that user's details into a DynamoDB table once the user confirms their email. The Post Confirmation Lambda trigger handles the event from Cognito and uses the AWS SDK for JavaScript (v3) to write user data to the DynamoDB table.",
+      "Key attributes such as the user's unique ID (sub), email, and optional custom attributes are passed to Lambda, which then processes and persists this data. The table is configured in on-demand capacity mode (Pay Per Request) for cost efficiency and minimal management overhead.",
+      "This pattern deploys a Cognito User Pool, a User Pool Client, a DynamoDB table, and a Node.js AWS Lambda function as the trigger."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns",
+      "templateURL": "serverless-patterns/cognito-lambda-dynamodb",
+      "projectFolder": "cognito-lambda-dynamodb/cdk",
+      "templateFile": "lib/cdk-stack.ts"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "text": "Amazon Cognito - User sign-up/sign-in with triggers",
+        "link": "https://aws.amazon.com/cognito/"
       },
       {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "AWS Lambda - Serverless compute for triggered actions",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Amazon DynamoDB - Fast and flexible NoSQL database",
+        "link": "https://aws.amazon.com/dynamodb/"
       }
     ]
   },
   "deploy": {
-    "text": [
-      "sam deploy"
-    ]
+    "text": ["cdk synth", "cdk deploy"]
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "See the GitHub repo for end-to-end tests using Jest and manual sign-up steps."
     ]
   },
   "cleanup": {
-    "text": [
-      "Delete the stack: <code>cdk delete</code>."
-    ]
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
   },
   "authors": [
     {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "name": "Vidit Sah",
+      "linkedin": "www.linkedin.com/in/vidit-shah",
+      "twitter": "https://x.com/Vidit_210/",
+      "image": "https://media.licdn.com/dms/image/v2/D4D03AQHbL_7ZCYfUGQ/profile-displayphoto-shrink_200_200/B4DZUXcQlTGkAY-/0/1739855039564?e=2147483647&v=beta&t=MhOEFqsUDaKnLypK8eYYRqqD8Uq9xHUnijO5tN-fMpc"
     }
   ]
 }
