@@ -1,0 +1,258 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::LanguageExtensions
+Description: 'Amazon private API gateway with private custom domain name configured with private SSL cert imported and managed by ACM'
+
+Mappings:
+  
+  Constants:
+    CustomDomain:
+      Value: "apigw.example.com"
+    DomainName:
+      Value: "example.com"
+
+Parameters:
+
+  VpcIdParameter:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC Id in which the VPC Endpoints (execute-api and acm-pca) and Lambda will be created.
+
+  VpcEndpointSubnetIdsParameter:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of subnet ids where the VPC Endpoints (execute-api and acm-pca) and Lambda will be created.
+
+  ApiVPCESecurityGroup:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Security group id for the VPC Endpoints (execute-api and acm-pca) and Lambda VPC configuration.
+
+Resources:
+
+  LambdaExecutionRoleACM:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [lambda.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      Policies:
+        - PolicyName: execution-role-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - acm:ImportCertificate
+                  - acm:DeleteCertificate
+                Resource: "*"
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  AcmCertificateImportLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.13
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRoleACM.Arn
+      Code: ./acm-certificate/
+
+  AcmCertificateImport:
+    Type: Custom::AcmCertificateImport
+    Properties:
+      ServiceToken: !GetAtt AcmCertificateImportLambdaFunction.Arn
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [lambda.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  PythonLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.13
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': 'Hello from Private REST API backend!'
+              }
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref PythonLambda
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+
+  ApiVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VpcIdParameter
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.execute-api"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: !Ref VpcEndpointSubnetIdsParameter
+      SecurityGroupIds: !Ref ApiVPCESecurityGroup
+
+  PrivateApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: PrivateAPI
+      EndpointConfiguration:
+        Types:
+          - PRIVATE
+        VpcEndpointIds:
+          - !Ref ApiVPCEndpoint
+      Policy:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Principal: "*"
+            Action: execute-api:Invoke
+            Resource: execute-api:/*
+            Condition:
+              StringNotEquals:
+                aws:sourceVpce: !Ref ApiVPCEndpoint
+          - Effect: Allow
+            Principal: "*"
+            Action: execute-api:Invoke
+            Resource: execute-api:/*
+
+  ApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref PrivateApiGateway
+      ParentId: !GetAtt PrivateApiGateway.RootResourceId
+      PathPart: mypath
+
+  ApiMethod:
+    Type: AWS::ApiGateway::Method
+    DependsOn:
+    - LambdaPermission
+    Properties:
+      RestApiId: !Ref PrivateApiGateway
+      ResourceId: !Ref ApiResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
+          - lambdaArn: !GetAtt PythonLambda.Arn
+      MethodResponses:
+        - StatusCode: 200
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ApiMethod
+    Properties:
+      RestApiId: !Ref PrivateApiGateway
+
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: prod
+      RestApiId: !Ref PrivateApiGateway
+      DeploymentId: !Ref ApiDeployment
+
+  ApiGatewayCustomDomain:
+    Type: AWS::ApiGateway::DomainNameV2
+    Properties:
+      DomainName: !FindInMap [Constants, CustomDomain, Value]
+      EndpointConfiguration:
+        Types:
+          - PRIVATE
+      CertificateArn: !Ref AcmCertificateImport
+      SecurityPolicy: TLS_1_2
+      Policy:
+        Fn::ToJsonString:
+          Statement:
+            - Effect: Deny
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource:
+                - execute-api:/*
+              Condition:
+                StringNotEquals:
+                  aws:SourceVpce: !Ref ApiVPCEndpoint
+            - Effect: Allow
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource:
+                - execute-api:/*
+
+  Association:
+    Type: AWS::ApiGateway::DomainNameAccessAssociation
+    Properties:
+      AccessAssociationSource: !Ref ApiVPCEndpoint
+      AccessAssociationSourceType: VPCE
+      DomainNameArn: !GetAtt ApiGatewayCustomDomain.DomainNameArn
+
+  Mapping:
+    Type: AWS::ApiGateway::BasePathMappingV2
+    Properties:
+      BasePath: prod
+      DomainNameArn: !Ref ApiGatewayCustomDomain
+      RestApiId: !Ref PrivateApiGateway
+      Stage: !Ref ApiStage
+
+  ClientLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [lambda.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+
+  APITestingLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.13
+      Handler: index.lambda_handler
+      Role: !GetAtt ClientLambdaExecutionRole.Arn
+      Code: ./api-testing/
+      VpcConfig:
+        SecurityGroupIds: !Ref ApiVPCESecurityGroup
+        SubnetIds: !Ref VpcEndpointSubnetIdsParameter
+      Environment:
+        Variables:
+          CUSTOM_DOMAIN_NAME: !FindInMap [Constants, CustomDomain, Value]
+
+  MyPrivateHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !FindInMap [Constants, DomainName, Value]
+      VPCs:
+        - VPCId: !Ref VpcIdParameter
+          VPCRegion: !Sub '${AWS::Region}'
+      HostedZoneConfig:
+        Comment: Private Hosted Zone for API Gateway
+
+  MyRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref MyPrivateHostedZone
+      Name: !FindInMap [Constants, CustomDomain, Value]
+      ResourceRecords: 
+        - !Select ['1', !Split [':', !Select ['0', !GetAtt ApiVPCEndpoint.DnsEntries]]]
+      Type: CNAME
+      TTL: 300
