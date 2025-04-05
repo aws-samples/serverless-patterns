@@ -1,0 +1,64 @@
+{
+  "title": "Amazon API Gateway Private Custom Domain Name",
+  "description": "Create Amazon API Gateway private REST API with private custom domain name configured with private SSL certificate managed my ACM signed by Amazon Private Certificate Authority.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CloudFormation",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+    "1. Private Certificate Authority and API Gateway Setup\n  1. Creates an PCA\n  2. Issue a root certificate through the PCA\n  3. Create a certificate in ACM using PCA's root certificate\n  4. Create a private REST API in API gateway\n  5. Associate the ACM certificate with API Gateway's private custom domain\n  6. Configure a Lambda function as the API Gateway backend processor\n  7. Deploys a private REST API through API Gateway\n  8. Associate the custom domain with the API Gateway stage",
+    "2. VPC Endpoints configurations for private communication:\n  1. 'acm-pca' VPC Endpoint - Facilitates communication with PCA\n  2. 'execute-api' VPC Endpoint - Provides private access to the REST API",
+    "3. DNS Configuration\n    1. Establish a private hosted zone for the domain name\n    2. Creates a CNAME record within the hosted zone for custom domain name\n    3. Points API Gateway's private custom domain name to the 'execute-api' VPC Endpoint DNS name"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-private-cdn-private-ca",
+      "templateURL": "serverless-patterns/apigw-private-cdn-private-ca",
+      "projectFolder": "apigw-private-cdn-private-ca",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Custom domain names for private APIs in API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-custom-domains.html"
+      },
+      {
+        "text": "Tutorial: Create and invoke a custom domain name for private APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-custom-domains-tutorial.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "aws cloudformation deploy --template-file template.yaml --stack-name apigw-private-cdn-private-ca --parameter-overrides VpcIdParameter=<vpc-id> VpcEndpointSubnetIdsParameter=<subnet-id> ApiVPCESecurityGroup=<security-group-id> --capabilities CAPABILITY_IAM"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>aws cloudformation delete-stack --stack-name apigw-private-cdn-private-ca</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vijay Shekhar Rao",
+      "image": "./images/vijay.jpg",
+      "bio": "Vijay Shekhar Rao is a Partner Solutions Architect working with global system integrators. Before joining AWS, Vijay spent several years architecting, building, managing, and troubleshooting complex infrastructure for critical systems. When not working, he enjoys time with his family and tries to stay healthy.",
+      "linkedin": "vsr4321"
+    },
+    {
+      "name": "Tushar Thapar",
+      "image": "./images/tusharthapar.jpg",
+      "bio": "Tushar Thapar is a Cloud Engineer at Amazon Web Services based in Australia.",
+      "linkedin": "tushar-thapar-b76247120"
+    }
+  ]
+}
