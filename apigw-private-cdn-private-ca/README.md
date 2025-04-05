@@ -26,18 +26,18 @@ Please refer to the architecture diagram below:
 This implementation consists of three major components:
 
 1. Private Certificate Authority and API Gateway Setup
-  1. Creates an PCA
-  2. Issue a root certificate through the PCA
-  3. Create a certificate in ACM using PCA's root certificate
-  4. Create a private REST API in API gateway
-  5. Associate the ACM certificate with API Gateway's private custom domain
-  6. Configure a Lambda function as the API Gateway backend processor
-  7. Deploys a private REST API through API Gateway
-  8. Associate the custom domain with the API Gateway stage
+   1. Creates an PCA
+   2. Issue a root certificate through the PCA
+   3. Create a certificate in ACM using PCA's root certificate
+   4. Create a private REST API in API gateway
+   5. Associate the ACM certificate with API Gateway's private custom domain
+   6. Configure a Lambda function as the API Gateway backend processor
+   7. Deploys a private REST API through API Gateway
+   8. Associate the custom domain with the API Gateway stage
   
 2. VPC Endpoints configurations for private communication:
-  1. "acm-pca" VPC Endpoint - Facilitates communication with PCA
-  2. "execute-api" VPC Endpoint - Provides private access to the REST API
+   1. "acm-pca" VPC Endpoint - Facilitates communication with PCA
+   2. "execute-api" VPC Endpoint - Provides private access to the REST API
 
 3. DNS Configuration
     1. Establish a private hosted zone for the domain name
@@ -58,7 +58,11 @@ This implementation consists of three major components:
     ```
 3. Execute the following AWS CLI command after replacing the placeholders (indicated by <>) with their corresponding values:
     ```bash
-    aws cloudformation deploy --template-file template.yaml --stack-name apigw-private-cdn-private-ca --parameter-overrides VpcIdParameter=<vpc-id> VpcEndpointSubnetIdsParameter=<subnet-id> ApiVPCESecurityGroup=<security-group-id> --capabilities CAPABILITY_IAM
+    aws cloudformation deploy \
+      --template-file template.yaml \
+      --stack-name apigw-private-cdn-private-ca \
+      --parameter-overrides VpcIdParameter=<vpc-id> VpcEndpointSubnetIdsParameter=<subnet-id> ApiVPCESecurityGroup=<security-group-id> \
+      --capabilities CAPABILITY_IAM
    ```
 4. To implement your own custom domain configuration, modify the CloudFormation template.yaml file by updating two constant parameter's values: `CustomDomain` and `DomainName`:
     ```bash
