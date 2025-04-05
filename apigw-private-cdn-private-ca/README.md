@@ -17,7 +17,7 @@ Important: This application uses various AWS Services and there are costs associ
   1. Inbound rule allowing 443 traffic on the VPC CIDR range.
   2. Outbound rule allowing 443 traffic on VPC CIDR range.
 
-### How it(This) works
+### How it works
 
 Please refer to the architecture diagram below:
 
@@ -58,12 +58,8 @@ This implementation consists of three major components:
     ```
 3. Execute the following AWS CLI command after replacing the placeholders (indicated by <>) with their corresponding values:
     ```bash
-    aws cloudformation deploy \
-  --template-file template.yaml \
-  --stack-name apigw-private-cdn-private-ca \
-  --parameter-overrides VpcIdParameter=<vpc-id> VpcEndpointSubnetIdsParameter=<subnet-id> ApiVPCESecurityGroup=<security-group-id> \
-  --capabilities CAPABILITY_IAM
-    ```
+    aws cloudformation deploy --template-file template.yaml --stack-name apigw-private-cdn-private-ca --parameter-overrides VpcIdParameter=<vpc-id> VpcEndpointSubnetIdsParameter=<subnet-id> ApiVPCESecurityGroup=<security-group-id> --capabilities CAPABILITY_IAM
+   ```
 4. To implement your own custom domain configuration, modify the CloudFormation template.yaml file by updating two constant parameter's values: `CustomDomain` and `DomainName`:
     ```bash
     Mappings:
