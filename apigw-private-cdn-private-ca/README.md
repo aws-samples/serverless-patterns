@@ -26,13 +26,13 @@ Please refer to the architecture diagram below:
 This implementation consists of three major components:
 
 1. Private Certificate Authority and API Gateway Setup
-   1. Creates an PCA
+   1. Create an PCA
    2. Issue a root certificate through the PCA
    3. Create a certificate in ACM using PCA's root certificate
    4. Create a private REST API in API gateway
-   5. Associate the ACM certificate with API Gateway's private custom domain
+   5. Create API Gateway's private custom domain configured with ACM certificate created in step 3
    6. Configure a Lambda function as the API Gateway backend processor
-   7. Deploys a private REST API through API Gateway
+   7. Deploy the private REST API through API Gateway
    8. Associate the custom domain with the API Gateway stage
   
 2. VPC Endpoints configurations for private communication:
@@ -41,8 +41,8 @@ This implementation consists of three major components:
 
 3. DNS Configuration
     1. Establish a private hosted zone for the domain name
-    2. Creates a CNAME record within the hosted zone for custom domain name
-    3. Points API Gateway's private custom domain name to the "execute-api" VPC Endpoint DNS name
+    2. Create a CNAME record within the hosted zone for custom domain name
+    3. Point API Gateway's private custom domain name to the "execute-api" VPC Endpoint DNS name
 
 ### Deployment Instructions
 
