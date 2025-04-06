@@ -1,4 +1,4 @@
-# Amazon API Gateway private REST API with private custom domain name configured with private SSL certificate managed my ACM signed by Amazon Private Certificate Authority 
+# Private Custom Domain for API Gateway API Using ACM and Amazon Private CA
 
 This pattern enables secure access to a private REST API Gateway using a private custom domain name. The solution utilizes SSL certificates managed by AWS Certificate Manager (ACM) and signed by Amazon Private Certificate Authority (PCA), ensuring secure and authenticated communication within the private network. 
 
