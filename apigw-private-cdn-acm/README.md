@@ -16,7 +16,7 @@ Important: This application uses various AWS Services and there are costs associ
 - [A VPC with subnets and a security group](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-getting-started.html). The security group must have following conditions:
     1. Inbound rule allowing 443 traffic on the VPC CIDR range.
     2. Outbound rule allowing 443 traffic on VPC CIDR range.
-- [An Amazon S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/GetStartedWithS3.html) that stores local artifacts, including Lambda function source code required for this deployment.
+- [An Amazon S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/GetStartedWithS3.html) located in the same region as the CloudFormation stack, used to store local artifacts including Lambda function source code required for this deployment.
 
 ### How it works
 
@@ -29,17 +29,17 @@ This implementation consists of three major components:
 1. Certificate and API Gateway Setup
     1. Import a private SSL certificate into ACM
     2. Create a private REST API in API gateway
-    3. Associate the ACM certificate with API Gateway's private custom domain
+    3. Create API Gateway's private custom domain configured with ACM certificate created in step 1
     4. Configure a Lambda function as the API Gateway backend processor
-    5. Deploys a private REST API through API Gateway
+    5. Deploy the private REST API through API Gateway
     6. Associate the custom domain with the API Gateway stage
 
-2. "execute-api" VPC Endpoint configuration - Provides private access to the private REST API
+2. "execute-api" VPC Endpoint configuration - Provide private access to the private REST API
 
 3. DNS Configuration
     1. Establish a private hosted zone for the domain name
-    2. Creates a CNAME record within the hosted zone for custom domain name
-    3. Points API Gateway's private custom domain name to the "execute-api" VPC Endpoint DNS name
+    2. Create a CNAME record within the hosted zone for custom domain name
+    3. Point API Gateway's private custom domain name to the "execute-api" VPC Endpoint DNS name
 
 ### Deployment Instructions
 
@@ -51,7 +51,7 @@ This implementation consists of three major components:
     ```
 2. Change directory to the pattern directory:
     ```bash
-    cd serverless-patterns/apigw-private-cdn
+    cd serverless-patterns/apigw-private-cdn-acm
     ```
 3. Execute the following AWS CLI command after replacing the placeholders (indicated by <>) with their corresponding values:
     ```bash
@@ -64,7 +64,7 @@ This implementation consists of three major components:
     ```bash
     aws cloudformation deploy \
         --template-file output.yaml \
-        --stack-name apigw-private-cdn \
+        --stack-name apigw-private-cdn-acm \
         --parameter-overrides VpcIdParameter=<vpc-id> VpcEndpointSubnetIdsParameter=<subnet-id> ApiVPCESecurityGroup=<security-group-id> \
         --capabilities CAPABILITY_IAM
     ```
@@ -103,7 +103,7 @@ This implementation consists of three major components:
 To remove all resources deployed to your AWS account through CloudFormation:
 
 ```bash
-aws cloudformation delete-stack --stack-name apigw-private-cdn
+aws cloudformation delete-stack --stack-name apigw-private-cdn-acm
 ```
 
 
