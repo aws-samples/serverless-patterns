@@ -1,5 +1,5 @@
 {
-  "title": "Amazon API Gateway Private Custom Domain Name",
+  "title": "Private Custom Domain for API Gateway API Using ACM Private Certificate",
   "description": "Create Amazon API Gateway private REST API with private custom domain name configured with private SSL certificate managed my ACM signed by Amazon Private Certificate Authority.",
   "language": "Python",
   "level": "200",
