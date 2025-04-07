@@ -1,7 +1,6 @@
-# AWS Step Functions to on-premises API
+# AWS Step Functions to on-premises API (CDK)
 
-This pattern demonstrate how to call an on-premises API from a Step Functions state machine, leveraging Amazon EventBridge connection and VPC Lattice resource
-gateway and resource configuration.
+This pattern demonstrate how to call an on-premises API from a Step Functions state machine, leveraging Amazon EventBridge connection and VPC Lattice resource gateway and resource configuration.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
