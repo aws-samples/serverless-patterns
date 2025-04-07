@@ -11,10 +11,6 @@
                 "Method": "GET",
                 "InvocationConfig": {
                     "ConnectionArn": "${EventBridgeConnectionArn}"
-                },
-                "Headers": {
-                    "x-execution-id": "{% $states.context.Execution.Name %}",
-                    "x-state-machine": "{% $states.context.StateMachine.Name %}"
                 }
             },
             "Catch": [
