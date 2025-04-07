@@ -1,5 +1,5 @@
 {
-  "title": "Step Functions to on-premises API",
+  "title": "Step Functions to on-premises API (Terraform)",
   "description": "Step Functions performing HTTP call to on-premises API",
   "language": "",
   "level": "200",
