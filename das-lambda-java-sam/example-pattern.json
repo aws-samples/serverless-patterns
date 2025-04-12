@@ -16,7 +16,7 @@
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/das-lambda-java-sam",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/das-lambda-java-sam",
             "templateURL": "serverless-patterns/das-lambda-java-sam",
             "projectFolder": "das-lambda-java-sam/das_consumer_sam_project",
             "templateFile": "template.yaml"
@@ -82,6 +82,11 @@
         "name": "Angelo Spagnolo",
         "bio": "AWS - Senior Technical Account Manager",
         "linkedin": "https://www.linkedin.com/in/aspagnolo/"
+      },
+      {
+        "name": "Arghya Banerjee",
+        "bio": "AWS - Senior Technical Account Manager",
+        "linkedin": "https://www.linkedin.com/in/arghya-b-6130b57/"
       }
     ]
   }

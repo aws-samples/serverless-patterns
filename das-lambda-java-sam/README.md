@@ -20,26 +20,17 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in as root or an user that has Administrative privileges. We will create a new IAM user for the purpose of setting up the Database Activity Streams end-to-end flow. The IAM user that you will create must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
-### Run the BootStrapFromCloudShell.sh or the BootStrapFromCloudShellNoConsoleAccess.sh script
 
-**Note that in the instructions below, you will need to run the BootStrapFromCloudShell.sh only if you allow AWS console access for IAM users.**
+### Step 1 - Create a service linked role for the Amazon OpenSearch service from CloudShell in your AWS Account
 
-**If not, then you will need to run the BootStrapFromCloudShellNoConsoleAccess.sh, so please look at the instructions in the relevant section**
+You need a service linked role for the Amazon OpenSearch service to be created in the AWS account.
 
 * [Log in to the AWS Account as Admin User] - You need to log in to the AWS Account as either root or as an user with Admin privileges
 
-* [Open AWS CloudShell and checkout files from Github] - Once you are inside AWS Cloudshell in the AWS console, type the following commands. In case you are using a fork of the aws-samples github repository, then please replace the github URL with your own fork.
+* [Open AWS CloudShell] - Once you are inside AWS Cloudshell in the AWS console
 
-```
-git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git 
-cd serverless-patterns
-git sparse-checkout set --no-cone /das-lambda-java-sam
-git checkout
-cd das-lambda-java-sam
 
-```
-
-You also need a service linked role for the Amazon OpenSearch service to be created in the AWS account. In order to create that, run the following command from the AWS CloudShell
+In order to create the service linked role for the Amazon OpenSearch service, run the following command from the AWS CloudShell
 
 ```
 aws iam create-service-linked-role --aws-service-name opensearchservice.amazonaws.com
@@ -55,6 +46,26 @@ An error occurred (InvalidInput) when calling the CreateServiceLinkedRole operat
 If you get the above error, it is harmless. Please ignore it and move ahead.
 
 
+### Step 2 - Checkout files from Github from CloudShell in your AWS Account
+
+* [From AWS CloudShell checkout files from Github] - Once you are inside AWS Cloudshell in the AWS console, type the following commands. In case you are using a fork of the aws-samples github repository, then please replace the github URL with your own fork.
+
+```
+git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git 
+cd serverless-patterns
+git sparse-checkout set --no-cone /das-lambda-java-sam
+git checkout
+cd das-lambda-java-sam
+
+```
+
+### Step 3 - Run the BootStrapFromCloudShell.sh or the BootStrapFromCloudShellNoConsoleAccess.sh script from CloudShell in your AWS Account
+
+**Note that in the instructions in this step, you will need to run the BootStrapFromCloudShell.sh only if you allow AWS console access for IAM users.**
+
+**If not, then you will need to run the BootStrapFromCloudShellNoConsoleAccess.sh, so please look at the instructions in the relevant section**
+
+
 ### Option 1 - If IAM users are allowed AWS console access
 
 * [Execute the BootStrapFromCloudShell.sh script to create an IAM user and store keys in Secrets Manager] - Once the BootStrapFromCloudShell.sh script has been checked out from Github, execute the following commands in your CloudShell. Substitute the \<username\> with value for the IAM user you want to create. You will be prompted for a password, which needs to be at least 8 characters long, it needs to include minimum of three of the following mix of character types: uppercase, lowercase, numbers, and non-alphanumeric character and it should not be identical to your AWS account name or email address. 
@@ -64,12 +75,44 @@ sh ./BootStrapFromCloudShell.sh <username>
 
 ```
 
-Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new \<username\> and password you just created. You will be asked to change the password upon first login. Once you are logged in as the IAM user, move to the next step - "Run the CloudFormation template to create the AWS resources"
+Once the above command is done executing, log out of the AWS account and log in to the AWS console using the new \<username\> and password you just created. You will be asked to change the password upon first login. Once you are logged in as the IAM user, move to the Step 5 - "Run the CloudFormation template to create the AWS resources"
+
+### Option 2 - If IAM users are not allowed AWS console access
+
+**Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh script as shown below**
+
+**Make sure to run the BootStrapFromCloudShellNoConsoleAccess.sh command from the CloudShell and not from your local machine**
+
+```
+sh ./BootStrapFromCloudShellNoConsoleAccess.sh <username>
+
+```
+
+The above script will generate three outputs, the access key, the secret access key and the default AWS region. Note down the above values. These will be needed in Step 4.
+
+
+### Step 4 - Setup AWS credentials on local machine
+
+
+### Option 1 - If IAM users are allowed AWS console access
+
+* [Checkout from Github on your local machine] - Type the following commands from any folder on your local machine to get the CloudFormation template from Github
+
+```
+git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git
+cd serverless-patterns
+git sparse-checkout set --no-cone /das-lambda-java-sam
+git checkout
+cd das-lambda-java-sam
+
+```
+
+Move to Step 5 - "Run the CloudFormation template to create the AWS resources"
     
 
 ### Option 2 - If IAM users are not allowed AWS console access
 
-* [Checkout from Github on your local machine in case you haven't done so already] - Type the following commands from any folder on your local machine to get the CloudFormation template from Github
+* [Checkout from Github on your local machine] - Type the following commands from any folder on your local machine to get the CloudFormation template from Github
 
 ```
 git clone -n --depth=1 --filter=tree:0 https://github.com/aws-samples/serverless-patterns.git
@@ -81,23 +124,13 @@ cd das-lambda-java-sam
 ```
 
 * [Set environment variables on your local machine] - To facilitate commands below, we'll create a couple of environment variables.
-Substitute the values between the brackets "" below as you like.
+Substitute the values between the brackets "" below as you like. For \<username\>, use the same value that you had specified in Step 3. For \<region\>, use the same value as that was output in Step 3 (Option 2)
+
 ```
-export AWS_USER="das-user"
-export AWS_REGION="us-east-1"
+export AWS_USER=<username>
+export AWS_REGION=<region>
 export STACK_NAME="das-lambda-serverless-patterns"
 ```
-
-**Note: If you do not have AWS console access and would rather run CloudFormation from the command line, do not run the BootStrapFromCloudShell.sh script. Instead run the BootStrapFromCloudShellNoConsoleAccess.sh script as shown below**
-
-**Make sure to run the BootStrapFromCloudShellNoConsoleAccess.sh command from the CloudShell and not from your local machine**
-
-```
-sh ./BootStrapFromCloudShellNoConsoleAccess.sh $AWS_USER
-
-```
-
-The above script will generate three outputs, the access key, the secret access key and the default AWS region. Note down the above values
 
 **On your local machine**, run the following:
 
@@ -106,9 +139,18 @@ sh ./CreateAWSCLIProfileOnLocalMachine.sh $AWS_USER <access key> <secret access 
 
 ```
 
-where the \<access key\> \<secret access key\> need to be replaced with the values of the three outputs from CloudShell noted above.
+where the \<access key\> \<secret access key\> need to be replaced with the values of the three outputs from Step 3 (Option 2) above.
 
-The above command will create an AWS profile for $AWS_USER on your local machine.
+**Note: In case you did not note the values of the access key and the secret access key from Step 3 (Option 2), you can log into CloudShell in the same region that you had used earlier and do the following**
+
+```
+cd serverless-patterns/das-lambda-java-sam
+sh ./GetAWSCLIProfileDetailsFromCloudshell.sh
+
+```
+
+
+Executing the CreateAWSCLIProfileOnLocalMachine.sh script will create an AWS profile for $AWS_USER on your local machine.
 
 Once you have configured the AWS profile on your local machine, run the following command to verify the profile has been created correctly
 
@@ -117,29 +159,28 @@ aws sts get-caller-identity --no-cli-pager --profile $AWS_USER
 
 ```
 
-## Run the CloudFormation template to create the AWS resources
 
-* [Deploy the CloudFormation stack using the AWS console or AWS CLI] - 
-
-On your local machine, the current folder should now contain the CloudFormation template file setup-das-cfn.yaml
+### Step 5 - Run the CloudFormation template to create the AWS resources
 
 
-### If IAM users are allowed AWS console access
+### Option 1 - If IAM users are allowed AWS console access
 
-You can log in to the AWS console using the new user that was just created.
+You can log in to the AWS console using the new user that was created in Step 3 (Option 1)
 
 Before you deploy the CloudFormation template, you will need to create a key-pair from the EC2 console, under "Network and Security". Name the key-pair "DASKeyPair" and choose RSA as the Key pair type. Choose .pem or .ppk as the Private key file format, depending on how you want to connect to the EC2 instance that will get created by the CloudFormation template. 
 
 Once you have created the key-pair, you can run CloudFormation using the template file setup-das-cfn.yaml
 
-Accept defaults for all the input parameters or modify them as needed.
+The setup-das-cfn.yaml should be available in the folder on your local machine where you ran the Step 4 (Option 1)
+
+Accept defaults for all the input parameters (or modify them if needed), when running the CloudFormation template.
 
 
-### If IAM users are not allowed AWS console access
+### Option 2 - If IAM users are not allowed AWS console access
 
-**Note: If you do not have AWS console access, you can deploy the CloudFormation from your local machine or CloudShell.**
+**Note: If you do not have AWS console access, you can deploy the CloudFormation from your local machine.**
 
-**Execute the following commands from a terminal on your local machine or CloudShell (preferably from your local machine)**
+**Execute the following commands from a terminal on your local machine**
 
 ```
 aws ec2 create-key-pair --key-name DASKeyPair --key-format pem --key-type rsa --profile $AWS_USER --query 'KeyMaterial' --output text > DASKeyPair.pem
@@ -156,6 +197,7 @@ chmod 400 DASKeyPair.pem
 **If you modify the name of the key-name from DASKeyPair, then make sure to replace it in the CloudFormation template as well.**
 
 Verify your identify by running
+
 ```
 aws sts get-caller-identity --profile $AWS_USER --no-cli-pager
 ```
@@ -174,17 +216,18 @@ Wait for the Cloudformation stack to be created. This can take a very long time.
 
 This Cloudformation template will create multiple AWS resources such as an Amazon Aurora Postgres Database, an Amazon OpenSearch domain, an AWS Lambda function that will process the Database Activity Streams (DAS) events, an S3 bucket to which the Lambda function will write the DAS events records, an OpenSearch Ingestion Pipeline, an SQS queue for triggering the OpenSearch Ingestion Pipeline and other supporting resources. It will also create an EC2 machine that already has the Postgres client installed for you to run SQL commands on the Aurora Postgres database.
 
-* [Connect to the EC2 machine] - 
 
-### If IAM users are allowed AWS console access
+### Step 6 - Connect to the EC2 machine
+
+### Option 1 - If IAM users are allowed AWS console access
 
 Once the Cloudformation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
 
 **Note: You may need to wait for some time after the Cloudformation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.**
 
-Now jump to the section "Pre-requisites to Deploy the sample Lambda function"
+Now jump to the section "Step 7 - Pre-requisites to Deploy the sample Lambda function"
 
-### If IAM users are not allowed AWS console access
+### Option 2 - If IAM users are not allowed AWS console access
 
 **If you are not allowed AWS console access as an IAM user, you can ssh into the EC2 machine by running the command below to get the Public DNS Name of the EC2 machine. Before that you will have to open an inbound rule allowing SSH from your local machine's IP address**
 
@@ -228,11 +271,11 @@ ssh -i "DASKeyPair.pem" ec2-user@$EC2_PUBLIC_DNS
 
 ```
 
-## Pre-requisites to Deploy the sample Lambda function
+## Step 7 - Pre-requisites to Deploy the sample Lambda function
 
 ### If you want to understand and deploy the Lambda function yourself
 
-If you do not want to build and deploy the lambda function yourself, you can jump to the step - "Generate Database Activity"
+If you do not want to build and deploy the lambda function yourself, you can jump to the step - "Step 8 - Generate Database Activity"
 
 If you are interested to understand more details of how the lambda function was built and deployed, or if you want to do it yourself, read the below sections before the "Generate Database Activity" step
 
@@ -292,7 +335,7 @@ aws lambda list-functions --profile $AWS_USER --region $AWS_REGION --no-cli-page
 
 ```
 
-## Generate Database Activity
+## Step 8 - Generate Database Activity
 
 In order to generate activity on the Aurora Postgres database, you can make use of the Postgres Client that is already installed for your convenience on the EC2 instance that was deployed as part of the CloudFormation stack.
 
@@ -306,8 +349,21 @@ To connect to the Aurora Postgres database use sh /home/ec2-user/db_connect.sh
 
 Sample SQL commands can be found in the file /home/ec2-user/db_commands.sql
 
+They are also listed here for convenience:
 
-## Test that the Database Activity Streams are flowing
+```
+create table persons(firstname varchar(25) not null, lastname varchar(25) not null, middle_initial varchar(1) null, street_address varchar(100) not null, unit_number varchar(10) null, city varchar(25) not null, state varchar(2) not null, zip varchar(10) not null);
+
+insert into persons values ('John', 'Cummins', 'M', '1320 Hollywood Blvd.', 'Apt - 213', 'London', 'KY', '40740');
+
+insert into persons values ('Bryan', 'Starc', 'M', '89075 Parkwood Dr.', 'Unit-M', 'Paris', 'TX', '75461');
+
+select * from persons;
+
+```
+
+
+## Step 9 - Test that the Database Activity Streams are flowing
 
 When the Lambda function gets a Database Activity Streams event, it parses the event, filters out heartbeat events and write out the unfiltered events to an S3 bucket. S3 Object Notifications get triggered when a new object is created and generates a new message in an SQS queue. An OpenSearch Ingestion (OSI) Pipeline gets triggered whenever there are new messages in the SQS queue. The OSI pipeline then reads the object from the S3 bucket and writes out the records to an OpenSearch domain in an index called "das-records". In order to validate that the Database Activity Streams records are being written to OpenSearch, you need to log in to the OpenSearch domain.
 
@@ -319,9 +375,15 @@ If you don't have access to the AWS console for IAM users, you can find out the 
 
 AOS_DASHBOARD_IP=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='AOSDashboardsPublicIP'].OutputValue" --output text)
 
+echo "DB_SECRET=$DB_SECRET"
+
 AOS_DASHBOARD_USERNAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='AOSDomainUserName'].OutputValue" --output text)
 
+echo "AOS_DASHBOARD_USERNAME=$AOS_DASHBOARD_USERNAME"
+
 AOS_DASHBOARD_PASSWORD=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='AOSDomainPassword'].OutputValue" --output text)
+
+echo "AOS_DASHBOARD_PASSWORD=$AOS_DASHBOARD_PASSWORD"
 
 ```
 

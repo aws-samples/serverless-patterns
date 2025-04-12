@@ -158,8 +158,11 @@ public class HandlerAuroraStream implements RequestHandler<KinesisEvent, String>
 							if (databaseActivityEvent.getDbUserName().strip().toLowerCase() != "rdsadmin") {
 								// Invoke method in AuroraStreamsS3Inserter class to insert each Aurora
 								// DAS event into S3 as a separate object in S3
+								logger.log("Now sending to OpenSearch: " + correlationId + " dbUserName = " + databaseActivityEvent.getDbUserName());
 								String s3Record = getOpenSearchRecordAsJsonString(requestId, recordNumber * 100 + eventNumber, postgresActivityRecord.getClusterId(), postgresActivityRecord.getInstanceId(), postgresActivityRecord.getType(), databaseActivityEvent);
 								auroraStreamsS3Inserter.insertIntoS3(s3Record);
+							} else {
+								logger.log("Not sending to OpenSearch: " + correlationId + " dbUserName = " + databaseActivityEvent.getDbUserName());
 							}
 							
 						}
