@@ -155,7 +155,7 @@ public class HandlerAuroraStream implements RequestHandler<KinesisEvent, String>
 							}
 							logger.log(correlationId + "Finished Printing Incoming Record");
 							//log only events that are not by the rdsamin user
-							if (databaseActivityEvent.getDbUserName().strip().toLowerCase() != "rdsadmin") {
+							if (!(databaseActivityEvent.getDbUserName().strip().equalsIgnoreCase("rdsadmin"))) {
 								// Invoke method in AuroraStreamsS3Inserter class to insert each Aurora
 								// DAS event into S3 as a separate object in S3
 								logger.log("Now sending to OpenSearch: " + correlationId + " dbUserName = " + databaseActivityEvent.getDbUserName());
