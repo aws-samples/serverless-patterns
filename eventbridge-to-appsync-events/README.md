@@ -37,7 +37,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. During the prompts:
     * Enter a stack name
-    * Enter the desired AWS Region
+    * Enter the desired AWS Region (where your existing Events API is deployed)
     * Allow SAM CLI to create IAM roles with the required permissions.
     * Enter the HTTP endpoint for the existing Event API (AppSync Console > {{Your Events API }} > Settings > HTTP > Copy)
     * Enter the API Key used to connect to your HTTP endpoint (AppSync Console > {{Your Events API }} > Settings > Copy API Key)
