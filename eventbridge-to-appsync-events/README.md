@@ -2,6 +2,15 @@
 
 This pattern demonstrates how you can send events from EventBridge to an AppSync Events API. This will allow you to consume events in real-time over WebSockets. This stack will deploy the following resources: 
 
+- EventBridge EventBus (we will use this to send messages to)
+- EventBridge Rule (to catch messages matching a pattern specified in the template)
+- EventBridge Connection (to your AppSync Events endoint)
+- EventBridge API Destination (to your AppSync Events endoint)
+- SQS Queue (for DLQ)
+- SQS Queue Policy (for DLQ)
+- IAM Role (to allow EventBridge Invoke an API Destination)
+- IAM Policy (attached to above role)
+
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
@@ -30,6 +39,8 @@ Important: this application uses various AWS services and there are costs associ
     * Enter a stack name
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
+    * Enter the HTTP endpoint for the existing Event API (AppSync Console > {{Your Events API }} > Settings > HTTP > Copy)
+    * Enter the API Key used to connect to your HTTP endpoint (AppSync Console > {{Your Events API }} > Settings > Copy API Key)
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
@@ -73,6 +84,8 @@ A new EventBus is created with a rule to catch events in your account which matc
 If events are not arriving in your Events API Console you should go to the SQS console, find the SQS queue created by this stack as your DLQ and poll for messages. Any errors should be shown in the attributes of the messages. 
 
 If there are no messages in the DLQ, double check that you have correctly entered the channel parameters in the Events API Console. 
+
+Ensure you are sending messages to the correct Event Bus. 
 
 ## Cleanup
  
