@@ -6,7 +6,7 @@ Parameters:
     Type: String
     MinLength: '1'
     MaxLength: '512'
-    Default: 'https://{{your-api-id}}.appsync-api.{{region}}.amazonaws.com'
+    Default: 'https://{{xxx}}.appsync-api.{{region}}.amazonaws.com'
   EventsApiAPIKey: 
     Type: String
     MinLength: '1'
@@ -132,3 +132,7 @@ Outputs:
   EventBusName:
     Value:
       Fn::Sub: "${EventBus.Name}"
+  DLQName:
+    Value:
+      Fn::Sub: "${DLQueue.QueueName}"
+

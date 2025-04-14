@@ -41,6 +41,7 @@ Important: this application uses various AWS services and there are costs associ
     * Allow SAM CLI to create IAM roles with the required permissions.
     * Enter the **HTTP endpoint** for the existing Event API (AppSync Console > {{Your Events API }} > Settings > HTTP > Copy)
     * Enter the **API Key** used to connect to your HTTP endpoint (AppSync Console > {{Your Events API }} > Settings > Copy API Key)
+    * Keep default values to the rest of the parameters.
 
     Once you have run `sam deploy --guided` once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
@@ -58,19 +59,19 @@ A new EventBus is created with a rule to catch events in your account which matc
 
 ### Set up your Events API to listen to events
 - Go to your pre-existing Events API in the console.
-- Click the pub/sub editor tab.
-- Scroll down to the subscriptions section and click on "connect".
+- Click the Pub/Sub Editor editor tab.
+- Scroll down to the Subscribe section and click on "connect".
 - For channel, leave the `default` parameter as it is. Replace `/*` with `/serverless-patterns`.
-- Click on Subscribe.
+- Click on Subscribe. You should see a `subscribe_success` message.
 
 ### Publish test events to EventBridge
 
-- Open a new tab and go to the EventBridge Console.
+- Open the Amazon EventBridge Console in a new tab.
 - Click "Event buses" on the left menu.
 - On the top right, click "send events".
-- Select the newly created event bus (from step 5 in Deployment Instructions). For "event source" enter anything (e.g `example.serverlesspatterns`) and for "detail type" enter `serverless-patterns`.
+- For the event bus dropdown, select the newly created event bus (from step 5 in Deployment Instructions). For "event source" enter anything (e.g `example.serverlesspatterns`) and for "detail type" enter `serverless-patterns`.
 - Enter the following payload: `{"message":"hello from test"}`.
-- Send the event.
+- Click "Send".
 - Navigate back to your Events API tab, you should see a new message arrived in the subscription area as follows: 
 ```
 {
@@ -81,9 +82,12 @@ A new EventBus is created with a rule to catch events in your account which matc
 ```
 
 ### Troubleshooting
+
+**Check the Event Bus Name**: Ensure you are sending test messages to the correct event bus (name is in the outputs of the stack) with "detail type" of `serverless-patterns`. This example won't work on the default event bus.
+
 **Events not arriving to Events API Console**: Go to the SQS console, find the SQS queue created by this stack (which is your DLQ) and poll for messages. Any errors should be shown in the attributes tab of the messages. 
 
-**No messages in DLQ**: Double check that you have subscribed to the correct namespace/channel `default/serverless-patterns` in the Events API Console. Also ensure you are sending messages to the correct event bus (name is in the outputs of the stack) with "detail type" of `serverless-patterns`.
+**No messages in DLQ**: Double check that you have subscribed to the correct namespace/channel `default/serverless-patterns` in the Events API Console. Triple check you are sending messages to the correct event bus.
 
 ## Cleanup
  
