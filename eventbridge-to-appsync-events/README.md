@@ -2,14 +2,14 @@
 
 This pattern demonstrates how you can send events from EventBridge to an AppSync Events API. This will allow you to consume events in real-time over WebSockets. This stack will deploy the following resources: 
 
-- **EventBridge EventBus**: We will use this event bus to send messages to for testing.
+- **EventBridge EventBus**: Use this event bus to send messages to for testing.
 - **EventBridge Rule**: Catches messages matching a pattern specified in the template.
 - **EventBridge API Destination**: HTTP invocation endpoint configured as a target for events. In this case, it's our pre-existing Events API HTTP endpoint passed in as a parameter.
 - **EventBridge Connection**: Defines the authorization type and credentials to use for authorization with an API destination. In this case, we use the pre-existing API key passed in as a parameter. 
-- **SQS Queue**: Used to store messages that couldn't be delivered to the API destination successfully)
-- **SQS Queue Policy**: This is the resource policy of the SQS queue, allowing EventBridge to put messages into the DLQ.
-- **IAM Role**: This is a role which eventbridge assumes, the policy below is attached to it.
-- **IAM Policy**: This defines permissions to allow EventBridge to invoke the API destination. 
+- **SQS Queue**: Stores messages that couldn't be delivered to the API destination successfully)
+- **SQS Queue Policy**: The resource policy of the SQS queue, allowing EventBridge to put messages into the DLQ.
+- **IAM Role**: IAM role which eventbridge assumes, the policy below is attached to it.
+- **IAM Policy**: Defines permissions to allow EventBridge to invoke the API destination. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -68,10 +68,10 @@ A new EventBus is created with a rule to catch events in your account which matc
 - Open a new tab and go to the EventBridge Console.
 - Click "Event buses" on the left menu.
 - On the top right, click "send events".
-- Select the newly created event bus. For "event source" put anything and for "detail type" enter `serverless-patterns`.
+- Select the newly created event bus (from step 5 in Deployment Instructions). For "event source" enter anything (e.g `example.serverlesspatterns`) and for "detail type" enter `serverless-patterns`.
 - Enter the following payload: `{"message":"hello from test"}`.
 - Send the event.
-- Swap back to your Events API tab, you should see a new message arrived in the following format: 
+- Navigate back to your Events API tab, you should see a new message arrived in the subscription area as follows: 
 ```
 {
   "detailType": "serverless-patterns",
@@ -81,11 +81,9 @@ A new EventBus is created with a rule to catch events in your account which matc
 ```
 
 ### Troubleshooting
-If events are not arriving in your Events API Console you should go to the SQS console, find the SQS queue created by this stack as your DLQ and poll for messages. Any errors should be shown in the attributes of the messages. 
+** Events not arriving to Events API Console**: Go to the SQS console, find the SQS queue created by this stack (which is your DLQ) and poll for messages. Any errors should be shown in the attributes tab of the messages. 
 
-If there are no messages in the DLQ, double check that you have correctly entered the channel parameters in the Events API Console. 
-
-Ensure you are sending messages to the correct Event Bus. 
+** No messages in DLQ**: Double check that you have subscribed to the correct namespace/channel `default/serverless-patterns` in the Events API Console. Also ensure you are sending messages to the correct event bus (name is in the outputs of the stack) with "detail type" of `serverless-patterns`.
 
 ## Cleanup
  
