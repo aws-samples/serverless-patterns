@@ -81,9 +81,9 @@ A new EventBus is created with a rule to catch events in your account which matc
 ```
 
 ### Troubleshooting
-** Events not arriving to Events API Console**: Go to the SQS console, find the SQS queue created by this stack (which is your DLQ) and poll for messages. Any errors should be shown in the attributes tab of the messages. 
+**Events not arriving to Events API Console**: Go to the SQS console, find the SQS queue created by this stack (which is your DLQ) and poll for messages. Any errors should be shown in the attributes tab of the messages. 
 
-** No messages in DLQ**: Double check that you have subscribed to the correct namespace/channel `default/serverless-patterns` in the Events API Console. Also ensure you are sending messages to the correct event bus (name is in the outputs of the stack) with "detail type" of `serverless-patterns`.
+**No messages in DLQ**: Double check that you have subscribed to the correct namespace/channel `default/serverless-patterns` in the Events API Console. Also ensure you are sending messages to the correct event bus (name is in the outputs of the stack) with "detail type" of `serverless-patterns`.
 
 ## Cleanup
  
