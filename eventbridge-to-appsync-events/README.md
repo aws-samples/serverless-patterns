@@ -2,14 +2,14 @@
 
 This pattern demonstrates how you can send events from EventBridge to an AppSync Events API. This will allow you to consume events in real-time over WebSockets. This stack will deploy the following resources: 
 
-- EventBridge EventBus (we will use this to send messages to)
-- EventBridge Rule (to catch messages matching a pattern specified in the template)
-- EventBridge Connection (to your AppSync Events endoint)
-- EventBridge API Destination (to your AppSync Events endoint)
-- SQS Queue (for DLQ)
-- SQS Queue Policy (for DLQ)
-- IAM Role (to allow EventBridge Invoke an API Destination)
-- IAM Policy (attached to above role)
+- **EventBridge EventBus**: We will use this event bus to send messages to for testing.
+- **EventBridge Rule**: Catches messages matching a pattern specified in the template.
+- **EventBridge API Destination**: HTTP invocation endpoint configured as a target for events. In this case, it's our pre-existing Events API HTTP endpoint passed in as a parameter.
+- **EventBridge Connection**: Defines the authorization type and credentials to use for authorization with an API destination. In this case, we use the pre-existing API key passed in as a parameter. 
+- **SQS Queue**: Used to store messages that couldn't be delivered to the API destination successfully)
+- **SQS Queue Policy**: This is the resource policy of the SQS queue, allowing EventBridge to put messages into the DLQ.
+- **IAM Role**: This is a role which eventbridge assumes, the policy below is attached to it.
+- **IAM Policy**: This defines permissions to allow EventBridge to invoke the API destination. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -39,10 +39,10 @@ Important: this application uses various AWS services and there are costs associ
     * Enter a stack name
     * Enter the desired AWS Region (where your existing Events API is deployed)
     * Allow SAM CLI to create IAM roles with the required permissions.
-    * Enter the HTTP endpoint for the existing Event API (AppSync Console > {{Your Events API }} > Settings > HTTP > Copy)
-    * Enter the API Key used to connect to your HTTP endpoint (AppSync Console > {{Your Events API }} > Settings > Copy API Key)
+    * Enter the **HTTP endpoint** for the existing Event API (AppSync Console > {{Your Events API }} > Settings > HTTP > Copy)
+    * Enter the **API Key** used to connect to your HTTP endpoint (AppSync Console > {{Your Events API }} > Settings > Copy API Key)
 
-    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy --guided` once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 1. Note the `EventBusName` output from the SAM deployment process. You will use this in the testing process in the Console. 
 
@@ -57,7 +57,7 @@ A new EventBus is created with a rule to catch events in your account which matc
 ## Testing
 
 ### Set up your Events API to listen to events
-- Go to your pre-created Events API in the console.
+- Go to your pre-existing Events API in the console.
 - Click the pub/sub editor tab.
 - Scroll down to the subscriptions section and click on "connect".
 - For channel, leave the `default` parameter as it is. Replace `/*` with `/serverless-patterns`.
@@ -91,7 +91,7 @@ Ensure you are sending messages to the correct Event Bus.
  
 1. Delete the stack
     ```bash
-    sam delete --stack-name {{YOUR_STACK_NAME}}
+    sam delete
     ```
 
 ----
