@@ -7,11 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This project demonstrates how to use EventBridge to send events to an AppSync Events API."
-      "An EventBridge rule catches events sent in your AWS account and sends them to an AppSync Events API."
-      "A new EventBus is created with a rule to catch events in your account. "
-      "You can test this pattern easily using the EventBridge and Events API Console."
-      "If there are errors delivering events to your Events API from EventBridge, they will be delivered to a DLQ where you can inspect what went wrong."
+      "This project demonstrates how to use EventBridge to send events to an Amazon AppSync Events API. An EventBridge rule catches events and sends them to an AppSync Events API. You can test this pattern easily using the EventBridge and Events API Console. If there are errors delivering events to your Events API from EventBridge, they will be delivered to a DLQ where you can inspect what went wrong."
     ]
   },
   "gitHub": {
@@ -46,14 +42,14 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
     {
       "name": "Ronan Prenty",
       "image": "https://avatars.githubusercontent.com/u/26303402?v=4",
-      "bio": "Ronan Prenty is a Principal Solutions Architect based in Dublin, Ireland. He has worked in AWS Premium Support's Serverless team for almost 4 years, diving deep into all things API Gateway, AppSync and Lambda. He has worked as a Solutions Architect with expertise in Serverless for the past 5 years. He mainly works with Travel and Financial Services customers in Ireland and loves combat sports. ",
+      "bio": "Principal Solutions Architect based in Dublin, Ireland.",
       "linkedin": "https://www.linkedin.com/in/ronan-prenty/"
     }
   ]
