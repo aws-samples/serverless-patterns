@@ -1,18 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - EventBridge to AppSync Events API integration
-Parameters:
-  EventsApiHttpURL: 
-    Type: String
-    MinLength: '1'
-    MaxLength: '512'
-    Default: 'https://{{xxx}}.appsync-api.{{region}}.amazonaws.com'
-  EventsApiAPIKey: 
-    Type: String
-    MinLength: '1'
-    MaxLength: '512'
-    Default: '{{your-api-key}}'
+Description: Serverless patterns - Amazon EventBridge to AWS AppSync Events API integration
+
 Resources:
+  # For storing failed deliveries to AppSync
   DLQueue:
     Type: AWS::SQS::Queue
     Properties:
@@ -32,7 +23,35 @@ Resources:
             Resource: !GetAtt DLQueue.Arn
             Condition:
               ArnEquals:
-                aws:SourceArn: !GetAtt ServerlessPatternsSendToEventsAPI.Arn
+                aws:SourceArn: !GetAtt RuleToSendToEventsAPI.Arn
+  # Test Event API to consume messages
+  EventAPI:
+    Type: AWS::AppSync::Api
+    Properties:
+      Name: !Sub ${AWS::StackName}-EventAPI
+      EventConfig:
+        AuthProviders:
+          - AuthType: API_KEY
+        ConnectionAuthModes:
+          - AuthType: API_KEY
+        DefaultPublishAuthModes:
+          - AuthType: API_KEY
+        DefaultSubscribeAuthModes:
+          - AuthType: API_KEY
+
+  EventApiNameSpace:
+    Type: AWS::AppSync::ChannelNamespace
+    Properties:
+      ApiId: !GetAtt EventAPI.ApiId
+      Name: 'default'
+
+  EventAPIKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt EventAPI.ApiId
+      Description: API Key for Events API
+
+
   # This is the destination we want to send events to. We will use our HTTP endpoint for the Events API. 
   EventBus:
     Type: AWS::Events::EventBus
@@ -48,8 +67,8 @@ Resources:
           - Arn
       HttpMethod: POST
       InvocationEndpoint: 
-        Fn::Sub: "${EventsApiHttpURL}/event"       
-      InvocationRateLimitPerSecond: 3 # Adjust this accordingly, set low for the demo.
+        Fn::Sub: "https://${EventAPI.Dns.Http}/event"       
+      InvocationRateLimitPerSecond: 10 # Adjust this accordingly, set low for the demo.
       Name:  !Sub ${AWS::StackName}-EventsApiDestination
   EventsAPIConnectionDetails:
     Type: AWS::Events::Connection
@@ -59,8 +78,7 @@ Resources:
       AuthParameters:
         ApiKeyAuthParameters:
           ApiKeyName: x-api-key
-          ApiKeyValue:
-            Ref: EventsApiAPIKey  
+          ApiKeyValue: !GetAtt EventAPIKey.ApiKey
   RoleToAllowEventBridgePublish:
     Type: AWS::IAM::Role
     Properties:
@@ -88,9 +106,10 @@ Resources:
               - events:InvokeApiDestination
             Resource:
               - Fn::Sub: arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:api-destination/${EventsAPIDestination}/*  
-  ServerlessPatternsSendToEventsAPI:
+  RuleToSendToEventsAPI:
     Type: AWS::Events::Rule
     DependsOn:
+      - EventAPI
       - EventsAPIDestination
       - RoleToAllowEventBridgePublish
       - PolicyToAllowInvokeDestination
@@ -135,4 +154,12 @@ Outputs:
   DLQName:
     Value:
       Fn::Sub: "${DLQueue.QueueName}"
+  EventApiHttpURL:
+    Value:
+      Fn::Sub: "${EventAPI.Dns.Http}"
+  EventApiKey: 
+    Value: !GetAtt EventAPIKey.ApiKey
+  EventApiName:
+    Value: !Sub ${AWS::StackName}-EventAPI
+      
 

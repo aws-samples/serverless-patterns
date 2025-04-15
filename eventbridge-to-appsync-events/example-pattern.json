@@ -1,14 +1,14 @@
 {
-  "title": "AWS EventBridge to AWS AppSync Events",
-  "description": "Create an EventBridge rule to send events to AppSync Events.",
+  "title": "Amazon EventBridge to AWS AppSync Events",
+  "description": "Create an EventBridge rule to send events to an AppSync Event API.",
   "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This project demonstrates how to use EventBridge to send events to an Amazon AppSync Events API. An EventBridge rule catches events and sends them to an AppSync Events API. You can test this pattern easily using the EventBridge and Events API Console. If there are errors delivering events to your Events API from EventBridge, they will be delivered to a DLQ where you can inspect what went wrong."
-    ]
+      "This project demonstrates how to use Amazon EventBridge to send events to an AWS AppSync Events API. An EventBridge rule catches events and sends them to an AppSync Events API. You can test this pattern easily using the EventBridge and Events API Console. If there are errors delivering events to your Events API from EventBridge, they will be delivered to a dead-letter queue (DLQ) where you can inspect what went wrong."
+     ]
   },
   "gitHub": {
     "template": {
@@ -25,7 +25,7 @@
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-transform-target-input.html"
       },
       {
-        "text": "Amazon AppSync - Creating an Events API",
+        "text": "Amazon AppSync - Creating an Event API",
         "link": "https://docs.aws.amazon.com/appsync/latest/eventapi/create-event-api-tutorial.html"
       }
     ]
@@ -49,8 +49,8 @@
     {
       "name": "Ronan Prenty",
       "image": "https://avatars.githubusercontent.com/u/26303402?v=4",
-      "bio": "Principal Solutions Architect based in Dublin, Ireland.",
-      "linkedin": "https://www.linkedin.com/in/ronan-prenty/",
+      "bio": "Principal Solutions Architect at AWS based in Dublin, Ireland.",
+      "linkedin": "ronan-prenty",
       "twitter": ""
     }
   ]

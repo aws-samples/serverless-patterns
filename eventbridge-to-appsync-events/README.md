@@ -1,10 +1,11 @@
 # AWS EventBridge to AWS AppSync Events
 
-This pattern demonstrates how you can send events from EventBridge to an AppSync Events API. This will allow you to consume events in real-time over WebSockets. This stack will deploy the following resources: 
-
+This pattern demonstrates how you can send events from EventBridge to an AppSync Event API. This will allow you to consume events in real-time over WebSockets. This stack will deploy the following resources: 
+- **Amazon AppSync Events API**: Used as the destination which EventBridge will send events to. 
+- **API Key**: To allow interactions with the above API.
 - **EventBridge EventBus**: Use this event bus to send messages to for testing.
 - **EventBridge Rule**: Catches messages matching a pattern specified in the template.
-- **EventBridge API Destination**: HTTP invocation endpoint configured as a target for events. In this case, it's our pre-existing Events API HTTP endpoint passed in as a parameter.
+- **EventBridge API Destination**: HTTP invocation endpoint configured as a target for events. In this case, it's our pre-existing AppSync Event API HTTP endpoint passed in as a parameter.
 - **EventBridge Connection**: Defines the authorization type and credentials to use for authorization with an API destination. In this case, we use the pre-existing API key passed in as a parameter. 
 - **SQS Queue**: Stores messages that couldn't be delivered to the API destination successfully)
 - **SQS Queue Policy**: The resource policy of the SQS queue, allowing EventBridge to put messages into the DLQ.
@@ -19,7 +20,6 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Create an AppSync Events API](https://docs.aws.amazon.com/appsync/latest/eventapi/create-event-api-tutorial.html) and note the HTTP endpoint and API Key created. You will need this later. 
 
 ## Deployment Instructions
 
@@ -37,15 +37,12 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. During the prompts:
     * Enter a stack name
-    * Enter the desired AWS Region (where your existing Events API is deployed)
     * Allow SAM CLI to create IAM roles with the required permissions.
-    * Enter the **HTTP endpoint** for the existing Event API (AppSync Console > {{Your Events API }} > Settings > HTTP > Copy)
-    * Enter the **API Key** used to connect to your HTTP endpoint (AppSync Console > {{Your Events API }} > Settings > Copy API Key)
     * Keep default values to the rest of the parameters.
 
     Once you have run `sam deploy --guided` once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the `EventBusName` output from the SAM deployment process. You will use this in the testing process in the Console. 
+1. Note the `EventBusName` and `EventApiName` values from the SAM deployment process. You will use this in the testing process in the Console. 
 
 ## How it works
 
@@ -57,8 +54,8 @@ A new EventBus is created with a rule to catch events in your account which matc
 
 ## Testing
 
-### Set up your Events API to listen to events
-- Go to your pre-existing Events API in the console.
+### Set up your Event API to listen to events
+- Navigate to the AppSync Console and find the Event API created by the stack. You can find the name in the outputs with the key `EventApiName`. Click on it. 
 - Click the Pub/Sub Editor editor tab.
 - Scroll down to the Subscribe section and click on "connect".
 - For channel, leave the `default` parameter as it is. Replace `/*` with `/serverless-patterns`.
@@ -69,7 +66,7 @@ A new EventBus is created with a rule to catch events in your account which matc
 - Open the Amazon EventBridge Console in a new tab.
 - Click "Event buses" on the left menu.
 - On the top right, click "send events".
-- For the event bus dropdown, select the newly created event bus (from step 5 in Deployment Instructions). For "event source" enter anything (e.g `example.serverlesspatterns`) and for "detail type" enter `serverless-patterns`.
+- For the event bus dropdown, select the newly created event bus. You can find the name in the outputs with the key `EventBusName`. For "event source" enter anything (e.g `example.serverlesspatterns`) and for "detail type" enter `serverless-patterns`.
 - Enter the following payload: `{"message":"hello from test"}`.
 - Click "Send".
 - Navigate back to your Events API tab, you should see a new message arrived in the subscription area as follows: 
@@ -85,9 +82,9 @@ A new EventBus is created with a rule to catch events in your account which matc
 
 **Check the Event Bus Name**: Ensure you are sending test messages to the correct event bus (name is in the outputs of the stack) with "detail type" of `serverless-patterns`. This example won't work on the default event bus.
 
-**Events not arriving to Events API Console**: Go to the SQS console, find the SQS queue created by this stack (which is your DLQ) and poll for messages. Any errors should be shown in the attributes tab of the messages. 
+**Events not arriving to Event API Console**: Go to the SQS console, find the SQS queue created by this stack (which is your DLQ) and poll for messages. Any errors should be shown in the attributes tab of the messages. 
 
-**No messages in DLQ**: Double check that you have subscribed to the correct namespace/channel `default/serverless-patterns` in the Events API Console. Triple check you are sending messages to the correct event bus.
+**No messages in DLQ**: Double check that you have subscribed to the correct namespace/channel `default/serverless-patterns` in the Event API Console. Triple check you are sending messages to the correct event bus.
 
 ## Cleanup
  
