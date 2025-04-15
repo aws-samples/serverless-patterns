@@ -23,7 +23,7 @@ class ApigwLambdaBedrockStack(Stack):
             statements=[
                 iam.PolicyStatement(
                     actions=["bedrock:InvokeModel"],
-                    resources=[f"arn:aws:bedrock:{self.region}::foundation-model/anthropic.claude-v2"]
+                    resources=[f"arn:aws:bedrock:{self.region}::foundation-model/*"]
                 )
             ]
         )
