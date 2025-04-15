@@ -1,9 +1,9 @@
-# AWS EventBridge to AWS AppSync Events
+# Sending events from Amazon EventBridge to AWS AppSync Events
 
 This pattern demonstrates how you can send events from EventBridge to an AppSync Event API. This will allow you to consume events in real-time over WebSockets. This stack will deploy the following resources: 
 - **Amazon AppSync Events API**: Used as the destination which EventBridge will send events to. 
 - **API Key**: To allow interactions with the above API.
-- **EventBridge EventBus**: Use this event bus to send messages to for testing.
+- **EventBridge Event bus**: Use this event bus to send messages to for testing.
 - **EventBridge Rule**: Catches messages matching a pattern specified in the template.
 - **EventBridge API Destination**: HTTP invocation endpoint configured as a target for events. In this case, it's our pre-existing AppSync Event API HTTP endpoint passed in as a parameter.
 - **EventBridge Connection**: Defines the authorization type and credentials to use for authorization with an API destination. In this case, we use the pre-existing API key passed in as a parameter. 
@@ -46,7 +46,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-A new EventBus is created with a rule to catch events in your account which match a specified detail-type. These events are then sent to an API Destination which is an AppSync Events API. If there are errors delivering these events to your Events API, they will be delivered to a DLQ where you can inspect what went wrong. 
+A new EventBridge event bus is created with a rule to catch events in your account which match a specified detail-type. These events are then sent to an API Destination which is an AppSync Event API. If there are errors delivering these events to your Events API, they will be delivered to a dead-letter queue (DLQ) where you can inspect what went wrong. 
 
 ### How to change what is sent to your Events API
 
@@ -94,6 +94,6 @@ A new EventBus is created with a rule to catch events in your account which matc
     ```
 
 ----
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
