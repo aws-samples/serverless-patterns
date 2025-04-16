@@ -1,0 +1,9 @@
+{
+  "status": "SHIPPED",
+  "shippingAddress": {
+    "street": "456 New St",
+    "city": "Seattle"
+  },
+  "trackingNumber": "1Z999AA1234567890",
+  "customerNotes": "Leave at door"
+}

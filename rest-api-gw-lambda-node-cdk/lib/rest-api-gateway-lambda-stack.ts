@@ -1,0 +1,36 @@
+// lib/rest-api-gateway-lambda-stack.ts
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { LambdaStack } from './lambda-stack';
+import { ApiGatewayStack } from './api-gateway-stack';
+import { SecretsStack } from './secrets-stack';
+
+interface RestApiGwLambdaStackProps extends cdk.StackProps {
+  stageName: string;
+}
+
+export class RestApiGwLambdaStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props: RestApiGwLambdaStackProps) {
+    super(scope, id, props);
+
+    // Create Secrets Stack
+    const secretsStack = new SecretsStack(this, 'OrdersSecretsStack', {
+        crossRegionReferences: true
+    });
+
+    // Create Lambda nested stack
+    const lambdaStack = new LambdaStack(this, 'OrdersLambdaStack', {
+      stageName: props.stageName,
+      apiKey: secretsStack.apiKey,
+      description: 'Lambda functions for the API',
+    });
+
+    // Create API Gateway nested stack
+    new ApiGatewayStack(this, 'OrdersApiStack', {
+      stageName: props.stageName,
+      handleLambda: lambdaStack.handleLambda,
+      searchLambda: lambdaStack.searchLambda,
+      description: 'API Gateway with Lambda integration',
+    });
+  }
+}
