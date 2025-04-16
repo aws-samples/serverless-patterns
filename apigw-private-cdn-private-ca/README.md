@@ -17,6 +17,23 @@ Important: This application uses various AWS Services and there are costs associ
   1. Inbound rule allowing 443 traffic on the VPC CIDR range.
   2. Outbound rule allowing 443 traffic on VPC CIDR range.
 
+### AWS Private CA Cost Considerations
+
+Amazon PCA incurs costs based on your chosen operating mode:
+- General-purpose mode: Allows issuing certificates with any validity period
+- Short-lived certificate mode: Limited to certificates valid for up to 7 days
+
+Please refer to the [AWS Private CA pricing page](https://aws.amazon.com/private-ca/pricing/). 
+
+**Alternative Cost-Effective Solution:**
+
+If cost is a concern, consider creating Amazon API Gateway private custom domain name which can be configured with a SSL/TLS certificate from:
+- Your existing enterprise/internal Private CA
+- A third-party public Certificate Authority
+- Any other Certificate Authority you trust
+
+The certificate can be imported and managed through [AWS Certificate Manager (ACM)](https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html). 
+
 ### How it works
 
 Please refer to the architecture diagram below:
