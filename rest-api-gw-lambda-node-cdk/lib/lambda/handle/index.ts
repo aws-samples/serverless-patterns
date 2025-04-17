@@ -116,9 +116,7 @@ class HandleOrderLambda implements LambdaInterface {
             return await deleteOrder(_event);
           }
           break;
-      }
-      metrics.publishStoredMetrics();
-  
+      }  
       return errorResponse(404, { message: 'Not Found' });
     } catch (error) {
       console.error('Error:', error);
