@@ -1,7 +1,7 @@
 {
   "title": "Amazon VPC Lattice with AWS Lambda as weighted targets",
   "description": "This pattern demonstrates how to create a VPC Lattice which shifts traffic to different targets based on the weighted routing policy.",
-  "language": "python",
+  "language": "Python",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
