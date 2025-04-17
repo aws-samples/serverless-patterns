@@ -4,7 +4,7 @@ This pattern implements a serverless text-to-image generation service using Amaz
 
 This invokes a Lambda function containing the request and the function makes a call to Amazon Bedrock's Nova Canvas model to generate an image based on the text description. Once the image is generated, the Lambda function saves it to an S3 bucket and returns this filename to the user through the API Gateway API.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-bedrock-novacanvas
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-bedrock-nova-canvas
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -28,7 +28,7 @@ You must request access to the model before you can use it. If you try to use th
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigw-lambda-bedrock-novacanvas
+    cd apigw-bedrock-nova-canvas
     ```
 1. From the command line, initialize terraform to downloads and installs the providers defined in the configuration:
     ```
@@ -58,7 +58,7 @@ You must request access to the model before you can use it. If you try to use th
 
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/apigw-lambda-bedrock-novacanvas
+    cd serverless-patterns/apigw-bedrock-nova-canvas
     ```
 
 1. Delete all created resources
