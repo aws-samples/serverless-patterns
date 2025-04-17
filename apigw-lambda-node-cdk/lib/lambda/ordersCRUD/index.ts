@@ -67,6 +67,10 @@ sampleOrders.forEach(order => orderCache.set(order.orderId, order));
 
 
 const logger = new Logger();
+logger.appendKeys({
+  stage: process.env.STAGE,
+});
+
 const metrics = new Metrics();
 const tracer = new Tracer();
 const secretsManager = new SecretsManager();
@@ -81,9 +85,7 @@ class HandleOrderLambda implements LambdaInterface {
   @metrics.logMetrics()
   @logger.injectLambdaContext()
   public async handler(_event: APIGatewayProxyEvent, _context: Context): Promise<APIGatewayProxyResult> {
-    logger.appendKeys({
-      stage: process.env.STAGE,
-    });
+    
     logger.info('Processing event', { _event });
     metrics.addMetric('ProcessedEvents', MetricUnit.Count, 1);
     tracer.getSegment();

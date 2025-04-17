@@ -5,12 +5,12 @@ import { LambdaStack } from './lambda-stack';
 import { ApiGatewayStack } from './api-gateway-stack';
 import { SecretsStack } from './secrets-stack';
 
-interface RestApiGwLambdaStackProps extends cdk.StackProps {
+interface ApigwLambdaNodeStackProps extends cdk.StackProps {
   stageName: string;
 }
 
-export class RestApiGwLambdaStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props: RestApiGwLambdaStackProps) {
+export class ApigwLambdaNodeStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props: ApigwLambdaNodeStackProps) {
     super(scope, id, props);
 
     // Create Secrets Stack

@@ -33,7 +33,7 @@ export class ApiGatewayStack extends cdk.NestedStack {
     );
 
     this.api = new apigateway.SpecRestApi(this, 'SampleApiGatewayLambda2Api', {
-      restApiName: 'My API Service',
+      restApiName: 'OrdersAPI',
       description: 'API Gateway with Lambda integration',
       apiDefinition: apigateway.ApiDefinition.fromInline(openApiSpec),
       deployOptions: {

@@ -26,9 +26,9 @@ export class LambdaStack extends cdk.NestedStack {
     this.handleLambda = new lambdaNodejs.NodejsFunction(this, 'Handle', {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'handler',
-      entry: 'lib/lambda/handle/index.ts',
+      entry: 'lib/lambda/ordersCRUD/index.ts',
       environment: {
-        POWERTOOLS_SERVICE_NAME: 'handleOrders',
+        POWERTOOLS_SERVICE_NAME: 'ordersCRUD',
         POWERTOOLS_LOG_LEVEL: 'INFO',
         POWERTOOLS_METRICS_NAMESPACE: 'RestAPIGWLambda',
         POWERTOOLS_TRACE_ENABLED: 'true',
@@ -49,9 +49,9 @@ export class LambdaStack extends cdk.NestedStack {
     this.searchLambda = new lambdaNodejs.NodejsFunction(this, 'Search', {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'handler',
-      entry: 'lib/lambda/search/index.ts',
+      entry: 'lib/lambda/ordersSearch/index.ts',
       environment: {
-        POWERTOOLS_SERVICE_NAME: 'searchOrders',
+        POWERTOOLS_SERVICE_NAME: 'ordersSearch',
         POWERTOOLS_LOG_LEVEL: 'INFO',
         POWERTOOLS_METRICS_NAMESPACE: 'RestAPIGWLambda',
         POWERTOOLS_TRACE_ENABLED: 'true',
