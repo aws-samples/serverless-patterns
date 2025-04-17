@@ -17,10 +17,12 @@ resource "random_string" "suffix" {
 
 resource "aws_s3_bucket" "upload_bucket" {
   bucket = "${lower(var.prefix)}-s3-upload-${random_string.suffix.result}"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket" "output_bucket" {
   bucket = "${lower(var.prefix)}-s3-output-${random_string.suffix.result}"
+  force_destroy = true
 }
 
 resource "aws_iam_role" "lambda_role" {

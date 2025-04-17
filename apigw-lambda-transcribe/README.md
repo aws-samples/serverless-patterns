@@ -63,15 +63,9 @@ Important: this application uses various AWS services and there are costs associ
 1. Delete the Transcription jobs:
     Go to Transcribe > Transcription jobs > Select your transcription jobs and choose Delete
 
-1. Delete all the objects from S3:
-    Go to S3 > Select all objects > choose Delete
-
-    https://docs.aws.amazon.com/AmazonS3/latest/userguide/delete-objects.html
-    https://docs.aws.amazon.com/AmazonS3/latest/userguide/delete-multiple-objects.html
-
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/apigw-lambda-rekognition
+    cd serverless-patterns/apigw-lambda-transcribe
     ```
 
 1. Delete all created resources
