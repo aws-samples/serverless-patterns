@@ -29,51 +29,21 @@ Learn more about this pattern at Serverless Land Patterns: [SQS to Lambda to S3]
     ```
     cd sqs-lambda-s3-terraform-python
     ```
-1. Pick a unique name for the target S3 bucket eg. `my-bucket-20250329`. Replace the bucket name in following files:
 
-    * Lambda handler - `handler.py`
-        
-        ```
-        resp = s3_client.put_object(
-            Body=str(request_body).encode(encoding="utf-8"),
-            Bucket='my-bucket-20250329',
-            Key=file_name
-        )
-        ```
-    * Terraform configuration - `main.tf`
-        
-        ```
-        # S3 bucket
-        resource "aws_s3_bucket" "event-storage" {
-            bucket        = "my-bucket-20250329"
-            force_destroy = true
-            tags = {
-                Name = "event-storage"
-            }
-        }
-        ```
-1. Update the AWS region in the following files with the region, in which the resources will be created:
+1. Pick a unique name for the target S3 bucket eg. `my-bucket-20250329`. Replace the bucket name and AWS region in `variables.tf`:
 
-    * Lambda handler - `handler.py`
-        
-        ```
-        config = Config(region_name='ap-south-1')
-        ```
-    * Terraform configuration - `main.tf`
-        
-        ```
-        provider "aws" {
-            region = "ap-south-1"
-        }
-        ```
-
-1. Compress the lambda handler to generate a zip file:
-    
     ```
-    cp handler.py handler_1.py
-    gzip -S .zip handler.py
-    mv handler.py.zip sqs-lambda-s3.zip
-    mv handler_1.py handler.py
+    variable aws_region_name {
+        type = string
+        default = "ap-south-1"
+        description = "AWS Region"
+    }
+
+    variable "s3_bucket_name" {
+        type = string
+        default = "my-bucket-20250329"
+        description = "S3 Bucket name"
+    }
     ```
 
 1. Deploy the AWS resources through Terraform:
@@ -98,7 +68,7 @@ The SQS queue is configured as a trigger for the Lambda function. Whenever a mes
 
 ## Testing
 
-1. Create an IAM user which will be used for writing messages on the SQS queue
+1. Create an IAM user which will be used for writing messages on the SQS queue.
 
 2. Add persmissions for the IAM user through the following inline policy:
     

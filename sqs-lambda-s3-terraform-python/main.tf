@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-south-1"
+  region = var.aws_region_name
 }
 
 data "archive_file" "lambda_handler_zip_file" {
@@ -27,6 +27,12 @@ resource "aws_lambda_function" "event-processor" {
   handler          = "handler.lambda_handler"
   runtime          = "python3.12"
   role             = aws_iam_role.event-processor-exec-role.arn
+  environment {
+    variables = {
+      AWS_REGION = var.aws_region_name
+      S3_BUCKET_NAME = var.s3_bucket_name
+    }
+  }
 }
 
 # Lambda execution role
@@ -149,7 +155,7 @@ resource "aws_sqs_queue_policy" "event-collector-policy" {
 
 # S3 bucket
 resource "aws_s3_bucket" "event-storage" {
-  bucket        = "my-bucket-20250329"
+  bucket        = var.s3_bucket_name
   force_destroy = true
   tags = {
     Name = "event-storage"
