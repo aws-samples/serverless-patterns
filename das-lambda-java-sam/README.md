@@ -397,39 +397,36 @@ echo "AOS_DASHBOARD_PASSWORD=$AOS_DASHBOARD_PASSWORD"
 
 ```
 
-Use the values of the above parameters to log in to the OpenSearch Dashboard. Ignore any SSL certificate related warnings and follow the steps 4-6 on this workshop link - https://catalog.us-east-1.prod.workshops.aws/workshops/f0213896-4dd9-494a-89c5-f7886b45ed4a/en-US/search
-
-Once you are inside the OpenSearch dashboard, follow instructions similar to the ones mentioned in https://catalog.us-east-1.prod.workshops.aws/workshops/f0213896-4dd9-494a-89c5-f7886b45ed4a/en-US/search/visualsearch/discover-setup. Replace the my-movie* with das-records* to discover the records in the OpenSearch dashboard.
-
-Log in to OpenSearch and ignore any SSL certificate related warnings
+Log in to OpenSearch and ignore any SSL certificate related warnings, as shown below
+**Note - We have set-up a self-signed certificate and therefore you will get this SSL certificate related warning**
 
 ![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/OpenSearch_Login_Screen.png)
 
-Click on "Explore On My Own" once you are logged into the OpenSearch Dashboard
+Click on "Explore On My Own" once you are logged into the OpenSearch Dashboard, as shown below
 
 ![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Welcome_To_OpenSearch_Dashboard.png)
 
-Leave the tenant as "Global" and click on the Confirm button
+Leave the tenant as "Global" and click on the Confirm button, as shown below
 
 ![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Select_Your_Tenant.png)
 
-Click on the "Dismiss" button in the next screen
+Click on the "Dismiss" button in the next screen, as shown below
 
 ![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Introducing_New_OpenSearch_Dashboard.png)
 
-Next open the menu on the left and click on "Discover" under "OpenSearch Dashboards"
+Next open the menu on the left and click on "Discover" under "OpenSearch Dashboards", as shown below
 
 ![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Discover_Menu_On_The_Left.png)
 
-Click on the "Create Index Pattern" button
+Click on the "Create Index Pattern" button, as shown below
 
 ![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Create_Index_Pattern.png)
 
-Add "das-*" in the "Index Pattern Name" field
+Add "das-*" in the "Index Pattern Name" field, as shown below
 
 ![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Add_Das_Star_As_Index_Pattern.png)
 
-Once again click on the "Create Index Pattern" button
+Once again click on the "Create Index Pattern" button, as shown below
 
 ![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Confirm_Create_Index_Pattern.png)
 
@@ -437,7 +434,7 @@ You should now see the fields in the index as shown below
 
 ![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Index_Fields_After_Index_Creation.png)
 
-Once again click on "Discover" on the left menu
+Once again click on "Discover" on the left menu, as shown below
 
 ![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Discover_Menu_On_The_Left.png)
 
