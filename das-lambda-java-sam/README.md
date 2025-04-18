@@ -129,7 +129,7 @@ Substitute the values between the brackets "" below as you like. For \<username\
 ```
 export AWS_USER=<username>
 export AWS_REGION=<region>
-export STACK_NAME="das-lambda-serverless-patterns"
+export STACK_NAME=das-lambda-serverless-patterns
 ```
 
 **On your local machine**, run the following:
@@ -141,11 +141,11 @@ sh ./CreateAWSCLIProfileOnLocalMachine.sh $AWS_USER <access key> <secret access 
 
 where the \<access key\> \<secret access key\> need to be replaced with the values of the three outputs from Step 3 (Option 2) above.
 
-**Note: In case you did not note the values of the access key and the secret access key from Step 3 (Option 2), you can log into CloudShell in the same region that you had used earlier and do the following**
+**Note: In case you did not note the values of the access key and the secret access key from Step 3 (Option 2), you can log into CloudShell in the same region that you had used earlier and run the following commands. Make sure to replace \<username\> with the value you had user earlier in Step 3**
 
 ```
 cd serverless-patterns/das-lambda-java-sam
-sh ./GetAWSCLIProfileDetailsFromCloudshell.sh
+sh ./GetAWSCLIProfileDetailsFromCloudshell.sh <username>
 
 ```
 
@@ -235,7 +235,8 @@ You need to first get the public IP address of your local machine. For example, 
 
 ```
 MY_LOCAL_IP=$(curl http://checkip.amazonaws.com | tr -d \")
-echo $MY_LOCAL_IP
+
+echo "MY_LOCAL_IP=$MY_LOCAL_IP"
 
 ```
 
@@ -245,6 +246,8 @@ To get the security group of the EC2 instance, use the following command and rep
 
 ```
 EC2_SECURITY_GROUP_ID=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='ReverseProxySecurityGroupName'].OutputValue" --output text)
+
+echo "EC2_SECURITY_GROUP_ID=$EC2_SECURITY_GROUP_ID"
 
 ```
 
@@ -260,7 +263,7 @@ Next determine the public DNS name of the EC2 instance using the command below. 
 ```
 EC2_PUBLIC_DNS=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='ReverseProxyEC2PublicDNSName'].OutputValue" --output text)
 
-echo $EC2_PUBLIC_DNS
+echo "EC2_PUBLIC_DNS=$EC2_PUBLIC_DNS"
 
 ```
 
@@ -275,7 +278,7 @@ ssh -i "DASKeyPair.pem" ec2-user@$EC2_PUBLIC_DNS
 
 ### If you want to understand and deploy the Lambda function yourself
 
-If you do not want to build and deploy the lambda function yourself, you can jump to the step - "Step 8 - Generate Database Activity"
+**If you do not want to build and deploy the lambda function yourself, you can jump to the step - "Step 8 - Generate Database Activity"**
 
 If you are interested to understand more details of how the lambda function was built and deployed, or if you want to do it yourself, read the below sections before the "Generate Database Activity" step
 
@@ -345,7 +348,12 @@ We have also provided a SQL file that has some sample SQL commands that show you
 
 These files can be found under the folder /home/ec2-user
 
-To connect to the Aurora Postgres database use sh /home/ec2-user/db_connect.sh
+To connect to the Aurora Postgres database use
+
+```
+sh /home/ec2-user/db_connect.sh
+
+```
 
 Sample SQL commands can be found in the file /home/ec2-user/db_commands.sql
 
@@ -371,11 +379,13 @@ If you have access to the AWS console for IAM users, you can take a look at the 
 
 If you don't have access to the AWS console for IAM users, you can find out the values of the above output parameters using AWS CLI commands:
 
+**Note: Run the below commands from your local machine and not from the EC2 machine**
+
 ```
 
 AOS_DASHBOARD_IP=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='AOSDashboardsPublicIP'].OutputValue" --output text)
 
-echo "DB_SECRET=$DB_SECRET"
+echo "AOS_DASHBOARD_IP=$AOS_DASHBOARD_IP"
 
 AOS_DASHBOARD_USERNAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --profile $AWS_USER --query "Stacks[*].Outputs[?OutputKey=='AOSDomainUserName'].OutputValue" --output text)
 
