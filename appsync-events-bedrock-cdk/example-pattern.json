@@ -3,7 +3,7 @@
     "description": "Leverage AppSync Events API to stream completions from Amazon Bedrock.",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [
