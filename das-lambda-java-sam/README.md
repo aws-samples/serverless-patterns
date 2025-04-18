@@ -403,43 +403,43 @@ Once you are inside the OpenSearch dashboard, follow instructions similar to the
 
 Log in to OpenSearch and ignore any SSL certificate related warnings
 
-https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/OpenSearch_Login_Screen.png
+![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/OpenSearch_Login_Screen.png)
 
 Click on "Explore On My Own" once you are logged into the OpenSearch Dashboard
 
-https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Welcome_To_OpenSearch_Dashboard.png
+![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Welcome_To_OpenSearch_Dashboard.png)
 
 Leave the tenant as "Global" and click on the Confirm button
 
-https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Select_Your_Tenant.png
+![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Select_Your_Tenant.png)
 
 Click on the "Dismiss" button in the next screen
 
-https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Introducing_New_OpenSearch_Dashboard.png
+![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Introducing_New_OpenSearch_Dashboard.png)
 
 Next open the menu on the left and click on "Discover" under "OpenSearch Dashboards"
 
-https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Discover_Menu_On_The_Left.png
+![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Discover_Menu_On_The_Left.png)
 
 Click on the "Create Index Pattern" button
 
-https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Create_Index_Pattern.png
+![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Create_Index_Pattern.png)
 
 Add "das-*" in the "Index Pattern Name" field
 
-https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Add_Das_Star_As_Index_Pattern.png
+![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Add_Das_Star_As_Index_Pattern.png)
 
 Once again click on the "Create Index Pattern" button
 
-https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Confirm_Create_Index_Pattern.png
+![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Confirm_Create_Index_Pattern.png)
 
 You should now see the fields in the index as shown below
 
-https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Index_Fields_After_Index_Creation.png
+![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Index_Fields_After_Index_Creation.png)
 
 Once again click on "Discover" on the left menu
 
-https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Discover_Menu_On_The_Left.png
+![image](https://github.com/awsbloggersfo28/serverless-patterns/blob/main/das-lambda-java-sam/Diagrams/Discover_Menu_On_The_Left.png)
 
 You should now be able to see the Database Activity Streams records in OpenSearch
 
