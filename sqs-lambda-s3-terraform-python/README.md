@@ -95,6 +95,12 @@ The SQS queue is configured as a trigger for the Lambda function. Whenever a mes
 
 1. Generate an access key pair (access key and secret access key) for IAM user in the AWS CLI. The key pair will be used while running the test script.
 
+1. Create an AWS CLI profile (see [AWS CLI Configuration](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration)), using the key pair in the previous step:
+
+    ```
+    aws configure
+    ```
+
 1. Update the AWS region in the test script `send_sqs_event.py` with the region, in which the SQS queue will be created:
     
     ```
@@ -107,18 +113,13 @@ The SQS queue is configured as a trigger for the Lambda function. Whenever a mes
     python send_sqs_event.py
     ```
 
-1. Enter the Access Key and Secret Access Key when prompted:
-
-    ```
-    Enter Access Key: ********************
-    Enter Secret Access Key: ****************************************
-    ```
-
 1. Check the S3 bucket to see if a new JSON object has been created:
 
     ```
-    aws s3 ls --region ap-south-1 my-bucket-20250329
+    aws s3 ls [bucket-name]
     ```
+
+    Alternately, the S3 bucket can be looked up on the AWS Console.
 
 ## Cleanup
  

@@ -29,7 +29,7 @@ resource "aws_lambda_function" "event-processor" {
   role             = aws_iam_role.event-processor-exec-role.arn
   environment {
     variables = {
-      AWS_REGION = var.aws_region_name
+      AWS_REGION_NAME = var.aws_region_name
       S3_BUCKET_NAME = var.s3_bucket_name
     }
   }

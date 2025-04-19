@@ -10,7 +10,7 @@ def lambda_handler(event, context):
     print(context)
     file_name = 'request_' + json.loads(event['Records'][0]['body'])["uniqueID"] + '.json'
     request_body = event['Records'][0]['body']
-    aws_region = os.getenv('AWS_REGION')
+    aws_region = os.getenv('AWS_REGION_NAME')
     s3_bucket_ident = os.getenv('S3_BUCKET_NAME')
     config = Config(region_name=aws_region)
     s3_client = boto3.client('s3',config=config)
