@@ -5,7 +5,7 @@ This pattern is an example of a Lambda function that consumes messages from an A
 
 Below is an architecture diagram that depicts the end-to-end flow.
 
-![image](Diagrams/Create_Index_Pattern.png)
+![image](Diagrams/DasToOpenSearch.png)
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
