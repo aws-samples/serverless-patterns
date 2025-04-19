@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd lambda-sqs-best-practices-cdk
+    cd serverless-patterns/lambda-sqs-best-practices-cdk
     ```
 
 1. Install cdk dependencies
@@ -39,7 +39,15 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd ..
     cdk deploy
+
     ```
+
+Note: If you are using CDK for the first time then bootstrap CDK in your account by using below command:
+
+```
+cdk bootstrap aws://ACCOUNT-NUMBER-1/REGION-1
+
+```
 
 ## How it works
 
