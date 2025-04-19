@@ -1,0 +1,30 @@
+{
+  "name": "lambda-sqs-best-practices-cdk",
+  "version": "1.0.0",
+  "bin": {
+    "lambda-sqs-best-practices-cdk": "bin/lambda-sqs-best-practices-cdk.js"
+  },
+  "scripts": {
+    "build": "echo \"The build step is not required when using JavaScript!\" && exit 0",
+    "cdk": "cdk",
+    "test": "jest",
+    "deploy": "cdk deploy",
+    "destroy": "cdk destroy",
+    "send-message": "node scripts/send-message.js",
+    "send-custom": "node scripts/send-custom-message.js",
+    "logs": "aws logs tail /aws/lambda/LambdaSqsBestPracticesCdkStack-MyLambdaFunction --follow",
+    "logs-insights": "aws logs start-query --log-group-name /aws/lambda/LambdaSqsBestPracticesCdkStack-MyLambdaFunction --start-time $(date -d '1 hour ago' +%s) --end-time $(date +%s) --query-string \"$(cat queries/log-insights.txt)\""
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.110.0",
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.110.0",
+    "aws-sdk": "^2.1490.0",
+    "constructs": "^10.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
