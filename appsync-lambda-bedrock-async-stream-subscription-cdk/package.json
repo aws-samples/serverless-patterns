@@ -24,7 +24,7 @@
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.496.0",
     "aws-amplify": "^6.0.12",
-    "aws-cdk-lib": "^2.99.1",
+    "aws-cdk-lib": "^2.185.0",
     "constructs": "^10.0.0",
     "cookie": "^1.0.2",
     "graphql": "^16.8.1",

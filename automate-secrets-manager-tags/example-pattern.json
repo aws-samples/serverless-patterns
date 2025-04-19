@@ -1,0 +1,53 @@
+{
+  "title": "Automate creator username tags for AWS Secrets Manager secrets",
+  "description": "Automate tagging of AWS Secrets Manager secrets with the creator's username",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates the automatic tagging of username to the secrets they created when user is authenticated via AWS IAM Identity Center. This enables easier ownership tracking and management of secrets across the organization.",
+      "Eventbridge rule is configured to look for CreateSecret events to invoke a Lambda function to tag the secret with the creator's username."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/automate-secrets-manager-tags",
+      "templateURL": "serverless-patterns/automate-secrets-manager-tags",
+      "projectFolder": "automate-secrets-manager-tags",
+      "templateFile": "automate-secrets-manager-tags.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Match AWS Secrets Manager events with Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/monitoring-eventbridge.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Chan Shi Hui",
+      "image": "https://avatars.githubusercontent.com/u/103100403?v=4",
+      "bio": "Shi Hui is a Technical Account Manager working at AWS Singapore to build, run, and scale customer workloads on AWS.",
+      "linkedin": "chan-shi-hui-38915aa3"
+    }
+  ]
+}

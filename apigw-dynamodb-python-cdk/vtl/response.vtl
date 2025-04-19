@@ -1,0 +1,9 @@
+## Response mapping template for DynamoDB PutItem operation
+#set($inputRoot = $input.path('$'))
+{
+  "statusCode": "200",
+  "body": {"message": "Item Added Successfully"},
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}
