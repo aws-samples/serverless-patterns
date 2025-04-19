@@ -278,6 +278,27 @@
           }
         }
       },
+      "OrderStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "CONFIRMED",
+          "PROCESSING",
+          "SHIPPED",
+          "DELIVERED",
+          "CANCELLED"
+        ],
+        "description": "The current status of the order"
+      },
+      "ShippingMethod": {
+        "type": "string",
+        "enum": [
+          "STANDARD",
+          "EXPRESS",
+          "NEXT_DAY"
+        ],
+        "description": "Available shipping methods for orders"
+      },
       "OrderItem": {
         "type": "object",
         "required": ["productId", "quantity", "price"],
@@ -351,8 +372,7 @@
             "enum": ["CREDIT_CARD", "DEBIT_CARD", "PAYPAL", "BANK_TRANSFER"]
           },
           "shippingMethod": {
-            "type": "string",
-            "enum": ["STANDARD", "EXPRESS", "NEXT_DAY"]
+            "$ref": "#/components/schemas/ShippingMethod"
           },
           "customerNotes": {
             "type": "string",
@@ -376,15 +396,13 @@
         "type": "object",
         "properties": {
           "status": {
-            "type": "string",
-            "enum": ["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]
+            "$ref": "#/components/schemas/OrderStatus"
           },
           "shippingAddress": {
             "$ref": "#/components/schemas/Address"
           },
           "shippingMethod": {
-            "type": "string",
-            "enum": ["STANDARD", "EXPRESS", "NEXT_DAY"]
+            "$ref": "#/components/schemas/ShippingMethod"
           },
           "trackingNumber": {
             "type": "string"
@@ -403,8 +421,7 @@
             "type": "string"
           },
           "status": {
-            "type": "string",
-            "enum": ["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]
+            "$ref": "#/components/schemas/OrderStatus"
           },
           "createdAt": {
             "type": "string",
