@@ -13,7 +13,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Order"
+                "$ref": "#/components/schemas/OrderCreationInput"
               }
             }
           }
@@ -24,7 +24,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderResponse"
+                  "$ref": "#/components/schemas/Order"
                 }
               }
             }
@@ -62,7 +62,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderResponse"
+                  "$ref": "#/components/schemas/Order"
                 }
               }
             }
@@ -108,7 +108,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderResponse"
+                  "$ref": "#/components/schemas/Order"
                 }
               }
             }
@@ -175,8 +175,7 @@
                   "statuses": {
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "enum": ["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]
+                      "$ref": "#/components/schemas/OrderStatus"
                     }
                   },
                   "productIds": {
@@ -220,7 +219,7 @@
                     "items": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/OrderResponse"
+                        "$ref": "#/components/schemas/Order"
                       }
                     },
                     "pagination": {
@@ -292,12 +291,12 @@
       },
       "ShippingMethod": {
         "type": "string",
-        "enum": [
-          "STANDARD",
-          "EXPRESS",
-          "NEXT_DAY"
-        ],
+        "enum": ["STANDARD", "EXPRESS", "NEXT_DAY"],
         "description": "Available shipping methods for orders"
+      },
+      "PaymentMethod": {
+        "type": "string",
+        "enum": ["CREDIT_CARD", "DEBIT_CARD", "PAYPAL", "BANK_TRANSFER"]
       },
       "OrderItem": {
         "type": "object",
@@ -327,9 +326,14 @@
           }
         }
       },
-      "Order": {
+      "OrderCreationInput": {
         "type": "object",
-        "required": ["customerId", "items", "shippingAddress", "billingAddress"],
+        "required": [
+          "customerId",
+          "items",
+          "shippingAddress",
+          "billingAddress"
+        ],
         "properties": {
           "customerId": {
             "type": "string"
@@ -347,11 +351,6 @@
           "billingAddress": {
             "$ref": "#/components/schemas/Address"
           },
-          "subtotal": {
-            "type": "number",
-            "format": "float",
-            "minimum": 0
-          },
           "tax": {
             "type": "number",
             "format": "float",
@@ -362,14 +361,8 @@
             "format": "float",
             "minimum": 0
           },
-          "total": {
-            "type": "number",
-            "format": "float",
-            "minimum": 0
-          },
           "paymentMethod": {
-            "type": "string",
-            "enum": ["CREDIT_CARD", "DEBIT_CARD", "PAYPAL", "BANK_TRANSFER"]
+            "$ref": "#/components/schemas/PaymentMethod"
           },
           "shippingMethod": {
             "$ref": "#/components/schemas/ShippingMethod"
@@ -392,6 +385,40 @@
           }
         }
       },
+      "Order": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OrderCreationInput"
+          },
+          {
+            "type": "object",
+            "required": ["orderId", "status", "createdAt"],
+            "properties": {
+              "orderId": {
+                "type": "string",
+                "readOnly": true
+              },
+              "status": {
+                "$ref": "#/components/schemas/OrderStatus",
+                "readOnly": true
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "readOnly": true
+              },
+              "estimatedDeliveryDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "trackingNumber": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
       "OrderUpdate": {
         "type": "object",
         "properties": {
@@ -410,29 +437,6 @@
           "customerNotes": {
             "type": "string",
             "maxLength": 500
-          }
-        }
-      },
-      "OrderResponse": {
-        "type": "object",
-        "required": ["orderId", "status", "createdAt"],
-        "properties": {
-          "orderId": {
-            "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/OrderStatus"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "estimatedDeliveryDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "trackingNumber": {
-            "type": "string"
           }
         }
       }
