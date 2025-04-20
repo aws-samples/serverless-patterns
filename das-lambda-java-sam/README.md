@@ -5,7 +5,9 @@ This pattern is an example of a Lambda function that consumes messages from an A
 
 Below is an architecture diagram that depicts the end-to-end flow.
 
-![image](Diagrams/DasToOpenSearch.png)
+
+
+As can be seen in the architecture diagram above, whenever there is any activity on the Aurora Postgres database, the Database Activity Streams (DAS) sends out messages on the Kinesis Data Streams, that is automatically created when DAS is enabled on the database. The messages that are put into the Kinesis Data Stream are encrypted using a KMS key. Apart from user originated database activity, Aurora also sends out heartbeat events and database activity by the RDS administrator. In the Lambda function that has the Kinesis Data Stream as its event source, the messages are decrypted using the same KMS key with which the messages were encrypted by the DAS. All heartbeat events and RDS Admin events are filtered out. The Lambda function formats user originated events into a structured JSON string and writes the JSON string to an S3 bucket as an object. As soon as a new object is written to the S3 bucket, an S3 Event Notification is trigggered and puts a message on an SQS queue. An OpenSearch Ingestion pipeline has been set-up that reads messages from the SQS queue, reads the object from the S3 bucket and then writes out the contents of the S3 object to an Amazon OpenSearch index.
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
