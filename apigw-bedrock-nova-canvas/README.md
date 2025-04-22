@@ -1,5 +1,7 @@
 # Serverless Text-to-Image Generation with Amazon Bedrock Nova Canvas
 
+![architecture](architecture/architecture.png)
+
 This pattern implements a serverless text-to-image generation service using Amazon API Gateway, AWS Lambda and Amazon Bedrock's Nova Canvas model. It provides a REST API endpoint where users can submit text prompts. 
 
 This invokes a Lambda function containing the request and the function makes a call to Amazon Bedrock's Nova Canvas model to generate an image based on the text description. Once the image is generated, the Lambda function saves it to an S3 bucket and returns this filename to the user through the API Gateway API.
@@ -39,18 +41,24 @@ You must request access to the model before you can use it. If you try to use th
     terraform apply
     ```
 1. During the prompts
+    ```
     #var.prefix
     - Enter a value: {enter any prefix to associate with resources}
+    ```
 
 ## Testing
 
 1. Make a POST request to the API using the following cURL command:
 
-    curl -X POST 'https://<api-id>.execute-api.us-east-1.amazonaws.com/dev/image_gen' --header "Content-Type: application/json" --data '{"prompt": "<your prompt>"}'
+    ```
+    curl -X POST 'API_ENDPOINT' --header "Content-Type: application/json" --data '{"prompt": "YOUR_PROMPT"}'
+    ```
 
-    Note: Replace 'api-id' with the generated API ID from Terraform (refer to the Terraform Outputs section), "your prompt" with your desired prompt. For ex,
+    Note: Replace `API_ENDPOINT` with the generated `api_endpoint` from Terraform (refer to the Terraform Outputs section), "YOUR_PROMPT" with your desired prompt. For ex,
 
+    ```
     curl -X POST 'https://1234abcde.execute-api.us-east-1.amazonaws.com/dev/image_gen' --header "Content-Type: application/json" --data '{"prompt": "Kitten playing the piano"}'
+    ```
 
 1. Once the API Gateway responds with the image ID, you can navigate to the S3 bucket (refer to the Terraform Outputs section for the bucket name) and select the correct image ID to view the generated image.
 
