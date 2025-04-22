@@ -5,6 +5,7 @@ import { DynamoDBStack } from './dynamodb-stack';
 import { LambdaStack } from './lambda-stack';
 import { ApiGatewayStack } from './api-gateway-stack';
 import { SecretsStack } from './secrets-stack';
+import { CognitoStack } from './cognito-stack';
 
 interface ApigwLambdaNodeStackProps extends cdk.StackProps {
   stageName: string;
@@ -21,6 +22,8 @@ export class ApigwLambdaNodeStack extends cdk.Stack {
 
     const dynamoDbStack = new DynamoDBStack(this, 'OrdersDynamoDBStack')
 
+    const cognitoStack = new CognitoStack(this, 'OrdersCognitoStack');
+
     // Create Lambda nested stack
     const lambdaStack = new LambdaStack(this, 'OrdersLambdaStack', {
       stageName: props.stageName,
@@ -30,11 +33,13 @@ export class ApigwLambdaNodeStack extends cdk.Stack {
     });
 
     // Create API Gateway nested stack
-    new ApiGatewayStack(this, 'OrdersApiStack', {
+    const apiGatewayStack = new ApiGatewayStack(this, 'OrdersApiStack', {
       stageName: props.stageName,
       handleLambda: lambdaStack.handleLambda,
       searchLambda: lambdaStack.searchLambda,
       description: 'API Gateway with Lambda integration',
+      userPool: cognitoStack.userPool
     });
+    apiGatewayStack.node.addDependency(cognitoStack);
   }
 }

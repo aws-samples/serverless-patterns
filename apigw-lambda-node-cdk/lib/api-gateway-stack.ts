@@ -1,15 +1,17 @@
 // lib/api-gateway-stack.ts
 import * as cdk from 'aws-cdk-lib';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
-import path = require('path');
+import * as path from 'path';
 import * as fs from 'fs';
 
 interface ApiGatewayStackProps extends cdk.NestedStackProps {
   handleLambda: lambda.Function;
   searchLambda: lambda.Function;
   stageName: string;
+  userPool: cognito.UserPool
 }
 
 export class ApiGatewayStack extends cdk.NestedStack {
@@ -29,6 +31,10 @@ export class ApiGatewayStack extends cdk.NestedStack {
             '${region}', cdk.Stack.of(this).region
         ).replaceAll(     
             '${searchLambdaArn}', props.searchLambda.functionArn,
+        ).replaceAll(
+            '${accountId}', cdk.Stack.of(this).account
+        ).replaceAll(
+            '${userPoolId}', props.userPool.userPoolId
         )
     );
 
