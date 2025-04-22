@@ -19,50 +19,59 @@ export class LambdaStack extends cdk.NestedStack {
 
     const powertoolsLayer = lambda.LayerVersion.fromLayerVersionArn(
       this,
-      'powertools-layer',
-      `arn:aws:lambda:${cdk.Stack.of(this).region}:094274105915:layer:AWSLambdaPowertoolsTypeScriptV2:3`
+      "powertools-layer",
+      `arn:aws:lambda:${
+        cdk.Stack.of(this).region
+      }:094274105915:layer:AWSLambdaPowertoolsTypeScriptV2:3`
     );
 
-    this.handleLambda = new lambdaNodejs.NodejsFunction(this, 'Handle', {
+    const ordersLayer = new lambda.LayerVersion(this, "orders-layer", {
+      code: lambda.Code.fromAsset("lib/ordersCommonCode"),
+      compatibleRuntimes: [lambda.Runtime.NODEJS_22_X],
+      description: "Common orders code layer",
+      layerVersionName: "orders-layer",
+    });
+
+    this.handleLambda = new lambdaNodejs.NodejsFunction(this, "Handle", {
       runtime: lambda.Runtime.NODEJS_22_X,
-      handler: 'handler',
-      entry: 'lib/lambda/ordersCRUD/index.ts',
+      handler: "handler",
+      entry: "lib/lambda/ordersCRUD/index.ts",
       environment: {
-        POWERTOOLS_SERVICE_NAME: 'ordersCRUD',
-        POWERTOOLS_LOG_LEVEL: 'INFO',
-        POWERTOOLS_METRICS_NAMESPACE: 'RestAPIGWLambda',
-        POWERTOOLS_TRACE_ENABLED: 'true',
-        POWERTOOLS_METRICS_FUNCTION_NAME: 'handle',
-        POWERTOOLS_TRACER_CAPTURE_HTTPS_REQUESTS: 'true',
-        POWERTOOLS_TRACER_CAPTURE_RESPONSE: 'true',
-        POWERTOOLS_DEV: 'false',
+        POWERTOOLS_SERVICE_NAME: "ordersCRUD",
+        POWERTOOLS_LOG_LEVEL: "INFO",
+        POWERTOOLS_METRICS_NAMESPACE: "RestAPIGWLambda",
+        POWERTOOLS_TRACE_ENABLED: "true",
+        POWERTOOLS_METRICS_FUNCTION_NAME: "handle",
+        POWERTOOLS_TRACER_CAPTURE_HTTPS_REQUESTS: "true",
+        POWERTOOLS_TRACER_CAPTURE_RESPONSE: "true",
+        POWERTOOLS_DEV: "false",
         STAGE: props.stageName,
-        API_KEY_SECRET_ARN: props.apiKey.secretArn
+        API_KEY_SECRET_ARN: props.apiKey.secretArn,
       },
       tracing: lambda.Tracing.ACTIVE,
-      layers: [powertoolsLayer],
+      layers: [powertoolsLayer, ordersLayer],
       timeout: cdk.Duration.seconds(30),
     });
 
     props.apiKey.grantRead(this.handleLambda);
 
-    this.searchLambda = new lambdaNodejs.NodejsFunction(this, 'Search', {
+    this.searchLambda = new lambdaNodejs.NodejsFunction(this, "Search", {
       runtime: lambda.Runtime.NODEJS_22_X,
-      handler: 'handler',
-      entry: 'lib/lambda/ordersSearch/index.ts',
+      handler: "handler",
+      entry: "lib/lambda/ordersSearch/index.ts",
       environment: {
-        POWERTOOLS_SERVICE_NAME: 'ordersSearch',
-        POWERTOOLS_LOG_LEVEL: 'INFO',
-        POWERTOOLS_METRICS_NAMESPACE: 'RestAPIGWLambda',
-        POWERTOOLS_TRACE_ENABLED: 'true',
-        POWERTOOLS_METRICS_FUNCTION_NAME: 'search',
-        POWERTOOLS_TRACER_CAPTURE_HTTPS_REQUESTS: 'true',
-        POWERTOOLS_TRACER_CAPTURE_RESPONSE: 'true',
-        POWERTOOLS_DEV: 'false',
+        POWERTOOLS_SERVICE_NAME: "ordersSearch",
+        POWERTOOLS_LOG_LEVEL: "INFO",
+        POWERTOOLS_METRICS_NAMESPACE: "RestAPIGWLambda",
+        POWERTOOLS_TRACE_ENABLED: "true",
+        POWERTOOLS_METRICS_FUNCTION_NAME: "search",
+        POWERTOOLS_TRACER_CAPTURE_HTTPS_REQUESTS: "true",
+        POWERTOOLS_TRACER_CAPTURE_RESPONSE: "true",
+        POWERTOOLS_DEV: "false",
         STAGE: props.stageName,
       },
       tracing: lambda.Tracing.ACTIVE,
-      layers: [powertoolsLayer],
+      layers: [powertoolsLayer, ordersLayer],
       timeout: cdk.Duration.seconds(30),
     });
 

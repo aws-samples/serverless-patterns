@@ -195,7 +195,7 @@
                   },
                   "sortBy": {
                     "type": "string",
-                    "enum": ["createdAt", "total", "status"],
+                    "enum": ["createdAt", "status"],
                     "default": "createdAt"
                   },
                   "sortOrder": {

@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "target": "ES2024",
-    "module": "commonjs",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noUncheckedIndexedAccess": true,
     "lib": [
       "es2024",
       "dom"
@@ -23,7 +25,13 @@
     "strictPropertyInitialization": false,
     "typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "/opt/ordersCommonCode/*": [
+        "lib/ordersCommonCode/*"
+      ]
+    }
   },
   "exclude": [
     "node_modules",
