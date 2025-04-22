@@ -1,13 +1,15 @@
 // lib/lambda-stack.ts
-import * as cdk from 'aws-cdk-lib';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as lambdaNodejs from 'aws-cdk-lib/aws-lambda-nodejs';
-import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
-import { Construct } from 'constructs';
+import * as cdk from "aws-cdk-lib";
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as lambdaNodejs from "aws-cdk-lib/aws-lambda-nodejs";
+import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
+import { Construct } from "constructs";
 
 export interface LambdaStackProps extends cdk.NestedStackProps {
-    stageName: string;
-    apiKey: secretsmanager.Secret;
+  stageName: string;
+  apiKey: secretsmanager.Secret;
+  table: dynamodb.TableV2;
 }
 
 export class LambdaStack extends cdk.NestedStack {
@@ -47,6 +49,7 @@ export class LambdaStack extends cdk.NestedStack {
         POWERTOOLS_DEV: "false",
         STAGE: props.stageName,
         API_KEY_SECRET_ARN: props.apiKey.secretArn,
+        DYNAMODB_TABLE_NAME: props.table.tableName,
       },
       tracing: lambda.Tracing.ACTIVE,
       layers: [powertoolsLayer, ordersLayer],
@@ -54,6 +57,7 @@ export class LambdaStack extends cdk.NestedStack {
     });
 
     props.apiKey.grantRead(this.handleLambda);
+    props.table.grantReadWriteData(this.handleLambda);
 
     this.searchLambda = new lambdaNodejs.NodejsFunction(this, "Search", {
       runtime: lambda.Runtime.NODEJS_22_X,
@@ -69,12 +73,12 @@ export class LambdaStack extends cdk.NestedStack {
         POWERTOOLS_TRACER_CAPTURE_RESPONSE: "true",
         POWERTOOLS_DEV: "false",
         STAGE: props.stageName,
+        DYNAMODB_TABLE_NAME: props.table.tableName,
       },
       tracing: lambda.Tracing.ACTIVE,
       layers: [powertoolsLayer, ordersLayer],
       timeout: cdk.Duration.seconds(30),
     });
-
+    props.table.grantReadData(this.searchLambda);
   }
- 
 }
