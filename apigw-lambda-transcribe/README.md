@@ -34,29 +34,37 @@ Important: this application uses various AWS services and there are costs associ
     terraform apply
     ```
 1. During the prompts
+    ```
     #var.prefix
     - Enter a value: {enter any prefix to associate with resources}
 
     #var.region
     - Enter a value: {enter the region for deployment}
-
+    ```
+    
 ## Testing
 
 1. Make a POST request to the API using the following cURL command:
 
-    curl --location 'https://<api-id>.execute-api.<region>.amazonaws.com/dev/generate-presigned-url' --header 'Content-Type: application/json' --data '{"object_name": "audio.mp3", "content_type": "audio/mpeg"}'
+    ```
+    curl --location 'API_ENDPOINT' --header 'Content-Type: application/json' --data '{"object_name": "audio.mp3", "content_type": "audio/mpeg"}'
+    ```
 
-    Note: Replace 'api-id' with the generated API ID from Terraform, 'region' with the region where the API is deployed (refer to the Terraform Outputs section) 'object_name' with your desired name for the S3 object and 'content_type' with the content type of the audio, for ex, mp3 or m4a
+    Note: Replace `API_ENDPOINT` with the generated `api_endpoint` from Terraform (refer to the Terraform Outputs section) `object_name` with your desired name for the S3 object and `content_type` with the content type of the audio, for ex, mp3 or m4a
 
 1. Get the pre-signed URL from the previous step and use the following cURL command to upload the object in S3:
 
-    curl -v --location --request PUT '<presigned-url>' --header 'Content-Type: application/json' --data '<path-of-the-object>.mp3'
+    ```
+    curl -v --location -T "audio.mp3" \
+  'PRESIGNED_URL' \
+  --header 'Content-Type: audio/mpeg'
+    ```
 
-    Note: Replace 'presigned-url' with pre-signed URL generated in the previous step. 'Content-Type' should match the content type used to generate the pre-signed URL in the previous step. Make sure you are passing the correct path of the object in the --data parameter.
+    Note: Replace `PRESIGNED_URL` with pre-signed URL generated in the previous step. `Content-Type` should match the content type used to generate the pre-signed URL in the previous step. 
 
     Once this command is run successfully and the object is uploaded, HTTP 200 OK should be seen. You can also check the S3 bucket to see if the object is uploaded correctly.
 
-1. Once the object is uploaded successfully, the "process_s3_event" Lambda function is invoked. Lambda function will then invoke the StartTranscriptionJob API and Amazon Transcibe will upload the transcribed output to the output S3 bucket.
+1. Once the object is uploaded successfully, the `process_s3_event` Lambda function is invoked. Lambda function will then invoke the `StartTranscriptionJob` API and Amazon Transcribe will upload the transcribed output to the output S3 bucket (Refer to the Terraform Outputs section under `output_bucket_name`).
 
 ## Cleanup
  
