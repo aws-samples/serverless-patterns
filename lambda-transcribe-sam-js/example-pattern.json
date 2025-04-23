@@ -1,13 +1,13 @@
 {
-  "title": "Amazon S3 to AWS Lambda to Amazon Transcribe using AWS SAM",
-  "description": "This pattern creates a serverless pipeline that automatically triggers an Amazon Transcribe job when audio files are uploaded to an S3 bucket, using Lambda to orchestrate the transcription process.",
-  "language": "Javascript",
+  "title": "Amazon S3 to AWS Lambda to Amazon Transcribe",
+  "description": "This pattern creates a serverless pipeline that automatically invokes an Amazon Transcribe job when audio files are uploaded to an Amazon S3 bucket.",
+  "language": "Node.js",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "When audio files are uploaded to the S3 bucket, it automatically triggers a Lambda function that starts a transcription job using Amazon Transcribe. The Lambda function extracts information about the uploaded audio file and sends it to the Amazon Transcribe service, which processes the audio and generates a text transcription that is saved back to the specified S3 bucket in the "transcriptions" folder."
+      "When audio files are uploaded to the S3 bucket, an AWS Lambda function starts a transcription job using Amazon Transcribe. The Lambda function extracts information about the uploaded audio file and sends it to the Amazon Transcribe service, which processes the audio and generates a text transcription that is saved back to the specified S3 bucket."
     ]
   },
   "gitHub": {
@@ -29,26 +29,19 @@
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
       },
       {
-          "text": "Amazon Transcribe",
-          "link": "https://docs.aws.amazon.com/transcribe/latest/dg/what-is.html"
-        }
+        "text": "Amazon Transcribe",
+        "link": "https://docs.aws.amazon.com/transcribe/latest/dg/what-is.html"
+      }
     ]
   },
   "deploy": {
-    "text": [
-      "sam build",
-      "sam deploy --guided"
-    ]
+    "text": ["sam build", "sam deploy --guided"]
   },
   "testing": {
-    "text": [
-      "See the GitHub repo for detailed testing instructions."
-    ]
+    "text": ["See the GitHub repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": [
-      "sam delete"
-    ]
+    "text": ["sam delete"]
   },
   "authors": [
     {

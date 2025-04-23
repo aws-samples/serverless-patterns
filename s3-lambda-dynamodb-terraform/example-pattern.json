@@ -1,7 +1,6 @@
 {
     "title": "Amazon S3 to AWS Lambda to Amazon DynamoDB",
-    "description": "Upload object data from S3 to DynamoDB via Lambda.",
-    "language": "Python",
+    "description": "Upload object data from Amazon S3 to Amazon DynamoDB via AWS Lambda.",    "language": "Python",
     "level": "200",
     "framework": "Terraform",
     "introBox": {
@@ -10,7 +9,7 @@
         "This pattern in Terraform offers a complete solution to load data from JSON files stored on S3. The following resources are created:",
         "- S3 Bucket with event notification on object creates",
         "- DynamoDB Table with on-demand billing mode",
-        "- Lambda function that runs python and takes environment variables of bucket name, and dynamodb table"
+        "- Lambda function that runs python and takes environment variables of bucket name, and DynamoDB table"
       ]
     },
     "gitHub": {

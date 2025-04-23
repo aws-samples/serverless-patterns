@@ -1,6 +1,6 @@
 {
-    "title": "Serverless Messaging Redrive",
-    "description": "Automate the redrive and fixing of queue messages using AWS Lambda.",
+    "title": "Amazon SQS Messaging Redrive",
+    "description": "Automate the redrive and fixing of Amazon SQS messages using AWS Lambda.",
     "language": "Python",
     "level": "200",
     "framework": "SAM",
@@ -11,7 +11,7 @@
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/serverless-messaging-processing",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/serverless-message-processing",
         "templateURL": "serverless-patterns/serverless-messaging-processing",
         "projectFolder": "serverless-messaging-processing",
         "templateFile": "template.yaml"

@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway to Amazon Translate",
-  "description": "Create a REST API Gateway that can perform POST API Call to Amazon Translate's TranslateText API",
+  "description": "Create an Amazon API Gateway REST API can perform POST API Call to Amazon Translate's TranslateText API",
   "language": "Python",
   "level": "200",
   "framework": "AWS CDK",

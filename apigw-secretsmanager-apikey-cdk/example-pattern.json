@@ -1,6 +1,6 @@
 {
-  "title": "API Gateway, Lambda Authorizer & Secrets Manager for API Key Authentication",
-  "description": "Implement a secure API key-based authorization system using Amazon API Gateway, Lambda Authorizer, and AWS Secrets Manager.",
+  "title": "Amazon API Gateway, AWS Lambda Authorizer & Secrets Manager for API Key Authentication",
+  "description": "Implement a secure API key-based authorization system using Amazon API Gateway, AWS Lambda Authorizer, and AWS Secrets Manager.",
 
   "language": "TypeScript",
   "level": "200",
