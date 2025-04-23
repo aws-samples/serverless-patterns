@@ -7,7 +7,7 @@ from aws_cdk import (
     aws_events as events,
     aws_events_targets as targets,
     aws_iam as iam,
-    CfnOutput,
+    CfnOutput, CfnParameter,
 )
 from aws_cdk.aws_iam import PolicyStatement
 from constructs import Construct
@@ -17,6 +17,13 @@ class BedrockBatchInferencePatternStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        # Accept the model id as a parameter
+        model_id = CfnParameter(self, "ModelARN",
+                                type="String",
+                                description="ARN of the model that you want to use for the batch inference. This would default to Anthropic 3.5 Haiku in us-west-2 if no input is provided",
+                                default="arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0"
+                                )
 
         # Create an S3 bucket with default encryption
         bucket = s3.Bucket(
@@ -48,7 +55,7 @@ class BedrockBatchInferencePatternStack(Stack):
         statement = PolicyStatement(
             actions=["bedrock:CreateModelInvocationJob", "iam:PassRole"],
             resources=[f"arn:aws:bedrock:{Stack.of(self).region}:{Stack.of(self).account}:model-invocation-job/*",
-                       "arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
+                       model_id.value_as_string,
                        bedrock_role.role_arn],
             effect=iam.Effect.ALLOW
         )
@@ -75,7 +82,7 @@ class BedrockBatchInferencePatternStack(Stack):
                 service="bedrock",
                 action="createModelInvocationJob",
                 parameters={
-                    "modelId": "arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
+                    "modelId": model_id.value_as_string,
                     "jobName": f"batch-inference-job-{int(time.time())}",
                     "inputDataConfig": {
                         "s3InputDataConfig": {
@@ -100,6 +107,3 @@ class BedrockBatchInferencePatternStack(Stack):
             value=bucket.bucket_name,
             description="Name of the S3 bucket created"
         )
-
-        # print the bucket name
-        print(f"Bucket name: cp model_input/input.jsonl s3://{bucket.bucket_name}/input/")
