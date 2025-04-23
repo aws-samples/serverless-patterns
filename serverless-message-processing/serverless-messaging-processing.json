@@ -1,0 +1,105 @@
+{
+    "title": "Serverless Messaging Redrive",
+    "description": "Automate the redrive and fixing of queue messages using AWS Lambda.",
+    "language": "Python",
+    "level": "200",
+    "framework": "SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates a serverless solution for processing and fixing malformed messages using Amazon SQS queues and AWS Lambda functions"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/serverless-messaging-processing",
+            "templateURL": "serverless-patterns/serverless-message-processing",
+            "projectFolder": "serverless-message-processing",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon SQS Docs",
+                "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+            },
+            {
+                "text": "Using dead-letter queues in Amazon SQS",
+                "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ilias Ali",
+            "image": "https://avatars.githubusercontent.com/zalilias",
+            "bio": "I am a Solutions Architect working at AWS based in the UK.",
+            "linkedin": "ilias-ali-0849991a4"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 10,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway"
+        },
+        "icon2": {
+            "x": 30,
+            "y": 50,
+            "service": "sqs",
+            "label": "Amazon SQS"
+        },
+        "icon3": {
+            "x": 52,
+            "y": 25,
+            "service": "lambda",
+            "label": "Processor"
+        },
+        "icon4": {
+            "x": 70,
+            "y": 40,
+            "service": "sqs",
+            "label": "Amazon SQS DLQ"
+        },
+        "icon5": {
+            "x": 92,
+            "y": 65,
+            "service": "lambda",
+            "label": "Remediation"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        },
+        "line4": {
+            "from": "icon4",
+            "to": "icon5"
+        }
+    }
+}
