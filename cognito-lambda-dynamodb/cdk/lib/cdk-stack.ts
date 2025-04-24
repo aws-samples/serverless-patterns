@@ -58,6 +58,8 @@ export class CdkStack extends cdk.Stack {
     this.userPool = new Cognito.UserPool(this, "UserPool", {
       userPoolName: "USER-POOL",
       selfSignUpEnabled: true,
+      deletionProtection: false,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoVerify: {
         email: true,
       },
