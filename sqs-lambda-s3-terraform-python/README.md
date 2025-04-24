@@ -2,6 +2,8 @@
 
 This pattern creates an SQS queue, a Lambda function, an S3 bucket along with event source mapping for the Lambda function and appropriate permissions to enable the interfacing between these resources.
 
+An example of where this pattern could be useful is **handling large number of deployment requests asynchronously**. Given that deployment requests can vary in terms of application target and payload, this pattern can be employed as an _entry point_ component for deployment systems, that receive and process a large number of requests for deployments across multiple applications. Requests can be processed in batches and outcomes can be saved on the S3 bucket, which can further trigger notifications workflows.
+
 Learn more about this pattern at Serverless Land Patterns: [SQS to Lambda to S3](https://serverlessland.com/patterns/sqs-lambda-s3)
 
 **Important:** this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -68,38 +70,12 @@ The SQS queue is configured as a trigger for the Lambda function. Whenever a mes
 
 ## Testing
 
-1. Create an IAM user which will be used for writing messages on the SQS queue.
+1. Before the test script can be executed, a few pre-steps should be completed:
 
-2. Add persmissions for the IAM user through the following inline policy:
-    
-    ```
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "VisualEditor0",
-                "Effect": "Allow",
-                "Action": [
-                    "sqs:DeleteMessage",
-                    "sqs:TagQueue",
-                    "sqs:UntagQueue",
-                    "sqs:ReceiveMessage",
-                    "sqs:SendMessage"
-                ],
-                "Resource": "arn:aws:sqs:[AWS_REGION]:[AWS_ACCOUNT]:event-collector-queue"
-            }
-        ]
-    }
-    ```
-    Replace `[AWS_REGION]` and `[AWS_ACCOUNT]` in the above policy before attaching with the IAM user.
-
-1. Generate an access key pair (access key and secret access key) for IAM user in the AWS CLI. The key pair will be used while running the test script.
-
-1. Create an AWS CLI profile (see [AWS CLI Configuration](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration)), using the key pair in the previous step:
-
-    ```
-    aws configure
-    ```
+    1. IAM user creation - [https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
+    2. Grant permissions to IAM user - [https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html)
+    3. Generate access key pair for IAM user - [https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html)
+    4. Configure AWS CLI - [https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration)
 
 1. Update the AWS region in the test script `send_sqs_event.py` with the region, in which the SQS queue will be created:
     
