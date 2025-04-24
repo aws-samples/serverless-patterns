@@ -1,0 +1,94 @@
+{
+    "title": "Amazon Cognito to AWS Lambda to Amazon DynamoDB",
+    "description": "Create a user in Amazon Cognito, handle a Post Confirmation trigger with AWS Lambda, and store user details in Amazon DynamoDB.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to create a user in an Amazon Cognito User Pool, then automatically insert that user's details into a DynamoDB table once the user confirms their email. The Post Confirmation Lambda trigger handles the event from Cognito and uses the AWS SDK for JavaScript (v3) to write user data to the DynamoDB table.",
+            "Key attributes such as the user's unique ID (sub), email, and optional custom attributes are passed to Lambda, which then processes and persists this data. The table is configured in on-demand capacity mode (Pay Per Request) for cost efficiency and minimal management overhead.",
+            "This pattern deploys a Cognito User Pool, a User Pool Client, a DynamoDB table, and a Node.js AWS Lambda function as the trigger."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns",
+            "templateURL": "serverless-patterns/cognito-lambda-dynamodb",
+            "projectFolder": "cognito-lambda-dynamodb/cdk",
+            "templateFile": "lib/cdk-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon Cognito - User sign-up/sign-in with triggers",
+                "link": "https://aws.amazon.com/cognito/"
+            },
+            {
+                "text": "AWS Lambda - Serverless compute for triggered actions",
+                "link": "https://aws.amazon.com/lambda/"
+            },
+            {
+                "text": "Amazon DynamoDB - Fast and flexible NoSQL database",
+                "link": "https://aws.amazon.com/dynamodb/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk synth",
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for end-to-end tests using Jest and manual sign-up steps."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Vidit Shah",
+            "bio": "Software Engineer working @ServerlessCreed,making Serverless Courses and workshops",
+            "linkedin": "www.linkedin.com/in/vidit-shah",
+            "twitter": "https://x.com/Vidit_210/",
+            "image": "https://media.licdn.com/dms/image/v2/D4D03AQHbL_7ZCYfUGQ/profile-displayphoto-shrink_200_200/B4DZUXcQlTGkAY-/0/1739855039564?e=2147483647&v=beta&t=MhOEFqsUDaKnLypK8eYYRqqD8Uq9xHUnijO5tN-fMpc"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "cognito",
+            "label": "Amazon Cognito"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": ""
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": ""
+        }
+    }
+}
