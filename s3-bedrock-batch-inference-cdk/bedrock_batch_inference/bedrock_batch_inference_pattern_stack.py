@@ -21,8 +21,7 @@ class BedrockBatchInferencePatternStack(Stack):
         # Accept the model id as a parameter
         model_id = CfnParameter(self, "ModelARN",
                                 type="String",
-                                description="ARN of the model that you want to use for the batch inference. This would default to Anthropic 3.5 Haiku in us-west-2 if no input is provided",
-                                default="arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0"
+                                description="ARN of the the Claude model that you want to use for batch inference. ",
                                 )
 
         # Create an S3 bucket with default encryption
