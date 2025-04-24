@@ -1,9 +1,0 @@
-{
-    "customerIds": ["CUST123", "CUST456"],
-    "statuses": ["PROCESSING", "DELIVERED"],
-    "productIds": ["PROD789"],
-    "page": 1,
-    "limit": 20,
-    "sortBy": "total",
-    "sortOrder": "desc"
-  }
