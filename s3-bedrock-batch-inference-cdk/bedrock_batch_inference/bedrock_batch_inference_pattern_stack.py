@@ -39,7 +39,6 @@ class BedrockBatchInferencePatternStack(Stack):
         bedrock_role = iam.Role(
             self,
             "BedrockBatchInferenceRole",
-            role_name="BedrockBatchInferenceRole",
             assumed_by=iam.ServicePrincipal("bedrock.amazonaws.com")
         )
 

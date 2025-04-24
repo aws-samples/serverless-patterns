@@ -25,11 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```shell
     cd s3-bedrock-batch-inference-cdk
     ```
-3. Install dependencies:
-    ```shell
-    pip3 install -r requirements.txt
-    ```
-4. Deploy the stack:
+3. Deploy the stack:
    Replace the `ModelARN` with the arn of the model you want to use.
    ```shell
    cdk deploy --parameters ModelARN=arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0
@@ -45,7 +41,7 @@ This pattern creates an S3 bucket to store the input and output of the batch inf
  - Upload the sample `input.jsonl` to this bucket by running this command
    
   ```shell
-   aws s3 cp model_input/input.jsonl  s3://<S3 Bucket Name>/input/
+   aws s3 cp model_input/input.jsonl  s3://bedrockbatchinferencepatt-bedrockbatchinferencebuc-kbjlcequyqzo/input/
    ```
 
  - The upload will trigger the batch inference job. You can check the status of the jobs by running this command:
