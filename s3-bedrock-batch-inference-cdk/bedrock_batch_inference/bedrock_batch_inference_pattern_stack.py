@@ -103,7 +103,7 @@ class BedrockBatchInferencePatternStack(Stack):
         # Output the bucket name
         CfnOutput(
             self,
-            "BucketName",
+            "BatchInferenceBucketName",
             value=bucket.bucket_name,
-            description="Name of the S3 bucket created"
+            description="S3 bucket to store the batch inference input and output"
         )
