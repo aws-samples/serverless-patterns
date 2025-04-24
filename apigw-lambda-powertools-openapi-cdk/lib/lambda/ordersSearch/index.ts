@@ -1,13 +1,11 @@
-import { Metrics, MetricUnit } from "@aws-lambda-powertools/metrics";
+import { MetricUnit } from "@aws-lambda-powertools/metrics";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { Context } from "aws-lambda";
 import type { LambdaInterface } from "@aws-lambda-powertools/commons/types";
-import { logger, tracer } from "./powertools";
+import { logger, metrics, tracer } from "./powertools";
 import { OrderSearchCriteria } from "@ordersCommonCode/order";
 import { searchOrders } from "./ddb";
 import { getCustomerIdFromAuthInfo } from "@ordersCommonCode/customer";
-
-const metrics = new Metrics();
 
 /**
  * Lambda class handling order search operations through API Gateway
