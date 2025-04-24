@@ -1,5 +1,5 @@
 {
-  "title": "Audio Transcription using AWS API Gateway and AWS Lambda",
+  "title": "Subtitle generation using AWS API Gateway and AWS Lambda",
   "description": "This pattern creates an AWS Lambda function which will invoke Amazon Transcribe for speech-to-text conversion, and stores results in Amazon S3",
   "language": "Python",
   "level": "200",
@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample pattern is an automated serverless solution for audio transcription using AWS services. This system securely handles audio file uploads via pre-signed URLs, automatically triggers Amazon Transcribe for speech-to-text conversion, and stores results in S3."
+      "This sample pattern is an automated serverless solution for subtitle generation using AWS services. This system securely handles video file uploads via pre-signed URLs, automatically triggers Amazon Transcribe for speech-to-text conversion, and stores results in S3."
     ]
   },
   "gitHub": {

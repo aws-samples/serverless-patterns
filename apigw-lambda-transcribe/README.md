@@ -1,8 +1,8 @@
-# Audio transcription with AWS Lambda and Amazon Transcribe
+# Subtitle generation with AWS Lambda and Amazon Transcribe
 
-Using this sample pattern, users can securely upload images to an Amazon S3 bucket by requesting a pre-signed URL through Amazon API Gateway.  This URL allows secure and temporary access for uploading files directly to S3.
+Using this sample pattern, users can securely upload videos to an Amazon S3 bucket by requesting a pre-signed URL through Amazon API Gateway.  This URL allows secure and temporary access for uploading files directly to S3.
 
-Once an audio file is uploaded, an S3 event invokes another Lambda function to start the Transcribe job using the StartTranscriptionJob API. Once the transcription is completed, the result will be stored in the output S3 bucket.
+Once a video file is uploaded, an S3 event invokes another Lambda function to start the Transcribe job using the StartTranscriptionJob API. Once the transcription is completed, the generated subtitles will be stored in the output S3 bucket.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-transcribe
 
@@ -47,17 +47,17 @@ Important: this application uses various AWS services and there are costs associ
 1. Make a POST request to the API using the following cURL command:
 
     ```
-    curl --location 'API_ENDPOINT' --header 'Content-Type: application/json' --data '{"object_name": "audio.mp3", "content_type": "audio/mpeg"}'
+    curl --location 'API_ENDPOINT' --header 'Content-Type: application/json' --data '{"object_name": "video.mp4", "content_type": "video/mp4"}'
     ```
 
-    Note: Replace `API_ENDPOINT` with the generated `api_endpoint` from Terraform (refer to the Terraform Outputs section) `object_name` with your desired name for the S3 object and `content_type` with the content type of the audio, for ex, mp3 or m4a
+    Note: Replace `API_ENDPOINT` with the generated `api_endpoint` from Terraform (refer to the Terraform Outputs section) `object_name` with your desired name for the S3 object and `content_type` with the content type of the video, for ex, mp4.
 
 1. Get the pre-signed URL from the previous step and use the following cURL command to upload the object in S3:
 
     ```
-    curl -v --location -T "audio.mp3" \
+    curl -v --location -T "video.mp4" \
   'PRESIGNED_URL' \
-  --header 'Content-Type: audio/mpeg'
+  --header 'Content-Type: video/mp4'
     ```
 
     Note: Replace `PRESIGNED_URL` with pre-signed URL generated in the previous step. `Content-Type` should match the content type used to generate the pre-signed URL in the previous step. 
