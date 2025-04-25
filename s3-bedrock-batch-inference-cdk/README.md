@@ -27,8 +27,7 @@ Important: this application uses various AWS services and there are costs associ
     ```shell
     cd s3-bedrock-batch-inference-cdk
     ```
-3. Deploy the stack:
-   Replace the `ModelARN` with the arn of the model you want to use. For example, if you want to use **Claude 3.5 Sonnet** in **us-east-1** the ARN would be `arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-sonnet-20240620-v1:0`. See [Pre-requisites](#pre-requisites) section for more details.
+3. Deploy the stack by running the command below. Replace `ModelARN` with the arn of the model you want to use. For example, if you want to use **Claude 3.5 Sonnet** in **us-west-2** the ARN would be `arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-sonnet-20240620-v1:0`. See [Pre-requisites](#pre-requisites) section for more details.
 
    ```shell
    cdk deploy --parameters ModelARN=<ARN of the model>
@@ -37,10 +36,10 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 ![End to End Architecture](images/architecture.png)
 
-This pattern creates an S3 bucket to store the input and output of the batch inference job. It also creates an EventBridge rule that is triggered when a batch inference input file is uploaded. EventBridge will create a new Bedrock batch inference job with the specified model. The output of the job is also stored in the same S3 bucket.
+This pattern creates an S3 bucket to store the input and output of the batch inference job. It also creates an EventBridge rule that is triggered when a batch inference input file is uploaded. The rule target will create a new Bedrock batch inference job with the specified model and the sample input. The output of the job is also stored in the same S3 bucket.
 
 ## Testing
- - Once the pattern is deployed successfully you should see the name of the S3 bucket in the output.
+ - Once the pattern is deployed successfully you should see the name of the S3 bucket in the CDK output.
  - Upload the sample `input.jsonl` to this bucket by running this command
    ```shell
    aws s3 cp model_input/input.jsonl  s3://<S3 bucket name>/input/
@@ -54,7 +53,7 @@ This pattern creates an S3 bucket to store the input and output of the batch inf
 
 ## Cleanup
 
-1. Delete the stack
+1. Delete the stack by running th command below:
    ```bash
    cdk destroy
    ```
