@@ -6,10 +6,10 @@ Learn more about this pattern at [Serverless Land Patterns](https://serverlessla
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-## Requirements
+## Pre-requisites
 
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-- [Access to the Bedrock foundation model](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-modify.html) that you want to use is granted 
+- **[ IMPORTANT]** This pattern uses an example input that is [based on Messages API](https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference-data.html#batch-inference-data-ex-text) format of Anthropic Claude. Only specific models support batch inference in specific regions. Check the [supported regions and models](https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference-supported.html) section of the batch inference documentation and make sure you have access to [the correct Claude model](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-modify.html) that you want to use.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
@@ -26,9 +26,9 @@ Important: this application uses various AWS services and there are costs associ
     cd s3-bedrock-batch-inference-cdk
     ```
 3. Deploy the stack:
-   Replace the `ModelARN` with the arn of the model you want to use.
+   Replace the `ModelARN` with the arn of the model you want to use. For example, if you want to use **Claude 3.5 Sonnet** in **us-east-1** the ARN would be `arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-sonnet-20240620-v1:0`. See [Pre-requisites](#pre-requisites) section for more details. 
    ```shell
-   cdk deploy --parameters ModelARN=arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0
+   cdk deploy --parameters ModelARN=<ARN of the model>
    ```
 
 ## How it works
@@ -44,13 +44,12 @@ This pattern creates an S3 bucket to store the input and output of the batch inf
    aws s3 cp model_input/input.jsonl  s3://<S3 bucket name>/input/
    ```
 
- - The upload will trigger the batch inference job. You can check the status of the jobs by running this command:
-```shell
-  aws bedrock list-model-invocation-jobs  | jq '.invocationJobSummaries[] | {jobArn, status, submitTime}'
+ - The upload will trigger the batch inference job. You can check the status of the job on the [AWS Console](https://console.aws.amazon.com/bedrock/home?#/batch-inference) or alternatively, you can use this command:
+   ```shell
+     aws bedrock list-model-invocation-jobs  | jq '.invocationJobSummaries[] | {jobArn, status, submitTime}'
+   ```
+ - Once the batch inference job's status is "Completed", you can check the results by navigating to the [S3 bucket](https://console.aws.amazon.com/s3/buckets?&bucketType=general) and checking the `output` prefix
 
-```
-
- - You can monitor the job status in the AWS Console
 
 ## Cleanup
 
