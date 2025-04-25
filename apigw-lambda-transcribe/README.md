@@ -55,9 +55,7 @@ Important: this application uses various AWS services and there are costs associ
 1. Get the pre-signed URL from the previous step and use the following cURL command to upload the object in S3:
 
     ```
-    curl -v --location -T "video.mp4" \
-  'PRESIGNED_URL' \
-  --header 'Content-Type: video/mp4'
+    curl -v --location -T "video.mp4" 'PRESIGNED_URL' --header 'Content-Type: video/mp4'
     ```
 
     Note: Replace `PRESIGNED_URL` with pre-signed URL generated in the previous step. `Content-Type` should match the content type used to generate the pre-signed URL in the previous step. 
