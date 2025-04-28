@@ -239,9 +239,9 @@ The console direct links in this section default to the `us-east-1` region. Ensu
    
    Next, choose **Service** in the **Refine query by** select item. In the table below, check the box next to **ordersCRUD** and again choose the **Add to query** button.
    
-   Filter all traces to your selection by choosing the **Run query** buttons.
+   Filter all traces to your selection by choosing the **Run query** button.
 
-   The **Traces** table at the bottom of the page show you the operations you executed against the API. Opening them, you should e.g. observe that not all of them have the Lambda cold start "Init" phase as the environment could be reused if you executed the test requests in a close sequence.
+   The **Traces** table at the bottom of the page shows you the operations you executed against the API. Opening them, you should e.g. observe that not all of them have the Lambda cold start "Init" phase as the environment could be reused if you executed the test requests in a close sequence.
 
    You will also see that if the environment was reused for multiple of the POST request for order creation, the **### payment processing** subsection will be considerably quicker for the subsequent reuses. This is due to the [Parameters functionality in Powertools for AWS Lambda](https://docs.powertools.aws.dev/lambda/python/latest/utilities/parameters/) caching the AWS Secrets Manager secret for the simulated payment processing operation.
 
