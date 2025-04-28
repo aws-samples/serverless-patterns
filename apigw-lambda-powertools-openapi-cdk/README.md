@@ -37,6 +37,10 @@ Important: this application uses various AWS services and there are costs associ
    ```
    cd apigw-lambda-powertools-openapi-cdk
    ```
+1. Install the dependencies
+   ```
+   npm install
+   ```
 1. Authenticate to the AWS account you want to deploy in.
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
 
