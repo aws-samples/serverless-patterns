@@ -51,6 +51,12 @@ export class LambdaStack extends cdk.NestedStack {
       layers: [powertoolsLayer],
       timeout: cdk.Duration.seconds(5),
     });
+    this.crudLambda.addToRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        actions: ["cloudwatch:PutMetricData"],
+        resources: ["*"],
+      })
+    );
 
     props.apiKey.grantRead(this.crudLambda);
     props.table.grantReadWriteData(this.crudLambda);
@@ -78,6 +84,13 @@ export class LambdaStack extends cdk.NestedStack {
       layers: [powertoolsLayer],
       timeout: cdk.Duration.seconds(5),
     });
+    this.searchLambda.addToRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        actions: ["cloudwatch:PutMetricData"],
+        resources: ["*"],
+      })
+    );
+
     props.table.grantReadData(this.searchLambda);
   }
 }
