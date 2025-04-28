@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import * as cdk from 'aws-cdk-lib';
-import { ApigwLambdaPowertoolsOpenapiStack } from '../lib/parent-stack';
+import * as cdk from "aws-cdk-lib";
+import { ParentStack } from "../lib/parent-stack";
 
 const app = new cdk.App();
 
-new ApigwLambdaPowertoolsOpenapiStack(app, 'ApigwLambdaStack', {
-  stageName: 'dev',
-  description: 'REST API Gateway with Lambda integration using openapi spec',
+new ParentStack(app, "ApigwLambdaPowertoolsOpenapiStack", {
+  stageName: "dev",
+  description: "REST API Gateway with Lambda integration using openapi spec",
 });

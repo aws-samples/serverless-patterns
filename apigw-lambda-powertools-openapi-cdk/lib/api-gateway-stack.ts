@@ -46,7 +46,6 @@ export class ApiGatewayStack extends cdk.NestedStack {
       cloudWatchRole: false,
     });
 
-    // TODO: is it too permissive? Should we define method and stage instead of **?
     new lambda.CfnPermission(this, "LambdaHandlerPermission", {
       action: "lambda:InvokeFunction",
       functionName: props.handleLambda.functionName,

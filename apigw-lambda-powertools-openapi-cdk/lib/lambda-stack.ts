@@ -13,7 +13,7 @@ export interface LambdaStackProps extends cdk.NestedStackProps {
 }
 
 export class LambdaStack extends cdk.NestedStack {
-  public readonly handleLambda: lambda.Function;
+  public readonly crudLambda: lambda.Function;
   public readonly searchLambda: lambda.Function;
 
   constructor(scope: Construct, id: string, props: LambdaStackProps) {
@@ -27,8 +27,9 @@ export class LambdaStack extends cdk.NestedStack {
       }:094274105915:layer:AWSLambdaPowertoolsTypeScriptV2:3`
     );
 
-    this.handleLambda = new lambdaNodejs.NodejsFunction(this, "Handle", {
+    this.crudLambda = new lambdaNodejs.NodejsFunction(this, "crudLambda", {
       runtime: lambda.Runtime.NODEJS_22_X,
+      functionName: "orderCRUD",
       handler: "handler",
       entry: "lib/lambda/ordersCRUD/index.ts",
       environment: {
@@ -51,11 +52,12 @@ export class LambdaStack extends cdk.NestedStack {
       timeout: cdk.Duration.seconds(5),
     });
 
-    props.apiKey.grantRead(this.handleLambda);
-    props.table.grantReadWriteData(this.handleLambda);
+    props.apiKey.grantRead(this.crudLambda);
+    props.table.grantReadWriteData(this.crudLambda);
 
-    this.searchLambda = new lambdaNodejs.NodejsFunction(this, "Search", {
+    this.searchLambda = new lambdaNodejs.NodejsFunction(this, "searchLambda", {
       runtime: lambda.Runtime.NODEJS_22_X,
+      functionName: "orderSearch",
       handler: "handler",
       entry: "lib/lambda/ordersSearch/index.ts",
       environment: {

@@ -6,15 +6,15 @@ import { ApiGatewayStack } from "./api-gateway-stack";
 import { SecretsStack } from "./secrets-stack";
 import { CognitoStack } from "./cognito-stack";
 
-interface ApigwLambdaPowertoolsOpenapiStackProps extends cdk.StackProps {
+interface ParentStackProps extends cdk.StackProps {
   stageName: string;
 }
 
-export class ApigwLambdaPowertoolsOpenapiStack extends cdk.Stack {
+export class ParentStack extends cdk.Stack {
   constructor(
     scope: Construct,
     id: string,
-    props: ApigwLambdaPowertoolsOpenapiStackProps
+    props: ParentStackProps
   ) {
     super(scope, id, props);
 
@@ -38,7 +38,7 @@ export class ApigwLambdaPowertoolsOpenapiStack extends cdk.Stack {
 
     const apiGatewayStack = new ApiGatewayStack(this, "OrdersApiStack", {
       stageName: props.stageName,
-      handleLambda: lambdaStack.handleLambda,
+      handleLambda: lambdaStack.crudLambda,
       searchLambda: lambdaStack.searchLambda,
       description: "API Gateway with Lambda integration",
       userPool: cognitoStack.userPool,
