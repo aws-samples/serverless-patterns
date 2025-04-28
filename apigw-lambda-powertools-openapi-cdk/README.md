@@ -91,6 +91,8 @@ The entire stack is deployed using AWS CDK, which creates and manages all requir
 
 You will create an Amazon Cogntio user for authenticating against the API. Then, you will execute some requests against the Order API to generate events. Finally, you will observe the Logging, Tracing, Metrics and Parameters functionalities of the Powertools for AWS Lambda in the AWS console.
 
+### Generate events
+
 1. Set environment variables for the following commands. You will need the values of the Outputs you copied as last step of the Deployment Instructions:
 
    ```bash
@@ -212,6 +214,36 @@ You will create an Amazon Cogntio user for authenticating against the API. Then,
    ```
 
    There will be no response for this request.
+
+Repeat the requests to the API gateway as often as desired for generating more events to observe. A new order ID will be generated during creation in the backend, so you can reuse the same request payloads without risking a collision.
+
+### View results in the AWS console
+
+The console direct links in this section default to the `us-east-1` region. Ensure you change your region selection if you deployed into a different one.
+
+1. View the CloudWatch logs
+
+   Open the [log group of the orderCRUD function](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252ForderCRUD) and choose the first log stream. You will see the log format enhanced by the [Logger of Powertools for AWS Lambda](https://docs.powertools.aws.dev/lambda/python/latest/core/logger/#getting-started), e.g. adding a `cold_start` property to the JSON. With this, you could easily query CloudWatch Logs for the frequency and start time of new lambda environments.
+
+1. View the CloudWatch metrics
+
+
+
+1. View the X-Ray traces
+
+   Open the [X-Ray traces](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#xray:traces/query) console. Ensure that you choose a long enough time frame on the top right to include the time of your test requests.
+
+   In the **Query refiners** secion, open the **Refine query by** select item.
+   
+   Scrolling down, you see that you can filter by **customerId** and **orderId** as those were added as X-Ray annotations in the orderCRUD Lambda function. Choose **customerId**. The table right below will now allow you to choose the singular customer ID for the Cognito user you created. Activate the checkbox next to it, then choose the **Add to query** button.
+   
+   Next, choose **Service** in the **Refine query by** select item. In the table below, check the box next to **ordersCRUD** and again choose the **Add to query** button.
+   
+   Filter all traces to your selection by choosing the **Run query** buttons.
+
+   The **Traces** table at the bottom of the page show you the operations you executed against the API. Opening them, you should e.g. observe that not all of them have the Lambda cold start "Init" phase as the environment could be reused if you executed the test requests in a close sequence.
+
+   You will also see that if the environment was reused for multiple of the POST request for order creation, the **### payment processing** subsection will be considerably quicker for the subsequent reuses. This is due to the [Parameters functionality in Powertools for AWS Lambda](https://docs.powertools.aws.dev/lambda/python/latest/utilities/parameters/) caching the AWS Secrets Manager secret for the simulated payment processing operation.
 
 ## Cleanup
 
