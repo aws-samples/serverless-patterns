@@ -2,11 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: SAM template for a websocket API with a mapping template and a Lambda integration
 
-Globals:
-  Function:
-    CodeUri: ./src
-    Runtime: nodejs22.x
-
 Resources:
   WebsocketApi:
     Type: AWS::ApiGatewayV2::Api
@@ -146,6 +141,8 @@ Resources:
     Properties:
       Handler: authorizer.handler
       MemorySize: 256
+      CodeUri: ./src
+      Runtime: nodejs22.x
 
   LambdaAuthPermission:
     Type: AWS::Lambda::Permission
@@ -156,11 +153,15 @@ Resources:
       FunctionName:
         Ref: AuthFunction
       Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*'
+      
      
   OnConnectFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: onconnect.handler
+      CodeUri: ./src
+      Runtime: nodejs22.x
       Environment:
         Variables:
           TABLE_NAME: !Ref ConnectionsTable
@@ -177,11 +178,14 @@ Resources:
       FunctionName:
         Ref: OnConnectFunction
       Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*'
 
   OnDisconnectFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: ondisconnect.handler
+      CodeUri: ./src
+      Runtime: nodejs22.x
       Environment:
         Variables:
           TABLE_NAME: !Ref ConnectionsTable
@@ -198,6 +202,7 @@ Resources:
       FunctionName:
         Ref: OnDisconnectFunction
       Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*'
 
   SendMessageFunction:
     Type: AWS::Serverless::Function
@@ -205,6 +210,8 @@ Resources:
     - WebsocketApi
     Properties:
       Handler: sendmessage.handler
+      CodeUri: ./src
+      Runtime: nodejs22.x
       Environment:
         Variables:
           TABLE_NAME: !Ref ConnectionsTable
@@ -228,6 +235,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref SendMessageFunction
       Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*'
 
 Outputs:
   WebSocketCommand:
