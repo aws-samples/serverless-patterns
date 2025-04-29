@@ -12,13 +12,13 @@ class ApigwLambdaBedrockStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        #lambda layer containing boto
+        #AWS Lambda Layer containing boto
         layer = _lambda.LayerVersion(self, "Boto3Layer",
             code=_lambda.Code.from_asset("./boto_layer.zip"),
             compatible_runtimes=[_lambda.Runtime.PYTHON_3_10]
         )
 
-        #add policy to invoke bedrock model
+        #add policy to invoke Amazon Bedrock model
         invoke_model_policy = iam.Policy(self, "InvokeModelPolicy",
             statements=[
                 iam.PolicyStatement(
@@ -28,7 +28,7 @@ class ApigwLambdaBedrockStack(Stack):
             ]
         )
 
-        # Create the Lambda function and attach the layer
+        # Create AWS Lambda function and attach the layer
         lambda_function = _lambda.Function(self, "MyFunction",
             runtime=_lambda.Runtime.PYTHON_3_10,
             handler="index.handler",
@@ -39,7 +39,7 @@ class ApigwLambdaBedrockStack(Stack):
 
         invoke_model_policy.attach_to_role(lambda_function.role)
 
-        #create api gateway
+        #create Amazon API Gateway
         api = apigw.RestApi(self, "ServerlessLandGenAI",)
 
         #create a new resource
