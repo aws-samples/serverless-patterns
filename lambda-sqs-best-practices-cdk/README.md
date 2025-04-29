@@ -80,6 +80,16 @@ Failed messages are:
 The pattern includes a load testing script to verify functionality:
 
 1. Set the Queue URL environment variable:
-```bash
+```
 export QUEUE_URL=$(aws cloudformation describe-stacks --stack-name LambdaSqsBestPracticesCdkStack --query 'Stacks[0].Outputs[?OutputKey==`QueueUrl`].OutputValue' --output text)
+
 export AWS_REGION=us-east-1  # or your AWS region
+```
+
+2. Rum test script
+```
+npm run test           # 100 messages
+npm run test:small    # 50 messages
+npm run test:medium   # 200 messages
+npm run test:large    # 500 messages
+```
