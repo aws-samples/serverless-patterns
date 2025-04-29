@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to implement AWS Lambda with Amazon SQS using best practices, including AWS Lambda Powertools for structured logging, metrics, and tracing. The pattern includes proper error handling, dead-letter queue configuration, and comprehensive operational monitoring.
 
-<img src="./resources/Lambda-SQS-Best-Practice" alt="Architecture" width="100%"/>
+<img src="./resources/Lambda-SQS-Best-Practice.png" alt="Architecture" width="100%"/>
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
