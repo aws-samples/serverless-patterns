@@ -1,11 +1,10 @@
-
 {
   "name": "lambda-function",
   "version": "1.0.0",
   "dependencies": {
     "@aws-lambda-powertools/logger": "^1.17.0",
-    "@aws-lambda-powertools/tracer": "^1.17.0",
     "@aws-lambda-powertools/metrics": "^1.17.0",
+    "@aws-lambda-powertools/tracer": "^1.17.0",
     "aws-sdk": "^2.1531.0"
   }
 }

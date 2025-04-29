@@ -7,13 +7,12 @@
   "scripts": {
     "build": "echo \"The build step is not required when using JavaScript!\" && exit 0",
     "cdk": "cdk",
-    "test": "jest",
+    "test": "node scripts/load-test.js",
+    "test:small": "MESSAGE_COUNT=50 node scripts/load-test.js",
+    "test:medium": "MESSAGE_COUNT=200 node scripts/load-test.js",
+    "test:large": "MESSAGE_COUNT=500 node scripts/load-test.js",
     "deploy": "cdk deploy",
-    "destroy": "cdk destroy",
-    "send-message": "node scripts/send-message.js",
-    "send-custom": "node scripts/send-custom-message.js",
-    "logs": "aws logs tail /aws/lambda/LambdaSqsBestPracticesCdkStack-MyLambdaFunction --follow",
-    "logs-insights": "aws logs start-query --log-group-name /aws/lambda/LambdaSqsBestPracticesCdkStack-MyLambdaFunction --start-time $(date -d '1 hour ago' +%s) --end-time $(date +%s) --query-string \"$(cat queries/log-insights.txt)\""
+    "destroy": "cdk destroy"
   },
   "devDependencies": {
     "aws-cdk": "^2.110.0",

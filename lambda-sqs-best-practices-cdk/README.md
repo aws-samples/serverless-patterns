@@ -1,8 +1,8 @@
-# AWS Service 1 to AWS Service 2
+# Lambda SQS Best Practices with AWS CDK
 
-This pattern explains Lambda with SQS configuration with best best practices included.
+This pattern demonstrates how to implement AWS Lambda with Amazon SQS using best practices, including AWS Lambda Powertools for structured logging, metrics, and tracing. The pattern includes proper error handling, dead-letter queue configuration, and comprehensive operational monitoring.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+<img src="./resources/Lambda-SQS-Best-Practice" alt="Architecture" width="100%"/>
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -11,7 +11,8 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Node.js 20 or greater](https://nodejs.org/en/download/) installed
+* [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed
 
 ## Deployment Instructions
 
@@ -51,19 +52,34 @@ cdk bootstrap aws://ACCOUNT-NUMBER-1/REGION-1
 
 ## How it works
 
-Explain how the service interaction works.
+This pattern sets up:
+
+1. An SQS queue with a Dead Letter Queue (DLQ) for failed message handling
+2. A Lambda function with:
+   - AWS Lambda Powertools integration
+   - Structured logging
+   - Custom metrics
+   - X-Ray tracing
+3. A CloudWatch Dashboard for operational monitoring
+4. Least priviledge permissions implemented on roles and policies
+
+The Lambda function:
+- Processes messages in batches
+- Validates message format
+- Handles errors gracefully
+- Reports metrics and traces
+- Uses structured logging
+
+Failed messages are:
+- Logged with error details
+- Sent to DLQ after 3 retries
+- Monitored via CloudWatch metrics
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+The pattern includes a load testing script to verify functionality:
 
-## Cleanup
- 
-1. Delete the stack
-    ```
-    cdk destroy
-    ```
-----
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-SPDX-License-Identifier: MIT-0
+1. Set the Queue URL environment variable:
+```bash
+export QUEUE_URL=$(aws cloudformation describe-stacks --stack-name LambdaSqsBestPracticesCdkStack --query 'Stacks[0].Outputs[?OutputKey==`QueueUrl`].OutputValue' --output text)
+export AWS_REGION=us-east-1  # or your AWS region

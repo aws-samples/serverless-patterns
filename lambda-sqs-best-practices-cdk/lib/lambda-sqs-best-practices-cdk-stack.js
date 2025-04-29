@@ -11,16 +11,16 @@ class LambdaSqsBestPracticesCdkStack extends Stack {
     super(scope, id, props);
 
     // Create DLQ
-    const dlq = new sqs.Queue(this, 'MyDeadLetterQueue', {
-      queueName: 'my-dead-letter-queue',
+    const dlq = new sqs.Queue(this, 'BatchProcessingDeadLetterQueue', {
+      queueName: 'batch-processing-dead-letter-queue',
       retentionPeriod: Duration.days(14),
       encryption: sqs.QueueEncryption.SQS_MANAGED,
       enforceSSL: true
     });
 
     // Create main queue
-    const queue = new sqs.Queue(this, 'MyQueue', {
-      queueName: 'my-sample-queue',
+    const queue = new sqs.Queue(this, 'BatchProcessingSourceQueue', {
+      queueName: 'batch-processing-source-queue',
       visibilityTimeout: Duration.seconds(30),
       encryption: sqs.QueueEncryption.SQS_MANAGED,
       enforceSSL: true,
@@ -31,7 +31,8 @@ class LambdaSqsBestPracticesCdkStack extends Stack {
     });
 
     // Create Lambda function
-    const mainLambdaFunction = new lambda.Function(this, 'MyLambdaFunction', {
+    const mainLambdaFunction = new lambda.Function(this, 'BatchProcessingLambdaFunction', {
+      functionName: 'BatchProcessingLambdaFunction',
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
@@ -72,7 +73,8 @@ class LambdaSqsBestPracticesCdkStack extends Stack {
     mainLambdaFunction.addEventSource(
       new lambdaEventSources.SqsEventSource(queue, {
         batchSize: 10,
-        reportBatchItemFailures: true
+        reportBatchItemFailures: true,
+        maxConcurrency: 1000
       })
     );
 
@@ -101,58 +103,6 @@ class LambdaSqsBestPracticesCdkStack extends Stack {
         new cloudwatch.Metric({
           namespace: 'SQSProcessor',
           metricName: 'FailedMessages',
-          dimensionsMap: {
-            service: 'sqs-processor'
-          },
-          statistic: 'sum',
-          period: Duration.minutes(1)
-        })
-      ],
-      width: 12
-    });
-
-    // Message Types Success Widget
-    const messageTypesSuccessWidget = new cloudwatch.GraphWidget({
-      title: 'Message Types - Success',
-      left: [
-        new cloudwatch.Metric({
-          namespace: 'SQSProcessor',
-          metricName: 'SuccessfulJSONMessages',
-          dimensionsMap: {
-            service: 'sqs-processor'
-          },
-          statistic: 'sum',
-          period: Duration.minutes(1)
-        }),
-        new cloudwatch.Metric({
-          namespace: 'SQSProcessor',
-          metricName: 'SuccessfulTEXTMessages',
-          dimensionsMap: {
-            service: 'sqs-processor'
-          },
-          statistic: 'sum',
-          period: Duration.minutes(1)
-        })
-      ],
-      width: 12
-    });
-
-    // Message Types Failure Widget
-    const messageTypesFailureWidget = new cloudwatch.GraphWidget({
-      title: 'Message Types - Failure',
-      left: [
-        new cloudwatch.Metric({
-          namespace: 'SQSProcessor',
-          metricName: 'FailedJSONMessages',
-          dimensionsMap: {
-            service: 'sqs-processor'
-          },
-          statistic: 'sum',
-          period: Duration.minutes(1)
-        }),
-        new cloudwatch.Metric({
-          namespace: 'SQSProcessor',
-          metricName: 'FailedTEXTMessages',
           dimensionsMap: {
             service: 'sqs-processor'
           },
@@ -232,31 +182,12 @@ class LambdaSqsBestPracticesCdkStack extends Stack {
     // Add all widgets to dashboard
     dashboard.addWidgets(
       messageProcessingWidget,
-      messageTypesSuccessWidget,
-      messageTypesFailureWidget,
       batchProcessingWidget,
       queueMetricsWidget,
       lambdaPerformanceWidget
     );
 
     // Create CloudWatch Alarms
-    
-    // High Error Rate Alarm
-    new cloudwatch.Alarm(this, 'HighErrorRate', {
-      metric: new cloudwatch.Metric({
-        namespace: 'SQSProcessor',
-        metricName: 'FailedMessages',
-        dimensionsMap: {
-          service: 'sqs-processor'
-        },
-        statistic: 'sum',
-        period: Duration.minutes(5)
-      }),
-      threshold: 1,
-      evaluationPeriods: 1,
-      alarmDescription: 'High message processing error rate'
-    });
-
     // DLQ Messages Alarm
     new cloudwatch.Alarm(this, 'DLQMessagesPresent', {
       metric: dlq.metricApproximateNumberOfMessagesVisible(),
