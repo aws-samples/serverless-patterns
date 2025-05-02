@@ -21,7 +21,8 @@
   "dependencies": {
     "aws-cdk-lib": "^2.110.0",
     "aws-sdk": "^2.1490.0",
-    "constructs": "^10.3.0"
+    "constructs": "^10.3.0",
+    "@aws-sdk/client-sqs": "^3.x"
   },
   "engines": {
     "node": ">=20.0.0"

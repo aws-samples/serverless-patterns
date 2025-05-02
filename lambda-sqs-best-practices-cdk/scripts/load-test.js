@@ -1,8 +1,8 @@
-const AWS = require('aws-sdk');
-const sqs = new AWS.SQS();
+const { SQSClient, SendMessageBatchCommand } = require('@aws-sdk/client-sqs');
 
-AWS.config.update({ 
-    region: process.env.AWS_REGION || 'us-east-1' // Default to us-east-1 or your preferred region
+// Initialize SQS client
+const sqs = new SQSClient({
+    region: process.env.AWS_REGION || 'us-east-1'
 });
 
 const QUEUE_URL = process.env.QUEUE_URL;
@@ -11,7 +11,6 @@ const BATCH_SIZE = 10;
 
 // Create message with 10% chance of failure
 const createMessage = (index) => {
-    // Random number between 0 and 1
     const rand = Math.random();
 
     // 5% chance for invalid format
@@ -43,10 +42,16 @@ async function sendMessages() {
         );
 
         try {
-            await sqs.sendMessageBatch({
+            const command = new SendMessageBatchCommand({
                 QueueUrl: QUEUE_URL,
                 Entries: entries
-            }).promise();
+            });
+
+            const response = await sqs.send(command);
+            
+            if (response.Failed && response.Failed.length > 0) {
+                console.warn('Some messages failed to send:', response.Failed);
+            }
         } catch (error) {
             console.error('Batch send error:', error);
         }
@@ -60,5 +65,5 @@ if (require.main === module) {
         console.error('Please set QUEUE_URL environment variable');
         process.exit(1);
     }
-    sendMessages();
+    sendMessages().catch(console.error);
 }
