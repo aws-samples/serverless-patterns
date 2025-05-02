@@ -1,7 +1,7 @@
 {
   "title": "AWS Lambda Layer and SSM Parameter Store - Configuration values for multiple functions",
   "description": "This AWS SAM application is an example of using a Lambda Layer and the SSM Parameter Store to centrally manage configuration values that can be used by multiple Lambda functions within the same account and region.",
-  "language": "NodeJs",
+  "language": "Node.js",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {

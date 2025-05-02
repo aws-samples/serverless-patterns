@@ -1,7 +1,7 @@
 {
   "title": "Amazon DocumentDB to AWS Lambda Event Source Mapping",
   "description": "Configure an AWS Lambda function to process events in an Amazon DocumentDB (with MongoDB compatibility) change stream by configuring an Amazon DocumentDB cluster as an event source",
-  "language": "NodeJs",
+  "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {

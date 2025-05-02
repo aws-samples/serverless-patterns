@@ -1,7 +1,7 @@
 {
   "title": "Amazon CloudFront Origin Access Control for AWS Lambda Function URLl",
   "description": "Access your Lambda Function URLs securely using Amazon CloudFront Origin Access Control",
-  "language": "Nodejs",
+  "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {

@@ -1,7 +1,7 @@
 {
     "title": "Live Streaming on AWS using RTP/RTMP sources",
     "description": "This pattern creates a live streaming stack leveraging AWS Elemental MediaLive, MediaPackage for RTP/RTMP input sources.",
-    "language": "nodejs",
+    "language": "Node.js",
     "level": "300",
     "framework": "AWS CDK",
     "introBox": {

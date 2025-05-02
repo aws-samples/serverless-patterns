@@ -1,7 +1,7 @@
 {
     "title": "Process Amazon SNS notification messages with AWS Lambda (Java)",
     "description": "This pattern shows how to process Amazon SNS messages using AWS Lambda.",
-    "language": "nodejs",
+    "language": "Node.js",
     "level": "200",
     "framework": "AWS SAM",
     "introBox": {
