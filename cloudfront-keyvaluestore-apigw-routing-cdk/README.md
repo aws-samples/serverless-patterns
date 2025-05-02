@@ -1,10 +1,9 @@
-# CloudFront with API Gateway Routing using Key Value Store
+# Amazon CloudFront with Amazon API Gateway Routing using Key Value Store
 
 This pattern demonstrates how to use Amazon CloudFront with CloudFront Functions to dynamically route traffic between multiple Amazon API Gateway endpoints. The routing decisions are based on values stored in CloudFront Key Value Store, allowing for flexible, configuration-driven request routing without redeploying your infrastructure.
 This example uses an equal (50:50 distribution) between both API Gateways. For more informations on "cell partitioning" you can read the [AWS Well-Architected Guide - Cell Partition](https://docs.aws.amazon.com/wellarchitected/latest/reducing-scope-of-impact-with-cell-based-architecture/cell-partition.html)
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/cloudfront-keyvaluestore-apigw-routing-cdk](https://serverlessland.com/patterns/cloudfront-keyvaluestore-apigw-routing-cdk)
-
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
