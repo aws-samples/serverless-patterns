@@ -3,7 +3,7 @@
     "description":"Deploys a Lambda function, an IoT thing, and the minimal IAM resources required to run the application",
     "language":".NET",
     "level":"200",
-    "framework":"CDK",
+    "framework":"AWS CDK",
     "introBox":{
        "headline":"How it works",
        "text":[
