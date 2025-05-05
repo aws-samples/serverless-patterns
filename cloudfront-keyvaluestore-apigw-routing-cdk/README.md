@@ -55,10 +55,7 @@ Important: this application uses various AWS services and there are costs associ
 1. Based on the retrieved value, the function redirects the request to one of the two API Gateway endpoints
 1. The selected API Gateway returns its response to the client
 
-In a real-world scenario:
-
-* The available targets would be maintained in the Key Value Store
-* More complex routing logic would be implemented in the CloudFront function (e.g., routing based on user attributes, geographic location, A/B testing scenarios)
+In a real-world scenario the available targets would be maintained in the Key Value Store depending on the desired business logic and requirements.
 
 ## Testing
 
