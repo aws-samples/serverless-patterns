@@ -1,5 +1,5 @@
 {
-  "title": "CloudFront with API Gateway Routing using Key Value Store",
+  "title": "Amazon CloudFront with API Gateway Routing using Key Value Store",
   "description": "Route traffic dynamically between API Gateway endpoints using CloudFront Functions and Key Value Store without redeploying infrastructure.",
   "language": "TypeScript",
   "level": "300",
