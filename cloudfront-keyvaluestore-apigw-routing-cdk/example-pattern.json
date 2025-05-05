@@ -3,7 +3,7 @@
   "description": "Route traffic dynamically between API Gateway endpoints using CloudFront Functions and Key Value Store without redeploying infrastructure.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
