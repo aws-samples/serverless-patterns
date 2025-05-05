@@ -1,0 +1,58 @@
+{
+  "title": "Serverless Text-to-Image Generation with Amazon Bedrock Nova Canvas",
+  "description": "This pattern implements a serverless text-to-image generation service using Amazon API Gateway, AWS Lambda and Amazon Bedrock's Nova Canvas model. It provides a REST API endpoint where users can submit text prompts and receive generated images whic are stored in an S3 bucket.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The solution works by receiving a text prompt to an API Gateway endpoint, which triggers a Lambda function containing the request. The Lambda function then formats this prompt and makes a call to Amazon Bedrock's Nova Canvas model to generate an image based on the text description and the generated image is saved to the S3 bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-bedrock-nova-canvas",
+      "templateURL": "serverless-patterns/apigw-bedrock-nova-canvas",
+      "projectFolder": "apigw-bedrock-nova-canvas",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Nova Canvas",
+        "link": "https://docs.aws.amazon.com/ai/responsible-ai/nova-canvas/overview.html"
+      },
+      {
+        "text": "Invoke Amazon Nova Canvas on Amazon Bedrock to generate an image",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-runtime_example_bedrock-runtime_InvokeModel_AmazonNovaImageGeneration_section.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Archana V",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQGhkVtEhllFEw/profile-displayphoto-shrink_400_400/B56ZZH3LL6H0Ag-/0/1744962369913?e=1750291200&v=beta&t=R0hX6jzWC03OyoWKvYJ0jDDTuPocobPSy0lAJY-3XfA",
+      "bio": "Solutions Architect at AWS",
+      "linkedin": "archana-venkat-9b80b7184"
+    }
+  ]
+}
