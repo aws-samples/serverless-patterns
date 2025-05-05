@@ -1,6 +1,7 @@
 # Lambda SQS Best Practices with AWS CDK
 
-This pattern demonstrates how to implement AWS Lambda with Amazon SQS using best practices, including AWS Lambda Powertools for structured logging, metrics, and tracing. The pattern includes proper error handling, dead-letter queue configuration, and comprehensive operational monitoring.
+This pattern demonstrates a production-ready implementation of AWS Lambda processing messages from Amazon SQS using AWS CDK. It serves as a reference architecture for building robust, observable, and maintainable serverless applications, featuring AWS Lambda Powertools integration for enhanced observability through structured logging, custom metrics, and distributed tracing with X-Ray. The pattern implements comprehensive error handling with automatic retries and Dead Letter Queue (DLQ) configuration, along with a detailed CloudWatch Dashboard for operational monitoring. Security is enforced through least privilege IAM roles, while operational excellence is maintained through proper resource configurations and cost optimizations. This enterprise-grade solution includes batch message processing, configurable timeouts, message validation, and a complete monitoring strategy, making it ideal for teams building production serverless applications that require high reliability, observability, and maintainability.
+
 
 <img src="./resources/Lambda-SQS-Best-Practice.png" alt="Architecture" width="100%"/>
 
@@ -92,4 +93,55 @@ npm run test           # 100 messages
 npm run test:small    # 50 messages
 npm run test:medium   # 200 messages
 npm run test:large    # 500 messages
+
 ```
+
+
+## Monitoring Guide
+
+Locating Resources
+
+```
+1. Navigate to AWS CloudFormation Console
+2. Select the stack "LambdaSqsBestPracticesCdkStack"
+3. Go to the "Resources" tab
+4. Here you can find:
+   - All resources created by the stack
+   - Direct links to each resource's console
+   - Resource physical IDs and types
+   - Current status of each resource
+```
+
+CloudWatch Logs
+
+```
+1. Navigate to CloudWatch Console > Log Groups
+2. Find /aws/lambda/BatchProcessingLambdaFunction
+3. View structured logs with:
+    * Batch processing information
+    * Error details
+```
+
+Metrics Dashboard
+
+```
+1. Go to CloudWatch > Dashboards
+2. Find the dashboard “SQS-Processing-Dashboard”
+3. Monitor:
+    * Message processing success rate
+    * Error rates
+    * DLQ message count
+    * Lambda Processing duration 
+
+```
+
+<img src="./resources/SQS_operational_dashboard.png" alt="Architecture" width="100%"/>
+
+## Cleanup
+
+To remove all deployed resources:
+
+```
+cdk destroy
+```
+
