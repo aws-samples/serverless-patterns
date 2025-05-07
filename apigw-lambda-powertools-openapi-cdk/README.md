@@ -100,9 +100,9 @@ You will create an Amazon Cogntio user for authenticating against the API. Then,
 1. Set environment variables for the following commands. You will need the values of the Outputs you copied as last step of the Deployment Instructions:
 
    ```bash
-   API_GATEWAY_ENDPOINT=<Value of the "ApiGatewayEndpoint" Output>
-   USER_POOL_ID=<Value of the "UserPoolId" Output>
-   USER_POOL_CLIENT_ID=<Value of the "UserPoolClientId" Output>
+   API_GATEWAY_ENDPOINT=https://axisqktpfd.execute-api.us-east-1.amazonaws.com/dev/
+   USER_POOL_ID=us-east-1_rvVtjsPQn
+   USER_POOL_CLIENT_ID=1u94umf8p7fjblbgite3rnvepj
    USER_NAME=testuser
    USER_EMAIL=user@example.com
    USER_PASSWORD=MyUserPassword123!
@@ -231,6 +231,7 @@ The console direct links in this section default to the `us-east-1` region. Ensu
 
 1. View the CloudWatch metrics
 
+   Open the [CloudWatch metrics](https://768942995475-qsphipsa.us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2?graph=~()) and notice the **Custom namespaces** on top of the **AWS namespaces**. You can select to graph the metrics from the Custom Namespace but also the managed metrics from the AWS namespaces that correspond to the orderCRUD and/or orderSearch AWS Lambda function(s)
 
 
 1. View the X-Ray traces
