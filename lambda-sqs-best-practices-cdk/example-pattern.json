@@ -83,6 +83,16 @@
       "image": "https://avatars.githubusercontent.com/u/75968399?v=4&size=64",
       "bio": "Cloud Support Engineer II - SVLS",
       "linkedin": "umangaggarwal"
-    }
+    },
+    {
+      "name": "Vaibhav Jain",
+      "bio": "AWS - Sr. Application Architect",
+      "linkedin": "https://www.linkedin.com/in/vaibhavjainv/"
+     },
+     {
+      "name": "Adam Wagner",
+      "bio": "AWS - Principal Serverless Solutions Architect",
+      "linkedin": "https://www.linkedin.com/in/adam-wagner-4bb412/"
+     }
   ]
 }
