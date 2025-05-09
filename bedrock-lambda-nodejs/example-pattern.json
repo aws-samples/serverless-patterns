@@ -1,6 +1,6 @@
 {
   "title": "Bedrock in a NodeJS Lambda",
-  "description": "Create Lambda Function that invokes Bedrock via Converse API",
+  "description": "Create an AWS Lambda Function that invokes Amazon Bedrock via Converse API",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
