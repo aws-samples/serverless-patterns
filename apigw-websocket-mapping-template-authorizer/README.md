@@ -99,7 +99,7 @@ You can then send the Json Payload to the `sendmessage` route:
  
 1. Delete the stack
     ```bash
-    sam deploy
+    sam delete
     ```
 
 ----
