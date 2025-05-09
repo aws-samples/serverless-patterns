@@ -3,7 +3,7 @@
     "description": "Create a user in Amazon Cognito, handle a Post Confirmation trigger with AWS Lambda, and store user details in Amazon DynamoDB.",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [
