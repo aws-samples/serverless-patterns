@@ -3,7 +3,7 @@
   "description": "This pattern explains workaround on how to integrate an API Gateway REST API with an Application Load Balancer.",
   "language": "Python",
   "level": "200",
-  "framework": "YAML",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -48,7 +48,8 @@
     {
       "name": "Vamsi Pulikonda",
       "image": "https://raw.githubusercontent.com/vamsipulikonda/my-photo/main/vamsi-photo.jpg",
-      "linkedin": "https://www.linkedin.com/in/vamsipulikonda/"
+      "linkedin": "vamsipulikonda",
+      "bio": "I am a cloud computing enthusiast working as a Cloud Engineer at Amazon Web Services."
     }
   ]
 }
