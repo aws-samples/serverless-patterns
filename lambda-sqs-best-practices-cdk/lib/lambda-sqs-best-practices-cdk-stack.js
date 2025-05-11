@@ -45,7 +45,7 @@ class LambdaSqsBestPracticesCdkStack extends Stack {
         POWERTOOLS_TRACER_CAPTURE_ERROR: 'true',
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1'
       },
-      timeout: Duration.seconds(30),
+      timeout: Duration.seconds(5),
       memorySize: 256,
       tracing: lambda.Tracing.ACTIVE
     });

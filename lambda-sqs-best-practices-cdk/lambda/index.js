@@ -38,8 +38,10 @@ const processMessage = async (message, messageId) => {
     try {
         logger.info('Processing message', { messageId, message });
 
+
         // Validate message
         if (typeof message !== 'object' || !message.id || !message.data) {
+            // Simulating poison pill scenario
             throw new Error('Invalid message format');
         }
 

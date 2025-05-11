@@ -67,6 +67,8 @@ This pattern sets up:
 The Lambda function:
 - Processes messages in batches
 - Validates message format
+- Simulates downstream API calls with random failures (5% failure rate)
+- Demonstrates handling of external service dependencies
 - Handles errors gracefully
 - Reports metrics and traces
 - Uses structured logging
