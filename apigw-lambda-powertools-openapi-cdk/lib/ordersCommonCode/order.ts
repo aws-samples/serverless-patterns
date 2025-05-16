@@ -134,8 +134,13 @@ export function convertDdbToOrderItem({
 }: {
   ddbOrderItem: DdbOrderItem;
 }): OrderItem {
+  const parts = ddbOrderItem.s.split("#ITEMS#");
+  if (parts.length < 2 || !parts[1]) {
+    throw new Error(`Invalid DdbOrderItem sort key format: ${ddbOrderItem.s}`);
+  }
+  
   return {
-    productId: ddbOrderItem.s.split("#ITEMS#")[1]!,
+    productId: parts[1],
     productName: ddbOrderItem.productName,
     quantity: ddbOrderItem.quantity,
     price: ddbOrderItem.price,

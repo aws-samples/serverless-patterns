@@ -47,26 +47,39 @@ async function handleOrderCreationEvent({
   event: APIGatewayProxyEvent;
   customerId: string;
 }) {
-  const orderCreationInput: OrderCreationInput = JSON.parse(event.body || "{}");
-  const order: Order = {
-    ...orderCreationInput,
-    customerId,
-    orderId: `ORD-${uuidv4()}`,
-    status: "PENDING",
-    createdAt: new Date().toISOString(),
-  };
-  await simulateExternalPaymentProcessing();
-  await writeOrder({
-    order,
-    update: false,
-  });
-  return {
-    statusCode: 201,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(order),
-  };
+  try {
+    const orderCreationInput: OrderCreationInput = JSON.parse(event.body || "{}");
+    const order: Order = {
+      ...orderCreationInput,
+      customerId,
+      orderId: `ORD-${uuidv4()}`,
+      status: "PENDING",
+      createdAt: new Date().toISOString(),
+    };
+    await simulateExternalPaymentProcessing();
+    await writeOrder({
+      order,
+      update: false,
+    });
+    return {
+      statusCode: 201,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    };
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return {
+        statusCode: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: "Invalid JSON in request body" }),
+      };
+    }
+    throw error;
+  }
 }
 
 /**
@@ -117,19 +130,32 @@ async function handleOrderUpdateEvent({
   customerId: string;
   orderId: string;
 }) {
-  const orderUpdateInput: OrderUpdate = JSON.parse(event.body || "{}");
-  const order = await updateOrder({
-    orderUpdate: orderUpdateInput,
-    orderId: orderId,
-    customerId,
-  });
-  return {
-    statusCode: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(order),
-  };
+  try {
+    const orderUpdateInput: OrderUpdate = JSON.parse(event.body || "{}");
+    const order = await updateOrder({
+      orderUpdate: orderUpdateInput,
+      orderId: orderId,
+      customerId,
+    });
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    };
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return {
+        statusCode: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: "Invalid JSON in request body" }),
+      };
+    }
+    throw error;
+  }
 }
 
 /**
@@ -229,8 +255,9 @@ class HandleOrderLambda implements LambdaInterface {
         body: JSON.stringify({ message: "Invalid request" }),
       };
     } catch (error) {
-      segment?.addError(error as Error);
-      console.error("Error:", error);
+      error instanceof Error ? error.message : String(error)
+      segment?.addError(error instanceof Error ? error : String(error));
+      logger.error("Error processing request", { error });
       return {
         statusCode: 500,
         headers: {

@@ -144,7 +144,7 @@ export async function searchOrders({
       },
     })
   );
-  if (!queryResult.Items) {
+  if (!queryResult || !queryResult.Items) {
     return {
       items: [],
       pagination: {

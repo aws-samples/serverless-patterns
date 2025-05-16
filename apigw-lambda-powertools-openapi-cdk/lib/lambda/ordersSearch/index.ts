@@ -62,11 +62,11 @@ class SearchOrderLambda implements LambdaInterface {
     } catch (error) {
       console.error("Search Orders Error:", error);
       return {
-        statusCode: 400,
+        statusCode: 500,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: "Invalid search criteria" }),
+        body: JSON.stringify({ message: "Invalid search criteria or internal error occured" }),
       };
     }
   }
