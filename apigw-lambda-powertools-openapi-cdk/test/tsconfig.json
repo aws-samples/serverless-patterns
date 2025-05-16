@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": false,
+    "types": ["jest", "node"]
+  },
+  "include": [
+    "**/*.ts"
+  ]
+}
