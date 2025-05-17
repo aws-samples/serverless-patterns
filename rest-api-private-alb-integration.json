@@ -1,0 +1,93 @@
+{
+    "title": "REST API Integration with Private ALB integration",
+    "description": "This pattern explains workaround on how to integrate an API Gateway REST API with an Application Load Balancer.",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "To work around this limitation for private ALBs, a multi-step approach is necessary",
+            "1. Use an API Gateway VPC to integrate your API with a private Network Load Balancer.",
+            "2. Use the Network Load Balancer to forward the API request to the private Application Load Balancer",
+            "3. Application Load Balancer will forward the traffic to Lambda Function configured on HTTPS listener."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rest-api-alb-integration-workaround",
+            "templateURL": "serverless-patterns/rest-api-alb-integration-workaround",
+            "projectFolder": "rest-api-alb-integration-workaround",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "How do I integrate an API Gateway REST API with an Application Load Balancer",
+                "link": "https://repost.aws/knowledge-center/api-gateway-application-load-balancers"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Once the application is deployed, retrieve the API URL provided as output and open it in a browser page."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Vamsi Pulikonda",
+            "image": "https://raw.githubusercontent.com/vamsipulikonda/my-photo/main/vamsi-photo.jpg",
+            "linkedin": "vamsipulikonda",
+            "bio": "I am a cloud computing enthusiast working as a Cloud Engineer at Amazon Web Services."
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 50,
+            "service": "apigw",
+            "label": "Amazon API Gateway"
+        },
+        "icon2": {
+            "x": 43,
+            "y": 50,
+            "service": "alb",
+            "label": "Network Load Balancer"
+        },
+        "icon3": {
+            "x": 70,
+            "y": 50,
+            "service": "alb",
+            "label": "App. Load Balancer"
+        },
+        "icon4": {
+            "x": 92,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        }
+    }
+}
