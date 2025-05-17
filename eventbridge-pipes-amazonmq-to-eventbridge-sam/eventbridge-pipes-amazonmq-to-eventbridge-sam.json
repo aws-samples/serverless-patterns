@@ -3,7 +3,7 @@
   "description": "This pattern uses Amazon EventBridge Pipes to forward events produced in Amazon MQ to an Amazon EventBridge custom Message Bus",
   "language": "YAML",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
       "headline": "How it works",
       "text": [

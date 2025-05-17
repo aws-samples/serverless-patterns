@@ -3,7 +3,7 @@
     "description": "Amazon EventBridge Scheduler job runs every five minutes to identify and delete one time Amazon EventBridge Scheduler jobs expired more than 7 days.",
     "language": "Python",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

@@ -1,0 +1,36 @@
+openapi: "3.0.1"
+info:
+  title: "ram-sfn-human-approval"
+  version: "2024-09-27T16:44:01Z"
+paths:
+  /:
+    x-amazon-apigateway-any-method:
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials:
+          Fn::GetAtt: [ReviewRESTApiRole, Arn]
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:${AWS::Region}:states:action/SendTaskSuccess"
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "{\n    \"Expense report status\" : \"$util.escapeJavaScript($input.params('Type'))\"\
+                \n}"
+        requestTemplates:
+          application/json: "{\n    \"output\": \"{\\\"Result\\\": \\\"$util.escapeJavaScript($input.params('Type'))\\\
+            \"}\",\n    \"taskToken\": \"$util.base64Decode($util.escapeJavaScript($input.params('Token')))\"\
+            \n}"
+        passthroughBehavior: "when_no_templates"
+components:
+  schemas:
+    Empty:
+      title: "Empty Schema"
+      type: "object"

@@ -1,0 +1,62 @@
+{
+  "title": "Amazon Bedrock streaming with AWS AppSync",
+  "description": "Stream Amazon Bedrock responses with AWS AppSync",
+  "language": "YAML",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template creates an AWS AppSync API along with a AWS Lambda function. The API exposes a mutation that can be called and will trigger an async lambda function invocation (thus bypassing the 30s timeout of AppSync) that will call Anthropic Claude V3 Haiku through Amazon Bedrock and stream the response back to the end user through an AppSync subscription.",
+      "Async invocation of AWS Lambda functions as AppSync data source has been announced on May 30th, 2024."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-bedrock-streaming-sam",
+      "templateURL": "serverless-patterns/appsync-bedrock-streaming-sam",
+      "projectFolder": "appsync-bedrock-streaming-sam",
+      "templateFile": "appsync-bedrock-streaming-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS AppSync",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "AWS AppSync async Lambda invocation",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2024/05/aws-appsync-events-asynchronous-lambda-function-invocations/"
+      },
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-service.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the Github repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alexis Philippart de Foy",
+      "image": "https://ca.slack-edge.com/E015GUGD2V6-U03KALDS3T6-7e7172b8ee1d-512",
+      "bio": " I am a Startup Solutions Architect, Serverless enthusiast and former Startup Founder.",
+      "linkedin": "apdf",
+      "twitter": "@aphilippartd"
+    }
+  ]
+}

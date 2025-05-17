@@ -2,7 +2,7 @@
   "title": "Amazon API Gateway REST API to Amazon SES",
   "description": "Create an Amazon API Gateway REST API that integrates with Amazon SES",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

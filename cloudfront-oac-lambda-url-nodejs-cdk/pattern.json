@@ -3,7 +3,7 @@
   "description": "This pattern shows how to protect AWS Lambda URL origins by using CloudFront Origin Access Control (OAC) to only allow access from designated CloudFront distributions",
   "language": "Node.js",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

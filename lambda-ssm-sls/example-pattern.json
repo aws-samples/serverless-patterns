@@ -1,0 +1,37 @@
+{
+  "title": "Lambda to samples",
+  "description": "GET and PUT entries in SSM.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Serverless",
+  "introBox": {
+    "headline": "Create a Lambda function that GETs and PUTs entries in SSM.",
+    "text": [
+      "This Serverless Framework project deploys a Lambda function, an SSM Parameter Store entry and the IAM permissions required to run the application. The Lambda function publishes a message to the SQS queue when invoked."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ssm-sls",
+      "templateURL": "serverless-patterns/lambda-ssm-sls"
+    }
+  },
+  "deploy": {
+    "text": ["serverless deploy --verbose"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>serverless remove --verbose</code>.",
+      "Confirm the stack has been deleted: aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\""
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alex Nelson",
+      "bio": "Senior Solutions Architect, AWS"
+    }
+  ]
+}

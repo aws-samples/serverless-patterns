@@ -1,0 +1,59 @@
+{
+  "title": "Resizing images uploaded to Amazon S3 with AWS Lambda",
+  "description": "Create an AWS Lambda function that resizes images uploaded to Amazon S3.",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project shows how to use a Java-based Lambda function to resize an image from a source S3 bucket and put the resized image in a destination S3 bucket.",
+      "When a new JPEG image is added to the source S3 bucket, an event gets triggered which invoks the Java-based Lambda function. The Lambda functions gets the object from the bucket, resizes it to 800x600 resolution, and puts the resized image in the destination bucket.",
+      "This pattern uses AWS SAM with Lambda SnapStart on ARM64 architecture on a Java 21 manged runtime."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-resizing-java",
+      "templateURL": "serverless-patterns/s3-lambda-resizing-java",
+      "projectFolder": "s3-lambda-resizing-java",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Effectively Running Java on Serverless",
+        "link": "https://s12d.com/serverless-java"
+      },
+      {
+        "text": "Lambda SnapStart",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build && sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dhiraj Mahapatro",
+      "image": "https://i.postimg.cc/cr6qVWdr/mahadhir-high-res-current-photo.jpg",
+      "bio": "Principal Specialist SA, Serverless, AWS",
+      "linkedin": "dmahapatro",
+      "twitter": "dhirajmahapatro"
+    }
+  ]
+}

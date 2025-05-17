@@ -4,7 +4,7 @@
   "language": "Node.js",
   "architectureURL": "pattern-cdk-appsync-sqs.png",
   "level": "100",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "services": {
     "from": "appsync",
     "to": "sqs"

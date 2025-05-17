@@ -1,0 +1,60 @@
+{
+  "title": "Amazon Cognito user management using Amazon API Gateway and AWS Lambda",
+  "description": "Deploys Amazon Cognito user pool, Amazon API Gateway REST API with AWS Lambda integration for user creation, confirmation & token retrieval in Java.",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon API Gateway receives the HTTP POST request containing the request details in JSON format. There are 3 POST methods exposed for create user, confirm user and login user operations.",
+      "AWS Lambda is by the API Gateway, this function written in Java uses Amazon Cognito API to create, confirm and login user.",
+      "Depending on the operation invoked, user is created, confirmed or logged in the Amazon Cognito user pool.",
+      "The Lambda function processes the Amazon Cognito API response and sends it back to the user via the API Gateway."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-cognito-sam-java",
+      "templateURL": "serverless-patterns/apigw-lambda-cognito-sam-java",
+      "projectFolder": "apigw-lambda-cognito-sam-java",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Call a REST API integrated with an Amazon Cognito user pool",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-invoke-api-integrated-with-cognito-user-pool.html"
+      },
+      {
+        "text": "Building fine-grained authorization using Amazon Cognito, API Gateway, and IAM",
+        "link": "https://aws.amazon.com/blogs/security/building-fine-grained-authorization-using-amazon-cognito-api-gateway-and-iam/"
+      }      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

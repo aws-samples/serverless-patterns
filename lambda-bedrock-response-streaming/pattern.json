@@ -3,7 +3,7 @@
   "description": "Create a Lambda function that invokes a Bedrock model with response streaming.",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

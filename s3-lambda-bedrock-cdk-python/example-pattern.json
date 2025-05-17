@@ -3,7 +3,7 @@
     "description": "This pattern facilitates the extraction of vector embeddings using Amazon Bedrock from input files uploaded to S3, triggered by a Lambda function.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

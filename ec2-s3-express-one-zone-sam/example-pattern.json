@@ -3,7 +3,7 @@
   "description": "SAM Template that creates an EC2 Instance, an Amazon S3 Express One Zone directory bucket and required IAM Role to access the bucket from the instance",
   "language": "YAML",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

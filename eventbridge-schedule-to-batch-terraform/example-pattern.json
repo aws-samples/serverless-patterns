@@ -1,0 +1,56 @@
+{
+  "title": "Amazon EventBridge Scheduler to AWS Batch",
+  "description": "Schedule AWS Batch jobs using Amazon EventBridge Scheduler",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use Amazon EventBridge Scheduler to schedule batch compute jobs with AWS Batch. This pattern leverages universal targets with EventBridge Scheduler to talk directly to Batch, which uses only JSON_based, structured language to define the implementation.",
+      "This pattern deploys one VPC, EventBridge Scheduler Schedule, one Batch compute environment, Batch Job and Queue."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-batch-terraform",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-batch-terraform",
+      "projectFolder": "eventbridge-schedule-to-batch-terraform",
+      "templateFile": "eventbridge-schedule-to-batch-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/scheduler.html"
+      },
+      {
+        "text": "AWS Batch",
+        "link": "https://docs.aws.amazon.com/batch/latest/userguide/what-is-batch.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ian Lodge",
+      "image": "https://avatars.githubusercontent.com/u/135351711?v=4",
+      "bio": "Ian is a Solutions Architect at Amazon Web Services based in the US.",
+      "linkedin": "https://www.linkedin.com/in/ian-lodge"
+    }
+  ]
+}

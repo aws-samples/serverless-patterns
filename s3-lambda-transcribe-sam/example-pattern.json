@@ -3,7 +3,7 @@
   "description": "Trigger a Transcribe job from an S3 upload.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

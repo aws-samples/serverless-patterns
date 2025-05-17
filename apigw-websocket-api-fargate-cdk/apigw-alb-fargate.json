@@ -3,7 +3,7 @@
     "description": "Creates a WebSocket API and integrates with ECS Fargate using ALB.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

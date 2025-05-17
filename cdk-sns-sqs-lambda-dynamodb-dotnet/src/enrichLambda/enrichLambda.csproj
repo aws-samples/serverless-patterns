@@ -17,6 +17,6 @@
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.4.7" />
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.4.1" />
     <PackageReference Include="AWSSDK.SQS" Version="3.7.2.98" />
-    <PackageReference Include="RestSharp" Version="108.0.1" />
+    <PackageReference Include="RestSharp" Version="112.0.0" />
   </ItemGroup>
 </Project>

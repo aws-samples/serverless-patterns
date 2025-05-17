@@ -1,0 +1,57 @@
+{
+    "title": "Enabling Service Discovery for AWS Fargate",
+    "description": "Provision Amazon Elastic Container Service (ECS) resources and deploy ECS service with integration of Cloud Map",
+    "language": "YAML",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern provides sample Terraform IaC template to provision end to end Amazon Elastic Container Service (ECS) resources and deploy ECS service with integration of Cloud Map",
+        "With Cloud Map, you can define custom names for your application resources, and it maintains the updated location of these dynamically changing resources"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudmap-fargate-terraform",
+        "templateURL": "serverless-patterns/cloudmap-fargate-terraform",
+        "projectFolder": "cloudmap-fargate-terraform",
+        "templateFile": "cloudmap-fargate-terraform/main.tf"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Service discovery considerations",
+          "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html#service-discovery-considerations"
+        },
+        {
+          "text": "Configuring AWS Cloud Map",
+          "link": "https://docs.aws.amazon.com/cloud-map/latest/dg/configuring-cloud-map.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "terraform init && terraform apply --auto-approve"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "terraform destroy --auto-approve"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Aditya Ranjan",
+        "image": "https://avatars.githubusercontent.com/u/129155368?v=4",
+        "bio": "Cloud Consultant at AWS ProServe",
+        "linkedin": "https://www.linkedin.com/in/aditya-ranjan-21a30515a/"
+      }
+    ]
+  }

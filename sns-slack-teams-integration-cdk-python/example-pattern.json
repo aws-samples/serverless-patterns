@@ -3,7 +3,7 @@
   "description": "This sample project demonstrates the publishing of messages from an SNS topic to an AWS Lambda function, which in turn triggers notifications to a Slack/Teams channel.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

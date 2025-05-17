@@ -58,7 +58,7 @@ Resources:
         Bucket: !Sub 'eventbridge-inbound-webhook-templates-prod-${AWS::Region}'
         Key: 'lambda-templates/github-lambdasrc.zip'
       Handler: app.lambda_handler
-      Runtime: python3.7
+      Runtime: python3.8
       ReservedConcurrentExecutions: 10
       Environment:
         Variables:

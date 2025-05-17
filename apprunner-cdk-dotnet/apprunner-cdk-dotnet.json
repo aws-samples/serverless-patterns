@@ -3,7 +3,7 @@
     "description": "The CDK stack that creates an AWS App Runner service to deploy a .NET Web API application.",
     "language": ".NET",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

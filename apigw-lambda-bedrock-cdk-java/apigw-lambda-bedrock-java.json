@@ -3,7 +3,7 @@
     "description": "Make a request to Bedrock via API Gateway using Java and CDK",
     "language": "Java",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

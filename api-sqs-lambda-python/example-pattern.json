@@ -3,7 +3,7 @@
   "description": "This sample project demonstrates how to crate an Amazon API Gateway HTTP API that integrates with an Amazon SQS queue.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "Create an Amazon API Gateway HTTP API that integrates with an Amazon SQS queue.",
     "text": ["This pattern deploys an Amazon API Gateway HTTP API with a SQS queue which acts as a buffer to alleviate traffic spikes which is further integrated to Lambda"]

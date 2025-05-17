@@ -5,7 +5,7 @@
   "architectureURL": "",
   "videoId": "",
   "level":"100",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "services": {
     "from": "apigatewayv2",
     "to": "eventbridge"

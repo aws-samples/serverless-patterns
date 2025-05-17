@@ -1,0 +1,136 @@
+name: Create and Update Releases
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  get-release:
+    runs-on: ubuntu-latest
+    outputs: 
+      latest_release: ${{ steps.get_latest_release.outputs.latest_release }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get the latest release tag
+        id: get_latest_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LATEST_RELEASE=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' || echo "none")
+          echo "Latest release tag: $LATEST_RELEASE"
+          echo "::set-output name=latest_release::$LATEST_RELEASE"
+          echo "latest_release=${latest_release}" >> $GITHUB_ENV
+        continue-on-error: true
+
+  create-release:
+    needs: get-release
+    runs-on: ubuntu-latest
+    if: needs.get-release.outputs.latest_release == ''
+    steps:
+      - name: print latest release output
+        run: echo "Latest release ${{ needs.get-release.outputs.latest_release }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Release doesn't exist so create one
+        id: create_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v1.0.0 --notes "Initial release v1.0.0" --prerelease=false
+          echo "Release created"
+      
+      - name: Zip files of folders
+        id: zip_folders
+        run: |
+          mkdir -p temp
+          for folder in */; do
+            if [ -d "$folder" ]; then
+              folder_name=$(basename "$folder")
+              zip -r "temp/${folder_name}.zip" "$folder_name"
+            fi
+          done
+          echo "Zip files created"
+    
+      - name: upload files to the release
+        id: upload_files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for file in temp/*.zip; do
+            if [ -f "$file" ]; then
+              gh release upload v1.0.0 "$file" --clobber
+              echo "Uploaded $file, waiting to avoid rate limits..."
+              sleep 3
+            else
+              echo "File $file not found"
+            fi
+          done
+
+  update-release:
+    needs: get-release
+    runs-on: ubuntu-latest
+    if: needs.get-release.outputs.latest_release != ''
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Fetch latest tags
+        run: |
+          git fetch --tags
+
+      - name: Get changed files
+        id: get_changes
+        run: |
+          if [ -n "${{ needs.get-release.outputs.latest_release }}" ]; then
+            git fetch origin refs/tags/${{ needs.get-release.outputs.latest_release }}:refs/tags/${{ needs.get-release.outputs.latest_release }}
+            changed_files=$(git diff --name-only ${{ needs.get-release.outputs.latest_release }} HEAD)
+            echo "Changed files: $changed_files"
+            echo "$changed_files" > changed_files.txt
+          else
+            echo "No latest release found"
+            echo "" > changed_files.txt
+          fi
+        
+      - name: Identify changed folders
+        id: identify_folders
+        run: |
+          if [ -s changed_files.txt ]; then
+            changed_folders=$(awk -F/ '{print $1}' changed_files.txt | sort | uniq)
+            echo "Changed folders: $changed_folders"
+            echo "$changed_folders" > changed_folders.txt
+          else
+            echo "No changed files"
+            echo "" > changed_folders.txt
+          fi
+      
+      - name: Archive changed folders
+        run: |
+          mkdir -p temp_archives
+          while IFS= read -r folder; do
+            if [ -d "$folder" ]; then
+              zip -r "temp_archives/$folder.zip" "$folder"
+              echo "Archived $folder"
+            else
+              echo "Folder $folder does not exist"
+            fi
+          done < changed_folders.txt
+      
+      - name: Upload archives to release
+        if: needs.get-release.outputs.latest_release != ''
+        env: 
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          while IFS= read -r folder; do
+            archive="temp_archives/$folder.zip"
+            if [ -f "$archive" ]; then
+              gh release upload ${{ needs.get-release.outputs.latest_release }} "$archive" --clobber
+              echo "Uploaded $archive, waiting to avoid rate limits..."
+            else
+              echo "Archive $archive not found"
+            fi
+          done < changed_folders.txt

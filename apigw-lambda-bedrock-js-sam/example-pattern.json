@@ -3,7 +3,7 @@
   "description": "This sample project creates a REST API with Lambda proxy integration that invokes Bedrock-runtime API for text generation.",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

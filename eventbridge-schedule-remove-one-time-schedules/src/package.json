@@ -9,7 +9,7 @@
     "@aws-sdk/client-scheduler": "^3.231.0",
     "@aws-sdk/client-sqs": "^3.231.0",
     "date-fns": "^2.29.3",
-    "esbuild": "^0.14.14"
+    "esbuild": "^0.25.1"
   },
   "scripts": {
     "unit": "jest",

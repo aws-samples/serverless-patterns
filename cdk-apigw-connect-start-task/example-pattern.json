@@ -3,7 +3,7 @@
   "description": "Create an API Gateway REST API that is protected with a Lambda token authorizer and integrates with AmazonSQS",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

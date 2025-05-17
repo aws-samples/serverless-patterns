@@ -3,7 +3,7 @@
     "description": "Create a Lambda function for Node.js with ESM modules configured and ESBuild bundle set up in the CDK configuration",
     "language": "Node.js",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Configure periodic replication schedule for your Amazon FSx for OpenZFS file system volumes.
+
+Parameters:
+  TargetVolumeID:
+    Description: Amazon FSx for OpenZFS Target Volume ID
+    Type: String
+    AllowedPattern: "^fsvol-[A-Za-z0-9]+"
+
+  # CopySnapshotAndUpdateVolume - "Options" parameter.
+  # Comma (,) separated values such as "DELETE_INTERMEDIATE_SNAPSHOTS,DELETE_INTERMEDIATE_DATA,DELETE_CLONED_VOLUMES"
+  Options:
+    Description: Options parameter value for the CopySnapshotAndUpdateVolume API
+    Type: String
+
+  # CopySnapshotAndUpdateVolume - "CopyStrategy" parameter.
+  # example = INCREMENTAL_COPY or FULL_COPY
+  CopyStrategy:
+    Description: CopyStrategy parameter value for the CopySnapshotAndUpdateVolume API
+    Type: String
+    Default: INCREMENTAL_COPY
+
+  SourceAWSAcctId:
+    Description: FSx Source AWS Account ID
+    Type: String
+    AllowedPattern: ^\d{12}
+
+Resources:
+  #
+  # IAM role going to be assumed by Source Lambda function to invoke target Lambda function.
+  #
+  CrossAcctIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub CrossAcctIAMRole-${AWS::StackName}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${SourceAWSAcctId}:root"
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: !Sub CrossAcctIAMRole-Policy-${AWS::StackName}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt CopySnapshotAndUpdateVolumeLambda.Arn
+
+  #
+  # Lambda Execution Role
+  #
+  CopySnapshotAndUpdateVolumeLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub CopySnapshotAndUpdateVolumeLambda-Role-${AWS::StackName}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: !Sub CopySnapshotAndUpdateVolumeLambda-Policy-${AWS::StackName}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+              - Effect: Allow
+                Action:
+                  - fsx:CreateSnapshot
+                  - fsx:DescribeSnapshots
+                  - fsx:DescribeVolumes
+                  - fsx:DeleteSnapshot
+                  - fsx:TagResource
+                  - fsx:ListTagsForResource
+                  - fsx:CopySnapshotAndUpdateVolume
+                Resource:
+                  - !Sub "arn:aws:fsx:${AWS::Region}:${AWS::AccountId}:*"
+                  - !Sub "arn:aws:fsx:*:${SourceAWSAcctId}:*"
+  #
+  # Lambda function that will make CopySnapshotAndUpdateVolume API call.
+  #
+  CopySnapshotAndUpdateVolumeLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub CopySnapshotAndUpdateVolumeLambda-${AWS::StackName}
+      Description: Lambda function that will make CopySnapshotAndUpdateVolume API call.
+      Environment:
+        Variables:
+          DEST_VOLUME_ID: !Ref TargetVolumeID
+          OPTIONS: !Ref Options
+          COPY_STRATEGY: !Ref CopyStrategy
+      Handler: CopySnapshotAndUpdateVolume.lambda_handler
+      Role: !GetAtt CopySnapshotAndUpdateVolumeLambdaRole.Arn
+      CodeUri: src/CopySnapshotAndUpdateVolume.py
+      Runtime: python3.13
+      Timeout: 600
+
+#
+# Stack output section
+#
+Outputs:
+  CrossAcctIAMRole:
+    Description: Cross account IAM role going to be assumed by Source Lambda function to invoke target Lambda function.
+    Value: !GetAtt CrossAcctIAMRole.Arn
+  LambdaFunction:
+    Description: Target account Lambda Function that will make CopySnapshotAndUpdateVolume API call
+    Value: !GetAtt CopySnapshotAndUpdateVolumeLambda.Arn
+  LambdaExecutionRole:
+    Description: IAM role used by target Lambda function
+    Value: !GetAtt CopySnapshotAndUpdateVolumeLambdaRole.Arn
+

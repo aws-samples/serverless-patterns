@@ -1,7 +1,7 @@
 import json
 import boto3 
 
-modelId = "anthropic.claude-v2"
+modelId = "anthropic.claude-3-5-sonnet-20240620-v1:0"
 
 def lambda_handler(event, context):
     # TODO implement
@@ -15,10 +15,12 @@ def lambda_handler(event, context):
         print(request)
         prompt_data = request["prompt"]
         body = json.dumps({
-            'prompt': f'Human:{prompt_data}\n\nAssistant:', 
-            'max_tokens_to_sample': 1028,
+            'anthropic_version': 'bedrock-2023-05-31',
+            'messages': [
+                {'role': 'user', 'content': prompt_data}
+            ],
+            'max_tokens': 1024,
             'temperature': 1,
-            'top_k': 250,
             'top_p': 0.999,
             'stop_sequences': ['\n\nHuman:']
         })
@@ -30,10 +32,12 @@ def lambda_handler(event, context):
             accept= "*/*"
 
         )
-        body = json.loads(response["body"].read().decode("utf-8"))
+        response_body = json.loads(response.get('body').read())
+        print(response_body)
+        body = response_body.get('content')[0].get('text')
 
         print(body)
 
-        #### Publish response to websocket, IoT Core topic
+
 
 

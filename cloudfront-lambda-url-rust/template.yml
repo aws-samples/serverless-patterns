@@ -23,9 +23,12 @@ Resources:
   LambdaFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       FunctionUrlConfig:
         AuthType: NONE
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 
 # ##########################################################################
 # #  CloudFront::CachePolicy                                               #

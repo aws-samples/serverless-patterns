@@ -3,7 +3,7 @@
   "description": "How to send messages from Amazon SQS queue to Amazon Redshift cluster using Amazon EventBridge Pipes ",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -1,0 +1,71 @@
+{
+    "title": "API Gateway Integration with AWS Lambda and Amazon Bedrock Nova Micro (Terraform)",
+    "description": "This pattern demonstrates how to create a serverless API that leverages Amazon Bedrock's Nova Micro model through AWS Lambda for generating text responses. The architecture enables real-time text generation through a RESTful API endpoint.",
+    "language": "Python",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "An Amazon API Gateway REST endpoint accepts POST requests containing prompts. These requests are automatically routed to an AWS Lambda function, which processes the input and interacts with Amazon Bedrock's Nova Micro model.",
+            "The Lambda function formats the request according to Nova Micro's requirements, invokes the model, and returns the generated response through API Gateway. This serverless architecture ensures scalability and cost-effectiveness, as you only pay for actual API calls and compute time."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-nova-terraform",
+            "templateURL": "serverless-patterns/apigw-lambda-bedrock-nova-terraform",
+            "projectFolder": "apigw-lambda-bedrock-nova-terraform",
+            "templateFile": "apigw-lambda-bedrock-nova-terraform/main.tf"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon API Gateway REST APIs",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
+            },
+            {
+                "text": "AWS Lambda Function Integration",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-with-lambda-integration.html"
+            },
+            {
+                "text": "Amazon Bedrock Nova Models",
+                "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-nova.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "terraform init",
+            "terraform plan",
+            "terraform apply"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Test the API endpoint using curl:",
+            "curl -X POST -H \"Content-Type: application/json\" -d '{\"prompt\": \"What are the key benefits of using AWS services?\"}' https://YOUR-API-ENDPOINT/dev/generate_content",
+            "",
+            "Or use Python with the requests library:",
+            "import requests",
+            "response = requests.post('https://YOUR-API-ENDPOINT/dev/generate_content',",
+            "                        json={'prompt': 'What are the key benefits of using AWS services?'})",
+            "print(response.json())"
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "terraform destroy",
+            "terraform show"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Naresh Rajaram",
+            "image": "",
+            "bio": "Senior Partner Solutions Architect, AWS",
+            "linkedin": "https://www.linkedin.com/nareshrajaram"
+        }
+    ]
+}

@@ -3,7 +3,7 @@
   "description": "This pattern demonstrates the use of multiple Lambda functions to manage a custom resource with CDK.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

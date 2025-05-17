@@ -3,7 +3,7 @@
     "description": "Amazon EventBridge Pipe that filters and transforms messages from Amazon SQS to AWS Step Functions.",
     "language": "Python",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

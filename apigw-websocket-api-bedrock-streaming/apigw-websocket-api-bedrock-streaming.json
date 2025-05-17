@@ -3,7 +3,7 @@
     "description": "Creates a WebSocket API and Lambda functions that provides a streaming response from the LLMs in Amazon Bedrock.",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

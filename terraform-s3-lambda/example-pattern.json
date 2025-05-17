@@ -1,0 +1,86 @@
+{
+  "title": "Amazon S3 bucket notifications to AWS Lambda",
+  "description": "This pattern creates an Amazon S3 bucket, AWS Lambda function and setup S3 bucket event notifications to trigger the Lambda function.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform (with modules)",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon S3 bucket, AWS Lambda function and setup S3 bucket event notifications to trigger the Lambda function.",
+      "In this example, notifications like `s3:ObjectCreated:*` with filter prefix (`data/`) and suffix (`.json`) are configured."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-s3-lambda",
+      "templateURL": "serverless-patterns/terraform-s3-lambda",
+      "projectFolder": "terraform-s3-lambda",
+      "templateFile": "terraform-s3-lambda/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "test": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+      },
+      {
+        "test": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "test": "Terraform AWS S3 bucket module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket"
+      },
+      {
+        "test": "Terraform AWS S3 bucket notification module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/modules/notification"
+      },
+      {
+        "test": "Terraform AWS S3 bucket examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples"
+      },
+      {
+        "test": "Terraform AWS S3 bucket notification examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples/notification"
+      },
+      {
+        "text": "Amazon S3 Event Notifications",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/NotificationHowTo.html"
+      },
+      {
+        "text": "Amazon S3 Developer Guide",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+      },
+      {
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anton Babenko",
+      "image": "https://avatars.githubusercontent.com/u/393243",
+      "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
+      "linkedin": "https://www.linkedin.com/in/antonbabenko",
+      "twitter": "antonbabenko"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "title": "Amazon SQS Queue to AWS Lambda",
+  "description": "This pattern creates an Amazon SQS Queue, AWS Lambda function and setup event sourcing from the Queue to the Lambda function.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform (with modules)",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon SQS Queue, AWS Lambda function and setup event sourcing from the Queue to the Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-sqs-lambda",
+      "templateURL": "serverless-patterns/terraform-sqs-lambda",
+      "projectFolder": "terraform-sqs-lambda",
+      "templateFile": "terraform-sqs-lambda/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "test": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+      },
+      {
+        "test": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "test": "Terraform AWS Lambda event source mapping examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples/event-source-mapping"
+      },
+      {
+        "test": "Terraform AWS SQS module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-sqs"
+      },
+      {
+        "test": "Terraform AWS SQS examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-sqs/tree/master/examples"
+      },
+      {
+        "text": "Lambda event source mappings",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
+      },
+      {
+        "text": "Amazon SQS Developer Guide",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+      },
+      {
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anton Babenko",
+      "image": "https://avatars.githubusercontent.com/u/393243",
+      "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
+      "linkedin": "https://www.linkedin.com/in/antonbabenko",
+      "twitter": "antonbabenko"
+    }
+  ]
+}

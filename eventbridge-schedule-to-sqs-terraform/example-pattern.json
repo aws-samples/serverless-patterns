@@ -1,0 +1,55 @@
+{
+	"title": "EventBridge Scheduler to SQS",
+	"description": "Create an EventBridge Scheduler that sends messages to an SQS queue",
+	"language": "Python",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This template deploys an EventBridge Scheduler that triggers an SQS SendMessage API Call every minute"
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-sqs-terraform",
+			"templateURL": "serverless-patterns/eventbridge-schedule-to-sqs-terraform",
+			"projectFolder": "eventbridge-schedule-to-sqs-terraform",
+			"templateFile": "eventbridge-schedule-to-sqs-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "Introducing Amazon EventBridge Scheduler",
+				"link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+			},
+			{
+				"text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+				"link": "https://serverlessland.com/learn/eventbridge"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the README in the GitHub repo for detailed instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+	  "name": "Francesco Vergona",
+	  "image": "https://avatars.githubusercontent.com/f-verg",
+	  "bio": "Solutions Architect, AWS",
+	  "linkedin": "https://www.linkedin.com/in/francesco-vergona/"
+	}]
+}

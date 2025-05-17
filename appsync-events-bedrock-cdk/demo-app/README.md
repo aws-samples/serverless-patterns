@@ -1,0 +1,1 @@
+Follow instructions in the pattern's root folder [README](../README.md).

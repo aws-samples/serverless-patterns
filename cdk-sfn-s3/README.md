@@ -27,19 +27,11 @@ Important: this application uses various AWS services and there are costs associ
      ```
      npm install
      ```
- 4. This project uses typescript as client language for AWS CDK. Run the given command to compile typescript to javascript:
-     ```
-     npm run build
-     ```
- 5. Synthesize CloudFormation template from the AWS CDK app:
-     ```
-     cdk synth
-     ```
- 6. Deploy the stack to your default AWS account and region. The output of this command should give you the StepFunctions State Machine ARN.
+ 4. Deploy the stack to your default AWS account and region. The output of this command should give you the StepFunctions State Machine ARN.
      ```
      cdk deploy
      ```
- 8. Note the outputs from the CDK deployment process. These contain the ARN of StepFunctions State Machine.
+ 5. Note the outputs from the CDK deployment process. These contain the ARN of StepFunctions State Machine.
 
 ## How it works
 
@@ -52,11 +44,11 @@ Use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2
 
  1. Execute the Step Functions workflow:
     ```
-    aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STATE_MACHINE_ARN
+    aws stepfunctions start-execution --state-machine-arn <STATE_MACHINE_ARN>
     ```
  2. View S3 bucket to see files created in the previously empty bucket: You should see a file has been saved to the S3 bucket:
      ```
-     aws s3 ls my-sfn-bucket-destination
+     aws s3 ls <S3_BUCKET_NAME>
      2022-06-06 14:53:12         17 filename.txt
      ```
 
@@ -68,7 +60,7 @@ Use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2
     ```
  2. Confirm the stack has been deleted
     ```
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'ENTER_STACK_NAME')].StackStatus"
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'<STACK_NAME>')].StackStatus"
     ```
 
 ## Useful commands

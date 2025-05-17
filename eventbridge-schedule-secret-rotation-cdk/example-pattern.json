@@ -1,0 +1,64 @@
+{
+    "title": "Secret rotation using Amazon EventBridge Scheduler and AWS Lambda",
+    "description": "Secret rotation in AWS Secrets Manager using Amazon EventBridge Scheduler and AWS Lambda",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates rotating secrets in AWS Secrets Manager using Amazon EventBridge Scheduler and AWS Lambda at desired intervals for several use cases. e.g. rotating OAuth tokens with limited lifespan.",
+        "An EventBridge schedule is created based on the 'Secret rotation schedule' CDK parameter with rotation Lambda as the target which does the job",
+        "You could provide the interval at which you want the secret to be rotated as a cron or rate expression."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-secret-rotation-cdk",
+        "templateURL": "serverless-patterns/eventbridge-schedule-secret-rotation-cdk",
+        "projectFolder": "eventbridge-schedule-secret-rotation-cdk",
+        "templateFile": "cdk/eventbridge_schedule_secret_rotation_stack.py"
+      }
+    },    
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Senthil Mohan",
+        "image": "https://ca.slack-edge.com/E015GUGD2V6-U03JTLBU1HD-ffd97b7877e5-512",
+        "bio": "Senthil is a Solutions Architect at AWS working with ISVs in the UK to migrate, modernize and build their software products on AWS.",
+        "linkedin": "senthil-kumar-mohan"
+      },
+      {
+        "name": "Shubhankar Sumar",
+        "image": "https://ca.slack-edge.com/E015GUGD2V6-W01BSTRT7EZ-3a3d16cf4fa5-192",
+        "bio": "Shubhankar is a Sr. Solutions Architect at AWS working with ISVs in the UK to build, run, and scale their software products on AWS.",
+        "linkedin": "shubhankar-sumar"
+      }     
+    ],
+    "resources": {
+      "bullets": [
+        {
+          "text": "Using cron and rate expressions to schedule rules in Amazon EventBridge",
+          "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-scheduled-rule-pattern.html"
+        },
+        {
+          "text":"AWS Secrets Manager rotation template",
+          "link": "https://github.com/aws-samples/aws-secrets-manager-rotation-lambdas/blob/master/SecretsManagerRotationTemplate/lambda_function.py"
+        }
+      ]
+    }
+  }

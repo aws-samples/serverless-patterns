@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Appsync Bedrock Streaming (uksb-1tthgi812) (tag:appsync-bedrock-streaming-sam)
+Resources:
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  BedrockFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - ${AWS::StackName}-${ResourceName}
+        - ResourceName: BedrockFunction
+      CodeUri: src/Function
+      Handler: index.handler
+      Runtime: nodejs20.x
+      MemorySize: 256
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          APP_SYNC_API: !GetAtt BedrockAppSyncApi.GraphQLUrl
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: bedrock:InvokeModelWithResponseStream
+              Resource:
+                - !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-3-haiku-20240307-v1:0
+        - Statement:
+            - Effect: Allow
+              Action: appsync:GraphQL
+              Resource: !Sub ${BedrockAppSyncApi}/types/Mutation/*
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - index.mts
+        External:
+          - '@aws-sdk/*'
+          - aws-sdk
+        Minify: false
+  BedrockFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${BedrockFunction}
+
+##########################################################################
+#   AppSync API                                                          #
+##########################################################################
+  BedrockAppSyncApi:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaUri: ./sam_graphql_api/schema.graphql
+      ApiKeys:
+        TestApiKey:
+          Description: Test Api Key
+      Auth:
+        Type: API_KEY
+        Additional:
+          - Type: AWS_IAM
+      DataSources:
+        Lambda:
+          BedrockFunctionDataSource:
+            FunctionArn: !GetAtt BedrockFunction.Arn
+      Functions:
+        onMessageFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: None
+          CodeUri: sam_graphql_api/resolvers/functions/onMessage.js
+        sendMessageFunction:
+          Runtime: 
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: BedrockFunctionDataSource
+          CodeUri: sam_graphql_api/resolvers/functions/sendMessage.js
+      Resolvers:
+        Mutation:
+          onMessage:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: "1.0.0"
+            Pipeline:
+            - onMessageFunction
+          sendMessage:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: "1.0.0"
+            Pipeline:
+            - sendMessageFunction

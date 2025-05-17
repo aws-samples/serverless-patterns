@@ -1,0 +1,53 @@
+{
+  "title": "AWS Step Functions to Amazon S3",
+  "description": "Creates a Step Functions workflow that puts an object to an S3 bucket.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Step Functions receives an execution request using the `start-execution` API command and puts an object to an S3 bucket using the `PutObject` API call from the AWS SDK service integration."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-sfn-s3",
+      "templateURL": "serverless-patterns/cdk-sfn-s3",
+      "projectFolder": "cdk-sfn-s3",
+      "templateFile": "src/lib/sfn-s3-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting started with the AWS CDK",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
+      },
+      {
+        "text": "Call other AWS services",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-services.html"
+      },
+      {
+        "text": "AWS SDK service integrations",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "Harshitha Shashidhar",
+      "image": "../assets/images/resources/harshihs.jpg",
+      "bio": "Harshitha Shashidhar is an Cloud Application architect who loves to build the serverless applications at scale."
+    }
+  ]
+}

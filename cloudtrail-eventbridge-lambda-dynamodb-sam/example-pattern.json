@@ -3,7 +3,7 @@
   "description": "Use EventBridge and Lambda to respond to <code>AdvertiseByoipCidr</code> events and validate if the address space should be advertised.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

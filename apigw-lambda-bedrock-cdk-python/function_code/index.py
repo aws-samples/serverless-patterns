@@ -10,15 +10,17 @@ def handler(event, context):
     prompt = body.get('prompt', 'Write a text to be posted on my social media channels about how Amazon Bedrock works')
     
     body = json.dumps({
-        'prompt': "\n\nHuman:" + prompt + "\n\nAssistant:",
-        "temperature": 0.5,
-        "top_p": 1,
-        "top_k": 250,
-        "max_tokens_to_sample": 200,
-        "stop_sequences": ["\n\nHuman:"]
+        'anthropic_version': 'bedrock-2023-05-31',
+        'messages': [
+            {'role': 'user', 'content': prompt}
+        ],
+        'max_tokens': 200,
+        'temperature': 0.5,
+        'top_p': 1,
+        'top_k': 250
     }) #all parameters (except for prompt) are set to default values
 
-    modelId = 'anthropic.claude-v2'
+    modelId = 'anthropic.claude-3-haiku-20240307-v1:0'
     accept = 'application/json'
     contentType = 'application/json'
 
@@ -28,6 +30,6 @@ def handler(event, context):
     return {
         'statusCode': 200,
         'body': json.dumps({
-            'generated-text': response_body
+            'generated-text': response_body.get('content', '')
         })
     }

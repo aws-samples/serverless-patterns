@@ -3,7 +3,7 @@
     "description": "Create a functionless cache invalidation process",
     "language": "TypeScript",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

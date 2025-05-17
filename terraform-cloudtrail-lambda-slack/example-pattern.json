@@ -1,0 +1,62 @@
+{
+  "title": "AWS Lambda to Cloudtrail data events",
+  "description": "This pattern demonstrates use of Cloudtrail lambda data events for monitoring invocations via Slack notifications ",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an AWS Cloudtrail which pushes AWS Lambda function data events to Cloudwatch ",
+      "The Cloudwatch has a lambda subscription filter to fetch only particular invocation events.", 
+      "The pattern deploys a lambda function which parses and forwards the Cloudwatch event over Slack notification"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-cloudtrail-lambda-slack",
+      "templateURL": "serverless-patterns/terraform-cloudtrail-lambda-slack",
+      "projectFolder": "terraform-cloudtrail-lambda-slack",
+      "templateFile": "terraform-cloudtrail-lambda-slack/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "test": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+      },
+      {
+        "test": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed execution instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abhishek Agawane",
+      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+      "bio": "I am a Cloud Support Engineer (Serverless) at AWS who loves cloud computing",
+      "linkedin": "https://www.linkedin.com/in/agawabhi/"
+    }
+  ]
+}

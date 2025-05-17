@@ -3,7 +3,7 @@
     "description": "This pattern helps transform data by using an event-driven architecture to trigger a data transformation job",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

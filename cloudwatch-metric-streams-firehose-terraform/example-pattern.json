@@ -1,0 +1,66 @@
+{
+  "title": "Amazon CloudWatch Metric Streams to Amazon Data Firehose",
+  "description": "Create CloudWatch Metric stream using Amazon Data Firehose and save them in Amazon S3",
+  "language": "",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+         "This pattern sets up Amazon CloudWatch Metric stream and associates that with Amazon Data Firehose. Through this setup you can continuously stream metrics to a destination of choice with near-real-time delivery and low latency. There are various destinations supported, which include Amazon Simple Storage Service (S3) and several third party provider destinations like Datadog, NewRelic, Splunk and Sumo Logic, but in this pattern we use S3. This setup also provides capability to stream all CloudWatch metrics, or use filters to stream only specified metrics. Each of the metric streams can include up to 1000 filters that can either include or exclude namespaces or specific metrics. Another limitation for a single metric stream is it can either include or exclude the metrics, but not both. If any new metrics are added matching the filters in place, an existing metric stream will automatically include them.",
+        "Traditionally, AWS customers relied on polling CloudWatch metrics using API's, which was used in all sorts of monitoring, alerting and cost management tools. Since the introduction of metric streams, customers now have the ability to create low-latency scalable streams of metrics with ability to filter them at a namespace level, for example to include or exclude metrics at a namespace level. Further to that, if there is a requirement to filter at a more granular level, Metric Name Filtering in metric streams comes into play, addressing the need for more precise filtering capabilities.",
+        "One of the good features of metric streams is that, it allows you to create metric name filers on metrics which may not exist yet on your AWS account. For example, you can define metrics for AWS/EC2 namespace if you know that the application will produce metrics for this namespace, but that application may yet to be deployed in the account. In this case those metrics will not exist in your AWS account unless the service is provisioned.",
+        "This pattern also creates the required roles and policies for the services, with the right level of permissions required. The roles and policies can be expanded if additional services come into play, based on principle of least privilege."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudwatch-metric-streams-firehose-terraform",
+      "templateURL": "serverless-patterns/cloudwatch-metric-streams-firehose-terraform",
+      "projectFolder": "cloudwatch-metric-streams-firehose-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Use metric streams to continually stream CloudWatch Metrics",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Metric-Streams.html"
+      },
+      {
+        "text": "Amazon Data Firehose - Streaming Data Pipeline",
+        "link": "https://aws.amazon.com/firehose/"
+      },
+      {
+        "text": "Amazon S3 - Cloud Object Storage",
+        "link": "https://aws.amazon.com/s3/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "In the same account and region, launch an EC2 instance. You should be able to see metrics arrive n S3 bucket in few minutes."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kiran Ramamurthy",
+      "image": "n/a",
+      "bio": "I am a Senior Partner Solutions Architect for Enterprise Transformation. I work predominantly with partners and specialize in migrations and modernization.",
+      "linkedin": "kiran-ramamurthy-a96341b",
+      "twitter": "n/a"
+    }
+  ]
+}

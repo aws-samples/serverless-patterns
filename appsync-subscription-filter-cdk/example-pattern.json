@@ -3,7 +3,7 @@
     "description": "This pattern demonstrates the use of AWS AppSync subscriptions' enhanced filtering to send real-time notifications to a single user only.",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

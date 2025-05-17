@@ -3,7 +3,7 @@
   "description": "Create a Step Functions workflow to query Amazon Athena.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
