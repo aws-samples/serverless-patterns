@@ -1,0 +1,86 @@
+{
+  "title": "Websocket API Gateway with an AWS Lambda Authorizer and mapping template",
+  "description": "Create a Websocket API with a Lambda Authorizer and an AWS Lambda in the back-end.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This projects demonstrates how to use a WebSocket API with an AWS Lambda Authorizer",
+      "The WebSocket API does not have a Proxy integration with the back-end Lambda Function written NodeJs 22, instead it is using a mapping template that forwards the main information of the request.",
+      "The Connection ID is stored in a Amazon DynamoDB table and the Lambda Function sends a response to the websocket API through the endpoint URL"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-mapping-template-authorizer",
+      "templateURL": "serverless-patterns/apigw-websocket-mapping-template-authorizer",
+      "projectFolder": "apigw-websocket-mapping-template-authorizer",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Invoke a Webscoket API with wscat",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-how-to-call-websocket-api-wscat.html"
+      },
+      {
+        "text": "Integration request in Websocket API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-integration-requests.html"
+      },
+      {
+        "text": "Control access to WebSocket APIs with AWS Lambda REQUEST authorizers",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-lambda-auth.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "Alice Goumain",
+      "image": "https://media.licdn.com/dms/image/v2/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1662636937225?e=2147483647&v=beta&t=f4IFRXMLweHD9WieD3X1D3YkZO3Hf-bdTXHAfYcFpbo",
+      "bio": "Cloud Support Engineer in Serverless @ AWS",
+      "linkedin": "alice-goumain/"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "apigw",
+      "label": "API Gateway WebSocket"
+    },
+    "icon2": {
+      "x": 50,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon3": {
+      "x": 80,
+      "y": 50,
+      "service": "dynamodb",
+      "label": "Amazon DynamoDB"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2",
+      "label": ""
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3",
+      "label": ""
+    }
+  }
+}
