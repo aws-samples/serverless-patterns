@@ -12,9 +12,8 @@ Important: this application uses various AWS services and there are costs associ
 * [Install and Configure AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 * [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Install Node and NPM](https://nodejs.org/en/download/)
-* [Install AWS Cloud Development Kit (AWS CDK)](https://docs.aws.amazon.com/cdk/latest/guide/cli.html)
+* [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 * [Install Python 3](https://www.python.org/downloads/)
-* [Install Docker](https://www.docker.com/products/docker-desktop/)
 * [Grant Bedrock Model Access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)
 
 ## Deployment Instructions
@@ -147,48 +146,12 @@ This pattern deploys an Amazon API Gateway REST API with the following routes: `
       "data": "..."
     }
     ```
-
-## Testing
-
-Prior to running the tests, ensure that your account has the necessary access to the following Bedrock models: `ai21.j2-mid-v1`, `anthropic.claude-instant-v1`, `amazon.titan-text-express-v1`, and `meta.llama2-13b-chat-v1`. Follow the guide provided in the [Requirements](#Requirements) - [Bedrock model access granted](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) to grant access to these models. Without access, the tests will fail due to insufficient permissions to interact with the foundation models.
-
-1. Activate the virtual environment, if you haven't already done so from the deployment instructions:
-    ```
-    source .venv/bin/activate
-    ```
-    For a Windows platform, activate the virtualenv like this:
-    ```
-    .venv\Scripts\activate.bat
-    ```
-2. Install the Python required dependencies:
-    ```
-    pip install -r requirements-dev.txt
-    ```
-3. From the CDK output during the deployment process, obtain the values for Cognito User Pool ID and Rest API Endpoint:
-    ``` 
-    ApigwBedrockCognitoCdkStack.CognitoUserPoolID = us-east-1_XXXXXXXXX
-    ApigwBedrockCognitoCdkStack.RestAPIEndpoint = https://XXXXXXXXX.execute-api.us-east-1.amazonaws.com/prod/
-    ```
-4. Update the `API_ENDPOINT` and `USER_POOL_ID` variables in `tests/e2e/test_apigw_bedrock_cognito_cdk_stack.py` with the obtained values:
-    ```
-    API_ENDPOINT = "https://XXXXXXXXX.execute-api.us-east-1.amazonaws.com/prod/"
-    USER_POOL_ID = "us-east-1_XXXXXXXXX"
-    ```
-    If organization domain restriction is enabled, modify the `TEST_EMAIL` to be an email with your domain, and `NON_ORG_TEST_EMAIL` to an email without your domain:
-    ```
-    TEST_EMAIL = "johndoe@org.com"
-    NON_ORG_TEST_EMAIL = "johndoe@example.com"
-    ```
-5. Execute Pytest:
-    ```
-    pytest -v
-    ```
-
+    
 ## Cleanup
  
 1. Delete the stack:
     ```
-    cdk destroy
+    terraform destroy
     ```
 2. Delete all API Keys:
     Before executing the following command, be aware that it will delete all API keys in the account. Ensure you have the necessary backups or are certain of the consequences.
@@ -196,6 +159,6 @@ Prior to running the tests, ensure that your account has the necessary access to
     sh utils/delete_all_api_keys.sh
     ```
 ----
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
