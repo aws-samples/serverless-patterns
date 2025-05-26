@@ -1,6 +1,6 @@
 # Amazon API Gateway to AWS Lambda to Amazon Bedrock using SAM
 
-This sample project deploys an Amazon API Gateway REST API with an AWS Lambda integration. The Lambda function is written in Python, calls the Amazon Bedrock API for Anthropic Claude-v2 model and returns a response containing the generated content.
+This sample project deploys an Amazon API Gateway REST API with an AWS Lambda integration. The Lambda function is written in Python, calls the Amazon Bedrock API for Anthropic Claude 3.5 Sonnet model and returns a response containing the generated content.
 
 Learn more about this pattern at Serverless Land Patterns: serverlessland.com/patterns/apigw-lambda-bedrock
 
@@ -100,16 +100,16 @@ Amazon Bedrock users need to request access to models before they are available 
 
 ## How it works
 
-This SAM project uses Amazon Bedrock API for Anthropic Claude-v2 model to generate content based on given prompt. This is exposed through a serverless REST API. Please refer to the architecture diagram below:
+This SAM project uses Amazon Bedrock API for Anthropic Claude 3.5 Sonnet model to generate content based on given prompt. This is exposed through a serverless REST API. Please refer to the architecture diagram below:
 ![End to End Architecture](images/architecture.png)
 
 Here's a breakdown of the steps:
 
 1. **Amazon API Gateway**: Receives the HTTP POST request containing the prompt.
 
-2. **AWS Lambda**: Triggered by the API Gateway, this function forwards the prompt to Amazon Bedrock API using boto3 bedrock-runtime API. It uses Anthropic Claude-v2 model and sets other required parameters to fixed values for simplicity.
+2. **AWS Lambda**: Triggered by the API Gateway, this function forwards the prompt to Amazon Bedrock API using boto3 bedrock-runtime API. It uses Anthropic Claude 3.5 Sonnet model and sets parameters like temperature, max tokens, and other configuration options.
 
-3. **Amazon Bedrock**: Based on the given prompt, using Anthropic Claude-v2 model generates the content and returns the response to Lambda.
+3. **Amazon Bedrock**: Based on the given prompt, using Anthropic Claude 3.5 Sonnet model generates the content and returns the response to Lambda.
 
 4. **Response**: Lambda processes the Bedrock output and sends it back to the user via the API Gateway.
 
