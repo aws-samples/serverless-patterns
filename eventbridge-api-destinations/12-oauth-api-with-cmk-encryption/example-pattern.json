@@ -1,5 +1,5 @@
 {
-    "title": "EventBridge API Destinations with OAuth credentials using Customer Managed Key (CMK) encryption",
+    "title": "EventBridge API Destinations with OAuth credentials using CMK encryption",
     "description": "Create an EventBridge rule and API Destination with OAuth credentials using Customer Managed Key (CMK) encryption",
     "language": "Node.js",
     "level": "100",
@@ -38,7 +38,7 @@
     "gitHub": {
         "template": {
             "projectFolder": "eventbridge-api-destinations",
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations/12-oauth-api-with-cmk-encryption",
             "templateURL": "serverless-patterns/eventbridge-api-destinations",
             "templateFile": "12-oauth-api-with-cmk-encryption/template.yaml"
         },
@@ -70,10 +70,62 @@
             }
         ]
     },
-    "author": {
-        "headline": "Presented by Rajesh Kumar",
-        "image": "https://avatars.githubusercontent.com/u/4745639",
-        "bio": "Rajesh Kumar is a Technical Account Manager (TAM) at Amazon Web Services (AWS) and is a contributor to ServerlessLand. He is passionate about serverless and wants to help everyone get started with serverless and what can be done with it.",
-        "linkedin": "rajeshk1988"
+    "authors": [
+        {
+            "name": "Rajesh Kumar",
+            "image": "https://avatars.githubusercontent.com/u/4745639",
+            "bio": "Rajesh Kumar is a Technical Account Manager (TAM) at Amazon Web Services (AWS) and is a contributor to ServerlessLand. He is passionate about serverless and wants to help everyone get started with serverless and what can be done with it.",
+            "linkedin": "rajeshk1988"
+        },
+        {
+            "name": "Biswanath Mukherjee",
+            "image": "https://d1rwvjey2iif32.cloudfront.net",
+            "bio": "I am a Sr. Solutions Architect working at AWS India.",
+            "linkedin": "biswanathmukherjee"
+        }
+    ],
+    "tags": [
+        "EventBridge",
+        "API Destinations",
+        "OAuth",
+        "CMK Encryption",
+        "Serverless"
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 10,
+            "y": 50,
+            "service": "eventbridge",
+            "label": "EventBridge rule"
+        },
+        "group": {
+            "x": 25,
+            "y": 20,
+            "w": 70,
+            "h": 60,
+            "label": "API Destinations"
+        },
+        "icon2": {
+            "x": 40,
+            "y": 50,
+            "service": "eventbridge-connection.png",
+            "label": "Connection"
+        },
+        "icon3": {
+            "x": 85,
+            "y": 50,
+            "service": "eventbridge-api.png",
+            "label": "API"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": ""
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": "with OAuth using CMK encryption"
+        }
     }
 }
