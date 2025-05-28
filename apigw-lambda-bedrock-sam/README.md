@@ -43,61 +43,6 @@ Amazon Bedrock users need to request access to models before they are available 
 
    For production applications, you should [enable authentication for the API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html) using one of several available options and [follow the API Gateway security best practices](https://docs.aws.amazon.com/apigateway/latest/developerguide/security-best-practices.html).
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for next step as well as testing.
-6. Run the `create_lambda_layer.sh`. You may have to change the file permission to make it executable.  This will create the lambda layer with necessary boto3 api for bedrock.
-   ```bash
-   ./create_lambda_layer.sh
-   ```
-7. Provide a name for the Lambda layer. Such as: 
-   ```bash
-   Enter the name of the Layer: boto3-lambda-layer
-   ```
-   It will show output like below:
-   ```bash
-   Publishing the layer. Please wait ...
-   {
-    "Content": {
-      .....
-      .....
-    },
-    "LayerArn": "arn:aws:lambda:us-east-1:xxxxxxxxxxxx:layer:boto3-lambda-layer",
-    "LayerVersionArn": "arn:aws:lambda:us-east-1:xxxxxxxxxxxx:layer:boto3-lambda-layer:1",
-    "Description": "",
-    "CreatedDate": "YYYY-MM-DDT10:47:36.983+0000",
-    "Version": 1
-   }
-   ``` 
-8. You may have to press `q` to come out of the output. Copy the value of `LayerVersionArn` from the above output and provide it into the next step. Such as:
-   ```bash
-   Enter the LayerVersionArn from the above command: arn:aws:lambda:us-east-1:xxxxxxxxxxxx:layer:boto3-lambda-layer:1
-   ```
-9. Please copy the value of `ContentGenerationLambdaFunction` from the `sam deploy --guided` output and provide that as response to next question. Such as:
-   ```bash
-   Enter the Lambda function name from the SAM deploy output: your-stack-name-ContentGenerationLambdaXx-xxxxxxxxxxxx
-   ```
-   The script will now run aws cli command to add the newly created layer to the Lambda function. It will show output as below:
-   It will show output like below:
-   ```bash
-   Adding the new layer to your Lambda function's configuration. Please wait ...
-   {
-      "FunctionName": "your-stack-name-ContentGenerationLambdaXx-xxxxxxxxxxxx",
-      ......
-      ......
-      "State": "Active",
-      "LastUpdateStatus": "InProgress",
-      "LastUpdateStatusReason": "The function is being created.",
-      "LastUpdateStatusReasonCode": "Creating",
-      "PackageType": "Zip",
-      "Architectures": [
-         "arm64"
-      ],
-      "EphemeralStorage": {
-         "Size": 512
-      }
-   }      
-   ```    
-10. You may have to press `q` to come out of the output. The setup is ready for testing.
-
 ## How it works
 
 This SAM project uses Amazon Bedrock API for Anthropic Claude 3.5 Sonnet model to generate content based on given prompt. This is exposed through a serverless REST API. Please refer to the architecture diagram below:
@@ -134,10 +79,6 @@ The API returns a response with generated content. Such as (Your out may vary):
 
 ```bash
 sam delete
-```
-2. Delete the Lambda layer version using the `delete_lambda_layer.sh` script. You may have to give execution permission to the file. You will need to pass the Lambda layer name and the version in the inpout when requested:
-```bash
-./delete_lambda_layer.sh
 ```
 
 ---
