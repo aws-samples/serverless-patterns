@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cdk-vpc-lambda-sfn
+    cd ddbstream-lambda-sfn-cdk-ts
     ```
 3. To deploy from the command line use the following:
     ```bash
@@ -43,9 +43,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Confirm the removal and wait for the resource deletion to complete.
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
-SPDX-License-Identifier: MIT-0
 
 
 
@@ -122,35 +120,7 @@ new DynamoWorkflowTrigger(this, "MyTrigger", {
 });
 ```
 
-#### Monitoring multiple event types:
 
-```typescript
-new DynamoWorkflowTrigger(this, "MultipleTriggers", {
-  eventHandlers: [
-    {
-      table: orderTable,
-      eventNames: [EventName.Insert],
-      conditions: [{ jsonPath: "$.NewImage.status.S", value: "NEW" }],
-      stateMachineConfig: {
-        stateMachine: newOrderWorkflow,
-        input: { orderId: "$.NewImage.orderId.S" }
-      }
-    },
-    {
-      table: orderTable,
-      eventNames: [EventName.Modify],
-      conditions: [
-        { jsonPath: "$.NewImage.status.S", value: "CANCELED" },
-        { jsonPath: "$.OldImage.status.S", value: "IN_PROGRESS" }
-      ],
-      stateMachineConfig: {
-        stateMachine: cancelOrderWorkflow,
-        input: { orderId: "$.NewImage.orderId.S" }
-      }
-    }
-  ]
-});
-```
 
 #### Using event source filters:
 
@@ -173,18 +143,7 @@ new DynamoWorkflowTrigger(this, "FilteredTrigger", {
 });
 ```
 
-#### Using VPC configuration:
 
-```typescript
-new DynamoWorkflowTrigger(this, "VpcTrigger", {
-  vpc: myVpc,
-  subnetType: SubnetType.PRIVATE_WITH_EGRESS,
-  additionalSecurityGroups: [mySecurityGroup],
-  eventHandlers: [
-    /* event handlers */
-  ]
-});
-```
 
 ## Features
 
@@ -207,3 +166,8 @@ new DynamoWorkflowTrigger(this, "VpcTrigger", {
 - Check CloudWatch Logs for the Lambda function
 - Monitor the dead letter queue for failed events
 - Ensure IAM permissions are correct for DynamoDB stream access and Step Functions execution
+
+
+Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
