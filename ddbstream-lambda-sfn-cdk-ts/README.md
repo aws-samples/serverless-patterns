@@ -1,7 +1,7 @@
 
-# DynamoDB Stream to Step Functions Trigger
+# Amazon DynamoDB Stream to AWS Step Functions Trigger
 
-A CDK construct to automatically trigger AWS Step Functions workflows in response to changes in DynamoDB tables. The `DynamoWorkflowTrigger` construct bridges DynamoDB streams and Step Functions by allowing you to define event handlers that monitor specific changes in your DynamoDB tables and trigger workflows in response. It leverages Lambda functions to evaluate conditions and start Step Functions state machines with inputs derived from the DynamoDB events.
+This Pattern is a  CDK construct to automatically trigger AWS Step Functions workflows in response to changes in DynamoDB tables. The `DynamoWorkflowTrigger` construct bridges DynamoDB streams and Step Functions by allowing you to define event handlers that monitor specific changes in your DynamoDB tables and trigger workflows in response. It leverages Lambda functions to evaluate conditions and start Step Functions state machines with inputs derived from the DynamoDB events.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/{}
 
