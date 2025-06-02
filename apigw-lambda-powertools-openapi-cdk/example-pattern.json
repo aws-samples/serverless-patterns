@@ -1,52 +1,61 @@
-
-///TODO Fix before deploying
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
-  "language": "Python",
-  "level": "200",
+  "title": "API Gateway REST API with Lambda, AWS Lambda Powertools, OpenAPI and CDK",
+  "description": "Create an API Gateway REST API with Lambda integration, using AWS Lambda Powertools, OpenAPI specification, and AWS CDK.",
+  "language": "TypeScript",
+  "level": "300",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to query Athena and get the results. This pattern is leveraging the native integration between these 2 services which means only JSON-based, structured language is used to define the implementation.",
-      "With Amazon Athena you can get up to 1000 results per invocation of the GetQueryResults method and this is the reason why the Step Function has a loop to get more results. The results are sent to a Map which can be configured to handle (the DoSomething state) the items in parallel or one by one by modifying the max_concurrency parameter.",
-      "This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database."
+      "This pattern creates an API Gateway REST API with Lambda integration, using AWS Lambda Powertools, OpenAPI specification, and AWS CDK.",
+      "The API provides CRUD operations for an order management system, with endpoints for creating, retrieving, updating, and deleting orders, as well as searching orders based on various criteria.",
+      "The pattern uses AWS Lambda Powertools for structured logging, metrics, and tracing, and includes Amazon Cognito for authentication, Amazon DynamoDB for data storage, and AWS Secrets Manager for API key storage."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python_stack.py"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-powertools-openapi-cdk",
+      "templateURL": "serverless-patterns/apigw-lambda-powertools-openapi-cdk",
+      "projectFolder": "apigw-lambda-powertools-openapi-cdk",
+      "templateFile": "lib/parent-stack.ts"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+        "text": "AWS Lambda Powertools for TypeScript",
+        "link": "https://awslabs.github.io/aws-lambda-powertools-typescript/"
       },
       {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Amazon API Gateway REST APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+
+      }
+      {
+        "text": "OpenAPI Specification",
+        "link": "https://swagger.io/specification/"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "npm install",
+      "npx cdk deploy"
     ]
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "After deployment, use the API endpoint URL from the outputs to test the API.",
+      "Run the test suite with: npm test"
     ]
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>npx cdk destroy</code>."
     ]
   },
   "authors": [
