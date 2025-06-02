@@ -15,7 +15,6 @@ Key features of this pattern:
 - Showcases best practices for building serverless APIs with AWS CDK
 
 The pattern includes a sample Order API that demonstrates CRUD operations and search functionality, complete with authentication via Amazon Cognito. This architecture ensures that API contracts are always in sync between the API Gateway configuration and the Lambda function implementations, reducing runtime errors and improving developer experience.
-Although it covers multiple features, this still remains a pattern, meaning that for production use cases, there are cases that need to be handled (e.g. add more error codes to the API and address in the lambda functions)
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -147,27 +146,109 @@ You will create an Amazon Cogntio user for authenticating against the API. Then,
    $API_GATEWAY_ENDPOINT/order | tee /dev/tty | jq -r .orderId)
    ```
 
-## Running Tests
+   You will get the Order json as response.
 
-This project includes comprehensive unit tests for all components. To run the tests:
+1. Update the order with new shipping information using a PUT request:
 
-```bash
-npm test
-```
+   ```bash
+   curl -sS -H "Authorization: Bearer $ID_TOKEN" \
+   $API_GATEWAY_ENDPOINT/order/$ORDER_ID -X PUT \
+   -H "Content-Type: application/json" \
+   --data '{
+       "shippingMethod": "NEXT_DAY",
+       "customerNotes": "Please deliver before noon",
+       "shippingAddress": {
+       "street": "777 Main Street",
+       "city": "Anytown",
+       "state": "WA",
+       "postalCode": "31415",
+       "country": "USA"
+       }
+   }'
+   ```
 
-To run tests with coverage report:
+   You will get the updated Order json as response.
 
-```bash
-npm run test:coverage
-```
+1. Retrieve the order using a GET request:
 
-The test suite includes:
-- Unit tests for order conversion functions
-- Unit tests for DynamoDB operations
-- Unit tests for Lambda handlers
-- Integration tests for the complete API flow
+   ```bash
+   curl -sS -H "Authorization: Bearer $ID_TOKEN" \
+   $API_GATEWAY_ENDPOINT/order/$ORDER_ID \
+   -X GET
+   ```
 
-The test suite is not exhaustive, meaning that coverage can get increased
+   You will again the the Order json as response.
+
+1. Send a POST request that will create a second order with the body being the content of the file `test/sample_create_order2.json`.
+
+   ```bash
+   curl -sS -H "Authorization: Bearer $ID_TOKEN" \
+   $API_GATEWAY_ENDPOINT/order \
+   -X POST \
+   -H "Content-Type: application/json" \
+   --data "@./test/sample_create_order2.json"
+   ```
+
+   You will get the second Order json as response.
+
+1. Send a request to the `/orders/search` endpoint, looking for orders containing the product ID "PROD111".
+
+   ```bash
+   curl -sS -H "Authorization: Bearer $ID_TOKEN" \
+   -X POST \
+   -H "Content-Type: application/json" \
+   --data '{
+       "productIds": ["PROD111"],
+       "page": 1,
+       "limit": 20,
+       "sortBy": "createdAt",
+       "sortOrder": "desc"
+   }' \
+   $API_GATEWAY_ENDPOINT/orders/search
+   ```
+
+   Only the second Order json will be returned as the first one does not include PROD111.
+
+1. Delete the first order
+
+   ```bash
+   curl -sS -H "Authorization: Bearer $ID_TOKEN" \
+   -X DELETE \
+   $API_GATEWAY_ENDPOINT/order/$ORDER_ID
+   ```
+
+   There will be no response for this request.
+
+Repeat the requests to the API gateway as often as desired for generating more events to observe. A new order ID will be generated during creation in the backend, so you can reuse the same request payloads without risking a collision.
+
+### View results in the AWS console
+
+The console direct links in this section default to the `us-east-1` region. Ensure you change your region selection if you deployed into a different one.
+
+1. View the CloudWatch logs
+
+   Open the [log group of the orderCRUD function](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252ForderCRUD) and choose the first log stream. You will see the log format enhanced by the [Logger of Powertools for AWS Lambda](https://docs.powertools.aws.dev/lambda/python/latest/core/logger/#getting-started), e.g. adding a `cold_start` property to the JSON. With this, you could easily query CloudWatch Logs for the frequency and start time of new lambda environments.
+
+1. View the CloudWatch metrics
+
+   Open the [CloudWatch metrics](https://768942995475-qsphipsa.us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2?graph=~()) and notice the **Custom namespaces** on top of the **AWS namespaces**. You can select to graph the metrics from the Custom Namespace but also the managed metrics from the AWS namespaces that correspond to the orderCRUD and/or orderSearch AWS Lambda function(s)
+
+
+1. View the X-Ray traces
+
+   Open the [X-Ray traces](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#xray:traces/query) console. Ensure that you choose a long enough time frame on the top right to include the time of your test requests.
+
+   In the **Query refiners** secion, open the **Refine query by** select item.
+   
+   Scrolling down, you see that you can filter by **customerId** and **orderId** as those were added as X-Ray annotations in the orderCRUD Lambda function. Choose **customerId**. The table right below will now allow you to choose the singular customer ID for the Cognito user you created. Activate the checkbox next to it, then choose the **Add to query** button.
+   
+   Next, choose **Service** in the **Refine query by** select item. In the table below, check the box next to **ordersCRUD** and again choose the **Add to query** button.
+   
+   Filter all traces to your selection by choosing the **Run query** button.
+
+   The **Traces** table at the bottom of the page shows you the operations you executed against the API. Opening them, you should e.g. observe that not all of them have the Lambda cold start "Init" phase as the environment could be reused if you executed the test requests in a close sequence.
+
+   You will also see that if the environment was reused for multiple of the POST request for order creation, the **### payment processing** subsection will be considerably quicker for the subsequent reuses. This is due to the [Parameters functionality in Powertools for AWS Lambda](https://docs.powertools.aws.dev/lambda/python/latest/utilities/parameters/) caching the AWS Secrets Manager secret for the simulated payment processing operation.
 
 ## Cleanup
 
