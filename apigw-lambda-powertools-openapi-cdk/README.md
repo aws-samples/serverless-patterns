@@ -274,7 +274,6 @@ The test suite includes:
 - Unit tests for order conversion functions
 - Unit tests for DynamoDB operations
 - Unit tests for Lambda handlers
-- Integration tests for the complete API flow
 
 The test suite is not exhaustive, meaning that coverage can get increased
 
