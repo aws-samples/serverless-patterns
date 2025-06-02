@@ -15,6 +15,7 @@ Key features of this pattern:
 - Showcases best practices for building serverless APIs with AWS CDK
 
 The pattern includes a sample Order API that demonstrates CRUD operations and search functionality, complete with authentication via Amazon Cognito. This architecture ensures that API contracts are always in sync between the API Gateway configuration and the Lambda function implementations, reducing runtime errors and improving developer experience.
+Although it covers multiple features, this still remains a pattern, meaning that for production use cases, there are cases that need to be handled (e.g. add more error codes to the API and address in the lambda functions)
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -100,9 +101,9 @@ You will create an Amazon Cogntio user for authenticating against the API. Then,
 1. Set environment variables for the following commands. You will need the values of the Outputs you copied as last step of the Deployment Instructions:
 
    ```bash
-   API_GATEWAY_ENDPOINT=https://axisqktpfd.execute-api.us-east-1.amazonaws.com/dev/
-   USER_POOL_ID=us-east-1_rvVtjsPQn
-   USER_POOL_CLIENT_ID=1u94umf8p7fjblbgite3rnvepj
+   API_GATEWAY_ENDPOINT=<Value of the "ApiGatewayEndpoint" Output>
+   USER_POOL_ID=<Value of the "UserPoolId" Output>
+   USER_POOL_CLIENT_ID=<Value of the "UserPoolClientId" Output>
    USER_NAME=testuser
    USER_EMAIL=user@example.com
    USER_PASSWORD=MyUserPassword123!
@@ -256,6 +257,26 @@ The console direct links in this section default to the `us-east-1` region. Ensu
    ```bash
    cdk destroy
    ```
+
+## Running Unit Tests
+This project includes comprehensive unit tests for all components. To run the tests:
+
+```bash
+npm test
+```
+
+To run tests with coverage report:
+```bash
+npm run test:coverage
+```
+
+The test suite includes:
+- Unit tests for order conversion functions
+- Unit tests for DynamoDB operations
+- Unit tests for Lambda handlers
+- Integration tests for the complete API flow
+
+The test suite is not exhaustive, meaning that coverage can get increased
 
 ---
 
