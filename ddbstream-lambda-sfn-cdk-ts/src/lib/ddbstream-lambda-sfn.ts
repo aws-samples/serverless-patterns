@@ -242,7 +242,6 @@ export class DynamoWorkflowTrigger extends Construct {
       code: Code.fromAsset(path.join(__dirname, '../lambda')),
       handler: "index.handler",
       runtime: Runtime.NODEJS_20_X,
-      memorySize: 2048,
       timeout: Duration.seconds(20),
       environment: {
         EVENT_HANDLER_CONFIG: JSON.stringify({

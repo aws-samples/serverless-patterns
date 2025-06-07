@@ -60,5 +60,17 @@ export class DdbstreamLambdaSfnExampleStack extends cdk.Stack {
         }
       ]
     })
+
+    new cdk.CfnOutput(this, "DynamoDBTable", {
+      value: testTable.tableName,
+    });
+
+    new cdk.CfnOutput(this, "StateMachineArn", {
+      value: testStateMachine.stateMachineArn,
+    });
+
+    new cdk.CfnOutput(this, "LambdaName", {
+      value: exampleTrigger.lambda.functionName,
+    });
   }
 }
