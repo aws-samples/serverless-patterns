@@ -1,0 +1,69 @@
+{
+  "title": "APIGW Private Custom Domain Name with Internet-Enabled Lambda using NAT Gateway in Terraform",
+  "description": "This architecture demonstrates how to build a private API accessible only from within a VPC using API Gateway private endpoints, where the API is protected by custom domain names and SSL certificates. The solution includes a Lambda function running in private subnets that can access the internet through NAT Gateways, and an EC2 instance configured with Session Manager for secure management, all while maintaining network isolation and security best practices through VPC endpoints.",
+  "language": "HCL",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The architecture works by routing API requests through a VPC Endpoint (PrivateLink) to API Gateway, ensuring all traffic stays within AWS's private network. When a request is made to the private API using the private custom domain (e.g., mydomain@example.com), it's resolved through a private hosted zone in Route 53, which directs traffic to the VPC Endpoint.",
+      "The request then flows to the API Gateway, which invokes a Lambda function running in private subnets, this Lambda can access the internet via NAT Gateways while maintaining security. For testing and management, an EC2 instance in the private subnet can access the API and be managed securely using Session Manager without requiring any public IP or bastion host."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/private-apigw-custom-domain-private-restapi-public-lambda-terraform",
+      "templateURL": "serverless-patterns/private-apigw-custom-domain-private-restapi-public-lambda-terraform",
+      "projectFolder": "private-apigw-custom-domain-private-restapi-public-lambda-terraform",
+      "templateFile": "private-apigw-custom-domain-private-restapi-public-lambda-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Implementing custom domain names for private endpoints with Amazon API Gateway",
+        "link": "https://aws.amazon.com/blogs/compute/implementing-custom-domain-names-for-private-endpoints-with-amazon-api-gateway/"
+      },
+      {
+        "text": "Tutorial: Create and invoke a custom domain name for private APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-custom-domains-tutorial.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Once the terraform apply command is completed and resources are created, you will able to see the output of the script in the terminal. The output will contain the following information:",
+"1. api_gateway_configuration",
+"2. dns_and_certificates",
+"3. ec2_instance",
+"4. network_infrastructure",
+"5. security",
+"6. ssm_endpoints",
+"7. vpc_endpoint_details",
+
+"See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Piyush Malviya",
+      "image": "https://drive.google.com/file/d/1ISkpmDwAClDH8RPdZOaxLq0aVbWNiIkX/view?usp=drive_link",
+      "bio": "Technology enthusiast and Amazon professional, driving innovation in the digital landscape",
+      "linkedin": "www.linkedin.com/in/piyush-malviyaa"
+    }
+  ]
+}
