@@ -1,0 +1,70 @@
+{
+  "title": "API Gateway REST API with Lambda, AWS Lambda Powertools, OpenAPI and CDK",
+  "description": "Create an API Gateway REST API with Lambda integration, using AWS Lambda Powertools, OpenAPI specification, and AWS CDK.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an API Gateway REST API with Lambda integration, using AWS Lambda Powertools, OpenAPI specification, and AWS CDK.",
+      "The API provides CRUD operations for an order management system, with endpoints for creating, retrieving, updating, and deleting orders, as well as searching orders based on various criteria.",
+      "The pattern uses AWS Lambda Powertools for structured logging, metrics, and tracing, and includes Amazon Cognito for authentication, Amazon DynamoDB for data storage, and AWS Secrets Manager for API key storage."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-powertools-openapi-cdk",
+      "templateURL": "serverless-patterns/apigw-lambda-powertools-openapi-cdk",
+      "projectFolder": "apigw-lambda-powertools-openapi-cdk",
+      "templateFile": "lib/parent-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Powertools for TypeScript",
+        "link": "https://awslabs.github.io/aws-lambda-powertools-typescript/"
+      },
+      {
+        "text": "Amazon API Gateway REST APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+
+      }
+      {
+        "text": "OpenAPI Specification",
+        "link": "https://swagger.io/specification/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "npx cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "After deployment, use the API endpoint URL from the outputs to test the API.",
+      "Run the test suite with: npm test"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Your name",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Your bio.",
+      "linkedin": "linked-in-ID",
+      "twitter": "twitter-handle"
+    }
+  ]
+}
