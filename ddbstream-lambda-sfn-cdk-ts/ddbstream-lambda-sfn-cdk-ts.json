@@ -1,0 +1,102 @@
+{
+  "title": "Amazon DynamoDB Stream to AWS Step Functions Trigger",
+  "description": "Trigger AWS Step Functions workflows in response to changes in DynamoDB tables using a CDK construct that connects DynamoDB and Step Functions.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to automatically trigger AWS Step Functions workflows in response to changes in DynamoDB tables.",
+      "The CDK construct 'DynamoWorkflowTrigger' connects DynamoDB and Step Functions by allowing you to define event handlers that monitor specific changes in your DynamoDB tables.",
+      "It leverages Lambda functions to evaluate conditions and start Step Functions state machines with inputs derived from the DynamoDB events.",
+      "The pattern includes features like dead letter queues, VPC support, custom security groups, and fine-grained event filtering."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ddbstream-lambda-sfn-cdk-ts",
+      "templateURL": "serverless-patterns/ddbstream-lambda-sfn-cdk-ts",
+      "projectFolder": "ddbstream-lambda-sfn-cdk-ts",
+      "templateFile": "lib/ddbstream-lambda-sfn-example-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS DynamoDB Streams Documentation",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html"
+      },
+      {
+        "text": "AWS Step Functions Documentation",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS CDK Documentation",
+        "link": "https://docs.aws.amazon.com/cdk/latest/guide/home.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Clone the repository: <code>git clone https://github.com/aws-samples/serverless-patterns</code>",
+      "Change directory: <code>cd ddbstream-lambda-sfn-cdk-ts</code>",
+      "Install dependencies: <code>npm install && npm run lambda</code>",
+      "Deploy the CDK stack: <code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "1. Create an initial item in DynamoDB: <code>aws dynamodb put-item --table-name <table_name> --item '{ \"Index\": {\"S\": \"test-item-1\"}, \"testKey\": {\"S\": \"test9\"}, \"ListAttribute\": {\"L\": [{\"S\": \"first-element\"}]} }'</code>",
+      "2. Update the item to trigger workflow: <code>aws dynamodb update-item --table-name <table_name> --key '{\"Index\": {\"S\": \"test-item-1\"}}' --update-expression \"SET testKey = :newval\" --expression-attribute-values '{\":newval\": {\"S\": \"test8\"}}'</code>",
+      "3. Check Step Functions execution: <code>aws stepfunctions list-executions --state-machine-arn <state-machine-arn></code>",
+      "4. Monitor Lambda logs: <code>aws logs tail /aws/lambda/<lambda-function-name> --follow</code>"
+    ]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>"]
+  },
+  "authors": [
+    {
+      "name": "Avnish Kumar",
+      "image": "https://i.postimg.cc/W1SVxLxR/avnish-profile.jpg",
+      "bio": "Senior Software Engineer, Amazon Web Services",
+      "linkedin": "avnish-kumar-40a54328"
+    },
+    {
+      "name": "Saptarshi Banerjee",
+      "bio": "Senior Solutions Architect, Amazon Web Services",
+      "linkedin": "saptarshi-banerjee-83472679"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "dynamodb",
+      "label": "Amazon DynamoDB"
+    },
+    "icon2": {
+      "x": 50,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon3": {
+      "x": 80,
+      "y": 50,
+      "service": "sfn",
+      "label": "AWS Step Function"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2",
+      "label": "DDB Stream"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3",
+      "label": ""
+    }
+  }
+}
