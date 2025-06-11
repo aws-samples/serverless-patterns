@@ -129,6 +129,10 @@ const handler = async (event) => {
         metrics.addMetric('BatchProcessingTime', 'Milliseconds', batchProcessingTime);
         metrics.publishStoredMetrics();
 
+        if (batchItemFailures.length > 0) {
+            logger.info('Batch Items returned on failure :', batchItemFailures);
+        }
+
         return { batchItemFailures };
     } catch (error) {
         logger.error('Batch processing error', { error: error.message });

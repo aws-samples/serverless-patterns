@@ -1,6 +1,6 @@
 # Lambda SQS Best Practices with AWS CDK
 
-This pattern demonstrates AWS Lambda processing messages from Amazon SQS using AWS CDK, implementing AWS best practices throughout its architecture. It incorporates observability patterns through AWS Lambda Powertools integration, featuring structured logging, custom metrics, and distributed tracing with X-Ray. Following security and operational best practices, the pattern implements comprehensive error handling with automatic retries, ReportBatchItemFailures and Dead Letter Queue (DLQ) configuration, least privilege IAM roles, and a CloudWatch Dashboard for monitoring. The solution showcases recommended approaches for batch message processing, timeout configurations, message validation, and monitoring strategies. This pattern serves as a reference implementation for teams building serverless applications, demonstrating how to implement reliability, observability, and maintainability according to AWS well-architected principles.
+This pattern demonstrates a production-ready implementation of AWS Lambda processing messages from Amazon SQS using AWS CDK. It serves as a reference architecture for building robust, observable, and maintainable serverless applications, featuring AWS Lambda Powertools integration for enhanced observability through structured logging, custom metrics, and distributed tracing with X-Ray. The pattern implements comprehensive error handling with automatic retries and Dead Letter Queue (DLQ) configuration, along with a detailed CloudWatch Dashboard for operational monitoring. Security is enforced through least privilege IAM roles, while operational excellence is maintained through proper resource configurations and cost optimizations. This enterprise-grade solution includes batch message processing, configurable timeouts, message validation, and a complete monitoring strategy, making it ideal for teams building production serverless applications that require high reliability, observability, and maintainability.
 
 
 <img src="./resources/Lambda-SQS-Best-Practice.png" alt="Architecture" width="100%"/>
@@ -62,7 +62,10 @@ This pattern sets up:
    - Custom metrics
    - X-Ray tracing
 3. A CloudWatch Dashboard for operational monitoring
-4. Least priviledge permissions implemented on roles and policies
+4. Least priviledge permissions implemented on roles and policies 
+<img src="./resources/Least-priviledge.png" alt="Architecture" width="100%"/>
+[ ensured by implemeting individual inline policies with only required permissions added to role ]
+
 
 The Lambda function:
 - Processes messages in batches
@@ -124,6 +127,35 @@ CloudWatch Logs
     * Error details
 ```
 
+Example walkthrough on structured logging for a batch :
+1. Batch information before starting processing
+<img src="./resources/batch-info.png" alt="Architecture" width="100%"/>
+
+2. Success information
+<img src="./resources/Success-info.png" alt="Architecture" width="100%"/>
+
+3. Error information of failure
+<img src="./resources/Error-info.png" alt="Architecture" width="100%"/>
+
+4. Batch processing info
+<img src="./resources/Batch-processing-info.png" alt="Architecture" width="100%"/>
+
+5. Failed items returned back to queue for reprocessing
+<img src="./resources/Failed-items.png" alt="Architecture" width="100%"/>
+
+6. Failed Item retried [note messageID and time for retry]
+<img src="./resources/Failed-item-retry.png" alt="Architecture" width="100%"/>
+
+7. Additionally, in case of failed retries/poison pill
+<img src="./resources/poison-pill.png" alt="Architecture" width="100%"/>
+
+Message in moved to DLQ
+<img src="./resources/message-in-DLQ.png" alt="Architecture" width="100%"/>
+
+Custom tracing can be used as well to get quick information on batch processing
+<img src="./resources/trace-info.png" alt="Architecture" width="100%"/>
+
+
 Metrics Dashboard
 
 ```
@@ -131,11 +163,13 @@ Metrics Dashboard
 2. Find the dashboard “SQS-Processing-Dashboard”
 3. Monitor:
     * Message processing success rate
+    * Batch size and processing time
     * Error rates
-    * DLQ message count
-    * Lambda Processing duration 
+    * Monitor Queue metrics to understand Source queue depth, processing speed of messages in queue and DLQ message count
+    * Lambda performance including duration 
 
 ```
+
 
 <img src="./resources/SQS_operational_dashboard.png" alt="Architecture" width="100%"/>
 
