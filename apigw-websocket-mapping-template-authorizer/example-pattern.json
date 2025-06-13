@@ -1,9 +1,9 @@
 {
-  "title": "AWS Websocket API Gateway with an AWS Lambda Authorizer and mapping template",
+  "title": "Websocket Amazon API Gateway with an AWS Lambda Authorizer and mapping template",
   "description": "Create a Websocket API with a Lambda authorizer and a Lambda in the back-end.",
-  "language": "NodeJs",
+  "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
