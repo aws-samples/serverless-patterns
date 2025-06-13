@@ -1,5 +1,5 @@
 aws-cdk-lib==2.130.0
 constructs>=10.0.0,<11.0.0
 pytest==8.2.2
-requests==2.32.2
+requests==2.32.4
 boto3
