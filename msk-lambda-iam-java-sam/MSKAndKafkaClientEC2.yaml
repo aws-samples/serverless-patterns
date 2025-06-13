@@ -31,6 +31,9 @@ Parameters:
   ServerlessLandGithubLocation:
     Type: String
     Default: https://github.com/aws-samples/serverless-patterns/
+  ContactSchemaName:
+    Type: String
+    Default: ContactSchema
 Conditions:
   CreateProvisionedCluster: !Equals 
     - !Ref EnvType
@@ -268,6 +271,32 @@ Resources:
       FromPort: 22
       ToPort: 22
       SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+      
+  ContactSchema:
+    Type: AWS::Glue::Schema
+    Properties:
+      Name: !Ref ContactSchemaName
+      Compatibility: BACKWARD
+      DataFormat: AVRO
+      SchemaDefinition: |
+        {
+          "type": "record",
+          "name": "Contact",
+          "fields": [
+            {"name": "firstname", "type": "string"},
+            {"name": "lastname", "type": "string"},
+            {"name": "company", "type": "string"},
+            {"name": "street", "type": "string"},
+            {"name": "city", "type": "string"},
+            {"name": "county", "type": "string"},
+            {"name": "state", "type": "string"},
+            {"name": "zip", "type": "string"},
+            {"name": "homePhone", "type": "string"},
+            {"name": "cellPhone", "type": "string"},
+            {"name": "email", "type": "string"},
+            {"name": "website", "type": "string"}
+          ]
+        }
 
   KafkaClientEC2InstanceProvisioned:
     Condition: CreateProvisionedCluster
@@ -1231,4 +1260,9 @@ Outputs:
     Value: !Ref KafkaTopicForLambda
     Export:
       Name: !Sub "${AWS::StackName}-KafkaTopicForLambda"
+  ContactSchemaArn:
+    Description: ARN of the Contact Schema Registry
+    Value: !Ref ContactSchema
+    Export:
+      Name: !Sub "${AWS::StackName}-ContactSchemaArn"
     

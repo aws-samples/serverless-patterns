@@ -16,7 +16,7 @@ Resources:
     Properties:
       CodeUri: kafka_event_consumer_function
       Handler: com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequest
-      Runtime: JAVA_VERSION
+      Runtime: java21
       Architectures:
         - x86_64
       MemorySize: 512
@@ -71,6 +71,21 @@ Resources:
           - ec2:DescribeNetworkInterfaces
           - ec2:DeleteNetworkInterface
           Resource: '*'
+          
+        - Sid: GlueSchemaRegistryPermissionsPolicy
+          Effect: Allow
+          Action:
+          - glue:GetSchemaByDefinition
+          - glue:GetSchemaVersion
+          - glue:GetRegistry
+          - glue:ListSchemas
+          - glue:ListSchemaVersions
+          - glue:RegisterSchemaVersion
+          - glue:PutSchemaVersionMetadata
+          - glue:GetSchemaVersionsDiff
+          Resource: 
+          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/default-registry"
+          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:schema/default-registry/${ContactSchemaName}"
 Parameters:
   MSKClusterName:
     Type: String
@@ -84,6 +99,10 @@ Parameters:
     Type: String
     Description: Enter the name of the MSK Topic
     Default: KAFKA_TOPIC
+  ContactSchemaName:
+    Type: String
+    Description: Enter the name of the Contact Schema
+    Default: ContactSchema
 Outputs:
   HelloWorldKafkaJavaFunction:
     Description: "Topic Consumer Lambda Function ARN"
