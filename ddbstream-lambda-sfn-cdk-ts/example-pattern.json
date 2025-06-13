@@ -18,7 +18,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ddbstream-lambda-sfn-cdk-ts",
       "templateURL": "serverless-patterns/ddbstream-lambda-sfn-cdk-ts",
       "projectFolder": "ddbstream-lambda-sfn-cdk-ts",
-      "templateFile": "lib/ddbstream-lambda-sfn-example-stack.ts"
+      "templateFile": "src/lib/ddbstream-lambda-sfn-example-stack.ts"
     }
   },
   "resources": {
