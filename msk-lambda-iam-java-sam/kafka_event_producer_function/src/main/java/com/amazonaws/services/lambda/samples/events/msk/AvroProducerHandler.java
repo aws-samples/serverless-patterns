@@ -39,15 +39,22 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
             // Get the schema definition from Glue Schema Registry
             String schemaDefinition = AvroSchemaHelper.getSchemaDefinition(schemaName);
             logger.log("Retrieved schema definition for: " + schemaName);
+            
+            // Get schema version ID
+            int schemaId = AvroSchemaHelper.getSchemaVersionId(schemaName);
+            logger.log("Retrieved schema ID: " + schemaId + " (hex: " + Integer.toHexString(schemaId) + ")");
 
-            // Create AVRO record
-            byte[] avroData = AvroSchemaHelper.createAvroRecord(schemaDefinition, contact);
-            logger.log("Created AVRO record, size: " + avroData.length + " bytes");
+            // Create AVRO record with schema registry header
+            byte[] avroData = AvroSchemaHelper.createAvroRecord(schemaDefinition, contact, schemaId);
+            logger.log("Created AVRO record with schema registry header, size: " + avroData.length + " bytes");
 
             // Get bootstrap brokers
             String bootstrapBrokers = KafkaProducerHelper.getBootstrapBrokers(mskClusterArn);
             logger.log("Using bootstrap brokers: " + bootstrapBrokers);
-
+            
+            // Log the topic name for debugging
+            logger.log("Target Kafka topic: '" + kafkaTopic + "'");
+            
             // Create Kafka producer
             try (Producer<String, byte[]> producer = KafkaProducerHelper.createProducer(bootstrapBrokers)) {
                 // Send 10 messages
@@ -60,7 +67,13 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
                     
                     // Create a new contact for each message to ensure variety
                     Contact messageContact = createContactFromEvent(event);
-                    byte[] messageAvroData = AvroSchemaHelper.createAvroRecord(schemaDefinition, messageContact);
+                    byte[] messageAvroData = AvroSchemaHelper.createAvroRecord(schemaDefinition, messageContact, schemaId);
+                    
+                    // Print the contact details before sending
+                    logger.log("Sending contact #" + (i+1) + ": " + gson.toJson(messageContact));
+                    logger.log("AVRO message #" + (i+1) + " includes schema registry header with schema ID: " + schemaId);
+                    logger.log("First 5 bytes (magic byte + schema ID): " + KafkaProducerHelper.bytesToHexString(messageAvroData, 5));
+                    logger.log("Complete AVRO message in hex:\n" + KafkaProducerHelper.bytesToHexString(messageAvroData, 0));
                     
                     // Send the message
                     KafkaProducerHelper.sendAvroMessage(producer, kafkaTopic, messageKey, messageAvroData);

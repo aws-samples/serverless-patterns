@@ -11,6 +11,16 @@ Globals:
     Timeout: 15
 
 Resources:
+  # SQS Queue to use as Dead Letter Queue for the MSK event source mapping
+  ConsumerDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600  # 14 days (maximum retention period)
+      VisibilityTimeout: 300  # 5 minutes
+      Tags:
+        - Key: Purpose
+          Value: MSKConsumerDLQ
+
   LambdaMSKConsumerJavaFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -20,6 +30,9 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 512
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIds
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           PARAM1: VALUE
@@ -34,6 +47,9 @@ Resources:
             Stream: !Join [ '', ["arn:", "aws:", "kafka:", !Ref "AWS::Region" , ":" ,!Ref "AWS::AccountId", ":", "cluster/", !Ref MSKClusterName, "/" , !Ref MSKClusterId] ]
             Topics:
               - !Ref MSKTopic
+            DestinationConfig:
+              OnFailure:
+                Destination: !GetAtt ConsumerDLQ.Arn
       Policies:
       - Statement:
         - Sid: KafkaClusterPermissionsPolicy
@@ -83,9 +99,17 @@ Resources:
           - glue:RegisterSchemaVersion
           - glue:PutSchemaVersionMetadata
           - glue:GetSchemaVersionsDiff
+          - glue:QuerySchemaVersionMetadata
           Resource: 
-          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/default-registry"
-          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:schema/default-registry/${ContactSchemaName}"
+          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/*"
+          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:schema/*/*"
+          
+        - Sid: SQSPermissionsPolicy
+          Effect: Allow
+          Action:
+          - sqs:SendMessage
+          Resource: !GetAtt ConsumerDLQ.Arn
+      - VPCAccessPolicy: {}
 
   LambdaMSKProducerJavaFunction:
     Type: AWS::Serverless::Function
@@ -97,6 +121,9 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 512
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIds
       Environment:
         Variables:
           MSK_CLUSTER_ARN: !Join [ '', ["arn:", "aws:", "kafka:", !Ref "AWS::Region" , ":" ,!Ref "AWS::AccountId", ":", "cluster/", !Ref MSKClusterName, "/" , !Ref MSKClusterId] ]
@@ -142,9 +169,13 @@ Resources:
           - glue:GetRegistry
           - glue:ListSchemas
           - glue:ListSchemaVersions
+          - glue:GetSchemaVersionsDiff
+          - glue:QuerySchemaVersionMetadata
+          - glue:GetSchemaVersionsDiff
           Resource: 
-          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/default-registry"
-          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:schema/default-registry/${ContactSchemaName}"
+          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/*"
+          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:schema/*/*"
+      - VPCAccessPolicy: {}
 
 Parameters:
   MSKClusterName:
@@ -163,6 +194,15 @@ Parameters:
     Type: String
     Description: Enter the name of the Contact Schema
     Default: ContactSchema
+  VpcId:
+    Type: String
+    Description: Enter the VPC ID where the MSK cluster is deployed
+  SubnetIds:
+    Type: CommaDelimitedList
+    Description: Enter the subnet IDs where the MSK cluster is deployed (comma-separated)
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Description: Enter the security group IDs that allow access to the MSK cluster (comma-separated)
 
 Outputs:
   MSKConsumerLambdaFunction:
@@ -171,3 +211,9 @@ Outputs:
   MSKProducerLambdaFunction:
     Description: "AVRO Producer Lambda Function ARN"
     Value: !GetAtt LambdaMSKProducerJavaFunction.Arn
+  ConsumerDLQUrl:
+    Description: "URL of the Dead Letter Queue for the MSK Consumer"
+    Value: !Ref ConsumerDLQ
+  ConsumerDLQArn:
+    Description: "ARN of the Dead Letter Queue for the MSK Consumer"
+    Value: !GetAtt ConsumerDLQ.Arn
