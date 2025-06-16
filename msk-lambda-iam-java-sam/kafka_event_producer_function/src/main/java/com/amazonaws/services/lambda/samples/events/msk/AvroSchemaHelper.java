@@ -2,9 +2,12 @@ package com.amazonaws.services.lambda.samples.events.msk;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.BinaryEncoder;
+import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DatumWriter;
+import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumWriter;
 import software.amazon.awssdk.services.glue.GlueClient;
@@ -16,6 +19,7 @@ import software.amazon.awssdk.services.glue.model.SchemaVersionNumber;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -23,7 +27,7 @@ import java.util.UUID;
  */
 public class AvroSchemaHelper {
 
-    // AWS Glue Schema Registry constants
+    // Schema registry constants
     private static final byte HEADER_VERSION_BYTE = 0x00;
 
     /**
@@ -145,6 +149,39 @@ public class AvroSchemaHelper {
         System.out.println("First 17 bytes of message (hex): " + bytesToHex(buffer.array(), 17));
         
         return buffer.array();
+    }
+    
+    /**
+     * Parse an AVRO message with schema registry header
+     * 
+     * @param avroMessage Complete AVRO message with schema registry header
+     * @param schemaDefinition AVRO schema definition
+     * @return Parsed GenericRecord
+     */
+    public static GenericRecord parseAvroMessage(byte[] avroMessage, String schemaDefinition) {
+        try {
+            // Check if this is a valid message with schema registry header
+            if (avroMessage.length <= 17 || avroMessage[0] != 0x00) {
+                throw new IllegalArgumentException("Invalid AVRO message format: missing or invalid schema registry header");
+            }
+            
+            // Extract the AVRO data (skip the 17-byte header)
+            byte[] avroData = Arrays.copyOfRange(avroMessage, 17, avroMessage.length);
+            
+            // Parse the schema
+            Schema schema = new Schema.Parser().parse(schemaDefinition);
+            
+            // Create a datum reader for the schema
+            DatumReader<GenericRecord> datumReader = new GenericDatumReader<>(schema);
+            
+            // Create a decoder for the AVRO data
+            org.apache.avro.io.Decoder decoder = DecoderFactory.get().binaryDecoder(avroData, null);
+            
+            // Read the record
+            return datumReader.read(null, decoder);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse AVRO message: " + e.getMessage(), e);
+        }
     }
     
     /**

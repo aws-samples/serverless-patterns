@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.Producer;
 
 import java.util.Map;
@@ -41,8 +42,8 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
             logger.log("Retrieved schema definition for: " + schemaName);
             
             // Get schema version ID
-            int schemaId = AvroSchemaHelper.getSchemaVersionId(schemaName);
-            logger.log("Retrieved schema ID: " + schemaId + " (hex: " + Integer.toHexString(schemaId) + ")");
+            UUID schemaId = AvroSchemaHelper.getSchemaVersionId(schemaName);
+            logger.log("Retrieved schema ID (UUID): " + schemaId);
 
             // Create AVRO record with schema registry header
             byte[] avroData = AvroSchemaHelper.createAvroRecord(schemaDefinition, contact, schemaId);
@@ -71,9 +72,18 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
                     
                     // Print the contact details before sending
                     logger.log("Sending contact #" + (i+1) + ": " + gson.toJson(messageContact));
-                    logger.log("AVRO message #" + (i+1) + " includes schema registry header with schema ID: " + schemaId);
-                    logger.log("First 5 bytes (magic byte + schema ID): " + KafkaProducerHelper.bytesToHexString(messageAvroData, 5));
+                    logger.log("AVRO message #" + (i+1) + " includes schema registry header with schema ID (UUID): " + schemaId);
+                    logger.log("First 17 bytes (magic byte + schema ID): " + KafkaProducerHelper.bytesToHexString(messageAvroData, 17));
                     logger.log("Complete AVRO message in hex:\n" + KafkaProducerHelper.bytesToHexString(messageAvroData, 0));
+                    
+                    // Parse the generated AVRO message to verify it can be deserialized correctly
+                    try {
+                        GenericRecord parsedRecord = AvroSchemaHelper.parseAvroMessage(messageAvroData, schemaDefinition);
+                        logger.log("Successfully parsed AVRO message #" + (i+1) + ":");
+                        logger.log(gson.toJson(parsedRecord));
+                    } catch (Exception e) {
+                        logger.log("Failed to parse AVRO message #" + (i+1) + ": " + e.getMessage());
+                    }
                     
                     // Send the message
                     KafkaProducerHelper.sendAvroMessage(producer, kafkaTopic, messageKey, messageAvroData);
