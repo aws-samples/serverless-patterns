@@ -5,6 +5,8 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.Producer;
 
@@ -28,6 +30,9 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
             String mskClusterArn = System.getenv("MSK_CLUSTER_ARN");
             String kafkaTopic = System.getenv("KAFKA_TOPIC");
             String schemaName = System.getenv("CONTACT_SCHEMA_NAME");
+            String region = System.getenv("AWS_REGION");
+            String registryName = System.getenv("REGISTRY_NAME") != null ? 
+                                 System.getenv("REGISTRY_NAME") : "default-registry";
 
             if (mskClusterArn == null || kafkaTopic == null || schemaName == null) {
                 throw new RuntimeException("Required environment variables not set: MSK_CLUSTER_ARN, KAFKA_TOPIC, CONTACT_SCHEMA_NAME");
@@ -35,19 +40,16 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
 
             // Create a Contact object from the input event or use default values
             Contact contact = createContactFromEvent(event);
-            logger.log("Created contact: " + contact.toString());
+            logger.log("Created contact: " + gson.toJson(contact));
 
-            // Get the schema definition from Glue Schema Registry
-            String schemaDefinition = AvroSchemaHelper.getSchemaDefinition(schemaName);
-            logger.log("Retrieved schema definition for: " + schemaName);
-            
-            // Get schema version ID
-            UUID schemaId = AvroSchemaHelper.getSchemaVersionId(schemaName);
-            logger.log("Retrieved schema ID (UUID): " + schemaId);
+            // Get the schema definition
+            String schemaDefinition = getContactSchemaDefinition();
+            logger.log("Using schema definition for: " + schemaName);
 
-            // Create AVRO record with schema registry header
-            byte[] avroData = AvroSchemaHelper.createAvroRecord(schemaDefinition, contact, schemaId);
-            logger.log("Created AVRO record with schema registry header, size: " + avroData.length + " bytes");
+            // Create AVRO record
+            Schema schema = new Schema.Parser().parse(schemaDefinition);
+            GenericRecord avroRecord = createAvroRecord(schema, contact);
+            logger.log("Created AVRO record");
 
             // Get bootstrap brokers
             String bootstrapBrokers = KafkaProducerHelper.getBootstrapBrokers(mskClusterArn);
@@ -56,8 +58,16 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
             // Log the topic name for debugging
             logger.log("Target Kafka topic: '" + kafkaTopic + "'");
             
-            // Create Kafka producer
-            try (Producer<String, byte[]> producer = KafkaProducerHelper.createProducer(bootstrapBrokers)) {
+            // Create Kafka producer with AWS Glue Schema Registry serializer
+            try (Producer<String, GenericRecord> producer = KafkaProducerHelper.createProducer(
+                    bootstrapBrokers, region, registryName, schemaName)) {
+                
+                // Log producer configuration
+                logger.log("Created Kafka producer with AWS Glue Schema Registry serializer");
+                logger.log("Registry name: " + registryName);
+                logger.log("Schema name: " + schemaName);
+                logger.log("Schema definition: " + schemaDefinition);
+                
                 // Send 10 messages
                 int messageCount = 10;
                 logger.log("Sending " + messageCount + " AVRO messages to topic: " + kafkaTopic);
@@ -68,25 +78,16 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
                     
                     // Create a new contact for each message to ensure variety
                     Contact messageContact = createContactFromEvent(event);
-                    byte[] messageAvroData = AvroSchemaHelper.createAvroRecord(schemaDefinition, messageContact, schemaId);
+                    
+                    // Create AVRO record
+                    GenericRecord messageAvroRecord = createAvroRecord(schema, messageContact);
                     
                     // Print the contact details before sending
                     logger.log("Sending contact #" + (i+1) + ": " + gson.toJson(messageContact));
-                    logger.log("AVRO message #" + (i+1) + " includes schema registry header with schema ID (UUID): " + schemaId);
-                    logger.log("First 17 bytes (magic byte + schema ID): " + KafkaProducerHelper.bytesToHexString(messageAvroData, 17));
-                    logger.log("Complete AVRO message in hex:\n" + KafkaProducerHelper.bytesToHexString(messageAvroData, 0));
-                    
-                    // Parse the generated AVRO message to verify it can be deserialized correctly
-                    try {
-                        GenericRecord parsedRecord = AvroSchemaHelper.parseAvroMessage(messageAvroData, schemaDefinition);
-                        logger.log("Successfully parsed AVRO message #" + (i+1) + ":");
-                        logger.log(gson.toJson(parsedRecord));
-                    } catch (Exception e) {
-                        logger.log("Failed to parse AVRO message #" + (i+1) + ": " + e.getMessage());
-                    }
+                    logger.log("AVRO record #" + (i+1) + ": " + messageAvroRecord.toString());
                     
                     // Send the message
-                    KafkaProducerHelper.sendAvroMessage(producer, kafkaTopic, messageKey, messageAvroData);
+                    KafkaProducerHelper.sendAvroMessage(producer, kafkaTopic, messageKey, messageAvroRecord);
                     logger.log("Successfully sent AVRO message #" + (i+1) + " to topic: " + kafkaTopic);
                 }
             }
@@ -123,6 +124,33 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
         contact.setWebsite(getStringValue(event, "website", "https://www." + randomSuffix() + ".com"));
         
         return contact;
+    }
+
+    /**
+     * Create an AVRO record from a Contact object
+     * 
+     * @param schema AVRO schema
+     * @param contact Contact object
+     * @return GenericRecord
+     */
+    private GenericRecord createAvroRecord(Schema schema, Contact contact) {
+        GenericRecord avroRecord = new GenericData.Record(schema);
+        
+        // Populate the record with data from the Contact object
+        avroRecord.put("firstname", contact.getFirstname());
+        avroRecord.put("lastname", contact.getLastname());
+        avroRecord.put("company", contact.getCompany());
+        avroRecord.put("street", contact.getStreet());
+        avroRecord.put("city", contact.getCity());
+        avroRecord.put("county", contact.getCounty());
+        avroRecord.put("state", contact.getState());
+        avroRecord.put("zip", contact.getZip());
+        avroRecord.put("homePhone", contact.getHomePhone());
+        avroRecord.put("cellPhone", contact.getCellPhone());
+        avroRecord.put("email", contact.getEmail());
+        avroRecord.put("website", contact.getWebsite());
+        
+        return avroRecord;
     }
 
     /**
@@ -170,5 +198,31 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
             sb.append(randomDigit());
         }
         return sb.toString();
+    }
+    
+    /**
+     * Get hardcoded Contact schema definition
+     * 
+     * @return Schema definition as a string
+     */
+    private String getContactSchemaDefinition() {
+        return "{"
+            + "\"type\": \"record\","
+            + "\"name\": \"ContactSchema\","
+            + "\"namespace\": \"com.amazonaws.services.lambda.samples.events.msk\","
+            + "\"fields\": ["
+            + "  {\"name\": \"firstname\", \"type\": \"string\"},"
+            + "  {\"name\": \"lastname\", \"type\": \"string\"},"
+            + "  {\"name\": \"company\", \"type\": \"string\"},"
+            + "  {\"name\": \"street\", \"type\": \"string\"},"
+            + "  {\"name\": \"city\", \"type\": \"string\"},"
+            + "  {\"name\": \"county\", \"type\": \"string\"},"
+            + "  {\"name\": \"state\", \"type\": \"string\"},"
+            + "  {\"name\": \"zip\", \"type\": \"string\"},"
+            + "  {\"name\": \"homePhone\", \"type\": \"string\"},"
+            + "  {\"name\": \"cellPhone\", \"type\": \"string\"},"
+            + "  {\"name\": \"email\", \"type\": \"string\"},"
+            + "  {\"name\": \"website\", \"type\": \"string\"}"
+            + "]}";
     }
 }
