@@ -1,15 +1,20 @@
 # msk-lambda-iam-java-sam
-# Java AWS Lambda Kafka consumer with IAM auth, using AWS SAM
+# Java AWS Lambda Kafka consumer and AVRO producer with IAM auth, using AWS SAM
 
-This pattern is an example of a Lambda function that consumes messages from an Amazon Managed Streaming for Kafka (Amazon MSK) topic, where the MSK Cluster has been configured to use IAM authentication.
+This pattern is an example of Lambda functions that:
+1. Consume messages from an Amazon Managed Streaming for Kafka (Amazon MSK) topic
+2. Produce AVRO-formatted messages to an Amazon MSK topic
+
+Both functions use IAM authentication to connect to the MSK Cluster.
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
-- kafka_event_consumer_function/src/main/java - Code for the application's Lambda function.
-- events - Invocation events that you can use to invoke the function.
-- kafka_event_consumer_function/src/test/java - Unit tests for the application code. 
-- template_original.yaml - A template that defines the application's Lambda function.
-- MSKAndKafkaClientEC2.yaml - A Cloudformation template file that can be used to deploy an MSK cluster and also deploy an EC2 machine with all pre-requisities already installed, so you can directly build and deploy the lambda function and test it out.
+- kafka_event_consumer_function/src/main/java - Code for the consumer Lambda function.
+- kafka_event_producer_function/src/main/java - Code for the AVRO producer Lambda function.
+- events - Invocation events that you can use to invoke the functions.
+- kafka_event_consumer_function/src/test/java - Unit tests for the consumer code.
+- template_original.yaml - A template that defines the application's Lambda functions.
+- MSKAndKafkaClientEC2.yaml - A Cloudformation template file that can be used to deploy an MSK cluster and also deploy an EC2 machine with all pre-requisities already installed, so you can directly build and deploy the lambda functions and test them out.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
