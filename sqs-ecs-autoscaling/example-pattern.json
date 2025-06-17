@@ -1,6 +1,6 @@
 {
     "title": "SQS - Amazon ECS Fargate - Target Tracking Scaling Policy",
-    "description": "This pattern creates an ECS Fargate application consumes an SQS queue and it scales on the basis of queue size",
+    "description": "This pattern creates an ECS Fargate application that consumes an SQS queue and it scales on the basis of queue size",
     "language": "Python",
     "level": "400",
     "framework": "AWS SAM",
