@@ -10,6 +10,10 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.Producer;
 
+import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
+import software.amazon.awssdk.services.glue.GlueClient;
+import software.amazon.awssdk.services.glue.model.*;
+
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,9 +46,9 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
             Contact contact = createContactFromEvent(event);
             logger.log("Created contact: " + gson.toJson(contact));
 
-            // Get the schema definition
-            String schemaDefinition = getContactSchemaDefinition();
-            logger.log("Using schema definition for: " + schemaName);
+            // Get the schema definition from AWS Glue Schema Registry
+            String schemaDefinition = getSchemaDefinitionFromRegistry(region, registryName, schemaName);
+            logger.log("Retrieved schema definition from registry for: " + schemaName);
 
             // Create AVRO record
             Schema schema = new Schema.Parser().parse(schemaDefinition);
@@ -201,28 +205,40 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
     }
     
     /**
-     * Get hardcoded Contact schema definition
+     * Get schema definition from AWS Glue Schema Registry
      * 
+     * @param region AWS region
+     * @param registryName Registry name
+     * @param schemaName Schema name
      * @return Schema definition as a string
      */
-    private String getContactSchemaDefinition() {
-        return "{"
-            + "\"type\": \"record\","
-            + "\"name\": \"ContactSchema\","
-            + "\"namespace\": \"com.amazonaws.services.lambda.samples.events.msk\","
-            + "\"fields\": ["
-            + "  {\"name\": \"firstname\", \"type\": \"string\"},"
-            + "  {\"name\": \"lastname\", \"type\": \"string\"},"
-            + "  {\"name\": \"company\", \"type\": \"string\"},"
-            + "  {\"name\": \"street\", \"type\": \"string\"},"
-            + "  {\"name\": \"city\", \"type\": \"string\"},"
-            + "  {\"name\": \"county\", \"type\": \"string\"},"
-            + "  {\"name\": \"state\", \"type\": \"string\"},"
-            + "  {\"name\": \"zip\", \"type\": \"string\"},"
-            + "  {\"name\": \"homePhone\", \"type\": \"string\"},"
-            + "  {\"name\": \"cellPhone\", \"type\": \"string\"},"
-            + "  {\"name\": \"email\", \"type\": \"string\"},"
-            + "  {\"name\": \"website\", \"type\": \"string\"}"
-            + "]}";
+    private String getSchemaDefinitionFromRegistry(String region, String registryName, String schemaName) {
+        try {
+            // Create Glue client with explicit HTTP client
+            GlueClient glueClient = GlueClient.builder()
+                    .httpClientBuilder(UrlConnectionHttpClient.builder())
+                    .region(software.amazon.awssdk.regions.Region.of(region))
+                    .build();
+            
+            // Get schema definition
+            GetSchemaVersionRequest request = GetSchemaVersionRequest.builder()
+                    .schemaId(SchemaId.builder()
+                            .registryName(registryName)
+                            .schemaName(schemaName)
+                            .build())
+                    .schemaVersionNumber(SchemaVersionNumber.builder().latestVersion(true).build())
+                    .build();
+            
+            GetSchemaVersionResponse response = glueClient.getSchemaVersion(request);
+            String schemaVersionId = response.schemaVersionId();
+            String schemaDefinition = response.schemaDefinition();
+            
+            System.out.println("Retrieved schema version ID: " + schemaVersionId);
+            System.out.println("Retrieved schema definition: " + schemaDefinition);
+            
+            return schemaDefinition;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get schema definition from registry: " + e.getMessage(), e);
+        }
     }
 }
