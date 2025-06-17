@@ -873,6 +873,7 @@ Resources:
         - arn:aws:iam::aws:policy/AWSCertificateManagerPrivateCAFullAccess
         - arn:aws:iam::aws:policy/IAMFullAccess
         - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
       Policies:
         - PolicyName: MSKConfigurationAccess
           PolicyDocument: !Sub '{
@@ -908,6 +909,19 @@ Resources:
                 Action:
                   - 'secretsmanager:*'
                   - 'kms:*'
+                Resource: '*'
+              - Sid: SQSPermissions
+                Effect: Allow
+                Action:
+                  - 'sqs:CreateQueue'
+                  - 'sqs:DeleteQueue'
+                  - 'sqs:SetQueueAttributes'
+                  - 'sqs:GetQueueAttributes'
+                  - 'sqs:GetQueueUrl'
+                  - 'sqs:TagQueue'
+                  - 'sqs:ListQueues'
+                  - 'sqs:ListQueueTags'
+                Resource: '*'
                   - 'glue:*Schema*'
                   - 'iam:CreatePolicy'
                   - 'iam:Tag*'
