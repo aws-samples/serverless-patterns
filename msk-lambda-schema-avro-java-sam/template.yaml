@@ -100,9 +100,7 @@ Resources:
           - glue:PutSchemaVersionMetadata
           - glue:GetSchemaVersionsDiff
           - glue:QuerySchemaVersionMetadata
-          Resource: 
-          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/*"
-          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:schema/*/*"
+          Resource: '*'
           
         - Sid: SQSPermissionsPolicy
           Effect: Allow
