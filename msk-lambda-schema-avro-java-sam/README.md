@@ -1,11 +1,11 @@
-# msk-lambda-iam-java-sam
-# Java AWS Lambda Kafka consumer and AVRO producer with IAM auth, using AWS SAM
+# msk-lambda-schema-avro-java-sam
+# Java AWS Lambda Kafka consumer and AVRO producer with Schema Registry and AVRO, using AWS SAM
 
 This pattern is an example of Lambda functions that:
 1. Consume messages from an Amazon Managed Streaming for Kafka (Amazon MSK) topic
-2. Produce AVRO-formatted messages to an Amazon MSK topic
+2. Produce AVRO-formatted messages to an Amazon MSK topic using Schema Registry
 
-Both functions use IAM authentication to connect to the MSK Cluster.
+Both functions use IAM authentication to connect to the MSK Cluster and leverage AWS Glue Schema Registry for AVRO schema management.
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
@@ -50,7 +50,7 @@ We have also cloned the Github repository for serverless-patterns on the EC2 mac
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/msk-lambda-iam-java-sam
+    cd serverless-patterns/msk-lambda-schema-avro-java-sam
     ```
 
 ## Use the SAM CLI to build and test locally
@@ -80,7 +80,7 @@ Invoking com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequ
 Local image is up-to-date                                                                                                                              
 Using local image: public.ecr.aws/lambda/java:11-rapid-x86_64.                                                                                         
                                                                                                                                                        
-Mounting /home/ec2-user/serverless-patterns/msk-lambda-iam-java-sam/.aws-sam/build/LambdaMSKConsumerJavaFunction as /var/task:ro,delegated, inside     
+Mounting /home/ec2-user/serverless-patterns/msk-lambda-schema-avro-java-sam/.aws-sam/build/LambdaMSKConsumerJavaFunction as /var/task:ro,delegated, inside     
 runtime container                                                                                                                                      
 START RequestId: 4484bb15-6749-4307-92d1-8ba2221e2218 Version: $LATEST
 START RequestId: 4484bb15-6749-4307-92d1-8ba2221e2218 Version: $LATEST
@@ -142,7 +142,7 @@ REPORT RequestId: fc96203d-e0c0-4c30-b332-d16708b25d3e  Init Duration: 0.06 ms  
 To deploy your application for the first time, run the following in your shell:
 
 ```bash
-sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name msk-lambda-iam-java-sam --guided
+sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name msk-lambda-schema-avro-java-sam --guided
 ```
 
 The sam deploy command will package and deploy your application to AWS, with a series of prompts. You can accept all the defaults by hitting Enter:
@@ -166,36 +166,62 @@ You should get a message "Successfully created/updated stack - <StackName> in <R
 
 ## Test the sample application
 
-Once the lambda function is deployed, send some Kafka messages on the topic that the lambda function is listening on, on the MSK server.
+Once the Lambda functions are deployed, you can test the application by invoking the producer Lambda function, which will generate AVRO-formatted messages to the MSK topic. The consumer Lambda function will then automatically process these messages.
 
-For your convenience, a script has been created on the EC2 machine that was provisioned using Cloudformation.
+### Option 1: Invoke the producer Lambda function using AWS CLI
 
-cd /home/ec2-user
+You can invoke the producer Lambda function using the AWS CLI with the following command:
 
-You should see a script called kafka_message_sender.sh. Run that script and you should be able to send a new Kafka message in every line as shown below
-
-```
-[ec2-user@ip-10-0-0-126 ~]$ sh kafka_message_sender.sh
->My first message
->My second message
->My third message
->My fourth message
->My fifth message
->My sixth message
->My seventh message
->My eigth message
->My ninth message
->My tenth message
->Ctrl-C
+```bash
+aws lambda invoke \
+  --function-name msk-lambda-schema-avro-java-sam-LambdaMSKProducerJavaFunction-XXXXXXXXXXXX \
+  --payload '{"message": "Test message using AVRO and Schema Registry"}' \
+  --cli-binary-format raw-in-base64-out \
+  response.json
 ```
 
-Either send at least 10 messages or wait for 300 seconds (check the values of BatchSize: 10 and MaximumBatchingWindowInSeconds: 300 in the template.yaml file)
+You can find the exact function name in the AWS Lambda console or by running:
 
-Then check Cloudwatch logs and you should see messages for the Cloudwatch Log Group with the name of the deployed Lambda function.
+```bash
+aws lambda list-functions --query "Functions[?contains(FunctionName, 'Producer')].FunctionName"
+```
 
-The lambda code parses the Kafka messages and outputs the fields in the Kafka messages to Cloudwatch logs
+### Option 2: Invoke the producer Lambda function using AWS Console
 
-A single lambda function receives a batch of messages. The messages are received as a map with each key being a combination of the topic and the partition, as a single batch can receive messages from multiple partitions.
+1. Open the [AWS Lambda Console](https://console.aws.amazon.com/lambda)
+2. Find and select your producer Lambda function (it will be named something like `msk-lambda-schema-avro-java-sam-LambdaMSKProducerJavaFunction-XXXXXXXXXXXX`)
+3. Click on the "Test" tab
+4. Create a new test event with the following JSON payload:
+   ```json
+   {
+     "message": "Test message using AVRO and Schema Registry"
+   }
+   ```
+5. Click "Test" to invoke the function
+
+### Verify the results
+
+After invoking the producer function, check the CloudWatch logs for both Lambda functions:
+
+1. Open the [CloudWatch Logs Console](https://console.aws.amazon.com/cloudwatch/home#logs:)
+2. Find the log groups for both your producer and consumer Lambda functions:
+   - Producer log group: `/aws/lambda/msk-lambda-schema-avro-java-sam-LambdaMSKProducerJavaFunction-XXXXXXXXXXXX`
+   - Consumer log group: `/aws/lambda/msk-lambda-schema-avro-java-sam-LambdaMSKConsumerJavaFunction-XXXXXXXXXXXX`
+   
+   You can search for these log groups by typing "msk-lambda-schema-avro-java-sam" in the filter box.
+   
+3. Click on each log group and then select the most recent log stream (typically named with a timestamp and UUID)
+4. In the producer logs, look for entries showing:
+   - Successful serialization of the message using AVRO format
+   - Successful registration or retrieval of the schema from Schema Registry
+   - Confirmation that the message was sent to the MSK topic
+   
+5. In the consumer logs, look for entries showing:
+   - Receipt of the message batch from the MSK topic
+   - Successful deserialization of the AVRO message
+   - The decoded message content and any processing performed on it
+
+The consumer Lambda function will automatically process messages from the MSK topic. It parses the Kafka messages and outputs the fields in the Kafka messages to CloudWatch logs.
 
 Each key has a list of messages. Each Kafka message has the following properties - Topic, Partition, Offset, TimeStamp, TimeStampType, Key and Value
 
@@ -208,7 +234,7 @@ The code in this example prints out the fields in the Kafka message and also dec
 You can first clean-up the Lambda function by running the sam delete command
 
 ```
-cd /home/ec2-user/serverless-patterns/msk-lambda-iam-java-sam
+cd /home/ec2-user/serverless-patterns/msk-lambda-schema-avro-java-sam
 sam delete
 
 ```
