@@ -559,10 +559,10 @@ Resources:
             GLUE_SCHEMA_REGISTRY_NAME=${glue_registry_name}
             CONTACT_SCHEMA=${contact_schema_name}
             VPC_ID=${vpcid}
-            LAMBDA_SECURITY_GROUP_ID={securitygroup}
-            PRIVATE_SUBNET_1={privatesubnetone}
-            PRIVATE_SUBNET_2={privatesubnettwo}
-            PRIVATE_SUBNET_3={privatesubnetthree}
+            LAMBDA_SECURITY_GROUP_ID=${securitygroup}
+            PRIVATE_SUBNET_1=${privatesubnetone}
+            PRIVATE_SUBNET_2=${privatesubnettwo}
+            PRIVATE_SUBNET_3=${privatesubnetthree}
             SUBNET_IDS="$PRIVATE_SUBNET_1,$PRIVATE_SUBNET_2,$PRIVATE_SUBNET_3"
             
             source /home/ec2-user/.bash_profile
@@ -597,11 +597,11 @@ Resources:
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
             java_version: !Ref JavaVersion
-            vpcid: !Ref VPCId
+            vpcid: !Ref VPC
             privatesubnetone: !Ref PrivateSubnetMSKOne
             privatesubnettwo: !Ref PrivateSubnetMSKTwo
             privatesubnetthree: !Ref PrivateSubnetMSKThree
-            securitygroup: !Ref SecurityGroupId
+            securitygroup: !GetAtt MSKSecurityGroup.GroupId
             glue_registry_name: !Ref GlueSchemaRegistryForMSKName
             contact_schema_name: !Ref ContactSchemaName
             
@@ -855,10 +855,10 @@ Resources:
             GLUE_SCHEMA_REGISTRY_NAME=${glue_registry_name}
             CONTACT_SCHEMA=${contact_schema_name}
             VPC_ID=${vpcid}
-            LAMBDA_SECURITY_GROUP_ID={securitygroup}
-            PRIVATE_SUBNET_1={privatesubnetone}
-            PRIVATE_SUBNET_2={privatesubnettwo}
-            PRIVATE_SUBNET_3={privatesubnetthree}
+            LAMBDA_SECURITY_GROUP_ID=${securitygroup}
+            PRIVATE_SUBNET_1=${privatesubnetone}
+            PRIVATE_SUBNET_2=${privatesubnettwo}
+            PRIVATE_SUBNET_3=${privatesubnetthree}
             SUBNET_IDS="$PRIVATE_SUBNET_1,$PRIVATE_SUBNET_2,$PRIVATE_SUBNET_3"
             
             
@@ -894,11 +894,11 @@ Resources:
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
             java_version: !Ref JavaVersion
-            vpcid: !Ref VPCId
+            vpcid: !Ref VPC
             privatesubnetone: !Ref PrivateSubnetMSKOne
             privatesubnettwo: !Ref PrivateSubnetMSKTwo
             privatesubnetthree: !Ref PrivateSubnetMSKThree
-            securitygroup: !Ref SecurityGroupId
+            securitygroup: !GetAtt MSKSecurityGroup.GroupId
             glue_registry_name: !Ref GlueSchemaRegistryForMSKName
             contact_schema_name: !Ref ContactSchemaName
             
