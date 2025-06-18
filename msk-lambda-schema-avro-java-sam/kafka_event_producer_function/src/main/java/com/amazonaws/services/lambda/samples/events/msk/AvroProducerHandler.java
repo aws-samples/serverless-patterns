@@ -32,7 +32,7 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
         try {
             // Get environment variables
             String mskClusterArn = System.getenv("MSK_CLUSTER_ARN");
-            String kafkaTopic = System.getenv("KAFKA_TOPIC");
+            String kafkaTopic = System.getenv("MSK_TOPIC");
             String schemaName = System.getenv("CONTACT_SCHEMA_NAME");
             String region = System.getenv("AWS_REGION");
             String registryName = System.getenv("REGISTRY_NAME") != null ? 

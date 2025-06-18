@@ -33,7 +33,11 @@ Parameters:
     Default: https://github.com/aws-samples/serverless-patterns/
   ContactSchemaName:
     Type: String
-    Default: ContactSchema
+    Default: ContactSchema   
+  GlueSchemaRegistryForMSKName:
+    Type: String
+    Default: GlueSchemaRegistryForMSK
+
 Conditions:
   CreateProvisionedCluster: !Equals 
     - !Ref EnvType
@@ -271,13 +275,21 @@ Resources:
       FromPort: 22
       ToPort: 22
       SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
-      
+
+  MSKGlueRegistry:
+    Type: AWS::Glue::Registry
+    Properties:
+      Name: !Ref GlueSchemaRegistryForMSKName
+      Description: "Registry for storing schemas related to MSK"
+
   ContactSchema:
     Type: AWS::Glue::Schema
     Properties:
       Name: !Ref ContactSchemaName
       Compatibility: BACKWARD
       DataFormat: AVRO
+      Registry: 
+        Arn: !GetAtt MSKGlueRegistry.Arn
       SchemaDefinition: |
         {
           "type": "record",
@@ -543,11 +555,26 @@ Resources:
             cd ./serverless-patterns/msk-lambda-schema-avro-java-sam
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
+            
+            GLUE_SCHEMA_REGISTRY_NAME=${glue_registry_name}
+            CONTACT_SCHEMA=${contact_schema_name}
+            VPC_ID=${vpcid}
+            LAMBDA_SECURITY_GROUP_ID={securitygroup}
+            PRIVATE_SUBNET_1={privatesubnetone}
+            PRIVATE_SUBNET_2={privatesubnettwo}
+            PRIVATE_SUBNET_3={privatesubnetthree}
+            SUBNET_IDS="$PRIVATE_SUBNET_1,$PRIVATE_SUBNET_2,$PRIVATE_SUBNET_3"
+            
             source /home/ec2-user/.bash_profile
             sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
+            sed -i "s/GLUE_SCHEMA_REGISTRY_NAME/$GLUE_SCHEMA_REGISTRY_NAME/g" template.yaml
+            sed -i "s/CONTACT_SCHEMA/$CONTACT_SCHEMA/g" template.yaml
+            sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
+            sed -i "s/LAMBDA_SECURITY_GROUP_ID/$LAMBDA_SECURITY_GROUP_ID/g" template.yaml
+            sed -i "s/SUBNET_IDS/$SUBNET_IDS/g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -570,6 +597,14 @@ Resources:
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
             java_version: !Ref JavaVersion
+            vpcid: !Ref VPCId
+            privatesubnetone: !Ref PrivateSubnetMSKOne
+            privatesubnettwo: !Ref PrivateSubnetMSKTwo
+            privatesubnetthree: !Ref PrivateSubnetMSKThree
+            securitygroup: !Ref SecurityGroupId
+            glue_registry_name: !Ref GlueSchemaRegistryForMSKName
+            contact_schema_name: !Ref ContactSchemaName
+            
 
   KafkaClientEC2InstanceServerless:
     Condition: CreateServerlessCluster
@@ -816,11 +851,27 @@ Resources:
             cd ./serverless-patterns/msk-lambda-schema-avro-java-sam
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
+            
+            GLUE_SCHEMA_REGISTRY_NAME=${glue_registry_name}
+            CONTACT_SCHEMA=${contact_schema_name}
+            VPC_ID=${vpcid}
+            LAMBDA_SECURITY_GROUP_ID={securitygroup}
+            PRIVATE_SUBNET_1={privatesubnetone}
+            PRIVATE_SUBNET_2={privatesubnettwo}
+            PRIVATE_SUBNET_3={privatesubnetthree}
+            SUBNET_IDS="$PRIVATE_SUBNET_1,$PRIVATE_SUBNET_2,$PRIVATE_SUBNET_3"
+            
+            
             source /home/ec2-user/.bash_profile
             sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
+            sed -i "s/GLUE_SCHEMA_REGISTRY_NAME/$GLUE_SCHEMA_REGISTRY_NAME/g" template.yaml
+            sed -i "s/CONTACT_SCHEMA/$CONTACT_SCHEMA/g" template.yaml
+            sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
+            sed -i "s/LAMBDA_SECURITY_GROUP_ID/$LAMBDA_SECURITY_GROUP_ID/g" template.yaml
+            sed -i "s/SUBNET_IDS/$SUBNET_IDS/g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -843,6 +894,15 @@ Resources:
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
             java_version: !Ref JavaVersion
+            vpcid: !Ref VPCId
+            privatesubnetone: !Ref PrivateSubnetMSKOne
+            privatesubnettwo: !Ref PrivateSubnetMSKTwo
+            privatesubnetthree: !Ref PrivateSubnetMSKThree
+            securitygroup: !Ref SecurityGroupId
+            glue_registry_name: !Ref GlueSchemaRegistryForMSKName
+            contact_schema_name: !Ref ContactSchemaName
+            
+            
 
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint
@@ -1214,6 +1274,9 @@ Resources:
             - !Ref PrivateSubnetMSKThree
           SecurityGroups:
               - !GetAtt MSKSecurityGroup.GroupId
+
+
+
 
 Outputs:
   VPCId: 
