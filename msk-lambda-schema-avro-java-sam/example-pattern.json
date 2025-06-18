@@ -1,23 +1,24 @@
 {
-    "title": "AWS Lambda function subscribed to an Amazon MSK topic using IAM auth (Java)",
-    "description": "Creates a Lambda function that uses an Amazon MSK topic as an event source with IAM authentication.",
+    "title": "AWS Lambda functions for MSK with AVRO and Schema Registry (Java)",
+    "description": "Creates Lambda functions that consume from and produce AVRO-formatted messages to Amazon MSK topics using AWS Glue Schema Registry and IAM authentication.",
     "language": "Java",
-    "level": "200",
+    "level": "300",
     "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This pattern provides a Lambda function along with an Event Source Mapping to a Kafka topic.",
-            "The CloudFormation template provided in this pattern installs an MSK Cluster and creates a Kafka topic.",
-            "This pattern works with either a Provisioned or Serverless MSK cluster as long as the cluster is configured to use IAM authentication. ",
-            "For detailed deployment instructions instructions see the README.md"
+            "This pattern provides two Lambda functions: a consumer that processes messages from a MSK topic, and a producer that generates AVRO-formatted messages using AWS Glue Schema Registry.",
+            "The CloudFormation template provided in this pattern deploys a MSK Cluster and creates a Kafka topic.",
+            "This pattern demonstrates how to use AVRO serialization with AWS Glue Schema Registry for efficient message handling in a Kafka-based architecture.",
+            "The pattern works with either a Provisioned or Serverless MSK cluster as long as the cluster is configured to use IAM authentication.",
+            "For detailed deployment instructions see the README.md"
             ]
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-lambda-iam-java-sam",
-            "templateURL": "serverless-patterns/msk-lambda-iam-java-sam",
-            "projectFolder": "msk-lambda-iam-java-sam",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-lambda-schema-avro-java-sam",
+            "templateURL": "serverless-patterns/msk-lambda-schema-avro-java-sam",
+            "projectFolder": "msk-lambda-schema-avro-java-sam",
             "templateFile": "template.yaml"
         }
     },
@@ -30,6 +31,14 @@
             {
                 "text": "Using AWS Lambda with Amazon MSK",
                 "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+            },
+            {
+                "text": "AWS Glue Schema Registry",
+                "link": "https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html"
+            },
+            {
+                "text": "Using the AWS Glue Schema Registry with Amazon MSK",
+                "link": "https://docs.aws.amazon.com/msk/latest/developerguide/integrations-schema-registry.html"
             },
             {
                 "text": "AWS CloudFormation Provisioned MSK cluster reference",
@@ -48,12 +57,15 @@
     },
     "testing": {
         "text": [
+            "Invoke the producer Lambda function to generate AVRO-formatted messages to the MSK topic.",
+            "The consumer Lambda function will automatically process these messages.",
             "See the GitHub repo for detailed testing instructions."
         ]
     },
     "cleanup": {
         "text": [
-            "Delete the template: <code>sam delete</code>."
+            "Delete the Lambda functions: <code>sam delete</code>.",
+            "Delete the CloudFormation stack that created the MSK cluster and EC2 client machine."
         ]
     },
     "authors": [
@@ -65,19 +77,7 @@
       {
         "name": "Vaibhav Jain",
         "bio": "AWS - Sr. Application Architect",
-        "image": "https://media.licdn.com/dms/image/C4E03AQEqzZWHGT4dBQ/profile-displayphoto-shrink_800_800/0/1580165399872?e=1687392000&v=beta&t=zdxENLnqCpqCz9i1Uf5Yx4YXlR9EYvgxP8N5UTsy6J8",
         "linkedin": "https://www.linkedin.com/in/vaibhavjainv/"
-      },
-      {
-        "name": "Paveen Allam",
-        "bio": "Senior Solutions Architect",
-        "image": "https://www.fintail.me/images/pa.jpg",
-        "linkedin": "https://www.linkedin.com/in/pallam/"
-      }, 
-      {
-        "name": "Suraj Tripathi",
-        "bio": "AWS - AppDev Cloud Consultant",
-        "linkedin": "https://www.linkedin.com/in/suraj-tripathi-01b49a140/"
       },
       {
         "name": "Adam Wagner",

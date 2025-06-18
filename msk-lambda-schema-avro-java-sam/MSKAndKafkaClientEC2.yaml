@@ -534,19 +534,6 @@ Resources:
             CLUSTER_ID="$(echo $MSK_CLUSTER_ARN | cut -d '/' -f3)"
             echo "export CLUSTER_NAME=$CLUSTER_NAME" >> /home/ec2-user/.bash_profile
             echo "export CLUSTER_ID=$CLUSTER_ID" >> /home/ec2-user/.bash_profile
-            # Set VPC, subnet, and security group IDs for Lambda deployment
-            VPC_ID=${vpc_id}
-            SUBNET_IDS=${subnet_ids}
-            SECURITY_GROUP_IDS=${security_group_id}
-            echo "export VPC_ID=$VPC_ID" >> /home/ec2-user/.bash_profile
-            echo "export SUBNET_IDS=$SUBNET_IDS" >> /home/ec2-user/.bash_profile
-            echo "export SECURITY_GROUP_IDS=$SECURITY_GROUP_IDS" >> /home/ec2-user/.bash_profile
-            VPC_ID="${VPC}"
-            SUBNET_IDS="${PrivateSubnetMSKOne},${PrivateSubnetMSKTwo},${PrivateSubnetMSKThree}"
-            SECURITY_GROUP_IDS="${MSKSecurityGroup}"
-            echo "export VPC_ID=$VPC_ID" >> /home/ec2-user/.bash_profile
-            echo "export SUBNET_IDS=$SUBNET_IDS" >> /home/ec2-user/.bash_profile
-            echo "export SECURITY_GROUP_IDS=$SECURITY_GROUP_IDS" >> /home/ec2-user/.bash_profile
             ./kafka_topic_creator.sh > kafka_topic_creator_output.txt
             
             #Checkout Serverless Patterns from Github
@@ -555,16 +542,12 @@ Resources:
             git clone $SERVERLESS_LAND_GITHUB_LOCATION
             cd ./serverless-patterns/msk-lambda-schema-avro-java-sam
             cp template_original.yaml template.yaml
-
             sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
             sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
-            sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
-            sed -i "s/SUBNET_IDS/$SUBNET_IDS/g" template.yaml
-            sed -i "s/SECURITY_GROUP_IDS/$SECURITY_GROUP_IDS/g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -587,9 +570,6 @@ Resources:
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
             java_version: !Ref JavaVersion
-            vpc_id: !Ref VPC
-            subnet_ids: !Sub "${PrivateSubnetMSKOne},${PrivateSubnetMSKTwo},${PrivateSubnetMSKThree}"
-            security_group_id: !GetAtt MSKSecurityGroup.GroupId
 
   KafkaClientEC2InstanceServerless:
     Condition: CreateServerlessCluster
@@ -827,19 +807,6 @@ Resources:
             CLUSTER_ID="$(echo $MSK_CLUSTER_ARN | cut -d '/' -f3)"
             echo "export CLUSTER_NAME=$CLUSTER_NAME" >> /home/ec2-user/.bash_profile
             echo "export CLUSTER_ID=$CLUSTER_ID" >> /home/ec2-user/.bash_profile
-            # Set VPC, subnet, and security group IDs for Lambda deployment
-            VPC_ID=${vpc_id}
-            SUBNET_IDS=${subnet_ids}
-            SECURITY_GROUP_IDS=${security_group_id}
-            echo "export VPC_ID=$VPC_ID" >> /home/ec2-user/.bash_profile
-            echo "export SUBNET_IDS=$SUBNET_IDS" >> /home/ec2-user/.bash_profile
-            echo "export SECURITY_GROUP_IDS=$SECURITY_GROUP_IDS" >> /home/ec2-user/.bash_profile
-            VPC_ID="${VPC}"
-            SUBNET_IDS="${PrivateSubnetMSKOne},${PrivateSubnetMSKTwo},${PrivateSubnetMSKThree}"
-            SECURITY_GROUP_IDS="${MSKSecurityGroup}"
-            echo "export VPC_ID=$VPC_ID" >> /home/ec2-user/.bash_profile
-            echo "export SUBNET_IDS=$SUBNET_IDS" >> /home/ec2-user/.bash_profile
-            echo "export SECURITY_GROUP_IDS=$SECURITY_GROUP_IDS" >> /home/ec2-user/.bash_profile
             ./kafka_topic_creator.sh > kafka_topic_creator_output.txt
             
             #Checkout Serverless Patterns from Github
@@ -848,16 +815,12 @@ Resources:
             git clone $SERVERLESS_LAND_GITHUB_LOCATION
             cd ./serverless-patterns/msk-lambda-schema-avro-java-sam
             cp template_original.yaml template.yaml
-
             sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
             sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
-            sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
-            sed -i "s/SUBNET_IDS/$SUBNET_IDS/g" template.yaml
-            sed -i "s/SECURITY_GROUP_IDS/$SECURITY_GROUP_IDS/g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -880,9 +843,6 @@ Resources:
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
             java_version: !Ref JavaVersion
-            vpc_id: !Ref VPC
-            subnet_ids: !Sub "${PrivateSubnetMSKOne},${PrivateSubnetMSKTwo},${PrivateSubnetMSKThree}"
-            security_group_id: !GetAtt MSKSecurityGroup.GroupId
 
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint
@@ -1322,4 +1282,3 @@ Outputs:
     Value: !Ref ContactSchema
     Export:
       Name: !Sub "${AWS::StackName}-ContactSchemaArn"
-    
