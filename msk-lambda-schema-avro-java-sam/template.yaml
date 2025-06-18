@@ -50,6 +50,9 @@ Resources:
             DestinationConfig:
               OnFailure:
                 Destination: !GetAtt ConsumerDLQ.Arn
+            FilterCriteria:
+              Filters:
+                - Pattern: '{    "value": {        "zip": [ { "prefix": "2000" } ]      }}'
       Policies:
       - Statement:
         - Sid: KafkaClusterPermissionsPolicy
@@ -198,12 +201,15 @@ Parameters:
   VpcId:
     Type: String
     Description: Enter the VPC ID where the MSK cluster is deployed
+    Default: VPC_ID
   SubnetIds:
     Type: CommaDelimitedList
     Description: Enter the subnet IDs where the MSK cluster is deployed (comma-separated)
+    Default: SUBNET_IDS
   SecurityGroupIds:
     Type: CommaDelimitedList
     Description: Enter the security group IDs that allow access to the MSK cluster (comma-separated)
+    Default: SECURITY_GROUP_IDS
 
 Outputs:
   MSKConsumerLambdaFunction:

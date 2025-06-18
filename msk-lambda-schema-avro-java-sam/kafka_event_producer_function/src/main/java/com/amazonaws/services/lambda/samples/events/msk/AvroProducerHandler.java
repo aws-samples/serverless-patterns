@@ -29,6 +29,11 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
         LambdaLogger logger = context.getLogger();
         logger.log("Received event: " + gson.toJson(event));
 
+        // Initialize counters for zip code distribution
+        int messageCount = 10;
+        int zip1000Count = 0;
+        int zip2000Count = 0;
+
         try {
             // Get environment variables
             String mskClusterArn = System.getenv("MSK_CLUSTER_ARN");
@@ -42,6 +47,9 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
                 throw new RuntimeException("Required environment variables not set: MSK_CLUSTER_ARN, KAFKA_TOPIC, CONTACT_SCHEMA_NAME");
             }
 
+            // Log that we're generating zip codes with different prefixes
+            logger.log("Generating contacts with zip codes starting with 1000 (50% chance) or 2000 (50% chance)");
+            
             // Create a Contact object from the input event or use default values
             Contact contact = createContactFromEvent(event);
             logger.log("Created contact: " + gson.toJson(contact));
@@ -73,7 +81,6 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
                 logger.log("Schema definition: " + schemaDefinition);
                 
                 // Send 10 messages
-                int messageCount = 10;
                 logger.log("Sending " + messageCount + " AVRO messages to topic: " + kafkaTopic);
                 
                 for (int i = 0; i < messageCount; i++) {
@@ -90,13 +97,34 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
                     logger.log("Sending contact #" + (i+1) + ": " + gson.toJson(messageContact));
                     logger.log("AVRO record #" + (i+1) + ": " + messageAvroRecord.toString());
                     
+                    // Log the zip code prefix for distribution tracking
+                    String zipCode = messageContact.getZip();
+                    if (zipCode != null && zipCode.length() >= 4) {
+                        String prefix = zipCode.substring(0, 4);
+                        logger.log("Contact #" + (i+1) + " zip code prefix: " + prefix);
+                        
+                        // Count zip codes by prefix
+                        if ("1000".equals(prefix)) {
+                            zip1000Count++;
+                        } else if ("2000".equals(prefix)) {
+                            zip2000Count++;
+                        }
+                    }
+                    
                     // Send the message
                     KafkaProducerHelper.sendAvroMessage(producer, kafkaTopic, messageKey, messageAvroRecord);
                     logger.log("Successfully sent AVRO message #" + (i+1) + " to topic: " + kafkaTopic);
                 }
+                
+                // Log summary of zip code distribution
+                logger.log("ZIP CODE DISTRIBUTION SUMMARY:");
+                logger.log("Messages with zip code starting with 1000: " + zip1000Count);
+                logger.log("Messages with zip code starting with 2000: " + zip2000Count);
+                logger.log("Other zip code formats: " + (messageCount - zip1000Count - zip2000Count));
             }
 
-            return "Successfully sent 10 AVRO messages to Kafka topic: " + kafkaTopic;
+            return "Successfully sent " + messageCount + " AVRO messages to Kafka topic: " + kafkaTopic + 
+                   " (Zip codes: " + zip1000Count + " with prefix 1000, " + zip2000Count + " with prefix 2000)";
         } catch (Exception e) {
             logger.log("Error sending AVRO message: " + e.getMessage());
             e.printStackTrace();
@@ -121,7 +149,17 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
         contact.setCity(getStringValue(event, "city", "AnyCity"));
         contact.setCounty(getStringValue(event, "county", "AnyCounty"));
         contact.setState(getStringValue(event, "state", "AnyState"));
-        contact.setZip(getStringValue(event, "zip", "1000" + randomDigit()));
+        
+        // Generate zip code starting with 1000 50% of the time and 2000 the other 50%
+        if (event.containsKey("zip") && event.get("zip") != null) {
+            // If zip is provided in the event, use it as is
+            contact.setZip(event.get("zip").toString());
+        } else {
+            // 50% chance for each prefix
+            String prefix = Math.random() < 0.5 ? "1000" : "2000";
+            contact.setZip(prefix + randomDigit());
+        }
+        
         contact.setHomePhone(getStringValue(event, "homePhone", "555-123-" + randomDigits(4)));
         contact.setCellPhone(getStringValue(event, "cellPhone", "555-456-" + randomDigits(4)));
         contact.setEmail(getStringValue(event, "email", "user-" + randomSuffix() + "@example.com"));

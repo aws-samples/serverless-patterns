@@ -160,6 +160,44 @@ The Key and Value are base64 encoded and have to be decoded. A message can also 
 
 The code in this example prints out the fields in the Kafka message and also decrypts the key and the value and logs them in Cloudwatch logs.
 
+### Message Filtering with Event Source Mapping
+
+This sample application demonstrates how to use event source mapping filters with Amazon MSK and Lambda. The producer Lambda function generates contacts with zip codes that start with either "1000" or "2000" (with approximately 50% probability for each). However, the consumer Lambda function is configured to only process messages where the zip code starts with "1000".
+
+#### Filter Configuration
+
+The filter is configured in the SAM template using the `FilterCriteria` property of the MSK event source mapping:
+
+```yaml
+FilterCriteria:
+  Filters:
+    - Pattern: '{    "value": {        "zip": [ { "prefix": "1000" } ]      }}'
+```
+
+This filter pattern instructs the event source mapping to only send messages to the Lambda function if the message value contains a "zip" field that starts with "1000".
+
+#### Verifying the Filter Behavior
+
+To verify that the filter is working correctly, follow these steps:
+
+1. **Invoke the producer Lambda function** using one of the methods described above.
+
+2. **Check the producer function logs** in CloudWatch:
+   - Navigate to the CloudWatch Logs console
+   - Find the log group for the producer function (`/aws/lambda/msk-lambda-schema-avro-java-sam-LambdaMSKProducerJavaFunction-XXXXXXXXXXXX`)
+   - Open the most recent log stream
+   - Look for the "ZIP CODE DISTRIBUTION SUMMARY" section, which shows how many messages were generated with zip codes starting with "1000" and how many with "2000"
+   - You should see that the producer generated a mix of both zip code types
+
+3. **Check the consumer function logs** in CloudWatch:
+   - Navigate to the CloudWatch Logs console
+   - Find the log group for the consumer function (`/aws/lambda/msk-lambda-schema-avro-java-sam-LambdaMSKConsumerJavaFunction-XXXXXXXXXXXX`)
+   - Open the most recent log stream
+   - You should see that the consumer only processed messages with zip codes starting with "1000"
+   - Messages with zip codes starting with "2000" were filtered out by the event source mapping and never reached the Lambda function
+
+This demonstrates how event source mapping filters can be used to efficiently process only the messages that match specific criteria, reducing Lambda invocation costs and processing overhead.
+
 ## Cleanup
 
 You can first clean-up the Lambda function by running the sam delete command

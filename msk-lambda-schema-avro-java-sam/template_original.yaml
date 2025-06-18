@@ -50,6 +50,9 @@ Resources:
             DestinationConfig:
               OnFailure:
                 Destination: !GetAtt ConsumerDLQ.Arn
+            FilterCriteria:
+              Filters:
+                - Pattern: '{    "value": {        "zip": [ { "prefix": "2000" } ]      }}'
       Policies:
       - Statement:
         - Sid: KafkaClusterPermissionsPolicy
