@@ -571,7 +571,7 @@ Resources:
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
             sed -i "s/GLUE_SCHEMA_REGISTRY_NAME/$GLUE_SCHEMA_REGISTRY_NAME/g" template.yaml
-            sed -i "s/CONTACT_SCHEMA/$CONTACT_SCHEMA/g" template.yaml
+            sed -i "s/AVRO_SCHEMA/$CONTACT_SCHEMA/g" template.yaml
             sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
             sed -i "s/LAMBDA_SECURITY_GROUP_ID/$LAMBDA_SECURITY_GROUP_ID/g" template.yaml
             sed -i "s/SUBNET_IDS/$SUBNET_IDS/g" template.yaml
@@ -868,7 +868,7 @@ Resources:
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
             sed -i "s/GLUE_SCHEMA_REGISTRY_NAME/$GLUE_SCHEMA_REGISTRY_NAME/g" template.yaml
-            sed -i "s/CONTACT_SCHEMA/$CONTACT_SCHEMA/g" template.yaml
+            sed -i "s/AVRO_SCHEMA/$CONTACT_SCHEMA/g" template.yaml
             sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
             sed -i "s/LAMBDA_SECURITY_GROUP_ID/$LAMBDA_SECURITY_GROUP_ID/g" template.yaml
             sed -i "s/SUBNET_IDS/$SUBNET_IDS/g" template.yaml

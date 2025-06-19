@@ -202,7 +202,7 @@ Parameters:
   ContactSchemaName:
     Type: String
     Description: Enter the name of the Contact Schema
-    Default: CONTACT_SCHEMA
+    Default: AVRO_SCHEMA
   VpcId:
     Type: String
     Description: Enter the VPC ID where the MSK cluster is deployed
