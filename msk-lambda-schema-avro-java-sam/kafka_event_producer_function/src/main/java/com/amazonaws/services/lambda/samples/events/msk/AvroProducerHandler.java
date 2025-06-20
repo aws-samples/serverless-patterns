@@ -5,9 +5,6 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.Producer;
 
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
@@ -54,15 +51,6 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
             Contact contact = createContactFromEvent(event);
             logger.log("Created contact: " + gson.toJson(contact));
 
-            // Get the schema definition from AWS Glue Schema Registry
-            String schemaDefinition = getSchemaDefinitionFromRegistry(region, registryName, schemaName);
-            logger.log("Retrieved schema definition from registry for: " + schemaName);
-
-            // Create AVRO record
-            Schema schema = new Schema.Parser().parse(schemaDefinition);
-            GenericRecord avroRecord = createAvroRecord(schema, contact);
-            logger.log("Created AVRO record");
-
             // Get bootstrap brokers
             String bootstrapBrokers = KafkaProducerHelper.getBootstrapBrokers(mskClusterArn);
             logger.log("Using bootstrap brokers: " + bootstrapBrokers);
@@ -71,14 +59,13 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
             logger.log("Target Kafka topic: '" + kafkaTopic + "'");
             
             // Create Kafka producer with AWS Glue Schema Registry serializer
-            try (Producer<String, GenericRecord> producer = KafkaProducerHelper.createProducer(
+            try (Producer<String, Contact> producer = KafkaProducerHelper.createProducer(
                     bootstrapBrokers, region, registryName, schemaName)) {
                 
                 // Log producer configuration
                 logger.log("Created Kafka producer with AWS Glue Schema Registry serializer");
                 logger.log("Registry name: " + registryName);
                 logger.log("Schema name: " + schemaName);
-                logger.log("Schema definition: " + schemaDefinition);
                 
                 // Send 10 messages
                 logger.log("Sending " + messageCount + " AVRO messages to topic: " + kafkaTopic);
@@ -90,12 +77,9 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
                     // Create a new contact for each message to ensure variety
                     Contact messageContact = createContactFromEvent(event);
                     
-                    // Create AVRO record
-                    GenericRecord messageAvroRecord = createAvroRecord(schema, messageContact);
-                    
-                    // Print the contact details before sending
+                    // Print the contact details before sending (Contact is now a SpecificRecord)
                     logger.log("Sending contact #" + (i+1) + ": " + gson.toJson(messageContact));
-                    logger.log("AVRO record #" + (i+1) + ": " + messageAvroRecord.toString());
+                    logger.log("AVRO record #" + (i+1) + ": " + messageContact.toString());
                     
                     // Log the zip code prefix for distribution tracking
                     String zipCode = messageContact.getZip();
@@ -111,8 +95,8 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
                         }
                     }
                     
-                    // Send the message
-                    KafkaProducerHelper.sendAvroMessage(producer, kafkaTopic, messageKey, messageAvroRecord);
+                    // Send the message (Contact is now a SpecificRecord)
+                    KafkaProducerHelper.sendAvroMessage(producer, kafkaTopic, messageKey, messageContact);
                     logger.log("Successfully sent AVRO message #" + (i+1) + " to topic: " + kafkaTopic);
                 }
                 
@@ -166,33 +150,6 @@ public class AvroProducerHandler implements RequestHandler<Map<String, Object>, 
         contact.setWebsite(getStringValue(event, "website", "https://www." + randomSuffix() + ".com"));
         
         return contact;
-    }
-
-    /**
-     * Create an AVRO record from a Contact object
-     * 
-     * @param schema AVRO schema
-     * @param contact Contact object
-     * @return GenericRecord
-     */
-    private GenericRecord createAvroRecord(Schema schema, Contact contact) {
-        GenericRecord avroRecord = new GenericData.Record(schema);
-        
-        // Populate the record with data from the Contact object
-        avroRecord.put("firstname", contact.getFirstname());
-        avroRecord.put("lastname", contact.getLastname());
-        avroRecord.put("company", contact.getCompany());
-        avroRecord.put("street", contact.getStreet());
-        avroRecord.put("city", contact.getCity());
-        avroRecord.put("county", contact.getCounty());
-        avroRecord.put("state", contact.getState());
-        avroRecord.put("zip", contact.getZip());
-        avroRecord.put("homePhone", contact.getHomePhone());
-        avroRecord.put("cellPhone", contact.getCellPhone());
-        avroRecord.put("email", contact.getEmail());
-        avroRecord.put("website", contact.getWebsite());
-        
-        return avroRecord;
     }
 
     /**

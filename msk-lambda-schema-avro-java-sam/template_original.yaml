@@ -42,8 +42,8 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            BatchSize: 10
-            MaximumBatchingWindowInSeconds: 300
+            BatchSize: 1
+            MaximumBatchingWindowInSeconds: 1
             Stream: !Join [ '', ["arn:", "aws:", "kafka:", !Ref "AWS::Region" , ":" ,!Ref "AWS::AccountId", ":", "cluster/", !Ref MSKClusterName, "/" , !Ref MSKClusterId] ]
             Topics:
               - !Ref MSKTopic
@@ -61,7 +61,7 @@ Resources:
                 - Attribute: VALUE  
             FilterCriteria:
               Filters:
-                - Pattern: '{    "value": {        "zip": [ { "prefix": "2000" } ]      }}'
+                - Pattern: '{"value": {"zip": [ { "prefix": "2000" } ]}}'
       Policies:
       - Statement:
         - Sid: KafkaClusterPermissionsPolicy
