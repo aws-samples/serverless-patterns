@@ -14,13 +14,6 @@ import com.amazonaws.services.schemaregistry.serializers.avro.AWSKafkaAvroSerial
 import com.amazonaws.services.schemaregistry.utils.AWSSchemaRegistryConstants;
 import com.amazonaws.services.schemaregistry.utils.AvroRecordType;
 
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.BinaryEncoder;
-import org.apache.avro.io.DatumWriter;
-import org.apache.avro.io.EncoderFactory;
-import org.apache.avro.specific.SpecificDatumWriter;
-
-import java.io.ByteArrayOutputStream;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
@@ -62,7 +55,7 @@ public class KafkaProducerHelper {
      * @param schemaName Schema name
      * @return Configured Kafka producer
      */
-    public static Producer<String, GenericRecord> createProducer(String bootstrapServers, String region, 
+    public static Producer<String, Contact> createProducer(String bootstrapServers, String region, 
                                                                String registryName, String schemaName) {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -79,7 +72,7 @@ public class KafkaProducerHelper {
         props.put(AWSSchemaRegistryConstants.AWS_REGION, region);
         props.put(AWSSchemaRegistryConstants.REGISTRY_NAME, registryName);
         props.put(AWSSchemaRegistryConstants.SCHEMA_NAME, schemaName);
-        props.put(AWSSchemaRegistryConstants.AVRO_RECORD_TYPE, AvroRecordType.GENERIC_RECORD.getName());
+        props.put(AWSSchemaRegistryConstants.AVRO_RECORD_TYPE, AvroRecordType.SPECIFIC_RECORD.getName());
         props.put(AWSSchemaRegistryConstants.SCHEMA_AUTO_REGISTRATION_SETTING, true);
         
         // Additional producer configurations
@@ -97,24 +90,20 @@ public class KafkaProducerHelper {
      * @param producer Kafka producer
      * @param topic Topic name
      * @param key Message key (can be null)
-     * @param avroRecord AVRO record
+     * @param contact Contact object (SpecificRecord)
      * @throws ExecutionException If sending fails
      * @throws InterruptedException If sending is interrupted
      */
-    public static void sendAvroMessage(Producer<String, GenericRecord> producer, String topic, String key, GenericRecord avroRecord) 
+    public static void sendAvroMessage(Producer<String, Contact> producer, String topic, String key, Contact contact) 
             throws ExecutionException, InterruptedException {
         try {
-            // Print AVRO record details before sending
+            // Print Contact details before sending
             System.out.println("Sending AVRO message to topic: '" + topic + "'");
             System.out.println("Message key: " + key);
-            System.out.println("AVRO record: " + avroRecord.toString());
+            System.out.println("Contact record: " + contact.toString());
             
-            // Serialize the AVRO record to bytes to print it
-            byte[] serializedBytes = serializeAvroRecord(avroRecord);
-            System.out.println("Serialized AVRO (without schema registry header) in hex: " + bytesToHexString(serializedBytes, 0));
-            
-            // Create and send the record
-            ProducerRecord<String, GenericRecord> record = new ProducerRecord<>(topic, key, avroRecord);
+            // Create and send the record (Contact is now a SpecificRecord)
+            ProducerRecord<String, Contact> record = new ProducerRecord<>(topic, key, contact);
             producer.send(record).get(); // Using get() to make it synchronous
             System.out.println("Successfully sent AVRO message to topic: " + topic);
         } catch (Exception e) {
@@ -122,53 +111,5 @@ public class KafkaProducerHelper {
             e.printStackTrace();
             throw e;
         }
-    }
-    
-    /**
-     * Serialize an AVRO record to bytes (without schema registry header)
-     * 
-     * @param avroRecord AVRO record to serialize
-     * @return Serialized AVRO bytes
-     */
-    private static byte[] serializeAvroRecord(GenericRecord avroRecord) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            org.apache.avro.io.BinaryEncoder encoder = org.apache.avro.io.EncoderFactory.get().binaryEncoder(outputStream, null);
-            org.apache.avro.specific.SpecificDatumWriter<GenericRecord> writer = 
-                new org.apache.avro.specific.SpecificDatumWriter<>(avroRecord.getSchema());
-            writer.write(avroRecord, encoder);
-            encoder.flush();
-            return outputStream.toByteArray();
-        } catch (Exception e) {
-            System.err.println("Error serializing AVRO record: " + e.getMessage());
-            return new byte[0];
-        }
-    }
-    
-    /**
-     * Convert byte array to hexadecimal string representation
-     * 
-     * @param bytes Byte array to convert
-     * @param maxLength Maximum number of bytes to convert (0 for all)
-     * @return Hexadecimal string representation
-     */
-    public static String bytesToHexString(byte[] bytes, int maxLength) {
-        StringBuilder sb = new StringBuilder();
-        int length = maxLength > 0 && maxLength < bytes.length ? maxLength : bytes.length;
-        
-        for (int i = 0; i < length; i++) {
-            sb.append(String.format("%02X", bytes[i]));
-            if (i % 16 == 15) {
-                sb.append("\n");
-            } else if (i % 4 == 3) {
-                sb.append(" ");
-            }
-        }
-        
-        if (maxLength > 0 && length < bytes.length) {
-            sb.append("... (").append(bytes.length - length).append(" more bytes)");
-        }
-        
-        return sb.toString();
     }
 }

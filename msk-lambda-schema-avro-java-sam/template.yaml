@@ -25,7 +25,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: kafka_event_consumer_function
-      Handler: com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequest
+      Handler: com.amazonaws.services.lambda.samples.events.msk.AvroKafkaHandler::handleRequest
       Runtime: java21
       Architectures:
         - x86_64
@@ -37,6 +37,8 @@ Resources:
         Variables:
           PARAM1: VALUE
           JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
+          POWERTOOLS_LOG_LEVEL: TRACE
+          POWERTOOLS_SERVICE_NAME: kafka_consumer
       Events:
         MSKEvent:
           Type: MSK
