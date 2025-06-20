@@ -50,6 +50,15 @@ Resources:
             DestinationConfig:
               OnFailure:
                 Destination: !GetAtt ConsumerDLQ.Arn
+            ProvisionedPollerConfig:
+              MaximumPollers: 3
+              MinimumPollers: 1
+            SchemaRegistryConfig: 
+              SchemaRegistryURI: !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/${GlueSchemaRegistryName}'
+              SchemaRegistryURI: !Join [ '', ["arn:", "aws:", "glue:", !Ref "AWS::Region" , ":" ,!Ref "AWS::AccountId", ":", "registry/", !Ref GlueSchemaRegistryName] ]
+              EventRecordFormat: SOURCE
+              SchemaValidationConfigs:
+                - Attribute: VALUE  
             FilterCriteria:
               Filters:
                 - Pattern: '{    "value": {        "zip": [ { "prefix": "2000" } ]      }}'
