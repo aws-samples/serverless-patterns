@@ -16,7 +16,8 @@ This project contains source code and supporting files for a serverless applicat
 - `template_original.yaml` - The original template with placeholders that get replaced during deployment.
 - `MSKAndKafkaClientEC2.yaml` - A CloudFormation template file that can be used to deploy an MSK cluster and also deploy an EC2 machine with all pre-requisites already installed, so you can directly build and deploy the lambda functions and test them out.
 
-> [!Important]  This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred.
+> [!Important] 
+> This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred.
 
 ## Requirements
 
@@ -35,7 +36,8 @@ There is a CloudFormation template to deploy an Amazon MSK Cluster. You can depl
 
 * Once the CloudFormation stack is created, you can go to the EC2 console and log into the machine using either **Connect using EC2 Instance Connect** or **Connect using EC2 Instance Connect Endpoint** option under the *EC2 Instance Connect* tab.
 
-> [!NOTE]  You may need to wait for some time after the CloudFormation stack is created, as some UserData scripts continue running after the CloudFormation stack shows *Created*.
+> [!NOTE]  
+> You may need to wait for some time after the CloudFormation stack is created, as some UserData scripts continue running after the CloudFormation stack shows *Created*.
 
 ### Check if Kafka Topic has been created
 * Once you are connected to the EC2 machine, you should be in the `/home/ec2-user` folder. Check to see the contents of the file `kafka_topic_creator_output.txt` by running the command:
@@ -93,7 +95,8 @@ sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rol
 
 The `sam deploy` command packages and deploys your application to AWS, with a series of prompts. 
 
-> [!NOTE] The script retrieves the required parameters from the CloudFormation outputs in the AWS Console after deploying the `MSKAndKafkaClientEC2.yaml` template. These outputs contain all the necessary information for deploying the Lambda functions. If you connect to a different Kafka cluster, enter the values manually.
+> [!NOTE]
+> The script retrieves the required parameters from the CloudFormation outputs in the AWS Console after deploying the `MSKAndKafkaClientEC2.yaml` template. These outputs contain all the necessary information for deploying the Lambda functions. If you connect to a different Kafka cluster, enter the values manually.
 
 * **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
 * **AWS Region**: The AWS region you want to deploy your app to.
