@@ -1,6 +1,6 @@
 {
-  "title": "REST API Integration with Private ALB integration",
-  "description": "This pattern explains workaround on how to integrate an API Gateway REST API with an Application Load Balancer.",
+  "title": "Amazon API Gateway REST API Integration with Private ALB integration",
+  "description": "This pattern explains how to integrate an Amazon API Gateway REST API with an Application Load Balancer.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
@@ -51,43 +51,5 @@
           "linkedin": "vamsipulikonda",
           "bio": "I am a cloud computing enthusiast working as a Cloud Engineer at Amazon Web Services."
       }
-  ],
-  "patternArch": {
-      "icon1": {
-          "x": 15,
-          "y": 50,
-          "service": "apigw",
-          "label": "Amazon API Gateway"
-      },
-      "icon2": {
-          "x": 43,
-          "y": 50,
-          "service": "alb",
-          "label": "Network Load Balancer"
-      },
-      "icon3": {
-          "x": 70,
-          "y": 50,
-          "service": "alb",
-          "label": "App. Load Balancer"
-      },
-      "icon4": {
-          "x": 92,
-          "y": 50,
-          "service": "lambda",
-          "label": "AWS Lambda"
-      },
-      "line1": {
-          "from": "icon1",
-          "to": "icon2"
-      },
-      "line2": {
-          "from": "icon2",
-          "to": "icon3"
-      },
-      "line3": {
-          "from": "icon3",
-          "to": "icon4"
-      }
-  }
+  ]
 }
