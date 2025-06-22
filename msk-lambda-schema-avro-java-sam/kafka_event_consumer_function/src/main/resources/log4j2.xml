@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="JsonAppender" target="SYSTEM_OUT">
+            <JsonTemplateLayout eventTemplateUri="classpath:LambdaJsonLayout.json" />
+        </Console>
+    </Appenders>
+    <Loggers>
+        <!-- Application Logger - Set to debug for detailed application logs -->
+        <Logger name="com.amazonaws.services.lambda.samples.events.msk" level="debug" additivity="false">
+            <AppenderRef ref="JsonAppender"/>
+        </Logger>
+        
+        <!-- Lambda PowerTools Logger -->
+        <Logger name="software.amazon.lambda.powertools" level="debug" additivity="false">
+            <AppenderRef ref="JsonAppender"/>
+        </Logger>
+        
+        <!-- AVRO and Schema Registry Loggers for debugging serialization -->
+        <Logger name="org.apache.avro" level="debug" additivity="false">
+            <AppenderRef ref="JsonAppender"/>
+        </Logger>
+        
+        <Logger name="com.amazonaws.services.schemaregistry" level="debug" additivity="false">
+            <AppenderRef ref="JsonAppender"/>
+        </Logger>
+        
+        <!-- Kafka Client Logger for connection details -->
+        <Logger name="org.apache.kafka" level="info" additivity="false">
+            <AppenderRef ref="JsonAppender"/>
+        </Logger>
+        
+        <!-- Root Logger - Catches all other loggers -->
+        <Root level="info">
+            <AppenderRef ref="JsonAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
