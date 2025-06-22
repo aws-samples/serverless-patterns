@@ -11,6 +11,43 @@ Globals:
     Timeout: 15
 
 Resources:
+  # Glue Schema Registry for storing Avro schemas
+  MSKGlueRegistry:
+    Type: AWS::Glue::Registry
+    Properties:
+      Name: !Ref GlueSchemaRegistryName
+      Description: "Registry for storing schemas related to MSK"
+
+  # Contact Schema for Avro serialization/deserialization
+  ContactSchema:
+    Type: AWS::Glue::Schema
+    Properties:
+      Name: !Ref ContactSchemaName
+      Description: "Schema for Contact data in Avro format"
+      Compatibility: BACKWARD
+      DataFormat: AVRO
+      Registry: 
+        Arn: !GetAtt MSKGlueRegistry.Arn
+      SchemaDefinition: |
+        {
+          "type": "record",
+          "name": "Contact",
+          "fields": [
+            {"name": "firstName", "type": "string"},
+            {"name": "lastName", "type": "string"},
+            {"name": "company", "type": "string"},
+            {"name": "address", "type": "string"},
+            {"name": "city", "type": "string"},
+            {"name": "county", "type": "string"},
+            {"name": "state", "type": "string"},
+            {"name": "zip", "type": "string"},
+            {"name": "homePhone", "type": "string"},
+            {"name": "cellPhone", "type": "string"},
+            {"name": "email", "type": "string"},
+            {"name": "website", "type": "string"}
+          ]
+        }
+
   # SQS Queue to use as Dead Letter Queue for the MSK event source mapping
   ConsumerDLQ:
     Type: AWS::SQS::Queue
@@ -105,7 +142,9 @@ Resources:
           - glue:PutSchemaVersionMetadata
           - glue:GetSchemaVersionsDiff
           - glue:QuerySchemaVersionMetadata
-          Resource: '*'
+          Resource: 
+          - !GetAtt MSKGlueRegistry.Arn
+          - !GetAtt ContactSchema.Arn
           
         - Sid: SQSPermissionsPolicy
           Effect: Allow
@@ -180,8 +219,8 @@ Resources:
           - glue:CreateSchema
           - glue:CreateRegistry
           Resource: 
-          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/*"
-          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:schema/*/*"
+          - !GetAtt MSKGlueRegistry.Arn
+          - !GetAtt ContactSchema.Arn
       - VPCAccessPolicy: {}
 
 Parameters:
@@ -231,3 +270,15 @@ Outputs:
   ConsumerDLQArn:
     Description: "ARN of the Dead Letter Queue for the MSK Consumer"
     Value: !GetAtt ConsumerDLQ.Arn
+  GlueSchemaRegistryArn:
+    Description: "ARN of the Glue Schema Registry"
+    Value: !GetAtt MSKGlueRegistry.Arn
+  GlueSchemaRegistryName:
+    Description: "Name of the Glue Schema Registry"
+    Value: !Ref MSKGlueRegistry
+  ContactSchemaArn:
+    Description: "ARN of the Contact Schema"
+    Value: !GetAtt ContactSchema.Arn
+  ContactSchemaName:
+    Description: "Name of the Contact Schema"
+    Value: !Ref ContactSchema
