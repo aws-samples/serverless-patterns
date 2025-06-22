@@ -151,9 +151,7 @@ Resources:
           - glue:PutSchemaVersionMetadata
           - glue:GetSchemaVersionsDiff
           - glue:QuerySchemaVersionMetadata
-          Resource: 
-          - !GetAtt MSKGlueRegistry.Arn
-          - !GetAtt ContactSchema.Arn
+          Resource: '*'
           
         - Sid: SQSPermissionsPolicy
           Effect: Allow
