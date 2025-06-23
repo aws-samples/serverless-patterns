@@ -118,9 +118,9 @@ You should get a message "Successfully created/updated stack - <StackName> in <R
 
 ## Test the sample application
 
-Once the Lambda functions are deployed, you can test the application by invoking the producer Lambda function, which generates Avro-formatted messages to the MSK topic. The consumer Lambda function will then automatically process these messages.
+Once the Lambda functions are deployed, you can test the application by invoking the producer Lambda function, which generates Avro-formatted messages to the MSK topic. The consumer Lambda function automatically processes these messages.
 
-### Invoke the producer Lambda function using the AWS SAM CLI
+### Invoke the producer Lambda function
 
 You can invoke the producer Lambda function using AWS SAM CLI with the following command:
 
@@ -138,7 +138,7 @@ Look for entries showing:
 
 You can also invoke the function using the AWS Console, or AWS CLI.
 
-### Verify the results
+### Verify the processing results from the consumer Lambda function
 
 View the consumer Lambda function logs using the Amazon CloudWatch logs console or CLI within the EC2 instance:
 ```
