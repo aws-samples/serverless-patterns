@@ -1290,8 +1290,3 @@ Outputs:
     Value: !Ref KafkaTopicForLambda
     Export:
       Name: !Sub "${AWS::StackName}-KafkaTopicForLambda"
-  ContactSchemaArn:
-    Description: ARN of the Contact Schema Registry
-    Value: !Ref ContactSchema
-    Export:
-      Name: !Sub "${AWS::StackName}-ContactSchemaArn"
