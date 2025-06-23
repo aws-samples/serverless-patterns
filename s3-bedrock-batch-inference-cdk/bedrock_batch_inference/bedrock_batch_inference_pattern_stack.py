@@ -27,7 +27,7 @@ class BedrockBatchInferencePatternStack(Stack):
         # Create an S3 bucket with default encryption
         bucket = s3.Bucket(
             self,
-            "BedrockBatchInferenceBucket",
+            "BatchInfBucket",
             encryption=s3.BucketEncryption.S3_MANAGED,
             enforce_ssl=True,
             versioned=True,
@@ -60,6 +60,7 @@ class BedrockBatchInferencePatternStack(Stack):
 
         # Create EventBridge rule to trigger Bedrock model invocation when input.jsonl file is
         # uploaded to S3 under /input prefix
+        # Note: The AwsApi target creates an AWS-managed Lambda function that makes the actual API call
         events.Rule(
             self,
             "S3ToBedrockBatchInferenceRule",
