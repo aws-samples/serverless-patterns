@@ -31,7 +31,12 @@ Parameters:
   ServerlessLandGithubLocation:
     Type: String
     Default: https://github.com/aws-samples/serverless-patterns/
-
+  ContactSchemaName:
+    Type: String
+    Default: ContactSchema   
+  GlueSchemaRegistryForMSKName:
+    Type: String
+    Default: GlueSchemaRegistryForMSK
 
 Conditions:
   CreateProvisionedCluster: !Equals 
@@ -271,6 +276,39 @@ Resources:
       ToPort: 22
       SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
 
+  MSKGlueRegistry:
+    Type: AWS::Glue::Registry
+    Properties:
+      Name: !Ref GlueSchemaRegistryForMSKName
+      Description: "Registry for storing schemas related to MSK"
+
+  ContactSchema:
+    Type: AWS::Glue::Schema
+    Properties:
+      Name: !Ref ContactSchemaName
+      Compatibility: BACKWARD
+      DataFormat: AVRO
+      Registry: 
+        Arn: !GetAtt MSKGlueRegistry.Arn
+      SchemaDefinition: |
+        {
+          "type": "record",
+          "name": "Contact",
+          "fields": [
+            {"name": "firstname", "type": "string"},
+            {"name": "lastname", "type": "string"},
+            {"name": "company", "type": "string"},
+            {"name": "street", "type": "string"},
+            {"name": "city", "type": "string"},
+            {"name": "county", "type": "string"},
+            {"name": "state", "type": "string"},
+            {"name": "zip", "type": "string"},
+            {"name": "homePhone", "type": "string"},
+            {"name": "cellPhone", "type": "string"},
+            {"name": "email", "type": "string"},
+            {"name": "website", "type": "string"}
+          ]
+        }
 
   KafkaClientEC2InstanceProvisioned:
     Condition: CreateProvisionedCluster
@@ -518,6 +556,8 @@ Resources:
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
             
+            GLUE_SCHEMA_REGISTRY_NAME=${glue_registry_name}
+            CONTACT_SCHEMA=${contact_schema_name}
             VPC_ID=${vpcid}
             LAMBDA_SECURITY_GROUP_ID=${securitygroup}
             PRIVATE_SUBNET_1=${privatesubnetone}
@@ -530,6 +570,8 @@ Resources:
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
+            sed -i "s/GLUE_SCHEMA_REGISTRY_NAME/$GLUE_SCHEMA_REGISTRY_NAME/g" template.yaml
+            sed -i "s/AVRO_SCHEMA/$CONTACT_SCHEMA/g" template.yaml
             sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
             sed -i "s/LAMBDA_SECURITY_GROUP_ID/$LAMBDA_SECURITY_GROUP_ID/g" template.yaml
             sed -i "s/SUBNET_IDS/$SUBNET_IDS/g" template.yaml
@@ -560,6 +602,8 @@ Resources:
             privatesubnettwo: !Ref PrivateSubnetMSKTwo
             privatesubnetthree: !Ref PrivateSubnetMSKThree
             securitygroup: !GetAtt MSKSecurityGroup.GroupId
+            glue_registry_name: !Ref GlueSchemaRegistryForMSKName
+            contact_schema_name: !Ref ContactSchemaName
             
 
   KafkaClientEC2InstanceServerless:
@@ -808,6 +852,8 @@ Resources:
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
             
+            GLUE_SCHEMA_REGISTRY_NAME=${glue_registry_name}
+            CONTACT_SCHEMA=${contact_schema_name}
             VPC_ID=${vpcid}
             LAMBDA_SECURITY_GROUP_ID=${securitygroup}
             PRIVATE_SUBNET_1=${privatesubnetone}
@@ -821,6 +867,8 @@ Resources:
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
+            sed -i "s/GLUE_SCHEMA_REGISTRY_NAME/$GLUE_SCHEMA_REGISTRY_NAME/g" template.yaml
+            sed -i "s/AVRO_SCHEMA/$CONTACT_SCHEMA/g" template.yaml
             sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
             sed -i "s/LAMBDA_SECURITY_GROUP_ID/$LAMBDA_SECURITY_GROUP_ID/g" template.yaml
             sed -i "s/SUBNET_IDS/$SUBNET_IDS/g" template.yaml
@@ -851,6 +899,8 @@ Resources:
             privatesubnettwo: !Ref PrivateSubnetMSKTwo
             privatesubnetthree: !Ref PrivateSubnetMSKThree
             securitygroup: !GetAtt MSKSecurityGroup.GroupId
+            glue_registry_name: !Ref GlueSchemaRegistryForMSKName
+            contact_schema_name: !Ref ContactSchemaName
             
             
 

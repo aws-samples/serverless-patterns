@@ -4,7 +4,7 @@ This pattern is an example of Lambda functions that:
 1. Consume messages from an Amazon Managed Streaming for Kafka (Amazon MSK) topic
 2. Produce Avro-formatted messages to an Amazon MSK topic using Schema Registry
 
-Both functions use IAM authentication to connect to the MSK Cluster and use AWS Glue Schema Registry for Avro schema management. The Glue Schema Registry and Contact Schema are created as part of the SAM deployment.
+Both functions use IAM authentication to connect to the MSK Cluster and use AWS Glue Schema Registry for Avro schema management.
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
@@ -12,7 +12,7 @@ This project contains source code and supporting files for a serverless applicat
 - `kafka_event_producer_function/src/main/java` - Code for the Avro producer Lambda function.
 - `events` - Invocation events that you can use to invoke the functions.
 - `kafka_event_consumer_function/src/test/java` - Unit tests for the consumer code.
-- `template.yaml` - A template that defines the application's Lambda functions, Glue Schema Registry, and Contact Schema.
+- `template.yaml` - A template that defines the application's Lambda functions.
 - `template_original.yaml` - The original template with placeholders that get replaced during deployment.
 - `MSKAndKafkaClientEC2.yaml` - A CloudFormation template file that can be used to deploy an MSK cluster and also deploy an EC2 machine with all pre-requisites already installed, so you can directly build and deploy the lambda functions and test them out.
 
@@ -96,15 +96,14 @@ sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rol
 The `sam deploy` command packages and deploys your application to AWS, with a series of prompts. 
 
 > [!NOTE]
-> The script retrieves the required parameters from the CloudFormation outputs in the AWS Console after deploying the `MSKAndKafkaClientEC2.yaml` template. These outputs contain the necessary information for deploying the Lambda functions. If you connect to a different Kafka cluster, enter the values manually.
+> The script retrieves the required parameters from the CloudFormation outputs in the AWS Console after deploying the `MSKAndKafkaClientEC2.yaml` template. These outputs contain all the necessary information for deploying the Lambda functions. If you connect to a different Kafka cluster, enter the values manually.
 
 * **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
 * **AWS Region**: The AWS region you want to deploy your app to.
 * **Parameter MSKClusterName**: The name of the MSK Cluster. This will be `<stack-name>-cluster` from the CloudFormation template you deployed in the previous step.
 * **Parameter MSKClusterId**: The unique ID of the MSK Cluster. This can be found in the MSK console or extracted from the MSK ARN in the CloudFormation outputs.
 * **Parameter MSKTopic**: The Kafka topic on which the Lambda functions will produce and consume messages. You can find this in the CloudFormation outputs as `KafkaTopicForLambda`
-* **Parameter GlueSchemaRegistryName**: The name of the Glue Schema Registry to be created (default: GlueSchemaRegistryForMSK).
-* **Parameter ContactSchemaName**: The name of the Contact Schema to be created (default: ContactSchema).
+* **Parameter ContactSchemaName**: The name of the schema to be used for the Avro serialization (default: ContactSchema).
 * **Parameter VpcId**: The ID of the VPC where the MSK cluster is deployed. You can find this in the CloudFormation outputs as `VPCId`.
 * **Parameter SubnetIds**: Comma-separated list of subnet IDs where the MSK cluster is deployed. You can find these in the CloudFormation outputs as `PrivateSubnetMSKOne`, `PrivateSubnetMSKTwo`, and `PrivateSubnetMSKThree`.
 * **Parameter SecurityGroupIds**: Comma-separated list of security group IDs that allow access to the MSK cluster. You can find this in the CloudFormation outputs as `SecurityGroupId`.
