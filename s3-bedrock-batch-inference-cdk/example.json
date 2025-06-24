@@ -67,56 +67,15 @@
     "authors": [
         {
             "name": "Biswanath Mukherjee",
-            "image": "https://d1rwvjey2iif32.cloudfront.net",
+            "image": "https://serverlessland.com/assets/images/resources/contributors/biswanath-mukherjee.jpg",
             "bio": "I am a Sr. Solutions Architect working at AWS India.",
             "linkedin": "biswanathmukherjee"
         },
         {
             "name": "Rakshith Rao",
-            "image": "https://rao.sh/assets/img/profile_pic.png",
+            "image": "https://serverlessland.com/assets/images/resources/contributors/rakshith-rao.png",
             "bio": "I am a Senior Solutions Architect at AWS and help our strategic customers build and operate their key workloads on AWS.",
             "linkedin": "rakshithrao"
         }
-    ],
-    "patternArch": {
-        "icon1": {
-            "x": 15,
-            "y": 50,
-            "service": "s3",
-            "label": "S3 Bucket"
-        },
-        "icon2": {
-            "x": 38,
-            "y": 50,
-            "service": "eventbridge",
-            "label": "EventBridge"
-        },
-        "icon3": {
-            "x": 61,
-            "y": 50,
-            "service": "lambda",
-            "label": "AWS Lambda"
-        },
-        "icon4": {
-            "x": 84,
-            "y": 50,
-            "service": "bedrock",
-            "label": "Amazon Bedrock"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2",
-            "label": "Object Created Event"
-        },
-        "line2": {
-            "from": "icon2",
-            "to": "icon3",
-            "label": "Trigger Lambda"
-        },
-        "line3": {
-            "from": "icon3",
-            "to": "icon4",
-            "label": "Create Batch Job"
-        }
-    }
+    ]
 }
