@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        #messages { 
+            margin-top: 20px; 
+            max-height: 400px; 
+            overflow-y: auto; 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #messages div { 
+            margin-bottom: 12px; 
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        .user-message {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            text-align: right;
+            margin-left: 20%;
+        }
+        .claude-message {
+            background-color: #f1f8e9;
+            border-left: 4px solid #8bc34a;
+        }
+        .system-message {
+            background-color: #eeeeee;
+            font-style: italic;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .controls { 
+            display: flex; 
+            align-items: center; 
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button { 
+            margin: 0 5px; 
+            padding: 8px 15px; 
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        textarea {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #2E7D32;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Chat using API Gateway & Websockets </h1>
+    <div class="controls">
+        <button onclick="connect()">Connect</button>
+        <textarea id="messageInput" placeholder="Enter message" rows="3" style="width: 600px; margin: 5px;"></textarea>
+        <button onclick="sendMessage()">Send</button>
+        <button onclick="disconnect()">Disconnect</button>
+    </div>
+    <div id="messages"></div>
+
+    <script>
+        let ws;
+        const messages = document.getElementById('messages');
+        
+        // Replace with your actual WebSocket URL
+        const WS_URL = '<WebSocketURL>';
+        
+        function connect() {
+            ws = new WebSocket(WS_URL);
+            
+            ws.onopen = () => {
+                addMessage('Connected to WebSocket');
+            };
+            
+            ws.onmessage = (event) => {
+                const response = JSON.parse(event.data);
+                // Replace newlines with HTML line breaks
+                const formattedMessage = response.message.replace(/\n/g, '<br>');
+                addMessage('Claude: ' + formattedMessage, true);
+            };
+            
+            ws.onclose = () => {
+                addMessage('Disconnected from WebSocket');
+            };
+            
+            ws.onerror = (error) => {
+                addMessage('Error: ' + error);
+            };
+        }
+        
+        function disconnect() {
+            if (ws) {
+                ws.close();
+            }
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            if (ws && ws.readyState === WebSocket.OPEN && input.value.trim() !== '') {
+                addMessage('You: ' + input.value);
+                ws.send(JSON.stringify({data: input.value}));
+                input.value = '';
+            }
+        }
+        
+        // Add keyboard shortcut (Ctrl+Enter or Cmd+Enter to send)
+        document.getElementById('messageInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        function addMessage(message, isHTML = false) {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            
+            if (message.startsWith('You: ')) {
+                div.className = 'user-message';
+                div.textContent = time + ' - ' + message;
+            } else if (message.startsWith('Claude: ')) {
+                div.className = 'claude-message';
+                if (isHTML) {
+                    div.innerHTML = time + ' - Claude: ' + message.substring(7);
+                } else {
+                    div.textContent = time + ' - ' + message;
+                }
+            } else {
+                div.className = 'system-message';
+                div.textContent = time + ' - ' + message;
+            }
+            
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight; // Auto-scroll to bottom
+        }
+    </script>
+</body>
+</html>
