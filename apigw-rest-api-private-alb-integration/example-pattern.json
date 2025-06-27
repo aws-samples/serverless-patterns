@@ -15,9 +15,9 @@
   },
   "gitHub": {
       "template": {
-          "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rest-api-alb-integration-workaround",
-          "templateURL": "serverless-patterns/rest-api-alb-integration-workaround",
-          "projectFolder": "rest-api-alb-integration-workaround",
+          "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-private-alb-integration",
+          "templateURL": "serverless-patterns/apigw-rest-api-private-alb-integration",
+          "projectFolder": "apigw-rest-api-private-alb-integration",
           "templateFile": "template.yaml"
       }
   },
