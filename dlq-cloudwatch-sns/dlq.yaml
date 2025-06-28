@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Template to create SQS DLQ with CloudWatch Alarm and SNS notification'
+
+Resources:
+  # First, create the SNS Topic that will receive the alarm notification
+  AlertSNSTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      DisplayName: 'DLQ-Alert-Topic'
+      TopicName: 'DLQ-Alert-Topic'
+
+  # Create the Dead Letter Queue
+  DeadLetterQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: 'MyDeadLetterQueue'
+      MessageRetentionPeriod: 1209600  # 14 days in seconds
+
+  # Create the CloudWatch Alarm
+  DLQAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmName: 'DLQ-Messages-Alarm'
+      AlarmDescription: 'Alarm when there are more than 3 messages in DLQ'
+      MetricName: 'ApproximateNumberOfMessagesVisible'
+      Namespace: 'AWS/SQS'
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt DeadLetterQueue.QueueName
+      Statistic: 'Sum'
+      Period: 300  # 5 minutes
+      EvaluationPeriods: 1
+      Threshold: 3
+      ComparisonOperator: 'GreaterThanThreshold'
+      AlarmActions:
+        - !Ref AlertSNSTopic
+
+Outputs:
+  DLQUrl:
+    Description: 'URL of the Dead Letter Queue'
+    Value: !Ref DeadLetterQueue
+  DLQArn:
+    Description: 'ARN of the Dead Letter Queue'
+    Value: !GetAtt DeadLetterQueue.Arn
+  SNSTopicArn:
+    Description: 'ARN of the SNS Topic'
+    Value: !Ref AlertSNSTopic
