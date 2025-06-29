@@ -552,7 +552,7 @@ Resources:
             cd /home/ec2-user
             SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
             git clone $SERVERLESS_LAND_GITHUB_LOCATION
-            cd ./serverless-patterns/msk-lambda-schema-avro-java-sam
+            cd ./serverless-patterns/msk-lambda-schema-avro-python-sam
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
             
