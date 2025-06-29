@@ -2,8 +2,8 @@
   "title": "Amazon MSK to Lambda with Avro and Schema Registry (Python)",
   "description": "Create Lambda functions that consume and produce Avro messages from Amazon MSK using AWS Glue Schema Registry",
   "language": "Python",
-  "level": "200",
-  "framework": "SAM",
+  "level": "300",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -59,10 +59,29 @@
   },
   "authors": [
     {
-      "name": "AWS Serverless Developer Advocacy Team",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/aws-serverless-da.jpg",
-      "bio": "The AWS Serverless Developer Advocacy team educates developers about serverless computing and helps them adopt serverless-first thinking.",
-      "linkedin": "aws-serverless-developer-advocacy"
+      "name": "Indranil Banerjee",
+      "bio": "AWS - Senior Solutions Architect",
+      "linkedin": "indranil-banerjee-b00a261"
+    },
+    {
+      "name": "Vaibhav Jain",
+      "bio": "AWS - Sr. Application Architect",
+      "linkedin": "vaibhavjainv"
+    },
+    {
+      "name": "Adam Wagner",
+      "bio": "AWS - Principal Serverless Solutions Architect",
+      "linkedin": "adam-wagner-4bb412"
+    },
+    {
+      "name": "Philipp Page",
+      "bio": "AWS - SA Engineer",
+      "linkedin": "philipp-page"
+    },
+    {
+      "name": "Leandro Cavalcante Damascena",
+      "bio": "AWS - Sr. SA Engineer",
+      "linkedin": "leandrodamascena"
     }
   ]
 }

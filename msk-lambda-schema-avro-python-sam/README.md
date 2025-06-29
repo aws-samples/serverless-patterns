@@ -23,19 +23,150 @@ This project contains source code and supporting files for a serverless applicat
 > [!Important] 
 > This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred.
 
-## Requirements
+## Prerequisites
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
-## Python Environment Setup
+## Deployment Options
 
-This project requires Python 3.9 or later. Before deploying, you need to set up a Python virtual environment.
+You have two options to deploy and test this pattern:
 
-### Automatic Setup
+### Option A: Using EC2 Instance (Recommended for Testing)
+- **Best for**: Quick testing and evaluation
+- **Includes**: Pre-configured MSK cluster, EC2 instance with all tools installed
+- **Setup time**: ~15-20 minutes
+- **Go to**: [EC2 Instance Setup](#option-a-ec2-instance-setup)
 
-Run the setup script to automatically create and configure the virtual environment:
+### Option B: Local Development Environment
+- **Best for**: Development and customization
+- **Requires**: Local setup of Python, SAM CLI, Docker
+- **Setup time**: ~10-15 minutes
+- **Go to**: [Local Development Setup](#option-b-local-development-setup)
+
+---
+
+# Option A: EC2 Instance Setup
+
+This option deploys everything you need including an MSK cluster and a pre-configured EC2 instance.
+
+## Step 1: Deploy MSK Cluster and EC2 Instance
+
+1. **Deploy the CloudFormation template**:
+   - Browse to the Amazon CloudFormation console
+   - Create a new stack using the file `MSKAndKafkaClientEC2.yaml`
+   - Keep the defaults for input parameters or modify them as necessary
+   - Wait for the CloudFormation stack to be created (~15-20 minutes)
+
+2. **What gets created**:
+   - MSK cluster (Provisioned or Serverless based on your selection)
+   - EC2 instance with all pre-requisites installed
+   - VPC, subnets, and security groups
+   - Kafka topic for Lambda functions
+
+## Step 2: Connect to EC2 Instance
+
+1. **Connect to the EC2 instance**:
+   - Go to the EC2 console
+   - Find your instance and click "Connect"
+   - Use **EC2 Instance Connect** or **EC2 Instance Connect Endpoint**
+
+> [!NOTE]  
+> You may need to wait for some time after the CloudFormation stack is created, as some UserData scripts continue running after the CloudFormation stack shows *Created*.
+
+## Step 3: Verify Kafka Topic Creation
+
+Once connected to the EC2 instance:
 
 ```bash
+# Check if Kafka topic was created successfully
+cat kafka_topic_creator_output.txt
+```
+
+You should see an output such as *Created topic <your-topic-name>.* where the topic name corresponds to what you specified when deploying the CloudFormation stack.
+
+If the file is missing or shows an error:
+
+```bash
+# Manually create the Kafka topic
+./kafka_topic_creator.sh
+```
+
+## Step 4: Navigate to Project Directory
+
+```bash
+# Change to the pattern directory
+cd serverless-patterns/msk-lambda-schema-avro-python-sam
+```
+
+## Step 5: Build and Deploy Lambda Functions
+
+The EC2 instance has all required tools pre-installed:
+- AWS SAM CLI
+- Python 3.9+
+- Docker
+- All project dependencies
+
+```bash
+# Build the application
+sam build
+
+# Deploy the application (guided mode for first time)
+sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name msk-lambda-schema-avro-python-sam --guided
+```
+
+### Deployment Parameters
+
+During deployment, you'll be prompted for these parameters (most will be auto-filled from CloudFormation outputs):
+
+* **Stack Name**: `msk-lambda-schema-avro-python-sam`
+* **AWS Region**: Your current region
+* **Parameter MSKClusterName**: The name of the MSK Cluster (from CloudFormation)
+* **Parameter MSKClusterId**: The unique ID of the MSK Cluster (from CloudFormation)
+* **Parameter MSKTopic**: The Kafka topic name (from CloudFormation outputs as `KafkaTopicForLambda`)
+* **Parameter ContactSchemaName**: The name of the schema (default: ContactSchema)
+* **Parameter VpcId**: The VPC ID (from CloudFormation outputs as `VPCId`)
+* **Parameter SubnetIds**: Comma-separated subnet IDs (from CloudFormation outputs)
+* **Parameter SecurityGroupIds**: Security group IDs (from CloudFormation outputs as `SecurityGroupId`)
+
+## Step 6: Test the Application
+
+```bash
+# Test the producer function
+sam remote invoke LambdaMSKProducerPythonFunction --region $AWS_REGION --stack-name msk-lambda-schema-avro-python-sam
+
+# View consumer logs
+sam logs --name LambdaMSKConsumerPythonFunction --stack-name msk-lambda-schema-avro-python-sam --region $AWS_REGION
+```
+
+---
+
+# Option B: Local Development Setup
+
+This option is for developers who want to work locally and connect to an existing MSK cluster.
+
+## Step 1: Prerequisites
+
+Ensure you have the following installed locally:
+
+* **[AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) CLI**
+* **Python 3.9 or later**
+* **[Docker](https://hub.docker.com/search/?type=edition&offering=community)** - Docker Community Edition
+* **AWS CLI** configured with appropriate credentials
+
+## Step 2: Clone the Repository
+
+```bash
+# Clone the serverless patterns repository
+git clone https://github.com/aws-samples/serverless-patterns.git
+cd serverless-patterns/msk-lambda-schema-avro-python-sam
+```
+
+## Step 3: Set Up Python Environment
+
+### Automatic Setup (Recommended)
+
+```bash
+# Run the setup script
 ./setup_venv.sh
 ```
 
@@ -45,8 +176,6 @@ This script will:
 3. Install all required dependencies from `requirements.txt`
 
 ### Manual Setup
-
-If you prefer to set up the environment manually:
 
 ```bash
 # Create virtual environment
@@ -62,9 +191,9 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Activating the Virtual Environment
+## Step 4: Activate Virtual Environment
 
-Before working with the project, always activate the virtual environment:
+**Important**: Always activate the virtual environment before working with the project:
 
 ```bash
 source venv/bin/activate
@@ -76,285 +205,220 @@ To deactivate when you're done:
 deactivate
 ```
 
-## Create the MSK Cluster and Client EC2 machine using CloudFormation template
-
-There is a CloudFormation template to deploy an Amazon MSK Cluster. You can deploy Amazon MSK to test this pattern or use your existing Kafka cluster. 
-
-### Create Amazon MSK Cluster
-
-* Run the CloudFormation template using the file `MSKAndKafkaClientEC2.yaml`.
-* Browse to the Amazon CloudFormation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the CloudFormation stack to be created. This CloudFormation template will create an MSK cluster (Provisioned or Serverless based on your selection). It will also create an EC2 machine that you can use as a client.
-
-### Connect to the EC2 machine
-
-* Once the CloudFormation stack is created, you can go to the EC2 console and log into the machine using either **Connect using EC2 Instance Connect** or **Connect using EC2 Instance Connect Endpoint** option under the *EC2 Instance Connect* tab.
-
-> [!NOTE]  
-> You may need to wait for some time after the CloudFormation stack is created, as some UserData scripts continue running after the CloudFormation stack shows *Created*.
-
-### Check if Kafka Topic has been created
-* Once you are connected to the EC2 machine, you should be in the `/home/ec2-user` folder. Check to see the contents of the file `kafka_topic_creator_output.txt` by running the command:
+## Step 5: Verify Installation
 
 ```bash
-cat kafka_topic_creator_output.txt
-```
-You should see an output such as *Created topic <your-topic-name>.* where the topic name corresponds to what you specified when deploying the CloudFormation stack.
-
-If you are not able to find the file `kafka_topic_creator_output.txt` or if it is blank or you see an error message, then you need to run the file:
-
-```bash
-./kafka_topic_creator.sh
+# Test that all dependencies are installed
+python -c "import boto3, kafka, avro; print('All dependencies installed successfully')"
 ```
 
-This file runs a script that creates the Kafka topic that the Lambda function will subscribe to.
+## Step 6: Configure for Your MSK Cluster
 
-## Pre-requisites to Deploy the sample Lambda function
+You'll need an existing MSK cluster. Update the deployment parameters to match your environment:
 
-The EC2 machine that was created by running the CloudFormation template has all the software needed to deploy the Lambda functions.
+- MSK Cluster Name and ID
+- VPC ID and Subnet IDs
+- Security Group IDs
+- Kafka Topic Name
 
-* **[AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) CLI**  is a serverless tool for building and testing Lambda applications. It uses Docker to locally test your functions in an Amazon Linux environment that resembles the Lambda execution environment. It can also emulate your application's build environment and API.
-
-* **Python** - Python 3.9 or later is supported by AWS SAM
-
-* **[Docker](https://hub.docker.com/search/?type=edition&offering=community)** - Installed the Docker Community Edition
-
-* The **[serverless-patterns](https://github.com/aws-samples/serverless-patterns) GitHub repository** is cloned on the EC2 machine.
-
-Change directory to the pattern directory:
+## Step 7: Build and Deploy
 
 ```bash
-cd serverless-patterns/msk-lambda-schema-avro-python-sam
-```
-
-## Local Development Setup
-
-If you're developing locally (not on the EC2 instance), follow these steps:
-
-1. **Set up Python virtual environment:**
-   ```bash
-   ./setup_venv.sh
-   ```
-
-2. **Activate the virtual environment:**
-   ```bash
-   source venv/bin/activate
-   ```
-
-3. **Verify installation:**
-   ```bash
-   python -c "import boto3, kafka, avro; print('All dependencies installed successfully')"
-   ```
-
-## Build the application
-
-Make sure your virtual environment is activated, then build your application with the `sam build` command.
-
-```bash
-# Activate virtual environment if not already active
+# Make sure virtual environment is activated
 source venv/bin/activate
 
 # Build the application
 sam build
+
+# Deploy with your parameters
+sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region <YOUR_REGION> --stack-name msk-lambda-schema-avro-python-sam --guided
 ```
 
-SAM CLI installs dependencies defined in `kafka_event_consumer_function/requirements.txt` and `kafka_event_producer_function/requirements.txt`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+---
 
-## Deploy the sample application
+# Testing the Application
 
-### Automated Deployment
+Once deployed (using either option), test the application:
 
-Use the provided deployment script for automatic parameter detection and deployment:
+## Invoke the Producer Function
 
 ```bash
-# Make sure virtual environment is activated
-source venv/bin/activate
+# Make sure you're in the project directory
+# For EC2: already in the right directory
+# For local: cd to your project directory
 
-# Run the deployment script
-./deploy.sh
+sam remote invoke LambdaMSKProducerPythonFunction --region <YOUR_REGION> --stack-name msk-lambda-schema-avro-python-sam
 ```
 
-### Manual Deployment
-
-To deploy your application manually for the first time, run the following:
-
-```bash
-# Make sure virtual environment is activated
-source venv/bin/activate
-
-sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name msk-lambda-schema-avro-python-sam --guided
-```
-
-The `sam deploy` command packages and deploys your application to AWS, with a series of prompts. 
-
-> [!NOTE]
-> The deployment script retrieves the required parameters from the CloudFormation outputs in the AWS Console after deploying the `MSKAndKafkaClientEC2.yaml` template. These outputs contain all the necessary information for deploying the Lambda functions. If you connect to a different Kafka cluster, enter the values manually.
-
-* **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
-* **AWS Region**: The AWS region you want to deploy your app to.
-* **Parameter MSKClusterName**: The name of the MSK Cluster. This will be `<stack-name>-cluster` from the CloudFormation template you deployed in the previous step.
-* **Parameter MSKClusterId**: The unique ID of the MSK Cluster. This can be found in the MSK console or extracted from the MSK ARN in the CloudFormation outputs.
-* **Parameter MSKTopic**: The Kafka topic on which the Lambda functions will produce and consume messages. You can find this in the CloudFormation outputs as `KafkaTopicForLambda`
-* **Parameter ContactSchemaName**: The name of the schema to be used for the Avro serialization (default: ContactSchema).
-* **Parameter VpcId**: The ID of the VPC where the MSK cluster is deployed. You can find this in the CloudFormation outputs as `VPCId`.
-* **Parameter SubnetIds**: Comma-separated list of subnet IDs where the MSK cluster is deployed. You can find these in the CloudFormation outputs as `PrivateSubnetMSKOne`, `PrivateSubnetMSKTwo`, and `PrivateSubnetMSKThree`.
-* **Parameter SecurityGroupIds**: Comma-separated list of security group IDs that allow access to the MSK cluster. You can find this in the CloudFormation outputs as `SecurityGroupId`.
-* **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review.
-* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions.
-* **Disable rollback**: Defaults to No and it preserves the state of previously provisioned resources when an operation fails.
-* **Save arguments to configuration file**: If set to yes, your choices will be saved to a configuration file inside the project.
-* **SAM configuration file [samconfig.toml]**: Name of the configuration file to store configuration information locally.
-* **SAM configuration environment [default]**: Environment for storing deployment information locally.
-
-You should get a message "Successfully created/updated stack - <StackName> in <Region>" if all goes well.
-
-## Test the sample application
-
-Once the Lambda functions are deployed, you can test the application by invoking the producer Lambda function, which generates Avro-formatted messages to the MSK topic. The consumer Lambda function automatically processes these messages.
-
-### Invoke the producer Lambda function
-
-You can invoke the producer Lambda function using AWS SAM CLI with the following command:
-
-```bash
-# Make sure virtual environment is activated
-source venv/bin/activate
-
-sam remote invoke LambdaMSKProducerPythonFunction --region $AWS_REGION --stack-name msk-lambda-schema-avro-python-sam
-```
-After invoking the producer function, the CloudWatch logs are displayed.
+### Expected Producer Output
 
 Look for entries showing:
-   - Confirmation that the message was sent to the MSK topic
-   - Successful serialization of the message using AVRO format
-   - Successful registration or retrieval of the schema from Schema Registry
-   - Look for the *ZIP CODE DISTRIBUTION SUMMARY* section, which shows how many messages were generated with zip codes starting with *1000* and how many with *2000*.
-   - You should see that the producer generated a mix of both zip code types   
+- Confirmation that the message was sent to the MSK topic
+- Successful serialization of the message using AVRO format
+- Successful registration or retrieval of the schema from Schema Registry
+- ZIP CODE DISTRIBUTION SUMMARY showing messages with zip codes starting with *1000* and *2000*
+- The producer should generate a mix of both zip code types
 
-You can also invoke the function using the AWS Console, or AWS CLI.
-
-### Verify the processing results from the consumer Lambda function
-
-View the consumer Lambda function logs using the Amazon CloudWatch logs console or CLI within the EC2 instance:
-```bash
-sam logs --name LambdaMSKConsumerPythonFunction --stack-name msk-lambda-schema-avro-python-sam --region $AWS_REGION
-```
-In the consumer logs, look for entries showing:
-   - Receipt of the message batch from the MSK topic
-   - Successful deserialization of the Avro message
-   - The decoded message content and any processing performed on it
-   - You should see that the consumer only processed messages with zip codes starting with *2000*
-   - Messages with zip codes starting with *1000* are filtered out by the event source mapping and never reached the Lambda function
-
-The consumer Lambda function automatically processes messages from the MSK topic. It parses the Kafka messages and outputs the fields in the Kafka messages to CloudWatch logs.
-
-Each key has a list of messages. Each Kafka message has the following properties *Topic, Partition, Offset, TimeStamp, TimeStampType, Key and Value*
-
-The *Key* and *Value* are base64 encoded and have to be decoded. [AWS Lambda Powertools for Python](https://docs.powertools.aws.dev/lambda/python/latest/) automatically decodes the base64 values. A message can also have a list of headers, each header having a key and a value.
-
-The code in this example prints out the fields in the Kafka message and also decrypts the key and the value and logs them in CloudWatch logs.
-
-This demonstrates how event source mapping filters can be used to efficiently process only the messages that match specific criteria, reducing Lambda invocation costs and processing overhead.
-
-## Running Tests
-
-To run the unit tests for the consumer function:
+## Verify Consumer Processing
 
 ```bash
-# Make sure virtual environment is activated
-source venv/bin/activate
-
-# Run tests for consumer function
-cd kafka_event_consumer_function
-python -m pytest tests/ -v
-
-# Return to project root
-cd ..
+# View consumer function logs
+sam logs --name LambdaMSKConsumerPythonFunction --stack-name msk-lambda-schema-avro-python-sam --region <YOUR_REGION>
 ```
 
-## Development Workflow
+### Expected Consumer Output
+
+In the consumer logs, look for:
+- Receipt of the message batch from the MSK topic
+- Successful deserialization of the Avro message
+- The decoded message content and processing
+- **Important**: Consumer only processes messages with zip codes starting with *2000*
+- Messages with zip codes starting with *1000* are filtered out by the event source mapping
+
+### How Event Filtering Works
+
+The consumer Lambda function automatically processes messages from the MSK topic. Each Kafka message has properties: *Topic, Partition, Offset, TimeStamp, TimeStampType, Key and Value*
+
+The *Key* and *Value* are base64 encoded and automatically decoded by [AWS Lambda Powertools for Python](https://docs.powertools.aws.dev/lambda/python/latest/).
+
+This demonstrates how event source mapping filters can be used to efficiently process only messages that match specific criteria, reducing Lambda invocation costs and processing overhead.
+
+---
+
+# Development Workflow (Local Development Only)
 
 When developing locally:
 
-1. **Always activate the virtual environment first:**
-   ```bash
-   source venv/bin/activate
-   ```
+## Daily Development
 
-2. **Install new dependencies:**
-   ```bash
-   pip install <new-package>
-   pip freeze > requirements.txt  # Update requirements.txt
-   ```
+```bash
+# 1. Always activate virtual environment first
+source venv/bin/activate
 
-3. **Test your changes:**
-   ```bash
-   # Run unit tests
-   cd kafka_event_consumer_function && python -m pytest tests/ -v && cd ..
-   
-   # Build and test locally
-   sam build
-   sam local invoke LambdaMSKProducerPythonFunction --event events/event.json
-   ```
+# 2. Make your code changes
 
-4. **Deploy changes:**
-   ```bash
-   sam build
-   sam deploy
-   ```
+# 3. Run unit tests
+cd kafka_event_consumer_function
+python -m pytest tests/ -v
+cd ..
 
-## Troubleshooting
+# 4. Build and test locally
+sam build
+sam local invoke LambdaMSKProducerPythonFunction --event events/event.json
+
+# 5. Deploy changes
+sam deploy
+```
+
+## Adding Dependencies
+
+```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Install new package
+pip install <new-package>
+
+# Update requirements file
+pip freeze > requirements.txt
+```
+
+---
+
+# Troubleshooting
+
+## Common Issues
 
 ### Import Errors
-If you encounter import errors:
-1. Make sure the virtual environment is activated: `source venv/bin/activate`
-2. Verify all dependencies are installed: `pip install -r requirements.txt`
-3. Check Python version: `python --version` (should be 3.9+)
-
-### Virtual Environment Issues
-If the virtual environment setup fails:
-1. Check Python version: `python3 --version`
-2. Install Python 3.9+ if needed
-3. Try manual setup as described above
-
-### SAM Build Issues
-If `sam build` fails:
-1. Make sure Docker is running
-2. Verify virtual environment is activated
-3. Check that all requirements.txt files have compatible versions
-
-## Cleanup
-
-### Delete Lambda  stack
-First delete the Lambda functions by running the `sam delete` command
-
 ```bash
 # Make sure virtual environment is activated
 source venv/bin/activate
 
-# Use the cleanup script
+# Reinstall dependencies
+pip install -r requirements.txt
+
+# Check Python version
+python --version  # Should be 3.9+
+```
+
+### Virtual Environment Issues
+```bash
+# Check Python version
+python3 --version
+
+# Remove and recreate virtual environment
+rm -rf venv/
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### SAM Build Issues
+```bash
+# Make sure Docker is running
+docker --version
+
+# For EC2 instances, Docker should already be running
+# For local development, start Docker Desktop
+
+# Clean build
+sam build --use-container
+```
+
+### EC2 Instance Issues
+```bash
+# If Kafka topic creation failed
+./kafka_topic_creator.sh
+
+# Check if all services are running
+sudo systemctl status docker
+
+# Verify AWS CLI configuration
+aws sts get-caller-identity
+```
+
+---
+
+# Cleanup
+
+## Delete Lambda Stack
+
+```bash
+# Option 1: Use cleanup script (if available)
 ./cleanup.sh
 
-# Or manually delete
+# Option 2: Manual deletion
 sam delete --stack-name msk-lambda-schema-avro-python-sam
 ```
 
-Confirm by pressing `y` for both the questions
-The Lambda function are deleted and the tool displays a final confirmation *Deleted successfully* on the command-line
+Confirm by pressing `y` for both questions.
 
-### Delete Amazon MSK cluster
-To delete the CloudFormation template that created the Amazon MSK Server and the EC2 machine
-1. Navigate to the CloudFormation console and select the stack. 
-2. Select the *Delete* button. The deletion process run for some time. Once complete the stack should be removed. 
+## Delete MSK Cluster (EC2 Option Only)
 
-If you get an error message that says the stack could not be deleted, please retry again and do a *Force Delete*. The reason this may happen is because ENIs created by the deployed Lambda function in your VPC may prevent the VPC from being deleted even after deleting the Lambda function.
+1. Navigate to the CloudFormation console
+2. Select the MSK stack
+3. Click "Delete"
+4. If deletion fails, use "Force Delete" option
 
-### Clean up Virtual Environment
-To remove the virtual environment:
+> [!NOTE]
+> ENIs created by Lambda functions in your VPC may prevent VPC deletion. If this happens, wait a few minutes and retry, or use Force Delete.
+
+## Clean Up Local Environment
 
 ```bash
-# Deactivate if currently active
+# Deactivate virtual environment
 deactivate
 
-# Remove the virtual environment directory
+# Remove virtual environment (optional)
 rm -rf venv/
 ```
+
+---
+
+# Additional Resources
+
+- [AWS Lambda Developer Guide](https://docs.aws.amazon.com/lambda/latest/dg/)
+- [Amazon MSK Developer Guide](https://docs.aws.amazon.com/msk/latest/developerguide/)
+- [AWS Glue Schema Registry](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html)
+- [AWS Lambda Powertools Python](https://awslabs.github.io/aws-lambda-powertools-python/)
+- [AWS SAM Developer Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/)
