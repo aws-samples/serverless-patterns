@@ -1,0 +1,68 @@
+{
+  "title": "Amazon MSK to Lambda with Avro and Schema Registry (Python)",
+  "description": "Create Lambda functions that consume and produce Avro messages from Amazon MSK using AWS Glue Schema Registry",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to create Lambda functions that consume and produce Avro-formatted messages from Amazon Managed Streaming for Kafka (MSK) using AWS Glue Schema Registry.",
+      "The consumer Lambda function is triggered by MSK events and automatically deserializes Avro messages using the schema from AWS Glue Schema Registry.",
+      "The producer Lambda function creates Avro-formatted messages and sends them to the MSK topic, with automatic schema registration in AWS Glue Schema Registry.",
+      "Both functions use IAM authentication to connect to the MSK cluster."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-lambda-schema-avro-python-sam",
+      "templateURL": "serverless-patterns/msk-lambda-schema-avro-python-sam",
+      "projectFolder": "msk-lambda-schema-avro-python-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon MSK Lambda trigger",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+      },
+      {
+        "text": "Using AWS Lambda with Amazon MSK",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+      },
+      {
+        "text": "AWS Glue Schema Registry",
+        "link": "https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html"
+      },
+      {
+        "text": "Apache Avro",
+        "link": "https://avro.apache.org/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "AWS Serverless Developer Advocacy Team",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/aws-serverless-da.jpg",
+      "bio": "The AWS Serverless Developer Advocacy team educates developers about serverless computing and helps them adopt serverless-first thinking.",
+      "linkedin": "aws-serverless-developer-advocacy"
+    }
+  ]
+}

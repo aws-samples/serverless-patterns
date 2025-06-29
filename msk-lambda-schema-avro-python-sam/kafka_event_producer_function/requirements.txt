@@ -1,0 +1,11 @@
+# Core AWS and Lambda dependencies
+boto3>=1.34.0
+aws-lambda-powertools>=3.15.0
+aws-xray-sdk>=2.12.0
+
+# Kafka and messaging
+kafka-python>=2.2.14
+
+# Avro serialization and AWS Glue Schema Registry
+fastavro>=1.8.0
+aws-glue-schema-registry>=1.1.3

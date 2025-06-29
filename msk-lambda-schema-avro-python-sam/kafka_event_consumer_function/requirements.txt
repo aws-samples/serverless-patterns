@@ -1,0 +1,6 @@
+# Core AWS and Lambda dependencies
+aws-lambda-powertools>=3.15.0
+
+# Avro serialization
+fastavro>=1.8.0
+avro>=1.11.0

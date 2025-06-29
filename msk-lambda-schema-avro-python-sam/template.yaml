@@ -1,0 +1,240 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  kafka_event_consumer_and_producer_functions
+
+  Sample SAM Template for MSK consumer and AVRO producer with IAM auth (Python)
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  # SQS Queue to use as Dead Letter Queue for the MSK event source mapping
+  ConsumerDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600  # 14 days (maximum retention period)
+      VisibilityTimeout: 300  # 5 minutes
+      Tags:
+        - Key: Purpose
+          Value: MSKConsumerDLQ
+
+  LambdaMSKConsumerPythonFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: kafka_event_consumer_function
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIds
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          PARAM1: VALUE
+          LOG_LEVEL: INFO
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            BatchSize: 1
+            MaximumBatchingWindowInSeconds: 1
+            Stream: !Join [ '', ["arn:", "aws:", "kafka:", !Ref "AWS::Region" , ":" ,!Ref "AWS::AccountId", ":", "cluster/", !Ref MSKClusterName, "/" , !Ref MSKClusterId] ]
+            Topics:
+              - !Ref MSKTopic
+            DestinationConfig:
+              OnFailure:
+                Destination: !GetAtt ConsumerDLQ.Arn
+            ProvisionedPollerConfig:
+              MaximumPollers: 3
+              MinimumPollers: 1
+            SchemaRegistryConfig: 
+              SchemaRegistryURI: !Join [ '', ["arn:", "aws:", "glue:", !Ref "AWS::Region" , ":" ,!Ref "AWS::AccountId", ":", "registry/", !Ref GlueSchemaRegistryName] ]
+              EventRecordFormat: SOURCE
+              SchemaValidationConfigs:
+                - Attribute: VALUE  
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"value": {"zip": [ { "prefix": "2000" } ]}}'
+      Policies:
+      - Statement:
+        - Sid: KafkaClusterPermissionsPolicy
+          Effect: Allow
+          Action:
+          - kafka-cluster:Connect
+          - kafka-cluster:DescribeGroup
+          - kafka-cluster:DescribeCluster
+          - kafka-cluster:AlterCluster
+          - kafka-cluster:AlterClusterDynamicConfiguration
+          - kafka-cluster:WriteDataIdempotently
+          - kafka-cluster:AlterGroup
+          - kafka-cluster:DescribeTopic
+          - kafka-cluster:ReadData
+          - kafka-cluster:DescribeClusterDynamicConfiguration
+          Resource: 
+          - !Join ['', ["arn:", "aws:", "kafka:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "cluster/", !Ref MSKClusterName, "/" , !Ref MSKClusterId]]
+          - !Join ['', ["arn:", "aws:", "kafka:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "topic/", !Ref MSKClusterName, "/" , !Ref MSKClusterId, "/*"]]
+          - !Join ['', ["arn:", "aws:", "kafka:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "group/", !Ref MSKClusterName, "/" , !Ref MSKClusterId, "/*"]]
+          
+        - Sid: KafkaPermissionsPolicy
+          Effect: Allow
+          Action:
+          - kafka:DescribeClusterV2
+          - kafka:GetBootstrapBrokers
+          Resource: '*'
+          
+        - Sid: EC2PermissionsPolicy
+          Effect: Allow
+          Action:
+          - ec2:DescribeSecurityGroups
+          - ec2:DescribeSubnets
+          - ec2:DescribeVpcs
+          - ec2:CreateNetworkInterface
+          - ec2:DescribeNetworkInterfaces
+          - ec2:DeleteNetworkInterface
+          Resource: '*'
+          
+        - Sid: GlueSchemaRegistryPermissionsPolicy
+          Effect: Allow
+          Action:
+          - glue:GetSchemaByDefinition
+          - glue:GetSchemaVersion
+          - glue:GetRegistry
+          - glue:ListSchemas
+          - glue:ListSchemaVersions
+          - glue:RegisterSchemaVersion
+          - glue:PutSchemaVersionMetadata
+          - glue:GetSchemaVersionsDiff
+          - glue:QuerySchemaVersionMetadata
+          Resource: '*'
+          
+        - Sid: SQSPermissionsPolicy
+          Effect: Allow
+          Action:
+          - sqs:SendMessage
+          Resource: !GetAtt ConsumerDLQ.Arn
+      - VPCAccessPolicy: {}
+
+  LambdaMSKProducerPythonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: kafka_event_producer_function
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Timeout: 300
+      Architectures:
+        - x86_64
+      MemorySize: 512
+
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIds
+      Environment:
+        Variables:
+          MSK_CLUSTER_ARN: !Join [ '', ["arn:", "aws:", "kafka:", !Ref "AWS::Region" , ":" ,!Ref "AWS::AccountId", ":", "cluster/", !Ref MSKClusterName, "/" , !Ref MSKClusterId] ]
+          MSK_TOPIC: !Ref MSKTopic
+          REGISTRY_NAME: !Ref GlueSchemaRegistryName
+          CONTACT_SCHEMA_NAME: !Ref ContactSchemaName
+          LOG_LEVEL: INFO
+      Policies:
+      - Statement:
+        - Sid: KafkaClusterPermissionsPolicy
+          Effect: Allow
+          Action:
+          - kafka-cluster:Connect
+          - kafka-cluster:DescribeCluster
+          - kafka-cluster:WriteData
+          - kafka-cluster:DescribeTopic
+          Resource: 
+          - !Join ['', ["arn:", "aws:", "kafka:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "cluster/", !Ref MSKClusterName, "/" , !Ref MSKClusterId]]
+          - !Join ['', ["arn:", "aws:", "kafka:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "topic/", !Ref MSKClusterName, "/" , !Ref MSKClusterId, "/*"]]
+          
+        - Sid: KafkaPermissionsPolicy
+          Effect: Allow
+          Action:
+          - kafka:DescribeClusterV2
+          - kafka:GetBootstrapBrokers
+          Resource: '*'
+          
+        - Sid: EC2PermissionsPolicy
+          Effect: Allow
+          Action:
+          - ec2:DescribeSecurityGroups
+          - ec2:DescribeSubnets
+          - ec2:DescribeVpcs
+          - ec2:CreateNetworkInterface
+          - ec2:DescribeNetworkInterfaces
+          - ec2:DeleteNetworkInterface
+          Resource: '*'
+          
+        - Sid: GlueSchemaRegistryPermissionsPolicy
+          Effect: Allow
+          Action:
+          - glue:GetSchemaByDefinition
+          - glue:GetSchemaVersion
+          - glue:GetRegistry
+          - glue:ListSchemas
+          - glue:ListSchemaVersions
+          - glue:GetSchemaVersionsDiff
+          - glue:QuerySchemaVersionMetadata
+          - glue:RegisterSchemaVersion
+          - glue:PutSchemaVersionMetadata
+          - glue:CreateSchema
+          - glue:CreateRegistry
+          Resource: 
+          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/*"
+          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:schema/*/*"
+      - VPCAccessPolicy: {}
+
+Parameters:
+  MSKClusterName:
+    Type: String
+    Description: Enter the name of the MSK Cluster
+    Default: msk-avro-python-cluster
+  MSKClusterId:
+    Type: String
+    Description: Enter the ID of the MSK Cluster
+    Default: 7d2ccd0a-8a2c-47af-8dca-03ae5bdd1542-19
+  MSKTopic:
+    Type: String
+    Description: Enter the name of the MSK Topic
+    Default: MskIamJavaLambdaTopic
+  GlueSchemaRegistryName:
+    Type: String
+    Description: Enter the name of the Glue Schema Registry
+    Default: GlueSchemaRegistryForMSK
+  ContactSchemaName:
+    Type: String
+    Description: Enter the name of the Contact Schema
+    Default: ContactSchema
+  VpcId:
+    Type: String
+    Description: Enter the VPC ID where the MSK cluster is deployed
+    Default: vpc-08dcffba7b0d58a97
+  SubnetIds:
+    Type: CommaDelimitedList
+    Description: Enter the subnet IDs where the MSK cluster is deployed (comma-separated)
+    Default: subnet-09282129e6dc5e758,subnet-0c2d1518a100fe850,subnet-0ea66fb1eae87b266
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Description: Enter the security group IDs that allow access to the MSK cluster (comma-separated)
+    Default: sg-053703175eec24f98
+
+Outputs:
+  MSKConsumerLambdaFunction:
+    Description: "Topic Consumer Lambda Function ARN"
+    Value: !GetAtt LambdaMSKConsumerPythonFunction.Arn
+  MSKProducerLambdaFunction:
+    Description: "AVRO Producer Lambda Function ARN"
+    Value: !GetAtt LambdaMSKProducerPythonFunction.Arn
+  ConsumerDLQUrl:
+    Description: "URL of the Dead Letter Queue for the MSK Consumer"
+    Value: !Ref ConsumerDLQ
+  ConsumerDLQArn:
+    Description: "ARN of the Dead Letter Queue for the MSK Consumer"
+    Value: !GetAtt ConsumerDLQ.Arn
