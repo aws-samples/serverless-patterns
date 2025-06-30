@@ -14,20 +14,21 @@ Parameters:
   MSKKafkaVersion:
     Type: String
     Default: 3.9.x
-  JavaVersion:
+  PythonVersion:
     Type: String
-    Description: Choose the version of Java. Lambda currently supports Java 11, 17 and 21
+    Description: Choose the version of Python. Lambda currently supports Python 3.9, 3.10, 3.11, and 3.12
     AllowedValues:
-      - java11
-      - java17
-      - java21
-    Default: java21
+      - python39
+      - python310
+      - python311
+      - python312
+    Default: python312
   ApacheKafkaInstallerLocation:
     Type: String
     Default: https://dlcdn.apache.org/kafka/3.9.1/kafka_2.13-3.9.1.tgz
   KafkaTopicForLambda:
     Type: String
-    Default: MskIamJavaLambdaTopic
+    Default: MskLambdaTopic
   ServerlessLandGithubLocation:
     Type: String
     Default: https://github.com/aws-samples/serverless-patterns/
@@ -343,25 +344,38 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python install"
                 yum update -y
-                # yum install java-openjdk11-devel -y
+                # Install Python 3.12 and development tools
             
-                # install Java
-                JAVA_VERSION=${java_version}
-                echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
-                if [ "$JAVA_VERSION" == "java11" ]; then
-                    sudo yum install java-11-amazon-corretto-devel -y
-                elif [ "$JAVA_VERSION" == "java17" ]; then
-                    sudo yum install java-17-amazon-corretto-devel -y
-                elif [ "$JAVA_VERSION" == "java21" ]; then
-                    sudo yum install java-21-amazon-corretto-devel -y
-                else
-                    sudo yum install java-21-amazon-corretto-devel -y
-                fi
+                # install Python
+                PYTHON_VERSION=${python_version}
+                echo "PYTHON_VERSION=$PYTHON_VERSION" >> /home/ec2-user/.bash_profile
+                
+                # Install Python 3.12 and development tools
+                sudo yum install -y python3.12 python3.12-pip python3.12-devel
+                
+                # Create symlinks for easier access
+                sudo ln -sf /usr/bin/python3.12 /usr/local/bin/python3
+                sudo ln -sf /usr/bin/pip3.12 /usr/local/bin/pip3
+                
+                # Install virtualenv
+                sudo pip3.12 install virtualenv
+                
+                # Install Java (required for Kafka tools)
+                sudo yum install -y java-21-amazon-corretto-headless
+                
+                # Set JAVA_HOME environment variable
+                echo "export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto" >> /home/ec2-user/.bash_profile
+                export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
+                
+                # Verify installations
+                python3 --version
+                pip3 --version
+                java -version
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
-                    echo "Yum install of Java succeeded"
+                    echo "Python install succeeded"
                     success=true
                 else
                     echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
@@ -374,7 +388,7 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python packages install"
                 yum install nmap-ncat -y
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -392,7 +406,7 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python packages install"
                 yum install git -y
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -410,7 +424,7 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python packages install"
                 yum erase awscli -y
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -427,7 +441,7 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python packages install"
                 yum install jq -y
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -444,7 +458,7 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python packages install"
                 sudo yum install -y docker
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -459,18 +473,16 @@ Resources:
             
             service docker start
             usermod -a -G docker ec2-user
-            sudo wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
-            sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
             
             max_attempts=5
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
-                sudo yum install -y apache-maven
+                echo "Trying Python packages install"
+                sudo pip3.12 install boto3 kafka-python avro-python3 confluent-kafka
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
-                    echo "Yum install of maven succeeded"
+                    echo "Python packages install succeeded"
                     success=true
                 else
                     echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
@@ -480,7 +492,7 @@ Resources:
             done
 
             cd /home/ec2-user
-            su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
+            su -c "ln -s /usr/bin/python3.12 /usr/bin/python3" -s /bin/sh ec2-user
             su -c "pip3 install boto3 --user" -s /bin/sh ec2-user
             su -c "pip3 install kafka-python --user" -s /bin/sh ec2-user
 
@@ -569,7 +581,6 @@ Resources:
             sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
-            sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
             sed -i "s/GLUE_SCHEMA_REGISTRY_NAME/$GLUE_SCHEMA_REGISTRY_NAME/g" template.yaml
             sed -i "s/AVRO_SCHEMA/$CONTACT_SCHEMA/g" template.yaml
             sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
@@ -596,7 +607,7 @@ Resources:
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
-            java_version: !Ref JavaVersion
+            python_version: !Ref PythonVersion
             vpcid: !Ref VPC
             privatesubnetone: !Ref PrivateSubnetMSKOne
             privatesubnettwo: !Ref PrivateSubnetMSKTwo
@@ -639,25 +650,38 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python install"
                 yum update -y
-                # yum install java-openjdk11-devel -y
+                # Install Python 3.12 and development tools
             
-                # install Java
-                JAVA_VERSION=${java_version}
-                echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
-                if [ "$JAVA_VERSION" == "java11" ]; then
-                    sudo yum install java-11-amazon-corretto-devel -y
-                elif [ "$JAVA_VERSION" == "java17" ]; then
-                    sudo yum install java-17-amazon-corretto-devel -y
-                elif [ "$JAVA_VERSION" == "java21" ]; then
-                    sudo yum install java-21-amazon-corretto-devel -y
-                else
-                    sudo yum install java-21-amazon-corretto-devel -y
-                fi
+                # install Python
+                PYTHON_VERSION=${python_version}
+                echo "PYTHON_VERSION=$PYTHON_VERSION" >> /home/ec2-user/.bash_profile
+                
+                # Install Python 3.12 and development tools
+                sudo yum install -y python3.12 python3.12-pip python3.12-devel
+                
+                # Create symlinks for easier access
+                sudo ln -sf /usr/bin/python3.12 /usr/local/bin/python3
+                sudo ln -sf /usr/bin/pip3.12 /usr/local/bin/pip3
+                
+                # Install virtualenv
+                sudo pip3.12 install virtualenv
+                
+                # Install Java (required for Kafka tools)
+                sudo yum install -y java-21-amazon-corretto-headless
+                
+                # Set JAVA_HOME environment variable
+                echo "export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto" >> /home/ec2-user/.bash_profile
+                export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
+                
+                # Verify installations
+                python3 --version
+                pip3 --version
+                java -version
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
-                    echo "Yum install of Java succeeded"
+                    echo "Python install succeeded"
                     success=true
                 else
                     echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
@@ -670,7 +694,7 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python packages install"
                 yum install nmap-ncat -y
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -688,7 +712,7 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python packages install"
                 yum install git -y
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -706,7 +730,7 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python packages install"
                 yum erase awscli -y
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -723,7 +747,7 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python packages install"
                 yum install jq -y
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -740,7 +764,7 @@ Resources:
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
+                echo "Trying Python packages install"
                 sudo yum install -y docker
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -755,18 +779,16 @@ Resources:
             
             service docker start
             usermod -a -G docker ec2-user
-            sudo wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
-            sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
             
             max_attempts=5
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
-                sudo yum install -y apache-maven
+                echo "Trying Python packages install"
+                sudo pip3.12 install boto3 kafka-python avro-python3 confluent-kafka
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
-                    echo "Yum install of maven succeeded"
+                    echo "Python packages install succeeded"
                     success=true
                 else
                     echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
@@ -776,7 +798,7 @@ Resources:
             done
 
             cd /home/ec2-user
-            su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
+            su -c "ln -s /usr/bin/python3.12 /usr/bin/python3" -s /bin/sh ec2-user
             su -c "pip3 install boto3 --user" -s /bin/sh ec2-user
             su -c "pip3 install kafka-python --user" -s /bin/sh ec2-user
 
@@ -866,7 +888,6 @@ Resources:
             sed -i "s/CLUSTER_NAME/$CLUSTER_NAME/g" template.yaml
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
-            sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
             sed -i "s/GLUE_SCHEMA_REGISTRY_NAME/$GLUE_SCHEMA_REGISTRY_NAME/g" template.yaml
             sed -i "s/AVRO_SCHEMA/$CONTACT_SCHEMA/g" template.yaml
             sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
@@ -893,7 +914,7 @@ Resources:
             apache_kafka_installer_location: !Ref ApacheKafkaInstallerLocation
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
-            java_version: !Ref JavaVersion
+            python_version: !Ref PythonVersion
             vpcid: !Ref VPC
             privatesubnetone: !Ref PrivateSubnetMSKOne
             privatesubnettwo: !Ref PrivateSubnetMSKTwo
