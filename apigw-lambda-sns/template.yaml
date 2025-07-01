@@ -28,7 +28,7 @@ Resources:
       Handler: code.lambda_handler
       MemorySize: 128
       Timeout: 3
-      Runtime: python3.8
+      Runtime: python3.13
       Environment:
         Variables:
           TOPIC_ARN: !Ref MySnsTopic
@@ -60,6 +60,6 @@ Outputs:
   SNStopicARN:
     Description: SNS topic ARN
     Value: !Ref MySnsTopic
-
+  
   apiGatewayInvokeURL:
     Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/s1
