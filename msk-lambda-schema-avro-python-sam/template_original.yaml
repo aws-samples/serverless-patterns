@@ -44,8 +44,8 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            BatchSize: 1
-            MaximumBatchingWindowInSeconds: 1
+            BatchSize: 10
+            MaximumBatchingWindowInSeconds: 20
             Stream: !Join [ '', ["arn:", "aws:", "kafka:", !Ref "AWS::Region" , ":" ,!Ref "AWS::AccountId", ":", "cluster/", !Ref MSKClusterName, "/" , !Ref MSKClusterId] ]
             Topics:
               - !Ref MSKTopic
@@ -113,9 +113,7 @@ Resources:
           - glue:PutSchemaVersionMetadata
           - glue:GetSchemaVersionsDiff
           - glue:QuerySchemaVersionMetadata
-          Resource: 
-          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/*"
-          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:schema/*/*"
+          Resource: '*'
           
         - Sid: SQSPermissionsPolicy
           Effect: Allow
