@@ -30,6 +30,8 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 512
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-python312-x86_64:18
       VpcConfig:
         SecurityGroupIds: !Ref SecurityGroupIds
         SubnetIds: !Ref SubnetIds
@@ -111,7 +113,9 @@ Resources:
           - glue:PutSchemaVersionMetadata
           - glue:GetSchemaVersionsDiff
           - glue:QuerySchemaVersionMetadata
-          Resource: '*'
+          Resource: 
+          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:registry/*"
+          - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:schema/*/*"
           
         - Sid: SQSPermissionsPolicy
           Effect: Allow
@@ -130,6 +134,8 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 512
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-python312-x86_64:18
 
       VpcConfig:
         SecurityGroupIds: !Ref SecurityGroupIds

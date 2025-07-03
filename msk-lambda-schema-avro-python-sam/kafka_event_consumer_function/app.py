@@ -62,9 +62,7 @@ def lambda_handler(event: ConsumerRecords, context: LambdaContext):
     logger.info("=== MSK AVRO Consumer Lambda started ===")
     
     try:
-        record_count = 0
         for record in event.records:
-            record_count += 1
             logger.info(f"Processing record - Topic: {record.topic}, Partition: {record.partition}, Offset: {record.offset}")
             logger.info(f"Timestamp: {record.timestamp}, TimestampType: {record.timestamp_type}")
             
@@ -86,7 +84,7 @@ def lambda_handler(event: ConsumerRecords, context: LambdaContext):
                 # Add your business logic here
                 # For example: save to database, send notifications, etc.
             
-        logger.info(f"Successfully processed {record_count} records")
+        logger.info(f"Successfully processed {len(list(event.records))} records")
         logger.info("=== MSK AVRO Consumer Lambda completed ===")
         
         return {"statusCode": 200}

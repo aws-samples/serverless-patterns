@@ -68,21 +68,19 @@ def get_schema_version_id(registry_name: str, schema_name: str) -> str:
             data_format='AVRO'
         )
         
-        logger.info("Schema version obtained", extra={
-            "schema_version_id": str(schema_version.version_id),
-            "version_number": schema_version.version_number,
-            "schema_name": schema_name,
-            "registry_name": registry_name
-        })
+        logger.info("Schema version obtained", 
+                   schema_version_id=str(schema_version.version_id),
+                   version_number=schema_version.version_number,
+                   schema_name=schema_name,
+                   registry_name=registry_name)
         
         return schema_version.version_id
         
     except Exception as e:
-        logger.exception("Failed to get schema version", extra={
-            "error": str(e),
-            "registry_name": registry_name,
-            "schema_name": schema_name
-        })
+        logger.exception("Failed to get schema version", 
+                        error=str(e),
+                        registry_name=registry_name,
+                        schema_name=schema_name)
         raise
 
 
@@ -97,19 +95,17 @@ def serialize_avro_message(contact_data: Dict[str, Any], schema_version_id: str)
         # Add AWS Glue Schema Registry header using the package
         encoded_message = encode(avro_data, schema_version_id)
         
-        logger.debug("Message serialized", extra={
-            "avro_data_size": len(avro_data),
-            "total_message_size": len(encoded_message),
-            "header_size": len(encoded_message) - len(avro_data)
-        })
+        logger.debug("Message serialized", 
+                    avro_data_size=len(avro_data),
+                    total_message_size=len(encoded_message),
+                    header_size=len(encoded_message) - len(avro_data))
         
         return encoded_message
         
     except Exception as e:
-        logger.exception("Failed to serialize message", extra={
-            "error": str(e),
-            "contact_data": contact_data
-        })
+        logger.exception("Failed to serialize message", 
+                        error=str(e),
+                        contact_data=contact_data)
         raise
 
 
@@ -148,7 +144,7 @@ def get_bootstrap_brokers(cluster_arn: str) -> str:
         response = kafka_client.get_bootstrap_brokers(ClusterArn=cluster_arn)
         return response['BootstrapBrokerStringSaslIam']
     except Exception as e:
-        logger.exception("Failed to get bootstrap brokers", extra={"cluster_arn": cluster_arn})
+        logger.exception("Failed to get bootstrap brokers", cluster_arn=cluster_arn)
         raise
 
 
@@ -179,13 +175,12 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> str:
         if not cluster_arn:
             raise ValueError("MSK_CLUSTER_ARN environment variable is required")
         
-        logger.info("Configuration loaded", extra={
-            "cluster_arn": cluster_arn,
-            "kafka_topic": kafka_topic,
-            "message_count": message_count,
-            "registry_name": registry_name,
-            "schema_name": schema_name
-        })
+        logger.info("Configuration loaded", 
+                   cluster_arn=cluster_arn,
+                   kafka_topic=kafka_topic,
+                   message_count=message_count,
+                   registry_name=registry_name,
+                   schema_name=schema_name)
         
         # Get schema version ID
         schema_version_id = get_schema_version_id(registry_name, schema_name)
@@ -204,11 +199,10 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> str:
             request_timeout_ms=60000,
         )
         
-        logger.info("Starting message production", extra={
-            "topic": kafka_topic,
-            "message_count": message_count,
-            "schema_version_id": str(schema_version_id)
-        })
+        logger.info("Starting message production", 
+                   topic=kafka_topic,
+                   message_count=message_count,
+                   schema_version_id=str(schema_version_id))
         
         # Track zip code distribution for filtering demo
         zip_1000_count = 0
@@ -230,13 +224,12 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> str:
             future = producer.send(kafka_topic, key=message_key, value=avro_message)
             record_metadata = future.get(timeout=60)
             
-            logger.info("Message sent successfully", extra={
-                "message_number": i+1,
-                "message_key": message_key,
-                "partition": record_metadata.partition,
-                "offset": record_metadata.offset,
-                "message_size": len(avro_message)
-            })
+            logger.info("Message sent successfully", 
+                       message_number=i+1,
+                       message_key=message_key,
+                       partition=record_metadata.partition,
+                       offset=record_metadata.offset,
+                       message_size=len(avro_message))
             
             # Add metrics
             metrics.add_metric(name="AvroMessagesSent", unit=MetricUnit.Count, value=1)
@@ -255,18 +248,16 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> str:
             f"(Zip codes: {zip_1000_count} with prefix 1000, {zip_2000_count} with prefix 2000)"
         )
         
-        logger.info("MSK AVRO Producer Lambda completed successfully", extra={
-            "success_message": success_message,
-            "total_messages_sent": message_count,
-            "schema_version_id": str(schema_version_id)
-        })
+        logger.info("MSK AVRO Producer Lambda completed successfully", 
+                   success_message=success_message,
+                   total_messages_sent=message_count,
+                   schema_version_id=str(schema_version_id))
         
         return success_message
         
     except Exception as e:
-        logger.exception("Error in lambda_handler", extra={
-            "error": str(e),
-            "error_type": type(e).__name__
-        })
+        logger.exception("Error in lambda_handler", 
+                        error=str(e),
+                        error_type=type(e).__name__)
         metrics.add_metric(name="AvroErrors", unit=MetricUnit.Count, value=1)
         raise RuntimeError(f"Failed to send AVRO messages: {str(e)}") from e
