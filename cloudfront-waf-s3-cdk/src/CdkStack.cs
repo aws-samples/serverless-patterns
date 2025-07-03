@@ -114,7 +114,7 @@ namespace CloudFrontS3WafStack
                 }
             );
 
-            //Observe index.html in the url. If we want to auto route to index.html then we can use CloudFront function to redirect requet to index.html.
+            //Observe index.html in the url. If we want to auto route to index.html then we can use CloudFront function to redirect request to index.html.
             new CfnOutput(
                 this,
                 "CloudFront URL",
