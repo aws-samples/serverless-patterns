@@ -4,11 +4,8 @@ The SAM template deploys an Amazon API Gateway Websocket API endpoint with a VPC
 
 Since Websocket APIs only support VPC Links associated with NLBs (Network Load Balancers), this pattern assumes that an internal NLB already exists in a VPC in the same Region.
 
-<<<<<<< HEAD
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/
 =======
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-rest-api-vpclink
->>>>>>> 79ec4deb37a6cd3b5e7b9877c6fa6e5175854d17
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -27,12 +24,9 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-<<<<<<< HEAD
     cd apigw-websocket-api-vpclink
-=======
-    cd apigw-rest-api-vpclink
->>>>>>> 79ec4deb37a6cd3b5e7b9877c6fa6e5175854d17
     ```
+
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy -g
