@@ -19,6 +19,8 @@ This project contains source code and supporting files for a serverless applicat
 - `MSKAndKafkaClientEC2.yaml` - A CloudFormation template file that can be used to deploy an MSK cluster and also deploy an EC2 machine with all pre-requisites already installed, so you can directly build and deploy the lambda functions and test them out.
 - `requirements.txt` - Python dependencies for the entire project.
 - `setup_venv.sh` - Script to set up the Python virtual environment.
+- `deploy.sh` - Automated deployment script that detects MSK CloudFormation stack and deploys Lambda functions.
+- `cleanup.sh` - Script to clean up deployed resources.
 
 > [!Important] 
 > This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred.
@@ -222,6 +224,24 @@ You'll need an existing MSK cluster. Update the deployment parameters to match y
 - Kafka Topic Name
 
 ## Step 7: Build and Deploy
+
+### Option 7A: Automated Deployment (If using MSKAndKafkaClientEC2 stack)
+
+If you have deployed the MSKAndKafkaClientEC2 CloudFormation stack, you can use the automated deployment script:
+
+```bash
+# Make sure virtual environment is activated
+source venv/bin/activate
+
+# Run the automated deployment script
+./deploy.sh
+```
+
+This script will automatically detect your MSK CloudFormation stack and configure all parameters.
+
+### Option 7B: Manual Deployment
+
+For custom MSK clusters or manual parameter control:
 
 ```bash
 # Make sure virtual environment is activated
