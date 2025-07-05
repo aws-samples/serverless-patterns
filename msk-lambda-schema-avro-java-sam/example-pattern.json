@@ -1,0 +1,91 @@
+{
+  "title": "AWS Lambda function subscribed to an Amazon MSK topic with Avro and Schema Registry (Java)",
+  "description": "Creates Lambda functions that produce and consume Avro-formatted messages to Amazon MSK topics using AWS Glue Schema Registry and IAM authentication.",
+  "language": "Java",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern provides two Lambda functions: a consumer that processes messages from a MSK topic, and a producer that generates Avro-formatted messages using AWS Glue Schema Registry.",
+      "There is a Amazon CloudFormation template provided in this pattern to deploys a MSK Cluster and create a Kafka topic.",
+      "The pattern works with either a Provisioned or Serverless MSK cluster as long as the cluster is configured to use IAM authentication.",
+      "This pattern demonstrates how to use Avro serialization with AWS Glue Schema Registry for efficient message handling in a Kafka-based architecture."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-lambda-schema-avro-java-sam",
+      "templateURL": "serverless-patterns/msk-lambda-schema-avro-java-sam",
+      "projectFolder": "msk-lambda-schema-avro-java-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon MSK cluster pattern",
+        "link": "https://serverlessland.com/patterns/msk-cfn-sasl-lambda"
+      },
+      {
+        "text": "Using AWS Lambda with Amazon MSK",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+      },
+      {
+        "text": "AWS Glue Schema Registry",
+        "link": "https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html"
+      },
+      {
+        "text": "Using the AWS Glue Schema Registry with Amazon MSK",
+        "link": "https://docs.aws.amazon.com/msk/latest/developerguide/integrations-schema-registry.html"
+      },
+      {
+        "text": "AWS CloudFormation Provisioned MSK cluster reference",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-msk-cluster.html"
+      },
+      {
+        "text": "AWS CloudFormation Serverless MSK cluster reference",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-msk-serverlesscluster.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy --guided"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Lambda functions: <code>sam delete</code>.",
+      "Delete the CloudFormation stack that created the MSK cluster and EC2 client machine."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Indranil Banerjee",
+      "bio": "AWS - Senior Solutions Architect",
+      "linkedin": "indranil-banerjee-b00a261"
+    },
+    {
+      "name": "Vaibhav Jain",
+      "bio": "AWS - Sr. Application Architect",
+      "linkedin": "vaibhavjainv"
+    },
+    {
+      "name": "Adam Wagner",
+      "bio": "AWS - Principal Serverless Solutions Architect",
+      "linkedin": "adam-wagner-4bb412"
+    },
+    {
+      "name": "Philipp Page",
+      "bio": "AWS - SA Engineer",
+      "linkedin": "philipp-page"
+    },
+    {
+      "name": "Leandro Cavalcante Damascena",
+      "bio": "AWS - Sr. SA Engineer",
+      "linkedin": "leandrodamascena"
+    }
+  ]
+}
