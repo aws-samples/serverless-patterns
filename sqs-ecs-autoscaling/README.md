@@ -59,7 +59,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     Replace the `SAM_STACK_NAME` with the name of the stack you have used during sam deployment.
     While you perform the testing, observe the scaling activities in the ECS console.
-    
+
     ![auto-scaling](./images/auto-scaling.png)
 
 2. Observe the CloudWatch logs of the application and the metrics of your cluster using CloudWatch Container Insights. Use the following command to turn on Container Insights with enhanced observability.
@@ -90,8 +90,8 @@ Important: this application uses various AWS services and there are costs associ
     ![Insights-2](./images/insights-2.png)
 
     Observe the container level metrics below:
-
-    ![Insights-3](./images/insights-3.png)
+    
+    ![Insights-3](./images/Insights-3.png)
     
     Once the testing is completing, observe how the task count varies with the `ApproximateNumberOfMessagesVisible` metric of your SQS queue:
 
