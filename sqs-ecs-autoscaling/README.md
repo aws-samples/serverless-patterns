@@ -48,14 +48,18 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-1. Execute the following stress testing script `stress-test-app.sh` :
+1. Once the deployment is completed successfully, execute the following stress testing script `stress-test-app.sh` :
     ```
     chmod +x stress-test-app.sh
     STACK_NAME=SAM_STACK_NAME ./stress-test-app.sh
     ```
     Replace the `SAM_STACK_NAME` with the name of the stack you have used during sam deployment.
 
-2. Observe the CloudWatch logs of the application and the metrics of your cluster using CloudWatch Container Insights. In order to enable Container Insights for your cluster, please refer to [this](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-ECS-cluster.html).
+2. Observe the CloudWatch logs of the application and the metrics of your cluster using CloudWatch Container Insights. In order to enable Container Insights for your cluster, use the following command using AWS CLI
+    ```
+    aws ecs put-account-setting --name containerInsights --value enhanced
+    ```
+Please refer to [this](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-ECS-cluster.html).
 
     Observe how the task count varies with the messages visible in the queue:
     ![Container Insights](./images/task-count-queue-depth.png)
