@@ -59,6 +59,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     Replace the `SAM_STACK_NAME` with the name of the stack you have used during sam deployment.
     While you perform the testing, observe the scaling activities in the ECS console.
+    
     ![auto-scaling](./images/auto-scaling.png)
 
 2. Observe the CloudWatch logs of the application and the metrics of your cluster using CloudWatch Container Insights. Use the following command to turn on Container Insights with enhanced observability.
@@ -81,15 +82,19 @@ Important: this application uses various AWS services and there are costs associ
     Replace CLUSTER_NAME with your ECS cluster name. Please refer to [this](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-ECS-cluster.html) document to know how to enable it from AWS Console.
 
 3. Once you have enabled container insights, re-run the stress testing script. In order to view the Container Insights, click the link as shown your ECS Cluster console.
+
     ![Insights-1](./images/insights-1.png)
 
     Now, you can observe your Cluster summary and performance metrics at Cluster, Service, Task as well as at Container-level.
 
     ![Insights-2](./images/insights-2.png)
 
+    Observe the container level metrics below:
+
     ![Insights-3](./images/insights-3.png)
     
     Once the testing is completing, observe how the task count varies with the `ApproximateNumberOfMessagesVisible` metric of your SQS queue:
+
     ![Task-Count](./images/task-count.png)
 
 
