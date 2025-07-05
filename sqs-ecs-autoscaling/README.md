@@ -62,7 +62,7 @@ Important: this application uses various AWS services and there are costs associ
 
     ![auto-scaling](./images/auto-scaling.png)
 
-2. Observe the CloudWatch logs of the application and the metrics of your cluster using CloudWatch Container Insights. Use the following command to turn on Container Insights with enhanced observability.
+2. Observe the CloudWatch logs of the application and the metrics of your cluster using [CloudWatch Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html). Use the following command to turn on Container Insights with enhanced observability.
 
     Set the containerInsights account setting to enhanced
     ```

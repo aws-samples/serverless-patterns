@@ -30,6 +30,10 @@
         {
           "text": "Target tracking scaling policies for Application Auto Scaling",
           "link": "https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-target-tracking.html"
+        },
+        {
+          "text": "Container Insights with enhanced observability now available in Amazon ECS",
+          "link": "https://aws.amazon.com/blogs/aws/container-insights-with-enhanced-observability-now-available-in-amazon-ecs/"
         }
       ]
     },
