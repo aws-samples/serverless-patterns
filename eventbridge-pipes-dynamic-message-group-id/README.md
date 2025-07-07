@@ -22,7 +22,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
 2. Change directory to the pattern directory:
     ```
-    cd Amazon EventBridge-pipes-dynamic-message-group-id
+    cd eventbridge-pipes-dynamic-message-group-id
     ```
 
 3. Build and deploy the SAM application
@@ -63,7 +63,7 @@ aws events put-events --entries file://events/test-event.json
 
 2. Wait for a couple seconds for the Amazon EventBridge pipe to process the message, then check the output queue.  Make sure you replace the queue-url value with the correct output queue URL from deployment. 
 ```bash
-aws Amazon SQS receive-message \
+aws sqs receive-message \
   --queue-url <OUTPUT_QUEUE_URL> \
   --attribute-names All \
   --message-attribute-names All \
