@@ -19,20 +19,19 @@ CONTACT_AVRO_SCHEMA = """
 {
     "type": "record",
     "name": "Contact",
-    "namespace": "com.amazonaws.services.lambda.samples.events.msk",
     "fields": [
-        {"name": "firstname", "type": ["null", "string"], "default": null},
-        {"name": "lastname", "type": ["null", "string"], "default": null},
-        {"name": "company", "type": ["null", "string"], "default": null},
-        {"name": "street", "type": ["null", "string"], "default": null},
-        {"name": "city", "type": ["null", "string"], "default": null},
-        {"name": "county", "type": ["null", "string"], "default": null},
-        {"name": "state", "type": ["null", "string"], "default": null},
-        {"name": "zip", "type": ["null", "string"], "default": null},
-        {"name": "homePhone", "type": ["null", "string"], "default": null},
-        {"name": "cellPhone", "type": ["null", "string"], "default": null},
-        {"name": "email", "type": ["null", "string"], "default": null},
-        {"name": "website", "type": ["null", "string"], "default": null}
+        {"name": "firstname", "type": "string"},
+        {"name": "lastname", "type": "string"},
+        {"name": "company", "type": "string"},
+        {"name": "street", "type": "string"},
+        {"name": "city", "type": "string"},
+        {"name": "county", "type": "string"},
+        {"name": "state", "type": "string"},
+        {"name": "zip", "type": "string"},
+        {"name": "homePhone", "type": "string"},
+        {"name": "cellPhone", "type": "string"},
+        {"name": "email", "type": "string"},
+        {"name": "website", "type": "string"}
     ]
 }
 """

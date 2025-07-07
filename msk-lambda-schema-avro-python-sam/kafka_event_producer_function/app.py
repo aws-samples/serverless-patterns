@@ -31,24 +31,23 @@ logger = Logger()
 tracer = Tracer()
 metrics = Metrics(namespace="MSKProducer")
 
-# Contact AVRO schema definition
+# Contact AVRO schema definition - matches MSKAndKafkaClientEC2.yaml exactly
 CONTACT_AVRO_SCHEMA = {
     "type": "record",
     "name": "Contact",
-    "namespace": "com.amazonaws.services.lambda.samples.events.msk",
     "fields": [
-        {"name": "firstname", "type": ["null", "string"], "default": None},
-        {"name": "lastname", "type": ["null", "string"], "default": None},
-        {"name": "company", "type": ["null", "string"], "default": None},
-        {"name": "street", "type": ["null", "string"], "default": None},
-        {"name": "city", "type": ["null", "string"], "default": None},
-        {"name": "county", "type": ["null", "string"], "default": None},
-        {"name": "state", "type": ["null", "string"], "default": None},
-        {"name": "zip", "type": ["null", "string"], "default": None},
-        {"name": "homePhone", "type": ["null", "string"], "default": None},
-        {"name": "cellPhone", "type": ["null", "string"], "default": None},
-        {"name": "email", "type": ["null", "string"], "default": None},
-        {"name": "website", "type": ["null", "string"], "default": None}
+        {"name": "firstname", "type": "string"},
+        {"name": "lastname", "type": "string"},
+        {"name": "company", "type": "string"},
+        {"name": "street", "type": "string"},
+        {"name": "city", "type": "string"},
+        {"name": "county", "type": "string"},
+        {"name": "state", "type": "string"},
+        {"name": "zip", "type": "string"},
+        {"name": "homePhone", "type": "string"},
+        {"name": "cellPhone", "type": "string"},
+        {"name": "email", "type": "string"},
+        {"name": "website", "type": "string"}
     ]
 }
 
