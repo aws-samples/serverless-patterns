@@ -1,8 +1,8 @@
-# Assigning a dynamic message group ID from the message body using EventBridge Pipes
+# Assigning a dynamic message group ID from the message body using Amazon EventBridge Pipes
 
-EventBridge, a serverless event bus service, and SQS, a managed message queuing service, work together in event-driven architectures to route and process messages between AWS services and applications. While EventBridge routes messages to SQS queues for processing by microservices, FIFO queues can be used for strict message ordering. Although EventBridge cannot directly set message group IDs for organizing related messages, EventBridge Pipes provides a solution by allowing dynamic message group ID assignment based on event properties, enabling ordered processing for specific users, applications, or locations without additional coding.
+Amazon EventBridge, a serverless event bus service, and Amazon SQS, a managed message queuing service, work together in event-driven architectures to route and process messages between AWS services and applications. While Amazon EventBridge routes messages to Amazon SQS queues for processing by microservices, FIFO queues can be used for strict message ordering. Although Amazon EventBridge cannot directly set message group IDs for organizing related messages, Amazon EventBridge Pipes provides a solution by allowing dynamic message group ID assignment based on event properties, enabling ordered processing for specific users, applications, or locations without additional coding.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-dynamic-message-group-id
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/Amazon EventBridge-pipes-dynamic-message-group-id
 
 > [!Important]
 > This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -22,12 +22,12 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
 2. Change directory to the pattern directory:
     ```
-    cd eventbridge-pipes-dynamic-message-group-id
+    cd Amazon EventBridge-pipes-dynamic-message-group-id
     ```
 
 3. Build and deploy the SAM application
 ```bash
-sam build && sam deploy --guided
+sam deploy --guided
 ```
 
 During the prompts:
@@ -35,42 +35,42 @@ During the prompts:
 * Enter the desired AWS Region
 * Allow SAM CLI to create IAM roles with the required permissions.
 
-You can accept all other defaults.  Copy down the SQS Output Queue URL.  You'll use this later in testing.  
+You can accept all other defaults.  Copy down the Amazon SQS Output Queue URL.  You'll use this later in testing.  
 
 Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 ## How it works
-![AWS Architecture EventBridge rule to SQS FIFO Queue to EventBridge Pipe to SQS FIFO Queue with message group ID set](assets/architecture.png)
+![AWS Architecture Amazon EventBridge rule to Amazon SQS FIFO Queue to Amazon EventBridge Pipe to Amazon SQS FIFO Queue with message group ID set](assets/architecture.png)
 
-This project implements an event processing pipeline using AWS EventBridge and SQS FIFO queues. The pipeline consists of:
+This project implements an event processing pipeline using Amazon EventBridge and Amazon SQS FIFO queues. The pipeline consists of:
 
-- An EventBridge rule that captures events from "my-custom-app" source
-- An input SQS FIFO queue that receives events from the EventBridge rule
-- An EventBridge pipe that processes messages from the input queue and dynamically sets the message group ID for the target SQS FIFO queue
-- An output SQS FIFO queue that receives processed messages
+- An Amazon EventBridge rule that captures events from "my-custom-app" source
+- An input Amazon SQS FIFO queue that receives events from the Amazon EventBridge rule
+- An Amazon EventBridge pipe that processes messages from the input queue and dynamically sets the message group ID for the target Amazon SQS FIFO queue
+- An output Amazon SQS FIFO queue that receives processed messages
 
 A key component of this pattern is the syntax in the EventBrige Pipe Target to obtain the correct property value to set the message group id.  The following shows an example in the AWS Console.  You can also view this configuration in the SAM template under the CustomEventPipe resource.
-![EventBridge Pipe Target Configuration](assets/pipeTargetConfiguration.png)
+![Amazon EventBridge Pipe Target Configuration](assets/pipeTargetConfiguration.png)
 
 ## Testing
 
-To test, you'll send an event from a custom source to EventBridge, which will trigger the EventBridge rule to send the event to an SQS FIFO Queue.  You'll then wait for the EventBridge pipe to process and finally verify the message within the destination SQS FIFO queue with the message group ID set.  
+To test, you'll send an event from a custom source to Amazon EventBridge, which will trigger the Amazon EventBridge rule to send the event to an Amazon SQS FIFO Queue.  You'll then wait for the Amazon EventBridge pipe to process and finally verify the message within the destination Amazon SQS FIFO queue with the message group ID set.  
 
-1. Send a test event to EventBridge.  Take a look at the event structure and attributes.  The account attribute will be used as the message group ID.  
+1. Send a test event to Amazon EventBridge.  Take a look at the event structure and attributes.  The account attribute will be used as the message group ID.  
 ```bash
 aws events put-events --entries file://events/test-event.json
 ```
 
-2. Wait for a couple seconds for the EventBridge pipe to process the message, then check the output queue.  Make sure you replace the queue-url value with the correct output queue URL from deployment. 
+2. Wait for a couple seconds for the Amazon EventBridge pipe to process the message, then check the output queue.  Make sure you replace the queue-url value with the correct output queue URL from deployment. 
 ```bash
-aws sqs receive-message \
+aws Amazon SQS receive-message \
   --queue-url <OUTPUT_QUEUE_URL> \
   --attribute-names All \
   --message-attribute-names All \
   --max-number-of-messages 10
 ```
 
-You should see a list of messages.  View the event and take note of the MessageGroupID under the Attributes section.  This originally came from your event input "accountId" property.  The EventBridge Pipe is what allows us to perform this modification.  Feel free to modify the event, send additional events to EventBridge and review the output queue messages.    
+You should see a list of messages.  View the event and take note of the MessageGroupID under the Attributes section.  This originally came from your event input "accountId" property.  The Amazon EventBridge Pipe is what allows us to perform this modification.  Feel free to modify the event, send additional events to Amazon EventBridge and review the output queue messages.    
 
 ## Cleanup
 

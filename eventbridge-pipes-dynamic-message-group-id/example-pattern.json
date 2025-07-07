@@ -1,13 +1,13 @@
 {
-  "title": "EventBridge Pipes Dynamic Message Group Id",
-  "description": "Uses EventBridge Pipes to dynamically retrieve and set the message group ID for a SQS FIFO destination queue",
-  "language": "",
+  "title": "Set an Amazon SQS FIFO queue's message group ID with an EventBridge Pipe",
+  "description": "Uses Amazon EventBridge Pipes to dynamically retrieve and set the message group ID for a SQS FIFO destination queue",
+  "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to use EventBridge rules, EventBridge Pipes and SQS FIFO queues to dynamically retrieve and set a message group ID from the message body for an SQS FIFO queue."
+      "This pattern demonstrates how to use an Amazon EventBridge rule, Amazon EventBridge Pipes and Amazon SQS FIFO queues to dynamically retrieve and set a message group ID from the message body for an Amazon SQS FIFO queue."
     ]
   },
   "gitHub": {
@@ -21,15 +21,15 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS EventBridge Pipes",
+        "text": "Amazon EventBridge Pipes",
         "link": "https://aws.amazon.com/eventbridge/pipes/"
       },
       {
-        "text": "AWS EventBridge Pipes SQS Source",
+        "text": "Amazon EventBridge User Guide",
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/"
       },
       {
-        "text": "AWS SQS FIFO Queues",
+        "text": "Amazon SQS (Simple Queue Service) FIFO (First-In-First-Out) Queues",
         "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html"
       }
     ]
@@ -52,7 +52,7 @@
   "authors": [
     {
       "name": "Kurt Tometich",
-      "image": "https://drive.google.com/uc?export=view&id=16K9snJRzXYTI7O0nYbzrKVYP58xOxciB",
+      "image": "https://raw.githubusercontent.com/boomtown15/static-references/refs/heads/main/kurt-tometich.jpeg",
       "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
       "linkedin": "kurt-tometich",
       "twitter": ""
