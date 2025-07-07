@@ -1,0 +1,7 @@
+[
+  {
+    "Source": "my-custom-app",
+    "DetailType": "CustomEvent",
+    "Detail": "{\"accountId\": \"12345678\", \"message\": \"Test message\", \"timestamp\": \"2023-01-01T00:00:00Z\"}"
+  }
+]
