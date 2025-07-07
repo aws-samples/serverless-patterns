@@ -2,7 +2,7 @@
 
 Amazon EventBridge, a serverless event bus service, and Amazon SQS, a managed message queuing service, work together in event-driven architectures to route and process messages between AWS services and applications. While Amazon EventBridge routes messages to Amazon SQS queues for processing by microservices, FIFO queues can be used for strict message ordering. Although Amazon EventBridge cannot directly set message group IDs for organizing related messages, Amazon EventBridge Pipes provides a solution by allowing dynamic message group ID assignment based on event properties, enabling ordered processing for specific users, applications, or locations without additional coding.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/Amazon EventBridge-pipes-dynamic-message-group-id
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-dynamic-message-group-id
 
 > [!Important]
 > This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
