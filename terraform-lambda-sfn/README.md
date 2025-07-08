@@ -2,7 +2,7 @@
 
 The pattern creates a Lambda function, and a Step Functions workflow, a Log group and the IAM resources required to run the application.
 
-A Lambda function uses the AWS SDK to asyncronously invoke the Step Function workflow, passing the event body. The Step Function workflow showcasing the different States.
+A Lambda function uses the AWS SDK to asynchronously invoke the Step Function workflow, passing the event body. The Step Function workflow showcasing the different States.
 
 ![](./images/stepfunctions_graph.png)
 
