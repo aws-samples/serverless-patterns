@@ -1,7 +1,5 @@
 # Implementing Target tracking scaling policies for an Amazon ECS Fargate application
 
-This pattern creates the following:
-
 This pattern creates a serverless architecture with an SQS queue connected to an ECS Fargate service that automatically scales based on queue depth. It includes a VPC with private subnets, VPC endpoints for ECR, S3, CloudWatch Logs, and SQS, enabling the Fargate tasks to process messages without internet access. The target tracking scaling policy adjusts the number of tasks (1-10) based on the number of messages visible in the queue `ApproximateNumberOfMessagesVisible`, targeting 5 messages.
 
 This pattern demonstrates how to effectively decouple your application components and tune your application scalability on the basis of incoming traffic flow.
