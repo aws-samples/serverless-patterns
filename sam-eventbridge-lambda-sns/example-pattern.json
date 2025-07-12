@@ -1,24 +1,22 @@
 {
-  "title": "EventBridge to Lambda to Bedrock & SNS",
-  "description": "Create an intelligent AWS Health event notification system with AI-powered analysis using EventBridge, Lambda, Bedrock, and SNS.",
+  "title": "AWS Health Intelligent Notification using Eventbridge, Lambda and SNS",
+  "description": "This pattern deploys an EventBridge rule which triggers for health events. The rule invokes Lambda function which sends enhanced health notification to SNS.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to build an intelligent AWS Health event monitoring system that automatically captures health events, analyzes them using AI, and sends enhanced notifications. The solution combines multiple AWS services to provide real-time health event processing with intelligent insights.",
+      "This pattern builds an intelligent AWS Health event monitoring system that automatically captures health events, analyzes them using AI, and sends enhanced notifications.",
       "When AWS Health events occur, EventBridge automatically captures them based on the configured rule pattern. The Lambda function processes these events and leverages Amazon Bedrock's Claude 3 Haiku model to generate intelligent summaries, impact assessments, and actionable recommendations. The enhanced analysis is then formatted and sent via SNS email notifications.",
-      "The AI analysis provides three key insights: a brief summary of the health event, potential impact on your AWS services, and specific recommended actions to take. This transforms basic health notifications into actionable intelligence, helping teams respond more effectively to AWS service issues.",
-      "The pattern uses Claude 3 Haiku for cost-effective AI analysis while maintaining high-quality insights. Error handling ensures notifications are still sent even if Bedrock analysis fails, providing system reliability. The solution is designed to be cost-efficient, leveraging AWS Free Tier eligible services where possible.",
-      "This pattern deploys one Lambda function, one SNS topic with email subscription, one EventBridge rule, and the necessary IAM permissions for Bedrock access."
+      "The AI analysis provides three key insights: a brief summary of the health event, potential impact on your AWS services, and specific recommended actions to take. This transforms basic health notifications into actionable intelligence, helping teams respond more effectively to AWS service issues."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-bedrock-sns-sam",
-      "templateURL": "serverless-patterns/eventbridge-lambda-bedrock-sns-sam",
-      "projectFolder": "eventbridge-lambda-bedrock-sns-sam",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sam-eventbridge-lambda-sns",
+      "templateURL": "serverless-patterns/sam-eventbridge-lambda-sns",
+      "projectFolder": "sam-eventbridge-lambda-sns",
       "templateFile": "template.yaml"
     }
   },
@@ -37,15 +35,16 @@
         "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"
       },
       {
-        "text": "Building AI-powered applications with Amazon Bedrock",
-        "link": "https://aws.amazon.com/blogs/machine-learning/building-ai-powered-applications-with-amazon-bedrock/"
+        "text": "Creating Email Subscription for SNS",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html"
       }
     ]
   },
   "deploy": {
     "text": [
       "sam build",
-      "sam deploy --parameter-overrides EmailAddress=your-email@example.com"
+      "sam deploy --guided",
+      "See the GitHub repo for detailed deploying instructions."
     ]
   },
   "testing": {
@@ -55,16 +54,16 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "Delete the stack: <code>same delete</code>.",
+       "See the GitHub repo for detailed deleting instructions."
     ]
   },
   "authors": [
     {
       "name": "Anirudh Gupta",
-      "image": "",
+      "image": "https://drive.google.com/file/d/1aQKx3aY2ID25FpsDI1HS_wSxgIMxOq9J/view?usp=sharing",
       "bio": "Technical Account Manager at AWS",
-      "linkedin": "https://www.linkedin.com/in/anirudh-gupta-13a0b111a/",
-      "twitter": ""
+      "linkedin": "https://www.linkedin.com/in/anirudh-gupta-13a0b111a/"
     }
   ]
 }

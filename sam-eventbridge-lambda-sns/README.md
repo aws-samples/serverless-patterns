@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
-    sam deploy --parameter-overrides EmailAddress=your-email@example.com
+    sam deploy --guided
     ```
 5. During the prompts:
     * **Stack Name [sam-app]:** Enter a stack name (e.g., `health-notification-setup`)
