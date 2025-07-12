@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Health Event Notifications using SAM
+
+Parameters:
+  EmailAddress:
+    Type: String
+    Default: admin@example.com
+    Description: Email address for health notifications
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.11
+
+Resources:
+  HealthNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: aws-health-notifications
+      DisplayName: AWS Health Event Notifications
+
+  EmailSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: email
+      TopicArn: !Ref HealthNotificationTopic
+      Endpoint: !Ref EmailAddress
+
+  HealthEventProcessor:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: handler.process_health_event
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref HealthNotificationTopic
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt HealthNotificationTopic.TopicName
+        - Statement:
+          - Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+            Resource: arn:aws:bedrock:*::foundation-model/anthropic.claude-3-haiku-20240307-v1:0
+      Events:
+        HealthEvent:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+                - aws.health
+              detail-type:
+                - AWS Health Event
+
+Outputs:
+  SNSTopicArn:
+    Description: SNS Topic ARN for health notifications
+    Value: !Ref HealthNotificationTopic
+  
+  LambdaFunctionArn:
+    Description: Lambda function ARN
+    Value: !GetAtt HealthEventProcessor.Arn

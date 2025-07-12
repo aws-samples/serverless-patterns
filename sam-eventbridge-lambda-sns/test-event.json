@@ -1,0 +1,31 @@
+{
+  "version": "0",
+  "id": "33acf945-09d9-7703-d309-bf74f77693ad",
+  "detail-type": "AWS Health Event",
+  "source": "aws.health",
+  "account": "123456789012",
+  "time": "2025-07-11T21:36:20Z",
+  "region": "eu-west-1",
+  "resources": [],
+  "detail": {
+    "eventArn": "arn:aws:health:us-east-1::event/EC2/AWS_EC2_OPERATIONAL_ISSUE",
+    "service": "EC2",
+    "eventTypeCode": "AWS_EC2_OPERATIONAL_ISSUE",
+    "eventTypeCategory": "issue",
+    "eventScopeCode": "PUBLIC",
+    "communicationId": "01b0993207d81a09dcd552ebd1e633e36cf1f09a-1",
+    "startTime": "Wed, 15 Feb 2023 22:07:07 GMT",
+    "lastUpdatedTime": "Wed, 15 Feb 2023 22:07:07 GMT",
+    "statusCode": "open",
+    "eventRegion": "us-east-1",
+    "eventDescription": [
+      {
+        "latestDescription": "We are investigating increased API Error rates and Latencies for Amazon Elastic Compute Cloud in the US-EAST-1 Region.",
+        "language": "en_US"
+      }
+    ],
+    "page": "1",
+    "totalPages": "1",
+    "affectedAccount": "123456789012"
+  }
+}
