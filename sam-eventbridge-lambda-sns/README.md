@@ -1,4 +1,4 @@
-# EventBridge to Lambda to Bedrock & SNS
+# AWS Health Intelligent Notification using Eventbridge, Lambda and SNS
 
 This pattern demonstrates how to build an intelligent AWS Health event monitoring system that automatically captures health events, analyzes them using AI, and sends enhanced notifications.
 
