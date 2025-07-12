@@ -1,4 +1,4 @@
-# AWS API Gateway HTTP APIs to Amazon SQS for buffering
+# Amazon API Gateway REST APIs to Amazon SQS for buffering
 
 In this pattern, called "Queue based leveling", a serverless queue is introduced between your API Gateway and your workers, which can be a Lambda function for example. 
 
