@@ -1,0 +1,59 @@
+{
+  "title": "SFTP Connector, Lambda, Step Functions to periodically transfer files from SFTP server to S3",
+  "description": "Create a Step Functions for orchastration and Lambda functions to execute the business logic. Use EventBridge for scheduling and other events mnagament.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an AWS Step Functions state machine to sequentially execute Lambda functions to create SFTP connector jobs to transfer files. This pattern is leveraging .",
+      "With AWS Transfer SFTP Connector you can retrieve list of directories, subdirectories and files from your remote SFTP server. It can also transfer these files to S3. The Step Function is used to retrieve file list in first step and transfer those files in following step. The failure events are sent to EventBridge and SQS. A Lambda function retrieve these events and retries file transfer by creating new transfer job with SFTP connector.",
+      "This pattern deploys one Step Functions, one SFTP Connector, three Lambda functions, one S3 bucket and three EventBridge events."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sftp-connector-stepfunction",
+      "templateURL": "serverless-patterns/lambda-sftp-connector-stepfunction",
+      "projectFolder": "slambda-sftp-connector-stepfunction",
+      "templateFile": "lambda-sftp-connector-stepfunction_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Call Athena with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+      },
+      {
+        "text": "Amazon Athena - Serverless Interactive Query Service",
+        "link": "https://aws.amazon.com/athena/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Your name",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Your bio.",
+      "linkedin": "linked-in-ID",
+      "twitter": "twitter-handle"
+    }
+  ]
+}
