@@ -1,0 +1,59 @@
+{
+  "title": "Step Functions to on-premises API (Terraform)",
+  "description": "Step Functions performing HTTP call to on-premises API",
+  "language": "",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an AWS Step Functions state machine to call an on-premises API without using an intermediary Lambda function. This pattern is leveraging EventBridge connection to connect to an HTTP endpoint and VPC Lattice to access private resources (in a VPC or on premises).",
+      "This pattern deploys one Step Functions, one EventBridge connection, a VPC Lattice resource configuration and resource gateway. You need to have a connection between a VPC and a datacenter (using VPN or Direct Connect)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunctions-eventbridge-onpremise-tf",
+      "templateURL": "serverless-patterns/stepfunctions-eventbridge-onpremise-tf",
+      "projectFolder": "stepfunctions-eventbridge-onpremise-tf",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Connect to private APIs using EventBridge connections",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/connection-private.html"
+      },
+      {
+        "text": "Call HTTPs endpoints using Step Functions HTTP Task",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/call-https-apis.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jerome Van Der Linden",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/jerome-van-der-linden.jpg",
+      "bio": "Jerome is a Solutions Architect Builder at AWS. Passionate about building stuff using the AWS services, and especially the serverless ones.",
+      "linkedin": "jeromevdl",
+      "twitter": "jeromevdl"
+    }
+  ]
+}
