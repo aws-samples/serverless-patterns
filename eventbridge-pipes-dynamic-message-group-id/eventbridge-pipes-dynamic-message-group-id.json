@@ -1,0 +1,102 @@
+{
+    "title": "Set an Amazon SQS FIFO queue's message group ID with an EventBridge Pipe",
+    "description": "Uses Amazon EventBridge Pipes to dynamically retrieve and set the message group ID for a SQS FIFO destination queue",
+    "language": "YAML",
+    "level": "200",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates how to use an Amazon EventBridge rule, Amazon EventBridge Pipes and Amazon SQS FIFO queues to dynamically retrieve and set a message group ID from the message body for an Amazon SQS FIFO queue."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-dynamic-message-group-id",
+            "templateURL": "serverless-patterns/eventbridge-pipes-dynamic-message-group-id",
+            "projectFolder": "eventbridge-pipes-dynamic-message-group-id",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon EventBridge Pipes",
+                "link": "https://aws.amazon.com/eventbridge/pipes/"
+            },
+            {
+                "text": "Amazon EventBridge User Guide",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/"
+            },
+            {
+                "text": "Amazon SQS (Simple Queue Service) FIFO (First-In-First-Out) Queues",
+                "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: sam delete"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Kurt Tometich",
+            "image": "https://raw.githubusercontent.com/boomtown15/static-references/refs/heads/main/kurt-tometich.jpeg",
+            "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
+            "linkedin": "kurt-tometich",
+            "twitter": ""
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 50,
+            "service": "eventbridge",
+            "label": "Amazon EventBridge"
+        },
+        "icon2": {
+            "x": 40,
+            "y": 50,
+            "service": "sqs",
+            "label": "Amazon SQS"
+        },
+        "icon3": {
+            "x": 65,
+            "y": 50,
+            "service": "eventbridge-pipes",
+            "label": "Amazon EventBridge Pipes"
+        },
+        "icon4": {
+            "x": 90,
+            "y": 50,
+            "service": "sqs",
+            "label": "Amazon SQS"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Rule"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": "msgs"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4",
+            "label": "set msg grp id"
+        }
+    }
+}
