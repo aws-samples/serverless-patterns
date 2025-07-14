@@ -7,10 +7,8 @@
   "scripts": {
     "build": "echo \"The build step is not required when using JavaScript!\" && exit 0",
     "cdk": "cdk",
-    "test": "node scripts/load-test.js",
-    "test:small": "MESSAGE_COUNT=50 node scripts/load-test.js",
-    "test:medium": "MESSAGE_COUNT=200 node scripts/load-test.js",
-    "test:large": "MESSAGE_COUNT=500 node scripts/load-test.js",
+    "test:success": "node scripts/send-success-messages.js",
+    "test:dlq": "node scripts/test-with-dlq.js",
     "deploy": "cdk deploy",
     "destroy": "cdk destroy"
   },

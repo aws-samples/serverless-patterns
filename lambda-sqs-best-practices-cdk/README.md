@@ -89,18 +89,42 @@ The pattern includes a load testing script to verify functionality:
 ```
 export QUEUE_URL=$(aws cloudformation describe-stacks --stack-name LambdaSqsBestPracticesCdkStack --query 'Stacks[0].Outputs[?OutputKey==`QueueUrl`].OutputValue' --output text)
 
+export DLQ_URL=$(aws cloudformation describe-stacks --stack-name LambdaSqsBestPracticesCdkStack --query 'Stacks[0].Outputs[?OutputKey==`DlqUrl`].OutputValue' --output text)
+
 export AWS_REGION=us-east-1  # or your AWS region
 ```
 
 2. Rum test script
+Success Scenario
 ```
-npm run test           # 100 messages
-npm run test:small    # 50 messages
-npm run test:medium   # 200 messages
-npm run test:large    # 500 messages
+npm run test:success
 
 ```
+Sample result
+<img src="./resources/Success-script-sample.png" alt="Architecture" width="100%"/>
 
+Refer Dashboard to verify all the Messages are processed successfully and no messages in DLQ 
+<img src="./resources/All-messages-processed.png" alt="Architecture" width="100%"/>
+
+Also refer DLQ count on dashboard
+<img src="./resources/No-messages-sent-to-DLQ.png" alt="Architecture" width="100%"/>
+
+Failure Scenario
+```
+npm run test:dlq
+```
+Sample result
+<img src="./resources/DLQ-Script-smaple-processing.png" alt="Architecture" width="100%"/>
+
+Verify the same using dashboard
+<img src="./resources/dashboard-mesage-processing.png" alt="Architecture" width="100%"/>
+
+<img src="./resources/dashboard-mesage-processing-2.png" alt="Architecture" width="100%"/>
+
+Additionally, confirm the messages in DLQ 
+<img src="./resources/DLQ-in-messaging.png" alt="Architecture" width="100%"/>
+
+Note: Refer Monitoring guide to locate “SQS-Processing-Dashboard”
 
 ## Monitoring Guide
 
@@ -127,7 +151,7 @@ CloudWatch Logs
     * Error details
 ```
 
-Example walkthrough on structured logging for a batch :
+Example DeepDive walkthrough on structured logging for a batch :
 1. Batch information before starting processing
 <img src="./resources/batch-info.png" alt="Architecture" width="100%"/>
 
