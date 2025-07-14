@@ -1,0 +1,82 @@
+{
+    "title": "SQS - Amazon ECS Fargate - Target Tracking Scaling Policy",
+    "description": "This pattern creates an ECS Fargate application that consumes an SQS queue and it scales on the basis of queue size",
+    "language": "Python",
+    "level": "400",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how target tracking scaling policy works with an ECS Fargate application",
+            "We have a python application under consumer/app.py that consumes messages from an SQS queue. The application is containerised and the image is pushed to an ECR registry.",
+            "On the basis of a target value of the SQS metric - ApproximateNumberOfMessagesVisible, the count of tasks of the cluster will increase.",
+            "Again, when the actual value drops below the target value, the count of tasks comes down to the initial value."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-ecs-autoscaling",
+            "templateURL": "serverless-patterns/sqs-ecs-autoscaling",
+            "projectFolder": "sqs-ecs-autoscaling",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Target tracking scaling policies for Amazon EC2 Auto Scaling",
+                "link": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html"
+            },
+            {
+                "text": "Target tracking scaling policies for Application Auto Scaling",
+                "link": "https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-target-tracking.html"
+            },
+            {
+                "text": "Container Insights with enhanced observability now available in Amazon ECS",
+                "link": "https://aws.amazon.com/blogs/aws/container-insights-with-enhanced-observability-now-available-in-amazon-ecs/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Saborni Bhattacharya",
+            "image": "https://drive.google.com/file/d/1AZFquOkafEQRUlrT4hKOtIbt4Cq66SHd/view?usp=sharing",
+            "bio": "Specialist SA at AWS EMEA",
+            "linkedin": "saborni-bhattacharya-5b523812a/"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "sqs",
+            "label": "Amazon SQS"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 50,
+            "service": "fargate",
+            "label": "AWS Fargate"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Target tracking scaling"
+        }
+    }
+}
