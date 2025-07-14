@@ -58,9 +58,9 @@ The API Gateway handles incoming requests, but instead of invoking for example a
 
 ## Testing
 
-1. Run the following command to send an HTTP `POST` request to the HTTP APIs endpoint. Note, you must edit the {MyHttpAPI} placeholder with the URL of the deployed HTTP APIs endpoint. This is provided in the terraform outputs. You can also find the same command automatically generated in the terraform output.
+1. Run the following command to send an HTTP `POST` request to the Rest APIs endpoint. Note, you must edit the {MyRestAPI} placeholder with the URL of the deployed Rest APIs endpoint. This is provided in the terraform outputs. You can also find the same command automatically generated in the terraform output.
     ```bash
-    curl --location --request POST '{MyHttpAPI}/submit'
+    curl --location --request POST '{MyRestAPI}/submit'
     > --header 'Content-Type: application/json' \
     > --data-raw '{ "isMessageReceived": "Yes" }'
     ```
