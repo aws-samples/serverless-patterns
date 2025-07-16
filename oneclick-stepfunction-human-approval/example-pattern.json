@@ -76,32 +76,5 @@
       "bio": "Yogesh is Cloud Support Engineer and SME of Lambda, API Gateway at Amazon Web Services.",
       "linkedin": "https://www.linkedin.com/in/yogesh-nain-a54133170/"
     }
-  ],
-  "patternCategory": {
-    "primary": "Workflows",
-    "secondary": ["Approvals", "Notifications"]
-  },
-  "components": {
-    "categories": ["Compute", "Application Integration", "Networking"],
-    "services": ["Step Functions", "Lambda", "SNS", "API Gateway"]
-  },
-  "recommended": {
-    "patterns": [
-      "Step Functions Choice State Pattern",
-      "SNS Email Notifications Pattern",
-      "API Gateway Lambda Integration"
-    ]
-  },
-  "architectureDiagram": {
-    "url": "link-to-architecture-diagram.png",
-    "description": "Architecture diagram showing the flow from Step Functions through SNS to API Gateway and back"
-  },
-  "tags": [
-    "approval-workflow",
-    "step-functions",
-    "manual-approval",
-    "serverless",
-    "sns",
-    "api-gateway"
   ]
 }
