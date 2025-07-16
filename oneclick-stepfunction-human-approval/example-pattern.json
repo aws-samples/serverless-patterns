@@ -1,0 +1,107 @@
+{
+  "title": "AWS Step Functions Manual Approval Workflow with SNS",
+  "description": "Create a serverless manual approval process within Step Functions workflows using SNS notifications and API Gateway.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a Step Functions workflow that pauses for human approval, using SNS for email notifications and API Gateway for handling responses.",
+      "The workflow sends approval requests via SNS email notifications containing approve/reject links.",
+      "Recipients can approve or reject the workflow by clicking links that trigger an API Gateway endpoint.",
+      "The pattern demonstrates how to incorporate human decision points within automated Step Functions workflows.",
+      "Please consider AWS Step Functions state transitions quotas and API Gateway limits when implementing this pattern."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "<your-repo-url>",
+      "templateURL": "serverless-patterns/stepfunctions-manual-approval",
+      "projectFolder": "stepfunctions-manual-approval",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Step Functions Task Tokens",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token"
+      },
+      {
+        "text": "Step Functions Service Integration Patterns",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html"
+      },
+      {
+        "text": "AWS Step Functions Developer Guide",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS SNS Developer Guide",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS Step Functions Quotas",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/limits.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build --use-container",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "1. Start a workflow execution using the AWS CLI:",
+      "export STATE_MACHINE_ARN=$(aws cloudformation describe-stacks --stack-name approval-workflow --query \"Stacks[0].Outputs[?OutputKey=='StateMachineArn'].OutputValue\" --output text)",
+      "aws stepfunctions start-execution --state-machine-arn $STATE_MACHINE_ARN --input \"{\\\"key\\\": \\\"value\\\"}\"",
+      "2. Check your email for the approval request",
+      "3. Click the approve or reject link in the email",
+      "4. Verify the workflow execution status in Step Functions console"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. Delete the stack: <code>sam delete</code>",
+      "2. Confirm stack deletion when prompted",
+      "3. Check SNS topic and unsubscribe from any remaining email subscriptions"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Yogesh Nain",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Yogesh is Cloud Support Engineer and SME of Lambda, API Gateway at Amazon Web Services.",
+      "linkedin": "https://www.linkedin.com/in/yogesh-nain-a54133170/"
+    }
+  ],
+  "patternCategory": {
+    "primary": "Workflows",
+    "secondary": ["Approvals", "Notifications"]
+  },
+  "components": {
+    "categories": ["Compute", "Application Integration", "Networking"],
+    "services": ["Step Functions", "Lambda", "SNS", "API Gateway"]
+  },
+  "recommended": {
+    "patterns": [
+      "Step Functions Choice State Pattern",
+      "SNS Email Notifications Pattern",
+      "API Gateway Lambda Integration"
+    ]
+  },
+  "architectureDiagram": {
+    "url": "link-to-architecture-diagram.png",
+    "description": "Architecture diagram showing the flow from Step Functions through SNS to API Gateway and back"
+  },
+  "tags": [
+    "approval-workflow",
+    "step-functions",
+    "manual-approval",
+    "serverless",
+    "sns",
+    "api-gateway"
+  ]
+}

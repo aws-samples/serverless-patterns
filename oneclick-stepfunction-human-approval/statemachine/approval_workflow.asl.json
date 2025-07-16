@@ -1,0 +1,43 @@
+{
+  "Comment": "Manual approval workflow with pass/fail states",
+  "StartAt": "Manual Approval",
+  "States": {
+    "Manual Approval": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "${SendApprovalEmailFunctionArn}",
+        "Payload": {
+          "execution.$": "$$.Execution.Id",
+          "taskToken.$": "$$.Task.Token",
+          "input.$": "$"
+        }
+      },
+      "Next": "Process Approval",
+      "TimeoutSeconds": 3600
+    },
+    "Process Approval": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.approved",
+          "BooleanEquals": true,
+          "Next": "Success Pass State"
+        }
+      ],
+      "Default": "Fail"
+    },
+    "Success Pass State": {
+      "Type": "Pass",
+      "Result": {
+        "status": "success",
+        "message": "Workflow approved and completed successfully"
+      },
+      "End": true
+    },
+    "Fail": {
+      "Type": "Fail",
+      "Cause": "Workflow rejected by user"
+    }
+  }
+}
