@@ -1,6 +1,6 @@
 {
     "title": "Amazon API Gateway REST API to Lambda to SNS",
-    "description": "Integration of Amazon API Gateway REST API with Amazon Lambda to publish to Amazon SNS",
+    "description": "Integration of Amazon API Gateway REST API with Amazon Lambda to publish to Amazon SNS with enhanced monitoring",
     "language": "Python",
     "level": "200",
     "framework": "AWS SAM",
@@ -8,7 +8,7 @@
       "headline": "How it works",
       "text": [
         "This sample project demonstrates how to publish to a SNS Topic whenever the REST API is invoked using Lambda function.",
-        "This pattern deploys a Amazon API Gateway REST API with Lambda Function integration and SNS Topic."
+        "This pattern deploys a Amazon API Gateway REST API with Lambda Function integration and SNS Topic with enhanced monitoring features including CloudWatch Alarms, X-Ray tracing, and Synthetics Canary."
       ]
     },
     "gitHub": {
@@ -29,6 +29,14 @@
           "text": "Publishing Messages in Amazon SNS",
           "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#topic"
         },
+        {
+          "text": "AWS X-Ray Distributed Tracing",
+          "link": "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html"
+        },
+        {
+          "text": "Amazon CloudWatch Synthetics",
+          "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Synthetics_Canaries.html"
+        },
       ]
     },
     "deploy": {
@@ -43,7 +51,8 @@
     },
     "cleanup": {
       "text": [
-        "Delete the stack: <code>same delete</code>."
+        "Delete the stack: <code>sam delete</code>.",
+        "Manually delete the S3 bucket created for Synthetics artifacts after deleting the CloudFormation stack."
       ]
     },
     "authors": [
