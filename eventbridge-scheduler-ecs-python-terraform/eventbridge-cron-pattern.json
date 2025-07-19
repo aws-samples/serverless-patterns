@@ -1,0 +1,15 @@
+{
+  "version": "0",
+  "id": "12345678-1234-1234-1234-123456789012",
+  "detail-type": "Scheduled Event",
+  "source": "aws.events",
+  "account": "123456789012",
+  "time": "2024-01-15T09:00:00Z",
+  "region": "us-east-1",
+  "resources": [
+    "arn:aws:events:us-east-1:123456789012:rule/scheduled-task-rule"
+  ],
+  "detail": {},
+  "replay-name": null,
+  "ingestion-time": "2024-01-15T09:00:00.123Z"
+}
