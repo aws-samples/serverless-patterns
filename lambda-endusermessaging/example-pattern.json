@@ -1,0 +1,60 @@
+{
+  "title": "Lambda - End User Messaging",
+  "description": "Scheduled SMS messaging using AWS Lambda and End User Messaging",
+  "language": "Python",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to send scheduled SMS messages using AWS Lambda and AWS End User Messaging with a serverless architecture."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-endusermessaging",
+      "templateURL": "serverless-patterns/lambda-endusermessaging",
+      "projectFolder": "lambda-endusermessaging",
+      "templateFile": "simple_sms_messaging/simple_sms_messaging_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "AWS End User Messaging",
+        "link": "https://aws.amazon.com/end-user-messaging/"
+      },
+      {
+        "text": "Amazon EventBridge",
+        "link": "https://aws.amazon.com/eventbridge/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Deploy the stack:<code>cdk deploy</code>."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sarath Kumar K.S",
+      "image": "https://i.postimg.cc/6qpwHbWD/IMG-0258.jpg",
+      "bio": "Sarath is a Senior Technical Account Manager at AWS.",
+      "linkedin": "kssarathkumar"
+    }
+  ]
+}
