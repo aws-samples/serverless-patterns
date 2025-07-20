@@ -1,6 +1,6 @@
 # Automated EBS Snapshot Creation on EC2 Shutdown using EventBridge
 
-This pattern demonstrates how to automatically create EBS snapshots when an EC2 instance shuts down using EventBridge with direct EBS snapshot target integration.
+This pattern demonstrates how to automatically create EBS snapshots when an EC2 instance shuts down using EventBridge with direct EBS snapshot target integration. It helps protect data on stateful applications or self-managed databases by capturing the volume state during instance shutdown events, reducing data loss risk and increasing recovery flexibility.
 
 ## Architecture
 
@@ -44,6 +44,20 @@ EC2 Instance State Change → EventBridge Rule → EBS CreateSnapshot (Direct Ta
 - No Lambda functions or custom code required
 - Snapshots are created automatically for the specified volume ID
 - Pure infrastructure-as-code approach
+
+## Scope and Limitations
+
+- This pattern targets a single EBS volume specified via the VolumeId parameter
+- It does not automatically detect or snapshot all volumes attached to an instance
+- Works with EBS volumes of any size (snapshot creation is asynchronous and incremental)
+- Only triggers on graceful EC2 state changes (stopping, shutting-down, terminated)
+- Will not capture snapshots during abrupt failures where no state change event is emitted
+
+## Use Cases
+
+- Protecting stateful applications or self-managed databases running on EC2
+- Preserving data during EC2 instance stop/terminate events (patching, maintenance)
+- Safeguarding against accidental shutdowns during testing
 
 ## Testing
 
