@@ -22,7 +22,7 @@
   "dependencies": {
     "@aws-cdk/aws-appsync-alpha": "^2.15.0-alpha.0",
     "@aws-cdk/aws-lambda-python-alpha": "^2.15.0-alpha.0",
-    "aws-cdk-lib": "2.80.0",
+    "aws-cdk-lib": "^2.185.0",
     "constructs": "^10.0.0"
   }
 }

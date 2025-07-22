@@ -1,0 +1,14 @@
+{
+  "firstname": "John",
+  "lastname": "Doe",
+  "company": "Example Corp",
+  "street": "123 Main St",
+  "city": "Seattle",
+  "county": "King",
+  "state": "WA",
+  "zip": "98101",
+  "homePhone": "555-123-4567",
+  "cellPhone": "555-987-6543",
+  "email": "john.doe@example.com",
+  "website": "https://www.johndoe.com"
+}

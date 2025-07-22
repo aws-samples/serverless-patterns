@@ -3,7 +3,7 @@
 	"description": "Creates SNS topic and SQS queues with message body based and attribute based filter using configuration file (appSettings.json)",
 	"language": "Java",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

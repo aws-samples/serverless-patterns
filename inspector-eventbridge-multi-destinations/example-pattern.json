@@ -3,7 +3,7 @@
     "description": "This pattern listens to Amazon Inspector events and triggers downstream services for only interested events",
     "language": "",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": ["Listening to Amazon Inspector Events, multiple Amazon EventBridge rules are setup to look up only for the specific events, every time they occur despite of the Status, downstream services are invoked based on the targets."]

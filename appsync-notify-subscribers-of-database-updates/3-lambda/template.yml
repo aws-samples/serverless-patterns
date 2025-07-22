@@ -5,7 +5,7 @@ Description: Notify subscribers of database updates
 Globals:
   Function:
     CodeUri: src/
-    Runtime: nodejs16.x
+    Runtime: nodejs20.x
     Timeout: 10
     MemorySize: 128
     Layers:

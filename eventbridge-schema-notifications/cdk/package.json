@@ -26,7 +26,7 @@
   "dependencies": {
     "@aws-sdk/client-schemas": "^3.168.0",
     "@slack/web-api": "^6.7.2",
-    "aws-cdk-lib": "2.80.0",
+    "aws-cdk-lib": "^2.185.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21",
     "variable-diff": "^2.0.2"

@@ -8,7 +8,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: app.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs20.x
       CodeUri: src/
       Description: A Lambda function that logs the IoT events sent to a IoT Thing topic.
       MemorySize: 128

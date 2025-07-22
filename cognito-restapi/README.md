@@ -43,7 +43,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-The stack will output the **api endpoint**. Use *curl* to make an HTTP request to the API Gateway endpoint that includes a Header with the authorization token to test the Cognito User Pools Authorizer.
+Generate an identity token from your Cognito User Pool to use in the HTTP request. Next, note the **api endpoint** in the stack outputs. Use *curl* to make an HTTP request to the API Gateway endpoint that includes a Header with the identity token.
    
 ```
 curl -i https://{apiId}.execute-api.{region}.amazonaws.com/Prod -H "authorizationToken: {tokenProvidedByCognito}"

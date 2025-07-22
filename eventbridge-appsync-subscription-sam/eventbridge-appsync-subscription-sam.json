@@ -3,7 +3,7 @@
     "description": "Listen to Eventbridge events from an Appsync subscription",
     "language": "YAML",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

@@ -3,7 +3,7 @@
 	"description": "Create a multi-tenant serverless API using Amazon API Gateway, AWS Lambda, and Amazon DynamoDB with tenant based authorization.",
 	"language": "Node.js",
 	"level": "200",
-	"framework": "SAM",
+	"framework": "AWS SAM",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

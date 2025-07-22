@@ -3,7 +3,7 @@
   "description": "This pattern shows how to implement the claim check pattern using Amazon EventBridge, SQS, Lambda and StepFunctions.",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

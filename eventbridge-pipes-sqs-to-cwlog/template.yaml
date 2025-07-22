@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sample SAM template that shows the filter and transformation capability of Amazon EventBridge Pipes.(uksb-1tthgi812) (tag:eventbridge-pipes-sqs-to-cwlog)
+
+Resources:
+  # source queue
+  SourceQueue:
+    Type: AWS::SQS::Queue
+
+  # CloudWatch Log group as target
+  TargetCWLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+
+  # Define the pipe
+  Pipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt SourceQueue.Arn
+      Target: !GetAtt TargetCWLogGroup.Arn
+      # filter the incoming SQS messages
+      SourceParameters:
+        SqsQueueParameters:
+          BatchSize: 1
+        FilterCriteria:
+          Filters:
+            - Pattern: '{"body": {"status": ["REJECTED", "RETURNED"]}}'
+      TargetParameters: 
+        InputTemplate: 'Order ID <$.body.id> requires immediate attention. Order status <$.body.status>'
+
+  # Role for Pipe
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - pipes.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: SourceQueuePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource: !GetAtt SourceQueue.Arn
+        - PolicyName: TargetCWLogGrpPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: !GetAtt TargetCWLogGroup.Arn
+
+Outputs:
+  SourceQueueURL:
+    Description: "Source Queue URL"
+    Value: !GetAtt SourceQueue.QueueUrl
+  TargetCWLogGroup:
+    Description: 'Target Log Group Name'
+    Value: !GetAtt TargetCWLogGroup.Arn
+  Pipe:
+    Description: 'Pipe info'
+    Value: !GetAtt Pipe.Arn
+  PipeRole:
+    Description: 'Pipe role'
+    Value: !GetAtt PipeRole.Arn

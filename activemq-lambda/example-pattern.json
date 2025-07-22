@@ -3,7 +3,7 @@
   "description": "Create an Application Load Balancer with path-based routing with target as AWS Lambda",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

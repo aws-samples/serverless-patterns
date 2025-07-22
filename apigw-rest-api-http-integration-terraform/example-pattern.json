@@ -1,0 +1,56 @@
+{
+    "title": "Amazon API Gateway with a HTTP integration in Terraform",
+    "description": "Create a REST API Gateway with a public HTTP endpoint integration",
+    "language": "",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern deploys an Amazon API Gateway REST API endpoint with a simple public HTTP endpoint integration."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-http-integration-terraform",
+        "templateURL": "serverless-patterns/apigw-rest-api-http-integration-terraform",
+        "projectFolder": "apigw-rest-api-http-integration-terraform",
+        "templateFile": "apigw-rest-api-http-integration-terraform/main.tf"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Create a REST API Gateway with a public HTTP endpoint integration",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-http-integrations.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "terraform init",
+        "terraform apply"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "terraform destroy",
+			  "terraform show"
+      ]
+    },
+    "authors": [
+      {
+        "headline": "Presented by Sumit Bhati",
+        "name": "Sumit Bhati",
+        "image": "https://avatars.githubusercontent.com/u/139027745",
+        "bio": "Senior Customer Solutions Manager at Amazon Web Services(AWS)",
+        "linkedin": "https://www.linkedin.com/in/sumitbhati19"
+      }
+    ]
+  }
+  

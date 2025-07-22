@@ -3,7 +3,7 @@
     "description": "Generate images using Amazon Bedrock from an AWS Lambda function fronted with API Gateway and save to Amazon S3",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

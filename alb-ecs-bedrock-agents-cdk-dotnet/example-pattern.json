@@ -1,0 +1,76 @@
+{
+    "title": "AI-Powered ChatBot with Bedrock Agent, OpenSearch, and ECS",
+    "description": "Create a serverless AI-powered ChatBot using Amazon Bedrock agent, Amazon OpenSearch Serverless, AWS Lambda, and Amazon ECS with Application Load Balancer",
+    "language": ".NET",
+    "level": "200",
+    "framework": "AWS CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern demonstrates how to create an AI-powered ChatBot using Amazon Bedrock for the AI agent, Amazon OpenSearch Serverless for vector search, AWS Lambda for processing, Amazon ECS with Fargate for hosting, and Application Load Balancer for routing. The pattern includes a Bedrock agent with Knowledge Base and Action Groups, and is implemented using AWS CDK with .NET."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-ecs-bedrock-agents-cdk-dotnet",
+        "templateURL": "serverless-patterns/alb-ecs-bedrock-agents-cdk-dotnet",
+        "projectFolder": "alb-ecs-bedrock-agents-cdk-dotnet",
+        "templateFile": "/src/AlbEcsBedrockAgentsCdkDotnet/AlbEcsBedrockAgentsCdkDotnetStack.cs"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon Bedrock",
+          "link": "https://aws.amazon.com/bedrock/"
+        },
+        {
+            "text": "Amazon Bedrock Agents",
+            "link": "https://aws.amazon.com/bedrock/agents/"
+        },        
+        {
+          "text": "Amazon OpenSearch Serverless",
+          "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless.html"
+        },
+        {
+          "text": "AWS Lambda",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+        },
+        {
+          "text": "Amazon ECS with Fargate",
+          "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html"
+        },
+        {
+          "text": "Application Load Balancer",
+          "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+        },
+        {
+          "text": "AWS CDK",
+          "link": "https://docs.aws.amazon.com/cdk/latest/guide/home.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions, including how to interact with the Bedrock agent, search for flights using the ALB endpoint, and verify processing in OpenSearch and Lambda functions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Tejas Vora",
+        "image": "./TejasVora.jpg",
+        "bio": "Tejas Vora is a Senior Solutions Architect with Amazon Web Services.",
+        "linkedin": "tejas-vora-b4758a47"
+      }
+    ]
+  }

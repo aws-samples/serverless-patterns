@@ -1,0 +1,56 @@
+{
+    "title": "Amazon SQS Messaging Redrive",
+    "description": "Automate the redrive and fixing of Amazon SQS messages using AWS Lambda.",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample project demonstrates how to use a serverless solution for processing and fixing malformed messages using SQS queues and Lambda functions"      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/serverless-message-processing",
+        "templateURL": "serverless-patterns/serverless-messaging-processing",
+        "projectFolder": "serverless-messaging-processing",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon SQS Docs",
+          "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+        },
+        {
+          "text": "Using dead-letter queues in Amazon SQS",
+          "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+      "sam build",
+      "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Ilias Ali",
+        "image": "https://avatars.githubusercontent.com/zalilias",
+        "bio": "I am a Solutions Architect working at AWS based in the UK.",
+        "linkedin": "ilias-ali-0849991a4"
+      }
+    ]
+  }

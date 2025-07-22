@@ -1,0 +1,13 @@
+{
+  "version": "0",
+  "id": "4bc56dd4-8009-9893-2bc0-a65214f1ef02",
+  "detail-type": "Imaging API Events:photoshop-job-status",
+  "source": "aws.partner/developer.adobe.com.test/8dc56ec7-dae2-43cf-bacf-5ab8fabcabcb",
+  "account": "XXXXX8448333",
+  "time": "2023-11-26T13:44:51Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+      "key": "value"
+  }
+}

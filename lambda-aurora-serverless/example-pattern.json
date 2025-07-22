@@ -3,7 +3,7 @@
   "description": "Creates a Lambda function with access to an Amazon Aurora Serverless v1 DB cluster.",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

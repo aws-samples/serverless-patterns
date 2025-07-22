@@ -1,0 +1,57 @@
+{
+  "title": "Q Business to S3",
+  "description": "Amazon Q Business to build a generative AI application to derive insights from content present in an S3 bucket.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon Q Business Application: Amazon Q Business application created with S3 as the data source.",
+      "Amazon S3: S3 bucket that contains documents to be indexed.",
+      "AWS Lambda: AWS Lambda function `DataSourceSync` crawls and indexes the content from the S3 bucket. The Amazon Q Business application retrieves data from the indexed content and provides a generated response."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/qbusiness-s3-cdk-python",
+      "templateURL": "serverless-patterns/qbusiness-s3-cdk-python",
+      "projectFolder": "qbusiness-s3-cdk-python",
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Q Business - AI Assistant for Enterprise",
+        "link": "https://aws.amazon.com/q/business/"
+      },
+      {
+        "text": "Discover insights with Amazon Q S3 connector",
+        "link": "https://aws.amazon.com/blogs/machine-learning/discover-insights-from-amazon-s3-with-amazon-q-s3-connector/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --parameters S3DSBucketName=${YourS3BucketName} --parameters IdentityCenterInstanceArn=${YourIdentityCenterInstanceArn}"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kruthi Jayasimha Rao",
+      "bio": "Kruthi is a Partner Solutions Architect with a focus in Generative AI. She provides technical guidance to AWS Partners in following best practices to build secure, resilient, and highly available solutions in the AWS Cloud.",
+      "linkedin": "https://www.linkedin.com/in/kruthi-jayasimha-rao-132a78167"
+    }
+  ]
+}

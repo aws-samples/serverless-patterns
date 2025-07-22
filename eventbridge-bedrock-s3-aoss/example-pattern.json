@@ -1,0 +1,62 @@
+{
+  "title": "Automatic sync of Amazon Bedrock Knowledge Base using EventBridge Scheduler",
+  "description": "Use Amazon EventBridge Scheduler to trigger an Ingestion Job periodically to keep the Knowledge Bases vector store up-to-date",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an EventBridge rule to periodically sync a Bedrock Knowledge Base data source to Amazon OpenSearch Serverless.",
+      "The sample project uses an EventBridge Scheduler that runs on a regular interval. The scheduler has a universal target configured to trigger the StartIngestionJob API on Amazon Bedrock Agent service. The StartIngestionJob runs a job to sync the data source to the Knowledge Base"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-bedrock-s3-aoss",
+      "templateURL": "serverless-patterns/eventbridge-bedrock-s3-aoss",
+      "projectFolder": "eventbridge-bedrock-s3-aoss",
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Sync to ingest your data sources into the knowledge base",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-ingest.html"
+      },
+      {
+        "text": "Knowledge bases for Amazon Bedrock",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html"
+      },
+      {
+        "text": "What is Amazon EventBridge Scheduler?",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+      {
+          "name": "Raja Vaidyanathan",
+          "image": "https://avatars.githubusercontent.com/u/125882914?v=4",
+          "bio": "Solutions Architect @ AWS",
+          "linkedin": "rajav",
+          "twitter": "rajav"
+      }
+  ]
+}

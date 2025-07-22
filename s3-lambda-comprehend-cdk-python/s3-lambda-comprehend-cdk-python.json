@@ -3,7 +3,7 @@
     "description": "Perform batch sentiment analysis using Comprehend through Lambda and S3",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

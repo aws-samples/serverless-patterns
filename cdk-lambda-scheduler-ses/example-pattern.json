@@ -3,7 +3,7 @@
     "description": "A serverless event-driven pattern that creates Amazon EventBridge schedules dynamically to send email reminders using Amazon SES.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

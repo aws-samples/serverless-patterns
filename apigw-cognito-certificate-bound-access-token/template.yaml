@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Certificate-Bound Access Tokens using Amazon API Gateway and Amazon Cognito
+
+  This SAM template deploys a secure API infrastructure with the following components:
+  - An API Gateway with a custom domain and mutual TLS (mTLS) authentication
+  - A Lambda-based custom authorizer for API requests
+  - A Cognito User Pool with a pre-token generation Lambda trigger to bind the certificate to the access token
+  
+  The infrastructure implements Certificate-Bound Access Tokens within AWS. (uksb-1tthgi812) (tag:apigw-cognito-certificate-bound-access-token)
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: Name of the S3 bucket containing the certificates
+
+  CACertKey:
+    Type: String
+    Description: Object key for the certificates in the S3 bucket
+
+  ClientCertKey:
+    Type: String
+    Description: Object key for the client certificate fingerprint
+
+  CustomDomainCertArn:
+    Type: String
+    Description: The ARN of the issued certificate for API Gateway custom domain
+
+  CustomDomainName:
+    Type: String
+    Description: Custom domain name for the API
+
+Resources:
+  CombinedLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: combined-dependencies-layer
+      ContentUri: ./
+      CompatibleRuntimes:
+        - python3.12
+    Metadata:
+      BuildMethod: makefile
+      BuildArchitecture: x86_64
+      Makefile: Makefile
+      BuildTarget: build-CombinedLayer
+
+  Authorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: handlers.authorizer.lambda_handler
+      Runtime: python3.12
+      Layers:
+        - !Ref CombinedLayer
+
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource: !Sub 'arn:aws:s3:::${BucketName}/${CACertKey}'
+            - Effect: Allow
+              Action:
+                - cognito-idp:GetSigningCertificate
+              Resource: '*'
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref BucketName
+          CACERT_KEY: !Ref CACertKey
+
+  PreTokenGenerationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: handlers.pre_token_gen_lambda.lambda_handler
+      Runtime: python3.12
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - cognito-idp:AdminGetUser
+              Resource: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
+
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${AWS::StackName}-user-pool
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      Schema:
+        - Name: cert_fingerprint
+          AttributeDataType: String
+          Mutable: true
+      LambdaConfig:
+        PreTokenGenerationConfig: 
+          LambdaArn: !GetAtt PreTokenGenerationFunction.Arn
+          LambdaVersion: V2_0
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub ${AWS::StackName}-user-pool-client
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Auth:
+        DefaultAuthorizer: CustomAuthorizer
+        Authorizers:
+          CustomAuthorizer:
+            FunctionArn: !GetAtt Authorizer.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Headers:
+                - Authorization
+      Domain:
+        DomainName: !Ref CustomDomainName
+        CertificateArn: !Ref CustomDomainCertArn
+        EndpointConfiguration: REGIONAL
+        SecurityPolicy: TLS_1_2
+        MutualTlsAuthentication:
+          TruststoreUri: !Sub 's3://${BucketName}/${CACertKey}'
+        BasePath: ["/"]
+
+  ExampleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      InlineCode: |
+        import json
+
+        def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps({
+                    'message': 'Hello from the example function!',
+                    'event': event
+                })
+            }
+      Events:
+        GetExample:
+          Type: Api
+          Properties:
+            Path: /example
+            Method: get
+            RestApiId: !Ref Api
+
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref PreTokenGenerationFunction
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt CognitoUserPool.Arn
+
+Outputs:
+  CustomDomainUrl:
+    Description: "Custom domain URL for the API"
+    Value: !Sub "https://${CustomDomainName}/"
+
+  UserPoolId:
+    Description: "ID of the Cognito User Pool"
+    Value: !Ref CognitoUserPool
+
+  UserPoolClientId:
+    Description: "ID of the Cognito User Pool Client"
+    Value: !Ref CognitoUserPoolClient

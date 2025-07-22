@@ -1,0 +1,62 @@
+{
+  "title": "Private Amazon API Gateway REST API to be invoked from an AWS Lambda function in a different AWS Region",
+  "description": "This sample project demonstrates how to invoke a Private Amazon API Gateway REST API from a different AWS Region.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern implements a cross-region private Amazon API Gateway REST API using an Interface VPC Endpoint and VPC peering."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/private-apigw-cross-region",
+      "templateURL": "serverless-patterns/private-apigw-cross-region",
+      "projectFolder": "private-apigw-cross-region",
+      "templateFile": "private-apigw-cross-region/template1-regionA.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Private APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html"
+      },
+      {
+        "text": "Private Hosted Zones",
+        "link": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-private.html"
+      },
+      {
+        "text": "VPC Peering",
+        "link": "https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html"
+      },
+      {
+        "text": "VPC Endpoints",
+        "link": "https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Luigi Napoleone Capasso",
+      "bio": "Luigi Napoleone Capasso is a Technical Account Manager at Amazon Web Services."
+    }
+  ]
+}

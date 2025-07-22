@@ -1,0 +1,59 @@
+{
+    "title": "S3 to Rekognition using EventBridge",
+    "description": "SAM template for S3 trigger to Lambda for detecting labels in an image using Rekognition and EventBridge",
+    "language": "python",
+    "level": "200",
+    "framework": "AWS SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern demonstrates how to creates two S3 buckets (source and destination) which when uploaded with an object invokes a Lambda function through EventBridge and detects labels in an image using Amazon Rekognition.",
+        "Once a file is uploaded to an S3 bucket, it is listened by the EventBridge which further invokes the lambda function",
+        "The lambda function writes the output of the detected labels using Rekognition to the destination S3 bucket."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rekognition-s3-detectlabels-python",
+        "templateURL": "serverless-patterns/rekognition-s3-detectlabels-python",
+        "projectFolder": "rekognition-s3-detectlabels-python",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Detecting Labels using Rekognition",
+          "link": "https://docs.aws.amazon.com/rekognition/latest/dg/labels-detect-labels-image.html"
+        },
+        {
+          "text": "Amazon Rekognition",
+          "link": "https://aws.amazon.com/rekognition/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Abilashkumar P C",
+        "image": "https://drive.google.com/file/d/1bxOh_WBw8J_xEqvT-qRezH8WXqSBPI24/view?usp=sharing",
+        "bio": "Sr. Cloud Support Engineer @ AWS",
+        "linkedin": "abilashkumar-p-c"
+      }
+    ]
+  }
+  

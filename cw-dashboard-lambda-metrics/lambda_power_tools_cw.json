@@ -3,7 +3,7 @@
     "description": "The CDK Stack deploys CloudWatch Dashboard with AWS Lambda Metrics.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

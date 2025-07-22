@@ -1,0 +1,15 @@
+{
+    "name": "auth-lambda-edge",
+    "version": "0.1.0",
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.119",
+        "aws-sdk": "^2.1452.0"
+    },
+    "dependencies": {
+        "@aws-crypto/sha256-js": "^5.2.0",
+        "@aws-sdk/credential-providers": "^3.624.0",
+        "@aws-sdk/protocol-http": "^3.374.0",
+        "@aws-sdk/signature-v4": "^3.374.0",
+        "axios": "^1.7.3"
+    }
+}

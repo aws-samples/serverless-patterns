@@ -3,7 +3,7 @@
   "description": "Create real time subscriptions from EventBridge to AppSync",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
     "description": "Create an EventBridge Pipe to connect a Kinesis Data Stream and a Step Functions Workflow.",
     "language": "YAML",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

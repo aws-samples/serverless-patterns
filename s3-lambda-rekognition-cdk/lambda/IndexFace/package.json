@@ -5,6 +5,6 @@
     "private": true,
     "license": "MIT",
     "dependencies": {
-        "aws-sdk": "*"
+        "aws-sdk": "^2.1692.0"
     }
 }

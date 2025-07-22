@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  ProcessingTopic:
+    Type: AWS::SNS::Topic
+
+  ProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      Events:
+        ProcessingEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref ProcessingTopic
+
+Outputs:
+  ProcessingTopicArn:
+    Description: "SNS Topic ARN"
+    Value: !Ref ProcessingTopic
+  ProcessorFunctionName:
+    Description: "Lambda Function Name"
+    Value: !Ref ProcessorFunction    
+  ProcessorFunctionARN:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt ProcessorFunction.Arn

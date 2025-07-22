@@ -1,9 +1,9 @@
 {
   "title": "Streaming Response With Bedrock and Lambda Function URL",
   "description": "Create a LLM Streaming Response API with Lambda Function URL Streaming write",
-  "language": "nodejs",
+  "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

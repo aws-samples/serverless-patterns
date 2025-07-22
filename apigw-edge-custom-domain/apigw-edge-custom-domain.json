@@ -3,7 +3,7 @@
     "description": "Edge Amazon API Gateway custom domain with AWS SAM: certificate in us-east-1 when using another Region",
     "language": "Python",
     "level": "300",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

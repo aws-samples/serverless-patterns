@@ -1,0 +1,82 @@
+{
+  "title": "Amazon S3 with S3 Object Lambda (return image thumbnails from S3)",
+  "description": "This pattern creates an S3 bucket, an S3 Access Point, an S3 Object Lambda Access Point, and Lambda function.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform (with modules)",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an S3 bucket, an S3 Access Point, an S3 Object Lambda Access Point, and Lambda function.",
+      "This application uses S3 Object Lambda to return a thumbnail version of an image in S3."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-s3-object-lambda",
+      "templateURL": "serverless-patterns/terraform-s3-object-lambda",
+      "projectFolder": "terraform-s3-object-lambda",
+      "templateFile": "terraform-s3-object-lambda/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "test": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+      },
+      {
+        "test": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "test": "Terraform AWS S3 bucket module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket"
+      },
+      {
+        "test": "Terraform AWS S3 bucket examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/tree/master/examples"
+      },
+      {
+        "text": "Using Amazon S3 Object Lambda Access Points",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/olap-use.html"
+      },
+      {
+        "text": "Introducing Amazon S3 Object Lambda – Use Your Code to Process Data as It Is Being Retrieved from S3",
+        "link": "https://aws.amazon.com/blogs/aws/introducing-amazon-s3-object-lambda-use-your-code-to-process-data-as-it-is-being-retrieved-from-s3/"
+      },
+      {
+        "text": "Amazon S3 Developer Guide",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+      },
+      {
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anton Babenko",
+      "image": "https://avatars.githubusercontent.com/u/393243",
+      "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
+      "linkedin": "https://www.linkedin.com/in/antonbabenko",
+      "twitter": "antonbabenko"
+    }
+  ]
+}

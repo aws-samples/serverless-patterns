@@ -20,7 +20,7 @@
     "typescript": "~5.0.4"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.81.0",
+    "aws-cdk-lib": "^2.185.0",
     "cloudevents": "^7.0.1",
     "constructs": "^10.2.62",
     "source-map-support": "^0.5.21"

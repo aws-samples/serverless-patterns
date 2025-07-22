@@ -3,7 +3,7 @@
   "description": "This pattern demonstrates how to create a synchronous REST API using API Gateway, AWS Lambda and DynamoDB.",
   "language": "Java",
   "level": "400",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

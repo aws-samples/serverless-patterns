@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon EventBridge to AWS AppSync Events API integration
+
+Resources:
+  # For storing failed deliveries to AppSync
+  DLQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-DLQ
+  DLQPolicy:
+    Type: AWS::SQS::QueuePolicy  
+    Properties:
+      Queues:
+        - !Ref DLQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt DLQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt RuleToSendToEventsAPI.Arn
+  # Test Event API to consume messages
+  EventAPI:
+    Type: AWS::AppSync::Api
+    Properties:
+      Name: !Sub ${AWS::StackName}-EventAPI
+      EventConfig:
+        AuthProviders:
+          - AuthType: API_KEY
+        ConnectionAuthModes:
+          - AuthType: API_KEY
+        DefaultPublishAuthModes:
+          - AuthType: API_KEY
+        DefaultSubscribeAuthModes:
+          - AuthType: API_KEY
+
+  EventApiNameSpace:
+    Type: AWS::AppSync::ChannelNamespace
+    Properties:
+      ApiId: !GetAtt EventAPI.ApiId
+      Name: 'default'
+
+  EventAPIKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt EventAPI.ApiId
+      Description: API Key for Events API
+
+
+  # This is the destination we want to send events to. We will use our HTTP endpoint for the Events API. 
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Description: This is for demonstrating the Serverless pattern for publishing messages from EventBridge to AppSync Events API.
+      Name:  !Sub ${AWS::StackName}-EventBridge-to-EventsAPI
+  EventsAPIDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      ConnectionArn:
+        Fn::GetAtt:
+          - EventsAPIConnectionDetails
+          - Arn
+      HttpMethod: POST
+      InvocationEndpoint: 
+        Fn::Sub: "https://${EventAPI.Dns.Http}/event"       
+      InvocationRateLimitPerSecond: 10 # Adjust this accordingly, set low for the demo.
+      Name:  !Sub ${AWS::StackName}-EventsApiDestination
+  EventsAPIConnectionDetails:
+    Type: AWS::Events::Connection
+    Properties:
+      Name: !Sub ${AWS::StackName}-Connection
+      AuthorizationType: API_KEY
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: x-api-key
+          ApiKeyValue: !GetAtt EventAPIKey.ApiKey
+  RoleToAllowEventBridgePublish:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:  !Sub ${AWS::StackName}-EventBridge-Rule-Target
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      MaxSessionDuration: 3600
+      Tags: []
+  PolicyToAllowInvokeDestination:
+    Type: AWS::IAM::RolePolicy
+    Properties:
+      PolicyName:  !Sub ${AWS::StackName}-Invoke_Api_Destination
+      RoleName:
+        Ref: RoleToAllowEventBridgePublish
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - events:InvokeApiDestination
+            Resource:
+              - Fn::Sub: arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:api-destination/${EventsAPIDestination}/*  
+  RuleToSendToEventsAPI:
+    Type: AWS::Events::Rule
+    DependsOn:
+      - EventAPI
+      - EventsAPIDestination
+      - RoleToAllowEventBridgePublish
+      - PolicyToAllowInvokeDestination
+    Properties:
+      Name:  !Sub ${AWS::StackName}-EventBridgeToEventsApi
+      EventPattern: !Sub '{"account":["${AWS::AccountId}"], "detail-type": ["serverless-patterns"]}'      
+      EventBusName: !Ref EventBus
+      Targets:
+        - Id: !Sub ${AWS::StackName}-TargetEventsAPI
+          Arn:
+            Fn::GetAtt:
+              - EventsAPIDestination
+              - Arn
+          RoleArn:
+            Fn::GetAtt:
+              - RoleToAllowEventBridgePublish
+              - Arn
+          InputTransformer:
+            InputPathsMap:
+              detailType: $.detail-type
+              region: $.region
+              message: $.detail.message
+            InputTemplate: |+ 
+              {
+                  "channel": "default/serverless-patterns",
+                  "events": [
+                    "{\"detailType\":\"<detailType>\",\"region\":\"<region>\",\"message\":\"<message>\"}"
+                    ]
+              }            
+          DeadLetterConfig:
+            Arn: !GetAtt DLQueue.Arn
+          RetryPolicy:
+            MaximumRetryAttempts: 2
+            MaximumEventAgeInSeconds: 60
+
+
+# List all common outputs for usage
+Outputs:
+  EventBusName:
+    Value:
+      Fn::Sub: "${EventBus.Name}"
+  DLQName:
+    Value:
+      Fn::Sub: "${DLQueue.QueueName}"
+  EventApiHttpURL:
+    Value:
+      Fn::Sub: "${EventAPI.Dns.Http}"
+  EventApiKey: 
+    Value: !GetAtt EventAPIKey.ApiKey
+  EventApiName:
+    Value: !Sub ${AWS::StackName}-EventAPI
+      
+

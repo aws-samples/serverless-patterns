@@ -3,7 +3,7 @@
   "description": "Sets up EventBridge, Data Firehose, and a S3 bucket for event delivery with dynamic partitioning based on metadata.",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": ["When a user sends a message to the EventBridge bus, the message gets routed to the EventBridge rule based on the \"DetailType\". Then, the EventBridge rule sends the \"Detail\" field value from the message to the rule target Firehose delivery stream. Once the message reaches the Firehose delivery stream, the JsonParsingEngine processes the message to read the \"Department\" field value, which is used for the S3 prefix. After message processing, the message gets delivered to the targeted S3 bucket by following the calculated S3 prefix based on the \"Department\" field value."]

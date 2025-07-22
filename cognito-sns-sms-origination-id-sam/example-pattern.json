@@ -3,7 +3,7 @@
     "description": "Integrate Amazon Pinpoint and Amazon SNS with your Cognito-based application.",
     "language": "JavaScript",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

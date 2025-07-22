@@ -3,7 +3,7 @@
   "description": "Create a Kinesis DataFirehose and Java Lambda function to transform the stream of data",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

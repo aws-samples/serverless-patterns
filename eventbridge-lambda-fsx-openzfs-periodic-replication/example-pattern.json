@@ -3,7 +3,7 @@
   "description": "Periodic FSx-OpenZFS volume replication across file systems using Amazon EventBridge Scheduler and AWS Lambda",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

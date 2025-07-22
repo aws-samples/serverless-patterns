@@ -3,7 +3,7 @@
     "description": "Create a CodeCommit Repository and launch an Amplify web application from a local folder.",
     "language": "Node.js",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

@@ -3,7 +3,7 @@
   "description": "Create an EventBridge rule that sends events to CloudWatch Logs.",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

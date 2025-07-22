@@ -1,0 +1,220 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: API Gateway used as a proxy to a Restaurants GraphQL API on AWS AppSync
+
+Resources:
+  #### HTTP API Proxy ####
+  HttpApiProxy:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Body:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: httpapi-spec/api.yaml
+
+  HttpApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApiProxy
+      StageName: $default
+      AutoDeploy: true
+
+  #### DynamoDb Table ####
+  RestaurantTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: restaurantId
+        Type: String
+
+  #### Appsync API ####
+  AppsyncGraphQLApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: !Sub "RestaurantAPI-${AWS::StackName}"
+      AuthenticationType: API_KEY
+      LogConfig:
+        ExcludeVerboseContent: false
+        FieldLogLevel: "ALL"
+        CloudWatchLogsRoleArn: !GetAtt AppsyncPushToCloudWatchLogsRole.Arn
+      XrayEnabled: true
+
+  AppsyncGraphQLApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt AppsyncGraphQLApi.ApiId
+
+  AppsyncGraphQLApiSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt AppsyncGraphQLApi.ApiId
+      DefinitionS3Location: "./graphql/schema.graphql"
+
+  #### Appsync API Logging ####
+
+  AppsyncGraphQLApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/appsync/apis/${AppsyncGraphQLApi.ApiId}"
+      RetentionInDays: 7
+
+  AppsyncPushToCloudWatchLogsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+            Action:
+              - sts:AssumeRole
+
+  AppsyncPushToCloudWatchLogsRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${AWS::StackName}-AppsyncPushToCloudWatchLogs-Policy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: !GetAtt AppsyncGraphQLApiLogGroup.Arn
+      Roles:
+        - !Ref AppsyncPushToCloudWatchLogsRole
+
+  #### Appsync DynamoDB Datasource ####
+
+  AppsyncDynamoDBDatasourceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+
+  AppsyncDynamoDBDatasourceRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${AWS::StackName}-AppsyncDynamoDB-Policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:DeleteItem
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:UpdateItem
+            Resource:
+              - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${RestaurantTable}"
+              - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${RestaurantTable}/*"
+      Roles:
+        - !Ref AppsyncDynamoDBDatasourceRole
+
+  AppsyncGraphQLApiDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt AppsyncGraphQLApi.ApiId
+      Name: "Restaurant_Api_Datasource"
+      Type: "AMAZON_DYNAMODB"
+      ServiceRoleArn: !GetAtt AppsyncDynamoDBDatasourceRole.Arn
+      DynamoDBConfig:
+        AwsRegion: !Sub "${AWS::Region}"
+        TableName: !Ref RestaurantTable
+
+  #### Appsync Resolvers ####
+  GetRestaurantResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn:
+      - AppsyncGraphQLApiSchema
+    Properties:
+      ApiId: !GetAtt AppsyncGraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getRestaurant
+      DataSourceName: !GetAtt AppsyncGraphQLApiDataSource.Name
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: "1.0.0"
+      CodeS3Location: resolvers/getRestaurant.js
+
+  ListRestaurantsResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn:
+      - AppsyncGraphQLApiSchema
+    Properties:
+      ApiId: !GetAtt AppsyncGraphQLApi.ApiId
+      TypeName: Query
+      FieldName: listRestaurants
+      DataSourceName: !GetAtt AppsyncGraphQLApiDataSource.Name
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: "1.0.0"
+      CodeS3Location: resolvers/listRestaurants.js
+
+  AddRestaurantResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn:
+      - AppsyncGraphQLApiSchema
+    Properties:
+      ApiId: !GetAtt AppsyncGraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: addRestaurant
+      DataSourceName: !GetAtt AppsyncGraphQLApiDataSource.Name
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: "1.0.0"
+      CodeS3Location: resolvers/addRestaurant.js
+
+  DeleteRestaurantResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn:
+      - AppsyncGraphQLApiSchema
+    Properties:
+      ApiId: !GetAtt AppsyncGraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: deleteRestaurant
+      DataSourceName: !GetAtt AppsyncGraphQLApiDataSource.Name
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: "1.0.0"
+      CodeS3Location: resolvers/deleteRestaurant.js
+
+  UpdateRestaurantResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn:
+      - AppsyncGraphQLApiSchema
+    Properties:
+      ApiId: !GetAtt AppsyncGraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: updateRestaurant
+      DataSourceName: !GetAtt AppsyncGraphQLApiDataSource.Name
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: "1.0.0"
+      CodeS3Location: resolvers/updateRestaurant.js
+
+Outputs:
+  ApiGatewayEndpoint:
+    Description: "HTTP API Gateway endpoint for /restaurant path"
+    Value: !Sub "https://${HttpApiProxy}.execute-api.${AWS::Region}.amazonaws.com/restaurant"
+
+  AppSyncApiKey:
+    Description: "AppSync API Key"
+    Value: !GetAtt AppsyncGraphQLApiKey.ApiKey
+
+  AppSyncGraphQLAPIURL:
+    Description: "AppSync GraphQL API URL"
+    Value: !GetAtt AppsyncGraphQLApi.GraphQLUrl

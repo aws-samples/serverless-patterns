@@ -3,7 +3,7 @@
   "description": "Create a Java Lambda function with Event Source as Kinesis Data source",
   "language": "Java",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

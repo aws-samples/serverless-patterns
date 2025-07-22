@@ -6,7 +6,7 @@
     "architectureURL": "apigw-sns-sqs-lambda-arch-diagram.png",
     "videoId": "",
     "level":"100",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "services": {
       "from": "apigw",
       "to": "sns, sqs and lambda"

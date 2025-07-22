@@ -1,0 +1,60 @@
+{
+  "title": "Lambda Function URL",
+  "description": "Creates a Lambda function with a function URL",
+  "language": "Node.js",
+  "level": "100",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create a Lambda Function URL for a Lambda function. You can use Function URLs to create a a dedicated HTTP(S) endpoint for your Lambda function. Use the FunctionEndpointURL when testing your Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-function-url-terraform",
+      "templateURL": "serverless-patterns/lambda-function-url-terraform",
+      "projectFolder": "lambda-function-url-terraform",
+      "templateFile": "lambda-function-url-terraform/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Overview of Lambda function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html"
+      },
+      {
+        "text": "Creating and managing Lambda function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html"
+      },
+      {
+        "text": "Announcing AWS Lambda Function URLs: Built-in HTTPS Endpoints for Single-Function Microservices",
+        "link": "https://aws.amazon.com/blogs/aws/announcing-aws-lambda-function-urls-built-in-https-endpoints-for-single-function-microservices/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply --auto-approve"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Use the Terraform Output FunctionURLEndpoint from the `terraform apply` command to test your Lambda function in a browser or API testing tool."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy --auto-approve."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Stephen Monaghan",
+      "image": "",
+      "bio": "Solutions Architect, AWS",
+      "linkedin": "https://www.linkedin.com/in/stephen-monaghan-61873194/"
+    }
+  ]
+}

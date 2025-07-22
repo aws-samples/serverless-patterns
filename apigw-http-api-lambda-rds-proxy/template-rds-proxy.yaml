@@ -13,11 +13,11 @@ Mappings:
   ClusterSettings:
     global:
       dbSchema: mylab
-      dbVersion: 5.7.mysql_aurora.2.11.2
+      dbVersion: 8.0.mysql_aurora.3.04.0
       dbEngine: aurora-mysql
-      dbFamily: aurora-mysql5.7
+      dbFamily: aurora-mysql8.0
       port: 3306
-      nodeType: db.r5.large
+      nodeType: db.t4g.medium
 
 Resources:
   # VPC for creating database and proxy
@@ -191,6 +191,7 @@ Resources:
       EnableCloudwatchLogsExports: [ error, slowquery ]
       BacktrackWindow: 86400
       EnableIAMDatabaseAuthentication: true
+      DeletionProtection: false
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-mysql-cluster"
@@ -210,8 +211,10 @@ Resources:
       PubliclyAccessible: false
       EnablePerformanceInsights: true
       PerformanceInsightsRetentionPeriod: 7
+      StorageEncrypted: true
       Tags:
         - Key: Name
+      
           Value: !Sub "${AWS::StackName}-mysql-node-1"
 
   # Reader node instance for RDS Aurora Cluster
@@ -228,6 +231,7 @@ Resources:
       MonitoringRoleArn: !GetAtt roleEnhancedMonitoring.Arn
       PubliclyAccessible: false
       EnablePerformanceInsights: true
+      StorageEncrypted: true
       PerformanceInsightsRetentionPeriod: 7
       Tags:
         - Key: Name

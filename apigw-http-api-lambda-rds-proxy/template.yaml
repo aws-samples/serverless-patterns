@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 Description: >
   (uksb-1tthgi812) (tag:apigw-http-api-lambda-rds-proxy)
@@ -31,7 +31,7 @@ Parameters:
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: python3.9
+    Runtime: python3.13
     MemorySize: 128
     Timeout: 30
 

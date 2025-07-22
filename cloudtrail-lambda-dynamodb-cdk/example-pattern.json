@@ -3,7 +3,7 @@
     "description": "Creates a CloudTrail trail to track S3 object creation events, and checks for the required tags on those objects to determine compliance",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [
