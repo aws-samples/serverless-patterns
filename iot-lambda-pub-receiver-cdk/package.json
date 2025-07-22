@@ -1,0 +1,24 @@
+{
+  "name": "lambda-iot-cdk",
+  "version": "0.1.0",
+  "bin": {
+    "lambda-iot-cdk": "bin/lambda-iot-cdk.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.173.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.7.2"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-iot-actions-alpha": "^2.173.0-alpha.0",
+    "@aws-cdk/aws-iot-alpha": "^2.173.0-alpha.0",
+    "aws-cdk-lib": "^2.185.0",
+    "constructs": "^10.0.0",
+    "source-map-support": "^0.5.21"
+  }
+}

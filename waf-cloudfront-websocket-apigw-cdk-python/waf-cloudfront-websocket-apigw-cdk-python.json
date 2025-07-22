@@ -1,0 +1,94 @@
+{
+    "title": "Amazon API Gateway WebSocket API with Amazon CloudFront & AWS WAF",
+    "description": "Protecting an  Amazon API Gateway WebSocket API with Amazon CloudFront, AWS WAF Integration and API Keys",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern implements a secure WebSocket API using AWS CDK, integrating CloudFront for distribution and WAF for protection through AWS CDK with Python. It makes use of API keys to ensure that the Websocket endpoint can only be accessed via the CloudFront distribution by passing the API key as custom header from CloudFront.The WebSocket API provides real-time communication capabilities, while CloudFront ensures low-latency content delivery. The Web Application Firewall (WAF) adds an extra layer of security by protecting against common web exploits and controlling access based on configurable rules."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/waf-cloudfront-websocket-apigw-cdk-python",
+            "templateURL": "serverless-patterns/waf-cloudfront-websocket-apigw-cdk-python",
+            "projectFolder": "waf-cloudfront-websocket-apigw-cdk-python",
+            "templateFile": "my_websocket_api/my_websocket_api_stack.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Protecting your API using Amazon API Gateway and AWS WAF",
+                "link": "https://aws.amazon.com/blogs/compute/protecting-your-api-using-amazon-api-gateway-and-aws-waf-part-2/"
+            },
+            {
+                "text": "Route Configuration for a WebSocket API",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/websocket-api-develop-routes.html#apigateway-websocket-api-routes"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "cdk destroy"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Sidharth Kothari",
+            "image": "https://www.linkedin.com/in/sidharthkothari/",
+            "bio": "Cloud Engineer @AWS",
+            "linkedin": "sidharthkothari"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 50,
+            "service": "waf",
+            "label": "AWS WAF"
+        },
+        "icon2": {
+            "x": 40,
+            "y": 50,
+            "service": "cloudfront",
+            "label": "Amazon CloudFront"
+        },
+        "icon3": {
+            "x": 65,
+            "y": 50,
+            "service": "api-gateway",
+            "label": "Amazon API Gateway"
+        },
+        "icon4": {
+            "x": 90,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        }
+    }
+}

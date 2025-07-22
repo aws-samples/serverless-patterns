@@ -3,7 +3,7 @@
   "description": "Create a Lambda function that calls Translate service for text translation via the Boto3 SDK.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "services": {
     "from": "Lambda",
     "to": "Translate"

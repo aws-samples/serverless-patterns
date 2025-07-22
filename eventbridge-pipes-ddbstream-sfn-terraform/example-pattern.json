@@ -1,0 +1,56 @@
+{
+  "title": "DynamoDB Stream to Step Functions",
+  "description": "Invoke Step Functions workflow from a DynamoDB stream message",
+  "language": "Terraform",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "Invoke a Step Functions workflow from a DynamoDB stream",
+    "text": [
+      "This sample project demonstrates how to invoke an AWS Step Functions state machine from DynamoDB Stream without using Lambda. ",
+      "This pattern deploys one Step Function, one DynamoDB with stream enabled and one EventBridge Pipe."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-ddbstream-sfn-terraform",
+      "templateURL": "serverless-patterns/eventbridge-pipes-ddbstream-sfn-terraform",
+      "projectFolder": "eventbridge-pipes-ddbstream-sfn-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Pipes - connects sources to targets. Pipes are intended for point-to-point integrations between supported sources and targets, with support for advanced transformations and enrichment.",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Oriol Matavacas",
+      "image": "https://togithub.s3.eu-west-1.amazonaws.com/Oriol.jpg",
+      "bio": "Oriol Matavacas is a Sr. Solutions Architect at AWS based in Barcelona. Oriol primarily supporting customers on the journey to the Cloud. He enjoys building new solutions with scalability, availability and easy to maintain by using serverless.",
+      "linkedin": "https://www.linkedin.com/in/oriol-matavacas-rodriguez-b165868a",
+      "twitter": ""
+    }
+  ]
+}
+

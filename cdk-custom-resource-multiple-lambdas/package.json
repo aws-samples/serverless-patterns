@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.549.0",
-    "aws-cdk-lib": "2.136.0",
+    "aws-cdk-lib": "^2.185.0",
     "constructs": "^10.3.0",
     "source-map-support": "^0.5.21"
   }

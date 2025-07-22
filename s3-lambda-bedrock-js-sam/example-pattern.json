@@ -1,0 +1,69 @@
+{
+    "title": "Amazon S3 to AWS Lambda to Amazon Bedrock using AWS SAM",
+    "description": "This pattern uses AWS Lambda to generate vector embeddings from text data uploaded to S3 using Amazon Bedrock.",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "AWS SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "When a new object is uploaded to an S3 bucket, S3 detects the putObject event and invokes a Lambda function asynchronously, passing details about the uploaded object. The Lambda function then retrieves the object's content and sends it to the Amazon Bedrock Titan Embedding service, which generates vector embeddings representing the content's meaning and context."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-bedrock-js-sam",
+        "templateURL": "serverless-patterns/s3-lambda-bedrock-js-sam",
+        "projectFolder": "s3-lambda-bedrock-js-sam",
+        "templateFile": "template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon S3",
+          "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+        },
+        {
+          "text": "AWS Lambda",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+        },
+        {
+            "text": "Amazon Bedrock",
+            "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"
+          }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam build",
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "sam delete"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Achintya Veer Singh",
+        "image": "https://avatars.githubusercontent.com/u/55053737?v=4",
+        "bio": "Solutions Architect @ AWS",
+        "linkedin": "www.linkedin.com/in/achintya-veer-singh-493403193",
+        "twitter": "achintya_veer"
+      },
+      {
+        "name": "Rohit Raj",
+        "image": "https://avatars.githubusercontent.com/u/69171887?v=4",
+        "bio": "Solutions Architect @ AWS",
+        "linkedin": "https://www.linkedin.com/in/rohitraj-11",
+        "twitter": "RohitRaj_11"
+      }
+    ]
+  }

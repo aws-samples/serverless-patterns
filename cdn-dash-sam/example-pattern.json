@@ -3,7 +3,7 @@
   "description": "This pattern deploys Amazon Eventbridge rule and a AWS Lambda function that creates custom metrics in Amazon CloudWatch for the API mappings present in all custom domain names that are present in the region where this is deployed.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

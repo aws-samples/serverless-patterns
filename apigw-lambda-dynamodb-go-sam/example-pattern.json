@@ -3,7 +3,7 @@
     "description": "Use AWS SAM to deploy a REST API connected to AWS Lambda, that puts items in Amazon DynamoDB.",
     "language": "Go",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": ["This pattern explains how to deploy an AWS SAM application that includes an API Gateway, AWS Lambda Function, written in Go, and writes items to an Amazon DynamoDB table."]

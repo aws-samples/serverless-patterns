@@ -1,0 +1,58 @@
+{
+  "title": "Certificate-Bound Access Tokens using API Gateway and Cognito",
+  "description": "Creating an API Gateway and Cognito to implement certificate-bound access tokens",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway REST API as well as a custom domain name and enables mTLS.",
+      "Further, it creates a Cognito User Pool. The Cognito User Pool is used to issue certificate-bound access tokens.",
+      "The REST API makes use of an authorizer to compare the 'cnf' claim in the access token to the fingerprint of the client certificate sent as part of the mutual authentication TLS handshake"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-cognito-certificate-bound-access-token",
+      "templateURL": "serverless-patterns/apigw-cognito-certificate-bound-access-token",
+      "projectFolder": "apigw-cognito-certificate-bound-access-token",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "API Gateway mTLS",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-mutual-tls-authentication-for-amazon-api-gateway/"
+      },
+      {
+        "text": "OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens",
+        "link": "https://datatracker.ietf.org/doc/html/rfc8705"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kevin Draai",
+      "image": "https://media.licdn.com/dms/image/v2/C4D03AQFaayZVs_v_bA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1556110763035?e=1740009600&v=beta&t=fJLsUYmOsXYgvp0m7oE_eUkPQ_V-WNrQsSJggGdf3d0",
+      "bio": "Senior Cloud Support Engineer",
+      "linkedin": "https://www.linkedin.com/in/kevin-draai-30587780?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BiRU2NMnHQpSHbj64llXe3A%3D%3D"
+    }
+  ]
+}

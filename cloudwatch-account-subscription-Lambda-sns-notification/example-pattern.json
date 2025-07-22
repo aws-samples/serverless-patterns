@@ -1,0 +1,63 @@
+{
+  "title": "Account level alerting using Amazon CloudWatch, AWS Lambda and Amazon SNS",
+  "description": "Creates alerting system at account level which triggers Lambda function which can parse and publish a SNS notification",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project showcases a centralized alerting system that leverages CloudWatch Logs Subscription filters and Lambda functions to trigger SNS notifications when a specified pattern is matched across any CloudWatch log group within the account. This robust solution enables comprehensive monitoring and proactive alerting, ensuring timely identification and mitigation of critical events or errors",
+      "The core components of this pattern include a CloudWatch Logs Account-level Subscription filter, which monitors log events across the entire account, and a notification Lambda function. This function is triggered by the Subscription filter and responsibly publishes relevant details, such as log group name, log stream name, and the matched log event, to the SNS topic, ensuring that stakeholders receive comprehensive and actionable information."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudwatch-account-subscription-Lambda-sns-notification",
+      "templateURL": "serverless-patterns/cloudwatch-account-subscription-Lambda-sns-notification",
+      "projectFolder": "cloudwatch-account-subscription-Lambda-sns-notification",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Account-level subscription filters",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters-AccountLevel.html#LambdaFunctionExample-AccountLevel"
+      },
+      {
+        "text": "Lambda function",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided --parameter-overrides EmailAddress='example.your@mail.com' LambdaFunctionName='NotificationLambda'"
+    ]
+  },
+  "testing": {
+    "text": [
+      "To test this pattern, which monitors all log groups for the 'Exception' pattern and sends SNS notifications, follow these steps:",
+      "1. Choose an application generating logs in your AWS account.",
+      "2. Intentionally introduce an exception or error condition that logs an 'Exception' message.",
+      "3. Verify the log event containing 'Exception' is written to CloudWatch Logs.",
+      "4. Monitor for an SNS email notification containing details like the log group name, log stream name, and the log event with the 'Exception' pattern.",
+      "This pattern automatically monitors new log groups created, ensuring comprehensive coverage across your AWS account."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shubham",
+      "image": "https://avatars.githubusercontent.com/u/150242047?s=400&u=aaa2db07529d3e1e82ec59daacb05b6abc7c3a5f&v=4",
+      "bio": "Cloud Support Engineer - SVLS",
+      "linkedin": "shubham-more-1b6aa185"
+    }
+  ]
+}

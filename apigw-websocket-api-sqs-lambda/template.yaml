@@ -5,7 +5,7 @@ Description: An Amazon API Gateway WebSocket API and SQS with a AWS Lambda funct
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: nodejs14.x
+    Runtime: nodejs20.x
     MemorySize: 128
     Timeout: 15
 
@@ -86,7 +86,8 @@ Resources:
           ApiGatewayEndpoint:
             Fn::Join:
               - ""
-              - - Ref: APIGWWebsocketSQSLambda
+              - - "https://"
+                - Ref: APIGWWebsocketSQSLambda
                 - .execute-api.
                 - Ref: AWS::Region
                 - "."

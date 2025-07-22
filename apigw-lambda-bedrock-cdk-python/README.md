@@ -1,4 +1,4 @@
-# Text generation via ApiGateway -> Lambda -> Bedrock
+# Text generation via Amazon API Gateway -> AWS Lambda -> Amazon Bedrock
 
 ![architecture](architecture/architecture.png)
 
@@ -18,27 +18,27 @@ Important: this application uses various AWS services and there are costs associ
 ## Amazon Bedrock setup instructions
 You must request access to a model before you can use it. If you try to use the model (with the API or console) before you have requested access to it, you receive an error message. For more information, see [Model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
-1. In the AWS console, select the region from which you want to access Amazon Bedrock. At the time of writing, Amazon Bedrock is available in us-east-1 (N. Virginia) and us-west-2 (Oregon) regions.
+1. In the AWS console, select the region from which you want to access Amazon Bedrock. At the time of writing, Amazon Bedrock is available in most major regions.
 
     ![Region Selection](bedrock_setup/region-selection.png)
 
 1. Find **Amazon Bedrock** by searching in the AWS console.
 
-    ![Bedrock Search](bedrock_setup/bedrock-search.png)
+    ![Amazon Bedrock Search](bedrock_setup/bedrock-search.png)
 
 1. Expand the side menu.
 
-    ![Bedrock Expand Menu](bedrock_setup/bedrock-menu-expand.png)
+    ![Amazon Bedrock Expand Menu](bedrock_setup/bedrock-menu-expand.png)
 
 1. From the side menu, select **Model access**.
 
-    ![Model Access](bedrock_setup/model-access-link.png)
+    ![Amazon Bedrock Model Access](bedrock_setup/model-access-link.png)
 
 1. Select the **Edit** button.
 
-    ![Model Access View](bedrock_setup/model-access-view.png)
+    ![Amazon Bedrock Model Access View](bedrock_setup/model-access-view.png)
 
-6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Save changes** to activate the models in your account. For this pattern we only need Anthropic/Claude but feel free to experiment with others.
+6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Save changes** to activate the models in your account. For this pattern we only need Anthropic Claude 3 Haiku but feel free to experiment with others.
 
 ## Deployment Instructions
 
@@ -74,14 +74,14 @@ You must request access to a model before you can use it. If you try to use the 
     ```
     cdk deploy
     ```
-1. After deployment completes, take a look at the Outputs section. There will be an entry containing the URL of the API Gateway resource you just created. Copy that URL as you'll need it for your tests.
+1. After deployment completes, take a look at the Outputs section. There will be an entry containing the URL of the Amazon API Gateway resource you just created. Copy that URL as you'll need it for your tests.
 
     The format of the URL will be something like `https://{id}.execute-api.{region}.amazonaws.com/prod`
 
 
 ## How it works
 
-CDK will create an Api Gateway, along with a resource and a POST method. There's a AWS Lambda function that will be taking the prompt and invoking an Amazon Bedrock model (anthropic.claude-v2) synchronously. If you wish to try other models, make sure to modify the policy attached to the Lambda function and invoke the right model. 
+CDK will create an Amazon API Gateway, along with a resource and a POST method. There is an AWS Lambda function that will be taking the prompt and invoking an Amazon Bedrock model (anthropic.claude-3-haiku-20240307-v1:0) synchronously. If you wish to try other models, make sure to modify the policy attached to the Lambda function and invoke the right model. 
 
 This pattern is a synchronous pattern. For an asynchronous approach, please check [this](../apigw-rest-api-sqs-lambda-bedrock-cdk) pattern that involves the usage of Amazon SQS.
 
@@ -107,7 +107,7 @@ Follow the example below and replace `{your-api-url}` with your api url from ste
     ```
 
 ## Extra Resources
-* [Bedrock Api Reference](https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html)
+* [Amazon Bedrock Api Reference](https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html)
 
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.

@@ -39,7 +39,27 @@ def get_aoss_index_name(resource_properties):
         
 #Function to use the opensearch-py library to create an index within an opensearch collection
 def create_aoss_index(index_name, aos_client):
-    aos_client.indices.create(index=index_name)
+    
+    index_body = {
+        "settings": {
+            "index.knn": True
+        },
+        "mappings": {
+            "properties": {
+                "page_vector": {
+                    "type": "knn_vector",
+                    "dimension": 1536
+                },
+                "page_text": {
+                    "type": "text"
+                },
+                "page_number":  { 
+                    "type" : "integer" 
+                }
+            }
+        }
+    }
+    aos_client.indices.create(index=index_name, body=index_body)
     print(f"Created index {index_name}")
     
 #Handles create event of the CloudFormation resource

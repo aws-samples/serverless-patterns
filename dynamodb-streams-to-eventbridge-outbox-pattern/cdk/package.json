@@ -27,7 +27,7 @@
     "@aws-sdk/client-eventbridge": "^3.200.0",
     "@aws-sdk/util-dynamodb": "^3.200.0",
     "@faker-js/faker": "^7.6.0",
-    "aws-cdk-lib": "2.80.0",
+    "aws-cdk-lib": "^2.185.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21",
     "uuid": "^9.0.0"

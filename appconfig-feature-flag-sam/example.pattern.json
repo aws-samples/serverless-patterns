@@ -3,7 +3,7 @@
     "description": "Create a AWS AppConfig Feature Flag with AWS SAM.",
     "language": "Typescript",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

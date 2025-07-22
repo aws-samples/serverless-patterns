@@ -1,0 +1,58 @@
+{
+  "title": "Process files uploaded to S3 with SQS, Lambda and DynamoDB",
+  "description": "Creates a serverless pattern to store and process csv data using Amazon S3, Amazon SQS, AWS Lambda and Amazon DynamoDB services",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+       "This AWS CDK template deploys an S3 bucket, SQS queue, Lambda function and DynamoDB table.",
+       "The SQS queue is configured to listen to S3 create object events",
+       "Lambda function is configured to read messages from the SQS queues, process them and insert records into DynamoDB table named EmployeeInfo."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-s3-sqs-lambda-dynamodb",
+      "templateURL": "serverless-patterns/cdk-s3-sqs-lambda-dynamodb",
+      "projectFolder": "cdk-s3-sqs-lambda-dynamodb",
+      "templateFile": "cdk-s3-sqs-lambda-dynamodb/lib/my-cdk-project-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "S3 event notification types and detinations",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html"
+      },
+      {
+        "text": "Configuring SQS queue to use with Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#events-sqs-queueconfig"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Create Stack: <code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shashi Shankar",
+      "image": "./assets/shankey28.jpg",
+      "bio": "Shashi Shankar is a Sr Cloud Architect at PwC Advisory services",
+      "linkedin": "https://www.linkedin.com/in/shashi-shankar-3a61a0a/"
+    }
+  ]
+}

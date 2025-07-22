@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Rust](https://www.rust-lang.org/) 1.56.0 or higher
-* [cargo-zigbuild](https://github.com/messense/cargo-zigbuild) and [Zig](https://ziglang.org/) for cross-compilation
+* [CargoLambda](https://www.cargo-lambda.info/guide/installation.html)
 * Make sure to run "rustup target add aarch64-unknown-linux-gnu;"
 
 ## Deployment Instructions
@@ -28,11 +28,11 @@ Important: this application uses various AWS services and there are costs associ
     ```
 3. Install dependencies and build:
     ```
-    make build
+    sam build
     ```
 4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
-    make deploy
+    sam deploy
     ```
 5. During the prompts:
     * Enter a stack name
@@ -52,7 +52,7 @@ This pattern deploys an Amazon Cloudfront distribution, an AWS Lambda function U
 
 Once the application is deployed, retrieve the CloudFront value from CloudFormation Outputs. Either browse to the endpoint in a web browser or call the endpoint from Postman.
 
-Example GET Request: https://{DistributionDomainName}
+Example GET Request: curl --location 'https://{DistributionDomainName}t?allowed_query_string_param=Daniele'
 
 Response:
 ```
@@ -65,7 +65,7 @@ X-Cache: Miss from cloudfront
 If you try again:
 X-Cache: Hit from cloudfront
 
-Example GET Request: https://{DistributionDomainName}?allowed_query_string_param=Daniele
+Example GET Request: curl --location 'https://{DistributionDomainName}t?allowed_query_string_param=Daniele'
 
 Response:
 ```
@@ -92,7 +92,7 @@ X-Cache: Hit from cloudfront
  
 1. Delete the stack
     ```bash
-    make delete
+    sam delete
     ```
 2. Confirm the stack has been deleted
     ```bash

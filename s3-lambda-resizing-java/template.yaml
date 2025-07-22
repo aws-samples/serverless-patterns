@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Image resizing service with Java-based Lambda functions (uksb-1tthgi812) (tag:s3-lambda-resizing-java)
+
+Parameters:
+  SourceBucketName:
+    Type: String
+    # Pass your bucket name dynamically or change it here
+    Default: my-source-bucket-name
+  DestinationBucketName:
+    Type: String
+    # Pass your bucket name dynamically or change it here
+    Default: my-destination-bucket-name
+
+Resources:
+  SourceBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref SourceBucketName
+
+  DestinationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DestinationBucketName
+
+  ResizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ResizerFunction
+      Handler: resizer.App::handleRequest
+      Runtime: java21
+      Timeout: 30
+      MemorySize: 1024
+      AutoPublishAlias: live
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          DESTINATION_BUCKET_NAME: !Ref DestinationBucketName
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref SourceBucketName
+        - S3CrudPolicy:
+            BucketName: !Ref DestinationBucketName
+      Events:
+        FileUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref SourceBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: '.jpeg'
+
+Outputs:
+  SourceBucketName:
+    Value: !Ref SourceBucketName
+    Description: S3 Bucket for object storage
+  DestinationBucketName:
+    Value: !Ref DestinationBucketName
+    Description: S3 destination Bucket for object storage
+  FunctionArn:
+    Value: !Ref ResizerFunction
+    Description: ResizerFunction function  Arn

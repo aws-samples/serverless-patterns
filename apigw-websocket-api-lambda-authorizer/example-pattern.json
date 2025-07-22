@@ -3,7 +3,7 @@
     "description": "This pattern demonstrates how to integrate Cognito authentication with Amazon API Gateway WebSocket API.",
     "language": ".NET",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

@@ -3,7 +3,7 @@
 	"description": "This example demonstrates a fan-out pattern using SNS topic and SQS queues. Subscription filters are used to route SNS topics to the the correct SQS queue.",
 	"language": "YAML",
 	"level": "200",
-	"framework": "SAM",
+	"framework": "AWS SAM",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

@@ -1,0 +1,58 @@
+{
+    "title": "Long running invocations of Amazon Bedrock using Amazon AppSync and AWS Lambda streaming",
+    "language": "Typescript",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "The pattern implements an asynchronous streaming architecture.",
+        "Client initiates a WebSocket subscription and makes a request to AppSync. AppSync invokes Lambda function in Event mode, enabling asynchronous processing.",
+        "Lambda function streams responses from Bedrock using ConverseStream. Lambda sends updates via mutations to AppSync. Updates are delivered to client through WebSocket subscription"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-lambda-bedrock-async-stream-subscription-cdk",
+        "templateURL": "serverless-patterns/appsync-lambda-bedrock-async-stream-subscription-cdk",
+        "projectFolder": "appsync-lambda-bedrock-async-stream-subscription-cdk",
+        "templateFile": "lib/appsync-lambda-bedrock-async-stream-subscription-cdk-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AWS AppSync JavaScript resolver and function reference for Amazon Bedrock runtime",
+          "link": "https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-bedrock-js.html#long-running-invocations"
+        },
+        {
+          "text": "Bedrock ConverseStream API",
+          "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ConverseStream.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk destroy --all</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Kaustav Dey",
+        "image": "https://avatars.githubusercontent.com/u/13236519",
+        "bio": "Solution Architect at AWS",
+        "linkedin": "https://www.linkedin.com/in/kaustavbecs/"
+      }
+    ]
+  }
+  

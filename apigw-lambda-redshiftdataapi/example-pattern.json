@@ -1,0 +1,55 @@
+{
+  "title": "Reshift Data API with API Gateway and Lambda",
+  "description": "Expose data from Redshift through API using API Gateway, Lambda and Redshift Data API",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates  how to expose data from Redshift through API using API Gateway, Lambda and Redshift Data API.",
+      "Implemented in CDK."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-redshiftdataapi",
+      "templateURL": "serverless-patterns/apigw-lambda-redshiftdataapi",
+      "projectFolder": "apigw-lambda-redshiftdataapi",
+      "templateFile": "apigw-lambda-redshiftdataapi/apigw_lambda_redshiftdataapi_stack"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Redshift Data API",
+        "link": "https://docs.aws.amazon.com/redshift/latest/mgmt/data-api.html"
+      },
+      {
+        "text": "API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --app \"python3 apigw_lambda_redshiftdataapi_stack.py\""
+    ]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk deploy --app \"python3 apigw_lambda_redshiftdataapi_stack.py\"</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Muthu Kumar",
+      "image": "https://avatars.githubusercontent.com/u/51725180",
+      "bio": "AWS Solutions Architect. Serverless advocate and enthusiast.",
+      "linkedin": "klmuthu"
+    }
+  ]
+}

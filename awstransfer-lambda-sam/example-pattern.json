@@ -3,7 +3,7 @@
     "description": "Setup an AWS SFTP server using AWS Transfer Family for SFTP with a workflow step to an AWS Lambda Function using AWS SAM.",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "Create a AWS Transfer Family SFTP Server to custom workflow step Lambda function.",
         "text": [

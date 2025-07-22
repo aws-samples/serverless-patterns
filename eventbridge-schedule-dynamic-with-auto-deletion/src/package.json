@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-scheduler": "^3.387.0",
-    "aws-cdk-lib": "2.80.0",
+    "aws-cdk-lib": "^2.185.0",
     "constructs": "^10.0.0",
     "date-fns": "^2.30.0"
   }

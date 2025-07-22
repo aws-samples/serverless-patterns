@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
 Description: >
   An AWS Lambda function and an Amazon Aurora PostgreSQL DB in an Aurora Serverless v2 DB cluster with RDS Data API and a Secrets Manager secret.
   (uksb-1tthgi812) (tag:lambda-aurora-serverlessv2-postgresql)
@@ -7,10 +8,11 @@ Description: >
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: python3.12
+    Runtime: python3.13
     MemorySize: 128
     Timeout: 10
     LoggingConfig:
+      LogGroup: !Sub /aws/lambda/${AWS::StackName}
       LogFormat: JSON
     Architectures:
       - arm64
@@ -64,11 +66,12 @@ Resources:
       DatabaseName: !Ref DatabaseName
       Engine: aurora-postgresql
       EngineMode: provisioned
+      EngineVersion: '16.4'
       StorageEncrypted: true
       # Enable the Data API for Aurora Serverless
       EnableHttpEndpoint: true
       ServerlessV2ScalingConfiguration:
-        MinCapacity: 0.5
+        MinCapacity: 0 #auto-pause
         MaxCapacity: 1
   AuroraInstance:
     Type: 'AWS::RDS::DBInstance'

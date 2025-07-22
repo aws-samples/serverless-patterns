@@ -3,7 +3,7 @@
     "description": "Perform sentiment analysis using Amazon Comprehend through AWS Lambda and Amazon API Gateway",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

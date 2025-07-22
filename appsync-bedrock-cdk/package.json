@@ -23,7 +23,7 @@
   "dependencies": {
     "@babel/preset-env": "^7.23.2",
     "aws-amplify": "^5.3.11",
-    "aws-cdk-lib": "2.80.0",
+    "aws-cdk-lib": "^2.185.0",
     "babel-jest": "^29.7.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"

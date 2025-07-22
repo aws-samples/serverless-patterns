@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: Event driven Amazon MQ for RabbitMQ message processing using AWS Lambda (Java)
+
+Globals:
+  Function:
+    Runtime: java21
+    MemorySize: 512
+
+Parameters:
+  username:
+    Type: String
+    AllowedPattern: "^[a-zA-Z0-9_][a-zA-Z0-9_.@-]{1,98}[a-zA-Z0-9_@.-]$"
+    Description: Username for accessing RabbitMQ
+  password:
+    Type: String
+    AllowedPattern: "^(?=(.*\\p{Print}){4,})(?!.*[ ,:=])[\\p{Print}]{12,}$"
+    Description: Password for accessing RabbitMQ (must be at least 12 characters long)
+
+Resources:
+  # Create the Amazon MQ Broker with RabbitMQ Engine
+  MyMQBroker:
+    Type: AWS::AmazonMQ::Broker
+    Properties: 
+      AutoMinorVersionUpgrade: false
+      BrokerName: myRabbitMQBroker
+      DeploymentMode: SINGLE_INSTANCE
+      EngineType: RABBITMQ
+      EngineVersion: "3.12.13"
+      HostInstanceType: mq.m5.large
+      PubliclyAccessible: true
+      Users:
+        - Password:
+            Ref: password
+          Username:
+            Ref: username
+  # Create the Lambda function to receive RabbitMQ messages
+  MyMQMessageHandlerFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: .
+      Handler: com.example.MyMQMessageHandlerFunction::handleRequest
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Resource:
+                - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:*/*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:*/*
+                - !Sub arn:aws:mq:${AWS::Region}:${AWS::AccountId}::*/*
+              Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeVpcs
+              - ec2:DeleteNetworkInterface
+              - ec2:DescribeSubnets
+              - ec2:DescribeSecurityGroups
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            BatchSize: 10
+            Broker: !GetAtt MyMQBroker.Arn
+            Queues:
+              - MyTestQueue
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Ref MySecret
+
+  # A secret to store Amazon MQ Access credential
+  MySecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: A secret to store Amazon MQ Access credential
+      SecretString: !Sub '{"username": "${username}", "password": "${password}"}'
+
+Outputs:
+  RabbitMQWebConsole:
+    Description: The RabbitMQ web-console URL
+    Value: !Sub 'https://${MyMQBroker}.mq.${AWS::Region}.amazonaws.com/'
+
+  MyMQMessageHandlerFunction:
+    Description: The name of the RabbitMQ message handler function
+    Value: !Ref MyMQMessageHandlerFunction

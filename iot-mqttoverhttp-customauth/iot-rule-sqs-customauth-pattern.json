@@ -4,7 +4,7 @@
   "language": "Node.js",
   "videoId": "",
   "level":"100",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "services": {
     "from": "iot",
     "to": "sqs"

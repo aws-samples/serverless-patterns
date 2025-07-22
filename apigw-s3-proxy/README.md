@@ -6,7 +6,7 @@ The API exposes 3 GET methods:
 
 * Root GET method: it provides a list of the S3 buckets of the account where the stack is deployed.
 * {folder} GET method: it provides a list of the objects contained in the bucket {folder}
-* {item} GET method: it returns the contents of the object {item}.
+* {item+} GET method: it returns the contents of the object in Folders and Sub-folders of S3 Bucket {item+}
 
 The template also deploys an IAM role with S3 read-only capabilities that is used by API Gateway to integrate with S3.
 
@@ -53,7 +53,7 @@ Important: this application uses various AWS services and there are costs associ
 The stack will output the **api endpoint**. Since all the methods are protected with IAM authentication, you can use *Postman* to send a SigV4-signed HTTP request to the API Gateway endpoint.
    
 ```
-https://12345abcde.execute-api.{region}.amazonaws.com/Prod/mybucket/myobject.txt
+https://12345abcde.execute-api.{region}.amazonaws.com/Prod/mybucket/folder1/folder2/index.html
 ```
 
 ## Cleanup

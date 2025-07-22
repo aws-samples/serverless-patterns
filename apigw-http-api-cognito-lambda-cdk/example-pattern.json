@@ -3,7 +3,7 @@
     "description": "This pattern creates an Amazon Gateway API (v2) and two Lambda functions protected by JwtAuthorizer and Cognito for user management.",
     "language": "Node.js",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

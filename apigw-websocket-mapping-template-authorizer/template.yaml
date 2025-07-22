@@ -1,0 +1,246 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM template for a websocket API with a mapping template and a Lambda integration
+
+Resources:
+  WebsocketApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: Websocket-api-mapping-template
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: $request.body.action
+
+  LambdaAuthorizer: 
+    Type: AWS::ApiGatewayV2::Authorizer
+    Properties:
+      ApiId: !Ref WebsocketApi
+      AuthorizerType: REQUEST
+      AuthorizerUri: 
+        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthFunction.Arn}/invocations
+      Name: lambda-authorizer-request
+      IdentitySource: 
+       - route.request.header.token
+      
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId:
+        Ref: WebsocketApi
+      RouteKey: $connect
+      Target:
+        Fn::Join:
+        - /
+        - - integrations
+          - Ref: ConnectInteg
+      AuthorizationType: CUSTOM
+      AuthorizerId: !Ref LambdaAuthorizer
+
+  ConnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebsocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnConnectFunction.Arn}/invocations
+  
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId:
+        Ref: WebsocketApi
+      RouteKey: $disconnect
+      Target:
+        Fn::Join:
+        - /
+        - - integrations
+          - Ref: DisconnectInteg
+  DisconnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId:
+        Ref: WebsocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnDisconnectFunction.Arn}/invocations
+  
+  SendRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId:
+        Ref: WebsocketApi
+      RouteKey: sendmessage
+      Target:
+        Fn::Join:
+        - /
+        - - integrations
+          - Ref: SendInteg
+
+  SendInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId:
+        Ref: WebsocketApi
+      Description: Send Integration
+      IntegrationType: AWS
+      IntegrationUri:
+        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SendMessageFunction.Arn}/invocations
+      RequestTemplates:
+        application/json: |
+          {
+            "requestContext": {
+              "routeKey": "$context.routeKey",
+              "messageId": "$context.messageId",
+              "auth": "$context.authorizer.principalId",
+              "token": "$context.authorizer.token",
+              "eventType": "$context.eventType",
+              "extendedRequestId": "$context.extendedRequestId",
+              "requestTime": "$context.requestTime",
+              "messageDirection": "$context.messageDirection",
+              "stage": "$context.stage",
+              "connectedAt": "$context.connectedAt",
+              "requestTimeEpoch": "$context.requestTimeEpoch",
+              "sourceIp": "$context.identity.sourceIp",
+              "requestId": "$context.requestId",
+              "domainName": "$context.domainName",
+              "connectionId": "$context.connectionId",
+              "apiId": "$context.apiId"
+            },
+              "body": "$util.escapeJavaScript($input.body)",
+              "isBase64Encoded": "$context.isBase64Encoded"
+          }
+
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+    - ConnectRoute
+    - SendRoute
+    - DisconnectRoute
+    Properties:
+      ApiId:
+        Ref: WebsocketApi
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: stage
+      DeploymentId:
+        Ref: Deployment
+      ApiId:
+        Ref: WebsocketApi
+
+  ConnectionsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: connectionId
+        Type: String
+      TableName: connection_table
+
+  AuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: authorizer.handler
+      MemorySize: 256
+      CodeUri: ./src
+      Runtime: nodejs22.x
+
+  LambdaAuthPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+    - WebsocketApi
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Ref: AuthFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*'
+      
+     
+  OnConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: onconnect.handler
+      CodeUri: ./src
+      Runtime: nodejs22.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ConnectionsTable
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref ConnectionsTable
+
+  OnConnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+    - WebsocketApi
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Ref: OnConnectFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*'
+
+  OnDisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ondisconnect.handler
+      CodeUri: ./src
+      Runtime: nodejs22.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ConnectionsTable
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref ConnectionsTable
+
+  OnDisconnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+    - WebsocketApi
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Ref: OnDisconnectFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*'
+
+  SendMessageFunction:
+    Type: AWS::Serverless::Function
+    DependsOn:
+    - WebsocketApi
+    Properties:
+      Handler: sendmessage.handler
+      CodeUri: ./src
+      Runtime: nodejs22.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ConnectionsTable
+          API_ID: !Ref WebsocketApi
+          STAGE: "stage"
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ConnectionsTable
+        - Statement:
+          - Effect: Allow
+            Action:
+            - execute-api:ManageConnections
+            Resource:
+            - Fn::Sub: arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*
+
+  SendMessagePermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+    - WebsocketApi
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref SendMessageFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*'
+
+Outputs:
+  WebSocketCommand:
+    Description: "The WSS command to use to connect"
+    Value: !Join [ '', [ 'wscat --header token:hello -c wss://', !Ref WebsocketApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+  PayloadJson:
+    Description: "The Json payload you can send to try the sendmessage route"
+    Value: '{"action": "sendmessage","message" : "hey queen"}'

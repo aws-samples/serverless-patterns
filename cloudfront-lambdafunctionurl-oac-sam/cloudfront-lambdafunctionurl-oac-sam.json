@@ -1,0 +1,76 @@
+{
+  "title": "Amazon CloudFront Origin Access Control for AWS Lambda Function URL",
+  "description": "Access your Lambda Function URLs securely using Amazon CloudFront Origin Access Control",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template sets up a CloudFront Distribution with a Lambda function URL as the origin. An Origin Access Control (OAC) specific to Lambda is created and linked to the CloudFront Distribution, ensuring that only CloudFront can access the Lambda function URL. The template also configures appropriate invoke permissions for the Lambda function. The Origin and Cache Behavior settings in the CloudFront Distribution are optimized for best practices when using a Lambda function URL as the origin."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/cloudfront-lambdafunctionurl-oac-sam",
+      "templateURL": "serverless-patterns/cloudfront-lambdafunctionurl-oac-sam",
+      "projectFolder": "cloudfront-lambdafunctionurl-oac-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon CloudFront now supports Origin Access Control (OAC) for Lambda function URL origins",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2024/04/amazon-cloudfront-oac-lambda-function-url-origins/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided",
+      "See the GitHub repo for detailed build and deploy instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "Access the Lambda function URL both through the CloudFront distribution and directly, then observe the results.",
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete",
+      "See the GitHub repo for detailed cleanup instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shekhar Shrinivasan",
+      "image": "https://avatars.githubusercontent.com/u/58206425?s=400&u=90899732423049a2e45523f631ab0379330aec62&v=4",
+      "bio": "Senior Technical Consultant (TAM) at Amazon Web Services (AWS)",
+      "linkedin": "shekhar-shrinivasan",
+      "twitter": ""
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "cloudfront",
+      "label": "Amazon CloudFront"
+    },
+    "icon2": {
+      "x": 80,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2",
+      "label": "function URL"
+    }
+  }
+}

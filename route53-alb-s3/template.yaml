@@ -1,0 +1,383 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: This template deploys infrastructure for a private website.
+
+Parameters:
+  PrivateWebsiteDomainName:
+    Type: String
+    Description: The name of the domain for the private website. This will also be the name of the S3 bucket that will created and therefore needs to be unique globally.
+
+Resources:
+  VPC: 
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: private-website-vpc
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: !Select [1, !GetAZs '']
+
+  # Private Application Load balancer
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: internal
+      Subnets:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+  ApplicationLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ApplicationLoadBalancerTargetGroup
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref Certificate
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01
+  ApplicationLoadBalancerListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        # Redirect to URL
+        - Type: redirect
+          RedirectConfig:
+            Host: "#{host}"
+            Path: "/#{path}index.html"
+            Port: "443"
+            Protocol: "HTTPS"
+            Query: "#{query}"
+            StatusCode: HTTP_301
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - "*/"
+      ListenerArn: !Ref ApplicationLoadBalancerListener
+      Priority: 1
+  ApplicationLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 6
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Matcher:
+        HttpCode: "307,405"
+      Port: 443
+      Protocol: HTTPS
+      TargetType: ip
+      Targets:
+        - Id: !Select [0, !GetAtt VPCEndpointPrivateIPs.PrivateIps]
+        - Id: !Select [1, !GetAtt VPCEndpointPrivateIPs.PrivateIps]
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VPC
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow incoming HTTP traffic
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+        - CidrIpv6: ::/0
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+      Tags:
+        - Key: Name
+          Value: alb-sg      
+
+  # Private Route 53 for the internal domain
+  PrivateHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref PrivateWebsiteDomainName
+      VPCs:
+        - VPCId: !Ref VPC
+          VPCRegion: !Ref AWS::Region
+      HostedZoneConfig:
+        Comment: Config for my hosted zone
+  PrivateDNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: !Ref PrivateWebsiteDomainName
+      Type: A
+      HostedZoneId: !Ref PrivateHostedZone
+      AliasTarget:
+        DNSName: !GetAtt ApplicationLoadBalancer.DNSName
+        HostedZoneId: !GetAtt ApplicationLoadBalancer.CanonicalHostedZoneID
+
+  # S3 bucket to host the static website
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref PrivateWebsiteDomainName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Id: PolicyForVPCEndpoint
+        Statement:
+          - Sid: AllowGetObjectFromVPCEndpoint
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource:
+              - !GetAtt S3Bucket.Arn
+              - !Sub "${S3Bucket.Arn}/*"
+            Condition:
+              StringEquals:
+                "aws:sourceVpce": !Ref VPCEndpointS3
+
+  # Create VPC Interface Endpoint for S3
+  VPCEndpointS3:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action:
+              - "s3:GetObject"
+              - "s3:ListBucket"
+            Resource:
+              - !GetAtt S3Bucket.Arn
+              - !Sub "${S3Bucket.Arn}/*"
+  VPCEndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow incoming HTTPS traffic from VPC Endpoint
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - SourceSecurityGroupId: !GetAtt ALBSecurityGroup.GroupId
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          Description: Allow incoming HTTPS traffic from ALB Security Group
+        - CidrIpv6: ::/0
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          Description: Allow incoming HTTPS traffic from ALB Security Group
+      Tags:
+        - Key: Name
+          Value: vpc-ep-sg
+
+  # Lambda backed custom resource to get the IPs of the VPC endpoint
+  VPCEndpointPrivateIPs:
+    Type: Custom::VPCEndpointPrivateIPs
+    DependsOn: VPCEndpointS3
+    Properties:
+      ServiceToken: !GetAtt LambdaFunction.Arn
+      NetworkInterfaceIds: !GetAtt VPCEndpointS3.NetworkInterfaceIds
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+
+          ec2 = boto3.client('ec2')
+
+          def get_private_ips(network_interface_ids):
+              private_ips = []
+              for network_interface_id in network_interface_ids:
+                  response = ec2.describe_network_interfaces(NetworkInterfaceIds=[network_interface_id])
+                  private_ips.append(response['NetworkInterfaces'][0]['PrivateIpAddress'])
+              return private_ips
+
+          def handler(event, context):
+              try:
+                  print(f"Event: {event}")
+                  if event['RequestType'] == 'Delete':
+                    cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, "")
+          
+                  # Extract the network interface IDs from the event
+                  network_interface_ids = event['ResourceProperties']['NetworkInterfaceIds']
+          
+                  # Retrieve private IP addresses from network interfaces
+                  private_ips = get_private_ips(network_interface_ids)
+          
+                  # Return the private IP addresses of the VPC endpoint to CloudFormation
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {
+                      'PrivateIps': private_ips
+                  }, f"Private IPs of the VPCE extracted - {', '.join(private_ips)}")
+              except Exception as e:
+                  cfnresponse.send(event, context, cfnresponse.FAILED, {}, str(e))
+      Handler: index.handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: VPCEndpointPrivateIPsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ec2:DescribeNetworkInterfaces'
+                Resource: '*'
+
+ # Private Certificate
+  RootCA:
+    Type: AWS::ACMPCA::CertificateAuthority
+    Properties:
+      Type: ROOT
+      KeyAlgorithm: RSA_2048
+      SigningAlgorithm: SHA256WITHRSA
+      Subject:
+        Country: US
+        Organization: Example Inc.
+        CommonName: Example Root CA 1
+      RevocationConfiguration:
+        CrlConfiguration:
+          Enabled: false
+  RootCACertificate:
+    Type: AWS::ACMPCA::Certificate
+    Properties:
+      CertificateAuthorityArn: !Ref RootCA
+      CertificateSigningRequest: !GetAtt RootCA.CertificateSigningRequest
+      SigningAlgorithm: SHA256WITHRSA
+      TemplateArn: arn:aws:acm-pca:::template/RootCACertificate/V1
+      Validity:
+        Type: DAYS
+        Value: 730
+  RootCAActivation:
+    Type: AWS::ACMPCA::CertificateAuthorityActivation
+    Properties:
+      CertificateAuthorityArn: !Ref RootCA
+      Certificate: !GetAtt RootCACertificate.Certificate
+      Status: ACTIVE
+  RootCAPermission:
+    Type: AWS::ACMPCA::Permission
+    Properties:
+      Actions:
+        - IssueCertificate
+        - GetCertificate
+        - ListPermissions
+      CertificateAuthorityArn: !Ref RootCA
+      Principal: acm.amazonaws.com
+  SubordinateCA:
+    Type: AWS::ACMPCA::CertificateAuthority
+    Properties:
+      Type: SUBORDINATE
+      KeyAlgorithm: RSA_2048
+      SigningAlgorithm: SHA256WITHRSA
+      Subject:
+        Country: US
+        Organization: Example Inc.
+        CommonName: Example Subordinate CA
+      RevocationConfiguration: {}
+      Tags: []
+  SubordinateCACACertificate:
+    DependsOn: RootCAActivation
+    Type: AWS::ACMPCA::Certificate
+    Properties:
+      CertificateAuthorityArn: !Ref RootCA
+      CertificateSigningRequest: !GetAtt SubordinateCA.CertificateSigningRequest
+      SigningAlgorithm: SHA256WITHRSA
+      TemplateArn: arn:aws:acm-pca:::template/SubordinateCACertificate_PathLen3/V1
+      Validity:
+        Type: DAYS
+        Value: 720
+  SubordinateCAActivation:
+    Type: AWS::ACMPCA::CertificateAuthorityActivation
+    Properties:
+      CertificateAuthorityArn: !Ref SubordinateCA
+      Certificate: !GetAtt SubordinateCACACertificate.Certificate
+      CertificateChain: !GetAtt RootCAActivation.CompleteCertificateChain
+      Status: ACTIVE
+  SubordinateCAPermission:
+    Type: AWS::ACMPCA::Permission
+    Properties:
+      Actions:
+        - IssueCertificate
+        - GetCertificate
+        - ListPermissions
+      CertificateAuthorityArn: !Ref SubordinateCA
+      Principal: acm.amazonaws.com
+  # Create a private certificate in ACM
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    DependsOn:
+      - PrivateHostedZone
+      - PrivateDNSRecord
+    Properties:
+      CertificateAuthorityArn: !Ref SubordinateCA
+      DomainName: !Ref PrivateWebsiteDomainName
+
+Outputs:
+  WebsiteBucket:
+    Description: The S3 bucket to host the static website. Upload the website's static contents to this bucket.
+    Value: !Ref S3Bucket
+  PrivateWebsiteUrl:
+    Description: The URL to access the static website. This needs to be accessed from a location which has connectivity to the private ALB. You could test this by launching an AWS CloudShell in the VPC and access the URL using curl -v -k -L ${PrivateWebsiteUrl}
+    Value: !Sub "https://${PrivateWebsiteDomainName}"
+    Export:
+      Name: PrivateWebsiteUrl
+  VPCId:
+    Description: The name of the VPC
+    Value: !Ref VPC
+  ALBSecurityGroup:
+    Description: The Security Group ID for the ALB
+    Value: !Ref ALBSecurityGroup
+  VPCEndpointSecurityGroup:
+    Description: The Security Group ID for the VPC Endpoint
+    Value: !Ref VPCEndpointSecurityGroup

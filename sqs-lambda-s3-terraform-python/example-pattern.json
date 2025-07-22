@@ -1,0 +1,83 @@
+{
+    "title": "Amazon SQS to Amazon S3 integration using AWS Lambda",
+    "description": "Integrate an Amazon SQS queue with an Amazon S3 bucket using an AWS Lambda function",
+    "language": "Python",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an SQS queue, a Lambda function, an S3 bucket along with event source mapping for the Lambda function and appropriate permissions to enable the interfacing between these resources.",
+            "The SQS queue is configured as a trigger for the Lambda function. Whenever a message is posted to the SQS queue, the Lambda function is invoked synchronously. This is useful in scenarios where the message requires some pre-processing before storage."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-s3-terraform-python",
+            "templateURL": "serverless-patterns/sqs-lambda-s3-terraform-python",
+            "projectFolder": "sqs-lambda-s3-terraform-python",
+            "templateFile": "main.tf"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "SQS to Lambda to S3 pattern",
+                "link": "https://serverlessland.com/patterns/sqs-lambda-s3"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "See the GitHub repo for detailed deployment instructions."
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "See the GitHub repo for detailed cleanup instructions."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Siddharth Das",
+            "image": "https://avatars.githubusercontent.com/u/62172649?v=4",
+            "bio": "Principal Software Engineer at Fidelity Investments",
+            "linkedin": "siddharth-das-a2578257"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 10,
+            "y": 50,
+            "service": "sqs",
+            "label": "Amazon SQS"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 90,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": ""
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": ""
+        }
+    }
+}

@@ -1,0 +1,71 @@
+{
+  "title": "Prompt Chaining with Amazon API Gateway and AWS Step Functions.",
+  "description": "Prompt Chaining no-code example with Amazon API Gateway HTTP API, AWS Step Functions and Amazon Bedrock.",
+  "language": "",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The provided example demonstrates the deployment of a serverless application using the AWS Serverless Application Model (SAM) template.",
+      "This serverless application includes an Amazon API Gateway HTTP API endpoint that is connected to an AWS Step Functions state machine.",
+      "The state machine is designed to invoke an Express workflow synchronously.",
+      "It utilizes AWS Step Functions' intrinsic functions to chain two prompts, which are then used to invoke the Amazon Bedrock language model.",
+      "The output from the state machine execution is returned to the client within 29 seconds through the HTTP API.", 
+      "This no-code example showcases how the results from the first prompt can be used to provide context for the second prompt, allowing the language model to deliver a highly-curated response.", 
+      "By chaining these prompts, the system can leverage the capabilities of the language model to generate more meaningful and contextual outputs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-stepfunctions-express-sync-bedrock-sam",
+      "templateURL": "serverless-patterns/apigw-rest-stepfunctions-express-sync-bedrock-sam",
+      "projectFolder": "apigw-rest-stepfunctions-express-sync-bedrock-sam",
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon API Gateway",
+        "link": "https://aws.amazon.com/api-gateway/"
+      },
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/bedrock/"
+      },
+      {
+        "text": "AWS Step Functions Intrinsic functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-intrinsic-functions.html"
+      },
+      {
+        "text": "Synchronous and Asynchronous Express Workflows",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/concepts-express-synchronous.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>sam delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mike Hume",
+      "image": "https://media.licdn.com/dms/image/D4E03AQEiUfmBiUOw_A/profile-displayphoto-shrink_200_200/0/1718324029612?e=1727308800&v=beta&t=ybhm76l-CP5xcUsHbdq2IaJOlfyycvQ6gNwuCSd3Z0w",
+      "bio": "AWS Senior Solutions Architect & UKPS Serverless Lead.",
+      "linkedin": "michael-hume-4663bb64",
+      "twitter": ""
+    }
+  ]
+}

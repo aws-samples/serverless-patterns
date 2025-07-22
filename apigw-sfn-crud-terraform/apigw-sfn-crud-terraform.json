@@ -1,0 +1,92 @@
+{
+    "title": "Amazon API Gateway, AWS Step Functions, to Amazon DynamoDB CRUD API",
+    "description": "Create a CRUD API with AWS Step Functions.",
+    "language": "",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+        "headline": "Create a CRUD API with AWS Step Functions.",
+        "text": [
+            "This stack creates a fully functioning CRUD API powered by Amazon API Gateway direct integration to AWS Step Functions and backed by Amazon DynamoDB."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn-crud-terraform",
+            "templateURL": "serverless-patterns/apigw-sfn-crud-terraform",
+            "projectFolder": "apigw-sfn-crud-terraform",
+            "templateFile": "main.tf"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Synchronous Express Workflows for AWS Step Functions",
+                "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions"
+            },
+            {
+                "text": "API Gateway VTL",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/rest-api-data-transformations.html"
+            },
+            {
+                "text": "Simple CRUD with API Gateway & DynamboDB",
+                "link": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-ddb-openapi-crud"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "terraform init",
+            "terraform apply"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>terraform destroy</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Oriol Matavacas",
+            "image": "https://togithub.s3.eu-west-1.amazonaws.com/Oriol.jpg",
+            "bio": "Oriol Matavacas is a Senior Solutions Architect at AWS based in Barcelona. Oriol primarily supports customers on the journey to the Cloud. He enjoys building new solutions with scalability, availability and easy to maintain by using serverless.",
+            "linkedin": "oriol-matavacas-rodriguez-b165868a",
+            "twitter": ""
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway REST API"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "sfn",
+            "label": "AWS Step Functions"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": ""
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": ""
+        }
+    }
+}

@@ -3,7 +3,7 @@
   "description": "The SAM template deploys Amazon SQS FIFO queues with DLQ and AWS Lambda functions to simulate the redrive capability of SQS FIFO queues from DLQ.", 
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

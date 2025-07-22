@@ -1,0 +1,177 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM Template for accountA containing Private API Gateway, VPC Link, Network Load Balancer, and ECS Cluster with Fargate. 
+
+Parameters:
+  ########### Parameters ###########
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: The VPC ID where the ECS service will be deployed.
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: The first private subnet ID within the VPC.
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description: The second private subnet ID within the VPC.
+  CentralAccountVpcID:
+    Type: String
+    Description: The ID of the VPC from the Central Account
+
+Resources:
+  ########### Private API Gateway ###########
+  PrivateApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration: PRIVATE
+      StageName: Prod
+      AlwaysDeploy: true
+      DefinitionBody:
+        openapi: "3.0.1"
+        info:
+          title: !Sub "PrivateApi-${AWS::StackName}"
+          version: "1.0"
+        paths:
+          /:
+            get:
+              responses:
+                "200":
+                  description: "200 response"
+              x-amazon-apigateway-integration:
+                connectionId: !Ref ApiGatewayVpcLink
+                httpMethod: GET
+                uri: !Sub http://${NLB.DNSName}/
+                connectionType: VPC_LINK
+                passthroughBehavior: when_no_match
+                type: http_proxy
+        x-amazon-apigateway-policy:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Principal: "*"
+            Action: "execute-api:Invoke"
+            Resource: "execute-api:/*"
+            Condition:
+              StringEquals:
+                aws:sourceVpc: !Ref CentralAccountVpcID
+
+  ########### API Gateway VPC Link ###########
+  ApiGatewayVpcLink:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: !Sub VPCLinkRestNlbInternal-${AWS::StackName}
+      TargetArns:
+        - !Ref NLB
+
+  ########### Network Load Balancer (NLB) ###########
+  NLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub PrivateNLB-${AWS::StackName}
+      Scheme: internal
+      Subnets:
+        - Ref: PrivateSubnet1
+        - Ref: PrivateSubnet2
+      Type: network
+      EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic: "off"
+      SecurityGroups:
+        - !Ref NLBSecurityGroup
+
+  ########### NLB Listener ###########
+  NLBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref NLBTG
+      LoadBalancerArn: !Ref NLB
+      Port: 80
+      Protocol: TCP
+
+  ########### NLB Target Group ###########
+  NLBTG:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub FargateNLB-TG-${AWS::StackName}
+      Port: 80
+      Protocol: TCP
+      VpcId: !Ref VPCId
+      TargetType: ip
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: '80'
+      HealthCheckPath: '/'
+      Matcher:
+        HttpCode: 200
+
+  ########### ECS Cluster ###########
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub FargateCluster-${AWS::StackName}
+
+  ########### ECS Fargate Task Definition ###########
+  ECSFargateTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: FargateTask
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ContainerDefinitions:
+        - Name: nginx
+          Image: public.ecr.aws/nginx/nginx:latest
+          Essential: true
+          PortMappings:
+            - ContainerPort: 80
+              Protocol: tcp
+
+  ########### ECS Fargate Service ###########
+  ECSFargateService:
+    Type: AWS::ECS::Service
+    DependsOn: NLBListener
+    Properties:
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref ECSFargateTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - Ref: PrivateSubnet1
+            - Ref: PrivateSubnet2
+          SecurityGroups:
+            - !Ref ECSSecurityGroup
+      LoadBalancers:
+        - ContainerName: nginx
+          ContainerPort: 80
+          TargetGroupArn: !Ref NLBTG
+
+  ########### ECS Security Group ###########
+  ECSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for ECS Fargate Service
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref NLBSecurityGroup
+
+  ########### NLB Security Group ###########
+  NLBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for the NLB
+      VpcId: !Ref VPCId
+
+Outputs:
+  ########### Outputs ###########
+  ApiUrl:
+    Description: "API Gateway Invoke URL"
+    Value: !Sub "https://${PrivateApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
+ 

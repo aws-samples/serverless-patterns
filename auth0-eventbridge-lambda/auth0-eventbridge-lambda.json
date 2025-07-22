@@ -3,7 +3,7 @@
     "description": "Use the Amazon EventBridge Auth0 SaaS integration to process failed login attempts with AWS Lambda.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

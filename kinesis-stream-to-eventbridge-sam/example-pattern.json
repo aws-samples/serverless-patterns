@@ -3,7 +3,7 @@
   "description": "This pattern creates an EventBridge Pipe which consumes messages from Amazon Kinesis Stream and places events on an Amazon EventBridge custom Bus.",
   "language": "YAML",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

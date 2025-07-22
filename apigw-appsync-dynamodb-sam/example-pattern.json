@@ -1,0 +1,64 @@
+{
+  "title": "Amazon API Gateway to AWS AppSync to Amazon DynamoDB ",
+  "description": "Create an Amazon API Gateway HTTP API as a proxy to AWS AppSync GraphQL API with Amazon DynamoDB as the API data source",
+  "language": "Yaml",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This patterns creates Amazon API Gateway HTTP API which is used as a proxy to AWS AppSync GraphQL API with Amazon DynamoDB as the data source.",
+      "To demonstrate the pattern, we have built a simple Restaurant API where users can add, delete, update, get and list restaurants. All requests to the API Gateway endpoint is sent to the AppSync API endpoint where the request is fulfilled.",
+      "This implementation will support all GraphQL queries and mutations defined in the AppSync API GraphQL schema however will not support subscriptions"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-appsync-dynamodb-sam",
+      "templateURL": "serverless-patterns/apigw-appsync-dynamodb-sam",
+      "projectFolder": "apigw-appsync-dynamodb-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "API Gateway documentation:",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
+      },
+      {
+        "text": "AppSync documentation:",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html"
+      },
+      {
+        "text": "DynamoDB documentation:",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ozioma Uzoegwu",
+      "image": "./Ouzoegwu.jpeg",
+      "bio": "I am a Principal Solutions Architect working at AWS",
+      "linkedin": "ouzoegwu",
+      "twitter": "iam_tessot"
+    }
+  ]
+}
+

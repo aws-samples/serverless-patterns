@@ -6,7 +6,7 @@ Description: An AWS Lambda function and an AWS Systems Manager Parameter Store p
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: nodejs14.x
+    Runtime: nodejs20.x
     MemorySize: 128
     Timeout: 15
 

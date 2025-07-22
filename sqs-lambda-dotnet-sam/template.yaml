@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SQS to Lambda (uksb-1tthgi812) (tag:sqs-lambda-dotnet-sam)
+
+Resources:
+  # Main processing queue with DLQ configuration
+  ProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-queue
+      MessageRetentionPeriod: 1800  # 30 minutes in seconds
+      VisibilityTimeout: 30
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt ProcessingDLQ.Arn
+        maxReceiveCount: 3 # Messages will be moved to DLQ after 3 failed attempts
+
+  # Dead Letter Queue
+  ProcessingDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-dlq
+  ProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: SqsIntegration::SqsIntegration.Function::FunctionHandler
+      Runtime: dotnet8
+      Timeout: 30
+      MemorySize: 256
+      Architectures:
+        - arm64      
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ProcessingQueue.Arn
+            BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt ProcessingQueue.QueueName
+
+Outputs:
+  ProcessorFunctionName:
+    Description: "Lambda Function Name"
+    Value: !Ref ProcessorFunction
+
+  ProcessorFunctionARN:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt ProcessorFunction.Arn
+
+  ProcessingQueueARN:
+    Description: "Processing SQS Queue ARN"
+    Value: !GetAtt ProcessingQueue.Arn
+
+  ProcessingQueueURL:
+    Description: "SQS Queue URL"
+    Value: !Ref ProcessingQueue
+
+  ProcessingDLQARN:
+    Description: "Dead Letter Queue ARN"
+    Value: !GetAtt ProcessingDLQ.Arn

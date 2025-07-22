@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'SAM Template for VPC with peering connection and Lambda function (uksb-1tthgi812) (tag:private-apigw-cross-region-2)'
+
+Parameters:
+  VpcCidrBlock:
+    Type: String
+    Default: 192.168.0.0/16
+    Description: The CIDR block for the VPC (must be a /16 block)
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){2}0\.0\/16$
+    ConstraintDescription: Must be a valid /16 IP CIDR range of the form x.x.0.0/16.
+
+  APIID:
+    Description: ID of the API Gateway
+    Type: String
+
+  PeerVPCID:
+    AllowedPattern: '^vpc-[0-9a-f]{17}$'
+    ConstraintDescription: Must have a prefix of "vpc-". Followed by 17 characters (numbers, letters "a-f")
+    Description: ID of the VPC which you are creating the VPC peering connection with
+    Type: String
+
+  REMOTEVPCCIDR:
+    Description: Remote VPC CIDR Block
+    Type: String
+
+  VPCENDPOINTURL:
+    Description: VPC Endpoint URL
+    Type: String
+
+  PeerRegion:
+    Description: Region of the VPC Accepter
+    Type: String
+
+Resources:
+  myVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-VPC'
+
+  subnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: !Select [ 0, !Cidr [ !Ref VpcCidrBlock, 1, 8 ] ]
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Subnet'
+
+  myRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myVPC
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-RT'
+          
+  myInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-IGW'
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref myVPC
+      InternetGatewayId: !Ref myInternetGateway
+
+  myRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref myRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref myInternetGateway
+
+  mySubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref subnet
+      RouteTableId: !Ref myRouteTable
+
+  mySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow HTTPS traffic from the VPC'
+      VpcId: !Ref myVPC
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref REMOTEVPCCIDR
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-SG'
+
+  VPCPeeringConnection:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties:
+      VpcId: !Ref myVPC
+      PeerVpcId: !Ref PeerVPCID
+      PeerOwnerId: !Ref "AWS::AccountId"
+      PeerRegion: !Ref PeerRegion
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-peering'
+
+  myRoutePeering:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref myRouteTable
+      DestinationCidrBlock: !Ref REMOTEVPCCIDR
+      VpcPeeringConnectionId: !Ref VPCPeeringConnection
+
+  DNS: 
+    Type: AWS::Route53::HostedZone
+    Properties: 
+      Name: !Sub 'execute-api.${PeerRegion}.amazonaws.com'
+      VPCs: 
+        - VPCId: !Ref myVPC
+          VPCRegion: !Ref AWS::Region
+
+  myDNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref DNS
+      Name: !Sub '${APIID}.execute-api.${PeerRegion}.amazonaws.com'
+      ResourceRecords: 
+        - !Ref VPCENDPOINTURL
+      TTL: 900
+      Type: CNAME
+
+  myLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: UrlLibLambdaFunction
+      Handler: index.lambda_handler
+      Runtime: python3.11
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref mySecurityGroup
+        SubnetIds:
+          - !Ref subnet
+      Environment:
+        Variables:
+          API_ID: !Ref APIID
+          API_REGION: !Ref PeerRegion
+      InlineCode: |
+        import urllib.request
+        import json
+        import os
+
+        def lambda_handler(event, context):
+            api_id = os.environ['API_ID']
+            api_region = os.environ['API_REGION']
+            url = f'https://{api_id}.execute-api.{api_region}.amazonaws.com/test/test-resource'
+            with urllib.request.urlopen(url) as response:
+                data = response.read()
+                return {
+                    'statusCode': response.status,
+                    'body': data.decode('utf-8')
+                }
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaVPCAccessExecutionRole
+
+Outputs:
+  PeeringConnection:
+    Description: The ID of the VPC Peering
+    Value: !Ref VPCPeeringConnection
+
+  VPCCidr:
+    Description: Cidr Range of the VPC
+    Value: !Ref VpcCidrBlock
+
+  LambdaFunctionName:
+    Description: Name of the Lambda function
+    Value: !Ref myLambdaFunction

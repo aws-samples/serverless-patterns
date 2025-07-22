@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SQS to Lambda (uksb-1tthgi812) (tag:sqs-lambda-python-sam)
+
+Resources:
+  ProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 30
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt ProcessingDLQ.Arn
+        maxReceiveCount: 3
+
+  ProcessingDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600  # 14 days
+
+  # Define the consumer Lambda function
+  ProcessorFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.13
+      Timeout: 3
+      MemorySize: 128
+      Architectures:
+        - arm64
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ProcessingQueue.Arn
+            BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures     
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn: !GetAtt ProcessingDLQ.Arn                     
+
+Outputs:
+  ProcessorFunctionName:
+    Description: "Lambda Function Name"
+    Value: !Ref ProcessorFunction
+
+  ProcessorFunctionARN:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt ProcessorFunction.Arn
+
+  ProcessingQueueARN:
+    Description: "Processing SQS Queue ARN"
+    Value: !GetAtt ProcessingQueue.Arn
+
+  ProcessingQueueURL:
+    Description: "SQS Queue URL"
+    Value: !Ref ProcessingQueue
+
+  ProcessingDLQARN:
+    Description: "Dead Letter Queue ARN"
+    Value: !GetAtt ProcessingDLQ.Arn

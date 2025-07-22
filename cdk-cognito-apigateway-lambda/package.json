@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@aws-cdk/aws-apigatewayv2-authorizers": "^1.175.0",
-    "aws-cdk-lib": "2.80.0",
+    "aws-cdk-lib": "^2.185.0",
     "constructs": "^10.1.116",
     "jsonwebtoken":">=9.0.0",
     "jwk-to-pem": "^2.0.5"

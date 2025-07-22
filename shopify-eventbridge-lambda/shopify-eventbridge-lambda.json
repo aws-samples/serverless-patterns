@@ -1,0 +1,102 @@
+{
+    "title": "Shopify - Amazon EventBridge Webhook Integration to AWS Lambda",
+    "description": "Use Amazon EventBridge Shopify webhook integration to process product events with AWS Lambda, notify users with Amazon SES or store data elsewhere.",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to use the Shopify webhook integration with Amazon EventBridge and AWS Lambda to process events from Shopify. This pattern is leveraging the Shopfy Amazon EventBridge webhook integration to send events from the customer's Shopify account to their AWS account, via an Amazon EventBridge Partner event bus.",
+            "Once the Shopify events are in the customer's account, an Amazon EventBridge rule routes updated product events to a downstream Lambda function. The Lambda function could transform the event, send it to a downstream application, archive it in a warehouse service, or send a notification email to a customer using SES.",
+            "Amazon CloudWatch Log Groups are provisioned for debugging and auditing.",
+            "This pattern deploys two EventBridge Rules, one Lambda function, and two CloudWatch Log Groups."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/shopify-eventbridge-lambda",
+            "templateURL": "serverless-patterns/shopify-eventbridge-lambda",
+            "projectFolder": "shopify-eventbridge-lambda",
+            "templateFile": "app.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon EventBridge SaaS Integrations",
+                "link": "https://aws.amazon.com/eventbridge/integrations/"
+            },
+            {
+                "text": "Amazon EventBridge SaaS Integrations Documentation",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html"
+            },
+            {
+                "text": "Shopify's Amazon EventBridge Webhook Integration",
+                "link": "https://shopify.dev/docs/apps/build/webhooks/configuration/eventbridge#eventbridge-payload-structure"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "cdk destroy"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ragib Ahsan",
+            "image": "https://media.licdn.com/dms/image/D4E03AQHKVYkUoGROvA/profile-displayphoto-shrink_800_800/0/1699650399893?e=1723680000&v=beta&t=A08_HJD38AAs5NdDzBsWzZksHIfztFW1ong3EJJodWA",
+            "bio": "AWS Partner Solutions Architect based in NYC. Huge advocate for serverless architectures!",
+            "linkedin": "ragibmahsan"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 50,
+            "service": "",
+            "label": "Partner Event Source"
+        },
+        "icon2": {
+            "x": 40,
+            "y": 50,
+            "service": "eventbridge",
+            "label": "Amazon EventBridge"
+        },
+        "icon3": {
+            "x": 85,
+            "y": 70,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon4": {
+            "x": 85,
+            "y": 20,
+            "service": "cloudwatch",
+            "label": "Amazon CloudWatch"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": "Transformation"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line3": {
+            "from": "icon2",
+            "to": "icon4"
+        }
+    }
+}

@@ -3,7 +3,7 @@
     "description": "The SAM template deploys an Amazon S3 bucket, an Amazon EventBridge rule with wildcard pattern match having target as an Amazon SQS queue.",
     "language": "YAML",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

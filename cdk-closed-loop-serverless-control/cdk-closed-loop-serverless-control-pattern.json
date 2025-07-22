@@ -3,7 +3,7 @@
   "description": "Create a closed-Loop (feedback) control mechanism for throttle-handling of 3rd party calls on AWS Lambda with Amazon Cloudwatch Alarms and Amazon EventBridge",
   "language": "TypeScript",
   "level": "400",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
