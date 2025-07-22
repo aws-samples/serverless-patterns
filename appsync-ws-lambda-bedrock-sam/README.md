@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [NOTE! Manage Access to Amazon Bedrock Foundation Models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)
+* [NOTE! Ensure you have access to a model prior to testing ! See Manage Access to Amazon Bedrock Foundation Models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)
 
 
 ## Deployment Instructions 
@@ -27,7 +27,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 3. Install dependencies
     ```
-    cd src && npm install && cd ..
+    cd lambda_function && npm install && cd ..
     ```    
 4. From the command line, use AWS SAM build to prepare an application for subsequent steps in the developer workflow, such as local testing or deploying to the AWS Cloud:
     ```
