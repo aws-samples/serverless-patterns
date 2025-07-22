@@ -94,10 +94,34 @@ class WebhookSnsStack(Stack):
         api.root.add_method(
             "POST",
             integration,
+            api_key_required=True,
             method_responses=[
                 apigateway.MethodResponse(status_code="200")
             ]
         )
+
+        # Create API Key
+        api_key = apigateway.ApiKey(
+            self, "WebhookApiKey",
+            enabled=True,
+            description="API Key for webhook endpoint"
+        )
+
+        # Create Usage Plan
+        usage_plan = apigateway.UsagePlan(
+            self, "WebhookUsagePlan",
+            name="webhook-usage-plan",
+            description="Usage plan for webhook API",
+            api_stages=[
+                apigateway.UsagePlanPerApiStage(
+                    api=api,
+                    stage=api.deployment_stage
+                )
+            ]
+        )
+
+        # Associate API Key with Usage Plan
+        usage_plan.add_api_key(api_key)
 
         # Outputs
         CfnOutput(
@@ -116,4 +140,10 @@ class WebhookSnsStack(Stack):
             self, "QueueUrl",
             value=queue.queue_url,
             description="SQS Queue URL"
+        )
+
+        CfnOutput(
+            self, "ApiKeyId",
+            value=api_key.key_id,
+            description="API Key ID for webhook endpoint"
         )

@@ -64,12 +64,26 @@ aws sns verify-sms-sandbox-phone-number --phone-number "+your-phone-number" --on
 
 ### API Testing
 
-Send a POST request to the API Gateway endpoint with the following JSON payload:
+The API is protected with an API key. After deployment, you'll need to retrieve the API key value before testing.
 
-Example using curl (update URL with your own API domain and phoneNumber with your phone number including country code e.g. +1234567890):
+#### Get the API Key Value
+
+1. **Note the API Key ID from the deployment output**, then get the actual key value:
+```bash
+aws apigateway get-api-key --api-key YOUR_API_KEY_ID --include-value
+```
+
+2. **Copy the `value` field from the response** - this is your actual API key.
+
+#### Send Test Request
+
+Send a POST request to the API Gateway endpoint with the API key header:
+
+Example using curl (update URL with your own API domain, API key, and phoneNumber with your phone number including country code e.g. +1234567890):
 ```bash
 curl -X POST https://your-api-id.execute-api.region.amazonaws.com/prod/ \
   -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_ACTUAL_API_KEY_VALUE" \
   -d '{"phoneNumber": "+your-phone-number", "message": "Hello from webhook!"}'
 ```
 
@@ -91,7 +105,7 @@ Expected response:
 }
 ```
 
-You should also received an SMS on your mobile with the following message:
+You should also receive an SMS on your mobile with the following message:
 ```
 Hello from webhook!
 ```
