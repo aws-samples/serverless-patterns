@@ -1,0 +1,70 @@
+{
+  "title": "Scheduled ECS Task Execution using EventBridge Cron and Terraform",
+  "description": "This pattern demonstrates how to use Amazon EventBridge to schedule and trigger Amazon ECS tasks on a cron schedule using Terraform. The pattern provides a serverless, cost-effective solution for running scheduled containerized workloads.",
+  "language": "Terraform",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an automated scheduled task execution system using EventBridge cron rules with ECS Fargate tasks.",
+      "The EventBridge rule triggers on a configurable schedule (cron or rate expression) and launches an ECS task in the specified cluster.",
+      "The solution is fully configurable through Terraform variables and implements security best practices with least-privilege IAM roles."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduler-ecs-python-terraform",
+      "templateURL": "serverless-patterns/eventbridge-ecs-cron-terraform",
+      "projectFolder": "eventbridge-ecs-cron-terraform",
+      "templateFile": "eventbridge-ecs.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Scheduled Rules",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-rule-schedule.html"
+      },
+      {
+        "text": "Amazon ECS Fargate",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html"
+      },
+      {
+        "text": "EventBridge to ECS Integration",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html#eb-ecs-task-target"
+      },
+      {
+        "text": "Terraform AWS Provider",
+        "link": "https://registry.terraform.io/providers/hashicorp/aws/latest/docs"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Check the EventBridge rule in the AWS Console to verify it's created with the correct schedule.",
+      "Manually trigger the rule to test the ECS task execution.",
+      "View CloudWatch logs to confirm the task is running as expected."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "Confirm the destruction by typing 'yes' when prompted."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Your Name",
+      "bio": "Your Role at AWS",
+      "linkedin": "https://www.linkedin.com/in/your-profile/"
+    }
+  ]
+}
