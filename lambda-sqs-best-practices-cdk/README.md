@@ -185,10 +185,10 @@ Retry 1 : note the timestamp and xray_trace_id
 Retry 2 : note the timestamp and xray_trace_id
 <img src="./resources/poison-pill-retry-2.png" alt="Architecture" width="100%"/>
 
-Message in moved to DLQ once the Receive count hit 3
+Message is moved to DLQ once the Receive count hit 3
 <img src="./resources/poison-pill-moved-to-DLQ.png" alt="Architecture" width="100%"/>
 
-Click on message to view the message details to understand failure reason
+Click on messageID to view the message details to understand failure reason
 
 <img src="./resources/message-in-DLQ.png" alt="Architecture" width="100%"/>
 
