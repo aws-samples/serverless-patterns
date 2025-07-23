@@ -10,11 +10,18 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: s1
-      DefinitionBody: # an OpenApi definition
-        'Fn::Transform':
-          Name: 'AWS::Include'
+      TracingEnabled: true
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          MetricsEnabled: true
+          DataTraceEnabled: true
+          LoggingLevel: INFO
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
           Parameters:
-            Location: './api.yaml'
+            Location: ./api.yaml
       OpenApiVersion: 3.0.3
       EndpointConfiguration:
           Type: REGIONAL
@@ -28,22 +35,13 @@ Resources:
       Handler: code.lambda_handler
       MemorySize: 128
       Timeout: 3
-      Runtime: python3.8
+      Runtime: python3.13
+      Tracing: Active
       Environment:
         Variables:
           TOPIC_ARN: !Ref MySnsTopic
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
+          API_URL: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${RestApi.Stage}'
       Policies:
-        - S3FullAccessPolicy:
-            BucketName: severlesspatternlambda
         - SNSPublishMessagePolicy:
             TopicName: !GetAtt MySnsTopic.TopicName
       Events:
@@ -53,6 +51,121 @@ Resources:
             Path: /
             Method: GET
             RestApiId: !Ref RestApi
+
+  # CloudWatch Alarm for API Gateway 5XX Errors
+  ApiGateway5XXErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${AWS::StackName}-API-Gateway-5XX-Error'
+      AlarmDescription: Monitor API Gateway 5XX errors
+      MetricName: 5XXError
+      Namespace: AWS/ApiGateway
+      Dimensions:
+        - Name: ApiName
+          Value: RestApi
+        - Name: Stage
+          Value: !Ref RestApi.Stage
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 3
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  # S3 Bucket for Synthetics Canary Artifacts
+  SyntheticsArtifactsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # IAM Role for Synthetics Canary
+  SyntheticsCanaryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+                - synthetics.amazonaws.com
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SyntheticsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:ListAllMyBuckets
+                  - s3:GetBucketLocation
+                Resource:
+                  - !Sub '${SyntheticsArtifactsBucket.Arn}/*'
+                  - !GetAtt SyntheticsArtifactsBucket.Arn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - cloudwatch:PutMetricData
+                  - synthetics:*
+                Resource: '*'
+
+  # Synthetics Canary
+  ApiGatewayCanary:
+    Type: AWS::Synthetics::Canary
+    Properties:
+      Name: !Sub '${AWS::StackName}-api-gw-canary'
+      RuntimeVersion: syn-python-selenium-6.0
+      ExecutionRoleArn: !GetAtt SyntheticsCanaryRole.Arn
+      ArtifactS3Location: !Sub 's3://${SyntheticsArtifactsBucket}/'
+      Schedule:
+        Expression: 'rate(1 minute)'
+        DurationInSeconds: 0
+      RunConfig:
+        TimeoutInSeconds: 60
+        MemoryInMB: 960
+      FailureRetentionPeriod: 30
+      SuccessRetentionPeriod: 30
+      StartCanaryAfterCreation: true
+      Code:
+        Handler: canary.handler
+        Script: !Sub |
+          from selenium.webdriver.common.by import By
+          from aws_synthetics.selenium import synthetics_webdriver as syn_webdriver
+          from aws_synthetics.common import synthetics_logger as logger
+
+          def main():
+              url = "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${RestApi.Stage}"
+              
+              # Set screenshot option
+              takeScreenshot = True
+              
+              browser = syn_webdriver.Chrome()
+              browser.get(url)
+              
+              if takeScreenshot:
+                  browser.save_screenshot("loaded.png")
+              
+              response_code = syn_webdriver.get_http_response(url)
+              if not response_code or response_code == "error" or response_code < 200 or response_code > 299:
+                  raise Exception("Failed to load page!")
+              logger.info("Canary successfully executed.")
+
+          def handler(event, context):
+              # user defined log statements using synthetics_logger
+              logger.info("Selenium Python heartbeat canary.")
+              return main()
+
 Outputs:
   lambdaArn:
     Value: !GetAtt lambdaFunction.Arn
@@ -62,4 +175,16 @@ Outputs:
     Value: !Ref MySnsTopic
 
   apiGatewayInvokeURL:
-    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/s1
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${RestApi.Stage}
+
+  CloudWatchAlarmName:
+    Description: Name of the API Gateway 5XX Error Alarm
+    Value: !Ref ApiGateway5XXErrorAlarm
+
+  SyntheticsCanaryName:
+    Description: Name of the Synthetics Canary
+    Value: !Ref ApiGatewayCanary
+
+  SyntheticsArtifactsBucket:
+    Description: S3 Bucket for Synthetics artifacts (delete manually after stack deletion)
+    Value: !Ref SyntheticsArtifactsBucket
