@@ -175,17 +175,18 @@ Example DeepDive walkthrough on structured logging for a batch :
 <img src="./resources/Failed-item-retry.png" alt="Architecture" width="100%"/>
 
 7. Additionally, in case of failed retries/poison pill
+
 Original Invocation
 <img src="./resources/poison-pill.png" alt="Architecture" width="100%"/>
 
 Retry 1 : note the timestamp and xray_trace_id
-<img src="./resources/poison-pill-retry-1" alt="Architecture" width="100%"/>
+<img src="./resources/poison-pill-retry-1.png" alt="Architecture" width="100%"/>
 
 Retry 2 : note the timestamp and xray_trace_id
-<img src="./resources/poison-pill-retry-2" alt="Architecture" width="100%"/>
+<img src="./resources/poison-pill-retry-2.png" alt="Architecture" width="100%"/>
 
 Message in moved to DLQ once the Receive count hit 3
-<img src="./resources/poison-pill-moved-to-DLQ" alt="Architecture" width="100%"/>
+<img src="./resources/poison-pill-moved-to-DLQ.png" alt="Architecture" width="100%"/>
 
 Click on message to view the message details to understand failure reason
 
