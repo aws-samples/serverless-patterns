@@ -1,0 +1,65 @@
+{
+  "title": "Automated EBS Snapshot Creation on EC2 Shutdown using EventBridge",
+  "description": "This pattern deploys an EventBridge rule that automatically creates EBS snapshots when an EC2 instance shuts down using direct EBS target integration.",
+  "language": "CloudFormation",
+  "level": "100",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an automated EBS snapshot system using EventBridge event-driven rules with direct EBS target integration.",
+      "The EventBridge rule monitors EC2 instance state changes and triggers when an instance enters shutting-down or stopping state.",
+      "The solution requires Volume ID and Instance ID parameters and uses pure infrastructure-as-code approach without Lambda functions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sam-eventbridge-ebs-snapshot",
+      "templateURL": "serverless-patterns/sam-eventbridge-ebs-snapshot",
+      "projectFolder": "sam-eventbridge-ebs-snapshot",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Event Rules",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html"
+      },
+      {
+        "text": "Amazon EBS Snapshots",
+        "link": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSSnapshots.html"
+      },
+      {
+        "text": "EventBridge Built-in Targets",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Stop or terminate the monitored EC2 instance after deployment.",
+      "Check EC2 console snapshots section - snapshot will be created when instance shuts down."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete",
+      "Note: Existing snapshots must be deleted manually if needed."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anirudh Gupta",
+      "image": "https://drive.google.com/file/d/1aQKx3aY2ID25FpsDI1HS_wSxgIMxOq9J/view?usp=sharing",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "https://www.linkedin.com/in/anirudh-gupta-13a0b111a/"
+    }
+  ]
+}
