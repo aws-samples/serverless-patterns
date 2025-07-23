@@ -1,0 +1,70 @@
+{
+  "title": "AI Chat with Amazon API Gateway (WebSockets), AWS Lambda, and Amazon Bedrock.",
+
+  "description": "WebSocket-Enabled AI Chat Using AWS Services.",
+
+  "language": "",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This serverless architecture enables real-time AI chat using AWS services. A WebSocket Amazon API Gateway maintains persistent connections between clients and a Node.js AWS Lambda function.",
+      "The AWS Lambda function handles user connections/disconnections, stores connection IDs in Amazon DynamoDB, and processes messages through an Amazon Bedrock LLM.",
+      "The system includes error handling, automatic scaling, and pay-per-use pricing.",
+      "The AWS SAM template provisions all necessary resources and IAM permissions, outputting a WebSocket URL for client connections."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websockets-lambda-bedrock-sam",
+      "templateURL": "serverless-patterns/apigw-websockets-lambda-bedrock-sam",
+      "projectFolder": "apigw-websockets-lambda-bedrock-sam",
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon API Gateway",
+        "link": "https://aws.amazon.com/api-gateway/"
+      },
+      {
+        "text": "Amazon API Gateway WebSocket APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/bedrock/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>sam delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mike Hume",
+      "image": "https://media.licdn.com/dms/image/D4E03AQEiUfmBiUOw_A/profile-displayphoto-shrink_200_200/0/1718324029612?e=1727308800&v=beta&t=ybhm76l-CP5xcUsHbdq2IaJOlfyycvQ6gNwuCSd3Z0w",
+      "bio": "AWS Senior Solutions Architect & UKPS Serverless Lead.",
+      "linkedin": "michael-hume-4663bb64",
+      "twitter": ""
+    }
+  ]
+}
