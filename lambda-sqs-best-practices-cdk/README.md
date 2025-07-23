@@ -61,7 +61,8 @@ This pattern sets up:
    - Custom metrics
    - X-Ray tracing
 3. A CloudWatch Dashboard for operational monitoring
-4. Least priviledge permissions implemented on roles and policies 
+4. Least priviledge permissions implemented on roles and policies.
+
 Navigate to IAM --> Roles --> LambdaSqsBestPracticesCdk-BatchProcessingLambdaFunc-** and review the Managed and customer inline policies.
 <img src="./resources/Least-priviledge.png" alt="Architecture" width="100%"/>
 [ ensured by implemeting individual inline policies with only required permissions added to role ]
@@ -122,7 +123,8 @@ Verify the same using dashboard
 
 <img src="./resources/dashboard-mesage-processing-2.png" alt="Architecture" width="100%"/>
 
-Additionally, confirm the messages in DLQ 
+Additionally, confirm the messages in DLQ.
+
 Note : Click on "Poll for messages" to view messages sent to DLQ
 <img src="./resources/DLQ-in-messaging.png" alt="Architecture" width="100%"/>
 
@@ -177,13 +179,13 @@ Original Invocation
 <img src="./resources/poison-pill.png" alt="Architecture" width="100%"/>
 
 Retry 1 : note the timestamp and xray_trace_id
-<img src="./poison-pill-retry-1" alt="Architecture" width="100%"/>
+<img src="./resources/poison-pill-retry-1" alt="Architecture" width="100%"/>
 
 Retry 2 : note the timestamp and xray_trace_id
-<img src="./poison-pill-retry-2" alt="Architecture" width="100%"/>
+<img src="./resources/poison-pill-retry-2" alt="Architecture" width="100%"/>
 
 Message in moved to DLQ once the Receive count hit 3
-<img src="./poison-pill-moved-to-DLQ" alt="Architecture" width="100%"/>
+<img src="./resources/poison-pill-moved-to-DLQ" alt="Architecture" width="100%"/>
 
 Click on message to view the message details to understand failure reason
 

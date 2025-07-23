@@ -99,6 +99,11 @@ async function runTest() {
         process.exit(1);
     }
     
+    console.log('Test running on following resources :')
+    console.log('SourceQueue URL:', QUEUE_URL);
+    console.log('DLQ URL :', DLQ_URL);
+    console.log('Region :', process.env.AWS_REGION);
+    
     await sendMessages();
     
     console.log('\nWaiting 30 seconds for message processing...');

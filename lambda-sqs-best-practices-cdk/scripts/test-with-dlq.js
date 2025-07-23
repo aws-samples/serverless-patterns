@@ -76,7 +76,7 @@ async function runTest() {
     console.log('Starting SQS DLQ test...\n');
     console.log('Test running on following resources :')
     console.log('SourceQueue URL:', QUEUE_URL);
-    console.log('DLQ URL :', QUEUE_URL);
+    console.log('DLQ URL :', DLQ_URL);
     console.log('Region :', process.env.AWS_REGION);
     const sentMessages = await sendMessages();
     console.log(`\nSent ${sentMessages.length} messages. Waiting for DLQ processing...`);
