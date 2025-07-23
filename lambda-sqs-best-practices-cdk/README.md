@@ -1,7 +1,6 @@
 # Lambda SQS Best Practices with AWS CDK
 
-This pattern demonstrates a production-ready implementation of AWS Lambda processing messages from Amazon SQS using AWS CDK. It serves as a reference architecture for building robust, observable, and maintainable serverless applications, featuring AWS Lambda Powertools integration for enhanced observability through structured logging, custom metrics, and distributed tracing with X-Ray. The pattern implements comprehensive error handling with automatic retries and Dead Letter Queue (DLQ) configuration, along with a detailed CloudWatch Dashboard for operational monitoring. Security is enforced through least privilege IAM roles, while operational excellence is maintained through proper resource configurations and cost optimizations. This enterprise-grade solution includes batch message processing, configurable timeouts, message validation, and a complete monitoring strategy, making it ideal for teams building production serverless applications that require high reliability, observability, and maintainability.
-
+This pattern demonstrates AWS Lambda processing messages from Amazon SQS using AWS CDK, implementing AWS best practices throughout its architecture. It incorporates observability patterns through AWS Lambda Powertools integration, featuring structured logging, custom metrics, and distributed tracing with X-Ray. Following security and operational best practices, the pattern implements comprehensive error handling with automatic retries, ReportBatchItemFailures and Dead Letter Queue (DLQ) configuration, least privilege IAM roles, and a CloudWatch Dashboard for monitoring. The solution showcases recommended approaches for batch message processing, timeout configurations, message validation, and monitoring strategies. This pattern serves as a reference implementation for teams building serverless applications, demonstrating how to implement reliability, observability, and maintainability according to AWS well-architected principles.
 
 <img src="./resources/Lambda-SQS-Best-Practice.png" alt="Architecture" width="100%"/>
 
@@ -63,8 +62,10 @@ This pattern sets up:
    - X-Ray tracing
 3. A CloudWatch Dashboard for operational monitoring
 4. Least priviledge permissions implemented on roles and policies 
+Navigate to IAM --> Roles --> LambdaSqsBestPracticesCdk-BatchProcessingLambdaFunc-** and review the Managed and customer inline policies.
 <img src="./resources/Least-priviledge.png" alt="Architecture" width="100%"/>
 [ ensured by implemeting individual inline policies with only required permissions added to role ]
+
 
 
 The Lambda function:
@@ -122,6 +123,7 @@ Verify the same using dashboard
 <img src="./resources/dashboard-mesage-processing-2.png" alt="Architecture" width="100%"/>
 
 Additionally, confirm the messages in DLQ 
+Note : Click on "Poll for messages" to view messages sent to DLQ
 <img src="./resources/DLQ-in-messaging.png" alt="Architecture" width="100%"/>
 
 Note: Refer Monitoring guide to locate “SQS-Processing-Dashboard”
@@ -171,9 +173,20 @@ Example DeepDive walkthrough on structured logging for a batch :
 <img src="./resources/Failed-item-retry.png" alt="Architecture" width="100%"/>
 
 7. Additionally, in case of failed retries/poison pill
+Original Invocation
 <img src="./resources/poison-pill.png" alt="Architecture" width="100%"/>
 
-Message in moved to DLQ
+Retry 1 : note the timestamp and xray_trace_id
+<img src="./poison-pill-retry-1" alt="Architecture" width="100%"/>
+
+Retry 2 : note the timestamp and xray_trace_id
+<img src="./poison-pill-retry-2" alt="Architecture" width="100%"/>
+
+Message in moved to DLQ once the Receive count hit 3
+<img src="./poison-pill-moved-to-DLQ" alt="Architecture" width="100%"/>
+
+Click on message to view the message details to understand failure reason
+
 <img src="./resources/message-in-DLQ.png" alt="Architecture" width="100%"/>
 
 Custom tracing can be used as well to get quick information on batch processing
