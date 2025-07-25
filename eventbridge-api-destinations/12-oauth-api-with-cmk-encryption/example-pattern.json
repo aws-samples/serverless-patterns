@@ -18,7 +18,6 @@
     "deploy": {
         "text": [
             "cd ./12-oauth-api-with-cmk-encryption",
-            "sam build",
             "sam deploy --guided"
         ]
     },
@@ -74,7 +73,7 @@
         {
             "name": "Rajesh Kumar",
             "image": "https://avatars.githubusercontent.com/u/4745639",
-            "bio": "Rajesh Kumar is a Technical Account Manager (TAM) at Amazon Web Services (AWS) and is a contributor to ServerlessLand. He is passionate about serverless and wants to help everyone get started with serverless and what can be done with it.",
+            "bio": "Rajesh Kumar is a Technical Account Manager (TAM) at Amazon Web Services (AWS) and contributor to ServerlessLand. He is passionate about serverless and wants to help everyone get started with serverless and what can be done with it.",
             "linkedin": "rajeshk1988"
         },
         {
@@ -90,42 +89,5 @@
         "OAuth",
         "CMK Encryption",
         "Serverless"
-    ],
-    "patternArch": {
-        "icon1": {
-            "x": 10,
-            "y": 50,
-            "service": "eventbridge",
-            "label": "EventBridge rule"
-        },
-        "group": {
-            "x": 25,
-            "y": 20,
-            "w": 70,
-            "h": 60,
-            "label": "API Destinations"
-        },
-        "icon2": {
-            "x": 40,
-            "y": 50,
-            "service": "eventbridge-connection.png",
-            "label": "Connection"
-        },
-        "icon3": {
-            "x": 85,
-            "y": 50,
-            "service": "eventbridge-api.png",
-            "label": "API"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2",
-            "label": ""
-        },
-        "line2": {
-            "from": "icon2",
-            "to": "icon3",
-            "label": "with OAuth using CMK encryption"
-        }
-    }
+    ]
 }

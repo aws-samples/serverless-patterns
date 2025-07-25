@@ -1,8 +1,8 @@
 [
     {
-        "DetailType": "MyTestMessage",
+        "DetailType": "demo-event-type",
         "EventBusName": "ExternalOAuthEventBus",
-        "Source": "MyTestApp",
+        "Source": "com.demo-event-bus.cmk",
         "Detail": "{\"responsePayload\":\"EventBridge CMK Demo success\"}"
     }
-  ]
+]

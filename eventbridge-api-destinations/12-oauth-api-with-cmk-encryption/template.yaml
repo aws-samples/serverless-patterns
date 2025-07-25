@@ -11,11 +11,11 @@ Parameters:
     Type: String
     Description: Enter Authorization Endpoint
     Default: '<>'
-  ExternalAPIClientID:
+  ExternalAuthAPIClientID:
     Type: String
     Description: Enter OAuth Client ID
     Default: '<>'
-  ExternalAPIClientSecret:
+  ExternalAuthAPIClientSecret:
     Type: String
     NoEcho: True
     Description: Enter OAuth Client Secret
@@ -27,19 +27,28 @@ Parameters:
 
 
 Resources:
+  # Event Bus Resource
+  # This will create an Event Bus named 'ExternalOAuthEventBus'
+  # The Event Bus will be used to publish events that will trigger the API Destination
+  # The Event Bus will be used to route events to the API Destination
   MyEventBus:
     Type: AWS::Events::EventBus
     Properties:
       Name: "ExternalOAuthEventBus"
-      
+  # Connection secret in Secrets Manager
+  # This will create a secret in Secrets Manager to store the OAuth credentials    
   ConnectionSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: "ExternalOAuthCredentials"
       Description: "OAuth connection credential secret"   
       SecretString: !Sub >-
-        {"ClientID": "${ExternalAPIClientID}", "ClientSecret": "${ExternalAPIClientSecret}"}      
-
+        {"ClientID": "${ExternalAuthAPIClientID}", "ClientSecret": "${ExternalAuthAPIClientSecret}"}      
+  # Connection Resource
+  # This will create a connection in EventBridge with OAuth Client Credentials
+  # The connection will use the OAuth credentials stored in the Secrets Manager secret created above
+  # The connection will use the CMK Key for encryption
+  # The connection will be used to invoke the API Destination with OAuth credentials
   MyConnection:
     Type: AWS::Events::Connection
     Properties:
@@ -64,7 +73,12 @@ Resources:
                 IsValueSecret: true         
     DependsOn: ConnectionSecret
               
-
+  # Api Destination Resource
+  # This will create an API Destination in EventBridge
+  # The API Destination will use the connection created above
+  # The API Destination will invoke the external API endpoint with OAuth credentials
+  # The API Destination will use the CMK Key for encryption
+  # The API Destination will be used to route events from the Event Bus to the external API
   MyApiDestination:
     Type: AWS::Events::ApiDestination
     Properties:
@@ -73,7 +87,10 @@ Resources:
       InvocationEndpoint: !Ref ExternalAPIURL
       HttpMethod: POST
       InvocationRateLimitPerSecond: 10
-      
+  # EventBridge Target Role
+  # This will create a role that EventBridge can assume to invoke the API Destination
+  # The role will have permissions to invoke the API Destination and access the Secrets Manager secret
+  # The role will be used by EventBridge to invoke the API Destination with OAuth credentials    
   EventBridgeTargetRole:
     Type: AWS::IAM::Role
     Properties:
@@ -107,7 +124,10 @@ Resources:
                 
   MyDLQueue: 
     Type: AWS::SQS::Queue
-
+  # Rule to trigger the API Destination
+  # This will create a rule that triggers the API Destination when an event is published to the Event Bus
+  # The rule will filter events based on the source and detail-type
+  # The rule will use the API Destination as the target
   EventRule: 
     Type: AWS::Events::Rule
     Properties: 
@@ -116,9 +136,9 @@ Resources:
       EventBusName: !Ref MyEventBus
       EventPattern: 
         source:
-          - "MyTestApp"
+          - "com.demo-event-bus.cmk"
         detail-type:
-          - "MyTestMessage"
+          - "demo-event-type"
       Targets: 
         - Arn: !GetAtt MyApiDestination.Arn
           RoleArn: !GetAtt EventBridgeTargetRole.Arn

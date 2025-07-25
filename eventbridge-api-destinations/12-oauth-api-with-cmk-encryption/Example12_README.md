@@ -23,14 +23,21 @@ This sample demonstrates how to use Amazon EventBridge API Destinations with OAu
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
-* Have HTTPS endpoints that you can invoke as the target of an event bus rule
-* Have Oauth Authorization Endpoint which get used to get the auth token along with OAuth Client ID,OAuth Client Secret
-* Have CMK Key ready in your AWS KMS Service and get the arn of that CMK key
+* Also, run the below CloudFormation (CFN) command to create pre-requisit resources:
+```bash
+aws cloudformation create-stack --stack-name serverlessland-prerequisite --template-body file://prerequsite.yaml
+```
+* Above command will create stack with the below resources, please goto the CFN console and select your pre-requisite stack. Copy the output in the notepad, we'll need this later.
+- External API URL for HTTP API Endpoint. If you already have one you can also use that.
+- Cognito Authorization Endpoint. If you have any external authorizer endpoint you can use that.
+- Cognito OAuth Client ID. 
+- OAuth Client Secret. To get that you need to goto aws cognito console, goto your MyServerlessLandUserPool and click on your App Client -> MyWebClient and copy the Client secret, we'll need this later.
+- CMK key in KMS. Please not the arn, we'll use this later.
 
 ## Deployment
 
+* Run the below command and provide all the parameter details which we can saved previously.
 ```bash
-sam build
 sam deploy --guided
 ```
 
@@ -40,6 +47,7 @@ sam deploy --guided
 ```bash
 aws events put-events --entries file://testEvent.json
 ```
+2. To verify if everything works correctly, you can check the execution logs of your api.
 
 ## Cleanup
  

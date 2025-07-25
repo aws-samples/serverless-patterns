@@ -25,8 +25,9 @@ Important: this application uses various AWS services and there are costs associ
 * To run example #10, an account with [Stripe](https://dashboard.stripe.com/login). Follow the instructions to [Set up your development environment](https://stripe.com/docs/development/quickstart) and note the api key.
 * To run example #11, an account with [Salesforce](https://login.salesforce.com/). Follow the Prerequisites to [Create an app and configure security token](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-tutorial-salesforce.html). Make sure to note the Authorization endpoint, Client ID, Client Secret and OAuth Http Parameters Key.
 * To run example #12, please have the below things with you:
-    - HTTPS API endpoint url that you can invoke as the target of an event bus rule
+    - HTTPS API endpoint url that you can invoke as the target of an event bus rule. Which uses the scope of 'myapi.example.com/domestic.read' to allow the request.
     - Oauth Authorization Endpoint to get the auth token along with OAuth Client ID,OAuth Client Secret
+      In our deployment we'll use cognito /oauth2/token endpoint (https://tfc-m2m-managed-login-domain.auth.eu-west-1.amazoncognito.com/oauth2/token)
     - CMK Key in your AWS KMS Service and get the arn of that CMK key
 
 ## Deployment Instructions
@@ -50,7 +51,7 @@ Important: this application uses various AWS services and there are costs associ
 - To run the Shopify API Destination example, cd to `9-shopify`.
 - To run the Stripe API Destination example, cd to `10-stripe`.
 - To run the API Destination with OAuth credentials example, cd to `11-oauth-api`.
-- To run the API Destination with OAuth credentials using CMK encryption example, cd to `12-oauth-api-with-cmk-encryption`.
+- To run the API Destination with OAuth credentials using CMK encryption example, cd to `12-oauth-api-with-cmk-encryption`. And then follow the Example12_README.md file instructions.
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
@@ -82,7 +83,7 @@ aws events put-events --entries file://testEvent.json
 11. For the OAuth example use the testEvent.json within the 11-oauth-api directory
 12. For the OAuth with cmk encryption example use the testEvent.json within the 12-oauth-api-with-cmk-encryption
 ```
-aws events put-events --entries file://3-sumologic/testEvent.json
+aws events put-events --entries file://testEvent.json
 ```
 
 ## Cleanup
