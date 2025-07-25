@@ -172,6 +172,7 @@ resource "aws_lb_target_group" "target_group" {
 resource "aws_lb_target_group_attachment" "target_group_attachment" {
   target_group_arn = aws_lb_target_group.target_group.arn
   target_id        = aws_lambda_function.lambda_function.arn
+  depends_on       = [aws_lambda_permission.with_lb]
 }
 
 # Create the Lambda Function
