@@ -16,6 +16,8 @@ This sample demonstrates how to use Amazon EventBridge API Destinations with OAu
 2. **API Destination** sends the event to an external API using OAuth.
 3. **KMS CMK** encrypts secrets and sensitive data.
 
+![alt EventBridge Rule with CMK integration](diagram.png "Architecture")
+
 ## Prerequisites
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
