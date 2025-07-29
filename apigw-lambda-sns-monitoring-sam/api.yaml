@@ -17,15 +17,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Empty"
+        "400":
+          description: "400 response"
+        "500":
+          description: "500 response"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
         uri: "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:LambdaFunctionName/invocations"
         responses:
           default:
             statusCode: "200"
+          ".*4\\d{2}.*":
+            statusCode: "400"
+          ".*5\\d{2}.*":
+            statusCode: "500"
         passthroughBehavior: "when_no_match"
         contentHandling: "CONVERT_TO_TEXT"
-        type: "aws"
+        type: "aws_proxy"
 components:
   schemas:
     Empty:
