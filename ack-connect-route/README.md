@@ -1,6 +1,7 @@
-## Websocket API Gateway acknowledgement for $connect route.
 
-The Serverless Application Model (SAM) template deploys an Amazon WebSocket API Gateway and two AWS Lambda functions. When a client connects, the API Gateway creates a $connect route with Lambda proxy integration. The first Lambda function processes the initial connection, capturing both the Connection ID and API Gateway stage URL, then asynchronously triggers the second Lambda function. This second function validates the Connection ID and, if valid, uses SDK API calls to send a greeting message back to the client.
+## Websocket acknowledgement for $connect route in Amazon API Gateway
+
+The Serverless Application Model (SAM) template deploys an Amazon WebSocket API Gateway and two AWS Lambda functions. When a client connects, the API Gateway creates a $connect route with Lambda proxy integration. The first Lambda function processes the initial connection, capturing both the Connection ID and API Gateway stage URL, then asynchronously invokes the second Lambda function. This second function validates the Connection ID and, if valid, uses SDK API calls to send a greeting message back to the client.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns
 
@@ -34,13 +35,13 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
           
-         Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
+         After running guided mode once, you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## Testing
 
-Once the application is deployed, retrieve the WebSocketURL value from CloudFormation Outputs. To test the WebSocket API, you can use [wscat](https://github.com/websockets/wscat) which is an open-source command line tool.
+After deployment, retrieve the `WebSocketURL` value from CloudFormation Outputs. To test the WebSocket API, you can use [wscat](https://github.com/websockets/wscat) which is an open-source command line tool.
 
 1. [Install NPM](https://www.npmjs.com/get-npm).
 
@@ -53,7 +54,7 @@ Once the application is deployed, retrieve the WebSocketURL value from CloudForm
     $ wscat -c <YOUR WEBSOCKET URL>
     ```
 
-4. To test the custom route and its associated function, send a JSON-formatted request. The Lambda function sends back the value of the "data" key using the callback URL:
+4. To test the custom route and its associated function, send a JSON-formatted request for example {"Test":"input"}. The Lambda function sends back the value of the "data" key using the callback URL:
 ```
 $ wscat -c <YOUR WEBSOCKET URL>
 connected (press CTRL+C to quit)
@@ -62,12 +63,8 @@ connected (press CTRL+C to quit)
 
 1. Delete the stack
     ```
-    aws cloudformation delete-stack --stack-name <YOUR STACK NAME>
+    sam delete
     ```
 
-2. Confirm the stack has been deleted
-    ```
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'<YOUR STACK NAME>')].StackStatus"
-    ```
 
 
