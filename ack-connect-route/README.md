@@ -1,6 +1,6 @@
 ## Websocket acknowledgement for $connect route in Amazon API Gateway
 
-The Serverless Application Model (SAM) template deploys an Amazon WebSocket API Gateway and two AWS Lambda functions. When a client connects, the API Gateway creates a $connect route with Lambda proxy integration. The first Lambda function processes the initial connection, capturing both the Connection ID and API Gateway stage URL, then asynchronously triggers the second Lambda function. This second function validates the Connection ID and, if valid, uses SDK API calls to send a greeting message back to the client.
+The Serverless Application Model (SAM) template deploys an Amazon WebSocket API Gateway and two AWS Lambda functions. When a client connects, the API Gateway creates a $connect route with Lambda proxy integration. The first Lambda function processes the initial connection, capturing both the Connection ID and API Gateway stage URL, then asynchronously invokes the second Lambda function. This second function validates the Connection ID and, if valid, uses SDK API calls to send a greeting message back to the client.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns
 
