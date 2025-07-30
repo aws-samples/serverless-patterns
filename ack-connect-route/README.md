@@ -34,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
           
-         Once you have run guided mode once, you can use `sam deploy` in future to use these defaults.
+         After running guided mode once, you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
