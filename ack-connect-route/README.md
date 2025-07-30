@@ -40,7 +40,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-Once the application is deployed, retrieve the WebSocketURL value from CloudFormation Outputs. To test the WebSocket API, you can use [wscat](https://github.com/websockets/wscat) which is an open-source command line tool.
+After deployment, retrieve the `WebSocketURL` value from CloudFormation Outputs. To test the WebSocket API, you can use [wscat](https://github.com/websockets/wscat) which is an open-source command line tool.
 
 1. [Install NPM](https://www.npmjs.com/get-npm).
 
