@@ -1,5 +1,5 @@
-# Amazon Cloudfront to APIGW routing to alternative origin for large payloads
-API Gateway has a [payload limit of 10mb](https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#http-api-quotas) which cannot be increaed. This pattern shows how to use Lambda@Edge to route client POST request to an alternative origin based on payload size of the POST request or URL.
+# Route large API payloads to alternate origin
+Amazon API Gateway has a [payload limit of 10mb](https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#http-api-quotas). This pattern shows how to use Lambda@Edge to route client POST request to an alternative origin based on payload size of the POST request.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cloudfront-apigw-large-uploads
 
@@ -22,7 +22,12 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd cloudfront-apigw-large-uploads
     ```
-1. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `large_uploads_test/test_stack.py` file.
+1. Set region to us-east-1 for your CDK environment, this is because Lambda@edge functions need to exist us-east-1 region.
+1. Bootstrap CDK:
+    ```
+    cdk bootstrap
+    ```
+1. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `large_uploads_test/test_stack.py` file:
     ```
     python3 -m pip install -r requirements.txt
     cdk synth
@@ -30,25 +35,26 @@ Important: this application uses various AWS services and there are costs associ
     ```
 
 ## How it works
-A Cloudfront distribution is created with 2 origins:
-* Default Origin - API Gateway with a Lambda Integration that returns stub responses based on HTTP request method.  
-* Custom Origin - A mock HTTP endpoint which sends a response with information from the request. We are using echo.free.beeceptor.com but you can substitue this with other endpoint URLs.
+An Amazon Cloudfront distribution is created with 2 origins:
+* Default Origin - Amazon API Gateway with an AWS Lambda Integration returning stub responses based on HTTP request method.  
+* Custom Origin - A mock HTTP endpoint which sends a response with information from the request. We are using echo.free.beeceptor.com but you can use any other endpoint.
 
-When a HTTP POST request is handled by CloudFront, a Lambda@Edge function is invoked as an Origin Request. This Lambda@Edge function uses the method and `ceontent-length` HTTP headers from the client request to determine whether the request should go to a custom origin. 
+When a HTTP POST request is handled by CloudFront, a Lambda@Edge function is invoked as an Origin Request. This Lambda@Edge function uses the method and `content-length` HTTP headers from the client request to determine whether the request should go to a custom origin. 
+
+To demonstrate this behaviour, we used a filesize limit of 300 bytes. In real world applications, you would set this higher by modifying the `MAX_FILE_SIZE` variable in `lambda.mjs`.
 ![diagram](diagram.png)
 
 
 ## Testing
 
-1. Set region to us-east-1 for your CDK environment, this is because Lambda@edge functions need to exist us-east-1 region.
-1. cdk bootstrap
-1. cdk deploy
 1. Once deployed, find the CloudFront distribution URL and use it in the following `curl` commands
 
 #### Test 1: 
 A GET request that CloudFront will route to API gateway
 
-`curl https://<CloudFront distribution URL> -i`
+```
+curl https://<CloudFront distribution URL> -i
+```
 
 Example output:
 ```
@@ -60,10 +66,11 @@ Example output:
 ```
 
 #### Test 2: 
-A POST request that CloudFront will route to API gateway as the payload size is smaller than `MAX_FILE_SIZE` defined in lambda.mjs.
+A POST request that CloudFront will route to API gateway as the payload size is smaller than `MAX_FILE_SIZE` defined in `lambda.mjs`. You will need to replace the `smallFile.example` filename in the following command with your file.
 
-`curl https://<CloudFront distribution URL> -i -X POST -F 'data=@smallFile.example' -H 'content-type: appli
-cation/json'`
+```
+curl https://<CloudFront distribution URL> -i -X POST -F 'data=@smallFile.example' -H 'content-type: application/json'
+```
 
 Example output:
 ```
@@ -75,9 +82,11 @@ Example output:
 ```
 
 #### Test 3: 
-A POST request that CloudFront will route to a custom origin as the payload size is larger than `MAX_FILE_SIZE` defined in `lambda.mjs`.
+A POST request that CloudFront will route to a custom origin as the payload size is larger than `MAX_FILE_SIZE` defined in `lambda.mjs`. You will need to replace the `largeFile.example` filename in the following command with your file.
 
-`curl https://<CloudFront distribution URL> -i -X POST -F 'data=@largeFile.example`
+```
+curl https://<CloudFront distribution URL> -i -X POST -F 'data=@largeFile.example'
+```
 
 Example output:
 ```
@@ -94,9 +103,11 @@ Example output:
 
 
 #### Test 4: 
-A POST request to a specific URL that CloudFront will route to a custom origin based on the Behaviour defined in `app.py`.
+A POST request to a specific URL that CloudFront will route to a custom origin based on the Behaviour defined in `app.py`. You will need to replace the `smallFile.example` filename in the following command with your file.
 
-`curl https://<CloudFront distribution URL>/upload/ -i -X POST -F 'data=@smallFile.example`
+```
+curl https://<CloudFront distribution URL>/upload/ -i -X POST -F 'data=@smallFile.example'
+```
 
 Example output:
 ```
