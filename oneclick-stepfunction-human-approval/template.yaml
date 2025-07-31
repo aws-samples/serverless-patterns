@@ -1,0 +1,174 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Approval Workflow with Step Functions and Lambda
+
+Parameters:
+  ApproverEmail:
+    Type: String
+    Description: Email address of the approver
+
+Resources:
+  # SNS Topic
+  ApprovalTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref ApproverEmail
+
+  # IAM Roles
+  SendApprovalEmailFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SNSPublish
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: sns:Publish
+                Resource: !Ref ApprovalTopic
+
+  ApprovalHandlerFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: StepFunctionsAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - states:SendTaskSuccess
+                  - states:SendTaskFailure
+                Resource: '*'
+
+  ApprovalWorkflowRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaInvoke
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt SendApprovalEmailFunction.Arn
+
+  # Lambda Functions
+  SendApprovalEmailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: send_approval_email.lambda_handler
+      Runtime: python3.13
+      Role: !GetAtt SendApprovalEmailFunctionRole.Arn
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref ApprovalTopic
+          API_ENDPOINT: !Sub "https://${ApprovalApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/approve"
+
+  ApprovalHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handle_approval.lambda_handler
+      Runtime: python3.13
+      Role: !GetAtt ApprovalHandlerFunctionRole.Arn
+
+  # Step Functions State Machine
+  ApprovalWorkflow:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/approval_workflow.asl.json
+      DefinitionSubstitutions:
+        SendApprovalEmailFunctionArn: !GetAtt SendApprovalEmailFunction.Arn
+      Role: !GetAtt ApprovalWorkflowRole.Arn
+      Type: STANDARD
+
+  # API Gateway
+  ApprovalApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: ApprovalApi
+
+  ApprovalApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApprovalApi.RootResourceId
+      PathPart: 'approve'
+      RestApiId: !Ref ApprovalApi
+
+  ApprovalApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: GET
+      ResourceId: !Ref ApprovalApiResource
+      RestApiId: !Ref ApprovalApi
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations
+          - LambdaArn: !GetAtt ApprovalHandlerFunction.Arn
+
+  ApprovalApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ApprovalApiMethod
+    Properties:
+      RestApiId: !Ref ApprovalApi
+
+  ApprovalApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref ApprovalApiDeployment
+      RestApiId: !Ref ApprovalApi
+      StageName: Prod
+
+  ApiGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ApprovalHandlerFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApprovalApi}/*/GET/approve
+
+Outputs:
+  StateMachineArn:
+    Description: "ARN of the Step Functions State Machine"
+    Value: !GetAtt ApprovalWorkflow.Arn
+
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${ApprovalApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/approve"
+
+  SNSTopicArn:
+    Description: "ARN of the SNS Topic"
+    Value: !Ref ApprovalTopic
