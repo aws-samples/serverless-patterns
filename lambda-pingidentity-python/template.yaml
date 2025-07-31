@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Simple JWT API with custom authorizer
+
+Parameters:
+  PingOneIssuer:
+    Type: String
+    Description: PingOne Issuer URL
+    Default: "https://auth.pingone.com/<ENVIRONMENT_ID>/as"
+  
+  PingOneJwksUrl:
+    Type: String
+    Description: PingOne JWKS URL for token validation
+    Default: "https://auth.pingone.com/<ENVIRONMENT_ID>/as/jwks"
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: python3.9
+
+Resources:
+  # API Gateway
+  SimpleJwtApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: JwtAuthorizer
+        Authorizers:
+          JwtAuthorizer:
+            FunctionArn: !GetAtt JwtAuthorizerFunction.Arn
+
+  # JWT Authorizer Function
+  JwtAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: jwt_authorizer.lambda_handler
+      Environment:
+        Variables:
+          PING_ISSUER_URL: !Ref PingOneIssuer
+          PING_JWKS_URL: !Ref PingOneJwksUrl
+
+  # User Info Handler Function
+  UserInfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: user_info.lambda_handler
+      Events:
+        GetUserInfo:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SimpleJwtApi
+            Path: /user
+            Method: get
+
+Outputs:
+  UserInfoEndpoint:
+    Description: User info endpoint
+    Value: !Sub "https://${SimpleJwtApi}.execute-api.${AWS::Region}.amazonaws.com/prod/user"
