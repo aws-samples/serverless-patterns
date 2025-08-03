@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.22"
+      version = "~> 5.0"
     }
   }
 
@@ -22,7 +22,7 @@ resource "aws_lambda_function" "lambda_function" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "app.handler"
   role             = aws_iam_role.lambda_iam_role.arn
-  runtime          = "nodejs16.x"
+  runtime          = "nodejs22.x"
   environment {
     variables = {
       SQSqueueName = aws_sqs_queue.sqs_queue.url
