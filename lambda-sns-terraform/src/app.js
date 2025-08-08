@@ -2,9 +2,11 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-const AWS = require('aws-sdk')
-AWS.config.region = process.env.AWS_REGION 
-const sns = new AWS.SNS({apiVersion: '2012-11-05'})
+const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns')
+
+const snsClient = new SNSClient({
+  region: process.env.AWS_REGION
+})
 
 // The Lambda handler
 exports.handler = async (event) => {
@@ -16,6 +18,6 @@ exports.handler = async (event) => {
   }
   
   // Send to SNS
-  const result = await sns.publish(params).promise()
+  const result = await snsClient.send(new PublishCommand(params))
   console.log(result)
 }
