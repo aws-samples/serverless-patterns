@@ -1,0 +1,26 @@
+{
+    "Comment": "A Retry example of the Amazon States Language using an AWS Comprehend",
+    "StartAt": "DetectSentiment",
+    "States": {
+        "DetectSentiment": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::aws-sdk:comprehend:detectSentiment",
+            "ResultPath": "$.Sentiment",
+            "Parameters": {
+                "LanguageCode": "en",
+                "Text.$": "$.message"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "IntervalSeconds": 20,
+                    "MaxAttempts": 5,
+                    "BackoffRate": 10
+                }
+            ],
+            "End": true
+        }
+    }
+}
