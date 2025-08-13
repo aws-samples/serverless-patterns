@@ -1,0 +1,227 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a Cognito User Pool and associated machine to machine App Client and the CMK key in KMS
+
+Parameters:
+  # User Pool Parameters
+  UserPoolName:
+    Type: String
+    Description: Name of the User Pool
+    Default: "MyServerlessLandUserPool"
+
+  UsernameAttributes:
+    Type: CommaDelimitedList
+    Description: Allowed attributes for usernames (e.g., email, phone_number)
+    Default: 'email'
+
+  # App Client Parameters
+  ClientName:
+    Type: String
+    Description: Name of the App Client
+    Default: "MyWebClient"
+
+  CallbackURLs:
+    Type: CommaDelimitedList
+    Description: Callback URLs for the App Client
+    Default: 'http://localhost:8080'
+
+  LogoutURLs:
+    Type: CommaDelimitedList
+    Description: Logout URLs for the App Client
+    Default: 'http://localhost:8080/logout'
+
+Resources:
+  # User Pool Resource
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Ref UserPoolName
+      UsernameAttributes: !Ref UsernameAttributes
+  # User Pool Domain Resource
+  # This will create a unique domain based on the stack name
+  # The domain will be in the format: svls-<unique-value>
+  # where <unique-value> is derived from the stack name
+  # This ensures that the domain is unique across different stacks
+  # and avoids conflicts when deploying multiple instances of the stack
+  # The unique value is derived from the stack ID and is used to create a unique domain    
+  CognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: 
+        !Sub
+          - 'svls-${selectedValue}'
+          - selectedValue: !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]  # <-- getting a unique value
+      UserPoolId: !Ref MyUserPool
+  # Resource Server for M2M access
+  # This will create a resource server with the identifier 'petstore-api.example.com'
+  # and a scope 'domestic.read' for M2M access
+  # The resource server is associated with the User Pool created above
+  # This allows the App Client to request access to the 'domestic.read' scope
+  # when making API calls to the resource server
+  # The resource server is used to define the scopes that the App Client can request
+  # when making API calls to the resource server
+  MyResourceServer:
+    Type: AWS::Cognito::UserPoolResourceServer
+    Properties:
+      Identifier: petstore-api.example.com
+      Name: myapi_resource_server
+      UserPoolId: !Ref MyUserPool
+      Scopes:
+        - ScopeName: domestic.read
+          ScopeDescription: Read scope for M2M access
+
+
+  # App Client Resource
+  MyWebClient:
+    Type: AWS::Cognito::UserPoolClient
+    DependsOn:
+      - MyResourceServer
+    Properties:
+      ClientId: !Ref ClientName
+      ClientName: !Ref ClientName
+      GenerateSecret: true 
+      AllowedOAuthFlows: 
+        - client_credentials
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes: 
+        - petstore-api.example.com/domestic.read
+      CallbackURLs: !Ref CallbackURLs
+      LogoutURLs: !Ref LogoutURLs
+      UserPoolId: !Ref MyUserPool
+
+  # CMK Key Resources
+  # This will create a CMK Key in KMS
+  # The CMK Key will be used to encrypt the OAuth credentials
+  MyCMKKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: "CMK Key for encrypting OAuth credentials"
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: key-default-1
+        Statement:   
+          - Sid: AllowRootUserToManageCMK
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: AllowEventsServiceToUseCMK
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: 
+              - 'kms:GenerateDataKey'
+              - 'kms:Decrypt'
+            Resource: '*'
+      Tags:
+        - Key: 'EventBridgeApiDestinations'
+          Value: true
+  MyCMKKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: alias/MyCMKKey
+      TargetKeyId: !Ref MyCMKKey
+
+  # Api Gateway Resources
+  # This will create an API Gateway with a Cognito Authorizer
+  # The API Gateway will use the Cognito User Pool created above
+  # The API Gateway will have a GET method that uses the Cognito Authorizer
+  # The API Gateway will be used to test the OAuth flow
+  # The logging level is set to INFO and data trace is enabled, so that we can see the logs in CloudWatch to verify
+  CogAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CognitoAuthorizer
+      RestApiId:
+        Ref: Api
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      ProviderARNs:
+        - !GetAtt MyUserPool.Arn
+  Api:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: MyCogAuthApi
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId:
+        Ref: Api
+    DependsOn:
+      - CogAuthorizer
+      - ApiGET
+  ApiDeploymentStageprod:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId:
+        Ref: Api
+      DeploymentId:
+        Ref: ApiDeployment
+      StageName: prod
+      MethodSettings:
+        - HttpMethod: '*'
+          ResourcePath: '/*'
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+  ApiGET:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: POST
+      ResourceId:
+        Fn::GetAtt:
+          - Api
+          - RootResourceId
+      RestApiId:
+        Ref: Api
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizationScopes:
+        - petstore-api.example.com/domestic.read
+      AuthorizerId:
+        Ref: CogAuthorizer
+      Integration:
+        IntegrationHttpMethod: GET
+        Type: HTTP
+        Uri: http://petstore-demo-endpoint.execute-api.com/petstore/pets
+        IntegrationResponses:
+          - StatusCode: 200
+      MethodResponses:
+        - StatusCode: 200
+
+Outputs:
+  UserPoolArn:
+    Description: User Pool ARN
+    Value: !GetAtt MyUserPool.Arn
+  
+  ApiEndpoint:
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Ref: Api
+          - .execute-api.
+          - Ref: AWS::Region
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: ApiDeploymentStageprod
+
+  ClientId:
+    Description: App Client ID
+    Value: !Ref MyWebClient
+  
+  CMKKeyArn:
+    Description: CMK Key ARN
+    Value: !GetAtt MyCMKKey.Arn
+  
+  ExternalAuthEndpoint:
+    Description: User Pool Domain
+    Value: 
+      !Join
+        - ""
+        - - "https://"
+          - !Ref CognitoUserPoolDomain
+          - ".auth."
+          - Ref: AWS::Region
+          - ".amazoncognito.com/oauth2/token"
+  
