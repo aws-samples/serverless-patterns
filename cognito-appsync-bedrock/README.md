@@ -1,6 +1,6 @@
-# AWS AppSync and Amazon Cognito to Amazon Bedrock via Lambda Resolver
+# AWS AppSync and Amazon Cognito to Amazon Bedrock via AWS Lambda 
 
-This pattern demonstrates how to invoke Amazon Bedrock models from AWS AppSync using a Lambda resolver, with user authentication handled by Amazon Cognito.
+This pattern demonstrates how to invoke Amazon Bedrock models from AWS AppSync using a AWS Lambda resolver, with user authentication handled by Amazon Cognito.
 
 > **Note**: This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
