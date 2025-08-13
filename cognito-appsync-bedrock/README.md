@@ -48,10 +48,10 @@ The Bedrock model ID, Anthropic API version, and other inference parameters (lik
 2. Navigate to the project directory:
 
    ```bash
-   cd cognito-appsync-bedrock
+   cd cognito-appsync-bedrock/cdk
    ```
 
-3. Install dependencies:
+3. Install dependencies inside cdk subfolder:
 
    ```bash
    npm install
