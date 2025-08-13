@@ -21,7 +21,7 @@ This pattern sets up an AWS AppSync GraphQL API configured with Amazon Cognito U
 
 1. **Authentication**: Users are authenticated against an Amazon Cognito User Pool
 2. **AppSync Mutation**: The client sends a GraphQL mutation including the prompt and a valid Cognito ID token
-3. **Lambda Resolver**: AppSync uses a Lambda resolver to process the `invoke` mutation
+3. **AWS Lambda **: AppSync uses a AWS Lambda to process the `invoke` mutation
 4. **Bedrock Invocation**: The AWS Lambda function (`src/lambda/invokeBedrock/index.ts`) receives the prompt from AppSync. It then constructs a request and invokes the specified Amazon Bedrock model (defaulting to Anthropic Claude 3 Sonnet). The Lambda function has the necessary IAM permissions to call the Bedrock `InvokeModel` API
 5. **Response**: The Bedrock model processes the prompt and returns a response. The Lambda function forwards this response back to AppSync, which then relays it to the client
 
