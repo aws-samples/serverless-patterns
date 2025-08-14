@@ -7,7 +7,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0"
+      version = "~> 5.0"
     }
     archive = {
       source  = "hashicorp/archive"
@@ -31,38 +31,6 @@ data "archive_file" "lambda_zip" {
 resource "aws_api_gateway_rest_api" "main_api" {
   name = "validation-api"
   description = "API Gateway with data validation"
-
-  body = jsonencode({
-    openapi = "3.0.1"
-    info = {
-      title = "validation-api"
-      version = "1.0"
-    }
-    components = {
-      schemas = {
-        Vehicle = {
-          type = "object"
-          required = ["make", "model", "year"]
-          properties = {
-            make = {
-              type = "string"
-            }
-            model = {
-              type = "string"
-            }
-            year = {
-              type = "integer"
-              minimum = 2010
-            }
-            color = {
-              type = "string"
-              enum = ["green", "red", "blue"]
-            }
-          }
-        }
-      }
-    }
-  })
 }
 
 # Lambda Function
