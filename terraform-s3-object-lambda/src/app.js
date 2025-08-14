@@ -2,7 +2,8 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-const { S3 } = require("aws-sdk");
+const { S3 } = require("@aws-sdk/client-s3");
+
 const axios = require("axios").default;  // Promise-based HTTP requests
 const sharp = require("sharp"); // Used for image resizing
 
@@ -32,7 +33,7 @@ exports.handler = async (event) => {
     RequestToken: outputToken,
     Body: resized,
   };
-  await s3.writeGetObjectResponse(params).promise();
+  await s3.writeGetObjectResponse(params);
 
   // Exit the Lambda function.
   return { statusCode: 200 };
