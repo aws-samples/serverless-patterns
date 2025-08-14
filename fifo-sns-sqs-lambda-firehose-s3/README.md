@@ -12,7 +12,7 @@ The Terraform template in this pattern allows you to connect an SQS FIFO queue t
 * FIFO SQS queue
 * FIFO SNS Topic
 * Lambda function in python
-* Cloudwatch log group for Lambda function
+* CloudWatch log group for Lambda function
 * Required roles and policies 
 
 Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sns-sqs-lambda-firehose-s3-terraform](https://serverlessland.com/patterns/sns-sqs-lambda-firehose-s3-terraform)
@@ -83,7 +83,7 @@ aws s3 ls "s3://fifo-sns-sqs-lambda-firehose-s3-bucket-<YOUR-DEPLOYMENT-ID>" --r
 2022-03-29 19:17:01  1672 2022/03/29/17/fifo-sns-sqs-lambda-firehose-s3-stream-<YOUR-DEPLOYMENT-ID>-1-2022-03-29-17-15-58-4c161535-d7d7-4ae8-b6b9-11ee2f4cd446
 ```
 
-4. You can check cloudwatch log group as well to see the lambda's event logs
+4. You can check CloudWatch log group as well to see the lambda's event logs
 ```bash
 aws logs describe-log-streams --log-group-name '/aws/lambda/fifo-sns-sqs-lambda-firehose-s3-lambda-<YOUR-DEPLOYMENT-ID>'
 {
@@ -197,11 +197,3 @@ terraform show
 ----
 Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 SPDX-License-Identifier: MIT-0
-
-
-
-
-
-
-
-
