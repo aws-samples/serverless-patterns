@@ -2,9 +2,11 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-const AWS = require('aws-sdk')
-AWS.config.region = process.env.AWS_REGION 
-const sqs = new AWS.SQS({apiVersion: '2012-11-05'})
+const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs')
+
+const sqsClient = new SQSClient({
+  region: process.env.AWS_REGION
+})
 
 // The Lambda handler
 exports.handler = async (event) => {
@@ -15,6 +17,7 @@ exports.handler = async (event) => {
   }
   
   // Send to SQS
-  const result = await sqs.sendMessage(params).promise()
+  const command = new SendMessageCommand(params)
+  const result = await sqsClient.send(command)
   console.log(result)
 }
