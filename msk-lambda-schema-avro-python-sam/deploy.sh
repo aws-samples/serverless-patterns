@@ -31,8 +31,15 @@ fi
 # Get current AWS region
 AWS_REGION=$(aws configure get region)
 if [ -z "$AWS_REGION" ]; then
-    echo "Error: AWS region is not set. Please configure your AWS CLI with a default region."
-    exit 1
+    # Try to get region from EC2 metadata if running on EC2
+    AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null || echo "")
+    if [ -n "$AWS_REGION" ]; then
+        echo "Detected region from EC2 metadata: $AWS_REGION"
+        aws configure set region "$AWS_REGION"
+    else
+        echo "Error: AWS region is not set. Please configure your AWS CLI with a default region."
+        exit 1
+    fi
 fi
 
 echo "Using AWS Region: $AWS_REGION"
