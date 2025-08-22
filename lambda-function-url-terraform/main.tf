@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.21"
+      version = "~> 5.0"
     }
   }
 
@@ -20,7 +20,7 @@ resource "aws_lambda_function" "lambda_function" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "app.handler"
   role             = aws_iam_role.lambda_iam_role.arn
-  runtime          = "nodejs16.x"
+  runtime          = "nodejs22.x"
 }
 
 data "archive_file" "lambda_zip_file" {
@@ -35,7 +35,6 @@ data "aws_iam_policy" "lambda_basic_execution_role_policy" {
 
 resource "aws_iam_role" "lambda_iam_role" {
   name_prefix = "LambdaFunctionRole-"
-  managed_policy_arns = [data.aws_iam_policy.lambda_basic_execution_role_policy.arn]
 
   assume_role_policy = <<EOF
 {
@@ -52,6 +51,11 @@ resource "aws_iam_role" "lambda_iam_role" {
   ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+  role       = aws_iam_role.lambda_iam_role.name
+  policy_arn = data.aws_iam_policy.lambda_basic_execution_role_policy.arn
 }
 
 resource "aws_lambda_function_url" "function_url" {
