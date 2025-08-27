@@ -3,7 +3,7 @@
 	"description": "Creates an AppSync API with a schema and a resolver to a DynamoDB table following the single table design model",
 	"language": "TypeScript",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

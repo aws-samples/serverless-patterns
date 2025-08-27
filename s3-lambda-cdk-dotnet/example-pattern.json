@@ -3,7 +3,7 @@
   "description": "This AWS CDK application demonstrates triggering a AWS Lambda function, when a file is uploaded in a S3 bucket.",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

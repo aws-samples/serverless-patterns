@@ -3,7 +3,7 @@
   "description": "Event-driven pattern that creates three schedules when records get added to a DynamoDB table. These schedules trigger an email service and are automatically deleted.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

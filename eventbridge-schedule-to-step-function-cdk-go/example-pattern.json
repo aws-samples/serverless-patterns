@@ -3,7 +3,7 @@
   "description": "Simple pattern that triggers Step Function execution at the beginning of every hour using EventBridge Scheduler with CDK/Go. ",
   "language": "Go",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

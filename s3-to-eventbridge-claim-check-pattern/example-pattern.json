@@ -3,7 +3,7 @@
   "description": "Event-driven claim check pattern using S3 and EventBridge. Using Lambda to transform events into domain events with enrichment and presgined urls.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

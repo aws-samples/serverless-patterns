@@ -3,7 +3,7 @@
   "description": "Invoke a step functions workflow through a lambda resolver from Appsync",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

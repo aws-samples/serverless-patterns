@@ -3,7 +3,7 @@
   "description": "Create a Cloudwatch Logs Subscription Filter to Lambda function with SAM",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

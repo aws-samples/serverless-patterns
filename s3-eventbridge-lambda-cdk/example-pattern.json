@@ -3,7 +3,7 @@
     "description": "Create a S3 bucket with EventBridge notifications enabled and send S3 events to AWS Lambda.",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

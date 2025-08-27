@@ -3,7 +3,7 @@
   "description": "Deploys Amazon Cognito user pool, Amazon API Gateway REST API with AWS Lambda integration for user creation, confirmation & token retrieval in Java.",
   "language": "Java",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

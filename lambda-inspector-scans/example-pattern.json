@@ -3,7 +3,7 @@
   "description": "This pattern listens to Amazon Inspector events and triggers downstream consumers",
   "language": "YAMl",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": ["Listening to Amazon Inspector events a rule is set up to trigger a downstream consumer (Lambda function). Every scan complete of Lambda function triggers the consumer allowing automation around vulnerability scanning."]

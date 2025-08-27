@@ -3,7 +3,7 @@
   "description": "This SAM application demonstrates how to push events from IoT Core to Amazon Simple Storage (S3).",
   "language": "YAML",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

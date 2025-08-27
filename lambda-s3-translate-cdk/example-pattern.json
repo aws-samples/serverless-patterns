@@ -3,7 +3,7 @@
     "description": "Create a Lambda with an S3 object created trigger that starts an Amazon Translate Task and puts the results in anoter S3 Bucket",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

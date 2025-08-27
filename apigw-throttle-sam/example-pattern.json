@@ -3,7 +3,7 @@
   "description": "Create an Amazon API Gateway application with throttling set in multiple places.",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

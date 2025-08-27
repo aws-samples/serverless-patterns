@@ -3,7 +3,7 @@
     "description": "Create an EventBridge rule and API Destination with OAuth credentials",
     "language": "Node.js",
     "level": "100",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "services": {
         "from": "eventbridge",
         "to": "eventbridge"

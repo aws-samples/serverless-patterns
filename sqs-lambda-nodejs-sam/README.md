@@ -1,16 +1,15 @@
-# Processing Amazon SQS records with AWS Lambda (Node.js)
+# Process Amazon SQS records with AWS Lambda (Node.js)
 
 This patterns shows how to process Amazon SQS messages using AWS Lambda. The AWS SAM template deploys an AWS Lambda function, an Amazon SQS queue, a dead-letter SQS queue, and the IAM permissions required to run the application. Lambda polls the SQS queue and invokes the Lambda function when new messages are available.
 
-- To demonstrate error handling, any message containing the text "error" will be reported as a failure.
 - Failed messages are automatically returned to the queue for retry using `batchItemFailures`.
 - After 3 failed processing attempts, messages are moved to the DLQ.
 - You should implement additional functionality to process messages that are sent to the DLQ.
 - Processing results are logged to Amazon CloudWatch Logs
 
-Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sql-lambda](https://serverlessland.com/patterns/sqs-lambda-nodejs-sam)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/sqs-lambda-nodejs-sam](https://serverlessland.com/patterns/sqs-lambda-nodejs-sam)
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+:heavy_exclamation_mark: Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
@@ -35,9 +34,9 @@ To download the patterns yourself:
 
 ## Deployment Instructions
 
-*For additional information on features to help you author, build, debug, test, and deploy Lambda applications more efficiently when using Visual Studio Code, see [Introducing an enhanced local IDE experience for AWS Lambda developers](https://aws.amazon.com/blogs/compute/introducing-an-enhanced-local-ide-experience-for-aws-lambda-developers/).*
+*For additional information on features to help you author, build, debug, test, and deploy Lambda applications more efficiently when using Visual Studio Code, see [Introducing an enhanced local IDE experience for AWS Lambda developers](https://aws.amazon.com/blogs/compute/introducing-an-enhanced-local-ide-experience-for-aws-lambda-developers?trk=2dd77e51-cb93-4970-a61a-5993781e5576&sc_channel=el).*
 
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```
     sam deploy --guided
     ```
@@ -81,7 +80,7 @@ There is also a sample file `\events\test-event.json` which contains a sample ev
 
 Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queue and observe the event delivered to the Lambda function:
 
-1. Send 10 messages to the SQS message:
+1. Send 10 messages to the SQS queue:
 
 #### Bash
 ```bash

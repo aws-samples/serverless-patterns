@@ -3,7 +3,7 @@
   "description": "Listen to DynamoDB changes using AppSync subscriptions",
   "language": "TypeScript",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

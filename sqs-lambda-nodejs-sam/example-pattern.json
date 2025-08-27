@@ -1,9 +1,9 @@
 {
     "title": "Process Amazon SQS records with AWS Lambda (Node.js)",
     "description": "This pattern shows how to process Amazon SQS messages using AWS Lambda.",
-    "language": "nodejs",
+    "language": "Node.js",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

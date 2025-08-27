@@ -3,7 +3,7 @@
   "description": "Simple pattern that creates a EventBridge Scheduler one time schedule using Step Functions SDK integration",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

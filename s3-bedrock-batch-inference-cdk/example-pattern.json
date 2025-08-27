@@ -1,0 +1,81 @@
+{
+    "title": "Amazon S3 to Amazon Bedrock Batch Inference using an Amazon EventBridge Rule",
+    "description": "This pattern demonstrates how to trigger a Bedrock batch inference job when an object, that is the input to the batch inference job, is uploaded to S3. The pattern is implemented using AWS CDK.",
+    "language": "Python",
+    "level": "200",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates an S3 bucket to store the input and output of the batch inference job.",
+            "It also creates an EventBridge rule that is triggered when a batch inference input file is uploaded.",
+            "When the EventBridge rule is triggered, it uses an AWS-managed Lambda function (created automatically by the AwsApi target) to call the Bedrock createModelInvocationJob API.",
+            "This Lambda function creates a new Bedrock batch inference job with the specified model and the uploaded input file.",
+            "The output of the batch inference job is stored in the same S3 bucket."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-bedrock-batch-inference-cdk",
+            "templateURL": "serverless-patterns/s3-bedrock-batch-inference-cdk",
+            "projectFolder": "s3-bedrock-batch-inference-cdk",
+            "templateFile": "app.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon Bedrock Batch Inference Documentation",
+                "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference.html"
+            },
+            {
+                "text": "Supported Models and Regions for Batch Inference",
+                "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference-supported.html"
+            },
+            {
+                "text": "EventBridge Targets Documentation",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
+            },
+            {
+                "text": "AWS CDK EventBridge Targets",
+                "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_events_targets.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "python3 -m venv .",
+            "source ./bin/activate",
+            "pip3 install -r requirements.txt",
+            "export AWS_REGION=us-west-2",
+            "cdk deploy --parameters ModelARN=<ARN of the model>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Upload the sample input file: <code>aws s3 cp model_input/input.jsonl s3://{S3 bucket name}/input/</code>",
+            "Check batch inference job status: <code>aws bedrock list-model-invocation-jobs | jq '.invocationJobSummaries[] | {jobArn, status, submitTime}'</code>",
+            "Once completed (30+ minutes), check results in S3 bucket under 'output' prefix"
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Empty the S3 bucket: <code>aws s3 rm s3://{S3 bucket name} --recursive</code>",
+            "Delete the stack: <code>cdk destroy</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Biswanath Mukherjee",
+            "image": "https://serverlessland.com/assets/images/resources/contributors/biswanath-mukherjee.jpg",
+            "bio": "I am a Sr. Solutions Architect working at AWS India.",
+            "linkedin": "biswanathmukherjee"
+        },
+        {
+            "name": "Rakshith Rao",
+            "image": "https://serverlessland.com/assets/images/resources/contributors/rakshith-rao.png",
+            "bio": "I am a Senior Solutions Architect at AWS and help our strategic customers build and operate their key workloads on AWS.",
+            "linkedin": "rakshithrao"
+        }
+    ]
+}

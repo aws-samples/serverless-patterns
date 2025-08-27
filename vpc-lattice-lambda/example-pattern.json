@@ -3,7 +3,7 @@
   "description": "This pattern demonstrates how to create a VPC Lattice which shifts traffic to different targets based on the weighted routing policy.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

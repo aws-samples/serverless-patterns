@@ -3,7 +3,7 @@
     "description": "AWS HealthLake is fantastic datastore when working with Healthcare data, especially data that is Patient centric.  It comes with a robust API, many integrations to other AWS services and is purely hands-off (serverless).",
     "language": "Go",
     "level": "400",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

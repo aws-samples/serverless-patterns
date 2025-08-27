@@ -3,7 +3,7 @@
   "description": "Create a Lambda function with public Elastic IP without provisioning NAT Gateway",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "services": {
     "from": "lambda",
     "to": "elastic-ip"

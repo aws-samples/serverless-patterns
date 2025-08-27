@@ -3,7 +3,7 @@
     "description": "Create a Static Website fronted by CloudFront with CloudFront Functions routing visitors to localized content using CloudFront's Geo Location Headers.",
     "language": ".NET",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

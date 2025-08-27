@@ -3,7 +3,7 @@
   "description": "Amazon SQS to CloudWatch Log group via Amazon EventBridge Pipes filter and transformation",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

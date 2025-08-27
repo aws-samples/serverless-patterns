@@ -3,7 +3,7 @@
     "description": "Create a agent with Amazon Bedrock with a Lambda function action group",
     "language": "Python",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

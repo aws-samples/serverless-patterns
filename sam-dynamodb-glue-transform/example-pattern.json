@@ -3,7 +3,7 @@
   "description": "Effortlessly deploy Glue scripts with AWS SAM in this streamlined serverless pattern",
   "language": "YAML",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

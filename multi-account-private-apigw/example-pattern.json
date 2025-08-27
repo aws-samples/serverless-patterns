@@ -3,7 +3,7 @@
   "description": "Create Private REST API Gateway in multiple accounts and integrate with the central account",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

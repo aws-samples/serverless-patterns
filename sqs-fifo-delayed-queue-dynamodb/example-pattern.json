@@ -3,7 +3,7 @@
   "description": "Amazon SQS FIFO queue with delay using AWS Lambda and Amazon DynamoDB",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

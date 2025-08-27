@@ -3,7 +3,7 @@
 	"description": "Creates a Lambda function that sends a message to a SNS that contains a filter. One function gets trigger always but the other depends on the filter.",
 	"language": "TypeScript",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

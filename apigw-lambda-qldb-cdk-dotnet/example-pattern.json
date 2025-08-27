@@ -3,7 +3,7 @@
   "description": "Create an Amazon API Gateway to AWS Lambda REST API",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

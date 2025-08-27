@@ -3,7 +3,7 @@
     "description": "Simple pattern that triggers Step Function execution from SQS using Amazon EventBridge Pipe and CDK using Python. ",
     "language": "Python",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

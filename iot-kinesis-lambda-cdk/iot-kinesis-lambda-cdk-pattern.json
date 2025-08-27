@@ -3,7 +3,7 @@
   "description": "Create a IoT Rule with a Kinesis Data Stream action that publishes messages to a Kinesis Data Stream and triggers a Lambda function to process the data.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -1,0 +1,60 @@
+{
+    "title": "Stream Amazon Bedrock completions via AWS AppSync Events API",
+    "description": "Leverage AppSync Events API to stream completions from Amazon Bedrock.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "AWS CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "In this pattern the end user is able to provide a prompt that will be used to invoke an Amazon Bedrock model from via a Lambda middleware.",
+        "The client will receive the model's completions through WebSocket provided by AppSync Events."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-events-bedrock-cdk",
+        "templateURL": "serverless-patterns/appsync-events-bedrock-cdk",
+        "projectFolder": "appsync-events-bedrock-cdk",
+        "templateFile": "lib/appsync-events-bedrock-cdk-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "AppSync Events API",
+          "link": "https://docs.aws.amazon.com/appsync/latest/eventapi/event-api-welcome.html"
+        },
+        {
+          "text": "Amazon Bedrock - Generative AI",
+          "link": "https://aws.amazon.com/bedrock/"
+        },
+        {
+            "text": "Bedrock's Response Stream API",
+            "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModelWithResponseStream.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "npm run deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "npm run test"
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "cdk destroy"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Gabriele Biagini",
+        "bio": "Solutions Architect @ AWS",
+        "linkedin": "gbiagini97"
+      }
+    ]
+  }

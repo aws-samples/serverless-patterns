@@ -2,7 +2,7 @@
     "title": "Amazon API Gateway REST API with SNS SMS integration",
     "description": "Send SMS messages from API Gateway using SNS",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

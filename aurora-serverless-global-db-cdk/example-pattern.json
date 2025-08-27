@@ -3,7 +3,7 @@
   "description": "Create an Aurora Serverless Global database to replicate across regions",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

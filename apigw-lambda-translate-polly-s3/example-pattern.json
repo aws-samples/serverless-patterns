@@ -3,7 +3,7 @@
   "description": "This pattern creates an Amazon API Gateway REST API and an AWS Lambda function that calls AWS Translate and Polly services and saves the audio file to S3.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

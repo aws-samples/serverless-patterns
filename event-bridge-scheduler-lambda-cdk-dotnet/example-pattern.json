@@ -3,7 +3,7 @@
   "description": "Simple pattern that triggers a .NET Lambda function every 5 minutes using Amazon EventBridge Scheduler and CDK",
   "language": ".NET",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

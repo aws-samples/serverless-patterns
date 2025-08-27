@@ -1,0 +1,48 @@
+{
+  "title": "Amazon API Gateway direct integration to Amazon DynamoDB",
+  "description": "Direct integration from Amazon API Gateway to Amazon DynamoDB with transformation using VTL and CDK and examples for Amazon Cognito, AWS Lambda authorizer and API keys.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to create an API Gateway with direct integration to DynamoDB.",
+      "The pettern showcase transformation of request/response using VTL and CDK and implement examples for using Cognito, Lambda authorizer and API keys."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-dynamodb-python-cdk",
+      "templateURL": "serverless-patterns/apigw-dynamodb-python-cdk",
+      "projectFolder": "apigw-dynamodb-python-cdk",
+      "templateFile": "apigw_dynamodb_python_cdk/apigw_dynamodb_python_cdk_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "API Gateway Integrations",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-integration-settings.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk delete</code>."]
+  },
+
+  "authors": [
+    {
+      "name": "Maya Morav Freiman",
+      "image": "https://avatars.githubusercontent.com/u/11615439?v=4",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "mayaaws"
+    }
+  ]
+}

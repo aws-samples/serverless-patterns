@@ -3,7 +3,7 @@
     "description": "Create an IoT rule with an SNS action that delivers messages to an SQS queue.",
     "language": "",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

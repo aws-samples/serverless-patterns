@@ -7,7 +7,7 @@
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
-    "esbuild": "^0.14.14"
+    "esbuild": "^0.25.1"
   },
   "scripts": {
     "unit": "jest",

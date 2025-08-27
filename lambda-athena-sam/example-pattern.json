@@ -3,7 +3,7 @@
     "description": "Create a Lambda function that queries a prefilled Athena table using boto3 library",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

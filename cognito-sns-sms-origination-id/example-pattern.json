@@ -3,7 +3,7 @@
   "description": "This pattern creates an Amazon Cognito userpool and an AWS Lambda function.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

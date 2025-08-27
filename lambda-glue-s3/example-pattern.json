@@ -3,7 +3,7 @@
   "description": "Create a lambda function to invoke a AWS Glue job to run the task and save the output file in S3",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

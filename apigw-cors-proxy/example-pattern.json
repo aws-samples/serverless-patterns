@@ -3,7 +3,7 @@
   "description": "API Gateway REST API with Lambda proxy integration which is responsible for returning the Access-Control-Allow-Origin and Access-Control-Allow-Headers headers",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

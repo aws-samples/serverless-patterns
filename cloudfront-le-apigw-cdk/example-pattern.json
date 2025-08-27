@@ -1,9 +1,9 @@
 {
     "title": "Secure AWS Api Gateway Requests with Signature Version 4 by using Lambda@Edge",
     "description": "This pattern demonstrates how to secure an API by blocking any direct access and allowing only the access through the CloudFront distribution deployed in front of the API.",
-    "language": "nodejs",
+    "language": "Node.js",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

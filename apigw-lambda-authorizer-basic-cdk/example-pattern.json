@@ -3,7 +3,7 @@
   "description": "This pattern deploys an API Gateway REST API protected by a Lambda Authorizer supporting Basic HTTP Authentication",
   "language": "Node.js",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

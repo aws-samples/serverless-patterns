@@ -3,7 +3,7 @@
     "description": "Create a simple Lambda function connected to a REST API.",
     "language": ".NET",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

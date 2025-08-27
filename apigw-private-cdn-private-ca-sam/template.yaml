@@ -1,0 +1,257 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 
+  - AWS::Serverless-2016-10-31
+  - AWS::LanguageExtensions
+Description: 'Amazon Private REST API Gateway with private custom domain name configured with private SSL certificate managed my ACM signed by AWS Private Certificate Authority'
+
+Mappings:
+  Constants:
+    CustomDomain:
+      Value: "apigw.example.com"
+    DomainName:
+      Value: "example.com"
+
+Parameters:
+  VpcIdParameter:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC Id in which the VPC Endpoints (execute-api and acm-pca) and Lambda will be created.
+
+  VpcEndpointSubnetIdsParameter:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of subnet ids where the VPC Endpoints (execute-api and acm-pca) and Lambda will be created.
+
+  ApiVPCESecurityGroup:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Security group id for the VPC Endpoints (execute-api and acm-pca) and Lambda VPC configuration.
+
+Resources:
+  MyPrivateCA:
+    Type: AWS::ACMPCA::CertificateAuthority
+    Properties:
+      Type: ROOT
+      KeyAlgorithm: RSA_2048
+      SigningAlgorithm: SHA256WITHRSA
+      Subject:
+        Country: US
+        Organization: Example Organization
+        OrganizationalUnit: IT
+        State: Washington
+        CommonName: !FindInMap [Constants, DomainName, Value]
+      RevocationConfiguration:
+        CrlConfiguration:
+          Enabled: false
+
+  MyCACertificate:
+    Type: AWS::ACMPCA::Certificate
+    Properties:
+      CertificateAuthorityArn: !Ref MyPrivateCA
+      CertificateSigningRequest: !GetAtt MyPrivateCA.CertificateSigningRequest
+      SigningAlgorithm: SHA256WITHRSA
+      TemplateArn: arn:aws:acm-pca:::template/RootCACertificate/V1
+      Validity:
+        Type: YEARS
+        Value: 3
+
+  MyCACertificateInstallation:
+    Type: AWS::ACMPCA::CertificateAuthorityActivation
+    Properties:
+      CertificateAuthorityArn: !Ref MyPrivateCA
+      Certificate: !GetAtt MyCACertificate.Certificate
+      Status: ACTIVE
+
+  MyAPIGWCertificate:
+    Type: AWS::CertificateManager::Certificate
+    DependsOn: MyCACertificateInstallation
+    Properties:
+      DomainName: !FindInMap [Constants, CustomDomain, Value]
+      CertificateAuthorityArn: !Ref MyPrivateCA
+
+  ApiVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VpcIdParameter
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.execute-api"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: !Ref VpcEndpointSubnetIdsParameter
+      SecurityGroupIds: !Ref ApiVPCESecurityGroup
+
+  PrivateApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: PrivateAPI
+      EndpointConfiguration:
+        Type: PRIVATE
+        VpcEndpointIds:
+          - !Ref ApiVPCEndpoint
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+            - Effect: Deny
+              Principal: "*"
+              Action: execute-api:Invoke
+              Resource: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*"
+              Condition:
+                StringNotEquals:
+                  aws:sourceVpce: !Ref ApiVPCEndpoint
+            - Effect: Allow
+              Principal: "*"
+              Action: execute-api:Invoke
+              Resource: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*"
+      StageName: prod
+
+  PythonLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.13
+      Handler: index.lambda_handler
+      InlineCode: |
+        def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': 'Hello from Private Lambda!'
+            }
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref PrivateApiGateway
+            Path: /mypath
+            Method: GET
+
+  ApiGatewayCustomDomain:
+    Type: AWS::ApiGateway::DomainNameV2
+    Properties:
+      DomainName: !FindInMap [Constants, CustomDomain, Value]
+      EndpointConfiguration:
+        Types:
+          - PRIVATE
+      CertificateArn: !Ref MyAPIGWCertificate
+      SecurityPolicy: TLS_1_2
+      Policy:
+        Fn::ToJsonString:
+          Statement:
+            - Effect: Deny
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*"
+              Condition:
+                StringNotEquals:
+                  aws:SourceVpce: !Ref ApiVPCEndpoint
+            - Effect: Allow
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*"
+
+  Association:
+    Type: AWS::ApiGateway::DomainNameAccessAssociation
+    Properties:
+      AccessAssociationSource: !Ref ApiVPCEndpoint
+      AccessAssociationSourceType: VPCE
+      DomainNameArn: !GetAtt ApiGatewayCustomDomain.DomainNameArn
+
+  Mapping:
+    Type: AWS::ApiGateway::BasePathMappingV2
+    DependsOn: PrivateApiGateway
+    Properties:
+      BasePath: prod
+      DomainNameArn: !Ref ApiGatewayCustomDomain
+      RestApiId: !Ref PrivateApiGateway
+      Stage: prod
+
+  MyPrivateHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !FindInMap [Constants, DomainName, Value]
+      VPCs:
+        - VPCId: !Ref VpcIdParameter
+          VPCRegion: !Sub '${AWS::Region}'
+      HostedZoneConfig:
+        Comment: Private Hosted Zone for API Gateway
+
+  MyRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref MyPrivateHostedZone
+      Name: !FindInMap [Constants, CustomDomain, Value]
+      ResourceRecords: 
+        - !Select ['1', !Split [':', !Select ['0', !GetAtt ApiVPCEndpoint.DnsEntries]]]
+      Type: CNAME
+      TTL: 300
+
+  VPCEndpointPCA:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VpcIdParameter
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.acm-pca"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: !Ref VpcEndpointSubnetIdsParameter
+      SecurityGroupIds: !Ref ApiVPCESecurityGroup
+
+  APITestingLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.13
+      Handler: index.lambda_handler
+      VpcConfig:
+        SecurityGroupIds: !Ref ApiVPCESecurityGroup
+        SubnetIds: !Ref VpcEndpointSubnetIdsParameter
+      Environment:
+        Variables:
+          CERTIFICATE_ARN: !GetAtt MyCACertificate.Arn
+          CA_ARN: !Ref MyPrivateCA
+          CUSTOM_DOMAIN_NAME: !FindInMap [Constants, CustomDomain, Value]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSPrivateCAReadOnly
+      InlineCode: |
+        import boto3
+        import os
+        import botocore.credentials
+        from botocore.awsrequest import AWSRequest
+        from botocore.httpsession import URLLib3Session
+        from botocore.auth import SigV4Auth
+
+        def lambda_handler(event, context):
+
+              # Initialize ACMPCA client
+              acmpca = boto3.client('acm-pca') 
+              
+              # Get ARNs from environment variables
+              ca_arn = os.environ['CA_ARN']
+              certificate_arn = os.environ['CERTIFICATE_ARN']
+              
+              if not ca_arn or not certificate_arn:
+                  raise ValueError("CA ARN or Certificate ARN not found in environment variables")
+              
+              # Get the certificate
+              response = acmpca.get_certificate(
+                  CertificateAuthorityArn=ca_arn,
+                  CertificateArn=certificate_arn
+              )
+
+              # Get certificate details
+              certificate = response['Certificate']
+              
+              # Define local paths for saving
+              cert_path = '/tmp/ca_certificate.pem'
+              
+              # Save certificate
+              with open(cert_path, 'w') as f:
+                  f.write(certificate)
+
+              # Getting custom domain name
+              custom_domain_name = os.environ['CUSTOM_DOMAIN_NAME']
+
+              request = AWSRequest(method="GET", url="https://"+custom_domain_name+"/prod/mypath")
+              
+              session = URLLib3Session(
+                  verify=cert_path
+              )
+
+              r = session.send(request.prepare())
+              print(r.text)
+              print(r.headers)
+              print(r.status_code)
+              return r.text

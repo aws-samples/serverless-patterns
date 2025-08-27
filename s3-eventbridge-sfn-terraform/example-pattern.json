@@ -1,7 +1,7 @@
 {
   "title": "Amazon S3 to AWS Step Functions with Amazon EventBridge Rule",
   "description": "How to create an EventBridge rule with S3 as the event source and Step Functions as target.",
-  "language": "nodejs",
+  "language": "Node.js",
   "level": "200",
   "framework": "Terraform",
   "introBox": {

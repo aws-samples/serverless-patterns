@@ -3,7 +3,7 @@
   "description": "Lambda function that uses PowerTools to get Secrets Manager secret and call an API.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
     "description": "An event-driven workflow to automatically detect and store text found within pdf files by leveraging Amazon Textract, AWS Lambda, and Amazon DynamoDB.",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

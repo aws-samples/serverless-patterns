@@ -3,7 +3,7 @@
 	"description": "Create a Lambda function that contains a NodeJS application and it is invoked by a Function URL",
 	"language": "Typescript",
 	"level": "200",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

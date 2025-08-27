@@ -3,7 +3,7 @@
   "description": "Uses EventBridge to trigger a Step Functions workflow each time an object is uploaded to S3.",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

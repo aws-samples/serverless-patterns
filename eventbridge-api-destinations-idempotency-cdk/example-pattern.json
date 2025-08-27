@@ -3,7 +3,7 @@
   "description": "Create an EventBridge event bus and API Destination to reliably send events to HTTP APIs.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -3,7 +3,7 @@
     "description": "The SAM template deploys a Step Functions Standard workflow that invokes a third-party API directly.",
     "language": "YAML",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

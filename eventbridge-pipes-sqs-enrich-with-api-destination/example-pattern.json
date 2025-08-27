@@ -3,7 +3,7 @@
   "description": "This pattern shows how to use EventBridge Pipes to enrich SQS message data using API destinations and then send response to pipe target.",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

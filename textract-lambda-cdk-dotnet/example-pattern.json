@@ -3,7 +3,7 @@
     "description": "This CDK application demonstrates how to use Amazon Textract service to extract text from images.",
     "language": ".NET",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

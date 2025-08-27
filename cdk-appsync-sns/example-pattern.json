@@ -3,7 +3,7 @@
 	"description": "Create an AppSync API with an SNS HTTP data source",
 	"language": "TypeScript",
 	"level": "100",
-	"framework": "CDK",
+	"framework": "AWS CDK",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

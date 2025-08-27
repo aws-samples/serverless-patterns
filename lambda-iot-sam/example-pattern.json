@@ -7,7 +7,7 @@
         "to": "iot"
     },
   "language": "Node.js",
-	"framework": "SAM",
+	"framework": "AWS SAM",
 	"introBox": {
 		"headline": "How it works",
 		"text": [

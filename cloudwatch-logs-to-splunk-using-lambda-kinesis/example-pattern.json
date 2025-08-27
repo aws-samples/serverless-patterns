@@ -3,7 +3,7 @@
   "description": "This pattern sets up a serverless stack with AWS Lambda and Amazon Kinesis Data Stream (KDS) to continuously process streaming CloudWatch logs from different accounts and regions. Lambda receives stream records containing Amazon CloudWatch log events, decompresses and decodes them to prepare events for pushing to Splunk. A log destination Amazon Resource Name (ARN) needs to be configured across all account's CloudWatch log groups.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How It Works",
     "text": [

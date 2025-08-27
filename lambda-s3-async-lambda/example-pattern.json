@@ -3,7 +3,7 @@
     "description": "Create a Lambda function that invoke another Lambda function asynchronously. When the payload exceed Lambda asynchronous invocation payload quota, payload is saved to S3 bucket. Then S3 trigger second asynchronous Lambda function",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

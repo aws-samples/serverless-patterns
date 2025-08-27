@@ -1,9 +1,9 @@
 {
   "title": "Bedrock in a NodeJS Lambda",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "description": "Create an AWS Lambda Function that invokes Amazon Bedrock via Converse API",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

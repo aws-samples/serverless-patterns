@@ -3,7 +3,7 @@
   "description": "This pattern triggers a Lambda function from an SQS queue with Step functions enrichment inbetween them using EventBridge Pipes",
   "language": "",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": ["SQS queue is polled and messages are sent to Step Function workflow, the workflow enriches the event and forwards them onto the Lambda function"]

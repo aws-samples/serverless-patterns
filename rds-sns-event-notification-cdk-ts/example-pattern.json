@@ -3,7 +3,7 @@
   "description": "Amazon RDS event subscriptions allow users to configure notifications for RDS events (provided through an SNS topic).",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

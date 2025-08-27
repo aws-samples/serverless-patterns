@@ -3,7 +3,7 @@
   "description": "Creating a SNS topic to publish to Slack channel via AWS Lambda",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

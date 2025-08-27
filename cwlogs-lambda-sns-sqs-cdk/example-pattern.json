@@ -3,7 +3,7 @@
   "description": "Create a CloudWatch Logs subscription to a Lambda function, publish to SNS topic and deliver logs to SQS queue.",
   "language": "Python",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

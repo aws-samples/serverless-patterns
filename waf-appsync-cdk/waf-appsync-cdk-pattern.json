@@ -3,7 +3,7 @@
   "description": "Create an AppSync graphql API protected with WAF rules. This WebACL limits the requests to certain countries and protects against common graphql attacks.",
   "language": "typescript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

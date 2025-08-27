@@ -3,7 +3,7 @@
   "description": "Create multiple Amazon Eventbridge Buses and Rules to orchestrate events to trigger Multiple SNS Topics using event patterns.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

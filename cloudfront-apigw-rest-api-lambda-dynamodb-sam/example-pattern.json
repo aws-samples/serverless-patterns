@@ -3,7 +3,7 @@
   "description": "This pattern creates an Amazon Cloudfront distribution in front of Amazon S3 and an Amazon API Gateway REST API which invokes an AWS Lambda function to store data in an Amazon DynamoDB table.",
   "language": "Node.js",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

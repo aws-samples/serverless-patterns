@@ -3,7 +3,7 @@
   "description": "Create a Lambda function that calls Comprehend for sentiment analysis via the Boto3 SDK.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "services": {
     "from": "Lambda",
     "to": "Comprehend"

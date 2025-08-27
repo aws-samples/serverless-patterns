@@ -3,7 +3,7 @@
   "description": "This pattern uses an EventBridge input transfomer to convert an EventBridge event to a CloudEvent and send it to a Lambda function using the CloudEvents SDK for event handling.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

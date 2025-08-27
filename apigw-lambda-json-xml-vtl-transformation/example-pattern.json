@@ -3,7 +3,7 @@
   "description": "Use VTL template to transform json response to xml in Amazon API Gateway.",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

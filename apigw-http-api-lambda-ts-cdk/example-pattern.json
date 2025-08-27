@@ -3,7 +3,7 @@
     "description": "This pattern create an Amazon API Gateway HTTP API and a dummy Lambda function returning a simple 'Hello World'",
     "language": "Node.js",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

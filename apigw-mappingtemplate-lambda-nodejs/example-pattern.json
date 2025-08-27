@@ -3,7 +3,7 @@
   "description": "Create a Regional REST API with a mapping template in the integration request to pass to the lambda function.",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

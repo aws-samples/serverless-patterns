@@ -3,7 +3,7 @@
     "description": "This shows how to receive email with Amazon SES and process them using AWS Lambda.",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [

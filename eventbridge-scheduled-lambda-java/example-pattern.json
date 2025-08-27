@@ -3,7 +3,7 @@
   "description": "Create a Lambda function triggered on a recurring schedule.",
   "language": "Java",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "Create an scheduled EventBridge rule that invokes a Lambda function",
     "text": [

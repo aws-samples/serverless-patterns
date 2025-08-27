@@ -2,7 +2,7 @@
     "title": "Long running invocations of Amazon Bedrock using Amazon AppSync and AWS Lambda streaming",
     "language": "Typescript",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

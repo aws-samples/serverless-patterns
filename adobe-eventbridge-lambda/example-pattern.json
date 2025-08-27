@@ -3,7 +3,7 @@
     "description": "Use EventBridge Adobe I/O Events Integration to process order events with AWS Lambda, send notifications via SES, or store data in other AWS services.",
     "language": "Python",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

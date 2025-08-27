@@ -3,7 +3,7 @@
   "description": "This pattern demonstrates how an event can be used to trigger a Lambda function and run Image analysis using Amazon Rekognition.",
   "language": "Rust",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

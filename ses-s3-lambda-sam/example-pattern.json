@@ -3,7 +3,7 @@
   "description": "This sample project demonstrates how to receive email using Amazon SES and store in Amazon S3 bucket which triggers AWS Lambda to process the email.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

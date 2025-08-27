@@ -3,7 +3,7 @@
   "description": "Trigger an AWS Fargate Task when a file is uploaded to S3",
   "language": "Typescript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

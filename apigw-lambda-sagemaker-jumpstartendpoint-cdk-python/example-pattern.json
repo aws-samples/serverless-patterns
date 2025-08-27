@@ -3,7 +3,7 @@
   "description": "This pattern deploys a SageMaker Jumpstart model (Flan T5 XL) endpoint. It also uses a Lambda function and API Gateway to integrate the endpoint",
   "language": "Python",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

@@ -5,7 +5,7 @@
     "architectureURL": "docs/architecture.png",
     "videoId": "",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "services": {
         "from": "cloudtrail",
         "to": "opensearch"

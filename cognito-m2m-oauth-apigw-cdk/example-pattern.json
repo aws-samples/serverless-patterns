@@ -3,7 +3,7 @@
     "description": "This pattern demonstrates how to implement machine-to-machine (M2M) authentication using AWS Cognito, OAuth 2.0, API Gateway, and AWS Lambda. It showcases the integration of Cognito as the authentication provider, allowing requests to be authorized based on custom scopes defined in OAuth 2.0",
     "language": "TypeScript",
     "level": "300",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

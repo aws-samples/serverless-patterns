@@ -3,7 +3,7 @@
     "description": "Using mapping template and StartSyncExecution API call, integrating Express State Machine with Rest API",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [

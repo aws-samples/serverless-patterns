@@ -3,7 +3,7 @@
     "description": "Detect labels in pictures using Amazon S3, AWS Lambda, Amazon Rekognition, and Amazon DynamoDB with Amazon Cloud Development Kit (AWS CDK)",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
         "headline": "How it works",
         "text": [

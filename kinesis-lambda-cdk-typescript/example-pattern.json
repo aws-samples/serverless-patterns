@@ -3,7 +3,7 @@
   "description": "A serverless example to connect Amazon Kinesis Data Streams to AWS Lambda.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [

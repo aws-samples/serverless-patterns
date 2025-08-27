@@ -3,7 +3,7 @@
     "description": "Replicate a S3 bucket to multiple S3 buckets. Implemented in CDK",
     "language": "TypeScript",
     "level": "200",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "introBox": {
       "headline": "How it works",
       "text": [

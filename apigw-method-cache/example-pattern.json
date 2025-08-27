@@ -3,7 +3,7 @@
     "description": "Create a REST API Gateway with a method-level cache",
     "language": "Node.js",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "introBox": {
       "headline": "How it works",
       "text": [
