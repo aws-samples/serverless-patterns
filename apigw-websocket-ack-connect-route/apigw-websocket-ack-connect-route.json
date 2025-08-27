@@ -12,9 +12,9 @@
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ack-connect-route",
-            "templateURL": "serverless-patterns/ack-connect-route",
-            "projectFolder": "ack-connect-route",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-ack-connect-route",
+            "templateURL": "serverless-patterns/apigw-websocket-ack-connect-route",
+            "projectFolder": "apigw-websocket-ack-connect-route",
             "templateFile": "template.yml"
         }
     },
