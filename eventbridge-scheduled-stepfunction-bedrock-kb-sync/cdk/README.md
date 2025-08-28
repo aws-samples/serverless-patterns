@@ -1,9 +1,5 @@
-# Semtech Chat Backend
 
-## Introduction
-The Semtech Chat Backend is a serverless chat application backend built using AWS CDK v2. It provides real-time messaging capabilities with secure authentication and scalable infrastructure.
-
-## Prerequisites
+# Prerequisites
 
 ### Required Tools
 - [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/home.html)
