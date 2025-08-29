@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.22"
+      version = "~> 5.0"
     }
   }
 
@@ -29,7 +29,7 @@ resource "aws_lambda_function" "publisher_function" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "app.handler"
   role             = aws_iam_role.iam_for_lambda.arn
-  runtime          = "nodejs16.x"
+  runtime          = "nodejs22.x"
 }
 
 data "archive_file" "lambda_zip_file" {
