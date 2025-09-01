@@ -59,9 +59,13 @@ resource "aws_iam_role" "iam_for_lambda" {
   ]
 }
 EOF
-  inline_policy {
-    name   = "lambda_logs_policy"
-    policy = <<EOF
+}
+
+resource "aws_iam_role_policy" "lambda_logs" {
+  name = "lambda_logs_policy"
+  role = aws_iam_role.iam_for_lambda.id
+
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -78,7 +82,6 @@ EOF
   ]
 }
 EOF
-  }
 }
 
 resource "aws_lambda_permission" "allow_bucket_invoke_lambda" {
