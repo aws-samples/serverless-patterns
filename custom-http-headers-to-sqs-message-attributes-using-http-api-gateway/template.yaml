@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  ApiGatewayName:
+    Type: String
+    Description: Name of the API Gateway
+  QueueName:
+    Type: String
+    Description: Name of the SQS queue
+
+Resources:
+  # CloudWatch Log Group
+  ApiGatewayLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/apigateway/${ApiGatewayName}'
+      RetentionInDays: 30
+
+  # SQS Queue
+  MyQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref QueueName
+
+  # API Gateway Role
+  ApiGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ApiGatewaySQSAndCloudWatchPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                  - sqs:GetQueueUrl
+                  - sqs:SendMessageBatch
+                Resource: !GetAtt MyQueue.Arn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                  - logs:GetLogEvents
+                  - logs:FilterLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/apigateway/${ApiGatewayName}:*'
+
+  # HTTP API
+  MyHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: !Ref ApiGatewayName
+      StageName: $default
+      Tags:
+        Name: !Ref ApiGatewayName
+      AccessLogSettings:
+        DestinationArn: !GetAtt ApiGatewayLogGroup.Arn
+        Format: '{"account":"$context.accountId","apiId":"$context.apiId","awsEndpointRequestId":"$context.awsEndpointRequestId","domainName":"$context.domainName","domainPrefix":"$context.domainPrefix","error.message":"$context.error.message","error.responseType":"$context.error.responseType","extendedRequestId":"$context.extendedRequestId","httpMethod":"$context.httpMethod","identity.accountId":"$context.identity.accountId","identity.caller":"$context.identity.caller","identity.sourceIp":"$context.identity.sourceIp","identity.user":"$context.identity.user","identity.userAgent":"$context.identity.userAgent","identity.userArn":"$context.identity.userArn","path":"$context.path","protocol":"$context.protocol","requestId":"$context.requestId","requestTime":"$context.requestTime","requestTimeEpoch":"$context.requestTimeEpoch","resourcePath":"$context.resourcePath","stage":"$context.stage","integrationLatency":"$context.integrationLatency","integrationStatus":"$context.integrationStatus","responseLatency":"$context.responseLatency","responseLength":"$context.responseLength","status":"$context.status","integrationErrorMessage":"$context.integrationErrorMessage", "error.responseType":"$context.error.responseType"}'
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 100
+        ThrottlingRateLimit: 50
+      DisableExecuteApiEndpoint: false
+      FailOnWarnings: false
+
+  # API Integration
+  SqsIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref MyHttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationSubtype: SQS-SendMessage
+      CredentialsArn: !GetAtt ApiGatewayRole.Arn
+      RequestParameters:
+        QueueUrl: !Ref MyQueue
+        MessageBody: $request.body.MessageBody
+        MessageAttributes: >-
+          {
+            "MessageAttribute1": {
+              "DataType": "String",
+              "StringValue": "${request.header.header1}"
+            },
+            "MessageAttribute2": {
+              "DataType": "String",
+              "StringValue": "${request.header.header2}"
+            },
+            "MessageAttribute3": {
+              "DataType": "String",
+              "StringValue": "static_header3"
+            }
+          }
+      PayloadFormatVersion: '1.0'
+
+  # Route
+  SqsRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref MyHttpApi
+      RouteKey: 'ANY /sqs'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref SqsIntegration
+
+Outputs:
+  # Resource ARNs and IDs
+  HttpApiId:
+    Description: HTTP API ID
+    Value: !Ref MyHttpApi
+
+  HttpApiArn:
+    Description: HTTP API ARN
+    Value: !Sub arn:aws:apigateway:${AWS::Region}::/apis/${MyHttpApi}
+
+  QueueUrl:
+    Description: URL of the SQS queue
+    Value: !Ref MyQueue
+
+  QueueArn:
+    Description: ARN of the SQS queue
+    Value: !GetAtt MyQueue.Arn
+
+  LogGroupArn:
+    Description: ARN of the CloudWatch Log Group
+    Value: !GetAtt ApiGatewayLogGroup.Arn
+
+  RoleArn:
+    Description: ARN of the IAM Role
+    Value: !GetAtt ApiGatewayRole.Arn
+
+  # API Endpoint and Usage Information
+  HttpApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${MyHttpApi}.execute-api.${AWS::Region}.amazonaws.com
+
+  ApiUsageInformation:
+    Description: API Usage Information
+    Value: |
+      Endpoint: POST https://${MyHttpApi}.execute-api.${AWS::Region}.amazonaws.com/sqs
+      Required Headers:
+        - The following headers and their corresponding values are expected to passed along with the request when using this template
+        - header1's (key and value) is required for MessageAttribute1 header1
+        - header2's (key and value) is required for MessageAttribute2 header2
+        - 'static_header3' is the static value being configured for MessageAttribute3 header.
+      Request Body Format:
+        {
+          "MessageBody": "Your message here"
+        }
+
+  # Input Parameters Used
+  ProvidedInputs:
+    Description: Input parameters provided for this deployment
+    Value: !Sub |
+      API Gateway Name: ${ApiGatewayName}
+      Queue Name: ${QueueName}
