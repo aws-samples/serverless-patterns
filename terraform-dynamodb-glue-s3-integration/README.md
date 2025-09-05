@@ -35,6 +35,8 @@ Important: this application uses various AWS services and there are costs associ
 
 This Terraform pattern creates a zero-ETL integration that automatically exports DynamoDB data to S3 using AWS Glue. The AWS Glue job reads from the Amazon DynamoDB table and writes the data in the specified format (currently specified as Parquet in the script) to an encrypted Amazon S3 bucket for potential use in analytics and/or for long-term storage. The entire infrastructure is provisioned with the required IAM permissions, and includes automated testing script to validate the data pipeline functionality.
 
+![pattern](Images/pattern.png)
+
 ## Testing
 
 After deployment, run ./test.sh. This script adds rows to Amazon DynamoDB database and triggers then the AWS Glue job. Once the job is complete, check Amazon S3 for the target files.
