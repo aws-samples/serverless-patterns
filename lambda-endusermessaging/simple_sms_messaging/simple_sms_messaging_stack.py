@@ -53,7 +53,7 @@ class SimpleSmSMessagingStack(Stack):
         # Create SMS Sender Lambda Function
         sms_sender_function = _lambda.Function(
             self, "SmsSenderFunction",
-            runtime=_lambda.Runtime.PYTHON_3_11,
+            runtime=_lambda.Runtime.PYTHON_3_13,
             handler="send_sms.lambda_handler",
             code=_lambda.Code.from_asset("lambda/simple_sms_sender"),
             timeout=Duration.seconds(30),

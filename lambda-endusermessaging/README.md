@@ -1,6 +1,6 @@
-# Amazon Lambda - End User Messaging
+# Sending SMS with AWS Lambda and AWS End User Messaging
 
-This sample pattern demonstrates how to send scheduled SMS messages using AWS Lambda and AWS End User Messaging. The solution uses EventBridge to trigger a Lambda function at a specified time each day, which then sends an SMS message to a configured phone number.
+This sample pattern demonstrates how to send scheduled SMS messages using AWS Lambda and AWS End User Messaging. The solution uses Amazon EventBridge to trigger a Lambda function at a specified time each day, which then sends an SMS message to a configured phone number.
 
 Built with a serverless-first approach, this solution automatically sends messages at your preferred time each day.
  
@@ -24,7 +24,7 @@ The entire solution is built using AWS Cloud Development Kit (CDK) and AWS Lambd
 
 * AWS Lambda
 * AWS End User Messaging SMS
-* AWS Secret Manager
+* AWS Secrets Manager
 * Amazon EventBridge
 
 ### Architecture Diagram

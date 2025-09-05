@@ -1,9 +1,9 @@
 {
   "title": "Lambda - End User Messaging",
-  "description": "Scheduled SMS messaging using AWS Lambda and End User Messaging",
+  "description": "Scheduled SMS messaging using AWS Lambda and AWS End User Messaging",
   "language": "Python",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
