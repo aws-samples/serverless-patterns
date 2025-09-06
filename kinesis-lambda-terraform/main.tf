@@ -52,6 +52,6 @@ output "kinesis_data_stream" {
 }
 
 output "consumer_function" {
-  value = aws_lambda_function.sample_function.arn
+  value = aws_lambda_function.sample_lambda.arn
   description = "Consumer Function function name"
 }
