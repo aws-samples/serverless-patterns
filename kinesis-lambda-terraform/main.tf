@@ -17,11 +17,19 @@ resource "aws_kinesis_stream" "sample_stream" {
   shard_count      = 1
   retention_period = 24
 }
+
+data "archive_file" "lambda_zip_file" {
+  type        = "zip"
+  source_file = "${path.module}/src/app.js"
+  output_path = "${path.module}/lambda.zip"
+}
+
 resource "aws_lambda_function" "sample_lambda" {
-  filename         = "sample_lambda.zip"  # Path to your Lambda code ZIP file
+  filename         = data.archive_file.lambda_zip_file.output_path
+  source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   function_name    = "sample-lambda"
   role             = aws_iam_role.lambda_role.arn
-  handler          = "index.handler"
+  handler          = "app.handler"
   runtime          = "nodejs22.x"  # Change to your preferred runtime
 }
 resource "aws_iam_role" "lambda_role" {
