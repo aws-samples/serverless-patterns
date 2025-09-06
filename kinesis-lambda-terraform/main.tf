@@ -48,6 +48,44 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
+resource "aws_iam_policy" "lambda_kinesis_policy" {
+  name = "lambda-kinesis-policy"
+
+  policy = jsonencode(
+    {
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Effect = "Allow",
+          Action = [
+            "kinesis:GetRecords",
+            "kinesis:GetShardIterator",
+            "kinesis:DescribeStream",
+            "kinesis:DescribeStreamSummary",
+            "kinesis:ListShards",
+            "kinesis:ListStreams"
+          ],
+          Resource = aws_kinesis_stream.sample_stream.arn
+        },
+        {
+          Effect = "Allow",
+          Action = [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          Resource = "arn:aws:logs:*:*:*"
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_kinesis_policy_attachment" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.lambda_kinesis_policy.arn
+}
+
 resource "aws_lambda_event_source_mapping" "sample_mapping" {
   event_source_arn = aws_kinesis_stream.sample_stream.arn
   function_name    = aws_lambda_function.sample_lambda.arn
