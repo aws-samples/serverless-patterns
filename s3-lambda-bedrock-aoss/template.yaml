@@ -29,7 +29,7 @@ Resources:
     Properties:
       ServiceToken: !GetAtt IndexCreationLambdaFunction.Arn
       AOSSIndexName: !Ref AmazonOpenSearchIndexName
-      AOSSHost: !Sub '${ExampleCollection.Id}.${AWS::Region}.aoss.amazonaws.com'
+      AOSSHost: !Sub '${ExampleCollection.Id}.${AWS::Region}.aoss.${AWS::URLSuffix}'
 
   IndexCreationLambdaExecutionRole: 
     Type: AWS::IAM::Role
@@ -138,7 +138,7 @@ Resources:
             BucketName: !Ref SourceBucket
       Environment:
         Variables:
-          AOS_HOST: !Sub '${ExampleCollection.Id}.${AWS::Region}.aoss.amazonaws.com'
+          AOS_HOST: !Sub '${ExampleCollection.Id}.${AWS::Region}.aoss.${AWS::URLSuffix}'
           BEDROCK_MODEL_REGION: !Ref BedrockModelRegion
           AOSS_INDEX_NAME:  !Ref AmazonOpenSearchIndexName
       Layers:

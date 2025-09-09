@@ -72,4 +72,4 @@ Resources:
 Outputs:
   ApiUrl:
     Description: API Gateway Invoke URL
-    Value: !Sub https://${PrivateApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+    Value: !Sub https://${PrivateApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/

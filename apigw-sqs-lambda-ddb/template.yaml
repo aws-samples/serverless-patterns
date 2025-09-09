@@ -298,4 +298,4 @@ Resources:
 Outputs:
   HttpApiEndpoint:
     Description: "Http API endpoint"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"

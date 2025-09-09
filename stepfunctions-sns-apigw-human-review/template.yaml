@@ -84,7 +84,7 @@ Resources:
       DefinitionUri: "./StepFunction/step-function-definition.json"
       DefinitionSubstitutions:
         TopicArn: !GetAtt SNSNotificationTopic.TopicArn
-        ApiEndpoint: !Sub https://${ReviewRESTApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+        ApiEndpoint: !Sub https://${ReviewRESTApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod
       Role: !GetAtt ReviewSfnRole.Arn
     Metadata:
       SamResourceId: "ReviewStateMachine"

@@ -246,4 +246,4 @@ Resources:
 Outputs:
   RestApiEndpoint:
     Description: "Rest API endpoint"
-    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"

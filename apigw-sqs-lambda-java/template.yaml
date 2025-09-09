@@ -103,7 +103,7 @@ Resources:
 Outputs:
   MyHttpApiEndpoint:
     Description: "HTTP API endpoint"
-    Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
 
   SQSLambdaFunction:
     Description: SQSLambdaFunction function name

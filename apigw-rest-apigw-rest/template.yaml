@@ -108,10 +108,10 @@ Resources:
 Outputs:
   ReportingEndpoint:
     Description: Reporting API endpoint
-    Value: !Sub "https://${ReportingApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${ReportingApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod"
   UserManagementEndpoint:
     Description: User management API endpoint
-    Value: !Sub "https://${UserManagementApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${UserManagementApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod"
   PrimaryApiEndpoint:
     Description: Primary API endpoint
-    Value: !Sub "https://${PrimaryApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${PrimaryApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod"
