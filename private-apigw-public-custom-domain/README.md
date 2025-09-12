@@ -2,12 +2,9 @@
 
 This pattern creates an Amazon Private API Gateway that is only accessible through VPC endpoints, with public custom domain name resolution for internal only access through an Amazon internal Application Load Balancer.
 
-This architecture is intended for:
-- **Internal APIs**: APIs that should only be accessible from within your network
-- **Hybrid Connectivity**: APIs accessible from on-premises via VPN/Direct Connect
-- **Public DNS Resolution**: APIs that resolve publicly but are only accessible privately
+This architecture is intended for use cases which require private APIs, which are only accessible from on-premises via VPN or Direct Connect, while the DNS can be resolved publicly.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/private-apigw-custom-domain](https://serverlessland.com/patterns/private-apigw-custom-domain)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -34,12 +31,16 @@ Important: this application uses various AWS services and there are costs associ
 ![image](architecture/architecture.png)
 
 ## Requirements
+Create an AWS account if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
-1. **Python Environment**: Python 3.8+ with venv
-2. **AWS CDK**: Installed and AWS Account bootstrapped
-3. **ACM Certificate**: Valid certificate for your domain in the deployment region
-4. **AWS CLI**: Configured with appropriate permissions
-5. **Custom Domain**: A domain name you control with DNS management access
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK) installed
+* [Amazon Route 53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring.html) configured as DNS service and public hosted zone created 
+* [Public Certificate](https://docs.aws.amazon.com/acm/latest/userguide/acm-public-certificates.html) requested in Amazon Certificate Manager (ACM)
+* [Python 3.8+](https://www.python.org/downloads/) installed
+
 
 ## Deployment Instructions
 
@@ -76,23 +77,17 @@ cdk deploy \
   -c certificate_arn=arn:aws:acm:region:account:certificate/<certificate-id>
 ```
 
-#### Outputs
+#### CDK Output
 
-The stack provides these outputs:
-- **VPCId**: VPC identifier
+The stack provides this output:
 - **ALBDNSName**: ALB DNS name for CNAME record
-- **ALBHostedZoneId**: ALB hosted zone ID
-- **VPCEndpointId**: VPC endpoint identifier
-- **APIGatewayId**: API Gateway identifier
-- **CustomDomainName**: Your custom domain
-- **APIEndpoint**: Full API URL
-- **PublicDNSInstructions**: DNS record to create
+
 
 ### 4. DNS Configuration
 
 After deployment, you must create a DNS record in your domain's hosted zone:
 
-1. **Get ALB DNS name** from CDK outputs
+1. **Get ALB DNS name** from CDK output
 2. **Create CNAME record**:
    ```
    api.example.com -> internal-alb-xxx.region.elb.amazonaws.com
@@ -133,7 +128,7 @@ curl https://api.example.com/pets/2
 ## Troubleshooting
 
 ### Certificate Issues
-- Ensure certificate is in the same region as deployment
+- Ensure certificate is in the same region
 - Verify certificate covers your domain name
 - Check certificate validation status
 
@@ -141,10 +136,6 @@ curl https://api.example.com/pets/2
 - Verify CNAME or ALIAS record points to ALB DNS name
 - Check DNS propagation with `nslookup your-domain.com`
 - Ensure you have DNS management access for your domain
-
-### Lambda Function Issues
-- Check CloudWatch logs for the RegisterVPCEndpointTargets function
-- Verify IAM permissions for EC2 and ELB operations
 
 ### Target Registration
 - Manually check target group health in AWS Console

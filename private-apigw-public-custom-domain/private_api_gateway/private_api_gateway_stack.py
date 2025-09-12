@@ -580,11 +580,5 @@ def handler(event, context):
         )
 
         # Outputs
-        CfnOutput(self, "VPCId", value=self.vpc.vpc_id)
         CfnOutput(self, "ALBDNSName", value=self.alb.load_balancer_dns_name)
-        CfnOutput(self, "ALBHostedZoneId", value=self.alb.load_balancer_canonical_hosted_zone_id)
-        CfnOutput(self, "VPCEndpointId", value=self.vpc_endpoint.vpc_endpoint_id)
-        CfnOutput(self, "APIGatewayId", value=self.api.rest_api_id)
-        CfnOutput(self, "CustomDomainName", value=domain_name)
-        CfnOutput(self, "APIEndpoint", value=f"https://{domain_name}/pets")
-        CfnOutput(self, "PublicDNSInstructions", value=f"CNAME: {domain_name} -> {self.alb.load_balancer_dns_name}")
+        
