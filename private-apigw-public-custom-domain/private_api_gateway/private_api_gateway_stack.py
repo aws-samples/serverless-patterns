@@ -435,7 +435,7 @@ class PrivateApiGatewayStack(Stack):
         # Lambda function to register VPC endpoint IPs as targets
         register_targets_function = _lambda.Function(
             self, "RegisterVPCEndpointTargets",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_13,
             handler="index.handler",
             timeout=Duration.seconds(60),
             code=_lambda.Code.from_inline('''
@@ -534,7 +534,12 @@ def handler(event, context):
                     "elasticloadbalancing:DeregisterTargets",
                     "elasticloadbalancing:DescribeTargetHealth"
                 ],
-                resources=["*"]
+                resources=["*"],
+                conditions={
+                    "StringEquals": {
+                        "aws:RequestedRegion": self.region
+                    }
+                }
             )
         )
 
