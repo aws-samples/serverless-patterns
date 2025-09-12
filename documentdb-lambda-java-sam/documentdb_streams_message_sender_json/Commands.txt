@@ -1,0 +1,4 @@
+java -classpath <Location of project>/documentdb_streams_message_sender_json/target/json-documentdb-producer-0.0.1-SNAPSHOT.jar documentdb.streams.producer.DocumentDBStreamsProducer <Name of DocumentDB Database> <Name Of DocumentDB Collection> <Unique String to identify this batch of messages> <Total Number of Messages to send in this batch>
+
+Example:
+java -classpath /home/ec2-user/environment/JavaExamples/documentdb_streams_message_sender_json/target/json-documentdb-producer-0.0.1-SNAPSHOT.jar documentdb.streams.producer.DocumentDBStreamsProducer DocumentDBStreamsLambdaTriggerDB Customer TestMessage01 100

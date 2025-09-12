@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  documentdb_streams_event_consumer_function
+
+  Sample SAM Template for documentdb-streams-consumer-with-sam
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  LambdaDocumentDBStreamsConsumerJavaFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: java-documentdb-streams-consumer-dynamodb-sam
+      CodeUri: documentdb_streams_event_consumer_function
+      Handler: com.amazonaws.services.lambda.samples.events.documentdbstreams.HandlerDocumentDBStreams::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          DYNAMO_DB_TABLE: !Ref StreamsConsumerDynamoDBTable
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+        SubnetIds:
+          - !Ref Subnet1
+          - !Ref Subnet2
+          - !Ref Subnet3
+      Events:
+        MyDDBEvent:
+          Type: DocumentDB
+          Properties:
+            Cluster: !Join ['', ["arn:", "aws:", "rds:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "cluster:", !Ref StreamsProducerDocumentDBCluster]]
+            BatchSize: 10
+            MaximumBatchingWindowInSeconds: 5
+            DatabaseName: !Ref StreamsProducerDocumentDBDatabase
+            CollectionName: !Ref StreamsProducerDocumentDBCollection
+            FullDocument: "UpdateLookup"
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Join ['', ["arn:", "aws:", "secretsmanager:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "secret:", !Ref SecretsManagerSecretForDocumentDBCredentialsName, "-", !Ref SecretsManagerSecretForDocumentDBCredentialsUniqueString]]
+            StartingPosition: LATEST
+      Policies:
+      - Statement:
+        - Sid: DocumentDBPermissionsPolicy
+          Effect: Allow
+          Action: 
+          - rds:DescribeDBClusters
+          - rds:DescribeDBClusterParameters
+          - rds:DescribeDBSubnetGroups
+          - ec2:CreateNetworkInterface
+          - ec2:DescribeNetworkInterfaces
+          - ec2:DescribeVpcs
+          - ec2:DeleteNetworkInterface
+          - ec2:DescribeSubnets
+          - ec2:DescribeSecurityGroups
+          - kms:Decrypt
+          - secretsmanager:GetSecretValue
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          Resource: '*'
+      - Statement:
+        - Sid: DynamoDBPermissionsPolicy
+          Effect: Allow
+          Action:
+          - dynamodb:GetItem
+          - dynamodb:DeleteItem
+          - dynamodb:PutItem
+          - dynamodb:Scan
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:BatchWriteItem
+          - dynamodb:BatchGetItem
+          - dynamodb:DescribeTable
+          - dynamodb:ConditionCheckItem
+          Resource: 
+          - !Join ['', ["arn:", "aws:", "dynamodb:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "table/", !Ref StreamsConsumerDynamoDBTable]]
+          - !Join ['', ["arn:", "aws:", "dynamodb:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "table/", !Ref StreamsConsumerDynamoDBTable, "/index/*"]]
+
+  StreamsConsumerDynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: DocumentDBStreamsConsumerDynamoDBTableJava
+      PrimaryKey:
+        Name: MessageID
+        Type: String 
+
+Parameters:  
+  StreamsProducerDocumentDBCluster:
+    Type: String
+    Description: Enter the name of the DocumentDB Cluster Identifier that has DocumentDB Streams enabled
+  StreamsProducerDocumentDBDatabase:
+    Type: String
+    Description: Enter the name of the DocumentDB Database that has DocumentDB Streams enabled
+  StreamsProducerDocumentDBCollection:
+    Type: String
+    Description: Enter the name of the DocumentDB Collection that has DocumentDB Streams enabled
+  SecretsManagerSecretForDocumentDBCredentialsName:
+    Type: String
+    Description: Enter the name of the secret that has username/password for the DocumentDB cluster
+  SecretsManagerSecretForDocumentDBCredentialsUniqueString:
+    Type: String
+    Description: Enter the unique string of the secret that has username/password for the DocumentDB cluster
+  Subnet1:
+    Type: String
+    Description: The first of the three private subnets in the DocumentDB cluster's VPC
+  Subnet2:
+    Type: String
+    Description: The second of the three private subnets in the DocumentDB cluster's VPC
+  Subnet3:
+    Type: String
+    Description: The third of the three private subnets in the DocumentDB cluster's VPC
+  SecurityGroup:
+    Type: String
+    Description: The security group associated with this function (use same as DocumentDB)
+Outputs:
+  LambdaDocumentDBStreamsConsumerJavaFunction:
+    Description: "DocumentDB Streams Consumer Lambda Function ARN"
+    Value: !GetAtt LambdaDocumentDBStreamsConsumerJavaFunction.Arn
