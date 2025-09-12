@@ -1,5 +1,5 @@
 {
-  "title": "Lambda - End User Messaging",
+  "title": "Sending SMS with AWS Lambda and AWS End User Messaging",
   "description": "Scheduled SMS messaging using AWS Lambda and AWS End User Messaging",
   "language": "Python",
   "level": "300",
