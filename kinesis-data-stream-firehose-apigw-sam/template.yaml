@@ -123,7 +123,7 @@ Resources:
         RoleARN: !GetAtt MyKinesisFirehoseRole.Arn
       HttpEndpointDestinationConfiguration:
         EndpointConfiguration:
-          Url: !Sub "https://${MyApiGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+          Url: !Sub "https://${MyApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/"
           AccessKey: '{{resolve:secretsmanager:KinesisFirehoseHttpEndpointAccessKey:SecretString}}'
         RoleARN: !GetAtt MyKinesisFirehoseRole.Arn
         BufferingHints:
@@ -143,7 +143,7 @@ Outputs:
   ApiEndpoint:
     Description: API Gateway endpoint URL
     Value:
-      Fn::Sub: "https://${MyApiGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+      Fn::Sub: "https://${MyApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/"
   MyKinesisStream:
     Description: Kinesis Data Stream name
     Value: !Ref MyKinesisStream     

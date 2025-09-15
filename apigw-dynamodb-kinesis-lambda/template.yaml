@@ -134,7 +134,7 @@ Outputs:
   ApiRootUrl:
     Description: Root Url of the API
     Value: !Sub 
-      - 'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/${StageName}'
+      - 'https://${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${StageName}'
       - ApiId: !Ref Api
   LambdaFunction:
     Description: Lambda Function ARN

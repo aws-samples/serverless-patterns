@@ -37,6 +37,6 @@ Resources:
 Outputs:
   EndpointUrl:
     Description: 'REST Edge-optimized endpoint URL'
-    Value: !Sub 'https://${ApiEdgeOptimized}.execute-api.${AWS::Region}.amazonaws.com/prod'
+    Value: !Sub 'https://${ApiEdgeOptimized}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod'
 
 

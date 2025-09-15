@@ -45,4 +45,4 @@ Resources:
 Outputs:
   API:
     Description: API to send SMS using SNS
-    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/dev"
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev"

@@ -60,4 +60,4 @@ Outputs:
     Value: !Ref BedrockLambdaFunction
   BedrockRestApi:
     Description: "API Gateway endpoint URL for the v1 stage of the Bedrock Rest API"
-    Value: !Sub "https://${BedrockRestApi}.execute-api.${AWS::Region}.amazonaws.com/v1/bedrock_test"
+    Value: !Sub "https://${BedrockRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/v1/bedrock_test"

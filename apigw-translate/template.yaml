@@ -71,6 +71,6 @@ Resources:
 Outputs:
   ApiEndpoint:
     Description: API Gateway Endpoint URL
-    Value: !Sub "https://${TranslateApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/translate"
+    Value: !Sub "https://${TranslateApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/translate"
 
 

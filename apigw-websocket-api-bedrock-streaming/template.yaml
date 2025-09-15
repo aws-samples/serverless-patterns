@@ -279,7 +279,7 @@ Outputs:
     Value: !GetAtt InvokeModelLambdaFunction.Arn
   WebSocketURL:
     Description: "The WSS Protocol URL to connect to"
-    Value: !Join [ '', [ 'wss://', !Ref WebSocketApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+    Value: !Join [ '', [ 'wss://', !Ref WebSocketApi, '.execute-api.',!Ref 'AWS::Region','.${AWS::URLSuffix}/',!Ref 'Stage'] ]
   WebSocketConnectionsTableNameArn:
     Description: "WebSocket connections table ARN"
     Value: !GetAtt WebSocketConnectionsTableName.Arn

@@ -126,7 +126,7 @@ Resources:
                 !Ref CapstoneWebSocketApi,
                 ".execute-api.",
                 !Ref "AWS::Region",
-                ".amazonaws.com/dev",
+                ".${AWS::URLSuffix}/dev",
               ],
             ]
           statemachine_arn: !Ref Orchestrator
@@ -398,7 +398,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: !Sub "states.${AWS::Region}.amazonaws.com"
+              Service: !Sub "states.${AWS::Region}.${AWS::URLSuffix}"
             Action: "sts:AssumeRole"
       Policies:
         - PolicyName: stepfn

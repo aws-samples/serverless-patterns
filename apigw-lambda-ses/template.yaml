@@ -62,4 +62,4 @@ Outputs:
     Value: !GetAtt EmailSESLambda.Arn
   
   apiGatewayInvokeURL:
-    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/sendEmail
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/sendEmail

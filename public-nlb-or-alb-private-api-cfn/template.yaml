@@ -410,12 +410,12 @@ Outputs:
   APIGatewayURL:
     Condition: SameAccCheck
     Value: !Sub 
-      - 'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/v0/lambda'
+      - 'https://${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}/v0/lambda'
       - ApiId: !Ref ApiGatewayRestApi
   CURLCommand:  
     Condition: SameAccCheck
     Value: !Sub 
-      - "curl https://${CustomDomain}/${ApiGatewayStage}/lambda -H 'Host:${ApiId}.execute-api.${AWS::Region}.amazonaws.com'"
+      - "curl https://${CustomDomain}/${ApiGatewayStage}/lambda -H 'Host:${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}'"
       - CustomDomain: !Ref HostedZoneRecordSet
         ApiGatewayStage: !Ref ApiGatewayStage
         ApiId: !Ref ApiGatewayRestApi

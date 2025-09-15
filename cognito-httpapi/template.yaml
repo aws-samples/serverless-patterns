@@ -67,7 +67,7 @@ Resources:
 Outputs:
   AppApiEndpoint:
     Description: API Endpoint
-    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
   AuthUrl:
     Description: Url used to authenticate
     Value: !GetAtt AuthStack.Outputs.AuthUrl

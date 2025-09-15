@@ -81,7 +81,7 @@ Outputs:
   # API endpoint for testing
   MyApi:
     Description: API endpoint URL
-    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/prod/
+    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/
   MyLogGroup:
     Description: Name of the log group
     Value: !Ref MyLogGroup                        

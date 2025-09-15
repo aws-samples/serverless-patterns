@@ -263,7 +263,7 @@ Outputs:
         - !Ref 'SimpleChatWebSocketApi'
         - .execute-api.
         - !Ref 'AWS::Region'
-        - .amazonaws.com/
+        - .${AWS::URLSuffix}/
         - !Ref 'Stage'
     Description: The WSS Protocol URI to connect to
   UserpoolId:
