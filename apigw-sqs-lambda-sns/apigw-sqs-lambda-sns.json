@@ -1,0 +1,93 @@
+{
+    "title": "Webhook integration with SMS notifications",
+    "description": "API Gateway webhook integration that queues events in SQS and processes them with Lambda to send SMS notifications via SNS",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates a reliable webhook integration that receives HTTP POST requests via API Gateway, queues them in SQS for decoupling and reliability, then processes the messages with Lambda to send SMS notifications through SNS.",
+            "The pattern uses SQS to decouple the API from message processing, providing resilience and the ability to handle traffic spikes. Lambda processes messages from the queue and sends SMS messages to phone numbers in E.164 format."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sqs-lambda-sns",
+            "templateURL": "serverless-patterns/apigw-sqs-lambda-sns",
+            "projectFolder": "apigw-sqs-lambda-sns",
+            "templateFile": "webhook_sns/webhook_sns_stack.py"
+        }
+    },
+    "deploy": {
+        "text": [
+            "pip install -r requirements.txt",
+            "cdk bootstrap",
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Send a POST request to the API Gateway endpoint:",
+            "curl -X POST https://your-api-id.execute-api.region.amazonaws.com/prod/ -H \"Content-Type: application/json\" -d '{\"phoneNumber\": \"+1234567890\", \"message\": \"Test message\"}'",
+            "Replace the phone number with a valid number in E.164 format for actual SMS delivery."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Shaun Guo",
+            "image": "https://media.licdn.com/dms/image/C5103AQG3KMyMdEIKpA/profile-displayphoto-shrink_800_800/0/1517283953925?e=1692835200&v=beta&t=AxJ9ST_8K_bw8nqTPDaJB2F5dnQspES9FuJ64DBScC8",
+            "bio": "Shaun is a Senior Technical Account Manager at Amazon Web Services based in Australia",
+            "linkedin": "shaun-guo"
+        },
+        {
+        "name": "Robbie Cooray",
+        "image": "https://media.licdn.com/dms/image/v2/C5603AQFK28pyKxfNiQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1603248682998?e=1729728000&v=beta&t=YcFUfepq9JCKMvcqzaHMhTJFks6nrsfxS6v8JpolvEc",
+        "bio": "Robbie is a Senior Solutions Architect at Amazon Web Services based in Australia",
+        "linkedin": "robbiecooray"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 10,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway"
+        },
+        "icon2": {
+            "x": 35,
+            "y": 50,
+            "service": "sqs",
+            "label": "Amazon SQS"
+        },
+        "icon3": {
+            "x": 60,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon4": {
+            "x": 85,
+            "y": 50,
+            "service": "sns",
+            "label": "Amazon SNS"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        }
+    }
+}
