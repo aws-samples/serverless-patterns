@@ -24,22 +24,30 @@ Important: this application uses various AWS services and there are costs associ
     cd eventbridge-webhooks
     ```
 3. There are several examples in this directory.
-- To run the GitHub example, cd to `2-github`.
-  1. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. [Create Encrypted Secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
-  2. Deploy the cloudformation template. You’ll need the secret you created in step 1 (See step 4, on how to deploy the cloudformation template)
-  3. Finally, create the webhook on GitHub. You’ll need the secret you created in step 1 and the Lambda function URL you created in step 2 to complete this step. [Set up GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
- 
-4. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+- To run the GitHub example, change to the `2-github` folder
+```
+cd 2-github
+```
+1. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. [Create Encrypted Secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+2. Use AWS SAM to build the template.
+    ```
+    sam build
+    ```
+3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
     ```
-5. During the prompts:
+2. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
+    * Enter the secret
     * Allow SAM CLI to create IAM roles with the required permissions.
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-6. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+3. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+
+4. Create the webhook on GitHub. You’ll need the secret you created in step 1 and the Lambda function URL you deployed in step 2 to complete this step. [Set up GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
+ 
 
 ## How it works
 
