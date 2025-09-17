@@ -1,8 +1,8 @@
 # Inbound webhooks for EventBridge
 
-This pattern creates an inbound webhook from Stripe to Amazon EventBridge. The webhook is a Lambda function URL that verifies the inbound request then forwards it to EventBridge.
+These patterns creates an inbound webhook for various 3P (Stripe/GitHub/Twilio) to Amazon EventBridge. The webhook is a Lambda function URL that verifies the inbound request then forwards it to EventBridge.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-webhook-stripe
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-webhooks
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -23,35 +23,36 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd eventbridge-webhooks
     ```
-3. There are several examples in this directory.
-- To run the GitHub example, change to the `2-github` folder
-```
-cd 2-github
-```
-1. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. [Create Encrypted Secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
-2. Use AWS SAM to build the template.
+There are several examples in this directory: 
+
+3. For example, to run the GitHub example, change to the `2-github` folder
+    ```
+    cd 2-github
+    ```
+5. The GitHub Inbound webhook requires a Secret prior to creating the CloudFormation Stack. [Create Encrypted Secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+6. From the command line, use AWS SAM to build the template.
     ```
     sam build
     ```
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+7. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
     ```
-2. During the prompts:
+8. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Enter the secret
     * Allow SAM CLI to create IAM roles with the required permissions.
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-3. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+9.  Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-4. Create the webhook on GitHub. You’ll need the secret you created in step 1 and the Lambda function URL you deployed in step 2 to complete this step. [Set up GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
+10. Create the webhook on GitHub. You’ll need the secret you created in step 1 and the Lambda function URL you deployed in step 2 to complete this step. [Set up GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
  
 
 ## How it works
 
-GitHub emits events for a variety of actions, for example, when a repository was created or the status of a commit changed. Using Inbound webhooks using Lambda function URLs you can send the payloads to EventBridge for processing. More info on GitHub Webhooks can be found [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/about-webhooks).
+The services such as GitHub emit events for a variety of actions, for example, when a repository was created or the status of a commit changed. Using inbound webhooks using Lambda function URLs you can send the payloads to EventBridge for processing. More info on GitHub Webhooks can be found [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/about-webhooks).
 
 ## Testing
 
@@ -63,13 +64,13 @@ GitHub emits events for a variety of actions, for example, when a repository was
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete
     ```
 2. Confirm the stack has been deleted
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
