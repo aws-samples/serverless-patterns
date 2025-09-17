@@ -49,7 +49,6 @@ There are several examples in this directory:
 
 10. Create the webhook on GitHub. You’ll need the secret you created in step 1 and the Lambda function URL you deployed in step 2 to complete this step. [Set up GitHub Webhook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
  
-
 ## How it works
 
 The services such as GitHub emit events for a variety of actions, for example, when a repository was created or the status of a commit changed. Using inbound webhooks using Lambda function URLs you can send the payloads to EventBridge for processing. More info on GitHub Webhooks can be found [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/about-webhooks).
