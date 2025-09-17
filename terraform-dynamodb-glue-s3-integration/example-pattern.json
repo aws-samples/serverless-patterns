@@ -1,0 +1,64 @@
+{
+  "title": "Amazon DynamoDB and Amazon S3 zero-ETL ingegration using AWS Glue",
+  "description": "Create a Amazon DynamoDB and S3 bucket and integrate them using a AWS Glue job for zero-ETL data transfer.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern sets up Amazon DynamoDB and Amazon S3 buckets, and integrates them with an AWS Glue job. Using this setup, you can move data from Amazon DynamoDB to Amazon S3 buckets (triggers are not implemented in the pattern, need to be added as required) and use that for analytics or long term storage. The scenarios where this pattern can be used are when there are large amounts of data on Amazon DynamoDB and you want to move them to a data lake as part of data strategy, or if the data has to be moved to long term storage due to refulatory reasons. The AWS Glue job copies the data into an encrypted Amazon S3 bucket and stores them in the specified format. In this pattern the format has been set to Parquet."
+      "This pattern also creates the required roles and policies for the services, with the right level of permissions required. The roles and policies can be expanded if additional services come into play, based on principle of least privilege."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-dynamodb-glue-s3-integration",
+      "templateURL": "serverless-patterns/terraform-dynamodb-glue-s3-integration",
+      "projectFolder": "terraform-dynamodb-glue-s3-integration",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Glue",
+        "link": "https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html"
+      },
+      {
+        "text": "Amazon DynamoDB",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+      },
+      {
+        "text": "Amazon S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kiran Ramamurthy",
+      "image": "n/a",
+      "bio": "I am a Senior Partner Solutions Architect for Enterprise Transformation. I work predominantly with partners and specialize in migrations and modernization.",
+      "linkedin": "kiran-ramamurthy-a96341b",
+      "twitter": "twitter-handle"
+    }
+  ]
+}
