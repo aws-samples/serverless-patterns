@@ -39,7 +39,7 @@ Create an AWS account if you do not already have one and log in. The IAM user th
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK) installed
 * [Amazon Route 53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring.html) configured as DNS service and public hosted zone created 
 * [Public Certificate](https://docs.aws.amazon.com/acm/latest/userguide/acm-public-certificates.html) requested in Amazon Certificate Manager (ACM)
-* [Python 3.8+](https://www.python.org/downloads/) installed
+* [Python 3.12+](https://www.python.org/downloads/) installed
 
 
 ## Deployment Instructions
@@ -69,7 +69,7 @@ You must provide both context parameters:
 # Deploy with both required parameters
 cdk deploy \
   -c domain_name=api.example.com \
-  -c certificate_arn=arn:aws:acm:region:account:certificate/cert-id
+  -c certificate_arn=arn:aws:acm:region:account:certificate/certificate-id
 
 # Example with subdomain
 cdk deploy \
