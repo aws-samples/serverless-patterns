@@ -314,7 +314,8 @@ Resources:
     Properties:
       ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${API}/stages/dev
       WebACLArn: !GetAtt  APIWebACL.Arn
-      
+    DependsOn: APIdevStage
+
 Outputs:
   CloudfrontDomain:
     Value: !GetAtt CloudFront.DomainName
