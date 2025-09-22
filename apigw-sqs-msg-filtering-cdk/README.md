@@ -25,7 +25,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 2. Change directory to the pattern directory:
 
 ```
-cd apigw-sqs-msg-filtering-cdk
+cd apigw-sqs-msg-filtering-cdk/cdk
 ```
 
 3. Install dependencies
