@@ -74,7 +74,7 @@ cdk deploy \
 # Example with subdomain
 cdk deploy \
   -c domain_name=privateapi.mycompany.com \
-  -c certificate_arn=arn:aws:acm:region:account:certificate/<certificate-id>
+  -c certificate_arn=arn:aws:acm:region:account:certificate/certificate-id
 ```
 
 #### CDK Output
@@ -143,13 +143,20 @@ curl https://api.example.com/pets/2
 
 ## Cleanup
 
-# Destroy
+### Delete manually created Resources
+- delete Amazon Route 53 Hosted Zone record
+- delete Amazon Route 53 Public Hosted Zone
+- delete Certificate in AWS Certificate Manager
 
+### Destory CDK Deployment
 ```bash
 cdk destroy -c domain_name=api.example.com -c certificate_arn=YOUR-CERT-ARN
 ```
+
+- 
+
 ----
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
 
