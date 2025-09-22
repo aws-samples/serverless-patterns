@@ -135,7 +135,6 @@ curl https://api.example.com/pets/2
 ### DNS Issues
 - Verify CNAME or ALIAS record points to ALB DNS name
 - Check DNS propagation with `nslookup your-domain.com`
-- Ensure you have DNS management access for your domain
 
 ### Target Registration
 - Manually check target group health in AWS Console
