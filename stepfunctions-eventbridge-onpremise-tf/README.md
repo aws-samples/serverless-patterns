@@ -28,14 +28,23 @@ The VPC and connection to your datacenter are not provided by this example. Refe
     ```
     cd stepfunctions-eventbridge-onpremise-tf
     ```
-3. Copy and edit `example.tfvars` with your custom values
+3. Create a `.tfvars` file with the following variables (use your custom values)
+
+   ```
+   api_domain_name = "api.internal.mycompany.com"
+	api_key_secret_arn = "arn:aws:secretsmanager:us-east-1:123456789012:secret:07a4e645-fc95-4a10-853a-410b1b1eca5b-012nZO"
+	vpc_id = "vpc-0e03d4ab114e951be"
+	private_subnet_ids = ["subnet-05d53fa850148290e","subnet-070324fd8bc5885a5"]
+	on_premises_cidr = "172.32.0.0/20"
+	```
+	
 4. From the command line, use Terraform to deploy the AWS resources:
     ```
     terraform init
     terraform apply -var-file=your-variables.tfvars
     ```
 
-   When prompted do you want to deploy the infrastructure, type ```yes``` and press enter.
+   When prompted "Do you want to deploy the infrastructure", type ```yes``` and press enter.
 
 5. Note the outputs from the terraform deployment process. These contain the resource ARNs which are used for testing.
 
