@@ -147,7 +147,7 @@ curl https://api.example.com/pets/2
 - delete Amazon Route 53 Public Hosted Zone
 - delete Certificate in AWS Certificate Manager
 
-### Destory CDK Deployment
+### Delete CDK Deployment
 ```bash
 cdk destroy -c domain_name=api.example.com -c certificate_arn=YOUR-CERT-ARN
 ```
