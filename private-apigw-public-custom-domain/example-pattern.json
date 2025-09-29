@@ -1,5 +1,5 @@
 {
-  "title": "Private API Gateway with a public custom domain",
+  "title": "Amazon Private API Gateway with a public custom domain",
   "description": "Create a Amazon Private API Gateway with a public custom domain.",
   "language": "Python",
   "level": "200",
@@ -53,11 +53,15 @@
   "authors": [
     {
       "name": "Nils Brandes",
-      "linkedin": "nils-brandes"
+      "image": "https://avatars.githubusercontent.com/u/179606611",
+      "linkedin": "nils-brandes",
+      "bio": "Nils is an AWS Solutions Architect with over 7 years of experience helping enterprise-level manufacturing and industrial companies architect and implement large-scale cloud solutions."
     },
     {
       "name": "Bruno Quintas",
-      "linkedin": "brunoquintas"
+      "image":"https://avatars.githubusercontent.com/u/17204295",
+      "linkedin": "brunoquintas",
+      "bio": "Bruno Quintas is an AWS Principal Cloud Operations Architect. He's been at AWS for more than 10 years and has held different roles spanning Support Engineering, Technical Account management and Solutions Architecture"
     }
   ]
 }
