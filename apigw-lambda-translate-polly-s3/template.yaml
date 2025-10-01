@@ -55,4 +55,4 @@ Resources:
 Outputs:
   RestApiEndpoint:
     Description: "The endpoint for the REST API Gateway"
-    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/"

@@ -240,7 +240,7 @@ Resources:
 Outputs:
   WebSocketCommand:
     Description: "The WSS command to use to connect"
-    Value: !Join [ '', [ 'wscat --header token:hello -c wss://', !Ref WebsocketApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+    Value: !Join [ '', [ 'wscat --header token:hello -c wss://', !Ref WebsocketApi, '.execute-api.',!Ref 'AWS::Region','.${AWS::URLSuffix}/',!Ref 'Stage'] ]
   PayloadJson:
     Description: "The Json payload you can send to try the sendmessage route"
     Value: '{"action": "sendmessage","message" : "hey queen"}'

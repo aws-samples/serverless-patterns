@@ -241,7 +241,7 @@ Resources:
 Outputs:
   APIEndpoint:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"
 
   DashboardURL:
     Description: "Dashboard URL"

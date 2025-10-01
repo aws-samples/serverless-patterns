@@ -81,7 +81,7 @@ Resources:
       Type: HTTP
       ServiceRoleArn: !GetAtt BedrockDataSourceRole.Arn
       HttpConfig:
-        Endpoint: !Sub "https://bedrock-runtime.${AWS::Region}.amazonaws.com/"
+        Endpoint: !Sub "https://bedrock-runtime.${AWS::Region}.${AWS::URLSuffix}/"
         AuthorizationConfig:
           AuthorizationType: AWS_IAM
           AwsIamConfig:

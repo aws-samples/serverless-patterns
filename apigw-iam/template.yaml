@@ -62,7 +62,7 @@ Outputs:
   # API Gateway endpoint to be used during tests
   AppApiEndpoint:
     Description: API Endpoint
-    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod"
 
   # IAM username to test an authorized call
   AuthorizedUserUsername:

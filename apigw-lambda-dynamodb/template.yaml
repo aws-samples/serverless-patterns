@@ -26,4 +26,4 @@ Resources:
 Outputs:
   EndpointUrl:
     Description: 'HTTP REST endpoint URL'
-    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod'

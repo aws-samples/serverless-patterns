@@ -37,6 +37,6 @@ Resources:
 Outputs:
   EndpointUrl:
     Description: 'REST regional endpoint URL'
-    Value: !Sub 'https://${ApiRegional}.execute-api.${AWS::Region}.amazonaws.com/prod'
+    Value: !Sub 'https://${ApiRegional}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod'
 
 

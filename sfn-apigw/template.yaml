@@ -14,7 +14,7 @@ Resources:
       DefinitionUri: statemachine/stateMachine.asl.json
       DefinitionSubstitutions:
          DefaultPath: '/'
-         APIEndPoint: !Sub "${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
+         APIEndPoint: !Sub "${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
       Role:
         Fn::GetAtt: [ StatesExecutionRole, Arn ]
       Logging:
@@ -89,4 +89,4 @@ Outputs:
     Description: StateMachinetoAPIGW Arn
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"

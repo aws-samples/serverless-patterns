@@ -120,17 +120,17 @@ Outputs:
   CreateUserAPIGatewayEndpoint:
     Description: Create User API Gateway Endpoint
     Value:
-      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/users
+      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/users
   
   ConfirmUserAPIGatewayEndpoint:
     Description: Confirm User API Gateway Endpoint
     Value:
-      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/confirm
+      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/confirm
   
   LoginUserAPIGatewayEndpoint:
     Description: Login User API Gateway Endpoint
     Value:
-      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/login
+      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/login
 
   MyCognitoUserPoolId:
     Description: The ID of the Cognito User Pool

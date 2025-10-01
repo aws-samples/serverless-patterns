@@ -79,6 +79,6 @@ Resources:
 Outputs:
   HelloWorldApi:
     Description: "Sync WF API endpoint"
-    Value: !Sub "https://${HttpApiforSyncWF}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${HttpApiforSyncWF}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
 
 

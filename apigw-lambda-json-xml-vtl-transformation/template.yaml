@@ -145,7 +145,7 @@ Resources:
 Outputs:
   MyApiEndpoint:
     Description: "API endpoint"
-    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
 
   MyLambdaFunction:
     Description: MyLambdaFunction name

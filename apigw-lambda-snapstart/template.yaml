@@ -55,4 +55,4 @@ Outputs:
   UnicornEndpoint:
     Description: API Gateway Unicorn Endpoint
     Value:
-      Fn::Sub: https://${UnicornStoreSpringApi}.execute-api.${AWS::Region}.amazonaws.com/prod/
+      Fn::Sub: https://${UnicornStoreSpringApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/

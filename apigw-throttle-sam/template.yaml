@@ -79,4 +79,4 @@ Resources:
 Outputs:
   ThrottlingApiUrl:
     Description: API Gateway endpoint URL for Prod stage for Hello World function
-    Value: !Sub "https://${ThrottlingApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${ThrottlingApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"

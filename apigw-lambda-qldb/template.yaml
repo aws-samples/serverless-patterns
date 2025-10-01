@@ -179,7 +179,7 @@ Outputs:
 
   PersonApi:
     Description: "API Gateway endpoint URL for Prod stage for Person functions"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/person/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/person/"
 
   PersonLedger:
     Description: QLDB Ledger for the sample application

@@ -183,7 +183,7 @@ Outputs:
   HttpApiUrl:
     Description: URL of your API endpoint
     Value:
-      Fn::Sub: 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/'
+      Fn::Sub: 'https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/'
   HttpApiId:
     Description: Api id of HttpApi
     Value:

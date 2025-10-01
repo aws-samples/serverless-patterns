@@ -73,8 +73,8 @@ Resources:
 Outputs:
   ApiBasePath:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
 
   RdsProxyApiPath:
     Description: "API Gateway endpoint URL for rds proxy function"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"
