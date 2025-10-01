@@ -1,6 +1,6 @@
-# Amazon Cloudfront distribution in front of Amazon S3 and an Amazon API Gateway REST API to AWS Lambda to Amazon DynamoDB
+# Amazon CloudFront distribution in front of Amazon S3 and an Amazon API Gateway REST API to AWS Lambda to Amazon DynamoDB
 
-This pattern demonstrates a simple webform application sitting in Cloudfront and S3.  The application stores data in DynamoDB via a ```POST``` request to an API Gateway which triggers a simple Lambda function.
+This pattern demonstrates a simple webform application sitting in CloudFront and S3.  The application stores data in DynamoDB via a ```POST``` request to an API Gateway which triggers a simple Lambda function.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -15,11 +15,11 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
-    git clone https://gitlab.aws.dev/jrdwyer/aws-serverless-webform-sample.git
+    git clone https://github.com/aws-samples/serverless-patterns
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-webform-sample
+    cd cloudfront-apigw-rest-api-lambda-dynamodb-sam
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the workflow as specified in the template.yaml file:
     ```
@@ -34,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
     ```
-    Stack Name [sam-app]: serverless-webform-sample
+    Stack Name [sam-app]: cloudfront-apigw-rest-api-lambda-dynamodb-sam
     AWS Region [us-east-1]: 
     Parameter HTTPGetFloodRateParam [10000]: 
     Parameter HTTPPostFloodRateParam [1000]: 
@@ -65,7 +65,7 @@ The web interface allows an end user to enter their personal details and click `
 
 ## Testing
 
-Open the Cloudfront URL in a browser on your local machine.  Fill out the form with data and click ```Submit```.  Upon submitting, your browser will send a ```POST``` request to the API Gateway and trigger the Lambda to store the data in DynamoDB.
+Open the CloudFront URL in a browser on your local machine.  Fill out the form with data and click ```Submit```.  Upon submitting, your browser will send a ```POST``` request to the API Gateway and trigger the Lambda to store the data in DynamoDB.
 
 To view the data in DynamoDB, navigate to the DynamoDB service in the AWS console, select ```Tables``` from the left navigation pane and click on the ```serverless-webform-sample-table``` table. In the ```View Table``` page click on ```Explore Table Items``` button and scroll down to ```Items Returned``` to view the data stored in the table.  This data should match the data entered in the previous step.
 
