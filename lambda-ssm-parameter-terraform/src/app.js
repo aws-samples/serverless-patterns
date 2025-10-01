@@ -6,8 +6,8 @@
 // 2. GET or PUT an SSM Parameter Store parameter.
 // 3. Return a response with parameter result.
 
-const AWS = require("aws-sdk")
-const ssm = new AWS.SSM()
+const { SSM } = require("@aws-sdk/client-ssm");
+const ssm = new SSM()
 
 exports.handler = async (event, context) => {
   try {
@@ -34,12 +34,12 @@ exports.handler = async (event, context) => {
         Overwrite: true,
         Type: "String",
       };
-      result = await ssm.putParameter(ssmPutParams).promise()
+      result = await ssm.putParameter(ssmPutParams)
     } else if (method == "GET") {
       const ssmGetParams = {
         Name: parameterName,
       };
-      result = await ssm.getParameter(ssmGetParams).promise()
+      result = await ssm.getParameter(ssmGetParams)
     } else {
       result = "Method not supported"
     }
