@@ -1,0 +1,67 @@
+{
+  "title": "Amazon Private API Gateway with a public custom domain",
+  "description": "Create a Amazon Private API Gateway with a public custom domain.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon Private API Gateway that is only accessible through VPC endpoints, with public custom domain name resolution for internal only access through an Amazon internal Application Load Balancer.",
+      "This architecture is intended for use cases which require private APIs, which are only accessible from on-premises via VPN or Direct Connect, while the DNS can be resolved publicly."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/private-apigw-public-custom-domain",
+      "templateURL": "serverless-patterns/private-apigw-public-custom-domain",
+      "projectFolder": "private-apigw-public-custom-domain",
+      "templateFile": "private_api_gateway/private_api_gateway_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Private REST APIs in API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html"
+      },
+      {
+        "text": "Working with public hosted zones",
+        "link": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/AboutHZWorkingWith.html"
+      },
+      {
+        "text": "Create an Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-application-load-balancer.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nils Brandes",
+      "image": "https://avatars.githubusercontent.com/u/179606611",
+      "linkedin": "nils-brandes",
+      "bio": "Nils is an AWS Solutions Architect with over 7 years of experience helping enterprise-level manufacturing and industrial companies architect and implement large-scale cloud solutions."
+    },
+    {
+      "name": "Bruno Quintas",
+      "image":"https://avatars.githubusercontent.com/u/17204295",
+      "linkedin": "brunoquintas",
+      "bio": "Bruno Quintas is an AWS Principal Cloud Operations Architect. He's been at AWS for more than 10 years and has held different roles spanning Support Engineering, Technical Account management and Solutions Architecture"
+    }
+  ]
+}
