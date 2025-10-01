@@ -1,0 +1,66 @@
+{
+  "authors": [
+    {
+      "name": "Shankar Srinivasan",
+      "bio": "I am an AWS Professional Services Delivery Consultant specializing in enterprise-scale cloud transformations and modernization initiatives.",
+      "linkedin": "https://www.linkedin.com/in/shankar-srinivasan-3863a110"
+    }
+  ],
+  "cleanup": {
+    "text": [
+      "1. Empty the S3 bucket",
+      "2. Delete the stack: <code>cdk destroy --all</code>"
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all"
+    ]
+  },
+  "description": "Create an automated workflow using EventBridge Scheduler and Step Functions to synchronize Amazon Bedrock Knowledge Base.",
+  "framework": "AWS CDK",
+  "gitHub": {
+    "template": {
+      "projectFolder": "eventbridge-scheduled-stepfunction-bedrock-kb-sync",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduled-stepfunction-bedrock-kb-sync",
+      "templateFile": "kb_sync_stack.py",
+      "templateURL": "serverless-patterns/eventbridge-scheduled-stepfunction-bedrock-kb-sync"
+    }
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use AWS EventBridge Scheduler to trigger a Step Functions workflow that synchronizes multiple Amazon Bedrock Knowledge Bases. The pattern automates the synchronization process using native service integrations, with a focus on handling multiple Knowledge Bases efficiently.",
+      "The Step Functions workflow is designed with nested Map states: the outer Map state processes multiple Knowledge Bases, while the inner Map state handles data sources for each Knowledge Base. Although designed for parallel processing, current Bedrock limitations restrict data source synchronization to sequential execution (one at a time) within each Knowledge Base. This architecture ensures scalability when these limitations are lifted in the future.",
+      "The workflow includes comprehensive status checking and result reporting for each sync operation. For each Knowledge Base, it retrieves all associated data sources, initiates sync operations sequentially, monitors progress, and aggregates results. The pattern deploys one EventBridge Scheduler (running every 15 minutes), one Step Functions state machine with nested Map states, S3 buckets for data sources, and configures the necessary IAM roles and permissions for Bedrock Knowledge Base integration.",
+      "Note: While the architecture supports parallel processing, current Bedrock service limitations mean data source syncs within each Knowledge Base must run sequentially. The pattern is future-proofed for when these limitations are removed."
+    ]
+  },
+  "language": "Python",
+  "level": "300",
+  "resources": {
+    "bullets": [
+      {
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html",
+        "text": "Amazon Bedrock Knowledge Base"
+      },
+      {
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/scheduler-step-functions.html",
+        "text": "AWS Step Functions with EventBridge Scheduler"
+      },
+      {
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-map-state.html",
+        "text": "Step Functions Map State"
+      }
+    ]
+  },
+  "testing": {
+    "text": [
+      "1. Upload sample documents to the created S3 bucket (kb-data-source-{account-id})",
+      "2. Wait for the next scheduled execution (15-minute intervals)",
+      "3. Monitor Step Functions execution in AWS Console",
+      "4. Verify sync status in Bedrock Knowledge Base console"
+    ]
+  },
+  "title": "EventBridge Scheduler to Step Functions for Bedrock Knowledge Base Sync"
+}
