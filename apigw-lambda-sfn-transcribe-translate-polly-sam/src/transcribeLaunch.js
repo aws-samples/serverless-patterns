@@ -1,6 +1,6 @@
 const path = require('path');
-const AWS = require('aws-sdk');
-const transcribe = new AWS.TranscribeService();
+const { TranscribeClient, StartTranscriptionJobCommand } = require('@aws-sdk/client-transcribe');
+const transcribe = new TranscribeClient({});
 
 module.exports.handler = async (event, context) => {
   console.log(event)
@@ -25,6 +25,6 @@ module.exports.handler = async (event, context) => {
     OutputBucketName: OUTPUT_BUCKET
   };
   console.log(params);
-  await transcribe.startTranscriptionJob(params).promise();
+  await transcribe.send(new StartTranscriptionJobCommand(params));
   return { jobName, outputBucket:OUTPUT_BUCKET, inputLanguageCode, outputLanguageCode };
 };
