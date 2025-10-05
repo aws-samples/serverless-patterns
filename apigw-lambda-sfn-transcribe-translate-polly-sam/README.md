@@ -60,7 +60,7 @@ API Gateway handles incoming traffic and sends it to the lambda which in turn in
 
 Follow the steps to test the pattern:
 
-1. Copy the audio to the input bucket (available from the output of the cloudformation stack).
+1. Copy the audio to the input bucket (available from the output of the CloudFormation stack).
     ```bash
     aws s3 cp audio.ogg s3://{input-bucket-name}
     ```
@@ -70,7 +70,7 @@ Follow the steps to test the pattern:
     ```
 1. Run websocket client to invoke the API Gateway. Get the API ID from the output of the deployment step
     ```bash
-    wscat -c  wss://<API-ID>.execute-api.<Region>.amazonaws.com/dev?proto=https
+    wscat -c wss://<API-ID>.execute-api.<Region>.amazonaws.com/dev?proto=https
     ```
 1. On the next prompt, add the input parameters. Replace the input bucket name. It can be tested with other language codes as well.
     ```bash
