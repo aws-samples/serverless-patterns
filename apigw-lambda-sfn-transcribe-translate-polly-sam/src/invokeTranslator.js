@@ -2,7 +2,7 @@ const { SFNClient, StartSyncExecutionCommand } = require('@aws-sdk/client-sfn');
 const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require('@aws-sdk/client-apigatewaymanagementapi');
 const stepfunctions = new SFNClient({});
 const apig = new ApiGatewayManagementApiClient({
-    endpoint: process.env.APIG_ENDPOINT,
+    endpoint: `https://${process.env.APIG_ENDPOINT}`,
   });
 
 module.exports.handler = async (event, context) => {

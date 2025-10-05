@@ -2,9 +2,9 @@ const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { PollyClient, SynthesizeSpeechCommand } = require('@aws-sdk/client-polly');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { GetObjectCommand } = require('@aws-sdk/client-s3');
+const { randomUUID } = require('crypto');
 const s3 = new S3Client({});
 const polly = new PollyClient({});
-const uuidv1 = require('uuidv1');
 
 
 module.exports.handler = async (event, context) => {
@@ -67,11 +67,18 @@ module.exports.handler = async (event, context) => {
 
     const response = await polly.send(new SynthesizeSpeechCommand(speechParams));
     let audioStream = response.AudioStream;
-    let key = uuidv1();
+    
+    const chunks = [];
+    for await (const chunk of audioStream) {
+        chunks.push(chunk);
+    }
+    const audioBuffer = Buffer.concat(chunks);
+    
+    let key = randomUUID();
     let params = {
       Bucket: outputBucket,
       Key: key + '.mp3',
-      Body: audioStream
+      Body: audioBuffer
     };
 
     const s3Response = await s3.send(new PutObjectCommand(params));
