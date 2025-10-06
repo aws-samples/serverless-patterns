@@ -1,4 +1,4 @@
-# Access Bedrock via API Gateway with Cognito User Management
+# Access Amazon Bedrock via Amazon API Gateway with Amazon Cognito User Management
 
 This pattern creates an AWS CDK Python application to access Bedrock via API Gateway with Cognito user management, domain restriction, API request throttling, and quota limits.
 
