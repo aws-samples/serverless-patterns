@@ -17,7 +17,7 @@ Resources:
       FunctionName: java-documentdb-streams-consumer-dynamodb-sam
       CodeUri: documentdb_streams_event_consumer_function
       Handler: com.amazonaws.services.lambda.samples.events.documentdbstreams.HandlerDocumentDBStreams::handleRequest
-      Runtime: java11
+      Runtime: JAVA_VERSION
       Architectures:
         - x86_64
       MemorySize: 512
@@ -44,7 +44,7 @@ Resources:
             FullDocument: "UpdateLookup"
             SourceAccessConfigurations:
               - Type: BASIC_AUTH
-                URI: !Join ['', ["arn:", "aws:", "secretsmanager:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "secret:", !Ref SecretsManagerSecretForDocumentDBCredentialsName, "-", !Ref SecretsManagerSecretForDocumentDBCredentialsUniqueString]]
+                URI: !Ref SecretsManagerARN
             StartingPosition: LATEST
       Policies:
       - Statement:
@@ -96,30 +96,35 @@ Parameters:
   StreamsProducerDocumentDBCluster:
     Type: String
     Description: Enter the name of the DocumentDB Cluster Identifier that has DocumentDB Streams enabled
+    Default: DOCDB_CLUSTER_IDENTIFIER
   StreamsProducerDocumentDBDatabase:
     Type: String
     Description: Enter the name of the DocumentDB Database that has DocumentDB Streams enabled
+    Default: DOCDB_DATABASE
   StreamsProducerDocumentDBCollection:
     Type: String
     Description: Enter the name of the DocumentDB Collection that has DocumentDB Streams enabled
-  SecretsManagerSecretForDocumentDBCredentialsName:
+    Default: DOCDB_COLLECTION
+  SecretsManagerARN:
     Type: String
     Description: Enter the name of the secret that has username/password for the DocumentDB cluster
-  SecretsManagerSecretForDocumentDBCredentialsUniqueString:
-    Type: String
-    Description: Enter the unique string of the secret that has username/password for the DocumentDB cluster
+    Default: DOCDB_SECRET_ARN
   Subnet1:
     Type: String
     Description: The first of the three private subnets in the DocumentDB cluster's VPC
+    Default: DOCDB_SUBNET_ONE
   Subnet2:
     Type: String
     Description: The second of the three private subnets in the DocumentDB cluster's VPC
+    Default: DOCDB_SUBNET_TWO
   Subnet3:
     Type: String
     Description: The third of the three private subnets in the DocumentDB cluster's VPC
+    Default: DOCDB_SUBNET_THREE
   SecurityGroup:
     Type: String
     Description: The security group associated with this function (use same as DocumentDB)
+    Default: DOCDB_SECURITY_GROUP
 Outputs:
   LambdaDocumentDBStreamsConsumerJavaFunction:
     Description: "DocumentDB Streams Consumer Lambda Function ARN"
