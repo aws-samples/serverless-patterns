@@ -555,8 +555,8 @@ Resources:
             sed -i "s/DOCDB_SECURITY_GROUP/$DOCDB_SECURITY_GROUP/g" template.yaml
             
             #Adding DocumentDB variables to DocumentDB secret as CloudFormation cannot create a secret of type DocumentDB like you manually can
-            aws secretsmanager put-secret-value --secret-id AmazonDocumentDBCredentials --secret-string "{\"host\":\"$DOCDB_CLUSTER_ENDPOINT\",\"port\":\"27017\",\"port\":\"27017\"}"
-            
+            aws secretsmanager put-secret-value --secret-id AmazonDocumentDBCredentials --secret-string "{\"host\":\"$DOCDB_CLUSTER_ENDPOINT\",\"port\":\"27017\",\"username\":\"$DOCDB_CLUSTER_ADMIN_USER\",\"password\":\"$DOCDB_CLUSTER_PASSWORD\",\"engine\":\"mongo\",\"ssl\":\"true\",\"dbClusterIdentifier\":\"$DOCDB_CLUSTER_IDENTIFIER\"}"
+                        
             #Compiling Sender Program and Updating Command File with DocumentDB Database and Collection names
             cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_message_sender_json
             sudo chown -R ec2-user .
