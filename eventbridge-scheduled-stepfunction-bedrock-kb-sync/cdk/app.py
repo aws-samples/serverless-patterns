@@ -23,7 +23,6 @@ config: dict = {}
 # Load Config Files in to Dict
 for file_path in (
     "config/config.global",
-    "config/config.{ORG_STAGE}",
 ):
 
     current_file_path = __file__
