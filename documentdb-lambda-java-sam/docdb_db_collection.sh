@@ -13,3 +13,7 @@ COLLECTION_NAME="DOCDB_COLLECTION"
 
 # Connect using Mongo Shell and create database and collection
 mongosh --tls --tlsCAFile ${TLS_CERT_FILE} --username ${DOCDB_USERNAME} --password ${DOCDB_PASSWORD} --host ${DOCDB_ENDPOINT} --port ${DOCDB_PORT} --file mongodbcolcreate.js
+
+
+# Connect to Mongo Shell
+# mongosh --tls --tlsCAFile /home/ec2-user/mongoshell/global-bundle.pem --username DOCDB_CLUSTER_ADMIN_USER --password DOCDB_CLUSTER_PASSWORD --host DOCDB_CLUSTER_ENDPOINT --port 27017
