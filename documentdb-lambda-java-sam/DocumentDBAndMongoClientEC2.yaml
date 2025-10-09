@@ -31,10 +31,12 @@ Parameters:
     Type: String
     Description: Password for the DocumentDB Cluster
     Default: docdbPassword123
+    NoEcho: true
   DocumentDBTrustStorePassword:
     Type: String
     Description: Password for the DocumentDB Client TLS Truststore Password
     Default: docdbTrustPass123
+    NoEcho: true
   ServerlessLandGithubLocation:
     Type: String
     Default: https://github.com/aws-samples/serverless-patterns.git
@@ -60,14 +62,22 @@ Resources:
     Properties:
       Name: 'AmazonDocumentDBCredentials'
       Description: DocumentDB cluster master user credentials
-      SecretString: '{"username": !Ref DocumentDBClusterAdminUser, "password":!Ref DocumentDBClusterPassword}'
+      SecretString: !Sub |
+        {
+          "username": "${DocumentDBClusterAdminUser}",
+          "password": "${DocumentDBClusterPassword}"
+        }
 
   DocumentDBTrustStoreSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: 'AmazonDocumentDBTruststore'
       Description: DocumentDB secret for truststore for SSL client to connect
-      SecretString: '{"truststore":"/home/ec2-user/mongotruststore/rds-truststore.jks", "password":!Ref DocumentDBTrustStorePassword}'
+      SecretString: !Sub |
+        {
+          "truststore": "/home/ec2-user/mongotruststore/rds-truststore.jks",
+          "password": "${DocumentDBTrustStorePassword}"
+        }
 
   VPC:
     Type: AWS::EC2::VPC
@@ -515,6 +525,7 @@ Resources:
             cd /home/ec2-user/mongoshell
             wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
             cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/docdb_db_collection.sh .
+            cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/mongodbcolcreate.js .
             sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
             sed -i "s/DOCDB_CLUSTER_ENDPOINT/$DOCDB_CLUSTER_ENDPOINT/g" docdb_db_collection.sh
@@ -522,6 +533,8 @@ Resources:
             sed -i "s/DOCDB_CLUSTER_PASSWORD/$DOCDB_CLUSTER_PASSWORD/g" docdb_db_collection.sh
             sed -i "s/DOCDB_DATABASE/$DOCDB_DATABASE/g" docdb_db_collection.sh
             sed -i "s/DOCDB_COLLECTION/$DOCDB_COLLECTION/g" docdb_db_collection.sh
+            sed -i "s/DOCDB_DATABASE/$DOCDB_DATABASE/g" mongodbcolcreate.js
+            sed -i "s/DOCDB_COLLECTION/$DOCDB_COLLECTION/g" mongodbcolcreate.js
             chmod +x docdb_db_collection.sh
             sh ./docdb_db_collection.sh
            
@@ -638,6 +651,7 @@ Resources:
                       "Effect": "Allow",
                       "Action": [
                           "secretsmanager:GetSecretValue",
+                          "secretsmanager:PutSecretValue",
                           "secretsmanager:DescribeSecret"
                       ],
                       "Resource": "${DocumentDBSecret}"
