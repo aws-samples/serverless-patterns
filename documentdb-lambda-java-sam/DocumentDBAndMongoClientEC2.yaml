@@ -473,6 +473,7 @@ Resources:
             DOCDB_CLUSTER_ADMIN_USER=${docdb_cluster_admin_user}
             DOCDB_CLUSTER_PASSWORD=${docdb_cluster_password}
             DOCDB_TRUST_STORE_PASSWORD=${docdb_trust_store_password}
+            SECURITY_GROUP=${security_group_id}
 
             
             echo "export DOCDB_CLUSTER_ENDPOINT=$DOCDB_CLUSTER_ENDPOINT" >> /home/ec2-user/.bash_profile
@@ -489,6 +490,7 @@ Resources:
             echo "export DOCDB_CLUSTER_ADMIN_USER=$DOCDB_CLUSTER_ADMIN_USER" >> /home/ec2-user/.bash_profile
             echo "export DOCDB_CLUSTER_PASSWORD=$DOCDB_CLUSTER_PASSWORD" >> /home/ec2-user/.bash_profile
             echo "export DOCDB_TRUST_STORE_PASSWORD=$DOCDB_TRUST_STORE_PASSWORD" >> /home/ec2-user/.bash_profile
+            echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
             
             
             
@@ -552,7 +554,7 @@ Resources:
             sed -i "s/DOCDB_SUBNET_ONE/$DOCDB_SUBNET_ONE/g" template.yaml
             sed -i "s/DOCDB_SUBNET_TWO/$DOCDB_SUBNET_TWO/g" template.yaml
             sed -i "s/DOCDB_SUBNET_THREE/$DOCDB_SUBNET_THREE/g" template.yaml
-            sed -i "s/DOCDB_SECURITY_GROUP/$DOCDB_SECURITY_GROUP/g" template.yaml
+            sed -i "s/DOCDB_SECURITY_GROUP/$SECURITY_GROUP/g" template.yaml
             
             #Adding DocumentDB variables to DocumentDB secret as CloudFormation cannot create a secret of type DocumentDB like you manually can
             aws secretsmanager put-secret-value --secret-id AmazonDocumentDBCredentials --secret-string "{\"host\":\"$DOCDB_CLUSTER_ENDPOINT\",\"port\":\"27017\",\"username\":\"$DOCDB_CLUSTER_ADMIN_USER\",\"password\":\"$DOCDB_CLUSTER_PASSWORD\",\"engine\":\"mongo\",\"ssl\":\"true\",\"dbClusterIdentifier\":\"$DOCDB_CLUSTER_IDENTIFIER\"}"
@@ -576,9 +578,6 @@ Resources:
             SECURITY_GROUP=${security_group_id}
             echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
             aws ec2 authorize-security-group-ingress --region $AWS_REGION --group-id $SECURITY_GROUP --protocol tcp --port 22 --cidr $EC2_CONNECT_IP
-            
-            
-            
             
           - docdb_cluster_endpoint: !GetAtt DocumentDBCluster.Endpoint
             docdb_cluster_resource: !GetAtt DocumentDBCluster.ClusterResourceId
