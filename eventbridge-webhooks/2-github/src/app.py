@@ -6,7 +6,6 @@ import urllib.parse
 import base64
 import hmac
 import hashlib
-from cgi import parse_header
 import boto3
 import botocore
 import botocore.session
@@ -160,7 +159,7 @@ def get_content_type(headers):
 
     if raw_content_type is None:
         return None
-    content_type, _ = parse_header(raw_content_type)
+    content_type = raw_content_type.split(';')[0].strip()
     return content_type
 
 
