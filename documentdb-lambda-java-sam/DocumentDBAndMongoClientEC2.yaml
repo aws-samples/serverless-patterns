@@ -48,12 +48,16 @@ Mappings:
         CIDR: '10.0.0.0/16'
       PublicOne:
         CIDR: '10.0.0.0/24'
-      PrivateSubnetDocDBOne:
+      PublicTwo:
         CIDR: '10.0.1.0/24'
-      PrivateSubnetDocDBTwo:
+      PublicThree:
         CIDR: '10.0.2.0/24'
-      PrivateSubnetDocDBThree:
+      PrivateSubnetDocDBOne:
         CIDR: '10.0.3.0/24'
+      PrivateSubnetDocDBTwo:
+        CIDR: '10.0.4.0/24'
+      PrivateSubnetDocDBThree:
+        CIDR: '10.0.5.0/24'
 
 Resources:
   # Secrets Manager Secret for DocumentDB credentials
@@ -76,7 +80,7 @@ Resources:
       SecretString: !Sub |
         {
           "truststore": "/home/ec2-user/mongotruststore/rds-truststore.jks",
-          "password": "${DocumentDBTrustStorePassword}"
+          "truststorepassword": "${DocumentDBTrustStorePassword}"
         }
 
   VPC:
@@ -101,7 +105,33 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: 'Name'
-          Value: 'PublicSubnet'
+          Value: 'PublicSubnetOne'
+  PublicSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 1
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicTwo', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: 'Name'
+          Value: 'PublicSubnetTwo'
+  PublicSubnetThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 2
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicThree', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: 'Name'
+          Value: 'PublicSubnetThree'
   PrivateSubnetDocDBOne:
     Type: AWS::EC2::Subnet
     Properties:
@@ -150,25 +180,56 @@ Resources:
       VpcId: !Ref 'VPC'
       InternetGatewayId: !Ref 'InternetGateway'
 
-  NATEIP:
+  NATEIP1:
     Type: AWS::EC2::EIP
     DependsOn: GatewayAttachement
     Properties: 
       Domain: vpc
 
-  NATGateway:
+  NATGateway1:
     Type: AWS::EC2::NatGateway
     Properties: 
-      AllocationId: !GetAtt NATEIP.AllocationId
+      AllocationId: !GetAtt NATEIP1.AllocationId
       SubnetId: !Ref 'PublicSubnetOne'
       Tags: 
         - Key: 'Name'
-          Value: 'DocumentDBNATGateway'
+          Value: 'DocumentDBNATGateway1'
+
+  NATEIP2:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachement
+    Properties: 
+      Domain: vpc
+
+  NATGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NATEIP2.AllocationId
+      SubnetId: !Ref 'PublicSubnetTwo'
+      Tags: 
+        - Key: 'Name'
+          Value: 'DocumentDBNATGateway2'
+
+  NATEIP3:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachement
+    Properties: 
+      Domain: vpc
+
+  NATGateway3:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NATEIP3.AllocationId
+      SubnetId: !Ref 'PublicSubnetThree'
+      Tags: 
+        - Key: 'Name'
+          Value: 'DocumentDBNATGateway3'
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref 'VPC'
+      
   PublicRoute:
     Type: AWS::EC2::Route
     DependsOn: GatewayAttachement
@@ -176,39 +237,80 @@ Resources:
       RouteTableId: !Ref 'PublicRouteTable'
       DestinationCidrBlock: '0.0.0.0/0'
       GatewayId: !Ref 'InternetGateway'
+      
   PublicSubnetOneRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PublicSubnetOne
       RouteTableId: !Ref PublicRouteTable
-
-  PrivateRouteTable:
+      
+  PublicSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetTwo
+      RouteTableId: !Ref PublicRouteTable
+      
+  PublicSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetThree
+      RouteTableId: !Ref PublicRouteTable
+      
+  PrivateRouteTable1:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref 'VPC'
 
-  PrivateRoute:
+  PrivateRoute1:
     Type: AWS::EC2::Route
-    DependsOn: NATGateway
+    DependsOn: NATGateway1
     Properties:
-      RouteTableId: !Ref 'PrivateRouteTable'
+      RouteTableId: !Ref 'PrivateRouteTable1'
       DestinationCidrBlock: '0.0.0.0/0'
-      NatGatewayId: !Ref 'NATGateway'
+      NatGatewayId: !Ref 'NATGateway1'
+      
+  PrivateRouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PrivateRoute2:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway2
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable2'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway2'
+
+  PrivateRouteTable3:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PrivateRoute3:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway3
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable3'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway3'
 
   PrivateSubnetDocDBOneRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref PrivateRouteTable1
       SubnetId: !Ref PrivateSubnetDocDBOne
+      
   PrivateSubnetDocDBTwoRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnetDocDBTwo
+      
   PrivateSubnetDocDBThreeRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref PrivateRouteTable3
       SubnetId: !Ref PrivateSubnetDocDBThree
   
   DocumentDBClientInstanceSecurityGroup:
@@ -491,9 +593,7 @@ Resources:
             echo "export DOCDB_CLUSTER_PASSWORD=$DOCDB_CLUSTER_PASSWORD" >> /home/ec2-user/.bash_profile
             echo "export DOCDB_TRUST_STORE_PASSWORD=$DOCDB_TRUST_STORE_PASSWORD" >> /home/ec2-user/.bash_profile
             echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
-            
-            
-            
+                       
             
             # Clone serverless patterns
             cd /home/ec2-user
@@ -528,6 +628,7 @@ Resources:
             wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
             cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/docdb_db_collection.sh .
             cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/mongodbcolcreate.js .
+            cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/connect_to_mongo_shell.sh .
             sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
             sed -i "s/DOCDB_CLUSTER_ENDPOINT/$DOCDB_CLUSTER_ENDPOINT/g" docdb_db_collection.sh
@@ -537,9 +638,13 @@ Resources:
             sed -i "s/DOCDB_COLLECTION/$DOCDB_COLLECTION/g" docdb_db_collection.sh
             sed -i "s/DOCDB_DATABASE/$DOCDB_DATABASE/g" mongodbcolcreate.js
             sed -i "s/DOCDB_COLLECTION/$DOCDB_COLLECTION/g" mongodbcolcreate.js
+            sed -i "s/DOCDB_CLUSTER_ENDPOINT/$DOCDB_CLUSTER_ENDPOINT/g" connect_to_mongo_shell.sh
+            sed -i "s/DOCDB_CLUSTER_ADMIN_USER/$DOCDB_CLUSTER_ADMIN_USER/g" connect_to_mongo_shell.sh
+            sed -i "s/DOCDB_CLUSTER_PASSWORD/$DOCDB_CLUSTER_PASSWORD/g" connect_to_mongo_shell.sh
             chmod +x docdb_db_collection.sh
+            chmod +x connect_to_mongo_shell.sh
             sh ./docdb_db_collection.sh
-           
+            
             #Substitute SAM template variables
             cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam
             cd documentdb_streams_consumer_dynamo_sam
@@ -762,15 +867,35 @@ Resources:
         - Key: Name
           Value: !Sub "${AWS::StackName}-docdb-cluster"
 
-  DocumentDBInstance:
+  DocumentDBInstance1:
     Type: AWS::DocDB::DBInstance
     Properties:
       DBClusterIdentifier: !Ref DocumentDBCluster
       DBInstanceClass: db.t3.medium
-      DBInstanceIdentifier: !Sub "${AWS::StackName}-docdb-instance"
+      DBInstanceIdentifier: !Sub "${AWS::StackName}-docdb-instance-1"
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-docdb-instance"
+          Value: !Sub "${AWS::StackName}-docdb-instance-1"
+
+  DocumentDBInstance2:
+    Type: AWS::DocDB::DBInstance
+    Properties:
+      DBClusterIdentifier: !Ref DocumentDBCluster
+      DBInstanceClass: db.t3.medium
+      DBInstanceIdentifier: !Sub "${AWS::StackName}-docdb-instance-2"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-docdb-instance-2"
+          
+  DocumentDBInstance3:
+    Type: AWS::DocDB::DBInstance
+    Properties:
+      DBClusterIdentifier: !Ref DocumentDBCluster
+      DBInstanceClass: db.t3.medium
+      DBInstanceIdentifier: !Sub "${AWS::StackName}-docdb-instance-3"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-docdb-instance-31"
 
 Outputs:
   VPCId: 
