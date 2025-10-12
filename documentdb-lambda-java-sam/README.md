@@ -1,15 +1,19 @@
-# msk-lambda-iam-java-sam
-# Java AWS Lambda Kafka consumer with IAM auth, using AWS SAM
+# documentdb-lambda-iam-java-sam
+# Java AWS Lambda DocumentDB Streams consumer, using AWS SAM
 
-This pattern is an example of a Lambda function that consumes messages from an Amazon Managed Streaming for Kafka (Amazon MSK) topic, where the MSK Cluster has been configured to use IAM authentication.
+This pattern is an example of a Lambda function written in Java that consumes messages from Amazon DocumentDB Streams
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
-- kafka_event_consumer_function/src/main/java - Code for the application's Lambda function.
-- events - Invocation events that you can use to invoke the function.
-- kafka_event_consumer_function/src/test/java - Unit tests for the application code. 
-- template_original.yaml - A template that defines the application's Lambda function.
-- MSKAndKafkaClientEC2.yaml - A Cloudformation template file that can be used to deploy an MSK cluster and also deploy an EC2 machine with all pre-requisities already installed, so you can directly build and deploy the lambda function and test it out.
+- documentdb_streams_consumer_dynamo_sam/documentdb_streams_event_consumer_function/src/main/java - Code for the application's Lambda function that will listen for DocumentDB Streams messages and write them to a DynamoDB table
+- documentdb_streams_message_sender_json/src/main/java - Code for adding documents in a DocumentDB collection that will in turn generate DocumentDB streams 
+- documentdb_streams_consumer_dynamo_sam/template_original.yaml - A template that defines the application's Lambda function to be used by SAM to deploy the lambda function
+- DocumentDBAndMongoClientEC2.yaml - A Cloudformation template file that can be used to deploy a DocumentDB cluster and also deploy an EC2 machine with all pre-requisities already installed, so you can directly build and deploy the lambda function and test it out.
+- connect_to_mongo_shell.sh - A shell script that can be used to connect to the DocumentDB cluster using the mongosh tool
+- docdb_db_collection.sh - A shell script that will be used to create a database and a collection inside the DocumentDB cluster. The lambda function's event listener will be configured to listen for change stream events on this database and collection
+- java_keystore_script.sh - A shell script that will be used to create a Java keystore file that will be required by the Sender program that will connect to the DocumentDB cluster and insert JSON documents in the created collection so that DocumentDB streams can then be generated for the lambda function to consume. The Java keystore is required to programmatically connect to the DocumentDB cluster
+- mongodb-org-8.0.repo - This file is required in order to be able to install mongosh tool on the EC2 machine. mongosh is a command-line tool that can be used to connect to the DocumentDB cluster to perform administrative tasks as well as to perform CRUD operations on the DocumentDB cluster
+- mongodbcolcreate.js - This file will be used to create a database and a collection inside the DocumentDB cluster. In order to programatically use the mongosh tool, a .js file needs to be passed as a --file argument to mongosh.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -17,27 +21,25 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
-## Run the Cloudformation template to create the MSK Cluster and Client EC2 machine
+## Run the Cloudformation template to create the DocumentDB Cluster and Client EC2 machine
 
-* [Run the Cloudformation template using the file MSKAndKafkaClientEC2.yaml] - You can go to the AWS Cloudformation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the Cloudformation stack to be created. This Cloudformation template will create an MSK cluster (Provisioned or Serverless based on your selection). It will also create an EC2 machine that you can use as a client.
+* [Run the Cloudformation template using the file DocumentDBAndMongoClientEC2.yaml] - You can go to the AWS Cloudformation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the Cloudformation stack to be created. This Cloudformation template will create an Amazon DocumentDB cluster. It will also create an EC2 machine that you can use as a client.
 
-* [Connect to the EC2 machine] - Once the Cloudformation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
-Note: You may need to wait for some time after the Cloudformation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.
+* [Connect to the EC2 machine] - Once the CloudFormation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
+Note: You may need to wait for some time after the CloudFormation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.
 
-* [Check if Kafka Topic has been created] - Once you are inside the EC2 machine, you should be in the /home/ec2-user folder. Check to see the contents of the file kafka_topic_creator_output.txt by running the command cat kafka_topic_creator_output.txt. You should see an output such as "Created topic MskIamJavaLambdaTopic."
+* [Check if the database and cluster have been created inside DocumentDB cluster] - Once you are inside the EC2 machine, you should be in the /home/ec2-user folder. cd to the mongoshell folder and then run ./connect_to_mongo_shell.sh. This should connect the mongosh tool to the DocumentDB cluster that was created by the CloudFormation template. Once inside the mongosh, you can issue commands like show dbs to see if the database was created, use <database name> to switch to the created database, and then show collections to see if the collection was created. If you did not modify the defaults in the CloudFormation template, then the name of the database should be DocumentDBJavaLambdaDB and the name of the collection should be DocumentDBJavaLambdaCollection
 
-If you are not able to find the file kafka_topic_creator_output.txt or if it is blank or you see an error message, then you need to run the file ./kafka_topic_creator.sh. This file runs a script that goes and creates the Kafka topic that the Lambda function will subscribe to.
 
 ## Pre-requisites to Deploy the sample Lambda function
 
-The EC2 machine that was created by running the Cloudformation template has all the software that will be needed to deploy the Lambda function.
+The EC2 machine that was created by running the CloudFormation template has all the software that will be needed to deploy the Lambda function.
 
-The AWS SAM CLI is a serverless tool for building and testing Lambda applications. It uses Docker to locally test your functions in an Amazon Linux environment that resembles the Lambda execution environment. It can also emulate your application's build environment and API.
+The AWS SAM CLI is a serverless tool for building and testing Lambda applications.
 
 * Java - On the EC2 machine, we have installed the version of Java that you selected. We have installed Amazon Corrretto JDK of the version that you had selected at the time of specifying the input parameters in the Cloudformation template. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
 * Maven - On the EC2 machine, we have installed Maven (https://maven.apache.org/install.html)
 * AWS SAM CLI - We have installed the AWS SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-* Docker - We have installed the Docker Community Edition on the EC2 machine (https://hub.docker.com/search/?type=edition&offering=community)
 
 We have also cloned the Github repository for serverless-patterns on the EC2 machine already by running the below command
     ``` 
@@ -45,89 +47,20 @@ We have also cloned the Github repository for serverless-patterns on the EC2 mac
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/msk-lambda-iam-java-sam
+    cd serverless-patterns/documentdb-lambda-java-sam
     ```
 
-## Use the SAM CLI to build and test locally
+## Use the SAM CLI to build and deploy the lambda function
 
 Build your application with the `sam build` command.
 
 ```bash
+cd documentdb_streams_consumer_dynamo_sam
 sam build
 ```
 
-The SAM CLI installs dependencies defined in `kafka_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+The SAM CLI installs dependencies defined in `documentdb_streams_consumer_dynamo_sam/documentdb_streams_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
-Test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
-
-Run functions locally and invoke them with the `sam local invoke` command.
-
-```bash
-sam local invoke --event events/event.json
-```
-
-You should see a response such as the below:
-
-```
-***** Begin sam local invoke response *****
-
-Invoking com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequest (java11)                                                           
-Local image is up-to-date                                                                                                                              
-Using local image: public.ecr.aws/lambda/java:11-rapid-x86_64.                                                                                         
-                                                                                                                                                       
-Mounting /home/ec2-user/serverless-patterns/msk-lambda-iam-java-sam/.aws-sam/build/LambdaMSKConsumerJavaFunction as /var/task:ro,delegated, inside     
-runtime container                                                                                                                                      
-START RequestId: 4484bb15-6749-4307-92d1-8ba2221e2218 Version: $LATEST
-START RequestId: 4484bb15-6749-4307-92d1-8ba2221e2218 Version: $LATEST
-Picked up JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
-Received this message from Kafka - KafkaMessage [topic=myTopic, partition=0, timestamp=1678072110111, timestampType=CREATE_TIME, key=null, value=Zg==, decodedKey=null, decodedValue=f, headers=[]]Message in JSON format : {
-  "topic": "myTopic",
-  "partition": 0,
-  "offset": 250,
-  "timestamp": 1678072110111,
-  "timestampType": "CREATE_TIME",
-  "value": "Zg\u003d\u003d",
-  "decodedKey": "null",
-  "decodedValue": "f",
-  "headers": []
-}Received this message from Kafka - KafkaMessage [topic=myTopic, partition=0, timestamp=1678072111086, timestampType=CREATE_TIME, key=null, value=Zw==, decodedKey=null, decodedValue=g, headers=[]]Message in JSON format : {
-  "topic": "myTopic",
-  "partition": 0,
-  "offset": 251,
-  "timestamp": 1678072111086,
-  "timestampType": "CREATE_TIME",
-  "value": "Zw\u003d\u003d",
-  "decodedKey": "null",
-  "decodedValue": "g",
-  "headers": []
-}All Messages in this batch = [
-  {
-    "topic": "myTopic",
-    "partition": 0,
-    "offset": 250,
-    "timestamp": 1678072110111,
-    "timestampType": "CREATE_TIME",
-    "value": "Zg\u003d\u003d",
-    "decodedKey": "null",
-    "decodedValue": "f",
-    "headers": []
-  },
-  {
-    "topic": "myTopic",
-    "partition": 0,
-    "offset": 251,
-    "timestamp": 1678072111086,
-    "timestampType": "CREATE_TIME",
-    "value": "Zw\u003d\u003d",
-    "decodedKey": "null",
-    "decodedValue": "g",
-    "headers": []
-  }
-]END RequestId: fc96203d-e0c0-4c30-b332-d16708b25d3e
-REPORT RequestId: fc96203d-e0c0-4c30-b332-d16708b25d3e  Init Duration: 0.06 ms  Duration: 474.31 ms     Billed Duration: 475 ms Memory Size: 512 MB   Max Memory Used: 512 MB
-"200 OK"
-
-***** End sam local invoke response *****
 ```
 
 
@@ -137,16 +70,21 @@ REPORT RequestId: fc96203d-e0c0-4c30-b332-d16708b25d3e  Init Duration: 0.06 ms  
 To deploy your application for the first time, run the following in your shell:
 
 ```bash
-sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name msk-lambda-iam-java-sam --guided
+sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name documentdb-lambda-java-sam --guided
 ```
 
 The sam deploy command will package and deploy your application to AWS, with a series of prompts. You can accept all the defaults by hitting Enter:
 
 * **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
 * **AWS Region**: The AWS region you want to deploy your app to.
-* **Parameter MSKClusterName**: The name of the MSKCluster
-* **Parameter MSKClusterId**: The unique ID of the MSKCluster
-* **Parameter MSKTopic**: The Kafka topic on which the lambda function will listen on
+* **Parameter StreamsProducerDocumentDBCluster**: The name of the DocumentDB Cluster that was created by the CloudFormation template
+* **Parameter StreamsProducerDocumentDBDatabase**: The name of the DocumentDB database that will generate streaming events to be consumed by the Lambda function
+* **Parameter StreamsProducerDocumentDBCollection**: The name of the DocumentDB collection that will generate streaming events to be consumed by the Lambda function
+* **Parameter SecretsManagerARN**: The ARN of the Secrets Manager secret that has the username and password to connect to the DocumentDB cluster
+* **Parameter Subnet1**: The first of the three private subnets where the DocumentDB cluster is deployed
+* **Parameter Subnet2**: The second of the three private subnets where the DocumentDB cluster is deployed
+* **Parameter Subnet3**: The third of the three private subnets where the DocumentDB cluster is deployed
+* **Parameter SecurityGroup**: The security group of the lambda function. This can be the same as the security group of the EC2 machine that was created by the CloudFormation template
 * **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
 * **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
 * **Disable rollback**: Defaults to No and it preserves the state of previously provisioned resources when an operation fails
@@ -156,58 +94,74 @@ The sam deploy command will package and deploy your application to AWS, with a s
 
 You should get a message "Successfully created/updated stack - <StackName> in <Region>" if all goes well
     
-**Note: In case you want to deploy the Lambda function by pointing to an existing MSK Cluster and not the one created by running the CloudFormation template provided in this pattern, you will need to modify the values of the parameters MSKClusterName and MSKClusterId accordingly**
+**Note: In case you want to deploy the Lambda function by pointing to an existing DocumentDB Cluster and not the one created by running the CloudFormation template provided in this pattern, you will need to modify the values of the above parameters accordingly**
 
 
-## Test the sample application
+## Test the application
 
-Once the lambda function is deployed, send some Kafka messages on the topic that the lambda function is listening on, on the MSK server.
+Once the lambda function is deployed, send some DocumentDB Streams messages by inputting documents in the Database and Collection that have been configured on the lambda function's event listener.
 
-For your convenience, a script has been created on the EC2 machine that was provisioned using Cloudformation.
+For your convenience, a Java program and a shell script has been created on the EC2 machine that was provisioned using Cloudformation.
 
-cd /home/ec2-user
+cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_message_sender_json
 
-You should see a script called kafka_message_sender.sh. Run that script and you should be able to send a new Kafka message in every line as shown below
+You should see a script called commands.sh. Run that script by passing a random string and a number between 1 and 500
 
 ```
-[ec2-user@ip-10-0-0-126 ~]$ sh kafka_message_sender.sh
->My first message
->My second message
->My third message
->My fourth message
->My fifth message
->My sixth message
->My seventh message
->My eigth message
->My ninth message
->My tenth message
->Ctrl-C
+[ec2-user@ip-10-0-0-126 ~]$ sh ./commands.sh firstBatch 10
+Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-1
+Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-1
+Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-2
+Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-2
+Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-3
+Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-3
+Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-4
+Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-4
+Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-5
+Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-5
+Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-6
+Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-6
+Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-7
+Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-7
+Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-8
+Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-8
+Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-9
+Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-9
+Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-10
+Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-10
 ```
 
 Either send at least 10 messages or wait for 300 seconds (check the values of BatchSize: 10 and MaximumBatchingWindowInSeconds: 300 in the template.yaml file)
 
 Then check Cloudwatch logs and you should see messages for the Cloudwatch Log Group with the name of the deployed Lambda function.
 
-The lambda code parses the Kafka messages and outputs the fields in the Kafka messages to Cloudwatch logs
+When you run the above script, it inputs JSON records into the DocumentDB cluster in the database and collection that were created. This results in the DocumentDB streams publishing every document. The lambda function listens on the published DocumentDB streams messages
 
-A single lambda function receives a batch of messages. The messages are received as a map with each key being a combination of the topic and the partition, as a single batch can receive messages from multiple partitions.
+The lambda code parses the DocumentDB streams messages and outputs the fields in the messages to Cloudwatch logs
 
-Each key has a list of messages. Each Kafka message has the following properties - Topic, Partition, Offset, TimeStamp, TimeStampType, Key and Value
+The lambda function also inputs each record into a DynamoDB table called DocumentDBStreamsConsumerDynamoDBTableJava (if you did not modify the default name in the sam template.yaml file)
 
-The Key and Value are base64 encoded and have to be decoded. A message can also have a list of headers, each header having a key and a value.
+You can go to the DynamoDB console and view the records.
 
-The code in this example prints out the fields in the Kafka message and also decrypts the key and the value and logs them in Cloudwatch logs.
+You can also use the aws cli command below to view the count of records inserted into DynamoDB
+
+```
+aws dynamodb scan --table-name DocumentDBStreamsConsumerDynamoDBTableJava --select "COUNT"
+
+```
+
+
 
 ## Cleanup
 
 You can first clean-up the Lambda function by running the sam delete command
 
 ```
-cd /home/ec2-user/serverless-patterns/msk-lambda-iam-java-sam
+cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_consumer_dynamo_sam
 sam delete
 
 ```
 confirm by pressing y for both the questions
 You should see the lambda function getting deleted and a final confirmation "Deleted successfully" on the command-line
 
-Next you need to delete the Cloudformation template that created the MSK Server and the EC2 machine by going to the Cloudformation console and selecting the stack and then hitting the "Delete" button. It will run for sometime but eventually you should see the stack getting cleaned up. If you get an error message that says the stack could not be deleted, please retry again and do a Force Delete. The reason this may happen is because ENIs created by the deplayed Lambda function in your VPC may prevent the VPC from being deleted even after deleting the lambda function.
+Next you need to delete the Cloudformation template that created the DocumentDB cluster and the EC2 machine by going to the Cloudformation console and selecting the stack and then hitting the "Delete" button. It will run for sometime but eventually you should see the stack getting cleaned up. If you get an error message that says the stack could not be deleted, please retry again and do a Force Delete. The reason this may happen is because ENIs created by the deplayed Lambda function in your VPC may prevent the VPC from being deleted even after deleting the lambda function.

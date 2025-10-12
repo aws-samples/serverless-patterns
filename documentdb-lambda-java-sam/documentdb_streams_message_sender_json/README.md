@@ -24,7 +24,7 @@ The steps required before this application can be run are
 	a) truststore - location of the truststore created in Step 4
 	b) truststorepassword - the password for the truststore
 	
-7) Use the command specified in the documentdb_streams_message_sender/Commands file to generate DocumentDB Streams messages that can be consumed by the Lambda function. The command specified in the Commands file takes four parameters
+7) Use the command specified in the documentdb_streams_message_sender/commands.sh file to generate DocumentDB Streams messages that can be consumed by the Lambda function. The command specified in the Commands file takes four parameters
 
 	a) The DocumentDB database created in Step 3
 	b) The DocumentDB collection created in Step 3
