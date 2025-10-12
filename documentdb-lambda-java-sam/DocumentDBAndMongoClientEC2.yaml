@@ -323,23 +323,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
-        CidrIp: 10.0.0.0/24
-      - IpProtocol: tcp
-        FromPort: 3500
-        ToPort: 3500
-        CidrIp: 10.0.0.0/24
-      - IpProtocol: tcp
-        FromPort: 3600
-        ToPort: 3600
-        CidrIp: 10.0.0.0/24
-      - IpProtocol: tcp
-        FromPort: 3800
-        ToPort: 3800
-        CidrIp: 10.0.0.0/24
-      - IpProtocol: tcp
-        FromPort: 3900
-        ToPort: 3900
-        CidrIp: 10.0.0.0/24
+        CidrIp: 10.0.0.0/16
 
   DocumentDBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -353,6 +337,10 @@ Resources:
           FromPort: 27017
           ToPort: 27017
           SourceSecurityGroupId: !GetAtt DocumentDBClientInstanceSecurityGroup.GroupId
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 10.0.0.0/16
 
   DocumentDBClientSelfIngressAllowRule:
     Type: AWS::EC2::SecurityGroupIngress
