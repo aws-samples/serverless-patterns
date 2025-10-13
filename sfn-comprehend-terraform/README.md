@@ -1,8 +1,8 @@
-# AWS Step Functions Express Workflow to Amazon Comprehend for Sentiment Analysis  
+# AWS Step Functions Integration with Amazon Comprehend for Sentiment Analysis
 
-The Step Functions Express Workflow can be started using the AWS CLI or from another service (e.g. API Gateway) to run an express workflow and return the result.
+The AWS Step Functions Express Workflow can be started using the AWS CLI or from another service (e.g. Amazon API Gateway) to run an express workflow and return the result.
 
-The Terraform template deploys a Step Functions Express workflow that invokes Amazon Comprehend and returns the sentiment analysis done by Comprehend in the response. The Terraform template contains the required resouces with IAM permission to run the application with logging enabled.
+The Terraform template deploys an AWS Step Functions Express workflow that invokes Amazon Comprehend and returns the sentiment analysis done by Amazon Comprehend in the response. The Terraform template contains the required resouces with IAM permission to run the application with logging enabled.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-comprehend-terraform
 
@@ -32,15 +32,15 @@ Important: this application uses various AWS services and there are costs associ
     ```
 4. Review the output from the Terraform deployment process to ensure there are no errors.
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+5. Note the outputs from the Terraform deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
 * Start the Express Workflow using the `start-sync-execution` api command with a "message" string in English for sentiment analysis in the input payload.
 * The Express Workflow invokes Amazon Comprehend.
-* Comprehend returns the sentiment of the input text. 
+* Amazon Comprehend returns the sentiment of the input text. 
 * If the integration works fine, the sentiment analysis outcome is returned in Step Function execution results within a `output` object
-* If the integration fails, the Step Functions workflow will retry up to 5 times before exiting with a `status:FAILED` response.
+* If the integration fails, the AWS Step Functions workflow will retry up to 5 times before exiting with a `status:FAILED` response.
 
 Please refer to the architecture diagram below:
 
@@ -49,7 +49,7 @@ Please refer to the architecture diagram below:
 
 ## Testing
 
-Run the following AWS CLI command to send a 'start-sync-execution` comand to start the Step Functions workflow. Note, you must edit the {StateMachineExpressSyncToComprehend} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs.
+Run the following AWS CLI command to send a 'start-sync-execution` comand to start the AWS Step Functions workflow. Note, you must edit the {StateMachineExpressSyncToComprehend} placeholder with the ARN of the deployed AWS Step Functions workflow. This is provided in the stack outputs.
 
 ```bash
 aws stepfunctions start-sync-execution  --name "test" --state-machine-arn "{StateMachineExpressSyncToComprehend}" --input "{\"message\":\"I am very happy today.\"}"

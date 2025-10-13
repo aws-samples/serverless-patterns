@@ -1,6 +1,6 @@
 {
-  "title": "AWS Step Functions Express Workflow to Amazon Comprehend for Sentiment Analysis",
-  "description": "The Terraform template deploys a Step Functions Express workflow that invokes Amazon Comprehend and returns the sentiment analysis done by Comprehend in the response. The SAM template contains the required resouces with IAM permission to run the application with logging enabled.",
+  "title": "AWS Step Functions Integration with Amazon Comprehend for Sentiment Analysis",
+  "description": "The Terraform template deploys an AWS Step Functions workflow with Amazon Comprehend and returns the sentiment analysis done by Amazon Comprehend.",
   "language": "",
   "level": "200",
   "framework": "Terraform",

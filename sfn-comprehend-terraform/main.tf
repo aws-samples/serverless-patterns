@@ -11,7 +11,7 @@ resource "aws_iam_role" "states_execution_role" {
     Statement = [{
       Effect = "Allow",
       Principal = {
-        Service = "states.${var.aws_region}.amazonaws.com"
+        Service = "states.amazonaws.com"
       },
       Action = "sts:AssumeRole"
     }]
@@ -77,17 +77,14 @@ resource "aws_cloudwatch_log_group" "state_machine_logs" {
 resource "aws_sfn_state_machine" "detect_sentiment_state_machine" {
   name     = "StateMachineExpressSyncToComprehend"
   role_arn = aws_iam_role.states_execution_role.arn
-  type     = "EXPRESS"
+  type     = "STANDARD"
   logging_configuration {
     level                  = "ALL"
     include_execution_data = false
-    destinations {
-      cloudwatch_logs_log_group {
-        log_group_arn = aws_cloudwatch_log_group.state_machine_logs.arn
+    log_destination = "${aws_cloudwatch_log_group.state_machine_logs.arn}:*"
       }
-    }
-  }
-  definition = file("${path.module}/detectSentiment.asl.json")
+    
+  definition = file("${path.module}/statemachine/detectSentiment.asl.json")
 }
 # ---------------------------
 # Output
