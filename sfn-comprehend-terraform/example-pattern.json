@@ -19,7 +19,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-comprehend-terraform",
       "templateURL": "serverless-patterns/sfn-comprehend-terraform",
       "projectFolder": "sfn-comprehend-terraform",
-      "templateFile": "sfn-comprehend-terraform/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {
