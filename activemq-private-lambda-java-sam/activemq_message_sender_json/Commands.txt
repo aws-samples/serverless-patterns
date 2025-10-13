@@ -1,0 +1,5 @@
+java -classpath <Location of JavaExamples>/activemq_message_sender_json/target/json-activemq-producer-0.0.1-SNAPSHOT.jar activemq.producer.JsonActiveMQProducer <URL of ActiveMQ Server> <ActiveMQ Queue Name> <Unique String to Identify this batch of messages> <Number of Messages to send in this batch>
+
+Example:
+
+java -classpath ~/environment/JavaExamples/activemq_message_sender_json/target/json-activemq-producer-0.0.1-SNAPSHOT.jar activemq.producer.JsonActiveMQProducer "failover:(ssl://b-aeb08c0d-6e46-412a-ad45-1507816242b0-1.mq.us-west-2.amazonaws.com:61617,ssl://b-aeb08c0d-6e46-412a-ad45-1507816242b0-2.mq.us-west-2.amazonaws.com:61617)" LambdaActiveMQQueue TestMessage12 10
