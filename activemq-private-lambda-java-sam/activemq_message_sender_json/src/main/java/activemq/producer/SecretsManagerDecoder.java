@@ -12,7 +12,7 @@ public class SecretsManagerDecoder {
 	
 	public static String getSecret() {
 
-		String secretName = "AmazonMQCredentials";
+		String secretName = "AmazonActiveMQCredentials";
 		
 		DefaultAwsRegionProviderChain defaultAwsRegionProviderChain = new DefaultAwsRegionProviderChain();
 		Region region = defaultAwsRegionProviderChain.getRegion();

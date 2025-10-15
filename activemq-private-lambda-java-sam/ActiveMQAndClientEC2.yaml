@@ -5,7 +5,7 @@ Parameters:
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
   ActiveMQEngineVersion:
     Type: String
-    Default: 5.18.3
+    Default: 5.18
     Description: ActiveMQ engine version
   JavaVersion:
     Type: String
@@ -340,58 +340,29 @@ Resources:
       ToPort: 22
       SourceSecurityGroupId: !GetAtt ActiveMQClientInstanceSecurityGroup.GroupId
 
-  # ActiveMQ Subnet Group
-  ActiveMQSubnetGroup:
-    Type: AWS::MQ::Configuration
+  # ActiveMQ Configuration
+  ActiveMQConfiguration:
+    Type: AWS::AmazonMQ::Configuration
     Properties:
       Name: !Sub "${AWS::StackName}-activemq-config"
       Description: ActiveMQ configuration for the cluster
       EngineType: ACTIVEMQ
       EngineVersion: !Ref ActiveMQEngineVersion
-      Data: |
-        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-        <broker xmlns="http://activemq.apache.org/schema/core">
-          <destinationPolicy>
-            <policyMap>
-              <policyEntries>
-                <policyEntry topic=">" producerFlowControl="true">
-                  <pendingMessageLimitStrategy>
-                    <spoolingSubscriptionPendingMessageLimitStrategy limit="1000"/>
-                  </pendingMessageLimitStrategy>
-                </policyEntry>
-                <policyEntry queue=">" producerFlowControl="true" memoryLimit="1mb">
-                </policyEntry>
-              </policyEntries>
-            </policyMap>
-          </destinationPolicy>
-          <systemUsage>
-            <systemUsage>
-              <memoryUsage>
-                <memoryUsage limit="64 mb"/>
-              </memoryUsage>
-              <storeUsage>
-                <storeUsage limit="512 mb"/>
-              </storeUsage>
-              <tempUsage>
-                <tempUsage limit="128 mb"/>
-              </tempUsage>
-            </systemUsage>
-          </systemUsage>
-        </broker>
+      Data: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pgo8YnJva2VyIHhtbG5zPSJodHRwOi8vYWN0aXZlbXEuYXBhY2hlLm9yZy9zY2hlbWEvY29yZSI+CiAgPGRlc3RpbmF0aW9uUG9saWN5PgogICAgPHBvbGljeU1hcD4KICAgICAgPHBvbGljeUVudHJpZXM+CiAgICAgICAgPHBvbGljeUVudHJ5IHRvcGljPSI+IiBwcm9kdWNlckZsb3dDb250cm9sPSJ0cnVlIj4KICAgICAgICAgIDxwZW5kaW5nTWVzc2FnZUxpbWl0U3RyYXRlZ3k+CiAgICAgICAgICAgIDxzcG9vbGluZ1N1YnNjcmlwdGlvblBlbmRpbmdNZXNzYWdlTGltaXRTdHJhdGVneSBsaW1pdD0iMTAwMCIvPgogICAgICAgICAgPC9wZW5kaW5nTWVzc2FnZUxpbWl0U3RyYXRlZ3k+CiAgICAgICAgPC9wb2xpY3lFbnRyeT4KICAgICAgICA8cG9saWN5RW50cnkgcXVldWU9Ij4iIHByb2R1Y2VyRmxvd0NvbnRyb2w9InRydWUiIG1lbW9yeUxpbWl0PSIxbWIiPgogICAgICAgIDwvcG9saWN5RW50cnk+CiAgICAgIDwvcG9saWN5RW50cmllcz4KICAgIDwvcG9saWN5TWFwPgogIDwvZGVzdGluYXRpb25Qb2xpY3k+CiAgPHN5c3RlbVVzYWdlPgogICAgPHN5c3RlbVVzYWdlPgogICAgICA8bWVtb3J5VXNhZ2U+CiAgICAgICAgPG1lbW9yeVVzYWdlIGxpbWl0PSI2NCBtYiIvPgogICAgICA8L21lbW9yeVVzYWdlPgogICAgICA8c3RvcmVVc2FnZT4KICAgICAgICA8c3RvcmVVc2FnZSBsaW1pdD0iNTEyIG1iIi8+CiAgICAgIDwvc3RvcmVVc2FnZT4KICAgICAgPHRlbXBVc2FnZT4KICAgICAgICA8dGVtcFVzYWdlIGxpbWl0PSIxMjggbWIiLz4KICAgICAgPC90ZW1wVXNhZ2U+CiAgICA8L3N5c3RlbVVzYWdlPgogIDwvc3lzdGVtVXNhZ2U+CjwvYnJva2VyPgo=
 
   # ActiveMQ Broker
   ActiveMQBroker:
-    Type: AWS::MQ::Broker
+    Type: AWS::AmazonMQ::Broker
     Properties:
       BrokerName: !Ref ActiveMQBrokerName
-      DeploymentMode: ACTIVE_STANDBY_MULTI_AZ
+      DeploymentMode: CLUSTER_MULTI_AZ
       EngineType: ACTIVEMQ
       EngineVersion: !Ref ActiveMQEngineVersion
       HostInstanceType: mq.t3.micro
       PubliclyAccessible: false
-      AutoMinorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
       Configuration:
-        Id: !Ref ActiveMQSubnetGroup
+        Id: !Ref ActiveMQConfiguration
         Revision: 1
       Users:
         - Username: !Ref ActiveMQBrokerAdminUser
@@ -402,6 +373,7 @@ Resources:
       SubnetIds:
         - !Ref PrivateSubnetActiveMQOne
         - !Ref PrivateSubnetActiveMQTwo
+        - !Ref PrivateSubnetActiveMQThree
       SecurityGroups:
         - !Ref ActiveMQSecurityGroup
       Tags:
@@ -596,6 +568,7 @@ Resources:
             
             # Set environment variables
             ACTIVEMQ_BROKER_ID=${activemq_broker_id}
+            ACTIVEMQ_BROKER_ARN=${activemq_broker_arn}
             ACTIVEMQ_BROKER_ENDPOINT=${activemq_broker_endpoint}
             ACTIVEMQ_QUEUE_NAME=${activemq_queue_name}
             ACTIVEMQ_SECRET_ARN=${activemq_secret_arn}
@@ -609,6 +582,7 @@ Resources:
             SECURITY_GROUP=${security_group_id}
 
             echo "export ACTIVEMQ_BROKER_ID=$ACTIVEMQ_BROKER_ID" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_BROKER_ARN=$ACTIVEMQ_BROKER_ARN" >> /home/ec2-user/.bash_profile
             echo "export ACTIVEMQ_BROKER_ENDPOINT=$ACTIVEMQ_BROKER_ENDPOINT" >> /home/ec2-user/.bash_profile
             echo "export ACTIVEMQ_QUEUE_NAME=$ACTIVEMQ_QUEUE_NAME" >> /home/ec2-user/.bash_profile
             echo "export ACTIVEMQ_SECRET_ARN=$ACTIVEMQ_SECRET_ARN" >> /home/ec2-user/.bash_profile
@@ -631,6 +605,36 @@ Resources:
             cd activemq-private-lambda-java-sam
             sudo chown -R ec2-user .
             
+            #Substitute SAM template variables
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam
+            cd activemq_consumer_dynamo_sam
+            cp template_original.yaml template.yaml
+            sudo chown -R ec2-user .
+            source /home/ec2-user/.bash_profile
+            sed -i "s/ACTIVEMQ_BROKER_ARN/$ACTIVEMQ_BROKER_ARN/g" template.yaml
+            sed -i "s/ACTIVEMQ_QUEUE_NAME/$ACTIVEMQ_QUEUE_NAME/g" template.yaml
+            sed -i "s/ACTIVEMQ_SECRET_ARN/$ACTIVEMQ_SECRET_ARN/g" template.yaml
+            sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
+            sed -i "s/ACTIVEMQ_SUBNET_ONE/$ACTIVEMQ_SUBNET_ONE/g" template.yaml
+            sed -i "s/ACTIVEMQ_SUBNET_TWO/$ACTIVEMQ_SUBNET_TWO/g" template.yaml
+            sed -i "s/ACTIVEMQ_SUBNET_THREE/$ACTIVEMQ_SUBNET_THREE/g" template.yaml
+            sed -i "s/SECURITY_GROUP/$SECURITY_GROUP/g" template.yaml
+            
+            #Install ActiveMQ (needed in case you want to use the CLI as a client to look at queues etc.)
+            mkdir /home/ec2-user/activemq_client
+            cd /home/ec2-user/activemq_client
+            wget https://archive.apache.org/dist/activemq/5.18.6/apache-activemq-5.18.6-bin.tar.gz
+            tar zxvf apache-activemq-5.18.6-bin.tar.gz
+            sudo chown -R ec2-user .
+            
+            #Update Shell script for sending ActiveMQ messages to Lambda function
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam/activemq_message_sender_json
+            sudo chown ec2-user ./commands.sh
+            sed -i "s/ACTIVEMQ_BROKER_ENDPOINT/$ACTIVEMQ_BROKER_ENDPOINT/g" commands.sh
+            sed -i "s/ACTIVEMQ_QUEUE_NAME/$ACTIVEMQ_QUEUE_NAME/g" commands.sh
+            mvn clean install
+            
+            
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
             mkdir -p ip_prefix
@@ -645,9 +649,8 @@ Resources:
             aws ec2 authorize-security-group-ingress --region $AWS_REGION --group-id $SECURITY_GROUP --protocol tcp --port 22 --cidr $EC2_CONNECT_IP
             
           - activemq_broker_id: !Ref ActiveMQBroker
-            activemq_broker_endpoint: !Sub 
-              - "ssl://${endpoint}:61617"
-              - endpoint: !Select [0, !GetAtt ActiveMQBroker.OpenWireEndpoints]
+            activemq_broker_arn: !GetAtt ActiveMQBroker.Arn
+            activemq_broker_endpoint: !GetAtt ActiveMQBroker.OpenWireEndpoints
             activemq_queue_name: !Ref ActiveMQQueueName
             activemq_secret_arn: !Ref ActiveMQSecret
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
@@ -816,9 +819,7 @@ Outputs:
       Name: !Sub "${AWS::StackName}-VPCStackName"
   ActiveMQBrokerEndpoint:
     Description: ActiveMQ Broker OpenWire Endpoint
-    Value: !Sub 
-      - "ssl://${endpoint}:61617"
-      - endpoint: !Select [0, !GetAtt ActiveMQBroker.OpenWireEndpoints]
+    Value: !GetAtt ActiveMQBroker.OpenWireEndpoints
     Export:
       Name: !Sub "${AWS::StackName}-ActiveMQBrokerEndpoint"
   ActiveMQBrokerConsoleURL:
