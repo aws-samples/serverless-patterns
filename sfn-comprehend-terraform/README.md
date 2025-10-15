@@ -1,4 +1,4 @@
-# AWS Step Functions Integration with Amazon Comprehend for Sentiment Analysis
+# AWS Step Functions integration with Amazon Comprehend using terraform
 
 The AWS Step Functions Express Workflow can be started using the AWS CLI or from another service (e.g. Amazon API Gateway) to run an express workflow and return the result.
 
@@ -36,7 +36,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-* Start the Express Workflow using the `start-sync-execution` api command with a "message" string in English for sentiment analysis in the input payload.
+* Start the Standard Workflow using the `start-execution` api command with a "message" string in English for sentiment analysis in the input payload.
 * The Express Workflow invokes Amazon Comprehend.
 * Amazon Comprehend returns the sentiment of the input text. 
 * If the integration works fine, the sentiment analysis outcome is returned in Step Function execution results within a `output` object
@@ -49,34 +49,49 @@ Please refer to the architecture diagram below:
 
 ## Testing
 
-Run the following AWS CLI command to send a 'start-sync-execution` comand to start the AWS Step Functions workflow. Note, you must edit the {StateMachineExpressSyncToComprehend} placeholder with the ARN of the deployed AWS Step Functions workflow. This is provided in the stack outputs.
+Run the following AWS CLI command to send a 'start-execution' command to start the AWS Step Functions workflow. Note, you must edit the <StateMachineArn> placeholder with the ARN of the deployed AWS Step Functions workflow. This is provided in the stack outputs.
 
 ```bash
-aws stepfunctions start-sync-execution  --name "test" --state-machine-arn "{StateMachineExpressSyncToComprehend}" --input "{\"message\":\"I am very happy today.\"}"
+aws stepfunctions start-execution \
+  --state-machine-arn <StateMachineArn> \
+  --input '{"message":"I am very happy today."}'
+```
+
+After running the above command, the exection ARN will be displayed as follows -
+```bash
+{
+    "executionArn": "arn:aws:states:us-east-1:<AccountId>:execution:StateMachineExpressSyncToComprehend:4d309af8-fb35-4427-aefc-da035954ccc3",
+    "startDate": "2025-10-15T16:29:41.454000+02:00"
+}
+```
+
+Run the describe-execution command to view the output from StepFunctions execution
+
+```bash
+aws stepfunctions describe-execution --execution-arn arn:aws:states:us-east-1:<AccountId>:execution:StateMachineExpressSyncToComprehend:4d309af8-fb35-4427-aefc-da035954ccc3
 ```
 
 ### Example output:
 
 ```bash
 {
-    "executionArn": "arn:aws:states:us-east-1:<AccountNumber>:express:StateMachineExpressSyncToComprehend-cqmUxRLjlvq7:test:8b75495d-cb96-4933-ac25-1f908050e33d",
-    "stateMachineArn": "arn:aws:states:us-east-1:<AccountNumber>:stateMachine:StateMachineExpressSyncToComprehend-cqmUxRLjlvq7",
-    "name": "test",
-    "startDate": "2023-10-08T07:35:55.257000+05:30",
-    "stopDate": "2023-10-08T07:35:55.358000+05:30",
+    "executionArn": "arn:aws:states:us-east-1:204524526462:execution:StateMachineExpressSyncToComprehend:4d309af8-fb35-4427-aefc-da035954ccc3",
+    "stateMachineArn": "arn:aws:states:us-east-1:204524526462:stateMachine:StateMachineExpressSyncToComprehend",
+    "name": "4d309af8-fb35-4427-aefc-da035954ccc3",
     "status": "SUCCEEDED",
+    "startDate": "2025-10-15T16:29:41.454000+02:00",
+    "stopDate": "2025-10-15T16:29:41.724000+02:00",
     "input": "{\"message\":\"I am very happy today.\"}",
     "inputDetails": {
         "included": true
     },
-    "output": "{\"message\":\"I am very happy today.\",\"Sentiment\":{\"Sentiment\":\"POSITIVE\",\"SentimentScore\":{\"Mixed\":1.4907288E-4,\"Negative\":1.3237515E-4,\"Neutral\":3.8026855E-4,\"Positive\":0.9993383}}}",
+    "output": "{\"message\":\"I am very happy today.\",\"Sentiment\":{\"Sentiment\":\"POSITIVE\",\"SentimentScore\":{\"Mixed\":6.753839E-4,\"Negative\":5.647173E-4,\"Neutral\":0.0011139456,\"Positive\":0.99764603}}}",
     "outputDetails": {
         "included": true
     },
-    "billingDetails": {
-        "billedMemoryUsedInMB": 64,
-        "billedDurationInMilliseconds": 200
-    }
+    "redriveCount": 0,
+    "redriveStatus": "NOT_REDRIVABLE",
+    "redriveStatusReason": "Execution is SUCCEEDED and cannot be redriven"
 }
 ```
 ## Cleanup
