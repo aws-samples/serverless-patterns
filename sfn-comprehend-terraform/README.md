@@ -59,8 +59,8 @@ aws stepfunctions start-sync-execution  --name "test" --state-machine-arn "{Stat
 
 ```bash
 {
-    "executionArn": "arn:aws:states:us-east-1:796495736600:express:StateMachineExpressSyncToComprehend-cqmUxRLjlvq7:test:8b75495d-cb96-4933-ac25-1f908050e33d",
-    "stateMachineArn": "arn:aws:states:us-east-1:796495736600:stateMachine:StateMachineExpressSyncToComprehend-cqmUxRLjlvq7",
+    "executionArn": "arn:aws:states:us-east-1:<AccountNumber>:express:StateMachineExpressSyncToComprehend-cqmUxRLjlvq7:test:8b75495d-cb96-4933-ac25-1f908050e33d",
+    "stateMachineArn": "arn:aws:states:us-east-1:<AccountNumber>:stateMachine:StateMachineExpressSyncToComprehend-cqmUxRLjlvq7",
     "name": "test",
     "startDate": "2023-10-08T07:35:55.257000+05:30",
     "stopDate": "2023-10-08T07:35:55.358000+05:30",
