@@ -1,5 +1,5 @@
 {
-  "title": "AWS Step Functions Integration with Amazon Comprehend for Sentiment Analysis",
+  "title": "AWS Step Functions integration with Amazon Comprehend using terraform",
   "description": "The Terraform template deploys an AWS Step Functions workflow with Amazon Comprehend and returns the sentiment analysis done by Amazon Comprehend.",
   "language": "",
   "level": "200",
