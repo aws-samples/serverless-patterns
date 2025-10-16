@@ -355,7 +355,7 @@ Resources:
     Type: AWS::AmazonMQ::Broker
     Properties:
       BrokerName: !Ref ActiveMQBrokerName
-      DeploymentMode: CLUSTER_MULTI_AZ
+      DeploymentMode: ACTIVE_STANDBY_MULTI_AZ
       EngineType: ACTIVEMQ
       EngineVersion: !Ref ActiveMQEngineVersion
       HostInstanceType: mq.t3.micro
@@ -373,7 +373,6 @@ Resources:
       SubnetIds:
         - !Ref PrivateSubnetActiveMQOne
         - !Ref PrivateSubnetActiveMQTwo
-        - !Ref PrivateSubnetActiveMQThree
       SecurityGroups:
         - !Ref ActiveMQSecurityGroup
       Tags:
@@ -569,7 +568,9 @@ Resources:
             # Set environment variables
             ACTIVEMQ_BROKER_ID=${activemq_broker_id}
             ACTIVEMQ_BROKER_ARN=${activemq_broker_arn}
-            ACTIVEMQ_BROKER_ENDPOINT=${activemq_broker_endpoint}
+            #ACTIVEMQ_BROKER_ENDPOINT1=${activemq_broker_endpoint1}
+            #ACTIVEMQ_BROKER_ENDPOINT2=${activemq_broker_endpoint2}
+            ACTIVEMQ_BROKER_ENDPOINT="failover:(${activemq_broker_endpoint1},${activemq_broker_endpoint2})"
             ACTIVEMQ_QUEUE_NAME=${activemq_queue_name}
             ACTIVEMQ_SECRET_ARN=${activemq_secret_arn}
             AWS_REGION=${aws_region}
@@ -650,7 +651,8 @@ Resources:
             
           - activemq_broker_id: !Ref ActiveMQBroker
             activemq_broker_arn: !GetAtt ActiveMQBroker.Arn
-            activemq_broker_endpoint: !GetAtt ActiveMQBroker.OpenWireEndpoints
+            activemq_broker_endpoint1: !Select [ 0, !GetAtt ActiveMQBroker.OpenWireEndpoints ]
+            activemq_broker_endpoint2: !Select [ 1, !GetAtt ActiveMQBroker.OpenWireEndpoints ]
             activemq_queue_name: !Ref ActiveMQQueueName
             activemq_secret_arn: !Ref ActiveMQSecret
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
@@ -817,11 +819,16 @@ Outputs:
     Value: !Ref 'AWS::StackName'
     Export:
       Name: !Sub "${AWS::StackName}-VPCStackName"
-  ActiveMQBrokerEndpoint:
+  ActiveMQBrokerEndpoint1:
     Description: ActiveMQ Broker OpenWire Endpoint
-    Value: !GetAtt ActiveMQBroker.OpenWireEndpoints
+    Value: !Select [0, !GetAtt ActiveMQBroker.OpenWireEndpoints]
     Export:
-      Name: !Sub "${AWS::StackName}-ActiveMQBrokerEndpoint"
+      Name: !Sub "${AWS::StackName}-ActiveMQBrokerEndpoint1"
+  ActiveMQBrokerEndpoint2:
+    Description: ActiveMQ Broker OpenWire Endpoint
+    Value: !Select [1, !GetAtt ActiveMQBroker.OpenWireEndpoints]
+    Export:
+      Name: !Sub "${AWS::StackName}-ActiveMQBrokerEndpoint2"
   ActiveMQBrokerConsoleURL:
     Description: ActiveMQ Broker Web Console URL
     Value: !Sub 
