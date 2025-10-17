@@ -17,7 +17,7 @@ Parameters:
   Client:
     Description: Client website for authentication redirects and cors (must start with https://)
     Type: String
-    Default: https://myapp.com
+    Default: https://aws.amazon.com
 
 Resources:
   # Creates a nested stack with the required Cognito requirements
