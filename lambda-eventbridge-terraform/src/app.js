@@ -4,9 +4,8 @@
 
 'use strict'
 
-const AWS = require('aws-sdk')
-AWS.config.update({ region: process.env.AWS_REGION })
-const eventbridge = new AWS.EventBridge()
+const { EventBridgeClient, PutEventsCommand } = require('@aws-sdk/client-eventbridge')
+const eventbridge = new EventBridgeClient({ region: process.env.AWS_REGION })
 
 exports.handler = async (event) => {
   const params = {
@@ -23,7 +22,8 @@ exports.handler = async (event) => {
       }
     ]
   }
+
   // Publish to EventBridge
-  const result = await eventbridge.putEvents(params).promise()
+  const result = await eventbridge.send(new PutEventsCommand(params))
   console.log(result)
 }
