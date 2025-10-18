@@ -418,7 +418,7 @@ Resources:
             
                 # install Java
                 JAVA_VERSION=${java_version}
-                echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+                echo "export JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
                 if [ "$JAVA_VERSION" == "java11" ]; then
                     sudo yum install java-11-amazon-corretto-devel -y
                 elif [ "$JAVA_VERSION" == "java17" ]; then
@@ -568,9 +568,9 @@ Resources:
             # Set environment variables
             ACTIVEMQ_BROKER_ID=${activemq_broker_id}
             ACTIVEMQ_BROKER_ARN=${activemq_broker_arn}
-            #ACTIVEMQ_BROKER_ENDPOINT1=${activemq_broker_endpoint1}
-            #ACTIVEMQ_BROKER_ENDPOINT2=${activemq_broker_endpoint2}
-            ACTIVEMQ_BROKER_ENDPOINT="failover:(${activemq_broker_endpoint1},${activemq_broker_endpoint2})"
+            ACTIVEMQ_BROKER_ENDPOINT_ONE=${activemq_broker_endpoint1}
+            ACTIVEMQ_BROKER_ENDPOINT_TWO=${activemq_broker_endpoint2}
+            ACTIVEMQ_BROKER_ENDPOINT="\"failover:(${activemq_broker_endpoint1},${activemq_broker_endpoint2})\""
             ACTIVEMQ_QUEUE_NAME=${activemq_queue_name}
             ACTIVEMQ_SECRET_ARN=${activemq_secret_arn}
             AWS_REGION=${aws_region}
@@ -584,6 +584,8 @@ Resources:
 
             echo "export ACTIVEMQ_BROKER_ID=$ACTIVEMQ_BROKER_ID" >> /home/ec2-user/.bash_profile
             echo "export ACTIVEMQ_BROKER_ARN=$ACTIVEMQ_BROKER_ARN" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_BROKER_ENDPOINT_ONE=$ACTIVEMQ_BROKER_ENDPOINT_ONE" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_BROKER_ENDPOINT_TWO=$ACTIVEMQ_BROKER_ENDPOINT_TWO" >> /home/ec2-user/.bash_profile
             echo "export ACTIVEMQ_BROKER_ENDPOINT=$ACTIVEMQ_BROKER_ENDPOINT" >> /home/ec2-user/.bash_profile
             echo "export ACTIVEMQ_QUEUE_NAME=$ACTIVEMQ_QUEUE_NAME" >> /home/ec2-user/.bash_profile
             echo "export ACTIVEMQ_SECRET_ARN=$ACTIVEMQ_SECRET_ARN" >> /home/ec2-user/.bash_profile
@@ -628,12 +630,27 @@ Resources:
             tar zxvf apache-activemq-5.18.6-bin.tar.gz
             sudo chown -R ec2-user .
             
+            
+            
             #Update Shell script for sending ActiveMQ messages to Lambda function
             cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam/activemq_message_sender_json
             sudo chown ec2-user ./commands.sh
-            sed -i "s/ACTIVEMQ_BROKER_ENDPOINT/$ACTIVEMQ_BROKER_ENDPOINT/g" commands.sh
+            source /home/ec2-user/.bash_profile
+            echo "ACTIVEMQ_BROKER_ENDPOINT=$ACTIVEMQ_BROKER_ENDPOINT" 
+            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT|\"${ACTIVEMQ_BROKER_ENDPOINT}\"|g" commands.sh
             sed -i "s/ACTIVEMQ_QUEUE_NAME/$ACTIVEMQ_QUEUE_NAME/g" commands.sh
             mvn clean install
+            
+            
+            #Update Shell script for browsing messages in ActiveMQ queue
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam
+            sudo chown ec2-user ./activemq_queue_browser.sh
+            source /home/ec2-user/.bash_profile
+            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT_ONE|$ACTIVEMQ_BROKER_ENDPOINT_ONE|g" activemq_queue_browser.sh
+            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT_TWO|$ACTIVEMQ_BROKER_ENDPOINT_TWO|g" activemq_queue_browser.sh
+            sed -i "s|ACTIVEMQ_BROKER_ADMIN_USER|$ACTIVEMQ_BROKER_ADMIN_USER|g" activemq_queue_browser.sh
+            sed -i "s|ACTIVEMQ_BROKER_PASSWORD|$ACTIVEMQ_BROKER_PASSWORD|g" activemq_queue_browser.sh
+            sed -i "s|ACTIVEMQ_QUEUE_NAME|$ACTIVEMQ_QUEUE_NAME|g" activemq_queue_browser.sh
             
             
             # Get IP CIDR range for EC2 Instance Connect
