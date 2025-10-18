@@ -568,10 +568,9 @@ Resources:
             # Set environment variables
             ACTIVEMQ_BROKER_ID=${activemq_broker_id}
             ACTIVEMQ_BROKER_ARN=${activemq_broker_arn}
-            ACTIVEMQ_BROKER_ENDPOINT_ONE=${activemq_broker_endpoint1}
-            ACTIVEMQ_BROKER_ENDPOINT_TWO=${activemq_broker_endpoint2}
-            #ACTIVEMQ_BROKER_ENDPOINT="\"failover:(${activemq_broker_endpoint1},${activemq_broker_endpoint2})\""
-            ACTIVEMQ_BROKER_ENDPOINT="\"failover:($ACTIVEMQ_BROKER_ENDPOINT_ONE,$ACTIVEMQ_BROKER_ENDPOINT_ONE)\""
+            ACTIVEMQ_BROKER_ENDPOINT="\"failover:(${activemq_broker_endpoint1},${activemq_broker_endpoint2})\""
+            #ACTIVEMQ_BROKER_ENDPOINT_ONE=${activemq_broker_endpoint1}
+            #ACTIVEMQ_BROKER_ENDPOINT_TWO=${activemq_broker_endpoint2}
             ACTIVEMQ_QUEUE_NAME=${activemq_queue_name}
             ACTIVEMQ_SECRET_ARN=${activemq_secret_arn}
             AWS_REGION=${aws_region}
