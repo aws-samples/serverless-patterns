@@ -40,19 +40,19 @@ Parameters:
 Mappings:
   SubnetConfig:
       VPC:
-        CIDR: '10.0.0.0/16'
+        CIDR: '10.1.0.0/16'
       PublicOne:
-        CIDR: '10.0.0.0/24'
+        CIDR: '10.1.0.0/24'
       PublicTwo:
-        CIDR: '10.0.1.0/24'
+        CIDR: '10.1.1.0/24'
       PublicThree:
-        CIDR: '10.0.2.0/24'
+        CIDR: '10.1.2.0/24'
       PrivateSubnetActiveMQOne:
-        CIDR: '10.0.3.0/24'
+        CIDR: '10.1.3.0/24'
       PrivateSubnetActiveMQTwo:
-        CIDR: '10.0.4.0/24'
+        CIDR: '10.1.4.0/24'
       PrivateSubnetActiveMQThree:
-        CIDR: '10.0.5.0/24'
+        CIDR: '10.1.5.0/24'
 
 Resources:
   # Secrets Manager Secret for ActiveMQ credentials
@@ -568,9 +568,7 @@ Resources:
             # Set environment variables
             ACTIVEMQ_BROKER_ID=${activemq_broker_id}
             ACTIVEMQ_BROKER_ARN=${activemq_broker_arn}
-            ACTIVEMQ_BROKER_ENDPOINT_ONE=${activemq_broker_endpoint1}
-            ACTIVEMQ_BROKER_ENDPOINT_TWO=${activemq_broker_endpoint2}
-            ACTIVEMQ_BROKER_ENDPOINT="\"failover:(${activemq_broker_endpoint1},${activemq_broker_endpoint2})\""
+            activemq_broker_endpoint="\"failover:(${activemq_broker_endpoint1},${activemq_broker_endpoint2})\""
             ACTIVEMQ_QUEUE_NAME=${activemq_queue_name}
             ACTIVEMQ_SECRET_ARN=${activemq_secret_arn}
             AWS_REGION=${aws_region}
@@ -584,9 +582,7 @@ Resources:
 
             echo "export ACTIVEMQ_BROKER_ID=$ACTIVEMQ_BROKER_ID" >> /home/ec2-user/.bash_profile
             echo "export ACTIVEMQ_BROKER_ARN=$ACTIVEMQ_BROKER_ARN" >> /home/ec2-user/.bash_profile
-            echo "export ACTIVEMQ_BROKER_ENDPOINT_ONE=$ACTIVEMQ_BROKER_ENDPOINT_ONE" >> /home/ec2-user/.bash_profile
-            echo "export ACTIVEMQ_BROKER_ENDPOINT_TWO=$ACTIVEMQ_BROKER_ENDPOINT_TWO" >> /home/ec2-user/.bash_profile
-            echo "export ACTIVEMQ_BROKER_ENDPOINT=$ACTIVEMQ_BROKER_ENDPOINT" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_BROKER_ENDPOINT=$activemq_broker_endpoint" >> /home/ec2-user/.bash_profile
             echo "export ACTIVEMQ_QUEUE_NAME=$ACTIVEMQ_QUEUE_NAME" >> /home/ec2-user/.bash_profile
             echo "export ACTIVEMQ_SECRET_ARN=$ACTIVEMQ_SECRET_ARN" >> /home/ec2-user/.bash_profile
             echo "export AWS_REGION=$AWS_REGION" >> /home/ec2-user/.bash_profile
@@ -629,30 +625,26 @@ Resources:
             wget https://archive.apache.org/dist/activemq/5.18.6/apache-activemq-5.18.6-bin.tar.gz
             tar zxvf apache-activemq-5.18.6-bin.tar.gz
             sudo chown -R ec2-user .
-            
-            
-            
+           
             #Update Shell script for sending ActiveMQ messages to Lambda function
             cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam/activemq_message_sender_json
             sudo chown ec2-user ./commands.sh
             source /home/ec2-user/.bash_profile
-            echo "ACTIVEMQ_BROKER_ENDPOINT=$ACTIVEMQ_BROKER_ENDPOINT" 
-            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT|\"${ACTIVEMQ_BROKER_ENDPOINT}\"|g" commands.sh
+            echo "ACTIVEMQ_BROKER_ENDPOINT=$activemq_broker_endpoint" 
+            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT|$activemq_broker_endpoint|g" commands.sh
             sed -i "s/ACTIVEMQ_QUEUE_NAME/$ACTIVEMQ_QUEUE_NAME/g" commands.sh
             mvn clean install
-            
             
             #Update Shell script for browsing messages in ActiveMQ queue
             cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam
             sudo chown ec2-user ./activemq_queue_browser.sh
             source /home/ec2-user/.bash_profile
-            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT_ONE|$ACTIVEMQ_BROKER_ENDPOINT_ONE|g" activemq_queue_browser.sh
-            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT_TWO|$ACTIVEMQ_BROKER_ENDPOINT_TWO|g" activemq_queue_browser.sh
+            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT_ONE|${activemq_broker_endpoint1}|g" activemq_queue_browser.sh
+            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT_TWO|${activemq_broker_endpoint2}|g" activemq_queue_browser.sh
             sed -i "s|ACTIVEMQ_BROKER_ADMIN_USER|$ACTIVEMQ_BROKER_ADMIN_USER|g" activemq_queue_browser.sh
             sed -i "s|ACTIVEMQ_BROKER_PASSWORD|$ACTIVEMQ_BROKER_PASSWORD|g" activemq_queue_browser.sh
             sed -i "s|ACTIVEMQ_QUEUE_NAME|$ACTIVEMQ_QUEUE_NAME|g" activemq_queue_browser.sh
-            
-            
+                        
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
             mkdir -p ip_prefix
