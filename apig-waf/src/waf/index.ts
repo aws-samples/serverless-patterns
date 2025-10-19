@@ -1,16 +1,16 @@
 import * as cdk from "aws-cdk-lib";
 import { CfnWebACL, CfnWebACLAssociation } from 'aws-cdk-lib/aws-wafv2';
 import { Construct } from 'constructs';
- 
+
 export class WafStack extends cdk.Stack {
     constructor(scope: Construct, id: string) {
         super(scope, id);
- 
+
         // const CustomHeader = new cdk.CfnParameter(this, "CustomHeader", {
         //     type: "String",
         //     default: "x-key"
         // });
- 
+
         //Web ACL
         const APIGatewayWebACL = new CfnWebACL(this, "APIGatewayWebACL", {
             name: "demo-api-gateway-webacl",
@@ -71,7 +71,7 @@ export class WafStack extends cdk.Stack {
                                     fieldToMatch: {
                                         allQueryArguments: {}
                                     },
-                                   textTransformations: [{
+                                    textTransformations: [{
                                         priority: 1,
                                         type: "URL_DECODE"
                                     },
@@ -152,20 +152,17 @@ export class WafStack extends cdk.Stack {
                                         }]
                                     }
                                 },
-                               
                             ]
                         }
                     }
                 }
             ]
         });
- 
+
         // Web ACL Association
-        // const APIGatewayWebACLAssociation = 
         new CfnWebACLAssociation(this, "APIGatewayWebACLAssociation", {
             webAclArn: APIGatewayWebACL.attrArn,
             resourceArn: cdk.Fn.join("", ["arn:aws:apigateway:", this.region, "::/restapis/", cdk.Fn.importValue("demorestapiid"), "/stages/prod"])
         });
     }
 }
- 
