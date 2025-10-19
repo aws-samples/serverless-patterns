@@ -1,13 +1,13 @@
-
-import { LambdaRestApi } from "@aws-cdk/aws-apigateway";
-import * as lambda from "@aws-cdk/aws-lambda";
-import * as cdk from "@aws-cdk/core";
+import * as cdk from "aws-cdk-lib";
+import { LambdaRestApi } from "aws-cdk-lib/aws-apigateway";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import { Construct } from 'constructs';
 import path from "path";
 import config from "./config.json";
-import {PolicyStatement, ServicePrincipal, Effect, PolicyDocument, AnyPrincipal } from '@aws-cdk/aws-iam';
+import {PolicyStatement, ServicePrincipal, Effect, PolicyDocument, AnyPrincipal } from 'aws-cdk-lib/aws-iam';
 
 export class ApiStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string) {
+  constructor(scope: Construct, id: string) {
     super(scope, id);
 
     const handler = new lambda.Function(this, "handler", {

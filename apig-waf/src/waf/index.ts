@@ -1,8 +1,9 @@
-import { CfnWebACL, CfnWebACLAssociation } from '@aws-cdk/aws-wafv2';
-import * as cdk from "@aws-cdk/core";
+import * as cdk from "aws-cdk-lib";
+import { CfnWebACL, CfnWebACLAssociation } from 'aws-cdk-lib/aws-wafv2';
+import { Construct } from 'constructs';
  
 export class WafStack extends cdk.Stack {
-    constructor(scope: cdk.Construct, id: string) {
+    constructor(scope: Construct, id: string) {
         super(scope, id);
  
         // const CustomHeader = new cdk.CfnParameter(this, "CustomHeader", {
