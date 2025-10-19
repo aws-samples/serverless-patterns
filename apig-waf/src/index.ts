@@ -13,7 +13,7 @@ buildSync({
   outfile: path.join(__dirname, "api", "dist", "index.js"),
   platform: "node",
   sourcemap: true,
-  target: "node14.2",
+  target: "node22",
 });
 
 const app = new cdk.App();
