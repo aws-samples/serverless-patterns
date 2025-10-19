@@ -13,7 +13,7 @@ export class ApiStack extends cdk.Stack {
     const handler = new lambda.Function(this, "handler", {
       code: new lambda.AssetCode(path.resolve(__dirname, "dist")),
       handler: `index.${config.api.handler}`,
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
     });
 
     //Grant api gateway invoke permission on lambda
