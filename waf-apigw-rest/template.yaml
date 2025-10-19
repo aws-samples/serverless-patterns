@@ -57,7 +57,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.13
       Events:
         RootGet:
           Type: Api
