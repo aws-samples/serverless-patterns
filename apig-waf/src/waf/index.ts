@@ -164,7 +164,7 @@ export class WafStack extends cdk.Stack {
         // const APIGatewayWebACLAssociation = 
         new CfnWebACLAssociation(this, "APIGatewayWebACLAssociation", {
             webAclArn: APIGatewayWebACL.attrArn,
-            resourceArn: cdk.Fn.join("", ["arn:aws:apigateway:us-east-1::/restapis/", cdk.Fn.importValue("demorestapiid"), "/stages/prod", ])
+            resourceArn: cdk.Fn.join("", ["arn:aws:apigateway:", this.region, "::/restapis/", cdk.Fn.importValue("demorestapiid"), "/stages/prod"])
         });
     }
 }
