@@ -340,7 +340,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 0
           ToPort: 65535
-          CidrIp: 10.0.0.0/16
+          CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
 
   DocumentDBClientSelfIngressAllowRule:
     Type: AWS::EC2::SecurityGroupIngress
@@ -533,7 +533,7 @@ Resources:
             sudo ./aws/install
 
             
-            # Install MongoDB shell
+            # Install MongoDB tools
             cd /home/ec2-user
             wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-amazon2-x86_64-100.9.4.tgz
             tar -zxvf mongodb-database-tools-amazon2-x86_64-100.9.4.tgz
