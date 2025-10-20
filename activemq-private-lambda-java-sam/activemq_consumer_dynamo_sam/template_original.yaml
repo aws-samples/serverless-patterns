@@ -17,7 +17,7 @@ Resources:
       FunctionName: java-activemq-consumer-dynamodb-sam
       CodeUri: activemq_event_consumer_function
       Handler: com.amazonaws.services.lambda.samples.events.activemq.HandlerActiveMQ::handleRequest
-      Runtime: java21
+      Runtime: JAVA_VERSION
       Architectures:
         - x86_64
       MemorySize: 512
@@ -98,7 +98,7 @@ Parameters:
     Default: ACTIVEMQ_QUEUE_NAME
   SecretsManagerSecretForMQ:
     Type: String
-    Description: Enter the name of the secret that has username/password for Active MQ
+    Description: Enter the ARN of the secret that has username/password for Active MQ
     Default: ACTIVEMQ_SECRET_ARN
   Subnet1:
     Type: String

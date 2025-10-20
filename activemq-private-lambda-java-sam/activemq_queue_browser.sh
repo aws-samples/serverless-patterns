@@ -6,6 +6,6 @@
 /home/ec2-user/activemq_client/apache-activemq-5.18.6/bin/activemq browse --amqurl ACTIVEMQ_BROKER_ENDPOINT_ONE --user ACTIVEMQ_BROKER_ADMIN_USER --password ACTIVEMQ_BROKER_PASSWORD ACTIVEMQ_QUEUE_NAME
 
 
-#Use the below command if the primary ActiveMQ broker is down for whatever reason
+#Uncomment and use the below command if you get a "Broker not available at:" message with the first broker endpoint
 
 #/home/ec2-user/activemq_client/apache-activemq-5.18.6/bin/activemq browse --amqurl ACTIVEMQ_BROKER_ENDPOINT_TWO --user ACTIVEMQ_BROKER_ADMIN_USER --password ACTIVEMQ_BROKER_PASSWORD ACTIVEMQ_QUEUE_NAME

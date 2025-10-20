@@ -328,7 +328,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 0
           ToPort: 65535
-          CidrIp: 10.0.0.0/16
+          CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
 
   ActiveMQClientSelfIngressAllowRule:
     Type: AWS::EC2::SecurityGroupIngress
