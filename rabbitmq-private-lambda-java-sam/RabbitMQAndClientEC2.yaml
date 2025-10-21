@@ -642,7 +642,7 @@ Resources:
             
           - rabbitmq_broker_id: !Ref RabbitMQBroker
             rabbitmq_broker_arn: !GetAtt RabbitMQBroker.Arn
-            rabbitmq_broker_endpoint: !GetAtt RabbitMQBroker.AmqpEndpoints
+            rabbitmq_broker_endpoint: !Select [ 0, !GetAtt RabbitMQBroker.AmqpEndpoints ]
             rabbitmq_virtual_host: !Ref RabbitMQVirtualHost
             rabbitmq_exchange: !Ref RabbitMQExchange
             rabbitmq_queue_name: !Ref RabbitMQQueueName
@@ -813,7 +813,7 @@ Outputs:
       Name: !Sub "${AWS::StackName}-VPCStackName"
   RabbitMQBrokerEndpoint:
     Description: RabbitMQ Broker AMQP Endpoint
-    Value: !GetAtt RabbitMQBroker.AmqpEndpoints
+    Value: !Select [ 0, !GetAtt RabbitMQBroker.AmqpEndpoints ]
     Export:
       Name: !Sub "${AWS::StackName}-RabbitMQBrokerEndpoint"
   RabbitMQSecretArn:
