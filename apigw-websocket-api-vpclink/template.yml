@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: An Amazon API Gateway WebSocket API with a VPC link.
+
+Parameters:
+  NlbInternalDns:
+    Type: String
+  NlbInternalArn:
+    Type: String
+
+Resources:
+  # API Gateway WebSocket API
+  MyWebSocketApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Ref AWS::StackName
+      Description: An Amazon API Gateway WebSocket API with a VPC link.
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: $request.body.action
+
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref MyWebSocketApi
+      RouteKey: $connect
+      Target: !Sub integrations/${ConnectIntegration}
+
+  MessageRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref MyWebSocketApi
+      RouteKey: $default
+      Target: !Sub integrations/${MessageIntegration}
+
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref MyWebSocketApi
+      RouteKey: $disconnect
+      Target: !Sub integrations/${DisconnectIntegration}
+
+  ConnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref MyWebSocketApi
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      IntegrationUri: !Sub http://${NlbInternalDns}/connect
+      ConnectionType: VPC_LINK
+      ConnectionId: !Ref VPCLinkRestNlbInternal
+
+  MessageIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref MyWebSocketApi
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      IntegrationUri: !Sub http://${NlbInternalDns}/message
+      ConnectionType: VPC_LINK
+      ConnectionId: !Ref VPCLinkRestNlbInternal
+
+  DisconnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref MyWebSocketApi
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      IntegrationUri: !Sub http://${NlbInternalDns}/disconnect
+      ConnectionType: VPC_LINK
+      ConnectionId: !Ref VPCLinkRestNlbInternal
+
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - ConnectRoute
+      - DisconnectRoute
+      - MessageRoute
+    Properties:
+      ApiId: !Ref MyWebSocketApi
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: Prod
+      ApiId: !Ref MyWebSocketApi
+      DeploymentId: !Ref Deployment
+
+  VPCLinkRestNlbInternal:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: VPCLinkRestNlbInternal
+      TargetArns:
+        - !Ref NlbInternalArn
+
+Outputs:
+
+  # API Gateway endpoint to be used during tests
+  AppApiEndpoint:
+    Description: API Endpoint
+    Value: !Sub https://${MyWebSocketApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+
