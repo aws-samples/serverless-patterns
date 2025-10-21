@@ -137,4 +137,4 @@ Resources:
 
 Outputs:
   apiGatewayInvokeURL:
-    Value: !Sub https://${APIGateway}.execute-api.${AWS::Region}.amazonaws.com/v1
+    Value: !Sub https://${APIGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/v1

@@ -185,7 +185,7 @@ Resources:
         - Name: user_pools_web_client_id
           Value: !Ref rAmplifyCognitoClient
         - Name: APIURL
-          Value: !Sub "https://${myAPI}.execute-api.${AWS::Region}.amazonaws.com/dev"
+          Value: !Sub "https://${myAPI}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev"
       Repository: !Ref AmplifyFrontendRepository
       OauthToken: !Ref OauthToken
      
@@ -222,6 +222,6 @@ Outputs:
 
   APIurl:
     Description: API url
-    Value: !Sub "https://${myAPI}.execute-api.${AWS::Region}.amazonaws.com/dev"
+    Value: !Sub "https://${myAPI}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev"
     Export:
       Name: APIurl
