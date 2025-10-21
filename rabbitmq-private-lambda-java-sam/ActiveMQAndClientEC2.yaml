@@ -3,10 +3,10 @@ Parameters:
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
-  DocumentDBEngineVersion:
+  ActiveMQEngineVersion:
     Type: String
-    Default: 5.0.0
-    Description: DocumentDB engine version
+    Default: 5.18
+    Description: ActiveMQ engine version
   JavaVersion:
     Type: String
     Description: Choose the version of Java. Lambda currently supports Java 11, 17 and 21
@@ -15,27 +15,22 @@ Parameters:
       - java17
       - java21
     Default: java21
-  DocumentDBDatabaseName:
+  ActiveMQBrokerName:
     Type: String
-    Default: DocumentDBJavaLambdaDB
-    Description: DocumentDB database name for Lambda function
-  DocumentDBCollectionName:
+    Default: ActiveMQJavaLambdaBroker
+    Description: ActiveMQ broker name for Lambda function
+  ActiveMQQueueName:
     Type: String
-    Default: DocumentDBJavaLambdaCollection
-    Description: DocumentDB collection name for Lambda function
-  DocumentDBClusterAdminUser:
+    Default: ActiveMQJavaLambdaQueue
+    Description: ActiveMQ queue name for Lambda function
+  ActiveMQBrokerAdminUser:
     Type: String
-    Description: Password for the DocumentDB Cluster
-    Default: docdbadmin
-  DocumentDBClusterPassword:
+    Description: Username for the ActiveMQ Broker
+    Default: activemqadmin
+  ActiveMQBrokerPassword:
     Type: String
-    Description: Password for the DocumentDB Cluster
-    Default: docdbPassword123
-    NoEcho: true
-  DocumentDBTrustStorePassword:
-    Type: String
-    Description: Password for the DocumentDB Client TLS Truststore Password
-    Default: docdbTrustPass123
+    Description: Password for the ActiveMQ Broker
+    Default: activemqPassword123
     NoEcho: true
   ServerlessLandGithubLocation:
     Type: String
@@ -45,42 +40,31 @@ Parameters:
 Mappings:
   SubnetConfig:
       VPC:
-        CIDR: '10.0.0.0/16'
+        CIDR: '10.1.0.0/16'
       PublicOne:
-        CIDR: '10.0.0.0/24'
+        CIDR: '10.1.0.0/24'
       PublicTwo:
-        CIDR: '10.0.1.0/24'
+        CIDR: '10.1.1.0/24'
       PublicThree:
-        CIDR: '10.0.2.0/24'
-      PrivateSubnetDocDBOne:
-        CIDR: '10.0.3.0/24'
-      PrivateSubnetDocDBTwo:
-        CIDR: '10.0.4.0/24'
-      PrivateSubnetDocDBThree:
-        CIDR: '10.0.5.0/24'
+        CIDR: '10.1.2.0/24'
+      PrivateSubnetActiveMQOne:
+        CIDR: '10.1.3.0/24'
+      PrivateSubnetActiveMQTwo:
+        CIDR: '10.1.4.0/24'
+      PrivateSubnetActiveMQThree:
+        CIDR: '10.1.5.0/24'
 
 Resources:
-  # Secrets Manager Secret for DocumentDB credentials
-  DocumentDBSecret:
+  # Secrets Manager Secret for ActiveMQ credentials
+  ActiveMQSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: 'AmazonDocumentDBCredentials'
-      Description: DocumentDB cluster master user credentials
+      Name: 'AmazonActiveMQCredentials'
+      Description: ActiveMQ broker master user credentials
       SecretString: !Sub |
         {
-          "username": "${DocumentDBClusterAdminUser}",
-          "password": "${DocumentDBClusterPassword}"
-        }
-
-  DocumentDBTrustStoreSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: 'AmazonDocumentDBTruststore'
-      Description: DocumentDB secret for truststore for SSL client to connect
-      SecretString: !Sub |
-        {
-          "truststore": "/home/ec2-user/mongotruststore/rds-truststore.jks",
-          "truststorepassword": "${DocumentDBTrustStorePassword}"
+          "username": "${ActiveMQBrokerAdminUser}",
+          "password": "${ActiveMQBrokerPassword}"
         }
 
   VPC:
@@ -91,7 +75,7 @@ Resources:
       CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
       Tags:
         - Key: 'Name'
-          Value: 'DocumentDBVPC'
+          Value: 'ActiveMQVPC'
 
   PublicSubnetOne:
     Type: AWS::EC2::Subnet
@@ -132,7 +116,7 @@ Resources:
       Tags:
         - Key: 'Name'
           Value: 'PublicSubnetThree'
-  PrivateSubnetDocDBOne:
+  PrivateSubnetActiveMQOne:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone:
@@ -140,12 +124,12 @@ Resources:
          - 0
          - Fn::GetAZs: {Ref: 'AWS::Region'}
       VpcId: !Ref 'VPC'
-      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetDocDBOne', 'CIDR']
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetActiveMQOne', 'CIDR']
       MapPublicIpOnLaunch: false
       Tags:
         - Key: 'Name'
-          Value: 'PrivateSubnetDocDBOne'
-  PrivateSubnetDocDBTwo:
+          Value: 'PrivateSubnetActiveMQOne'
+  PrivateSubnetActiveMQTwo:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone:
@@ -153,12 +137,12 @@ Resources:
          - 1
          - Fn::GetAZs: {Ref: 'AWS::Region'}
       VpcId: !Ref 'VPC'
-      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetDocDBTwo', 'CIDR']
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetActiveMQTwo', 'CIDR']
       MapPublicIpOnLaunch: false
       Tags:
         - Key: 'Name'
-          Value: 'PrivateSubnetDocDBTwo'
-  PrivateSubnetDocDBThree:
+          Value: 'PrivateSubnetActiveMQTwo'
+  PrivateSubnetActiveMQThree:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone:
@@ -166,11 +150,11 @@ Resources:
          - 2
          - Fn::GetAZs: {Ref: 'AWS::Region'}
       VpcId: !Ref 'VPC'
-      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetDocDBThree', 'CIDR']
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetActiveMQThree', 'CIDR']
       MapPublicIpOnLaunch: false
       Tags:
         - Key: 'Name'
-          Value: 'PrivateSubnetDocDBThree'
+          Value: 'PrivateSubnetActiveMQThree'
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -193,7 +177,7 @@ Resources:
       SubnetId: !Ref 'PublicSubnetOne'
       Tags: 
         - Key: 'Name'
-          Value: 'DocumentDBNATGateway1'
+          Value: 'ActiveMQNATGateway1'
 
   NATEIP2:
     Type: AWS::EC2::EIP
@@ -208,7 +192,7 @@ Resources:
       SubnetId: !Ref 'PublicSubnetTwo'
       Tags: 
         - Key: 'Name'
-          Value: 'DocumentDBNATGateway2'
+          Value: 'ActiveMQNATGateway2'
 
   NATEIP3:
     Type: AWS::EC2::EIP
@@ -223,7 +207,7 @@ Resources:
       SubnetId: !Ref 'PublicSubnetThree'
       Tags: 
         - Key: 'Name'
-          Value: 'DocumentDBNATGateway3'
+          Value: 'ActiveMQNATGateway3'
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -295,29 +279,29 @@ Resources:
       DestinationCidrBlock: '0.0.0.0/0'
       NatGatewayId: !Ref 'NATGateway3'
 
-  PrivateSubnetDocDBOneRouteTableAssociation:
+  PrivateSubnetActiveMQOneRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PrivateRouteTable1
-      SubnetId: !Ref PrivateSubnetDocDBOne
+      SubnetId: !Ref PrivateSubnetActiveMQOne
       
-  PrivateSubnetDocDBTwoRouteTableAssociation:
+  PrivateSubnetActiveMQTwoRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PrivateRouteTable2
-      SubnetId: !Ref PrivateSubnetDocDBTwo
+      SubnetId: !Ref PrivateSubnetActiveMQTwo
       
-  PrivateSubnetDocDBThreeRouteTableAssociation:
+  PrivateSubnetActiveMQThreeRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PrivateRouteTable3
-      SubnetId: !Ref PrivateSubnetDocDBThree
+      SubnetId: !Ref PrivateSubnetActiveMQThree
   
-  DocumentDBClientInstanceSecurityGroup:
+  ActiveMQClientInstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
-      GroupName: !Sub "${AWS::StackName} Security group attached to the DocumentDB client"
+      GroupName: !Sub "${AWS::StackName} Security group attached to the ActiveMQ client"
       VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
@@ -325,35 +309,78 @@ Resources:
         ToPort: 22
         CidrIp: 10.0.0.0/16
 
-  DocumentDBSecurityGroup:
+  ActiveMQSecurityGroup:
     Type: AWS::EC2::SecurityGroup
-    DependsOn: [VPC,DocumentDBClientInstanceSecurityGroup]
+    DependsOn: [VPC,ActiveMQClientInstanceSecurityGroup]
     Properties:
-      GroupDescription: DocumentDB Security Group
-      GroupName: !Sub "${AWS::StackName} Security group for the DocumentDB cluster"
+      GroupDescription: ActiveMQ Security Group
+      GroupName: !Sub "${AWS::StackName} Security group for the ActiveMQ broker"
       VpcId: !Ref 'VPC'
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 27017
-          ToPort: 27017
-          SourceSecurityGroupId: !GetAtt DocumentDBClientInstanceSecurityGroup.GroupId
+          FromPort: 61617
+          ToPort: 61617
+          SourceSecurityGroupId: !GetAtt ActiveMQClientInstanceSecurityGroup.GroupId
+        - IpProtocol: tcp
+          FromPort: 8162
+          ToPort: 8162
+          SourceSecurityGroupId: !GetAtt ActiveMQClientInstanceSecurityGroup.GroupId
         - IpProtocol: tcp
           FromPort: 0
           ToPort: 65535
-          CidrIp: 10.0.0.0/16
+          CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
 
-  DocumentDBClientSelfIngressAllowRule:
+  ActiveMQClientSelfIngressAllowRule:
     Type: AWS::EC2::SecurityGroupIngress
-    DependsOn: DocumentDBClientInstanceSecurityGroup
+    DependsOn: ActiveMQClientInstanceSecurityGroup
     Properties:
-      GroupId: !GetAtt DocumentDBClientInstanceSecurityGroup.GroupId
+      GroupId: !GetAtt ActiveMQClientInstanceSecurityGroup.GroupId
       IpProtocol: tcp
       FromPort: 22
       ToPort: 22
-      SourceSecurityGroupId: !GetAtt DocumentDBClientInstanceSecurityGroup.GroupId
+      SourceSecurityGroupId: !GetAtt ActiveMQClientInstanceSecurityGroup.GroupId
 
-  DocumentDBClientEC2Instance:
-    DependsOn: DocumentDBCluster
+  # ActiveMQ Configuration
+  ActiveMQConfiguration:
+    Type: AWS::AmazonMQ::Configuration
+    Properties:
+      Name: !Sub "${AWS::StackName}-activemq-config"
+      Description: ActiveMQ configuration for the cluster
+      EngineType: ACTIVEMQ
+      EngineVersion: !Ref ActiveMQEngineVersion
+      Data: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pgo8YnJva2VyIHhtbG5zPSJodHRwOi8vYWN0aXZlbXEuYXBhY2hlLm9yZy9zY2hlbWEvY29yZSI+CiAgPGRlc3RpbmF0aW9uUG9saWN5PgogICAgPHBvbGljeU1hcD4KICAgICAgPHBvbGljeUVudHJpZXM+CiAgICAgICAgPHBvbGljeUVudHJ5IHRvcGljPSI+IiBwcm9kdWNlckZsb3dDb250cm9sPSJ0cnVlIj4KICAgICAgICAgIDxwZW5kaW5nTWVzc2FnZUxpbWl0U3RyYXRlZ3k+CiAgICAgICAgICAgIDxzcG9vbGluZ1N1YnNjcmlwdGlvblBlbmRpbmdNZXNzYWdlTGltaXRTdHJhdGVneSBsaW1pdD0iMTAwMCIvPgogICAgICAgICAgPC9wZW5kaW5nTWVzc2FnZUxpbWl0U3RyYXRlZ3k+CiAgICAgICAgPC9wb2xpY3lFbnRyeT4KICAgICAgICA8cG9saWN5RW50cnkgcXVldWU9Ij4iIHByb2R1Y2VyRmxvd0NvbnRyb2w9InRydWUiIG1lbW9yeUxpbWl0PSIxbWIiPgogICAgICAgIDwvcG9saWN5RW50cnk+CiAgICAgIDwvcG9saWN5RW50cmllcz4KICAgIDwvcG9saWN5TWFwPgogIDwvZGVzdGluYXRpb25Qb2xpY3k+CiAgPHN5c3RlbVVzYWdlPgogICAgPHN5c3RlbVVzYWdlPgogICAgICA8bWVtb3J5VXNhZ2U+CiAgICAgICAgPG1lbW9yeVVzYWdlIGxpbWl0PSI2NCBtYiIvPgogICAgICA8L21lbW9yeVVzYWdlPgogICAgICA8c3RvcmVVc2FnZT4KICAgICAgICA8c3RvcmVVc2FnZSBsaW1pdD0iNTEyIG1iIi8+CiAgICAgIDwvc3RvcmVVc2FnZT4KICAgICAgPHRlbXBVc2FnZT4KICAgICAgICA8dGVtcFVzYWdlIGxpbWl0PSIxMjggbWIiLz4KICAgICAgPC90ZW1wVXNhZ2U+CiAgICA8L3N5c3RlbVVzYWdlPgogIDwvc3lzdGVtVXNhZ2U+CjwvYnJva2VyPgo=
+
+  # ActiveMQ Broker
+  ActiveMQBroker:
+    Type: AWS::AmazonMQ::Broker
+    Properties:
+      BrokerName: !Ref ActiveMQBrokerName
+      DeploymentMode: ACTIVE_STANDBY_MULTI_AZ
+      EngineType: ACTIVEMQ
+      EngineVersion: !Ref ActiveMQEngineVersion
+      HostInstanceType: mq.t3.micro
+      PubliclyAccessible: false
+      AutoMinorVersionUpgrade: true
+      Configuration:
+        Id: !Ref ActiveMQConfiguration
+        Revision: 1
+      Users:
+        - Username: !Ref ActiveMQBrokerAdminUser
+          Password: !Ref ActiveMQBrokerPassword
+          ConsoleAccess: true
+          Groups:
+            - admin
+      SubnetIds:
+        - !Ref PrivateSubnetActiveMQOne
+        - !Ref PrivateSubnetActiveMQTwo
+      SecurityGroups:
+        - !Ref ActiveMQSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-activemq-broker"
+
+  ActiveMQClientEC2Instance:
+    DependsOn: ActiveMQBroker
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: m5.large
@@ -363,11 +390,11 @@ Resources:
           - 0
           - Fn::GetAZs: {Ref: 'AWS::Region'}
       SubnetId: !Ref PublicSubnetOne
-      SecurityGroupIds: [!GetAtt DocumentDBClientInstanceSecurityGroup.GroupId]
+      SecurityGroupIds: [!GetAtt ActiveMQClientInstanceSecurityGroup.GroupId]
       ImageId: !Ref LatestAmiId
       Tags:
         - Key: 'Name'
-          Value: 'DocumentDBClientInstance'
+          Value: 'ActiveMQClientInstance'
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
@@ -388,11 +415,10 @@ Resources:
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
                 echo "Trying yum install"
                 yum update -y
-                # yum install java-openjdk11-devel -y
             
                 # install Java
                 JAVA_VERSION=${java_version}
-                echo "JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+                echo "export JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
                 if [ "$JAVA_VERSION" == "java11" ]; then
                     sudo yum install java-11-amazon-corretto-devel -y
                 elif [ "$JAVA_VERSION" == "java17" ]; then
@@ -446,7 +472,6 @@ Resources:
                     ((attempt_num++))
                 fi
             done
-            
             
             max_attempts=5
             attempt_num=1
@@ -531,15 +556,7 @@ Resources:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-
             
-            # Install MongoDB shell
-            cd /home/ec2-user
-            wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-amazon2-x86_64-100.9.4.tgz
-            tar -zxvf mongodb-database-tools-amazon2-x86_64-100.9.4.tgz
-            sudo cp mongodb-database-tools-amazon2-x86_64-100.9.4/bin/* /usr/local/bin/
-            
-           
             # Install AWS SAM CLI
             cd /home/ec2-user
             mkdir -p awssam
@@ -549,116 +566,85 @@ Resources:
             sudo ./sam-installation/install
             
             # Set environment variables
-            DOCDB_CLUSTER_ENDPOINT=${docdb_cluster_endpoint}
-            DOCDB_CLUSTER_RESOURCE=${docdb_cluster_resource}
-            DOCDB_CLUSTER_IDENTIFIER=${docdb_cluster_identifier}
-            DOCDB_DATABASE=${docdb_database}
-            DOCDB_COLLECTION=${docdb_collection}
-            DOCDB_SECRET_ARN=${docdb_secret_arn}
+            ACTIVEMQ_BROKER_ID=${activemq_broker_id}
+            ACTIVEMQ_BROKER_ARN=${activemq_broker_arn}
+            activemq_broker_endpoint="\"failover:(${activemq_broker_endpoint1},${activemq_broker_endpoint2})\""
+            ACTIVEMQ_QUEUE_NAME=${activemq_queue_name}
+            ACTIVEMQ_SECRET_ARN=${activemq_secret_arn}
             AWS_REGION=${aws_region}
-            DOCDB_SUBNET_ONE=${docdb_subnet_one}
-            DOCDB_SUBNET_TWO=${docdb_subnet_two}
-            DOCDB_SUBNET_THREE=${docdb_subnet_three}
-            DOCDB_SECURITY_GROUP=${docdb_security_group}
-            DOCDB_CLUSTER_ADMIN_USER=${docdb_cluster_admin_user}
-            DOCDB_CLUSTER_PASSWORD=${docdb_cluster_password}
-            DOCDB_TRUST_STORE_PASSWORD=${docdb_trust_store_password}
+            ACTIVEMQ_SUBNET_ONE=${activemq_subnet_one}
+            ACTIVEMQ_SUBNET_TWO=${activemq_subnet_two}
+            ACTIVEMQ_SUBNET_THREE=${activemq_subnet_three}
+            ACTIVEMQ_SECURITY_GROUP=${activemq_security_group}
+            ACTIVEMQ_BROKER_ADMIN_USER=${activemq_broker_admin_user}
+            ACTIVEMQ_BROKER_PASSWORD=${activemq_broker_password}
             SECURITY_GROUP=${security_group_id}
 
-            
-            echo "export DOCDB_CLUSTER_ENDPOINT=$DOCDB_CLUSTER_ENDPOINT" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_CLUSTER_RESOURCE=$DOCDB_CLUSTER_RESOURCE" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_CLUSTER_IDENTIFIER=$DOCDB_CLUSTER_IDENTIFIER" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_DATABASE=$DOCDB_DATABASE" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_COLLECTION=$DOCDB_COLLECTION" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_SECRET_ARN=$DOCDB_SECRET_ARN" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_BROKER_ID=$ACTIVEMQ_BROKER_ID" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_BROKER_ARN=$ACTIVEMQ_BROKER_ARN" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_BROKER_ENDPOINT=$activemq_broker_endpoint" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_QUEUE_NAME=$ACTIVEMQ_QUEUE_NAME" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_SECRET_ARN=$ACTIVEMQ_SECRET_ARN" >> /home/ec2-user/.bash_profile
             echo "export AWS_REGION=$AWS_REGION" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_SUBNET_ONE=$DOCDB_SUBNET_ONE" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_SUBNET_TWO=$DOCDB_SUBNET_TWO" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_SUBNET_THREE=$DOCDB_SUBNET_THREE" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_SECURITY_GROUP=$DOCDB_SECURITY_GROUP" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_CLUSTER_ADMIN_USER=$DOCDB_CLUSTER_ADMIN_USER" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_CLUSTER_PASSWORD=$DOCDB_CLUSTER_PASSWORD" >> /home/ec2-user/.bash_profile
-            echo "export DOCDB_TRUST_STORE_PASSWORD=$DOCDB_TRUST_STORE_PASSWORD" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_SUBNET_ONE=$ACTIVEMQ_SUBNET_ONE" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_SUBNET_TWO=$ACTIVEMQ_SUBNET_TWO" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_SUBNET_THREE=$ACTIVEMQ_SUBNET_THREE" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_SECURITY_GROUP=$ACTIVEMQ_SECURITY_GROUP" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_BROKER_ADMIN_USER=$ACTIVEMQ_BROKER_ADMIN_USER" >> /home/ec2-user/.bash_profile
+            echo "export ACTIVEMQ_BROKER_PASSWORD=$ACTIVEMQ_BROKER_PASSWORD" >> /home/ec2-user/.bash_profile
             echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
                        
-            
             # Clone serverless patterns
             cd /home/ec2-user
             SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
             git clone -n --depth=1 --filter=tree:0 $SERVERLESS_LAND_GITHUB_LOCATION
             cd ./serverless-patterns
-            git sparse-checkout set --no-cone /documentdb-lambda-java-sam
+            git sparse-checkout set --no-cone /activemq-private-lambda-java-sam
             git checkout
-            cd documentdb-lambda-java-sam
+            cd activemq-private-lambda-java-sam
             sudo chown -R ec2-user .
-            
-            #Install MongoShell
-            sudo cp ./mongodb-org-8.0.repo /etc/yum.repos.d
-            cd /home/ec2-user
-            mkdir mongoshell
-            cd mongoshell
-            sudo yum install -y mongodb-mongosh
-            
-            #Create Java Keystore to connect to DocumentDB
-            cd /home/ec2-user
-            mkdir mongotruststore
-            cd /home/ec2-user/mongotruststore
-            cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/java_keystore_script.sh .
-            sudo chown -R ec2-user .
-            source /home/ec2-user/.bash_profile
-            sed -i "s/TRUSTSTORE_PASSWORD/$DOCDB_TRUST_STORE_PASSWORD/g" java_keystore_script.sh
-            chmod +x java_keystore_script.sh
-            sh ./java_keystore_script.sh
-            
-            #Create DocumentDB database and collection
-            cd /home/ec2-user/mongoshell
-            wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
-            cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/docdb_db_collection.sh .
-            cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/mongodbcolcreate.js .
-            cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/connect_to_mongo_shell.sh .
-            sudo chown -R ec2-user .
-            source /home/ec2-user/.bash_profile
-            sed -i "s/DOCDB_CLUSTER_ENDPOINT/$DOCDB_CLUSTER_ENDPOINT/g" docdb_db_collection.sh
-            sed -i "s/DOCDB_CLUSTER_ADMIN_USER/$DOCDB_CLUSTER_ADMIN_USER/g" docdb_db_collection.sh
-            sed -i "s/DOCDB_CLUSTER_PASSWORD/$DOCDB_CLUSTER_PASSWORD/g" docdb_db_collection.sh
-            sed -i "s/DOCDB_DATABASE/$DOCDB_DATABASE/g" docdb_db_collection.sh
-            sed -i "s/DOCDB_COLLECTION/$DOCDB_COLLECTION/g" docdb_db_collection.sh
-            sed -i "s/DOCDB_DATABASE/$DOCDB_DATABASE/g" mongodbcolcreate.js
-            sed -i "s/DOCDB_COLLECTION/$DOCDB_COLLECTION/g" mongodbcolcreate.js
-            sed -i "s/DOCDB_CLUSTER_ENDPOINT/$DOCDB_CLUSTER_ENDPOINT/g" connect_to_mongo_shell.sh
-            sed -i "s/DOCDB_CLUSTER_ADMIN_USER/$DOCDB_CLUSTER_ADMIN_USER/g" connect_to_mongo_shell.sh
-            sed -i "s/DOCDB_CLUSTER_PASSWORD/$DOCDB_CLUSTER_PASSWORD/g" connect_to_mongo_shell.sh
-            chmod +x docdb_db_collection.sh
-            chmod +x connect_to_mongo_shell.sh
-            sh ./docdb_db_collection.sh
             
             #Substitute SAM template variables
-            cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam
-            cd documentdb_streams_consumer_dynamo_sam
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam
+            cd activemq_consumer_dynamo_sam
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
-            sed -i "s/DOCDB_CLUSTER_IDENTIFIER/$DOCDB_CLUSTER_IDENTIFIER/g" template.yaml
-            sed -i "s/DOCDB_DATABASE/$DOCDB_DATABASE/g" template.yaml
-            sed -i "s/DOCDB_COLLECTION/$DOCDB_COLLECTION/g" template.yaml
+            sed -i "s/ACTIVEMQ_BROKER_ARN/$ACTIVEMQ_BROKER_ARN/g" template.yaml
+            sed -i "s/ACTIVEMQ_QUEUE_NAME/$ACTIVEMQ_QUEUE_NAME/g" template.yaml
+            sed -i "s/ACTIVEMQ_SECRET_ARN/$ACTIVEMQ_SECRET_ARN/g" template.yaml
             sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
-            sed -i "s/DOCDB_SECRET_ARN/$DOCDB_SECRET_ARN/g" template.yaml
-            sed -i "s/DOCDB_SUBNET_ONE/$DOCDB_SUBNET_ONE/g" template.yaml
-            sed -i "s/DOCDB_SUBNET_TWO/$DOCDB_SUBNET_TWO/g" template.yaml
-            sed -i "s/DOCDB_SUBNET_THREE/$DOCDB_SUBNET_THREE/g" template.yaml
-            sed -i "s/DOCDB_SECURITY_GROUP/$SECURITY_GROUP/g" template.yaml
+            sed -i "s/ACTIVEMQ_SUBNET_ONE/$ACTIVEMQ_SUBNET_ONE/g" template.yaml
+            sed -i "s/ACTIVEMQ_SUBNET_TWO/$ACTIVEMQ_SUBNET_TWO/g" template.yaml
+            sed -i "s/ACTIVEMQ_SUBNET_THREE/$ACTIVEMQ_SUBNET_THREE/g" template.yaml
+            sed -i "s/SECURITY_GROUP/$SECURITY_GROUP/g" template.yaml
             
-            #Adding DocumentDB variables to DocumentDB secret as CloudFormation cannot create a secret of type DocumentDB like you manually can
-            aws secretsmanager put-secret-value --secret-id AmazonDocumentDBCredentials --secret-string "{\"host\":\"$DOCDB_CLUSTER_ENDPOINT\",\"port\":\"27017\",\"username\":\"$DOCDB_CLUSTER_ADMIN_USER\",\"password\":\"$DOCDB_CLUSTER_PASSWORD\",\"engine\":\"mongo\",\"ssl\":\"true\",\"dbClusterIdentifier\":\"$DOCDB_CLUSTER_IDENTIFIER\"}"
-                        
-            #Compiling Sender Program and Updating Command File with DocumentDB Database and Collection names
-            cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_message_sender_json
+            #Install ActiveMQ (needed in case you want to use the CLI as a client to look at queues etc.)
+            mkdir /home/ec2-user/activemq_client
+            cd /home/ec2-user/activemq_client
+            wget https://archive.apache.org/dist/activemq/5.18.6/apache-activemq-5.18.6-bin.tar.gz
+            tar zxvf apache-activemq-5.18.6-bin.tar.gz
             sudo chown -R ec2-user .
-            sed -i "s/DOCDB_DATABASE/$DOCDB_DATABASE/g" commands.sh
-            sed -i "s/DOCDB_COLLECTION/$DOCDB_COLLECTION/g" commands.sh
+           
+            #Update Shell script for sending ActiveMQ messages to Lambda function
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam/activemq_message_sender_json
+            sudo chown ec2-user ./commands.sh
+            source /home/ec2-user/.bash_profile
+            echo "ACTIVEMQ_BROKER_ENDPOINT=$activemq_broker_endpoint" 
+            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT|$activemq_broker_endpoint|g" commands.sh
+            sed -i "s/ACTIVEMQ_QUEUE_NAME/$ACTIVEMQ_QUEUE_NAME/g" commands.sh
             mvn clean install
             
+            #Update Shell script for browsing messages in ActiveMQ queue
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam
+            sudo chown ec2-user ./activemq_queue_browser.sh
+            source /home/ec2-user/.bash_profile
+            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT_ONE|${activemq_broker_endpoint1}|g" activemq_queue_browser.sh
+            sed -i "s|ACTIVEMQ_BROKER_ENDPOINT_TWO|${activemq_broker_endpoint2}|g" activemq_queue_browser.sh
+            sed -i "s|ACTIVEMQ_BROKER_ADMIN_USER|$ACTIVEMQ_BROKER_ADMIN_USER|g" activemq_queue_browser.sh
+            sed -i "s|ACTIVEMQ_BROKER_PASSWORD|$ACTIVEMQ_BROKER_PASSWORD|g" activemq_queue_browser.sh
+            sed -i "s|ACTIVEMQ_QUEUE_NAME|$ACTIVEMQ_QUEUE_NAME|g" activemq_queue_browser.sh
+                        
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
             mkdir -p ip_prefix
@@ -672,31 +658,29 @@ Resources:
             echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
             aws ec2 authorize-security-group-ingress --region $AWS_REGION --group-id $SECURITY_GROUP --protocol tcp --port 22 --cidr $EC2_CONNECT_IP
             
-          - docdb_cluster_endpoint: !GetAtt DocumentDBCluster.Endpoint
-            docdb_cluster_resource: !GetAtt DocumentDBCluster.ClusterResourceId
-            docdb_cluster_identifier: !Ref DocumentDBCluster
-            docdb_database: !Ref DocumentDBDatabaseName
-            docdb_collection: !Ref DocumentDBCollectionName
-            docdb_secret_arn: !Ref DocumentDBSecret
+          - activemq_broker_id: !Ref ActiveMQBroker
+            activemq_broker_arn: !GetAtt ActiveMQBroker.Arn
+            activemq_broker_endpoint1: !Select [ 0, !GetAtt ActiveMQBroker.OpenWireEndpoints ]
+            activemq_broker_endpoint2: !Select [ 1, !GetAtt ActiveMQBroker.OpenWireEndpoints ]
+            activemq_queue_name: !Ref ActiveMQQueueName
+            activemq_secret_arn: !Ref ActiveMQSecret
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
             java_version: !Ref JavaVersion
-            security_group_id : !GetAtt DocumentDBClientInstanceSecurityGroup.GroupId
-            docdb_subnet_one: !Ref PrivateSubnetDocDBOne
-            docdb_subnet_two: !Ref PrivateSubnetDocDBTwo
-            docdb_subnet_three: !Ref PrivateSubnetDocDBThree
-            docdb_security_group: !GetAtt DocumentDBSecurityGroup.GroupId
-            docdb_cluster_admin_user: !Ref DocumentDBClusterAdminUser
-            docdb_cluster_password: !Ref DocumentDBClusterPassword
-            docdb_trust_store_password: !Ref DocumentDBTrustStorePassword
-            
+            security_group_id : !GetAtt ActiveMQClientInstanceSecurityGroup.GroupId
+            activemq_subnet_one: !Ref PrivateSubnetActiveMQOne
+            activemq_subnet_two: !Ref PrivateSubnetActiveMQTwo
+            activemq_subnet_three: !Ref PrivateSubnetActiveMQThree
+            activemq_security_group: !GetAtt ActiveMQSecurityGroup.GroupId
+            activemq_broker_admin_user: !Ref ActiveMQBrokerAdminUser
+            activemq_broker_password: !Ref ActiveMQBrokerPassword
 
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint
     Properties:
       PreserveClientIp: true
       SecurityGroupIds: 
-        - !GetAtt DocumentDBClientInstanceSecurityGroup.GroupId
+        - !GetAtt ActiveMQClientInstanceSecurityGroup.GroupId
       SubnetId: !Ref PublicSubnetOne
 
   EC2Role:
@@ -712,7 +696,7 @@ Resources:
             Action: 'sts:AssumeRole'
       Path: "/"
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonDocDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonMQFullAccess
         - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
         - arn:aws:iam::aws:policy/CloudWatchFullAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
@@ -721,16 +705,15 @@ Resources:
         - arn:aws:iam::aws:policy/AWSLambda_FullAccess
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess_v2
       Policies:
-        - PolicyName: DocumentDBAccess
+        - PolicyName: ActiveMQAccess
           PolicyDocument: !Sub '{
               "Version": "2012-10-17",
               "Statement": [
                   {
-                      "Sid": "DocumentDBFullAccess",
+                      "Sid": "ActiveMQFullAccess",
                       "Effect": "Allow",
                       "Action": [
-                          "docdb:*",
-                          "docdb-elastic:*"
+                          "mq:*"
                       ],
                       "Resource": "*"
                   }
@@ -747,15 +730,7 @@ Resources:
                           "secretsmanager:PutSecretValue",
                           "secretsmanager:DescribeSecret"
                       ],
-                      "Resource": "${DocumentDBSecret}"
-                  },
-                  {
-                      "Effect": "Allow",
-                      "Action": [
-                          "secretsmanager:GetSecretValue",
-                          "secretsmanager:DescribeSecret"
-                      ],
-                      "Resource": "${DocumentDBTrustStoreSecret}"
+                      "Resource": "${ActiveMQSecret}"
                   }
               ]
           }'
@@ -817,73 +792,10 @@ Resources:
     Properties:
       InstanceProfileName: !Join
         - '-'
-        - - 'EC2DocumentDBProfile'
+        - - 'EC2ActiveMQProfile'
           - !Ref 'AWS::StackName'
       Roles:
         - !Ref EC2Role
-  
-  
-  # DocumentDB Subnet Group
-  DocumentDBSubnetGroup:
-    Type: AWS::DocDB::DBSubnetGroup
-    Properties:
-      DBSubnetGroupDescription: Subnet group for DocumentDB cluster
-      SubnetIds:
-        - !Ref PrivateSubnetDocDBOne
-        - !Ref PrivateSubnetDocDBTwo
-        - !Ref PrivateSubnetDocDBThree
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-docdb-subnet-group"
-
-  # DocumentDB Instance-Based Cluster
-  DocumentDBCluster:
-    Type: AWS::DocDB::DBCluster
-    Properties:
-      DBClusterIdentifier: !Sub "${AWS::StackName}-docdb-cluster"
-      MasterUsername: !Sub "{{resolve:secretsmanager:${DocumentDBSecret}:SecretString:username}}"
-      MasterUserPassword: !Sub "{{resolve:secretsmanager:${DocumentDBSecret}:SecretString:password}}"
-      EngineVersion: !Ref DocumentDBEngineVersion
-      DBSubnetGroupName: !Ref DocumentDBSubnetGroup
-      VpcSecurityGroupIds:
-        - !Ref DocumentDBSecurityGroup
-      BackupRetentionPeriod: 7
-      PreferredBackupWindow: "07:00-09:00"
-      PreferredMaintenanceWindow: "sun:09:00-sun:11:00"
-      StorageEncrypted: true
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-docdb-cluster"
-
-  DocumentDBInstance1:
-    Type: AWS::DocDB::DBInstance
-    Properties:
-      DBClusterIdentifier: !Ref DocumentDBCluster
-      DBInstanceClass: db.t3.medium
-      DBInstanceIdentifier: !Sub "${AWS::StackName}-docdb-instance-1"
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-docdb-instance-1"
-
-  DocumentDBInstance2:
-    Type: AWS::DocDB::DBInstance
-    Properties:
-      DBClusterIdentifier: !Ref DocumentDBCluster
-      DBInstanceClass: db.t3.medium
-      DBInstanceIdentifier: !Sub "${AWS::StackName}-docdb-instance-2"
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-docdb-instance-2"
-          
-  DocumentDBInstance3:
-    Type: AWS::DocDB::DBInstance
-    Properties:
-      DBClusterIdentifier: !Ref DocumentDBCluster
-      DBInstanceClass: db.t3.medium
-      DBInstanceIdentifier: !Sub "${AWS::StackName}-docdb-instance-3"
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-docdb-instance-31"
 
 Outputs:
   VPCId: 
@@ -896,51 +808,63 @@ Outputs:
     Value: !Ref 'PublicSubnetOne'
     Export:
       Name: !Sub "${AWS::StackName}-PublicSubnetOne"
-  PrivateSubnetDocDBOne: 
+  PrivateSubnetActiveMQOne: 
     Description: The ID of private subnet one created
-    Value: !Ref 'PrivateSubnetDocDBOne'
+    Value: !Ref 'PrivateSubnetActiveMQOne'
     Export:
-      Name: !Sub "${AWS::StackName}-PrivateSubnetDocDBOne"
-  PrivateSubnetDocDBTwo: 
+      Name: !Sub "${AWS::StackName}-PrivateSubnetActiveMQOne"
+  PrivateSubnetActiveMQTwo: 
     Description: The ID of private subnet two created
-    Value: !Ref 'PrivateSubnetDocDBTwo'
+    Value: !Ref 'PrivateSubnetActiveMQTwo'
     Export:
-      Name: !Sub "${AWS::StackName}-PrivateSubnetDocDBTwo"
-  PrivateSubnetDocDBThree: 
+      Name: !Sub "${AWS::StackName}-PrivateSubnetActiveMQTwo"
+  PrivateSubnetActiveMQThree: 
     Description: The ID of private subnet three created
-    Value: !Ref 'PrivateSubnetDocDBThree'
+    Value: !Ref 'PrivateSubnetActiveMQThree'
     Export:
-      Name: !Sub "${AWS::StackName}-PrivateSubnetDocDBThree"
+      Name: !Sub "${AWS::StackName}-PrivateSubnetActiveMQThree"
   VPCStackName: 
     Description: The name of the VPC Stack
     Value: !Ref 'AWS::StackName'
     Export:
       Name: !Sub "${AWS::StackName}-VPCStackName"
-  DocumentDBClusterEndpoint:
-    Description: DocumentDB Instance-Based Cluster Endpoint
-    Value: !GetAtt DocumentDBCluster.Endpoint
+  ActiveMQBrokerEndpoint1:
+    Description: ActiveMQ Broker OpenWire Endpoint
+    Value: !Select [0, !GetAtt ActiveMQBroker.OpenWireEndpoints]
     Export:
-      Name: !Sub "${AWS::StackName}-DocumentDBClusterEndpoint"
-  DocumentDBSecretArn:
-    Description: ARN of the DocumentDB credentials secret
-    Value: !Ref DocumentDBSecret
+      Name: !Sub "${AWS::StackName}-ActiveMQBrokerEndpoint1"
+  ActiveMQBrokerEndpoint2:
+    Description: ActiveMQ Broker OpenWire Endpoint
+    Value: !Select [1, !GetAtt ActiveMQBroker.OpenWireEndpoints]
     Export:
-      Name: !Sub "${AWS::StackName}-DocumentDBSecretArn"
+      Name: !Sub "${AWS::StackName}-ActiveMQBrokerEndpoint2"
+  ActiveMQBrokerConsoleURL:
+    Description: ActiveMQ Broker Web Console URL
+    Value: !Sub 
+      - "https://${endpoint}"
+      - endpoint: !Select [0, !GetAtt ActiveMQBroker.IpAddresses]
+    Export:
+      Name: !Sub "${AWS::StackName}-ActiveMQBrokerConsoleURL"
+  ActiveMQSecretArn:
+    Description: ARN of the ActiveMQ credentials secret
+    Value: !Ref ActiveMQSecret
+    Export:
+      Name: !Sub "${AWS::StackName}-ActiveMQSecretArn"
   SecurityGroupId:
-    Description: ID of security group for DocumentDB clients
-    Value: !GetAtt DocumentDBSecurityGroup.GroupId
+    Description: ID of security group for ActiveMQ clients
+    Value: !GetAtt ActiveMQSecurityGroup.GroupId
     Export:
       Name: !Sub "${AWS::StackName}-SecurityGroupId"
   EC2InstanceEndpointID:
     Description: The ID of the EC2 Instance Endpoint
     Value: !Ref EC2InstanceEndpoint
-  DocumentDBDatabaseName:
-    Description: The Database name to use for the Java Lambda Function
-    Value: !Ref DocumentDBDatabaseName
+  ActiveMQBrokerName:
+    Description: The Broker name to use for the Java Lambda Function
+    Value: !Ref ActiveMQBrokerName
     Export:
-      Name: !Sub "${AWS::StackName}-DocumentDBDatabaseName"
-  DocumentDBCollectionName:
-    Description: The Collection name to use for the Java Lambda Function
-    Value: !Ref DocumentDBCollectionName
+      Name: !Sub "${AWS::StackName}-ActiveMQBrokerName"
+  ActiveMQQueueName:
+    Description: The Queue name to use for the Java Lambda Function
+    Value: !Ref ActiveMQQueueName
     Export:
-      Name: !Sub "${AWS::StackName}-DocumentDBCollectionName"
+      Name: !Sub "${AWS::StackName}-ActiveMQQueueName"

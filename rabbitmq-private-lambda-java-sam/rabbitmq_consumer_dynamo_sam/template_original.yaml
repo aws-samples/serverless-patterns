@@ -38,14 +38,12 @@ Resources:
           Properties:
             BatchSize: 10
             MaximumBatchingWindowInSeconds: 5
-            Broker:
-              !Join ['', ["arn:", "aws:", "mq:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "broker:", !Ref RabbitMQBrokerName, ":", !Ref RabbitMQBrokerUniqueString]]
+            Broker: !Ref RabbitMQBrokerArn
             Queues:
               - !Ref RabbitMQQueue
             SourceAccessConfigurations:
               - Type: BASIC_AUTH
-                URI:
-                  !Join ['', ["arn:", "aws:", "secretsmanager:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "secret:", !Ref SecretsManagerSecretForMQName, "-", !Ref SecretsManagerSecretForMQUniqueString]]
+                URI: !Ref SecretsManagerSecretForMQ
               - Type: VIRTUAL_HOST
                 URI: !Ref RabbitMQVirtualHost
             
@@ -92,36 +90,38 @@ Resources:
         Name: MessageID
         Type: String
 Parameters:  
-  RabbitMQBrokerName:
+  RabbitMQBrokerArn:
     Type: String
-    Description: Enter the name of the RabbitMQBroker that is part of the ARN
-  RabbitMQBrokerUniqueString:
-    Type: String
-    Description: Enter the unique string of the RabbitMQBroker after the broker name in the ARN
+    Description: Enter the ARN of the ActiveMQBroker
+    Default: RABBITMQ_BROKER_ARN
   RabbitMQVirtualHost:
     Type: String
     Description: Enter the name of the RabbitMQ virtualhost from which the lambda function will consume messages
+    Default: RABBITMQ_VIRTUAL_HOST
   RabbitMQQueue:
     Type: String
     Description: Enter the name of the RabbitMQ queue from which the lambda function will consume messages
-  SecretsManagerSecretForMQName:
+    Default: RABBITMQ_QUEUE_NAME
+  SecretsManagerSecretForMQ:
     Type: String
-    Description: Enter the name of the secret that has username/password for Rabbit MQ
-  SecretsManagerSecretForMQUniqueString:
-    Type: String
-    Description: Enter the unique string of the secret that has username/password for Rabbit MQ
+    Description: Enter the ARN of the secret that has username/password for Rabbit MQ
+    Default: RABBITMQ_SECRET_ARN
   Subnet1:
     Type: String
     Description: The first of the three private subnets in the RabbitMQ broker's VPC
+    Default: RABBITMQ_SUBNET_ONE
   Subnet2:
     Type: String
     Description: The second of the three private subnets in the RabbitMQ broker's VPC
+    Default: RABBITMQ_SUBNET_TWO
   Subnet3:
     Type: String
     Description: The third of the three private subnets in the RabbitMQ broker's VPC
+    Default: Default: RABBITMQ_SUBNET_THREE
   SecurityGroup:
     Type: String
     Description: The security group associated with this function (use same RabbitMQ)
+    Default: RABBITMQ_SECURITY_GROUP
 Outputs:
   LambdaRabbitMQConsumerJavaFunction:
     Description: "Queue Consumer Lambda Function ARN"
