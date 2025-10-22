@@ -1,0 +1,9 @@
+#!/bin/bash
+
+curl -i -u RABBITMQ_BROKER_ADMIN_USER:RABBITMQ_BROKER_PASSWORD -X PUT RABBITMQ_HTTPS_BROKER_ENDPOINT/api/vhosts/RABBITMQ_VIRTUAL_HOST
+            
+curl -i -u RABBITMQ_BROKER_ADMIN_USER:RABBITMQ_BROKER_PASSWORD -X PUT -H "Content-type: application/json" -d '{"type": "fanout", "durable": true, "auto_delete": false, "internal": false}' RABBITMQ_HTTPS_BROKER_ENDPOINT/api/exchanges/RABBITMQ_VIRTUAL_HOST/RABBITMQ_EXCHANGE
+            
+curl -i -u RABBITMQ_BROKER_ADMIN_USER:RABBITMQ_BROKER_PASSWORD -X PUT -H "Content-type: application/json" -d '{"durable": true, "auto_delete": false}' RABBITMQ_HTTPS_BROKER_ENDPOINT/api/queues/RABBITMQ_VIRTUAL_HOST/RABBITMQ_QUEUE_NAME
+            
+curl -i -u RABBITMQ_BROKER_ADMIN_USER:RABBITMQ_BROKER_PASSWORD -X POST -H "Content-type: application/json" -d '{"routing_key": "RABBITMQ_EXCHANGE-RABBITMQ_QUEUE_NAME"}' RABBITMQ_HTTPS_BROKER_ENDPOINT/api/bindings/RABBITMQ_VIRTUAL_HOST/e/RABBITMQ_EXCHANGE/q/RABBITMQ_QUEUE_NAME
