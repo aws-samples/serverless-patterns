@@ -614,33 +614,13 @@ Resources:
             sed -i "s/RABBITMQ_SUBNET_TWO/$RABBITMQ_SUBNET_TWO/g" template.yaml
             sed -i "s/RABBITMQ_SUBNET_THREE/$RABBITMQ_SUBNET_THREE/g" template.yaml
             sed -i "s/SECURITY_GROUP/$SECURITY_GROUP/g" template.yaml
-            
-            original_broker_endpoint="${rabbitmq_broker_endpoint}"
-
-            amqps_prefix="amqps://"
-
-            # Remove the prefix from the beginning of the string
-            broker_endpoint_without_amqps="${original_broker_endpoint#$amqps_prefix}"
-
-            # Print the result
-            echo "original_broker_endpoint: $original_broker_endpoint"
-            echo "broker_endpoint_without_amqps: $broker_endpoint_without_amqps"
-
-            suffix=":5671"
-            broker_endpoint_without_port="${broker_endpoint_without_amqps%${suffix}}"
-            echo "broker_endpoint_without_port: $broker_endpoint_without_port"
-            
-            https_prefix="https://"
-
-            rabbitmq_https_broker_endpoint="$https_prefix$broker_endpoint_without_port"
-            echo "rabbitmq_https_broker_endpoint=$rabbitmq_https_broker_endpoint"
-            
+                        
             #Update Shell script for sending RabbitMQ messages to Lambda function
             cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam/rabbitmq_message_sender_json
             sudo chown ec2-user ./commands.sh
             source /home/ec2-user/.bash_profile
             echo "RABBITMQ_BROKER_ENDPOINT=${rabbitmq_broker_endpoint}" 
-            sed -i "s|RABBITMQ_BROKER_ENDPOINT|$broker_endpoint_without_port|g" commands.sh
+            sed -i "s|RABBITMQ_BROKER_ENDPOINT|${rabbitmq_broker_endpoint}|g" commands.sh
             sed -i "s/RABBITMQ_QUEUE_NAME/$RABBITMQ_QUEUE_NAME/g" commands.sh
             sed -i "s/RABBITMQ_VIRTUAL_HOST/$RABBITMQ_VIRTUAL_HOST/g" commands.sh
             sed -i "s/RABBITMQ_EXCHANGE/$RABBITMQ_EXCHANGE/g" commands.sh
@@ -650,7 +630,7 @@ Resources:
             cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam
             sudo chown ec2-user ./create_rabbit_queue.sh
             source /home/ec2-user/.bash_profile
-            sed -i "s|RABBITMQ_HTTPS_BROKER_ENDPOINT|$rabbitmq_https_broker_endpoint|g" create_rabbit_queue.sh
+            sed -i "s|RABBITMQ_BROKER_ENDPOINT|${rabbitmq_broker_endpoint}|g" create_rabbit_queue.sh
             sed -i "s/RABBITMQ_QUEUE_NAME/$RABBITMQ_QUEUE_NAME/g" create_rabbit_queue.sh
             sed -i "s/RABBITMQ_VIRTUAL_HOST/$RABBITMQ_VIRTUAL_HOST/g" create_rabbit_queue.sh
             sed -i "s/RABBITMQ_EXCHANGE/$RABBITMQ_EXCHANGE/g" create_rabbit_queue.sh
