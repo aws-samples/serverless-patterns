@@ -117,11 +117,11 @@ Parameters:
   Subnet3:
     Type: String
     Description: The third of the three private subnets in the RabbitMQ broker's VPC
-    Default: Default: RABBITMQ_SUBNET_THREE
+    Default: RABBITMQ_SUBNET_THREE
   SecurityGroup:
     Type: String
     Description: The security group associated with this function (use same RabbitMQ)
-    Default: RABBITMQ_SECURITY_GROUP
+    Default: SECURITY_GROUP
 Outputs:
   LambdaRabbitMQConsumerJavaFunction:
     Description: "Queue Consumer Lambda Function ARN"

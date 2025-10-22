@@ -636,6 +636,8 @@ Resources:
             sed -i "s/RABBITMQ_EXCHANGE/$RABBITMQ_EXCHANGE/g" create_rabbit_queue.sh
             sed -i "s/RABBITMQ_BROKER_ADMIN_USER/$RABBITMQ_BROKER_ADMIN_USER/g" create_rabbit_queue.sh
             sed -i "s/RABBITMQ_BROKER_PASSWORD/$RABBITMQ_BROKER_PASSWORD/g" create_rabbit_queue.sh
+            
+            sh ./create_rabbit_queue.sh
                                    
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -836,6 +838,11 @@ Outputs:
     Value: !GetAtt RabbitMQSecurityGroup.GroupId
     Export:
       Name: !Sub "${AWS::StackName}-SecurityGroupId"
+  ClientSecurityGroupId:
+    Description: ID of security group for RabbitMQ clients
+    Value: !GetAtt RabbitMQClientInstanceSecurityGroup.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}-ClientSecurityGroupId"
   EC2InstanceEndpointID:
     Description: The ID of the EC2 Instance Endpoint
     Value: !Ref EC2InstanceEndpoint
