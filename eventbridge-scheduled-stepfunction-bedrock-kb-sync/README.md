@@ -1,6 +1,6 @@
-# Bedrock Knowledge Base Synchronization Flow with EventBridge Scheduler 
+# Amazon Bedrock Knowledge Base Synchronization Flow with EventBridge Scheduler 
 
-This pattern demonstrates an automated synchronization process for Amazon Bedrock Knowledge Bases using EventBridge Scheduler and Step Functions. The solution enables periodic synchronization of data sources, ensuring your Knowledge Base stays up-to-date with the latest content.
+This pattern demonstrates an automated synchronization process for Amazon Bedrock Knowledge Bases using Amazon EventBridge Scheduler and AWS Step Functions. The solution enables periodic synchronization of data sources, ensuring your Knowledge Base stays up-to-date with the latest content.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-scheduled-stepfunction-bedrock-kb-sync
 
@@ -53,13 +53,13 @@ KbInfraStack
 
 Here's a detailed summary of your serverless pattern for automated Knowledge Base synchronization:
 
-Pattern Overview: This is a scheduled, serverless workflow that automates the synchronization of Bedrock Knowledge Bases using AWS EventBridge Scheduler, AWS Step Functions, and Amazon Bedrock.
+Pattern Overview: This is a scheduled, serverless workflow that automates the synchronization of Amazon Bedrock Knowledge Bases using AWS EventBridge Scheduler, AWS Step Functions, and Amazon Bedrock.
 
 Key Components:
     a) EventBridge Scheduler
         - Runs every 15 minutes
         - Triggers the Step Function workflow
-        - Passes Bedrock Knowledge Base ID as input parameter
+        - Passes Amazon Bedrock Knowledge Base ID as input parameter
         - Enables consistent and automated synchronization
 
     b) Step Functions Workflow
@@ -92,7 +92,7 @@ Key Components:
 
 ## Testing
 
-Step 1: Upload Sample Documents to S3
+Step 1: Upload Sample Documents to Amazon S3
         - Navigate to Amazon S3 in AWS Console
         - Locate the bucket named kb-data-source-{account-id}
         - Upload your sample documents to this bucket
@@ -104,11 +104,11 @@ Step 2: Wait for Scheduler Execution
 
 Step 3: Monitor Step Function Execution
         - Navigate to AWS Step Functions console
-        - Find your state machine execution
+        - Locate the state machine execution named KnowledgeBaseSyncStateMachine
         - Monitor the workflow progress through different states
         - Verify successful completion of all steps
 
-Step 4: Verify Sync Status in Bedrock
+Step 4: Verify Sync Status in Amazon Bedrock
         - Go to Amazon Bedrock console
         - Navigate to Knowledge Bases
         - Select your Knowledge Base

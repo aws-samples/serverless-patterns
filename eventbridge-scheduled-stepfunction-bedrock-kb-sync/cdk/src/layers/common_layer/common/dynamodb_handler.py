@@ -108,24 +108,6 @@ class DynamoDBHandler:
         log.debug("Result after Get Item: %s", item)
         return item
 
-    # def delete_item(self, part_key: str, sort_key: str):
-    #     """Delete item from dynamodb table"""
-    #     try:
-    #         self.dynamodb_table.delete_item(
-    #             Key={PART_KEY_NAME: part_key, SORT_KEY_NAME: sort_key},
-    #             ConditionExpression=Key(PART_KEY_NAME).eq(part_key) & Key(SORT_KEY_NAME).eq(sort_key),
-    #         )
-    #     except self.dynamodb_table.meta.client.exceptions.ConditionalCheckFailedException:
-    #         return {"Status": "Success", "detail": "Permission already removed"}
-    #     return {"Status": "Success", "detail": "Permission Deleted"}
-
-    # def delete_item_by_list(self, item_list: list, part_key: str = ItemTypes.GIT_HUB):
-    #     with self.dynamodb_table.batch_writer() as batch:
-    #         for item_key in item_list:
-    #             item_key[PART_KEY_NAME] = part_key
-    #             batch.delete_item(Key=item_key)
-    #     return {"Status": "Success", "detail": f"{len(item_list)} Permission(s) Deleted"}
-
     def put_item(self, item: dict, schema: Schema = ITEM_SCHEMA):
         """Validate the request body against the schema, Then create a new item in the auth api table."""
         item["CreatedAt"] = str(time.time())

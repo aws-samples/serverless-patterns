@@ -88,7 +88,6 @@ class OpenSearchServerlessStack(Stack):
                             {"ResourceType": "dashboard", "Resource": [f"collection/{self.collection_name}"]},
                         ],
                         "AllowFromPublic": True,
-                        # "SourceServices": ["bedrock.amazonaws.com"],
                     }
                 ]
             ),

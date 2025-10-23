@@ -18,7 +18,7 @@ class KbRoleStack(Stack):
         region = Stack.of(self).region
         partition = Stack.of(self).partition
         kb_role_name = params["kb_role_name"]
-        kb_source_bucket = f"kb-data-source-{account_id}"
+        kb_source_bucket = f"kb-data-source-1-{account_id}"
         kb_source_bucket_arn = f"arn:{partition}:s3:::{kb_source_bucket}"
 
         intermediate_bucket_name = f"{params['intermediate_bucket_name']}-{account_id}"
