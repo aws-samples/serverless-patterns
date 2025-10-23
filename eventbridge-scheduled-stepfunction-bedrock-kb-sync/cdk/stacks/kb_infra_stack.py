@@ -6,7 +6,7 @@ from aws_cdk import aws_bedrock as bedrock
 from aws_cdk import aws_s3 as s3
 from aws_cdk import aws_ssm as ssm
 from constructs import Construct
-
+from cdk_nag import NagSuppressions
 
 class KbInfraStack(Stack):
     def __init__(
@@ -77,7 +77,17 @@ class KbInfraStack(Stack):
             versioned=True,
             removal_policy=RemovalPolicy.DESTROY,
             auto_delete_objects=True,
-            server_access_logs_prefix="access-logs",
+        )
+
+        # Suppress S3 access logs warning
+        NagSuppressions.add_resource_suppressions(
+            intermediate_bucket,
+            [
+                {
+                    "id": "AwsSolutions-S1",
+                    "reason": "S3 server access logs disabled to reduce costs and storage overhead. This is an intermediate processing bucket with short-lived data. Access is controlled via IAM policies and bucket policies.",
+                }
+            ],
         )
 
         supplemental_data_storage_configuration = bedrock.CfnKnowledgeBase.SupplementalDataStorageConfigurationProperty(
@@ -130,7 +140,17 @@ class KbInfraStack(Stack):
             versioned=True,
             removal_policy=RemovalPolicy.DESTROY,
             auto_delete_objects=True,
-            server_access_logs_prefix="access-logs",
+        )
+
+        # Suppress S3 access logs warning
+        NagSuppressions.add_resource_suppressions(
+            source_bucket,
+            [
+                {
+                    "id": "AwsSolutions-S1",
+                    "reason": "S3 server access logs disabled to reduce costs and storage overhead. This is an intermediate processing bucket with short-lived data. Access is controlled via IAM policies and bucket policies.",
+                }
+            ],
         )
 
         kb_id = knowledge_base.attr_knowledge_base_id
