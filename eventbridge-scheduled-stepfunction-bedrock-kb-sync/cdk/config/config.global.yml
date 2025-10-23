@@ -1,4 +1,4 @@
-intermediate_bucket_name: multi-modal-knowledge-base-1
+intermediate_bucket_name: multi-modal-knowledge-base
 embedding_model_id: amazon.titan-embed-text-v2:0
 kb_role_name: kb-execution-role
 kb_chunk_max_size: 500
