@@ -14,8 +14,9 @@ from aws_cdk import aws_ssm as ssm
 from aws_cdk import aws_stepfunctions as sfn
 from aws_cdk import aws_stepfunctions_tasks as tasks
 from constructs import Construct
+from cdk_nag import NagSuppressions
 
-LAMBDA_RUNTIME = _lambda.Runtime.PYTHON_3_9
+LAMBDA_RUNTIME = _lambda.Runtime.PYTHON_3_13
 STACK_RESOURCE_PREFIX = "KbSyncPipeline"
 
 
@@ -65,37 +66,61 @@ class KbSyncPipelineStack(Stack):
         self.create_sync_schedule()
 
     def create_lambda_execution_role(self) -> iam.Role:
-        return iam.Role(
+        role = iam.Role(
             self,
             gen_logical_id("KBLambdaExecRole"),
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
             role_name="kb-sync-handler-exec-role",
-            description="Lambda Exec Role for Handling Citation Metadata update",
-            managed_policies=[
-                iam.ManagedPolicy(
-                    self,
-                    gen_logical_id("BedrockExecPolicy"),
-                    managed_policy_name="kb-sync-handler-exec-policy",
-                    description="Bedrock Sync execution policies",
-                    statements=[
-                        iam.PolicyStatement(
-                            sid="CloudwatchPermissions",
-                            effect=iam.Effect.ALLOW,
-                            actions=["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-                            resources=["*"],
-                        ),
-                        iam.PolicyStatement(
-                            sid="KBPermissions",
-                            effect=iam.Effect.ALLOW,
-                            actions=["bedrock:ListDataSources", "bedrock:StartIngestionJob", "bedrock:GetIngestionJob"],
-                            resources=[
-                                f"arn:{self.aws_partition}:bedrock:{self.aws_region}:{self.account_id}:knowledge-base/{self.kb_id}",
-                            ],
-                        ),
-                    ],
-                ),
-            ],
+            description="Lambda Exec Role for Handling KB Sync Operations",
         )
+
+        # Specific CloudWatch Logs permissions
+        role.add_to_policy(
+            iam.PolicyStatement(
+                sid="CloudwatchLogsPermissions",
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                ],
+                resources=[
+                    f"arn:{self.aws_partition}:logs:{self.aws_region}:{self.account_id}:log-group:/aws/lambda/kb-*",
+                    f"arn:{self.aws_partition}:logs:{self.aws_region}:{self.account_id}:log-group:/aws/lambda/kb-*:*",
+                ],
+            )
+        )
+
+        # Specific Bedrock KB permissions
+        role.add_to_policy(
+            iam.PolicyStatement(
+                sid="BedrockKBPermissions",
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "bedrock:ListDataSources",
+                    "bedrock:StartIngestionJob",
+                    "bedrock:GetIngestionJob",
+                ],
+                resources=[
+                    f"arn:{self.aws_partition}:bedrock:{self.aws_region}:{self.account_id}:knowledge-base/{self.kb_id}",
+                    f"arn:{self.aws_partition}:bedrock:{self.aws_region}:{self.account_id}:knowledge-base/{self.kb_id}/*",
+                ],
+            )
+        )
+
+        # Add suppressions for necessary wildcards
+        NagSuppressions.add_resource_suppressions(
+            role,
+            [
+                {
+                    "id": "AwsSolutions-IAM5",
+                    "reason": "CloudWatch Logs requires wildcard for log stream creation within specific log groups. Scoped to kb-* Lambda functions only."
+                }
+            ],
+            apply_to_children=True,
+        )
+
+        return role
 
     def create_list_kb_lambda(self) -> _lambda.Function:
 
@@ -104,25 +129,39 @@ class KbSyncPipelineStack(Stack):
             gen_logical_id("ListRequestHandlerLambdaExecRole"),
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
             role_name="list-kb-lambda-exec-role",
-            description="Lambda Exec Role for Handling Citation update",
-            managed_policies=[
-                iam.ManagedPolicy(
-                    self,
-                    gen_logical_id("DBExecPolicy"),
-                    managed_policy_name="list-kb-lambda-exec-policy",
-                    description="Dynamodb Sync execution policies",
-                    statements=[
-                        iam.PolicyStatement(
-                            sid="CloudwatchPermissions",
-                            effect=iam.Effect.ALLOW,
-                            actions=["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-                            resources=["*"],
-                        ),
-                    ],
-                ),
-            ],
+            description="Lambda Exec Role for KB List Handler",
         )
-        return _lambda.Function(
+
+        # Specific CloudWatch Logs permissions
+        list_lambda_execution_role.add_to_policy(
+            iam.PolicyStatement(
+                sid="CloudwatchLogsPermissions",
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                ],
+                resources=[
+                    f"arn:{self.aws_partition}:logs:{self.aws_region}:{self.account_id}:log-group:/aws/lambda/kb-list-request-handler",
+                    f"arn:{self.aws_partition}:logs:{self.aws_region}:{self.account_id}:log-group:/aws/lambda/kb-list-request-handler:*",
+                ],
+            )
+        )
+
+        # Add suppressions
+        NagSuppressions.add_resource_suppressions(
+            list_lambda_execution_role,
+            [
+                {
+                    "id": "AwsSolutions-IAM5",
+                    "reason": "CloudWatch Logs requires wildcard for log stream creation. Scoped to specific Lambda function log group.",
+                }
+            ],
+            apply_to_children=True,
+        )
+
+        function = _lambda.Function(
             self,
             id=gen_logical_id("KnowledgeBaseListRequestFunction"),
             function_name="kb-list-request-handler",
@@ -138,14 +177,12 @@ class KbSyncPipelineStack(Stack):
             handler="index.handler",
             layers=[self.common_lambda_layer],
             environment={
-                "KNOWLEDGE_BASE_IDS": json.dumps(
-                    [
-                        self.kb_id,
-                    ]
-                ),
+                "KNOWLEDGE_BASE_IDS": json.dumps([self.kb_id]),
             },
             timeout=Duration.seconds(300),
         )
+
+        return function
 
     def create_list_datasources_lambda(self) -> _lambda.Function:
         return _lambda.Function(
@@ -261,7 +298,7 @@ class KbSyncPipelineStack(Stack):
             retention=logs.RetentionDays.THREE_MONTHS,
         )
 
-        return sfn.StateMachine(
+        state_machine = sfn.StateMachine(
             self,
             "KnowledgeBaseSyncStateMachine",
             state_machine_name="KnowledgeBaseSyncStateMachine",
@@ -271,6 +308,30 @@ class KbSyncPipelineStack(Stack):
             timeout=Duration.hours(1),  # FAIL ME After 1 hour
             tracing_enabled=True,
         )
+                # Add suppressions for Lambda ARN wildcards (CDK auto-generates these)
+        NagSuppressions.add_resource_suppressions(
+            state_machine,
+            [
+                {
+                    "id": "AwsSolutions-IAM5",
+                    "reason": "Step Functions requires wildcard permissions to invoke Lambda function versions and aliases. This is a CDK-generated policy and follows AWS best practices for Step Functions Lambda integration.",
+                    "appliesTo": [
+                        "Resource::<KbSyncPipelineKnowledgeBaseListRequestFunctionF2ADAB6C.Arn>:*",
+                        "Resource::<KbSyncPipelineListDataSourcesFunctionB35719E6.Arn>:*",
+                        "Resource::<KbSyncPipelineStartSyncFunction4D3412CD.Arn>:*",
+                        "Resource::<KbSyncPipelineSyncStatusCheckFunction7B2E9B12.Arn>:*",
+                    ],
+                },
+                {
+                    "id": "AwsSolutions-IAM5",
+                    "reason": "Step Functions requires permissions for X-Ray tracing across all resources. This is required for distributed tracing and follows AWS Step Functions best practices.",
+                    "appliesTo": ["Resource::*"],
+                },
+            ],
+            apply_to_children=True,
+        )
+
+        return state_machine
 
     def create_sync_schedule(self):
         # Create EventBridge rule to trigger Step Function

@@ -106,29 +106,6 @@ kb_sync_pipeline_stack.add_dependency(common_lambda_layer_stack)
 
 
 cdk.Aspects.of(app).add(AwsSolutionsChecks())
-# Suppress the AwsSolutions-* where remediation is already applied and recommendation is out of use case scope
-
-NagSuppressions.add_stack_suppressions(
-    kb_role_stack,
-    [
-        {
-            "id": "AwsSolutions-IAM5",
-            "reason": "The IAM user, role, or group uses AWS managed policies",
-        },
-    ],
-    apply_to_nested_stacks=True,
-)
-
-NagSuppressions.add_stack_suppressions(
-    kb_infra_stack,
-    [
-        {
-            "id": "AwsSolutions-IAM5",
-            "reason": "The IAM user, role, or group uses AWS managed policies",
-        },
-    ],
-    apply_to_nested_stacks=True,
-)
 
 NagSuppressions.add_stack_suppressions(
     vector_infra_stack,
@@ -149,38 +126,4 @@ NagSuppressions.add_stack_suppressions(
     apply_to_nested_stacks=True,
 )
 
-NagSuppressions.add_stack_suppressions(
-    kb_sync_pipeline_stack,
-    [
-        {
-            "id": "AwsSolutions-IAM4",
-            "reason": "The IAM user, role, or group uses AWS managed policies",
-        },
-        {
-            "id": "AwsSolutions-IAM5",
-            "reason": "The IAM user, role, or group uses AWS managed policies",
-        },
-        {
-            "id": "AwsSolutions-L1",
-            "reason": "The non-container Lambda function is not configured to use the latest runtime version",
-        },
-        {
-            "id": "AwsSolutions-APIG4",
-            "reason": "APIGW Methods will use IAM Authorizor eventually",
-        },
-        {
-            "id": "AwsSolutions-COG4",
-            "reason": "APIGW Methods will use IAM Authorizor eventually",
-        },
-        {
-            "id": "AwsSolutions-APIG6",
-            "reason": "Logging will be added eventually eventually",
-        },
-        {
-            "id": "AwsSolutions-APIG2",
-            "reason": "Fast API will validate the requests",
-        },
-    ],
-    apply_to_nested_stacks=True,
-)
 app.synth()

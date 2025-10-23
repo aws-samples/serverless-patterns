@@ -15,18 +15,6 @@
 aws configure
 ```
 
-### Setup Git Defender Exception
-
-To avoid Git Defender Exception exceptions,
-add the following to your file `.git/config`:
-
-```
-[secrets]
-	providers = git secrets --aws-provider
-	patterns = (\"|')?(AWS|aws|Aws)?_?(ACCOUNT|account|Account)_?(ID|id|Id)?(\"|')?\\s*(:|=>|=)\\s*(\"|')?[0-9]{4}\\-?[0-9]{4}\\-?[0-9]{4}(\"|')?
-	allowed = (\"|')?(AWS|aws|Aws)?_?(ACCOUNT|account|Account)_?(ID|id|Id)?(\"|')?\\s*(:|=>|=)\\s*(\"|')?[0-9]{4}\\-?[0-9]{4}\\-?[0-9]{4}(\"|')?
-```
-
 ## Setup local developer environment and dependencies:
 
 ```

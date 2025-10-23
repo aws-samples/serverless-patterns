@@ -11,5 +11,4 @@ bootstrap_util upgrade_pip_version
 bootstrap_util install_common_tools 
 # Optionally pass requirements file label and path (without the extension) e.g "project" "requirements"
 bootstrap_util install_python_dependencies 
-bootstrap_util setup_pre_commit
 bootstrap_util bootstrap_complete

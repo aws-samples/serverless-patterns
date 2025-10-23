@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
-bedrock = boto3.client("bedrock-agent", "us-west-2")
+bedrock = boto3.client("bedrock-agent")
 
 
 def handler(event, context):

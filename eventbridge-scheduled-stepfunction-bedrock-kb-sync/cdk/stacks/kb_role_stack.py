@@ -2,7 +2,7 @@ from aws_cdk import Stack
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_ssm as ssm
 from constructs import Construct
-
+from cdk_nag import NagSuppressions
 
 class KbRoleStack(Stack):
     def __init__(
@@ -110,6 +110,18 @@ class KbRoleStack(Stack):
             },
         )
 
+        
+        # Add suppressions for necessary wildcards
+        NagSuppressions.add_resource_suppressions(
+            kb_role,
+            [
+                {
+                    "id": "AwsSolutions-IAM5",
+                    "reason": "CloudWatch Logs requires wildcard for log stream creation within specific log groups. Scoped to kb-* Lambda functions only."
+                }
+            ],
+            apply_to_children=True,
+        )
         # Create an SSM parameter which stores export values
         ssm.StringParameter(
             self,

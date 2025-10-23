@@ -141,24 +141,6 @@ EOL
         echo -e "${red} To fix this, please define the path to adf-build/shared via ADF_BUILD_HOME environment variable.${reset}"
         exit 1    
     }
-    # shellcheck disable=SC2317
-    setup_pre_commit(){
-        # Install pre-commit hook and git defender
-        echo "🪝 Installing pre-commit hook "
-        if command -v git-defender &> /dev/null; then
-            echo "🔒 Git Defender Tool Detected!"
-            git defender --install
-            git defender -v --precommit_tool_setup
-
-            # Need to run this to install commit-msg type hooks (not installed via git defender)
-            git config --system --unset-all core.hookspath
-        else
-            echo "No Git Defender Detected"
-            pre-commit install --hook-type commit-msg
-        fi
-
-        pre-commit validate-config
-    }
 
     # shellcheck disable=SC2317
     install_common_tools(){
