@@ -100,6 +100,158 @@ cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam
 sh ./query_rabbit_queue.sh
 ```
 
+The response from running this script will be something like this if all the commands from the create_rabbit_queue.sh ran properly
+
+```
+original_broker_endpoint: amqps://b-55617af0-19ff-4939-8702-e5a508977c0b.mq.us-west-2.on.aws:5671
+broker_endpoint_without_amqps: b-55617af0-19ff-4939-8702-e5a508977c0b.mq.us-west-2.on.aws:5671
+broker_endpoint_without_port: b-55617af0-19ff-4939-8702-e5a508977c0b.mq.us-west-2.on.aws
+rabbitmq_https_broker_endpoint=https://b-55617af0-19ff-4939-8702-e5a508977c0b.mq.us-west-2.on.aws
+########## Begin verifying if Virtual Host has been created ##########
+{
+  "name": "RabbitMQVirtualHost",
+  "description": "",
+  "tags": [],
+  "default_queue_type": "undefined",
+  "metadata": {
+    "description": "",
+    "tags": []
+  },
+  "tracing": false,
+  "cluster_state": {
+    "rabbit@ip-10-0-12-186.us-west-2.compute.internal": "running",
+    "rabbit@ip-10-0-28-241.us-west-2.compute.internal": "running",
+    "rabbit@ip-10-0-20-83.us-west-2.compute.internal": "running"
+  },
+  "messages_ready": 0,
+  "messages_ready_details": {
+    "rate": 0.0
+  },
+  "messages_unacknowledged": 0,
+  "messages_unacknowledged_details": {
+    "rate": 0.0
+  },
+  "messages": 0,
+  "messages_details": {
+    "rate": 0.0
+  }
+}
+########## End verifying if Virtual Host has been created ##########
+########## Begin verifying if Exchange has been created ##########
+{
+  "arguments": {},
+  "auto_delete": false,
+  "durable": true,
+  "incoming": [],
+  "internal": false,
+  "name": "RabbitMQExchange",
+  "outgoing": [],
+  "type": "fanout",
+  "user_who_performed_action": "rabbitmqadmin",
+  "vhost": "RabbitMQVirtualHost"
+}
+########## End verifying if Exchange has been created ##########
+########## Begin verifying if Queue has been created ##########
+{
+  "consumer_details": [],
+  "arguments": {},
+  "auto_delete": false,
+  "consumer_capacity": 0,
+  "consumer_utilisation": 0,
+  "consumers": 0,
+  "deliveries": [],
+  "durable": true,
+  "effective_policy_definition": {
+    "ha-mode": "all",
+    "ha-sync-mode": "automatic",
+    "queue-version": 2
+  },
+  "exclusive": false,
+  "exclusive_consumer_tag": null,
+  "garbage_collection": {
+    "fullsweep_after": 65535,
+    "max_heap_size": 0,
+    "min_bin_vheap_size": 46422,
+    "min_heap_size": 233,
+    "minor_gcs": 6
+  },
+  "head_message_timestamp": null,
+  "idle_since": "2025-10-25T01:46:54.843+00:00",
+  "incoming": [],
+  "memory": 6768,
+  "message_bytes": 0,
+  "message_bytes_paged_out": 0,
+  "message_bytes_persistent": 0,
+  "message_bytes_ram": 0,
+  "message_bytes_ready": 0,
+  "message_bytes_unacknowledged": 0,
+  "messages": 0,
+  "messages_details": {
+    "rate": 0.0
+  },
+  "messages_paged_out": 0,
+  "messages_persistent": 0,
+  "messages_ram": 0,
+  "messages_ready": 0,
+  "messages_ready_details": {
+    "rate": 0.0
+  },
+  "messages_ready_ram": 0,
+  "messages_unacknowledged": 0,
+  "messages_unacknowledged_details": {
+    "rate": 0.0
+  },
+  "messages_unacknowledged_ram": 0,
+  "name": "RabbitMQJavaLambdaQueue",
+  "node": "rabbit@ip-10-0-12-186.us-west-2.compute.internal",
+  "operator_policy": "default_operator_policy_AWS_managed",
+  "policy": "ha-all-AWS-OWNED-DO-NOT-DELETE",
+  "recoverable_slaves": [
+    "rabbit@ip-10-0-28-241.us-west-2.compute.internal",
+    "rabbit@ip-10-0-20-83.us-west-2.compute.internal"
+  ],
+  "reductions": 46934,
+  "reductions_details": {
+    "rate": 0.0
+  },
+  "single_active_consumer_tag": null,
+  "slave_nodes": [
+    "rabbit@ip-10-0-28-241.us-west-2.compute.internal",
+    "rabbit@ip-10-0-20-83.us-west-2.compute.internal"
+  ],
+  "state": "running",
+  "storage_version": 2,
+  "synchronised_slave_nodes": [
+    "rabbit@ip-10-0-28-241.us-west-2.compute.internal",
+    "rabbit@ip-10-0-20-83.us-west-2.compute.internal"
+  ],
+  "type": "classic",
+  "vhost": "RabbitMQVirtualHost"
+}
+########## End verifying if Queue has been created ##########
+########## Begin verifying if Queue has been bound to exchange ##########
+[
+  {
+    "source": "RabbitMQExchange",
+    "vhost": "RabbitMQVirtualHost",
+    "destination": "RabbitMQJavaLambdaQueue",
+    "destination_type": "queue",
+    "routing_key": "RabbitMQExchange-RabbitMQJavaLambdaQueue",
+    "arguments": {},
+    "properties_key": "RabbitMQExchange-RabbitMQJavaLambdaQueue"
+  }
+]
+########## End verifying if Queue has been bound to exchange ##########
+
+```
+
+If you see any exceptions when running the above script, please run the below command
+
+```
+sh ./create_rabbit_queue.sh
+
+```
+
 
 ## Deploy the sample application
 
