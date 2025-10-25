@@ -1,5 +1,5 @@
 # activemq-private-lambda-java-sam
-# Java AWS Lambda DocumentDB Streams consumer, using AWS SAM
+# Java AWS Lambda ActiveMQ (in private subnets) consumer, using AWS SAM
 
 This pattern is an example of a Lambda function written in Java that consumes messages from Amazon MQ (Apache ActiveMQ)
 
@@ -52,7 +52,7 @@ cd activemq_consumer_dynamo_sam
 sam build
 ```
 
-The SAM CLI installs dependencies defined in `documentdb_streams_consumer_dynamo_sam/documentdb_streams_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+The SAM CLI installs dependencies defined in `activemq-private-lambda-java-sam/activemq_consumer_dynamo_sam/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
 ```
 
@@ -94,9 +94,9 @@ The sam deploy command will package and deploy your application to AWS, with a s
 * **Parameter ActiveMQBrokerArn**: The ARN of the ActiveMQBroker that was created by the CloudFormation template
 * **Parameter ActiveMQQueue**: The name of the ActiveMQ queue from which the lambda function will consume messages
 * **Parameter SecretsManagerSecretForMQ**: The ARN of the secret that has username/password for Active MQ
-* **Parameter Subnet1**: The first of the three private subnets where the DocumentDB cluster is deployed
-* **Parameter Subnet2**: The second of the three private subnets where the DocumentDB cluster is deployed
-* **Parameter Subnet3**: The third of the three private subnets where the DocumentDB cluster is deployed
+* **Parameter Subnet1**: The first of the three private subnets where the ActiveMQ cluster is deployed
+* **Parameter Subnet2**: The second of the three private subnets where the ActiveMQ cluster is deployed
+* **Parameter Subnet3**: The third of the three private subnets where the ActiveMQ cluster is deployed
 * **Parameter SecurityGroup**: The security group of the lambda function. This can be the same as the security group of the EC2 machine that was created by the CloudFormation template
 * **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
 * **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.

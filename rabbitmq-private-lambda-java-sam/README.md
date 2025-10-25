@@ -1,15 +1,15 @@
 # rabbitmq-private-lambda-java-sam
-# Java AWS Lambda DocumentDB Streams consumer, using AWS SAM
+# Java AWS Lambda RabbitMQ (in private subnets) consumer, using AWS SAM
 
-This pattern is an example of a Lambda function written in Java that consumes messages from Amazon MQ (Apache ActiveMQ)
+This pattern is an example of a Lambda function written in Java that consumes messages from Amazon MQ (RabbitMQ)
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
-- activemq_consumer_dynamo_sam/activemq_event_consumer_function/src/main/java - Code for the application's Lambda function that will listen for Amazon MQ (Apache ActiveMQ) messages and write them to a DynamoDB table
-- activemq_message_sender_json/src/main/java - Code for publishing messages with JSON payload into an Amazon MQ (ActiveMQ cluster), that will in turn be consumed by the Lambda function
-- activemq_consumer_dynamo_sam/template_original.yaml - A template that defines the application's Lambda function to be used by SAM to deploy the lambda function
-- ActiveMQAndClientEC2.yaml - A Cloudformation template file that can be used to deploy an Amazon MQ (Apache ActiveMQ) cluster and also deploy an EC2 machine with all pre-requisities already installed, so you can directly build and deploy the lambda function and test it out.
-- activemq_queue_browser.sh - A shell script that can be used to connect to the Amazon MQ (Apache ActiveMQ) brokers using the activemq command-line tool
+- rabbitmq_consumer_dynamo_sam/rabbit_event_consumer_function/src/main/java - Code for the application's Lambda function that will listen for Amazon MQ (RabbitMQ) messages and write them to a DynamoDB table
+- rabbit_message_sender_json/src/main/java - Code for publishing messages with JSON payload into an Amazon MQ (RabbitMQ cluster), that will in turn be consumed by the Lambda function
+- rabbit_consumer_dynamo_sam/template_original.yaml - A template that defines the application's Lambda function to be used by SAM to deploy the lambda function
+- RabbitMQAndClientEC2.yaml - A Cloudformation template file that can be used to deploy an Amazon MQ (RabbitMQ) cluster and also deploy an EC2 machine with all pre-requisities already installed, so you can directly build and deploy the lambda function and test it out.
+- create_rabbit_queue.sh - A shell script that can be used to connect to the Amazon MQ (RabbitMQ) brokers to create virtualhosts, exchanges and queues, required for the lambda functions event listener
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -17,9 +17,9 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
-## Run the Cloudformation template to create the Amazon MQ (Apache ActiveMQ) Cluster and Client EC2 machine
+## Run the Cloudformation template to create the Amazon MQ (RabbitMQ) Cluster and Client EC2 machine
 
-* [Run the Cloudformation template using the file ActiveMQAndClientEC2.yaml] - You can go to the AWS Cloudformation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the Cloudformation stack to be created. This Cloudformation template will create an Amazon MQ (Apache ActiveMQ) cluster. It will also create an EC2 machine that you can use as a client.
+* [Run the Cloudformation template using the file RabbitMQAndClientEC2.yaml] - You can go to the AWS Cloudformation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the Cloudformation stack to be created. This Cloudformation template will create an Amazon MQ (RabbitMQ) cluster. It will also create an EC2 machine that you can use as a client.
 
 * [Connect to the EC2 machine] - Once the CloudFormation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab.
 Note: You may need to wait for some time after the CloudFormation stack is created, as some UserData scripts continue running after the Cloudformation stack shows Created.
@@ -40,7 +40,7 @@ We have also cloned the Github repository for serverless-patterns on the EC2 mac
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/activemq-private-lambda-java-sam
+    cd serverless-patterns/rabbit-private-lambda-java-sam
     ```
 
 ## Use the SAM CLI to build and deploy the lambda function
@@ -48,11 +48,11 @@ Change directory to the pattern directory:
 Build your application with the `sam build` command.
 
 ```bash
-cd activemq_consumer_dynamo_sam
+cd rabbit_consumer_dynamo_sam
 sam build
 ```
 
-The SAM CLI installs dependencies defined in `documentdb_streams_consumer_dynamo_sam/documentdb_streams_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+The SAM CLI installs dependencies defined in `rabbitmq_consumer_dynamo_sam/rabbit_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
 ```
 
@@ -87,6 +87,19 @@ REPORT RequestId: 92cccff5-2663-4725-af9a-4a301bcbf777  Init Duration: 0.05 ms  
 ***** End sam local invoke response *****
 ```
 
+## Check RabbitMQ Queue Creation
+
+We have included a shell script file called create_rabbit_queue.sh. This shell script creates a VirtualHost, an Exchange and a Queue in the RabbitMQ cluster. It also binds the queue to the exchange. This step is necessary before the Lambda function can be deployed.
+
+The create_rabbit_queue.sh script is run automatically as part of the CloudFormation script.
+
+There is another shell script file called query_rabbit_queue.sh that has been included. You should find it in the /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam folder. You can run this script as below to ensure the virtualhost, exhange and queue have been created in the RabbitMQ cluster
+
+```bash
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam
+sh ./query_rabbit_queue.sh
+```
+
 
 ## Deploy the sample application
 
@@ -94,19 +107,20 @@ REPORT RequestId: 92cccff5-2663-4725-af9a-4a301bcbf777  Init Duration: 0.05 ms  
 To deploy your application for the first time, run the following in your shell:
 
 ```bash
-sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name activemq-lambda-java-sam --guided
+sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name rabbit-lambda-java-sam --guided
 ```
 
 The sam deploy command will package and deploy your application to AWS, with a series of prompts. You can accept all the defaults by hitting Enter:
 
 * **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
 * **AWS Region**: The AWS region you want to deploy your app to.
-* **Parameter ActiveMQBrokerArn**: The ARN of the ActiveMQBroker that was created by the CloudFormation template
-* **Parameter ActiveMQQueue**: The name of the ActiveMQ queue from which the lambda function will consume messages
-* **Parameter SecretsManagerSecretForMQ**: The ARN of the secret that has username/password for Active MQ
-* **Parameter Subnet1**: The first of the three private subnets where the DocumentDB cluster is deployed
-* **Parameter Subnet2**: The second of the three private subnets where the DocumentDB cluster is deployed
-* **Parameter Subnet3**: The third of the three private subnets where the DocumentDB cluster is deployed
+* **Parameter RabbitMQBrokerArn**: The ARN of the RabbitMQBroker that was created by the CloudFormation template
+* **Parameter RabbitMQVirtualHost**: The name of the RabbitMQ virtual host from which the lambda function will consume messages
+* **Parameter RabbitMQQueue**: The name of the RabbitMQ queue from which the lambda function will consume messages
+* **Parameter SecretsManagerSecretForMQ**: The ARN of the secret that has username/password for Rabbit MQ
+* **Parameter Subnet1**: The first of the three private subnets where the RabbitMQ cluster is deployed
+* **Parameter Subnet2**: The second of the three private subnets where the RabbitMQ cluster is deployed
+* **Parameter Subnet3**: The third of the three private subnets where the RabbitMQ cluster is deployed
 * **Parameter SecurityGroup**: The security group of the lambda function. This can be the same as the security group of the EC2 machine that was created by the CloudFormation template
 * **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
 * **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
@@ -117,16 +131,16 @@ The sam deploy command will package and deploy your application to AWS, with a s
 
 You should get a message "Successfully created/updated stack - <StackName> in <Region>" if all goes well
     
-**Note: In case you want to deploy the Lambda function by pointing to an existing Amazon MQ (Apache ActiveMQ) Cluster and not the one created by running the CloudFormation template provided in this pattern, you will need to modify the values of the above parameters accordingly**
+**Note: In case you want to deploy the Lambda function by pointing to an existing Amazon MQ (RabbitMQ) Cluster and not the one created by running the CloudFormation template provided in this pattern, you will need to modify the values of the above parameters accordingly**
 
 
 ## Test the application
 
-Once the lambda function is deployed, send some messages to the Amazon MQ (Apache ActiveMQ) cluster on the queue that have been configured on the lambda function's event listener.
+Once the lambda function is deployed, send some messages to the Amazon MQ (RabbitMQ) cluster on the queue that have been configured on the lambda function's event listener.
 
 For your convenience, a Java program and a shell script has been created on the EC2 machine that was provisioned using Cloudformation.
 
-cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam/activemq_message_sender_json
+cd /home/ec2-user/serverless-patterns/rabbit-private-lambda-java-sam/rabbit_message_sender_json
 
 You should see a script called commands.sh. Run that script by passing a random string and a number between 1 and 500
 
@@ -148,18 +162,18 @@ Either send at least 10 messages or wait for 300 seconds (check the values of Ba
 
 Then check Cloudwatch logs and you should see messages for the Cloudwatch Log Group with the name of the deployed Lambda function.
 
-When you run the above script, it sends messages with JSON records to the Amazon MQ (Apache ActiveMQ) cluster on the queue on which the lambda function is listening on. The lambda function listens on the published ActiveMQ messages on the queue.
+When you run the above script, it sends messages with JSON records to the Amazon MQ (RabbitMQ) cluster on the queue on which the lambda function is listening on. The lambda function listens on the published RabbitMQ messages on the queue.
 
-The lambda code parses the ActiveMQ messages and outputs the fields in the messages to Cloudwatch logs
+The lambda code parses the RabbitMQ messages and outputs the fields in the messages to Cloudwatch logs
 
-The lambda function also inputs each record into a DynamoDB table called ActiveMQDynamoDBTableJava (if you did not modify the default name in the sam template.yaml file)
+The lambda function also inputs each record into a DynamoDB table called RabbitMQDynamoDBTableJava (if you did not modify the default name in the sam template.yaml file)
 
 You can go to the DynamoDB console and view the records.
 
 You can also use the aws cli command below to view the count of records inserted into DynamoDB
 
 ```
-aws dynamodb scan --table-name ActiveMQDynamoDBTableJava --select "COUNT"
+aws dynamodb scan --table-name RabbitMQDynamoDBTableJava --select "COUNT"
 
 ```
 
@@ -170,11 +184,11 @@ aws dynamodb scan --table-name ActiveMQDynamoDBTableJava --select "COUNT"
 You can first clean-up the Lambda function by running the sam delete command
 
 ```
-cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam/activemq_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/rabbit-private-lambda-java-sam/rabbit_consumer_dynamo_sam
 sam delete
 
 ```
 confirm by pressing y for both the questions
 You should see the lambda function getting deleted and a final confirmation "Deleted successfully" on the command-line
 
-Next you need to delete the Cloudformation template that created the Amazon MQ (Apache ActiveMQ) cluster and the EC2 machine by going to the Cloudformation console and selecting the stack and then hitting the "Delete" button. It will run for sometime but eventually you should see the stack getting cleaned up. If you get an error message that says the stack could not be deleted, please retry again and do a Force Delete. The reason this may happen is because ENIs created by the deplayed Lambda function in your VPC may prevent the VPC from being deleted even after deleting the lambda function.
+Next you need to delete the Cloudformation template that created the Amazon MQ (RabbitMQ) cluster and the EC2 machine by going to the Cloudformation console and selecting the stack and then hitting the "Delete" button. It will run for sometime but eventually you should see the stack getting cleaned up. If you get an error message that says the stack could not be deleted, please retry again and do a Force Delete. The reason this may happen is because ENIs created by the deplayed Lambda function in your VPC may prevent the VPC from being deleted even after deleting the lambda function.

@@ -638,6 +638,17 @@ Resources:
             sed -i "s/RABBITMQ_BROKER_PASSWORD/$RABBITMQ_BROKER_PASSWORD/g" create_rabbit_queue.sh
             
             sh ./create_rabbit_queue.sh
+            
+            #Script to check if RabbitMQ Virtual Host, Exchange and Queue have been created properly
+            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam
+            sudo chown ec2-user ./query_rabbit_queue.sh
+            source /home/ec2-user/.bash_profile
+            sed -i "s|RABBITMQ_BROKER_ENDPOINT|${rabbitmq_broker_endpoint}|g" query_rabbit_queue.sh
+            sed -i "s/RABBITMQ_QUEUE_NAME/$RABBITMQ_QUEUE_NAME/g" query_rabbit_queue.sh
+            sed -i "s/RABBITMQ_VIRTUAL_HOST/$RABBITMQ_VIRTUAL_HOST/g" query_rabbit_queue.sh
+            sed -i "s/RABBITMQ_EXCHANGE/$RABBITMQ_EXCHANGE/g" query_rabbit_queue.sh
+            sed -i "s/RABBITMQ_BROKER_ADMIN_USER/$RABBITMQ_BROKER_ADMIN_USER/g" query_rabbit_queue.sh
+            sed -i "s/RABBITMQ_BROKER_PASSWORD/$RABBITMQ_BROKER_PASSWORD/g" query_rabbit_queue.sh
                                    
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
