@@ -74,6 +74,15 @@ Important: this application uses various AWS services and there are costs associ
     ```
     sam deploy -g --capabilities CAPABILITY_IAM
     ```
+13. During the prompts:
+    * Enter a stack name
+    * Select the desired AWS Region
+    * Enter a GraphQLApiEndpoint
+    * Enter an AppSyncApiKey
+    * Enter a GraphQLApiId
+    * Enter an OrdersEventBusName
+    * Enter an OrdersEventBusArn
+    * Allow SAM to create roles with the required permissions.
 
 ## Testing Part 1 - notify via HTTP Request
 
