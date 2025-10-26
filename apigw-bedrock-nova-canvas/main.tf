@@ -36,7 +36,7 @@ resource "aws_iam_policy" "invoke_model_policy" {
         ]
         Effect = "Allow"
         Resource = [
-          "arn:aws:bedrock:${data.aws_region.current.name}::foundation-model/amazon.nova-canvas-v1:0"
+          "arn:aws:bedrock:${data.aws_region.current.region}::foundation-model/amazon.nova-canvas-v1:0"
         ]
       },
     ]
