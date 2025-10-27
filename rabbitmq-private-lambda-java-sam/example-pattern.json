@@ -1,22 +1,22 @@
 {
-    "title": "AWS Lambda function subscribed to an Amazon MQ - Apache ActiveMQ in private subnets (Java)",
-    "description": "Creates a Lambda function that uses a private Amazon MQ (Apache ActiveMQ) as an event source.",
+    "title": "AWS Lambda function subscribed to an Amazon MQ - RabbitMQ in private subnets (Java)",
+    "description": "Creates a Lambda function that uses a private Amazon MQ (RabbitMQ) as an event source.",
     "language": "Java",
     "level": "200",
     "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This pattern provides a Lambda function along with an Event Source Mapping to an Amazon MQ (Apache ActiveMQ) queue.",
-            "The CloudFormation template provided in this pattern installs an Amazon MQ (Apache ActiveMQ) Cluster in private subnets in a VPC.",
+            "This pattern provides a Lambda function along with an Event Source Mapping to an Amazon MQ (RabbitMQ) queue.",
+            "The CloudFormation template provided in this pattern installs an Amazon MQ (RabbitMQ) Cluster in private subnets in a VPC.",
             "For detailed deployment instructions instructions see the README.md"
             ]
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/activemq-private-lambda-java-sam",
-            "templateURL": "serverless-patterns/activemq-private-lambda-java-sam/activemq_consumer_dynamo_sam",
-            "projectFolder": "activemq-private-lambda-java-sam",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rabbitmq-private-lambda-java-sam",
+            "templateURL": "serverless-patterns/rabbitmq-private-lambda-java-sam/rabbitmq_consumer_dynamo_sam",
+            "projectFolder": "rabbitmq-private-lambda-java-sam",
             "templateFile": "template_original.yaml"
         }
     },
@@ -33,6 +33,10 @@
             {
                 "text": "Amazon MQ resource type reference",
                 "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/AWS_AmazonMQ.html"
+            },
+            {
+                "text": "HTTP API Reference",
+                "link": "https://www.rabbitmq.com/docs/http-api-reference"
             }
         ]
     },
