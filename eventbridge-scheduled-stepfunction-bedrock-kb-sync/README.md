@@ -1,4 +1,4 @@
-# Amazon Bedrock Knowledge Base Synchronization Flow with EventBridge Scheduler 
+# Amazon Bedrock Knowledge Base Synchronization Flow with Amazon EventBridge Scheduler 
 
 This pattern demonstrates an automated synchronization process for Amazon Bedrock Knowledge Bases using Amazon EventBridge Scheduler and AWS Step Functions. The solution enables periodic synchronization of data sources, ensuring your Knowledge Base stays up-to-date with the latest content.
 
@@ -121,7 +121,7 @@ Step 4: Verify Sync Status in Amazon Bedrock
             Any errors or warnings
 
 
-Step 45: Validation Points
+Step 5: Validation Points
         - Confirm documents are indexed
         - Check sync completion status
         - Verify no errors in sync history
