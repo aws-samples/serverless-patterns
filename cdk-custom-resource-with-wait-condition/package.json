@@ -1,0 +1,26 @@
+{
+  "name": "cdk-custom-resource-with-wait-condition",
+  "version": "0.1.0",
+  "bin": {
+    "cdk-custom-resource-with-wait-condition": "bin/cdk-custom-resource-with-wait-condition.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.2",
+    "@types/node": "24.10.0",
+    "aws-cdk": "2.1031.1",
+    "esbuild": "^0.25.12",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sfn": "^3.922.0",
+    "@types/aws-lambda": "^8.10.157",
+    "aws-cdk-lib": "2.222.0",
+    "constructs": "^10.4.2"
+  }
+}
