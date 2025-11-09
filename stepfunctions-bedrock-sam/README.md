@@ -1,8 +1,8 @@
-# AWS Step Functions Express Workflow to Amazon Bedrock Anthropic Claude Model v2.1 for Content Generation  
+# AWS Step Functions Express Workflow to Amazon Bedrock Anthropic Claude Sonnet 4.5 for Content Generation
 
 The Step Functions Express Workflow can be started using the AWS CLI or from another service (e.g. API Gateway).
 
-The SAM template deploys a Step Functions Express workflow that invokes Amazon Bedrock Anthropic Claude Model v2.1 and returns the generated content based on the provided prompts. The SAM template contains the required resources with IAM permission to run the application with logging enabled.
+The SAM template deploys a Step Functions Express workflow that invokes Amazon Bedrock Anthropic Claude Sonnet 4.5 and returns the generated content based on the provided prompts. The SAM template contains the required resources with IAM permission to run the application with logging enabled.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/stepfunctions-bedrock-sam
 
@@ -42,7 +42,7 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 * Start the Express Workflow using the `start-sync-execution` api command with a "prompt" string in English for generating content as per the input payload.
-* The Express Workflow invokes Amazon Bedrock Anthropic Claude v2.1 Model with the prompt.
+* The Express Workflow invokes Amazon Bedrock Anthropic Claude Sonnet 4.5 with the prompt.
 * Amazon Bedrock returns the generated content as the given promptsentiment of the input text. 
 * If the integration succeeds, the generated content is returned in the Step Function execution results within an `output` object.
 * If the integration fails, the Step Functions workflow will retry up to 5 times before exiting with a `status:FAILED` response.
