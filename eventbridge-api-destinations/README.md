@@ -51,7 +51,7 @@ Important: this application uses various AWS services and there are costs associ
 - To run the Shopify API Destination example, cd to `9-shopify`.
 - To run the Stripe API Destination example, cd to `10-stripe`.
 - To run the API Destination with OAuth credentials example, cd to `11-oauth-api`.
-- To run the API Destination with OAuth credentials using CMK encryption example, cd to `12-oauth-api-with-cmk-encryption`. And then follow the Example12_README.md file instructions.
+- To run the API Destination with OAuth credentials using CMK encryption example, cd to `12-oauth-api-cmk-encryption`. And then follow the Example12_README.md file instructions.
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
@@ -81,7 +81,7 @@ aws events put-events --entries file://testEvent.json
 9. For the shopify example use the testEvent.json within the 9-shopify directory
 10. For the stripe example use the testEvent.json within the 10-stripe directory
 11. For the OAuth example use the testEvent.json within the 11-oauth-api directory
-12. For the OAuth with cmk encryption example use the testEvent.json within the 12-oauth-api-with-cmk-encryption
+12. For the OAuth with cmk encryption example use the testEvent.json within the 12-oauth-api-cmk-encryption
 ```
 aws events put-events --entries file://testEvent.json
 ```

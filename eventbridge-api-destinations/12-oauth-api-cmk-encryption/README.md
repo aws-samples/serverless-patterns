@@ -1,4 +1,4 @@
-# EventBridge API Destinations with OAuth and CMK Encryption
+# Amazon EventBridge API Destinations with OAuth and CMK Encryption
 
 Amazon EventBridge announces support for Amazon Key Management Service (KMS) Customer Managed Keys (CMK) in API destinations connections. This enhancement enables you to encrypt your HTTPS endpoint authentication credentials managed by API destinations with your own keys instead of an AWS owned key (which is used by default). With CMK support, you now have more granular security control over your authentication credentials used in API destinations, helping you meet your organization's security requirements and governance policies.
 
@@ -27,7 +27,7 @@ This sample demonstrates how to use Amazon EventBridge API Destinations with OAu
 
 * Also, run the below CloudFormation (CFN) command to create pre-requisit resources:
 ```bash
-aws cloudformation create-stack --stack-name serverlessland-prerequisite --template-body file://prerequsite.yaml
+aws cloudformation create-stack --stack-name serverlessland-prerequisite --template-body file://prerequisite.yaml
 ```
 * Above command will create stack with the below resources, please goto the CFN console and select your pre-requisite stack. Copy the output in the notepad, we'll need this later.
 - External API URL for HTTP API Endpoint. If you already have one you can also use that.
@@ -66,7 +66,7 @@ aws events put-events --entries file://testEvent.json
 
 - [Amazon EventBridge now supports Customer Managed Keys (CMK) in API destinations connections](https://aws.amazon.com/about-aws/whats-new/2025/04/amazon-eventbridge-customer-managed-keys-api/)
 
-- [Encrypting EventBridge connection authorization with AWS KMS keys](https://docs.aws.amazon.com/eventbridge/latest/userguide/encryption-connections.html)
+- [Encrypting Amazon EventBridge connection authorization with AWS KMS keys](https://docs.aws.amazon.com/eventbridge/latest/userguide/encryption-connections.html)
 
 - [Using API destinations with Amazon EventBridge](https://aws.amazon.com/blogs/compute/using-api-destinations-with-amazon-eventbridge/)
 

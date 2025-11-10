@@ -73,7 +73,7 @@ Resources:
                 IsValueSecret: true         
     DependsOn: ConnectionSecret
               
-  # Api Destination Resource
+  # API Destination Resource
   # This will create an API Destination in EventBridge
   # The API Destination will use the connection created above
   # The API Destination will invoke the external API endpoint with OAuth credentials
