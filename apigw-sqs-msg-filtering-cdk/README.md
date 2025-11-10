@@ -2,6 +2,14 @@
 
 This project contains sample AWS CDK code to create an API Gateway Rest API, an SQS Queue and the correct VTL integration mapping template to filter out parts of the message body.
 
+The Amazon API Gateway can be integrated with various other services such as Amazon SQS. This is particularly useful to buffer requests or decouple the request and response lifecycle.
+However, SQS has a message size limit of 1MiB. When you are in control of the client, you could handle sending larger messages e.g. using the [Extended Client Library](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-managing-large-messages.html). 
+
+But sometimes you provide only the API endpoint to other parties to send their messages to (e.g. as a webhook), so you need a way to control the payload size before sending the messages to SQS. This is where VTL comes into play.
+
+The [Velocity Template Language](https://velocity.apache.org/), or short VTL, is used in AWS API Gateway to transform your method request and your integration response. This allows you directly filter the messahe body and only send what is need to SQS. 
+This pattern demonstrates message filtering using VTL in an API Gateway REST API.
+
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sqs-msg-filtering-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -59,9 +67,9 @@ Run the following command to send a POST request to the REST API endpoint that w
 ```bash
 export API_GATEWAY_SQS_RESOURCE_ENDPOINT=$(aws cloudformation describe-stacks --stack-name ApigwSqsMsgFilteringCdkStack --query 'Stacks[0].Outputs[?OutputKey==`ApiGatewaySqsResourceEndpoint`].OutputValue' --output text)
 
-curl --location --request POST $API_GATEWAY_SQS_RESOURCE_ENDPOINT \  
+curl --location --request POST $API_GATEWAY_SQS_RESOURCE_ENDPOINT \
 --header 'Content-Type: application/json' \
--d @test/test-payload.json
+-d @../test/test-payload.json
 ```
 
 To check and receive messages in the queue, it can be done in the AWS console or by running the following command. Note, replace {MyQueueUrl} placeholder in the command with the endpoint that has been deployed. The endpoint can be found in the CloudFormation stack output.
