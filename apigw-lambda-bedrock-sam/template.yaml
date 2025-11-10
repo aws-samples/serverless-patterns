@@ -62,4 +62,4 @@ Outputs:
     Value: !Ref ContentGenerationLambdaFunction
   GenerateContentAPI:
     Description: "API Gateway endpoint URL for the dev stage of the Generate Content API"
-    Value: !Sub "https://${GenerateContentApi}.execute-api.${AWS::Region}.amazonaws.com/dev/generate_content/"
+    Value: !Sub "https://${GenerateContentApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/generate_content/"

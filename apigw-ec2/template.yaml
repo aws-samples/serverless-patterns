@@ -227,6 +227,6 @@ Resources:
 Outputs:
   WebsiteURL:
     Value: !Sub 
-            - "curl https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/v0"
+            - "curl https://${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}/v0"
             - ApiId: !Ref ApiGatewayRestApi
     Description: ApiGateway URL

@@ -232,4 +232,4 @@ Resources:
 Outputs:
   PrivateIntApiEndpoint:
     Description: API Endpoint
-    Value: !Sub "https://${PrivateIntApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${PrivateIntApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod"

@@ -99,12 +99,12 @@ module "lambda_function" {
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
   handler       = "LambdaFunction.lambda_handler"
-  runtime       = "python3.8"
+  runtime       = "python3.12"
   publish       = true
 
   source_path = "${path.module}/src"
 
-  layers = ["arn:aws:lambda:${data.aws_region.current.name}:017000801446:layer:AWSLambdaPowertoolsPython:15"]
+  layers = ["arn:aws:lambda:${data.aws_region.current.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-python312-x86_64:19"]
 
   environment_variables = {
     SFN_ARN = module.step_function.state_machine_arn

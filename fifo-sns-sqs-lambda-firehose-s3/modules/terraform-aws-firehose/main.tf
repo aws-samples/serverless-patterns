@@ -18,10 +18,10 @@ resource "aws_kinesis_firehose_delivery_stream" "stream" {
 
 
   extended_s3_configuration {
-    role_arn        = aws_iam_role.firehose_role.arn
-    bucket_arn      = var.bucket_arn
-    buffer_size     = var.buffer_size != null ? var.buffer_size : 1
-    buffer_interval = var.buffer_interval != null ? var.buffer_interval : 60
+    role_arn           = aws_iam_role.firehose_role.arn
+    bucket_arn         = var.bucket_arn
+    buffering_size     = var.buffer_size != null ? var.buffer_size : 1
+    buffering_interval = var.buffer_interval != null ? var.buffer_interval : 60
   }
 }
 

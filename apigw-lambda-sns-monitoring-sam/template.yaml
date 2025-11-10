@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
-Description: 
+Description: API Gateway with Lambda and SNS integration and enhanced monitoring
 Resources:
   MySnsTopic:
     Type: AWS::SNS::Topic
@@ -40,7 +40,7 @@ Resources:
       Environment:
         Variables:
           TOPIC_ARN: !Ref MySnsTopic
-          API_URL: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${RestApi.Stage}'
+          API_URL: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${RestApi.Stage}'
       Policies:
         - SNSPublishMessagePolicy:
             TopicName: !GetAtt MySnsTopic.TopicName
@@ -145,7 +145,7 @@ Resources:
           from aws_synthetics.common import synthetics_logger as logger
 
           def main():
-              url = "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${RestApi.Stage}"
+              url = "https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${RestApi.Stage}"
               
               # Set screenshot option
               takeScreenshot = True
@@ -175,7 +175,7 @@ Outputs:
     Value: !Ref MySnsTopic
 
   apiGatewayInvokeURL:
-    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${RestApi.Stage}
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${RestApi.Stage}
 
   CloudWatchAlarmName:
     Description: Name of the API Gateway 5XX Error Alarm

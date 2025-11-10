@@ -35,4 +35,4 @@ Resources:
 Outputs:
   API:
     Description: Invoke URL to test mapping template
-    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/dev"
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev"

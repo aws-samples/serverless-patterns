@@ -61,7 +61,7 @@ Resources:
     Properties:
       Name: !Sub ${AWS::StackName}-api-destinations
       ConnectionArn: !GetAtt TargetConnection.Arn
-      InvocationEndpoint: !Sub "https://${TargetApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+      InvocationEndpoint: !Sub "https://${TargetApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"
       HttpMethod: POST 
       InvocationRateLimitPerSecond: 10
       
