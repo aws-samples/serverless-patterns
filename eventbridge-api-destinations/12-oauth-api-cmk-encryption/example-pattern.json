@@ -17,7 +17,7 @@
     },
     "deploy": {
         "text": [
-            "cd ./12-oauth-api-with-cmk-encryption",
+            "cd ./12-oauth-api-cmk-encryption",
             "sam deploy --guided"
         ]
     },
@@ -37,9 +37,9 @@
     "gitHub": {
         "template": {
             "projectFolder": "eventbridge-api-destinations",
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations/12-oauth-api-with-cmk-encryption",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations/12-oauth-api-cmk-encryption",
             "templateURL": "serverless-patterns/eventbridge-api-destinations",
-            "templateFile": "12-oauth-api-with-cmk-encryption/template.yaml"
+            "templateFile": "12-oauth-api-cmk-encryption/template.yaml"
         },
         "payloads": [
             {
