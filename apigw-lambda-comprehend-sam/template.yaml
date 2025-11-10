@@ -40,4 +40,4 @@ Resources:
 Outputs:
   SentimentAnalysisAPI:
     Description: "API Gateway endpoint URL for the dev stage of the Detect Sentiment API"
-    Value: !Sub "https://${DetectSentimentApi}.execute-api.${AWS::Region}.amazonaws.com/dev/detect_sentiment/"
+    Value: !Sub "https://${DetectSentimentApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/detect_sentiment/"

@@ -140,7 +140,7 @@ Outputs:
     Value: !Ref memdbClusterVPC
   HelloWorldApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${HelloWorldAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/hello/"
+    Value: !Sub "https://${HelloWorldAPIGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/hello/"
   HelloWorldFunction:
     Description: "Hello World Lambda Function ARN"
     Value: !GetAtt HelloWorldFunction.Arn

@@ -54,11 +54,9 @@ Resources:
           "InboundWebhook-Lambda-${ID}",
           ID: !Select [2, !Split ["/", !Ref AWS::StackId]],
         ] # Append the stack UUID
-      CodeUri:
-        Bucket: !Sub 'eventbridge-inbound-webhook-templates-prod-${AWS::Region}'
-        Key: 'lambda-templates/twilio-lambdasrc.zip'
+      CodeUri: ./src
       Handler: app.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.13
       ReservedConcurrentExecutions: 10
       Environment:
         Variables:

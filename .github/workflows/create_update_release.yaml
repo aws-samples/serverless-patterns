@@ -1,4 +1,6 @@
 name: Create and Update Releases
+permissions:
+  contents: write
 
 on:
   push:

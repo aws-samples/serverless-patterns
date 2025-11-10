@@ -1,0 +1,50 @@
+{
+    "title": "Amazon API Gateway WebSocket acknowledgement for $connect route.",
+    "description": "This pattern demonstrates acknowledging WebSocket connections with API Gateway and AWS Lambda",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "The Serverless Application Model (SAM) template deploys an Amazon WebSocket API Gateway and two AWS Lambda functions. When a client connects, the API Gateway creates a $connect route with Lambda proxy integration. The first Lambda function processes the initial connection, capturing both the Connection ID and API Gateway stage URL, then asynchronously invokes the second Lambda function. This second function validates the Connection ID and, if valid, uses SDK API calls to send a greeting message back to the client."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-ack-connect-route",
+            "templateURL": "serverless-patterns/apigw-websocket-ack-connect-route",
+            "projectFolder": "apigw-websocket-ack-connect-route",
+            "templateFile": "template.yml"
+        }
+    },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Manasvi Jain",
+      "image": "https://avatars.githubusercontent.com/u/56217984?v=4",
+      "bio": "Associate Partner Solutions Architect at AWS",
+      "linkedin": "https://www.linkedin.com/in/manasvi-jain-36b9941a3/"
+    },
+    {
+      "name": "Umang Aggarwal",
+      "image": "https://avatars.githubusercontent.com/Umang071",
+      "bio": "Technical Account Manager @ AWS",
+      "linkedin": "https://www.linkedin.com/in/umangaggarwal"
+    }
+  ]
+}

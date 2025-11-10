@@ -1,0 +1,65 @@
+{
+  "title": "AWS Step Functions integration with Amazon Comprehend using terraform",
+  "description": "The Terraform template deploys an AWS Step Functions workflow with Amazon Comprehend and returns the sentiment analysis done by Amazon Comprehend.",
+  "language": "",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Start the Express Workflow using the start-sync-execution api command with a message string in English for sentiment analysis in the input payload.",
+      "The Express Workflow invokes Amazon Comprehend.",
+      "Comprehend returns the sentiment of the input text.",
+      "If the integration works fine, the sentiment analysis outcome is returned in Step Function execution results within a output object.",
+      "If the integration fails, the Step Functions workflow will retry up to 5 times before exiting with a status:FAILED response."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-comprehend-terraform",
+      "templateURL": "serverless-patterns/sfn-comprehend-terraform",
+      "projectFolder": "sfn-comprehend-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Step Function - AWS SDK service integrations",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      },
+      {
+        "text": "AWS Step Function - CloudWatch Logs",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/cw-logs.html"
+      },
+      {
+        "text": "ComprehendBasicAccessPolicy",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-template-list.html#comprehend-basic-access-policy"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply --auto-approve"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy --auto-approve"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rahul Sringeri",
+      "image": "",
+      "bio": "Technical Account Manager at AWS EMEA for Strategic Accounts",
+      "linkedin": ""
+    }
+  ]
+}

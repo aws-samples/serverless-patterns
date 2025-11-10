@@ -79,7 +79,7 @@ Resources:
 Outputs:
   RabbitMQWebConsole:
     Description: The RabbitMQ web-console URL
-    Value: !Sub 'https://${MyMQBroker}.mq.${AWS::Region}.amazonaws.com/'
+    Value: !Sub 'https://${MyMQBroker}.mq.${AWS::Region}.${AWS::URLSuffix}/'
 
   MyMQMessageHandlerFunction:
     Description: The name of the RabbitMQ message handler function

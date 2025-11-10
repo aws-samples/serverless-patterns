@@ -17,10 +17,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websockets-lambda-bedrock-sam",
-      "templateURL": "serverless-patterns/apigw-websockets-lambda-bedrock-sam",
-      "projectFolder": "apigw-websockets-lambda-bedrock-sam",
-      "templateFile": "template.yml"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-lambda-bedrock-sam",
+      "templateURL": "serverless-patterns/apigw-websocket-lambda-bedrock-sam",
+      "projectFolder": "apigw-websocket-lambda-bedrock-sam",
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
