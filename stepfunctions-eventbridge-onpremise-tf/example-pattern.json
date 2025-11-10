@@ -1,16 +1,16 @@
 {
-  "title": "Step Functions to on-premises API (Terraform)",
-  "description": "Step Functions performing HTTP call to on-premises API",
-  "language": "",
-  "level": "200",
-  "framework": "Terraform",
-  "introBox": {
-    "headline": "How it works",
-    "text": [
-      "This sample project demonstrates how to use an AWS Step Functions state machine to call an on-premises API without using an intermediary Lambda function. This pattern is leveraging EventBridge connection to connect to an HTTP endpoint and VPC Lattice to access private resources (in a VPC or on premises).",
-      "This pattern deploys one Step Functions, one EventBridge connection, a VPC Lattice resource configuration and resource gateway. You need to have a connection between a VPC and a datacenter (using VPN or Direct Connect)."
-    ]
-  },
+    "title": "AWS Step Functions to on-premises API (Terraform)",
+    "description": "AWS Step Functions performing HTTP call to on-premises API",
+    "language": "",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This sample project demonstrates how to use an AWS Step Functions state machine to call an on-premises API without using an intermediary AWS Lambda function. This pattern uses an  Amazon EventBridge connection to connect to an HTTP endpoint and VPC Lattice to access private resources (in a VPC or on premises).",
+            "This pattern deploys one Step Functions, one EventBridge connection, a VPC Lattice resource configuration and resource gateway. You need to have a connection between a VPC and a datacenter (using VPN or Direct Connect)."
+        ]
+    },
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunctions-eventbridge-onpremise-tf",
