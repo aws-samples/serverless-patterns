@@ -43,6 +43,8 @@ Important: this application uses various AWS services and there are costs associ
 
 This pattern deploys an Amazon API Gateway REST API with the following routes: `POST /register`, `POST /login`, `GET` and `POST /bedrock`. It includes a Amazon Cognito User Pool and Lambda functions to handle requests from the API Gateway. The API Gateway allows CORS for all origins and methods, incorporates an Usage Plan, and has throttle and quota limits for the `/bedrock` endpoint. The `/bedrock` endpoint allows access to Amazon Bedrock Foundation models.
 
+**This is not intended for production use**
+
 ### Components and Configuration
 
 #### API Gateway Routes
