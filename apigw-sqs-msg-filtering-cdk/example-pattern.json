@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway to Amazon SQS with message filtering",
-  "description": "Simple pattern that sends a messsage directly to an SQS queue via an API Gateway endpoint and uses the Velocity Template Language (VTL) to transform (e.g. fitler) the message body.",
+  "description": "Simple pattern that sends a messsage directly to an SQS queue via an API Gateway endpoint and uses VTL to transform (e.g. filter) the message body.",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS CDK",
@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sqs-msg-filtering-cdk",
       "templateURL": "serverless-patterns/apigw-sqs-msg-filtering-cdk",
       "projectFolder": "apigw-sqs-msg-filtering-cdk",
-      "templateFile": "lib/apigw-sqs-msg-filtering-cdk-stack.ts"
+      "templateFile": "cdk/lib/apigw-sqs-msg-filtering-cdk-stack.ts"
     }
   },
   "resources": {
