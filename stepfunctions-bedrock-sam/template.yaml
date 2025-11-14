@@ -14,7 +14,7 @@ Resources:
     Properties:
       DefinitionUri: statemachine/bedrock-integration.asl.json
       DefinitionSubstitutions:
-        ModelId: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-v2:1
+        ModelId: !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/global.anthropic.claude-sonnet-4-5-20250929-v1:0
       Role:
         Fn::GetAtt: [ StatesExecutionRole, Arn ]
       Type: EXPRESS
@@ -32,7 +32,7 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Join [ "/", [ "stepfunctions", StateMachineExpressSyncToBedrock]]
-       
+
 ##########################################################################
 #   Roles                                                               #
 ##########################################################################
@@ -72,8 +72,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - "bedrock:InvokeModel"
-                Resource: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-v2:1                               
+                  - "bedrock:InvokeModel*"
+                Resource:
+                  - !Sub arn:aws:bedrock:*:*:inference-profile/global.anthropic.claude-sonnet-4-5-20250929-v1:0
+                  - !Sub arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0
 ##########################################################################
 #   Outputs                                                              #
 ##########################################################################
