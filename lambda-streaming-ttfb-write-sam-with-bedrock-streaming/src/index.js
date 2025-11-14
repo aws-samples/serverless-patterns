@@ -33,17 +33,14 @@ exports.handler = awslambda.streamifyResponse(
             }
         };
 
-        const
+         const
             maxTokens = 2500,
             temperature = .7,
             topP = 1,
-            stopSequences = ["\n\nHuman:"],
-            anthropicVersion = "bedrock-2023-05-31",
-            modelId = 'anthropic.claude-v2',
+            anthropicVersion = "bedrock-2023-05-31"
+            modelId = 'anthropic.claude-3-haiku-20240307-v1:0',
             contentType = 'application/json',
             accept = '*/*';
-
-        const formattedPrompt = `Human: ${prompt}\n\nAssistant:`
 
         try {
             responseStream = awslambda.HttpResponseStream.from(responseStream, httpResponseMetadata);
@@ -58,12 +55,16 @@ exports.handler = awslambda.streamifyResponse(
             });
 
             const llmRequestBody = {
-                prompt: formattedPrompt,
-                max_tokens_to_sample: maxTokens,
+                max_tokens: maxTokens,
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
                 temperature,
-                top_p: topP,
-                stop_sequences: stopSequences,
-                anthropic_version: anthropicVersion
+                top_p: topP
+                anthropic_version: anthropicVersion,
             };
 
             const params = {
@@ -81,19 +82,21 @@ exports.handler = awslambda.streamifyResponse(
             responseStream = awslambda.HttpResponseStream.from(responseStream, httpResponseMetadata);
             const chunks = []
             for await (const value of actualStream) {
-                const jsonString = new TextDecoder().decode(value.body); // body is a Uint8Array. jsonString->'{"bytes":"eyJjb21wbGV0aW9uIjoiIEkiLCJzdG9wX3JlYXNvbiI6bnVsbH0="}'
-                const base64encoded = JSON.parse(jsonString).bytes; // base64 encoded string. 
-                const decodedString = Buffer.from(base64encoded, "base64").toString(
-                    "utf-8"
-                  );
+                const jsonString = new TextDecoder().decode(value.body);
+                const base64encoded = JSON.parse(jsonString).bytes;
+                const decodedString = Buffer.from(base64encoded, "base64").toString("utf-8");
+                
                 try {
-                    const streamingCompletion = JSON.parse(decodedString).completion;
-                    chunks.push(streamingCompletion)
-                    responseStream.write(streamingCompletion)
+                    const chunk = JSON.parse(decodedString);
+                    if (chunk.type === 'content_block_delta' && chunk.delta?.text) {
+                        const text = chunk.delta.text;
+                        chunks.push(text);
+                        responseStream.write(text);
+                    }
                 } catch (error) {
                     console.error(error);
                     responseStream.write(null);
-                    responseStream.end()
+                    responseStream.end();
                 }
             }
             console.log("stream ended: ", chunks.join(''))
