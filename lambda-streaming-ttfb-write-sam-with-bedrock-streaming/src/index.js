@@ -6,6 +6,19 @@ const {
 exports.handler = awslambda.streamifyResponse(
     async (event, responseStream, context) => {
         const lambdaRequestBody = JSON.parse(event.body);
+        try {
+            // Handle base64 encoded body from AWS SigV4 requests
+            const body = event.isBase64Encoded ? 
+                Buffer.from(event.body, 'base64').toString('utf-8') : 
+                event.body;
+            lambdaRequestBody = JSON.parse(body);
+        } catch (error) {
+            console.error('Error parsing request body:', error);
+            responseStream.write("Invalid JSON in request body.");
+            responseStream.end();
+            return;
+        }
+
         const prompt = lambdaRequestBody.prompt || '';
         if (prompt == '') {
             responseStream.write("No prompt provided.");
