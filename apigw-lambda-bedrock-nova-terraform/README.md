@@ -87,22 +87,22 @@ Key components:
 
 ## Testing
 
-   Using Curl:
+Using Curl:
 
-    ```
-    curl -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"prompt": "What are the key benefits of using AWS services?"}' \
-    https://YOUR-API-ENDPOINT/dev/generate_content
-    
-    ```
+```sh
+curl -X POST \
+-H "Content-Type: application/json" \
+-d '{"prompt": "What are the key benefits of using AWS services?"}' \
+https://YOUR-API-ENDPOINT/dev/generate_content
+```
 
 ## Viewing Test Results
-   ```
-   {
-    "generated-text": "<Model generated response>"
-   }
-   ```
+
+```json
+{
+"generated-text": "<Model generated response>"
+}
+```
 
 ## Cleanup
 
