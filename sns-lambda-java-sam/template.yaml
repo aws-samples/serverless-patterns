@@ -10,7 +10,7 @@ Resources:
     Properties:
       CodeUri: SNSEventHandlerFunction
       Handler: example.SNSEventHandler::handleRequest
-      Runtime: java21      
+      Runtime: java25  
       Timeout: 30
       MemorySize: 512
       Architectures:
