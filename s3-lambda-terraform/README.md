@@ -1,4 +1,4 @@
-# AWS S3 to AWS Lambda
+# Amazon S3 to AWS Lambda
 
 The Terraform template deploys a Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The Lambda code checks the uploaded file and console log the event.
 
@@ -57,7 +57,7 @@ After deployment, upload an object to the S3. Go to the CloudWatch Logs for the 
     ```bash
     terraform show
     ```
-    ```
+
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
