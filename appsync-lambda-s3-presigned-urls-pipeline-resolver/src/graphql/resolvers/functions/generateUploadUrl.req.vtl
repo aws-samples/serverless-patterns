@@ -1,0 +1,9 @@
+{
+  "version": "2018-05-29",
+  "operation": "Invoke",
+  "payload": {
+    "operation": "generateUploadUrl",
+    "noteId": $util.toJson($ctx.args.NoteId),
+    "fileName": $util.toJson($util.defaultIfNull($ctx.args.fileName, "attachment"))
+  }
+}
