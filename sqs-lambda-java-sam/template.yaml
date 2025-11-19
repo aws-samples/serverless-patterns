@@ -26,7 +26,7 @@ Resources:
     Properties:
       CodeUri: ProcessSQSMessageBatchFunction
       Handler: ProcessSQSMessageBatch::handleRequest
-      Runtime: java21 5    
+      Runtime: java25
       Timeout: 30
       MemorySize: 512
       Architectures:
