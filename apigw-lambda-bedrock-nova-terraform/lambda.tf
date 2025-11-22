@@ -5,17 +5,17 @@ resource "aws_lambda_layer_version" "boto3_bedrock_layer" {
 }
 
 resource "aws_lambda_function" "content_generation" {
-  filename         = "${path.module}/lambda_function.zip"
-  function_name    = "ContentGenerationFunction"
-  role             = aws_iam_role.lambda_role.arn
-  handler          = "bedrock_integration.lambda_handler"
-  runtime          = "python3.10"
-  architectures    = ["arm64"]
-  
-  layers           = [aws_lambda_layer_version.boto3_bedrock_layer.arn]
-  
-  memory_size      = 256
-  timeout          = 30
+  filename      = "${path.module}/lambda_function.zip"
+  function_name = "ContentGenerationFunction"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "bedrock_integration.lambda_handler"
+  runtime       = "python3.10"
+  architectures = ["arm64"]
+
+  layers = [aws_lambda_layer_version.boto3_bedrock_layer.arn]
+
+  memory_size = 256
+  timeout     = 30
 
   environment {
     variables = {
