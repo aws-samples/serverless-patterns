@@ -78,7 +78,6 @@ The stack will output the **api endpoint**. You can use *Postman* or *curl* to s
    
 ```
 curl -H "Content-type: application/json" -X POST -d '{"prompt_one": "Write a 500 word blog post on The Beatles"}' <Your API endpoint>
-
 ```
 After runnning the above command, API Gateway will invoke the State machine and return the results back to the client instead of just the State machine's execution Id. 
 
