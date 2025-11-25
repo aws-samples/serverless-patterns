@@ -1,0 +1,68 @@
+{
+  "title": "AppSync Pipeline Resolvers with S3 Presigned URLs",
+  "description": "Create an AppSync GraphQL API with pipeline resolvers that generate S3 presigned URLs for secure file uploads and downloads.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use AWS AppSync pipeline resolvers to orchestrate multiple data sources in a single GraphQL operation. The pattern integrates AppSync with Lambda, DynamoDB, and S3 to create a notes API with secure file attachment capabilities.",
+      "When a note is created via the saveNote mutation, the pipeline resolver first invokes a Lambda function to generate a presigned S3 upload URL, then saves the note metadata (including the attachment key and upload URL) to DynamoDB. The client receives both the note data and a temporary upload URL in a single response, enabling immediate file upload without additional API calls.",
+      "When retrieving a note via the getNote query, the pipeline resolver first fetches the note from DynamoDB, then conditionally invokes Lambda to generate a presigned download URL if an attachment exists. This demonstrates how pipeline resolvers can execute conditional logic and pass data between stages using $ctx.prev.result.",
+      "This pattern deploys one AppSync GraphQL API, one Lambda function, one DynamoDB table, and one S3 bucket with CORS configuration."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-lambda-s3-presigned-cdk-python",
+      "templateURL": "serverless-patterns/appsync-lambda-s3-presigned-cdk-python",
+      "projectFolder": "appsync-lambda-s3-presigned-cdk-python",
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS AppSync Pipeline Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/pipeline-resolvers.html"
+      },
+      {
+        "text": "Amazon S3 Presigned URLs",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html"
+      },
+      {
+        "text": "AWS AppSync - Build data-driven apps with fully managed GraphQL APIs",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "VTL Mapping Templates for AppSync",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/resolver-mapping-template-reference.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Matia Rašetina",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Your bio.",
+      "linkedin": "linked-in-ID",
+      "twitter": "twitter-handle"
+    }
+  ]
+}
