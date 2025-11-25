@@ -120,7 +120,7 @@ Resources:
     Properties:
       Handler: iterate.handler
       CodeUri: ./src
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Timeout: 60
       ReservedConcurrentExecutions: 5
 

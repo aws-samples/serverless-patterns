@@ -32,7 +32,7 @@ Resources:
       Handler: function.handler
       PackageType: "Zip"
       Tracing: Active
-      Runtime: "nodejs22.x"
+      Runtime: "nodejs24.x"
       Environment:
         Variables:
           DatabaseTable: !Ref DynamoDBTable

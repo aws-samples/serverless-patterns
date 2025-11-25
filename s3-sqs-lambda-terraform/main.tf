@@ -84,7 +84,7 @@ resource "aws_lambda_function" "MyHandlerFunction-Function" {
   function_name = "s3-sqs-lambda-tf-LambdaFunction"
   role          = aws_iam_role.MyHandlerFunction-Role.arn
   handler       = "app.handler"
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs24.x"
 }
 
 # Create a zip file from the Lambda source code

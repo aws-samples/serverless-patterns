@@ -12,7 +12,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Timeout: 3
       FunctionUrlConfig:
         AuthType: AWS_IAM

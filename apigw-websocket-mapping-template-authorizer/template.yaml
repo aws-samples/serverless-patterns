@@ -142,7 +142,7 @@ Resources:
       Handler: authorizer.handler
       MemorySize: 256
       CodeUri: ./src
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
 
   LambdaAuthPermission:
     Type: AWS::Lambda::Permission
@@ -161,7 +161,7 @@ Resources:
     Properties:
       Handler: onconnect.handler
       CodeUri: ./src
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Environment:
         Variables:
           TABLE_NAME: !Ref ConnectionsTable
@@ -185,7 +185,7 @@ Resources:
     Properties:
       Handler: ondisconnect.handler
       CodeUri: ./src
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Environment:
         Variables:
           TABLE_NAME: !Ref ConnectionsTable
@@ -211,7 +211,7 @@ Resources:
     Properties:
       Handler: sendmessage.handler
       CodeUri: ./src
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Environment:
         Variables:
           TABLE_NAME: !Ref ConnectionsTable
