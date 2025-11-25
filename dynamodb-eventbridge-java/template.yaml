@@ -24,7 +24,7 @@ Resources:
     Properties:
       CodeUri: PublishFunction
       Handler: com.example.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       Architectures:
         - x86_64
       Timeout: 30
@@ -49,7 +49,7 @@ Resources:
       Description: Processes events for inserts.
       CodeUri: SubscribeFunction/
       Handler: com.example.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       MemorySize: 512
       Timeout: 30
 
@@ -59,7 +59,7 @@ Resources:
       Description: Processes events for deletes.
       CodeUri: SubscribeFunction/
       Handler: com.example.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       MemorySize: 512
       Timeout: 30
 

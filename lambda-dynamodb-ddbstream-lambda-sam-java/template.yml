@@ -4,7 +4,7 @@ Description: lambda-dynamodb-ddbstream-lambda (uksb-1tthgi812) (tag:lambda-dynam
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 512
     Timeout: 25
 

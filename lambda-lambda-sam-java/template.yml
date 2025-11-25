@@ -4,7 +4,7 @@ Description: choreography-pattern (uksb-1tthgi812) (tag:lambda-lambda-sam-java)
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 3072
     Timeout: 30
 

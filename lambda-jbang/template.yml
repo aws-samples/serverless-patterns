@@ -8,7 +8,7 @@ Resources:
       CodeUri: JBangFunction
       FunctionName: JBangFunction
       Handler: 'JBangHandler'
-      Runtime: java17
+      Runtime: java25
       Description: 'Hello Java 17 with JBang'
       MemorySize: 1769
       Timeout: 15

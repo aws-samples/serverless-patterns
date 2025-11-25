@@ -27,7 +27,7 @@ Resources:
       FunctionName: GetSecret
       CodeUri: GetSecretFunction
       Handler: com.example.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       Architectures:
         - x86_64
       Timeout: 30
