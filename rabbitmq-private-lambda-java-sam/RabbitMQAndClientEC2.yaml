@@ -1,0 +1,869 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
+  RabbitMQEngineVersion:
+    Type: String
+    Default: 3.13
+    Description: RabbitMQ engine version
+  JavaVersion:
+    Type: String
+    Description: Choose the version of Java. Lambda currently supports Java 11, 17 and 21
+    AllowedValues:
+      - java11
+      - java17
+      - java21
+    Default: java21
+  RabbitMQBrokerName:
+    Type: String
+    Default: RabbitMQJavaLambdaBroker
+    Description: RabbitMQ broker name for Lambda function
+  RabbitMQQueueName:
+    Type: String
+    Default: RabbitMQJavaLambdaQueue
+    Description: RabbitMQ queue name for Lambda function
+  RabbitMQVirtualHost:
+    Type: String
+    Default: RabbitMQVirtualHost
+    Description: RabbitMQ virtual host name for Lambda function
+  RabbitMQExchange:
+    Type: String
+    Default: RabbitMQExchange
+    Description: RabbitMQ exchange for Lambda function
+  RabbitMQBrokerAdminUser:
+    Type: String
+    Description: Username for the RabbitMQ Broker
+    Default: rabbitmqadmin
+  RabbitMQBrokerPassword:
+    Type: String
+    Description: Password for the RabbitMQ Broker
+    Default: rabbitmqPassword123
+    NoEcho: true
+  ServerlessLandGithubLocation:
+    Type: String
+    Default: https://github.com/aws-samples/serverless-patterns.git
+    Description: Github location of the code. Make sure to leave the .git at the end even if you are using a fork
+
+Mappings:
+  SubnetConfig:
+      VPC:
+        CIDR: '10.2.0.0/16'
+      PublicOne:
+        CIDR: '10.2.0.0/24'
+      PublicTwo:
+        CIDR: '10.2.1.0/24'
+      PublicThree:
+        CIDR: '10.2.2.0/24'
+      PrivateSubnetRabbitMQOne:
+        CIDR: '10.2.3.0/24'
+      PrivateSubnetRabbitMQTwo:
+        CIDR: '10.2.4.0/24'
+      PrivateSubnetRabbitMQThree:
+        CIDR: '10.2.5.0/24'
+
+Resources:
+  # Secrets Manager Secret for RabbitMQ credentials
+  RabbitMQSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: 'AmazonRabbitMQCredentials'
+      Description: RabbitMQ broker master user credentials
+      SecretString: !Sub |
+        {
+          "username": "${RabbitMQBrokerAdminUser}",
+          "password": "${RabbitMQBrokerPassword}"
+        }
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+      Tags:
+        - Key: 'Name'
+          Value: 'RabbitMQVPC'
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicOne', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: 'Name'
+          Value: 'PublicSubnetOne'
+  PublicSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 1
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicTwo', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: 'Name'
+          Value: 'PublicSubnetTwo'
+  PublicSubnetThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 2
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicThree', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: 'Name'
+          Value: 'PublicSubnetThree'
+  PrivateSubnetRabbitMQOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetRabbitMQOne', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetRabbitMQOne'
+  PrivateSubnetRabbitMQTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 1
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetRabbitMQTwo', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetRabbitMQTwo'
+  PrivateSubnetRabbitMQThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 2
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetRabbitMQThree', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetRabbitMQThree'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+
+  NATEIP1:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachement
+    Properties: 
+      Domain: vpc
+
+  NATGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NATEIP1.AllocationId
+      SubnetId: !Ref 'PublicSubnetOne'
+      Tags: 
+        - Key: 'Name'
+          Value: 'RabbitMQNATGateway1'
+
+  NATEIP2:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachement
+    Properties: 
+      Domain: vpc
+
+  NATGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NATEIP2.AllocationId
+      SubnetId: !Ref 'PublicSubnetTwo'
+      Tags: 
+        - Key: 'Name'
+          Value: 'RabbitMQNATGateway2'
+
+  NATEIP3:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachement
+    Properties: 
+      Domain: vpc
+
+  NATGateway3:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NATEIP3.AllocationId
+      SubnetId: !Ref 'PublicSubnetThree'
+      Tags: 
+        - Key: 'Name'
+          Value: 'RabbitMQNATGateway3'
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+      
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachement
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
+      
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetOne
+      RouteTableId: !Ref PublicRouteTable
+      
+  PublicSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetTwo
+      RouteTableId: !Ref PublicRouteTable
+      
+  PublicSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetThree
+      RouteTableId: !Ref PublicRouteTable
+      
+  PrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PrivateRoute1:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway1
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable1'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway1'
+      
+  PrivateRouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PrivateRoute2:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway2
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable2'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway2'
+
+  PrivateRouteTable3:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PrivateRoute3:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway3
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable3'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway3'
+
+  PrivateSubnetRabbitMQOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnetRabbitMQOne
+      
+  PrivateSubnetRabbitMQTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2
+      SubnetId: !Ref PrivateSubnetRabbitMQTwo
+      
+  PrivateSubnetRabbitMQThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable3
+      SubnetId: !Ref PrivateSubnetRabbitMQThree
+  
+  RabbitMQClientInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
+      GroupName: !Sub "${AWS::StackName} Security group attached to the RabbitMQ client"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 10.0.0.0/16
+
+  RabbitMQSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: [VPC,RabbitMQClientInstanceSecurityGroup]
+    Properties:
+      GroupDescription: RabbitMQ Security Group
+      GroupName: !Sub "${AWS::StackName} Security group for the RabbitMQ broker"
+      VpcId: !Ref 'VPC'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5671
+          ToPort: 5671
+          SourceSecurityGroupId: !GetAtt RabbitMQClientInstanceSecurityGroup.GroupId
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !GetAtt RabbitMQClientInstanceSecurityGroup.GroupId
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+
+  RabbitMQClientSelfIngressAllowRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: RabbitMQClientInstanceSecurityGroup
+    Properties:
+      GroupId: !GetAtt RabbitMQClientInstanceSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      SourceSecurityGroupId: !GetAtt RabbitMQClientInstanceSecurityGroup.GroupId
+
+  # RabbitMQ Broker
+  RabbitMQBroker:
+    Type: AWS::AmazonMQ::Broker
+    Properties:
+      BrokerName: !Ref RabbitMQBrokerName
+      DeploymentMode: CLUSTER_MULTI_AZ
+      EngineType: RABBITMQ
+      EngineVersion: !Ref RabbitMQEngineVersion
+      HostInstanceType: mq.m5.large
+      PubliclyAccessible: false
+      AutoMinorVersionUpgrade: true
+      Users:
+        - Username: !Ref RabbitMQBrokerAdminUser
+          Password: !Ref RabbitMQBrokerPassword
+          ConsoleAccess: true
+      SubnetIds:
+        - !Ref PrivateSubnetRabbitMQOne
+        - !Ref PrivateSubnetRabbitMQTwo
+        - !Ref PrivateSubnetRabbitMQThree
+      SecurityGroups:
+        - !Ref RabbitMQSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-rabbitmq-broker"
+
+  RabbitMQClientEC2Instance:
+    DependsOn: RabbitMQBroker
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: {Ref: 'AWS::Region'}
+      SubnetId: !Ref PublicSubnetOne
+      SecurityGroupIds: [!GetAtt RabbitMQClientInstanceSecurityGroup.GroupId]
+      ImageId: !Ref LatestAmiId
+      Tags:
+        - Key: 'Name'
+          Value: 'RabbitMQClientInstance'
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp2
+            DeleteOnTermination: true    
+      UserData:
+        Fn::Base64:
+          !Sub
+          - |
+            #!/bin/bash
+            yum update -y
+            
+            # install Java
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum update -y
+            
+                # install Java
+                JAVA_VERSION=${java_version}
+                echo "export JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+                if [ "$JAVA_VERSION" == "java11" ]; then
+                    sudo yum install java-11-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java17" ]; then
+                    sudo yum install java-17-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java21" ]; then
+                    sudo yum install java-21-amazon-corretto-devel -y
+                else
+                    sudo yum install java-21-amazon-corretto-devel -y
+                fi
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of Java succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install nmap-ncat -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of nmap succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install git -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of git succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum erase awscli -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum erase of awscli succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                yum install jq -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of jq succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y docker
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of docker succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            service docker start
+            usermod -a -G docker ec2-user
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo yum install -y maven
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of maven succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+
+            cd /home/ec2-user
+            su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
+            su -c "pip3 install boto3 --user" -s /bin/sh ec2-user
+
+            # install AWS CLI 2 - access with aws2
+            cd /home/ec2-user
+            mkdir -p awscli
+            cd awscli
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            
+            # Install AWS SAM CLI
+            cd /home/ec2-user
+            mkdir -p awssam
+            cd awssam
+            wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+            unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
+            sudo ./sam-installation/install
+            
+            # Set environment variables
+            RABBITMQ_BROKER_ID=${rabbitmq_broker_id}
+            RABBITMQ_BROKER_ARN=${rabbitmq_broker_arn}
+            RABBITMQ_QUEUE_NAME=${rabbitmq_queue_name}
+            RABBITMQ_SECRET_ARN=${rabbitmq_secret_arn}
+            AWS_REGION=${aws_region}
+            RABBITMQ_SUBNET_ONE=${rabbitmq_subnet_one}
+            RABBITMQ_SUBNET_TWO=${rabbitmq_subnet_two}
+            RABBITMQ_SUBNET_THREE=${rabbitmq_subnet_three}
+            RABBITMQ_SECURITY_GROUP=${rabbitmq_security_group}
+            RABBITMQ_BROKER_ADMIN_USER=${rabbitmq_broker_admin_user}
+            RABBITMQ_BROKER_PASSWORD=${rabbitmq_broker_password}
+            SECURITY_GROUP=${security_group_id}
+            RABBITMQ_VIRTUAL_HOST=${rabbitmq_virtual_host}
+            RABBITMQ_EXCHANGE=${rabbitmq_exchange}
+
+            echo "export RABBITMQ_BROKER_ID=$RABBITMQ_BROKER_ID" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_BROKER_ARN=$RABBITMQ_BROKER_ARN" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_QUEUE_NAME=$RABBITMQ_QUEUE_NAME" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_VIRTUAL_HOST=$RABBITMQ_VIRTUAL_HOST" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_EXCHANGE=$RABBITMQ_EXCHANGE" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_SECRET_ARN=$RABBITMQ_SECRET_ARN" >> /home/ec2-user/.bash_profile
+            echo "export AWS_REGION=$AWS_REGION" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_SUBNET_ONE=$RABBITMQ_SUBNET_ONE" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_SUBNET_TWO=$RABBITMQ_SUBNET_TWO" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_SUBNET_THREE=$RABBITMQ_SUBNET_THREE" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_SECURITY_GROUP=$RABBITMQ_SECURITY_GROUP" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_BROKER_ADMIN_USER=$RABBITMQ_BROKER_ADMIN_USER" >> /home/ec2-user/.bash_profile
+            echo "export RABBITMQ_BROKER_PASSWORD=$RABBITMQ_BROKER_PASSWORD" >> /home/ec2-user/.bash_profile
+            echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
+                       
+            # Clone serverless patterns
+            cd /home/ec2-user
+            SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
+            git clone -n --depth=1 --filter=tree:0 $SERVERLESS_LAND_GITHUB_LOCATION
+            cd ./serverless-patterns
+            git sparse-checkout set --no-cone /rabbitmq-private-lambda-java-sam
+            git checkout
+            cd rabbitmq-private-lambda-java-sam
+            sudo chown -R ec2-user .
+            
+            #Substitute SAM template variables
+            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam
+            cd rabbitmq_consumer_dynamo_sam
+            cp template_original.yaml template.yaml
+            sudo chown -R ec2-user .
+            source /home/ec2-user/.bash_profile
+            sed -i "s/RABBITMQ_BROKER_ARN/$RABBITMQ_BROKER_ARN/g" template.yaml
+            sed -i "s/RABBITMQ_QUEUE_NAME/$RABBITMQ_QUEUE_NAME/g" template.yaml
+            sed -i "s/RABBITMQ_VIRTUAL_HOST/$RABBITMQ_VIRTUAL_HOST/g" template.yaml
+            sed -i "s/RABBITMQ_SECRET_ARN/$RABBITMQ_SECRET_ARN/g" template.yaml
+            sed -i "s/JAVA_VERSION/$JAVA_VERSION/g" template.yaml
+            sed -i "s/RABBITMQ_SUBNET_ONE/$RABBITMQ_SUBNET_ONE/g" template.yaml
+            sed -i "s/RABBITMQ_SUBNET_TWO/$RABBITMQ_SUBNET_TWO/g" template.yaml
+            sed -i "s/RABBITMQ_SUBNET_THREE/$RABBITMQ_SUBNET_THREE/g" template.yaml
+            sed -i "s/SECURITY_GROUP/$SECURITY_GROUP/g" template.yaml
+                        
+            #Update Shell script for sending RabbitMQ messages to Lambda function
+            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam/rabbitmq_message_sender_json
+            sudo chown ec2-user ./commands.sh
+            source /home/ec2-user/.bash_profile
+            echo "RABBITMQ_BROKER_ENDPOINT=${rabbitmq_broker_endpoint}" 
+            sed -i "s|RABBITMQ_BROKER_ENDPOINT|${rabbitmq_broker_endpoint}|g" commands.sh
+            sed -i "s/RABBITMQ_QUEUE_NAME/$RABBITMQ_QUEUE_NAME/g" commands.sh
+            sed -i "s/RABBITMQ_VIRTUAL_HOST/$RABBITMQ_VIRTUAL_HOST/g" commands.sh
+            sed -i "s/RABBITMQ_EXCHANGE/$RABBITMQ_EXCHANGE/g" commands.sh
+            mvn clean install
+            
+            #Create RabbitMQ Exchange and Queue and link queue to exchange
+            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam
+            sudo chown ec2-user ./create_rabbit_queue.sh
+            source /home/ec2-user/.bash_profile
+            sed -i "s|RABBITMQ_BROKER_ENDPOINT|${rabbitmq_broker_endpoint}|g" create_rabbit_queue.sh
+            sed -i "s/RABBITMQ_QUEUE_NAME/$RABBITMQ_QUEUE_NAME/g" create_rabbit_queue.sh
+            sed -i "s/RABBITMQ_VIRTUAL_HOST/$RABBITMQ_VIRTUAL_HOST/g" create_rabbit_queue.sh
+            sed -i "s/RABBITMQ_EXCHANGE/$RABBITMQ_EXCHANGE/g" create_rabbit_queue.sh
+            sed -i "s/RABBITMQ_BROKER_ADMIN_USER/$RABBITMQ_BROKER_ADMIN_USER/g" create_rabbit_queue.sh
+            sed -i "s/RABBITMQ_BROKER_PASSWORD/$RABBITMQ_BROKER_PASSWORD/g" create_rabbit_queue.sh
+            
+            sh ./create_rabbit_queue.sh
+            
+            #Script to check if RabbitMQ Virtual Host, Exchange and Queue have been created properly
+            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam
+            sudo chown ec2-user ./query_rabbit_queue.sh
+            source /home/ec2-user/.bash_profile
+            sed -i "s|RABBITMQ_BROKER_ENDPOINT|${rabbitmq_broker_endpoint}|g" query_rabbit_queue.sh
+            sed -i "s/RABBITMQ_QUEUE_NAME/$RABBITMQ_QUEUE_NAME/g" query_rabbit_queue.sh
+            sed -i "s/RABBITMQ_VIRTUAL_HOST/$RABBITMQ_VIRTUAL_HOST/g" query_rabbit_queue.sh
+            sed -i "s/RABBITMQ_EXCHANGE/$RABBITMQ_EXCHANGE/g" query_rabbit_queue.sh
+            sed -i "s/RABBITMQ_BROKER_ADMIN_USER/$RABBITMQ_BROKER_ADMIN_USER/g" query_rabbit_queue.sh
+            sed -i "s/RABBITMQ_BROKER_PASSWORD/$RABBITMQ_BROKER_PASSWORD/g" query_rabbit_queue.sh
+                                   
+            # Get IP CIDR range for EC2 Instance Connect
+            cd /home/ec2-user
+            mkdir -p ip_prefix
+            cd ip_prefix
+            git clone https://github.com/joetek/aws-ip-ranges-json.git
+            cd aws-ip-ranges-json
+            AWS_REGION=${aws_region}
+            EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
+            echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
+            SECURITY_GROUP=${security_group_id}
+            echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
+            aws ec2 authorize-security-group-ingress --region $AWS_REGION --group-id $SECURITY_GROUP --protocol tcp --port 22 --cidr $EC2_CONNECT_IP
+            
+          - rabbitmq_broker_id: !Ref RabbitMQBroker
+            rabbitmq_broker_arn: !GetAtt RabbitMQBroker.Arn
+            rabbitmq_broker_endpoint: !Select [ 0, !GetAtt RabbitMQBroker.AmqpEndpoints ]
+            rabbitmq_virtual_host: !Ref RabbitMQVirtualHost
+            rabbitmq_exchange: !Ref RabbitMQExchange
+            rabbitmq_queue_name: !Ref RabbitMQQueueName
+            rabbitmq_secret_arn: !Ref RabbitMQSecret
+            serverless_land_github_location: !Ref ServerlessLandGithubLocation
+            aws_region: !Ref 'AWS::Region'
+            java_version: !Ref JavaVersion
+            security_group_id : !GetAtt RabbitMQClientInstanceSecurityGroup.GroupId
+            rabbitmq_subnet_one: !Ref PrivateSubnetRabbitMQOne
+            rabbitmq_subnet_two: !Ref PrivateSubnetRabbitMQTwo
+            rabbitmq_subnet_three: !Ref PrivateSubnetRabbitMQThree
+            rabbitmq_security_group: !GetAtt RabbitMQSecurityGroup.GroupId
+            rabbitmq_broker_admin_user: !Ref RabbitMQBrokerAdminUser
+            rabbitmq_broker_password: !Ref RabbitMQBrokerPassword
+
+  EC2InstanceEndpoint:
+    Type: AWS::EC2::InstanceConnectEndpoint
+    Properties:
+      PreserveClientIp: true
+      SecurityGroupIds: 
+        - !GetAtt RabbitMQClientInstanceSecurityGroup.GroupId
+      SubnetId: !Ref PublicSubnetOne
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonMQFullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess_v2
+      Policies:
+        - PolicyName: RabbitMQAccess
+          PolicyDocument: !Sub '{
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+                      "Sid": "RabbitMQFullAccess",
+                      "Effect": "Allow",
+                      "Action": [
+                          "mq:*"
+                      ],
+                      "Resource": "*"
+                  }
+              ]
+          }'
+        - PolicyName: SecretsManagerAccess
+          PolicyDocument: !Sub '{
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+                      "Effect": "Allow",
+                      "Action": [
+                          "secretsmanager:GetSecretValue",
+                          "secretsmanager:PutSecretValue",
+                          "secretsmanager:DescribeSecret"
+                      ],
+                      "Resource": "${RabbitMQSecret}"
+                  }
+              ]
+          }'
+        - PolicyName: CloudformationDeploy
+          PolicyDocument: !Sub '{
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+            "Effect": "Allow",
+            "Action": [
+                "iam:*"
+            ],
+            "Resource": "*"
+        }
+              ]
+          }' 
+        - PolicyName: SecurityGroupsPolicy
+          PolicyDocument: !Sub '{
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:DescribeSecurityGroups",
+                        "ec2:DescribeSecurityGroupRules",
+                        "ec2:DescribeTags"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:AuthorizeSecurityGroupIngress", 
+                        "ec2:RevokeSecurityGroupIngress", 
+                        "ec2:AuthorizeSecurityGroupEgress", 
+                        "ec2:RevokeSecurityGroupEgress", 
+                        "ec2:ModifySecurityGroupRules",
+                        "ec2:UpdateSecurityGroupRuleDescriptionsIngress", 
+                        "ec2:UpdateSecurityGroupRuleDescriptionsEgress"
+                    ],
+                    "Resource": [
+                        "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*"
+                    ]
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:ModifySecurityGroupRules"
+                    ],
+                    "Resource": [
+                        "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group-rule/*"
+                    ]
+                }
+            ]
+        }'         
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Join
+        - '-'
+        - - 'EC2RabbitMQProfile'
+          - !Ref 'AWS::StackName'
+      Roles:
+        - !Ref EC2Role
+
+Outputs:
+  VPCId: 
+    Description: The ID of the VPC created
+    Value: !Ref 'VPC'
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCID"
+  PublicSubnetOne: 
+    Description: The name of the public subnet created
+    Value: !Ref 'PublicSubnetOne'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnetOne"
+  PrivateSubnetRabbitMQOne: 
+    Description: The ID of private subnet one created
+    Value: !Ref 'PrivateSubnetRabbitMQOne'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetRabbitMQOne"
+  PrivateSubnetRabbitMQTwo: 
+    Description: The ID of private subnet two created
+    Value: !Ref 'PrivateSubnetRabbitMQTwo'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetRabbitMQTwo"
+  PrivateSubnetRabbitMQThree: 
+    Description: The ID of private subnet three created
+    Value: !Ref 'PrivateSubnetRabbitMQThree'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetRabbitMQThree"
+  VPCStackName: 
+    Description: The name of the VPC Stack
+    Value: !Ref 'AWS::StackName'
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCStackName"
+  RabbitMQBrokerEndpoint:
+    Description: RabbitMQ Broker AMQP Endpoint
+    Value: !Select [ 0, !GetAtt RabbitMQBroker.AmqpEndpoints ]
+    Export:
+      Name: !Sub "${AWS::StackName}-RabbitMQBrokerEndpoint"
+  RabbitMQSecretArn:
+    Description: ARN of the RabbitMQ credentials secret
+    Value: !Ref RabbitMQSecret
+    Export:
+      Name: !Sub "${AWS::StackName}-RabbitMQSecretArn"
+  SecurityGroupId:
+    Description: ID of security group for RabbitMQ clients
+    Value: !GetAtt RabbitMQSecurityGroup.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}-SecurityGroupId"
+  ClientSecurityGroupId:
+    Description: ID of security group for RabbitMQ clients
+    Value: !GetAtt RabbitMQClientInstanceSecurityGroup.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}-ClientSecurityGroupId"
+  EC2InstanceEndpointID:
+    Description: The ID of the EC2 Instance Endpoint
+    Value: !Ref EC2InstanceEndpoint
+  RabbitMQBrokerName:
+    Description: The Broker name to use for the Java Lambda Function
+    Value: !Ref RabbitMQBrokerName
+    Export:
+      Name: !Sub "${AWS::StackName}-RabbitMQBrokerName"
+  RabbitMQQueueName:
+    Description: The Queue name to use for the Java Lambda Function
+    Value: !Ref RabbitMQQueueName
+    Export:
+      Name: !Sub "${AWS::StackName}-RabbitMQQueueName"
