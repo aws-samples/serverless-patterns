@@ -33,7 +33,7 @@ export class CdkStack extends cdk.Stack {
       "AddUserPostConfirmationFunc",
       {
         functionName: "addUserFunc", // optional
-        runtime: Runtime.NODEJS_20_X,
+        runtime: Runtime.NODEJS_24_X,
         handler: "handler",
         entry: path.join(
           __dirname,

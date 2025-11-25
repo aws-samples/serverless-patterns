@@ -14,7 +14,7 @@ export class HttpApiLambdaStack extends cdk.Stack {
     // Dummy Lambda
     const dummyFn = new NodejsFunction(this, "HelloWorldHandler", {
       functionName: "dummy",
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_24_X,
       entry: path.join(__dirname, `/../resources/dummy.ts`)
     })
 

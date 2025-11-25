@@ -5462,7 +5462,7 @@
         "PYTHON_3_8",
         "PYTHON_3_14",
         "UNSUPPORTED",
-        "NODEJS_18_X",
+        "NODEJS_24_X",
         "GO_1_X",
         "JAVA_17",
         "PYTHON_3_10"
