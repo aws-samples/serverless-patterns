@@ -8,7 +8,7 @@ Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/devel
     Function:
         Timeout: 5
         MemorySize: 128
-        Runtime: python3.10
+        Runtime: python3.14
         Tracing: Active
 
 Resources:
@@ -58,10 +58,10 @@ Resources:
             Description: Layer containing extension(s)
             ContentUri: share_layer/
             CompatibleRuntimes:
-                - python3.10
+                - python3.14
             RetentionPolicy: Delete  
         Metadata:
-            BuildMethod: python3.10
+            BuildMethod: python3.14
     SourceSqsQueue:
         Type: AWS::SQS::Queue
 

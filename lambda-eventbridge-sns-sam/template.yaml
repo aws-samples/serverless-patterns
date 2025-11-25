@@ -246,7 +246,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 128
       Policies:
       - Statement:

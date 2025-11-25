@@ -48,7 +48,7 @@ variable "function_description" {
 
 variable "function_runtime" {
   type        = string
-  default     = "python3.12"
+  default     = "python3.14"
   description = "Identifier of the function's runtime"
 }
 

@@ -61,7 +61,7 @@ resource "aws_s3_object" "lambda_code_upload" {
 # resource "aws_lambda_layer_version" "lambda_layer_wrangler" {
 #   filename   = "${path.module}/../../../../build_tools/awswrangler-layer-2.17.0-py3.9.zip"
 #   layer_name = "aws_wrangler"
-#   compatible_runtimes = ["python3.9"]
+#   compatible_runtimes = ["python3.14"]
 # }
 
 # Create Lambda Function
@@ -72,7 +72,7 @@ resource "aws_lambda_function" "first_glue_job_trigger_glue_workflow" {
   s3_key    = "lambda_scripts/first_glue_job_trigger_glue_workflow.zip" # S3 Key for the Lambda Function
   source_code_hash = "${data.archive_file.lambda_zip_dir.output_base64sha256}" # Archived source code hash
  
-  runtime = "python3.9" # Choose from python3.6, python3.7, python3.8, python3.9
+  runtime = "python3.14" # Choose from python3.6, python3.14, python3.14, python3.14
   handler = "first_glue_job_trigger_glue_workflow.lambda_handler" # This is the function that will be executed when the lambda is triggered
   timeout = 900 # 15 minutes is the maximum time allowed for the lambda function to run
   role = aws_iam_role.terraform_lambda_function_role.arn

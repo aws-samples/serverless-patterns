@@ -17,7 +17,7 @@ Resources:
     Properties:
       FunctionName: LambdaProducerFunction
       Handler: apiHandler.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       CodeUri: src/
       Policies:
         DynamoDBCrudPolicy:
@@ -51,7 +51,7 @@ Resources:
     Properties:
       FunctionName: LambdaConsumerFunction
       Handler: messageHandler.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       CodeUri: src/
       Policies: 
       - KinesisStreamReadPolicy:

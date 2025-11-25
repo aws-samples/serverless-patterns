@@ -46,7 +46,7 @@ with the following pytest directive:
 ```
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ".venv/lib/python3.9/site-packages"]
+pythonpath = ".venv/lib/python3.14/site-packages"]
 `
 
 ## Architecture

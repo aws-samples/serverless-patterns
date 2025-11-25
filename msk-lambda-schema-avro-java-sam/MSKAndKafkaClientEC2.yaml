@@ -480,7 +480,7 @@ Resources:
             done
 
             cd /home/ec2-user
-            su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
+            su -c "ln -s /usr/bin/python3.14 /usr/bin/python3" -s /bin/sh ec2-user
             su -c "pip3 install boto3 --user" -s /bin/sh ec2-user
             su -c "pip3 install kafka-python --user" -s /bin/sh ec2-user
 
@@ -776,7 +776,7 @@ Resources:
             done
 
             cd /home/ec2-user
-            su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
+            su -c "ln -s /usr/bin/python3.14 /usr/bin/python3" -s /bin/sh ec2-user
             su -c "pip3 install boto3 --user" -s /bin/sh ec2-user
             su -c "pip3 install kafka-python --user" -s /bin/sh ec2-user
 

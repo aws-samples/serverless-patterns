@@ -13,7 +13,7 @@ variable "function_name" {
 variable "runtime" {
     description = "runtime"
     type        = string 
-    default     = "python3.9"
+    default     = "python3.14"
 }
 
 # Lambda - Timeout

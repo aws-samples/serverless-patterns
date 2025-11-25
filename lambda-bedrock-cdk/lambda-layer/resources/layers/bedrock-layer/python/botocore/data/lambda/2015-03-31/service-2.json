@@ -5214,7 +5214,7 @@
         "python3.6",
         "python3.7",
         "python3.8",
-        "python3.9",
+        "python3.14",
         "dotnetcore1.0",
         "dotnetcore2.0",
         "dotnetcore2.1",
@@ -5230,7 +5230,7 @@
         "python3.10",
         "java17",
         "ruby3.2",
-        "python3.11"
+        "python3.14"
       ]
     },
     "RuntimeVersionArn":{

@@ -47,7 +47,7 @@ Resources:
             Path: /text/model_anthropic_claudev2
             Method: post    
             RestApiId: !Ref bedrockAPI
-      Runtime: python3.11
+      Runtime: python3.14
       Handler: lambda_function.lambda_handler
       CodeUri: src/
       Timeout: 90

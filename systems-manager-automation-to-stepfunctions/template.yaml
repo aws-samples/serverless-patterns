@@ -86,7 +86,7 @@ Resources:
     Properties:
       Handler: create-snapshot-lamda-function.handler
       CodeUri: ./src
-      Runtime: python3.8
+      Runtime: python3.14
       Timeout: 60
       ReservedConcurrentExecutions: 5
       Policies:
@@ -103,7 +103,7 @@ Resources:
     Properties:
       Handler: get-snapshot-status-lamda-function.handler
       CodeUri: ./src
-      Runtime: python3.8
+      Runtime: python3.14
       Timeout: 60
       ReservedConcurrentExecutions: 5
       Policies:

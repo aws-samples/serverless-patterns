@@ -7,7 +7,7 @@ Description: Serverless patterns - Amazon API Gateway, AWS Lambda and Amazon Aur
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: python3.13
+    Runtime: python3.14
     MemorySize: 128
     Timeout: 3
     LoggingConfig:

@@ -36,7 +36,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: lambda_authorizer.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Ref MySecret
@@ -49,7 +49,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: lambda_function.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Events:
         Post:
           Type: Api
