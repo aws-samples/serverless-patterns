@@ -1,6 +1,6 @@
 # Amazon Eventbridge Schedule to Invoke AWS Lambda
 
-The application creates an Eventbridge Schedule for every 5 minutes that invokes a Lambda function.  The function in this example uses the Java11 runtime.  For more information on Amazon EventBridge Scheduler, please see the [User Guide](https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html).
+The application creates an Eventbridge Schedule for every 5 minutes that invokes a Lambda function.  The function in this example uses the Java runtime.  For more information on Amazon EventBridge Scheduler, please see the [User Guide](https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

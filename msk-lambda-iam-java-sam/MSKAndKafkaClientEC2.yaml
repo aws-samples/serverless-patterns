@@ -21,7 +21,8 @@ Parameters:
       - java11
       - java17
       - java21
-    Default: java21
+      - java25
+    Default: java25
   ApacheKafkaInstallerLocation:
     Type: String
     Default: https://archive.apache.org/dist/kafka/3.5.1/kafka_2.13-3.5.1.tgz
@@ -315,8 +316,10 @@ Resources:
                     sudo yum install java-17-amazon-corretto-devel -y
                 elif [ "$JAVA_VERSION" == "java21" ]; then
                     sudo yum install java-21-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java25" ]; then
+                    sudo yum install java-25-amazon-corretto-devel -y
                 else
-                    sudo yum install java-21-amazon-corretto-devel -y
+                    sudo yum install java-25-amazon-corretto-devel -y
                 fi
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -588,8 +591,10 @@ Resources:
                     sudo yum install java-17-amazon-corretto-devel -y
                 elif [ "$JAVA_VERSION" == "java21" ]; then
                     sudo yum install java-21-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java25" ]; then
+                    sudo yum install java-25-amazon-corretto-devel -y
                 else
-                    sudo yum install java-21-amazon-corretto-devel -y
+                    sudo yum install java-25-amazon-corretto-devel -y
                 fi
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
