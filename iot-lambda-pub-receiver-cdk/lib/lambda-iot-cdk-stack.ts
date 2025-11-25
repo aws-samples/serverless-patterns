@@ -27,7 +27,7 @@ export class LambdaIotCdkStack extends Stack {
       handler: 'publisher_function.handler',
       code: Code.fromAsset('./src'),
       description: 'This function publishes a message to AWS IoT Core - MTTQ',
-      runtime: Runtime.PYTHON_3_12,
+      runtime: Runtime.PYTHON_3_14,
       architecture: Architecture.ARM_64,
       logGroup: this.addLogGroup(`/aws/lambda/pub-lambda`),
       environment: {
@@ -50,14 +50,14 @@ export class LambdaIotCdkStack extends Stack {
       description: 'This function get invoked by AWS IoT Core through the action-rule',
       code: Code.fromAsset('./src', {
         bundling: {
-          image: Runtime.PYTHON_3_12.bundlingImage,
+          image: Runtime.PYTHON_3_14.bundlingImage,
           command: [
             'bash', '-c',
             'pip install -r receiver_requirements.txt -t /asset-output && cp -au . /asset-output'
           ],
         },
       }),
-      runtime: Runtime.PYTHON_3_12,
+      runtime: Runtime.PYTHON_3_14,
       architecture: Architecture.ARM_64,
       logGroup: this.addLogGroup(`/aws/lambda/receiver-lambda`)
     })

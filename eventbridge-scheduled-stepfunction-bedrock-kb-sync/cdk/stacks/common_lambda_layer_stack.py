@@ -11,7 +11,7 @@ from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_ssm as ssm
 from constructs import Construct
 
-LAMBDA_RUNTIME = _lambda.Runtime.PYTHON_3_9
+LAMBDA_RUNTIME = _lambda.Runtime.PYTHON_3_14
 bundle_commands = [
     "pip",
     "install",

@@ -86,7 +86,7 @@ class ApigwBedrockCognitoCdkStack(Stack):
             "bedrock",
             None,
             BundlingOptions(
-                image=_lambda.Runtime.PYTHON_3_12.bundling_image,
+                image=_lambda.Runtime.PYTHON_3_14.bundling_image,
                 command=[
                     "bash",
                     "-c",
@@ -151,7 +151,7 @@ class ApigwBedrockCognitoCdkStack(Stack):
         return _lambda.Function(
             self,
             func_id,
-            runtime=_lambda.Runtime.PYTHON_3_12,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset(
                 os.path.join("src", handler), bundling=bundle_options
             ),
