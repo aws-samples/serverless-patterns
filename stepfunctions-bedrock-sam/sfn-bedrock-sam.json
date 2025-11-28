@@ -1,6 +1,6 @@
 {
     "title": "AWS Step Functions to Amazon Bedrock Integration",
-    "description": "This SAM template deploys a Step Functions workflow that invokes Amazon Bedrock Anthropic Claude Model v2.1 to generate content for a given prompt.",
+    "description": "This SAM template deploys a Step Functions workflow that invokes Amazon Bedrock Anthropic Claude Sonnet 4.5 to generate content for a given prompt.",
     "language": "YAML",
     "level": "200",
     "framework": "AWS SAM",
@@ -8,7 +8,7 @@
         "headline": "How it works",
         "text": [
             "Start the Express Workflow using the `start-sync-execution` api command with a prompt string in English for generating content as per the input payload.",
-            "The Express Workflow invokes Amazon Bedrock Anthropic Claude v2.1 Model with the prompt.",
+            "The Express Workflow invokes Amazon Bedrock Anthropic Claude Sonnet 4.5 with the prompt.",
             "Amazon Bedrock returns the generated content as the given promptsentiment of the input text.",
             "If the integration succeeds, the generated content is returned in Step Function execution results within an output object.",
             "If the integration fails, the Step Functions workflow will retry up to 5 times before exiting with a status:FAILED response."
