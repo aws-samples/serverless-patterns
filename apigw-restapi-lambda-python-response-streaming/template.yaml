@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: |
+  A sample SAM template for streaming Bedrock responses with Lambda Response Streaming and Lambda Web Adapter.
+  This template includes an response streaming enabled Amazon API Gateway REST API that invokes a python Lambda function
+  that uses Lambda Web Adaptor with Fast API to enable response streaming.
+
+Resources:
+  StreamingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap #required for Lambda Web Adapter
+          PORT: 8080 #sets the port to be used in run.sh, for Lambda Web Adapter
+          AWS_LWA_INVOKE_MODE: RESPONSE_STREAM #set Lambda Web Adapter to enable response streaming for Lambda functions
+      CodeUri: src/
+      Handler: run.sh #required for the Lambda Web Adapter
+      Runtime: python3.14
+      Architectures:
+        - arm64 #AWS Graviton for better price performance
+      Timeout: 60
+      Tracing: Active
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:753240598075:layer:LambdaAdapterLayerArm64:25 #Lambda Web Adapter Layer for arm64/graviton
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - bedrock:InvokeModelWithResponseStream #Lambda function permission to call Bedrock with response streaming
+            Resource: '*'
+      Events: #connects the Lambda function to the API Gateway StreamingAPI
+        StreamingApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref StreamingApi
+            Path: /story
+            Method: post
+
+  StreamingApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+          MetricsEnabled: true
+      TracingEnabled: true
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title: Streaming API
+          version: 1.0.0
+        paths:
+          /story:
+            post:
+              responses:
+                '200':
+                  description: Success
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                responseTransferMode: "STREAM" #enable response streaming on API Gateway
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2021-11-15/functions/${StreamingFunction.Arn}/response-streaming-invocations' #the ARN for Lamba is different for response streaming
+
+Outputs:
+  StreamingApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${StreamingApi}.execute-api.${AWS::Region}.amazonaws.com/prod/story'
