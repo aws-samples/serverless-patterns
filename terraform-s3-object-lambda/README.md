@@ -28,6 +28,8 @@ aws s3 cp ./images/sample.jpg s3://<bucket-name>
 Download a thumbnail version of the uploaded image from the S3 Object Lambda Access Point using this command (replace `<lambda-access-point>` with the value returned in `s3_lambda_access_point`):
 
 ```shell
+mkdir ./thumbs
+
 aws s3api get-object --bucket <lambda-access-point> --key sample.jpg ./thumbs/sample-thumbnail.jpg
 
 open ./thumbs/sample-thumbnail.jpg
