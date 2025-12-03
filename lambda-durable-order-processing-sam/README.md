@@ -201,7 +201,7 @@ aws lambda get-durable-execution \
   --region us-east-2
 ```
 
-For detailed testing instructions, see [TESTING.md](TESTING.md).
+
 
 ## How It Works
 
