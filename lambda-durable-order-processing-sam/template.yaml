@@ -1,0 +1,147 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Order Processing Workflow using Lambda Durable Functions
+
+Globals:
+  Function:
+    Timeout: 900
+    Runtime: nodejs22.x
+    Architectures:
+      - arm64
+    Environment:
+      Variables:
+        ORDERS_TABLE: !Ref OrdersTable
+
+Resources:
+  # DynamoDB Table for Orders
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${AWS::StackName}-orders'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # IAM Role for Order Processing Function
+  OrderProcessingFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt OrdersTable.Arn
+        - PolicyName: DurableExecutionAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:CreateDurableExecution
+                  - lambda:GetDurableExecution
+                  - lambda:ListDurableExecutions
+                  - lambda:StopDurableExecution
+                  - lambda:SendDurableExecutionCallbackSuccess
+                  - lambda:SendDurableExecutionCallbackFailure
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-order-processor:*'
+
+  # Order Processing Durable Function
+  OrderProcessingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-order-processor'
+      CodeUri: src/
+      Handler: index.handler
+      Role: !GetAtt OrderProcessingFunctionRole.Arn
+      # DurableConfig will be enabled after deployment via AWS CLI
+      # ExecutionTimeout: 86400 (24 hours)
+      # RetentionPeriodInDays: 7
+
+  # API Gateway to trigger order processing
+  OrderApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub '${AWS::StackName}-order-api'
+      StageName: prod
+      Cors:
+        AllowMethods: "'POST, GET, OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"
+
+  # Lambda function to initiate order processing
+  OrderInitiatorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-order-initiator'
+      CodeUri: src/
+      Handler: initiator.handler
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref OrderProcessingFunction
+      Events:
+        CreateOrder:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OrderApi
+            Path: /orders
+            Method: POST
+
+  # Lambda function to check order status
+  OrderStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-order-status'
+      CodeUri: src/
+      Handler: status.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref OrdersTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:GetDurableExecution
+              - lambda:ListDurableExecutions
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-order-processor:*'
+      Events:
+        GetOrderStatus:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OrderApi
+            Path: /orders/{orderId}
+            Method: GET
+
+Outputs:
+  OrderApiEndpoint:
+    Description: API Gateway endpoint URL for order processing
+    Value: !Sub 'https://${OrderApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  
+  OrderProcessingFunctionArn:
+    Description: Order Processing Durable Function ARN
+    Value: !GetAtt OrderProcessingFunction.Arn
+  
+  OrdersTableName:
+    Description: DynamoDB table name for orders
+    Value: !Ref OrdersTable

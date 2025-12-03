@@ -1,0 +1,103 @@
+{
+  "title": "Order Processing Workflow with Lambda Durable Functions",
+  "description": "Multi-step order processing workflow using Lambda Durable Functions with automatic checkpointing and state persistence across long-running operations",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "SAM",
+  "services": {
+    "from": "apigateway",
+    "to": "lambda"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates a resilient order processing workflow using Lambda Durable Functions.",
+      "The workflow validates orders, processes payments, checks inventory, and arranges shipping with automatic checkpointing at each step.",
+      "Durable execution enables the workflow to survive Lambda timeouts and failures by automatically resuming from the last checkpoint.",
+      "The pattern includes API Gateway endpoints for order creation and status checking, with state persisted in DynamoDB."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-order-processing-sam",
+      "templateURL": "serverless-patterns/lambda-durable-order-processing-sam",
+      "projectFolder": "lambda-durable-order-processing-sam",
+      "templateFile": "lambda-durable-order-processing-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Durable Functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Durable Execution SDK for JavaScript",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-js"
+      },
+      {
+        "text": "AWS Blog: Build multi-step applications with Lambda durable functions",
+        "link": "https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Note: Lambda Durable Functions are currently available in us-east-2 (Ohio) region only.",
+      "cd src && npm install && cd ..",
+      "sam build",
+      "sam deploy --guided --region us-east-2"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See README.md for comprehensive testing instructions including:",
+      "- Creating test orders via API",
+      "- Checking order status",
+      "- Monitoring Lambda logs",
+      "- Verifying DynamoDB storage",
+      "- Listing durable executions"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete --region us-east-2"
+    ]
+  },
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "apigateway",
+      "label": "API Gateway"
+    },
+    "icon2": {
+      "x": 50,
+      "y": 50,
+      "service": "lambda",
+      "label": "Lambda Durable Function"
+    },
+    "icon3": {
+      "x": 80,
+      "y": 50,
+      "service": "dynamodb",
+      "label": "DynamoDB"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    }
+  },
+  "authors": [
+    {
+      "name": "Abhishek Agawane",
+      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+      "bio": "Abhishek Agawane is a Security Consultant at Amazon Web Services with more than 8 years of industry experience. He helps organizations architect resilient, secure, and efficient cloud environments, guiding them through complex challenges and large-scale infrastructure transformations. He has helped numerous organizations enhance their cloud operations through targeted optimizations, robust architectures, and best-practice implementations.",
+      "linkedin": "https://www.linkedin.com/in/agawabhi/"
+    }
+  ]
+}
