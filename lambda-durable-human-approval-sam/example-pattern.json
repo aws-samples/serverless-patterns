@@ -1,0 +1,112 @@
+{
+  "title": "Human-in-the-Loop Approval Workflow with Lambda Durable Functions",
+  "description": "Approval workflow that pauses execution while waiting for human decisions, with automatic timeout handling and callback-based resumption",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "services": {
+    "from": "apigateway",
+    "to": "lambda"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates a human-in-the-loop approval workflow using Lambda Durable Functions with callback operations.",
+      "The workflow pauses execution using create_callback() while waiting for human approval, incurring no compute charges during the wait period.",
+      "If no decision is received within 24 hours, the workflow automatically times out and rejects the request.",
+      "When an approver submits a decision via API, the durable function resumes from its checkpoint and processes the result.",
+      "The pattern uses DynamoDB to map short UUIDs to callback IDs for clean approval URLs, and SNS to send email notifications with approve/reject links."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-hitl-approval-sam",
+      "templateURL": "serverless-patterns/lambda-durable-hitl-approval-sam",
+      "projectFolder": "lambda-durable-hitl-approval-sam",
+      "templateFile": "lambda-durable-hitl-approval-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Durable Functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Durable Execution SDK for Python",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-python"
+      },
+      {
+        "text": "Callback Operations",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-callback.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Note: Lambda Durable Functions are currently available in us-east-2 (Ohio) region only.",
+      "sam build",
+      "sam deploy --guided --region us-east-2"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See README.md for comprehensive testing instructions including:",
+      "- Creating approval requests",
+      "- Submitting approval decisions",
+      "- Testing timeout behavior",
+      "- Monitoring durable executions"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete --region us-east-2"
+    ]
+  },
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "apigateway",
+      "label": "API Gateway"
+    },
+    "icon2": {
+      "x": 50,
+      "y": 50,
+      "service": "lambda",
+      "label": "Durable Approval Function"
+    },
+    "icon3": {
+      "x": 80,
+      "y": 30,
+      "service": "dynamodb",
+      "label": "DynamoDB"
+    },
+    "icon4": {
+      "x": 80,
+      "y": 70,
+      "service": "sns",
+      "label": "SNS"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon2",
+      "to": "icon4"
+    }
+  },
+  "authors": [
+    {
+      "name": "Abhishek Agawane",
+      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+      "bio": "Abhishek Agawane is a Security Consultant at Amazon Web Services with more than 8 years of industry experience. He helps organizations architect resilient, secure, and efficient cloud environments, guiding them through complex challenges and large-scale infrastructure transformations. He has helped numerous organizations enhance their cloud operations through targeted optimizations, robust architectures, and best-practice implementations.",
+      "linkedin": "https://www.linkedin.com/in/agawabhi/"
+    }
+  ]
+}
