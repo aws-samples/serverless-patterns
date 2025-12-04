@@ -31,10 +31,6 @@
       {
         "text": "Durable Execution SDK for Python",
         "link": "https://github.com/aws/aws-durable-execution-sdk-python"
-      },
-      {
-        "text": "Callback Operations",
-        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-callback.html"
       }
     ]
   },
