@@ -3,7 +3,7 @@
   "description": "Demonstrates a 7-day workflow with scheduled checkpoints for daily report generation, data processing, and notifications using Lambda Durable Functions.",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -51,45 +51,15 @@
   },
   "cleanup": {
     "text": [
-      "sam delete --stack-name lambda-durable-scheduled-tasks --region us-east-2"
+      "Delete the stack: <code>sam delete --stack-name lambda-durable-scheduled-tasks --region us-east-2</code>."
     ]
   },
   "authors": [
     {
-      "name": "AWS Serverless",
-      "image": "https://avatars.githubusercontent.com/u/12814935",
-      "bio": "AWS Serverless team",
-      "linkedin": "aws"
+      "name": "Abhishek Agawane",
+      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+      "bio": "Abhishek Agawane is a Security Consultant at Amazon Web Services with more than 8 years of industry experience. He helps organizations architect resilient, secure, and efficient cloud environments, guiding them through complex challenges and large-scale infrastructure transformations. He has helped numerous organizations enhance their cloud operations through targeted optimizations, robust architectures, and best-practice implementations.",
+      "linkedin": "https://www.linkedin.com/in/agawabhi/"
     }
-  ],
-  "patternArch": {
-    "icon1": {
-      "x": 20,
-      "y": 50,
-      "service": "apigateway",
-      "label": "API Gateway"
-    },
-    "icon2": {
-      "x": 50,
-      "y": 50,
-      "service": "lambda",
-      "label": "Durable Function (7-day workflow)"
-    },
-    "icon3": {
-      "x": 80,
-      "y": 50,
-      "service": "dynamodb",
-      "label": "DynamoDB (State)"
-    },
-    "line1": {
-      "from": "icon1",
-      "to": "icon2",
-      "label": "POST /tasks"
-    },
-    "line2": {
-      "from": "icon2",
-      "to": "icon3",
-      "label": "Store progress"
-    }
-  }
+  ]
 }
