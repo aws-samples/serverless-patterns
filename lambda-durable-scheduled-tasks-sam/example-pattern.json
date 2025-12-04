@@ -1,0 +1,95 @@
+{
+  "title": "Multi-Day Scheduled Task Orchestration with Lambda Durable Functions",
+  "description": "Demonstrates a 7-day workflow with scheduled checkpoints for daily report generation, data processing, and notifications using Lambda Durable Functions.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern implements a multi-day scheduled task orchestration using AWS Lambda Durable Functions. The workflow spans 7 days with automatic checkpointing, demonstrating how to build long-running workflows with scheduled intervals and zero compute cost during wait periods.",
+      "The solution uses a streamlined architecture: a durable function handles the 7-day orchestration with automatic checkpointing, while a unified task management function provides listing, status queries, and deletion operations via API Gateway.",
+      "Day 1 collects initial data from multiple sources. Days 2-6 process daily batches with 24-hour waits between each day. Day 7 generates a comprehensive report, sends notifications, and performs cleanup. Each step is automatically checkpointed for resilience.",
+      "The pattern includes a web-based dashboard for real-time monitoring of all tasks with progress tracking, statistics, and management capabilities.",
+      "The pattern demonstrates significant cost savings: traditional polling would require 10,080 Lambda invocations over 7 days, while durable functions need only ~10 invocations with $0 cost during wait states - a 99.9% cost reduction."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-scheduled-tasks-sam",
+      "templateURL": "serverless-patterns/lambda-durable-scheduled-tasks-sam",
+      "projectFolder": "lambda-durable-scheduled-tasks-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Durable Functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "JavaScript/TypeScript SDK for Durable Functions",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-js"
+      },
+      {
+        "text": "AWS Blog: Build multi-step applications with Lambda Durable Functions",
+        "link": "https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided --region us-east-2"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete --stack-name lambda-durable-scheduled-tasks --region us-east-2"
+    ]
+  },
+  "authors": [
+    {
+      "name": "AWS Serverless",
+      "image": "https://avatars.githubusercontent.com/u/12814935",
+      "bio": "AWS Serverless team",
+      "linkedin": "aws"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "apigateway",
+      "label": "API Gateway"
+    },
+    "icon2": {
+      "x": 50,
+      "y": 50,
+      "service": "lambda",
+      "label": "Durable Function (7-day workflow)"
+    },
+    "icon3": {
+      "x": 80,
+      "y": 50,
+      "service": "dynamodb",
+      "label": "DynamoDB (State)"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2",
+      "label": "POST /tasks"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3",
+      "label": "Store progress"
+    }
+  }
+}
