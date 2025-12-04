@@ -1,0 +1,195 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Multi-Day Scheduled Task Orchestration with Lambda Durable Functions
+  
+  This pattern demonstrates a 7-day workflow with scheduled checkpoints for
+  daily report generation, data processing, and notifications.
+
+Globals:
+  Function:
+    Timeout: 900
+    Runtime: nodejs22.x
+    Architectures:
+      - arm64
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref TaskStateTable
+
+Resources:
+  # DynamoDB table for task state persistence
+  TaskStateTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${AWS::StackName}-TaskState'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: taskId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: taskId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # Durable Function for scheduled task orchestration
+  ScheduledTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-ScheduledTask'
+      CodeUri: src/
+      Handler: index.handler
+      AutoPublishAlias: live
+      DurableConfig:
+        ExecutionTimeout: 604800  # 7 days in seconds
+        RetentionPeriodInDays: 14
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TaskStateTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:CreateDurableExecution
+              - lambda:GetDurableExecution
+              - lambda:ListDurableExecutions
+              - lambda:StopDurableExecution
+              - lambda:CheckpointDurableExecution
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-ScheduledTask:*'
+
+  # Permission for API Gateway to invoke ScheduledTaskFunction
+  ScheduledTaskFunctionApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ScheduledTaskFunction.Alias
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${TaskApi}/*/*'
+
+  # Unified task management function (list, status, delete)
+  TaskManagementFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-TaskManagement'
+      CodeUri: src/
+      Handler: status.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TaskStateTable
+
+  # Permission for API Gateway to invoke TaskManagementFunction
+  TaskManagementFunctionApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref TaskManagementFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${TaskApi}/*/*'
+
+  # API Gateway for task management
+  TaskApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub '${AWS::StackName}-TaskApi'
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+      DefinitionBody:
+        openapi: 3.0.1
+        paths:
+          /tasks:
+            get:
+              responses:
+                '200':
+                  description: List all tasks
+                  headers:
+                    Access-Control-Allow-Origin:
+                      schema:
+                        type: string
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TaskManagementFunction.Arn}/invocations'
+            delete:
+              responses:
+                '200':
+                  description: All tasks deleted
+                  headers:
+                    Access-Control-Allow-Origin:
+                      schema:
+                        type: string
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TaskManagementFunction.Arn}/invocations'
+            post:
+              responses:
+                '202':
+                  description: Task accepted
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ScheduledTaskFunction.Arn}:live/invocations'
+                requestParameters:
+                  integration.request.header.X-Amz-Invocation-Type: "'Event'"
+                requestTemplates:
+                  application/json: |
+                    #set($taskId = "TASK-$context.requestTimeEpoch")
+                    {
+                      "taskId": "$taskId",
+                      "config": $input.json('$.config')
+                    }
+                responses:
+                  default:
+                    statusCode: 202
+                    responseTemplates:
+                      application/json: |
+                        {
+                          "taskId": "$input.path('$.taskId')",
+                          "status": "INITIALIZED",
+                          "message": "Task started successfully"
+                        }
+          /tasks/{taskId}:
+            get:
+              parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+              responses:
+                '200':
+                  description: Task status
+                  headers:
+                    Access-Control-Allow-Origin:
+                      schema:
+                        type: string
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TaskManagementFunction.Arn}/invocations'
+
+Outputs:
+  TaskApiEndpoint:
+    Description: API Gateway endpoint for task management
+    Value: !Sub 'https://${TaskApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  
+  ScheduledTaskFunctionArn:
+    Description: Durable function ARN for scheduled tasks
+    Value: !GetAtt ScheduledTaskFunction.Arn
+  
+  TaskManagementFunctionArn:
+    Description: Unified task management function ARN (list, status, delete)
+    Value: !GetAtt TaskManagementFunction.Arn
+  
+  TaskStateTableName:
+    Description: DynamoDB table for task state
+    Value: !Ref TaskStateTable
+  
+  TestCommand:
+    Description: Command to start a scheduled task
+    Value: !Sub |
+      curl -X POST ${TaskApi}.execute-api.${AWS::Region}.amazonaws.com/prod/tasks \
+        -H "Content-Type: application/json" \
+        -d '{"config":{"reportType":"weekly","dataSource":"analytics","notifyEmail":"admin@example.com"}}'
