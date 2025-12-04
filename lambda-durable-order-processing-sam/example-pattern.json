@@ -3,11 +3,7 @@
   "description": "Production-ready 17-step order processing workflow using Lambda Durable Functions with automatic checkpointing, long-running waits, and state persistence",
   "language": "Node.js",
   "level": "300",
-  "framework": "SAM",
-  "services": {
-    "from": "apigateway",
-    "to": "lambda"
-  },
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -24,7 +20,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-order-processing-sam",
       "templateURL": "serverless-patterns/lambda-durable-order-processing-sam",
       "projectFolder": "lambda-durable-order-processing-sam",
-      "templateFile": "lambda-durable-order-processing-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -53,46 +49,13 @@
   },
   "testing": {
     "text": [
-      "See README.md for comprehensive testing instructions including:",
-      "- Creating test orders via API",
-      "- Checking order status",
-      "- Monitoring Lambda logs",
-      "- Verifying DynamoDB storage",
-      "- Listing durable executions"
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
     "text": [
-      "sam delete --region us-east-2"
+      "Delete the stack: <code>sam delete --region us-east-2</code>."
     ]
-  },
-  "patternArch": {
-    "icon1": {
-      "x": 20,
-      "y": 50,
-      "service": "apigateway",
-      "label": "API Gateway"
-    },
-    "icon2": {
-      "x": 50,
-      "y": 50,
-      "service": "lambda",
-      "label": "Lambda Durable Function"
-    },
-    "icon3": {
-      "x": 80,
-      "y": 50,
-      "service": "dynamodb",
-      "label": "DynamoDB"
-    },
-    "line1": {
-      "from": "icon1",
-      "to": "icon2"
-    },
-    "line2": {
-      "from": "icon2",
-      "to": "icon3"
-    }
   },
   "authors": [
     {
