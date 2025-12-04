@@ -3,11 +3,7 @@
   "description": "Approval workflow that pauses execution while waiting for human decisions, with automatic timeout handling and callback-based resumption",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
-  "services": {
-    "from": "apigateway",
-    "to": "lambda"
-  },
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -20,10 +16,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-hitl-approval-sam",
-      "templateURL": "serverless-patterns/lambda-durable-hitl-approval-sam",
-      "projectFolder": "lambda-durable-hitl-approval-sam",
-      "templateFile": "lambda-durable-hitl-approval-sam/template.yaml"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-human-approval-sam",
+      "templateURL": "serverless-patterns/lambda-durable-human-approval-sam",
+      "projectFolder": "lambda-durable-human-approval-sam",
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -51,55 +47,13 @@
   },
   "testing": {
     "text": [
-      "See README.md for comprehensive testing instructions including:",
-      "- Creating approval requests",
-      "- Submitting approval decisions",
-      "- Testing timeout behavior",
-      "- Monitoring durable executions"
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
     "text": [
-      "sam delete --region us-east-2"
+      "Delete the stack: <code>sam delete --region us-east-2</code>."
     ]
-  },
-  "patternArch": {
-    "icon1": {
-      "x": 20,
-      "y": 50,
-      "service": "apigateway",
-      "label": "API Gateway"
-    },
-    "icon2": {
-      "x": 50,
-      "y": 50,
-      "service": "lambda",
-      "label": "Durable Approval Function"
-    },
-    "icon3": {
-      "x": 80,
-      "y": 30,
-      "service": "dynamodb",
-      "label": "DynamoDB"
-    },
-    "icon4": {
-      "x": 80,
-      "y": 70,
-      "service": "sns",
-      "label": "SNS"
-    },
-    "line1": {
-      "from": "icon1",
-      "to": "icon2"
-    },
-    "line2": {
-      "from": "icon2",
-      "to": "icon3"
-    },
-    "line3": {
-      "from": "icon2",
-      "to": "icon4"
-    }
   },
   "authors": [
     {
