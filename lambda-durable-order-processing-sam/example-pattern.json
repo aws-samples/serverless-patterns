@@ -1,6 +1,6 @@
 {
   "title": "Order Processing Workflow with Lambda Durable Functions",
-  "description": "Multi-step order processing workflow using Lambda Durable Functions with automatic checkpointing and state persistence across long-running operations",
+  "description": "Production-ready 17-step order processing workflow using Lambda Durable Functions with automatic checkpointing, long-running waits, and state persistence",
   "language": "Node.js",
   "level": "300",
   "framework": "SAM",
@@ -11,10 +11,12 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates a resilient order processing workflow using Lambda Durable Functions.",
-      "The workflow validates orders, processes payments, checks inventory, and arranges shipping with automatic checkpointing at each step.",
-      "Durable execution enables the workflow to survive Lambda timeouts and failures by automatically resuming from the last checkpoint.",
-      "The pattern includes API Gateway endpoints for order creation and status checking, with state persisted in DynamoDB."
+      "This pattern demonstrates a production-ready order processing workflow with 17 steps using Lambda Durable Functions.",
+      "The workflow includes validation, payment processing, fraud checks, credit checks (for high-value orders), inventory management, and shipping coordination.",
+      "Durable execution enables long-running waits (5 minutes for warehouse processing, 3 minutes for carrier pickup) without consuming compute resources.",
+      "Each step is automatically checkpointed, allowing the workflow to survive interruptions and resume from the last successful step.",
+      "The pattern uses a dual-function architecture: async durable function for order processing and sync non-durable function for real-time status queries.",
+      "Order state is persisted in DynamoDB with real-time status updates throughout the 17-step workflow."
     ]
   },
   "gitHub": {

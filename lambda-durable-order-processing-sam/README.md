@@ -8,15 +8,40 @@ This pattern demonstrates a multi-step order processing workflow using AWS Lambd
 
 ![Architecture Diagram](architecture.png)
 
-The Order Processor uses Lambda Durable Functions to execute a multi-step workflow with automatic checkpointing. Each step (validate, payment, inventory, shipping) is checkpointed, allowing the workflow to resume from the last successful step if interrupted.
+The solution uses a dual-function architecture:
+- **Durable Function**: Handles async order processing with 17 steps and automatic checkpointing
+- **Status Function**: Provides real-time order status via synchronous API calls
 
-### Workflow Steps
+### Order Processing Workflow (17 Steps)
 
-1. **Validate Order** - Validates order data and customer information
-2. **Process Payment** - Simulates payment processing with 5-second wait
-3. **Check Inventory** - Verifies item availability with 5-second wait
-4. **Arrange Shipping** - Creates shipment with 5-second wait
-5. **Complete Order** - Saves final order state to DynamoDB
+The workflow consists of 17 steps organized into 5 phases:
+
+**Phase 1: Validation (Steps 1-3)**
+1. Validate Order - Check order data and customer information
+2. Check Inventory - Verify item availability
+3. Process Payment - Process payment transaction
+
+**Phase 2: Risk Assessment (Steps 4-6)**
+4. Reserve Inventory - Lock inventory for order
+5. Fraud Check - Run fraud detection
+6. Credit Check - Verify credit (for orders > $1000)
+
+**Phase 3: Invoice (Step 7)**
+7. Generate Invoice - Create customer invoice
+
+**Phase 4: Fulfillment (Steps 8-12)**
+- *Wait 5 minutes for warehouse processing (no compute cost)*
+8. Pick Items - Warehouse picks items
+9. Quality Check - Inspect items
+10. Package Order - Package for shipping
+11. Generate Shipping Label - Create shipping label
+
+**Phase 5: Shipping & Completion (Steps 13-17)**
+- *Wait 3 minutes for carrier pickup (no compute cost)*
+12. Ship Order - Hand off to carrier
+13. Send Notifications - Email/SMS to customer
+14. Update Loyalty Points - Award loyalty points
+15. Complete Order - Mark order as complete
 
 Each step is automatically checkpointed, allowing the workflow to resume from the last successful step if interrupted.
 
@@ -69,9 +94,9 @@ Each step is automatically checkpointed, allowing the workflow to resume from th
 
 ## Testing
 
-### Get Your API Endpoint
+### Step 1: Get Your API Endpoint
 
-First, retrieve your API endpoint from the CloudFormation stack:
+Retrieve your API endpoint from the CloudFormation stack:
 
 ```bash
 API_ENDPOINT=$(aws cloudformation describe-stacks \
@@ -83,9 +108,9 @@ API_ENDPOINT=$(aws cloudformation describe-stacks \
 echo "API Endpoint: $API_ENDPOINT"
 ```
 
-### Create Test Orders
+### Step 2: Create Test Orders
 
-**Test 1: Simple order**
+**Test 1: Low-value order (< $1000)**
 ```bash
 curl -X POST ${API_ENDPOINT}/orders \
   -H "Content-Type: application/json" \
@@ -93,12 +118,20 @@ curl -X POST ${API_ENDPOINT}/orders \
     "customerId": "CUST-001",
     "customerEmail": "customer1@example.com",
     "items": [
-      {"productId": "LAPTOP-001", "quantity": 1}
+      {"productId": "BOOK-001", "name": "Programming Book", "quantity": 2, "price": 45.99}
     ]
   }'
 ```
 
-**Test 2: Multiple items**
+Expected response:
+```json
+{
+  "message": "Order processing initiated",
+  "orderId": "order-1764821208592"
+}
+```
+
+**Test 2: High-value order (> $1000, triggers credit check)**
 ```bash
 curl -X POST ${API_ENDPOINT}/orders \
   -H "Content-Type: application/json" \
@@ -106,68 +139,114 @@ curl -X POST ${API_ENDPOINT}/orders \
     "customerId": "CUST-002",
     "customerEmail": "customer2@example.com",
     "items": [
-      {"productId": "PHONE-001", "quantity": 2},
-      {"productId": "CASE-001", "quantity": 2},
-      {"productId": "CHARGER-001", "quantity": 1}
+      {"productId": "SERVER-001", "name": "Enterprise Server", "quantity": 1, "price": 3500.00}
     ]
   }'
 ```
 
-**Test 3: Validation error (missing customerId)**
+**Test 3: Multiple items order**
 ```bash
 curl -X POST ${API_ENDPOINT}/orders \
   -H "Content-Type: application/json" \
   -d '{
+    "customerId": "CUST-003",
+    "customerEmail": "customer3@example.com",
     "items": [
-      {"productId": "LAPTOP-001", "quantity": 1}
+      {"productId": "LAPTOP-001", "name": "Gaming Laptop", "quantity": 1, "price": 1299.99},
+      {"productId": "MOUSE-001", "name": "Wireless Mouse", "quantity": 2, "price": 29.99},
+      {"productId": "KEYBOARD-001", "name": "Mechanical Keyboard", "quantity": 1, "price": 149.99}
     ]
   }'
 ```
 
-Response format:
+**Test 4: Edge case - Empty items (should fail validation)**
+```bash
+curl -X POST ${API_ENDPOINT}/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerId": "CUST-004",
+    "customerEmail": "customer4@example.com",
+    "items": []
+  }'
+```
+
+### Step 3: Check Order Status
+
+Wait 10 seconds, then check the order status using the order ID from the response:
+
+```bash
+ORDER_ID="order-1764821208592"  # Replace with your order ID
+curl ${API_ENDPOINT}/orders/${ORDER_ID} | jq '.'
+```
+
+Expected response:
 ```json
 {
-  "message": "Order processing initiated",
-  "orderId": "order-1234567890-abc123",
-  "statusUrl": "/orders/order-1234567890-abc123"
+  "orderId": "order-1764821208592",
+  "status": "awaiting-warehouse",
+  "customerId": "CUST-001",
+  "customerEmail": "customer1@example.com",
+  "total": 91.98,
+  "items": [
+    {
+      "name": "Programming Book",
+      "quantity": 2,
+      "productId": "BOOK-001",
+      "price": 45.99
+    }
+  ],
+  "createdAt": "2025-12-04T04:06:48.964Z",
+  "lastUpdated": "2025-12-04T04:06:50.621Z"
 }
 ```
 
-### Check Order Status
+### Step 4: Track Status Progression
 
-Replace `<orderId>` with the order ID from the response:
+Poll the order status to see it progress through the workflow:
 
 ```bash
-curl ${API_ENDPOINT}/orders/<orderId>
+# Check status every 30 seconds
+for i in {1..10}; do
+  echo "=== Check $i at $(date +%H:%M:%S) ==="
+  curl -s ${API_ENDPOINT}/orders/${ORDER_ID} | jq '{status, lastUpdated}'
+  sleep 30
+done
 ```
 
-### Monitor Durable Executions
+You'll see the status progress through:
+- `validated` → `inventory-checked` → `payment-processed` → `inventory-reserved` → `fraud-checked` → `invoice-generated` → `awaiting-warehouse` (5 min wait) → `items-picked` → `quality-checked` → `packaged` → `awaiting-pickup` (3 min wait) → `shipped` → `completed`
 
-**View Lambda logs in real-time:**
+### Step 5: Monitor Lambda Logs
+
+View real-time Lambda execution logs:
+
 ```bash
+# Get function name
 FUNCTION_NAME=$(aws cloudformation describe-stack-resources \
   --stack-name lambda-durable-order-processing \
   --region us-east-2 \
-  --query 'StackResources[?ResourceType==`AWS::Lambda::Function`].PhysicalResourceId' \
-  --output text | grep -i "order-processor")
+  --query 'StackResources[?LogicalResourceId==`OrderProcessingFunction`].PhysicalResourceId' \
+  --output text)
 
+# Tail logs
 aws logs tail /aws/lambda/${FUNCTION_NAME} \
   --follow \
   --format short \
   --region us-east-2
 ```
 
-**View recent logs:**
-```bash
-aws logs tail /aws/lambda/${FUNCTION_NAME} \
-  --since 5m \
-  --format short \
-  --region us-east-2
+Look for checkpoint and step execution messages:
+```
+Starting order processing { orderId: 'order-1764821208592' }
+Validating order { orderId: 'order-1764821208592' }
+Checking inventory { orderId: 'order-1764821208592' }
+Processing payment { orderId: 'order-1764821208592', amount: 91.98 }
+Waiting for warehouse processing { orderId: 'order-1764821208592' }
 ```
 
-### Verify DynamoDB Storage
+### Step 6: Verify DynamoDB Storage
 
-Check orders saved to DynamoDB:
+Check orders stored in DynamoDB:
 
 ```bash
 TABLE_NAME=$(aws cloudformation describe-stacks \
@@ -176,30 +255,40 @@ TABLE_NAME=$(aws cloudformation describe-stacks \
   --query 'Stacks[0].Outputs[?OutputKey==`OrdersTableName`].OutputValue' \
   --output text)
 
+# Scan all orders
 aws dynamodb scan \
   --table-name ${TABLE_NAME} \
   --region us-east-2 \
-  --max-items 10
+  --max-items 5 | jq '.Items[] | {orderId: .orderId.S, status: .status.S, total: .total.N}'
 ```
 
-### List Durable Executions
+### Step 7: Test Concurrent Orders
 
-View all durable executions for the function:
+Create multiple orders simultaneously to test concurrency:
 
 ```bash
-aws lambda list-durable-executions \
-  --function-name ${FUNCTION_NAME}:prod \
-  --region us-east-2
+for i in {1..5}; do
+  curl -X POST ${API_ENDPOINT}/orders \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"customerId\": \"CONCURRENT-$i\",
+      \"customerEmail\": \"concurrent$i@example.com\",
+      \"items\": [{\"productId\": \"PROD-$i\", \"name\": \"Product $i\", \"quantity\": 1, \"price\": $((100 + i * 10))}]
+    }" &
+done
+wait
+echo "All 5 orders submitted concurrently"
 ```
 
-Get details for a specific execution:
+### Expected Test Results
 
-```bash
-aws lambda get-durable-execution \
-  --function-name ${FUNCTION_NAME}:prod \
-  --execution-id <execution-id> \
-  --region us-east-2
-```
+- ✅ **Low-value orders**: Complete all 17 steps (no credit check)
+- ✅ **High-value orders**: Include credit check step (Step 6)
+- ✅ **Multi-item orders**: Calculate total correctly
+- ✅ **Invalid orders**: Fail validation and mark as failed
+- ✅ **Status API**: Returns real-time order status
+- ✅ **Concurrent orders**: All process independently
+- ✅ **Wait periods**: 8 minutes total (5 min + 3 min) with no compute cost
 
 
 
