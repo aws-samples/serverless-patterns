@@ -1,0 +1,125 @@
+{
+    "title": "Amazon DocumentDB streams consumer",
+    "description": "Consume Amazon DocumentDB stream records with AWS Lambda.",
+    "language": "Java",
+    "level": "200",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates consuming Amazon DocumentDB stream records with an AWS Lambda function.",
+            "The CloudFormation template provided in this pattern creates an Amazon DocumentDB Cluster and database with a collection. It also enables change streams on the database and collection, and creates an Amazon EC2 instances for accessing the Amazon DocumentDB cluster.",
+            "For detailed deployment instructions instructions see the README.md"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/documentdb-lambda-java-sam",
+            "templateURL": "serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_consumer_dynamo_sam",
+            "projectFolder": "documentdb_streams_consumer_dynamo_sam",
+            "templateFile": "template_original.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Process Amazon DocumentDB events with Lambda",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-documentdb.html"
+            },
+            {
+                "text": "Using AWS Lambda with change streams",
+                "link": "https://docs.aws.amazon.com/documentdb/latest/developerguide/using-lambda.html"
+            },
+            {
+                "text": "Amazon DocumentDB quick start using AWS CloudFormation",
+                "link": "https://docs.aws.amazon.com/documentdb/latest/developerguide/quick_start_cfn.html"
+            },
+            {
+                "text": "AWS CloudFormation DocumentDB cluster reference",
+                "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-docdb-dbcluster.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the template: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Indranil Banerjee",
+            "bio": "AWS - Senior Solutions Architect",
+            "image": "https://media.licdn.com/dms/image/v2/C5603AQEL3BG6JZca6A/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1653972622784?e=1762992000&v=beta&t=a9gnmtxyWBhfEfqDF3HiPHWDoc4KZjG2sdNsIakcJXw",
+            "linkedin": "indranil-banerjee-b00a261"
+        },
+        {
+            "name": "Arghya Banerjee",
+            "bio": "AWS - Senior Solutions Architect",
+            "image": "https://media.licdn.com/dms/image/v2/C5603AQHFFKivT-1iKA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1516305772138?e=1762992000&v=beta&t=dKgoxEfgZd3M5XW-GEJ9Ss4I5ka8-C7iEIy8Sb_PTOQ",
+            "linkedin": "arghya-b-6130b57"
+        },
+        {
+            "name": "Kunal Ghosh",
+            "bio": "AWS - Sr SA, Strategic Accounts",
+            "image": "https://media.licdn.com/dms/image/v2/C5603AQHrj7mHd7Z1hg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1516355158121?e=1762992000&v=beta&t=8h0cpHLR6v4-e3BJ7n9Wd_OHL2rRDa8F_74rTUnu8Js",
+            "linkedin": "kunal-ghosh-6583058"
+        },
+        {
+            "name": "Angelo Spagnolo",
+            "bio": "AWS - Sr Technical Account Manager",
+            "image": "https://media.licdn.com/dms/image/v2/D5603AQFQj2a90KFFZQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1692659294509?e=1762992000&v=beta&t=gEfdRLVzNPXGZ9-5EZKA358NBf4F7VBcVthyWSrzjrs",
+            "linkedin": "aspagnolo"
+        },
+        {
+            "name": "Vinayak Datar",
+            "bio": "AWS - Sr. Customer Solutions Manager",
+            "image": "https://media.licdn.com/dms/image/v2/C5103AQFAa6JcLNknkA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1548189034877?e=1762992000&v=beta&t=o2lDqU3V4ivFjt00rEDYd2yjGr55TszcG0J9hGuRM_w",
+            "linkedin": "vinayakdatar"
+        },
+        {
+            "name": "Greg Medard",
+            "bio": "AWS - Solutions Architect",
+            "image": "https://media.licdn.com/dms/image/v2/C4E03AQGveSDnRH9aCg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1565226836063?e=1762992000&v=beta&t=Jkir-cq-T1EU8MTqY7PPPxreVo2_zI4FXaXXrdTdpfQ",
+            "linkedin": "gregorymedard"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "documentdb",
+            "label": "Amazon DocumentDB"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Stream event"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    }
+}
