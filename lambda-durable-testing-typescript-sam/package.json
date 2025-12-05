@@ -1,0 +1,23 @@
+{
+  "name": "test-ts-validation",
+  "version": "1.0.0",
+  "description": "Validation project for durable functions testing blog",
+  "type": "module",
+  "scripts": {
+    "test": "jest --testPathIgnorePatterns=cloud",
+    "test:cloud": "AWS_PROFILE=private jest tests/cloud",
+    "test:all": "jest",
+    "test:watch": "jest --watch --testPathIgnorePatterns=cloud",
+    "test:coverage": "jest --coverage --testPathIgnorePatterns=cloud"
+  },
+  "devDependencies": {
+    "@aws-sdk/credential-providers": "^3.940.0",
+    "@aws/durable-execution-sdk-js-testing": "latest",
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.27.1",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,213 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Durable Functions Testing Validation Project
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Architectures:
+      - arm64
+    Timeout: 30
+    MemorySize: 512
+    Tracing: Active
+
+Resources:
+  OrderProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/order-processor
+      Handler: index.handler
+      DurableConfig:
+        ExecutionTimeout: 900
+        RetentionPeriodInDays: 7
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecution
+                - lambda:GetDurableExecutionState
+              Resource: '*'
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - index.ts
+        External:
+          - '@aws-sdk/*'
+
+  PaymentProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/payment-processor
+      Handler: index.handler
+      DurableConfig:
+        ExecutionTimeout: 900
+        RetentionPeriodInDays: 7
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecution
+                - lambda:GetDurableExecutionState
+              Resource: '*'
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - index.ts
+        External:
+          - '@aws-sdk/*'
+
+  ApprovalWorkflowFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/approval-workflow
+      Handler: index.handler
+      DurableConfig:
+        ExecutionTimeout: 900
+        RetentionPeriodInDays: 7
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecution
+                - lambda:GetDurableExecutionState
+              Resource: '*'
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - index.ts
+        External:
+          - '@aws-sdk/*'
+
+  BatchProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/batch-processor
+      Handler: index.handler
+      DurableConfig:
+        ExecutionTimeout: 900
+        RetentionPeriodInDays: 7
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecution
+                - lambda:GetDurableExecutionState
+              Resource: '*'
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - index.ts
+        External:
+          - '@aws-sdk/*'
+
+  ChildWorkflowFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/child-workflow
+      Handler: index.handler
+      DurableConfig:
+        ExecutionTimeout: 900
+        RetentionPeriodInDays: 7
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecution
+                - lambda:GetDurableExecutionState
+              Resource: '*'
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - index.ts
+        External:
+          - '@aws-sdk/*'
+
+  MainWorkflowFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/main-workflow
+      Handler: index.handler
+      DurableConfig:
+        ExecutionTimeout: 900
+        RetentionPeriodInDays: 7
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecution
+                - lambda:GetDurableExecutionState
+                - lambda:InvokeFunction
+              Resource: '*'
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - index.ts
+        External:
+          - '@aws-sdk/*'
+
+Outputs:
+  OrderProcessorFunctionArn:
+    Description: Order Processor Function ARN
+    Value: !GetAtt OrderProcessorFunction.Arn
+
+  PaymentProcessorFunctionArn:
+    Description: Payment Processor Function ARN
+    Value: !GetAtt PaymentProcessorFunction.Arn
+
+  ApprovalWorkflowFunctionArn:
+    Description: Approval Workflow Function ARN
+    Value: !GetAtt ApprovalWorkflowFunction.Arn
+
+  BatchProcessorFunctionArn:
+    Description: Batch Processor Function ARN
+    Value: !GetAtt BatchProcessorFunction.Arn
+
+  MainWorkflowFunctionArn:
+    Description: Main Workflow Function ARN
+    Value: !GetAtt MainWorkflowFunction.Arn
+
+  ChildWorkflowFunctionArn:
+    Description: Child Workflow Function ARN
+    Value: !GetAtt ChildWorkflowFunction.Arn
