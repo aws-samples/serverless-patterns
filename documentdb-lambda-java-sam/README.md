@@ -73,7 +73,7 @@ Run functions locally and invoke them with the `sam local invoke` command.
 sam local invoke --event events/event.json
 ```
 
-You should see a response such as the below:
+The following is example test output:
 
 ```
 ***** Begin sam local invoke response *****
@@ -126,9 +126,9 @@ The message "Successfully created/updated stack - <StackName> in <Region>" indic
 
 ## Test the application
 
-Once the lambda function is deployed, send some Amazon DocumentDB Streams messages by inputting documents in the Database and Collection that have been configured on the lambda function's event listener.
+After deployment, create documents in the Collection to generate stream records.
 
-For your convenience, a Java program and a shell script has been created on the EC2 machine that was provisioned using Cloudformation.
+For your convenience, a Java program and a shell script are included on the EC2 instance provisioned by CloudFormation.
 
 ```
 cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_message_sender_json
@@ -142,8 +142,8 @@ You should see a script called commands.sh. Run that script by passing a random 
 [ec2-user@ip-10-0-0-126 ~]$ sh ./commands.sh firstBatch 10
 ```
 
-You should see output similar to what is shown below:
-
+The following is sample output:
+```
 Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-1
 Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-1
 Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-2
@@ -164,31 +164,26 @@ Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-1
 Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-9
 Now going to insert a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-10
 Now done inserting a row in DynamoDB for messageID = firstBatch-10-12-2025-08-10-62-10
+```
 
-
-Once the messages have been sent, check Amazon Cloudwatch Logs and you should see messages for the Amazon Cloudwatch Log Group with the name of the deployed AWS Lambda function. The name of the Amazon Cloudwatch Log Group is /aws/lambda/<Name of the AWS Lambda function>
+After sending the messages, check Amazon CloudWatch Logs for the AWS Lambda function. The name of the Amazon Cloudwatch Log Group is /aws/lambda/<Name of the AWS Lambda function>.
 
 When you run the above script, it inputs JSON records into the Amazon DocumentDB cluster in the database and collection that were created. This results in the Amazon DocumentDB streams publishing every document. The AWS Lambda function listens on the published Amazon DocumentDB streams messages
 
-The AWS Lambda code parses the Amazon DocumentDB streams messages and outputs the fields in the messages to Amazon Cloudwatch logs.
+The AWS Lambda function parses the Amazon DocumentDB streams messages and outputs the fields to Amazon Cloudwatch logs.
 
-The lambda function also inputs each record into a Amazon DynamoDB table called DocumentDBStreamsConsumerDynamoDBTableJava (if you did not modify the default name in the sam template.yaml file)
+The  function also writes each record into a Amazon DynamoDB table named DocumentDBStreamsConsumerDynamoDBTableJava (if you did not modify the default name in the sam template.yaml file).
 
-You can go to the Amazon DynamoDB console and view the records.
-
-You can also use the aws cli command below to view the count of records inserted into Amazon DynamoDB
+You can view the records using the Amazon DynamoDB console, or use the following aws cli command:
 
 ```
 aws dynamodb scan --table-name DocumentDBStreamsConsumerDynamoDBTableJava --select "COUNT"
 
 ```
 
-
-
 ## Cleanup
 
-You can first clean-up the AWS Lambda function by running `sam delete`
-
+First, delete the lambda function stack:
 ```
 cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_consumer_dynamo_sam
 sam delete
