@@ -1,0 +1,24 @@
+{
+  "name": "lambda-durable-order-processing",
+  "version": "1.0.0",
+  "description": "Order processing workflow using Lambda Durable Functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@aws/durable-execution-sdk-js": "^1.0.0",
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0",
+    "@aws-sdk/client-lambda": "^3.0.0"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "durable-functions",
+    "serverless",
+    "order-processing"
+  ],
+  "author": "",
+  "license": "MIT-0"
+}
