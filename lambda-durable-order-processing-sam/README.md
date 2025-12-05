@@ -60,6 +60,17 @@ Each step is automatically checkpointed, allowing the workflow to resume from th
 * [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed
 * [Node.js 18+](https://nodejs.org/) installed
 
+### Required IAM Permissions
+
+Your AWS CLI user/role needs the following permissions for deployment and testing:
+- **CloudFormation**: `cloudformation:DescribeStacks`, `cloudformation:DeleteStack`
+- **Lambda**: `lambda:CreateFunction`, `lambda:InvokeFunction`, `lambda:GetFunction`
+- **DynamoDB**: `dynamodb:Scan`, `dynamodb:GetItem`
+- **CloudWatch Logs**: `logs:DescribeLogGroups`, `logs:FilterLogEvents`, `logs:GetLogEvents`, `logs:TailLogEvents`
+- **API Gateway**: `apigateway:GET`
+- **IAM**: `iam:CreateRole`, `iam:AttachRolePolicy`, `iam:PassRole`
+
+
 ## Deployment
 
 1. Navigate to the pattern directory:
@@ -244,7 +255,7 @@ Processing payment { orderId: 'order-1764821208592', amount: 91.98 }
 Waiting for warehouse processing { orderId: 'order-1764821208592' }
 ```
 
-### Step 6: Verify DynamoDB Storage
+### Step 6: Verify Amazon DynamoDB Storage
 
 Check orders stored in DynamoDB:
 

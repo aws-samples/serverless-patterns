@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Order Processing Workflow using Lambda Durable Functions
+Description: Order Processing Workflow using AWS Lambda Durable Functions
 
 Globals:
   Function:
@@ -34,7 +34,6 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs22.x
       Timeout: 120
       AutoPublishAlias: live
       DurableConfig:
@@ -47,7 +46,7 @@ Resources:
           - Effect: Allow
             Action:
               - lambda:CheckpointDurableExecution
-            Resource: '*'
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-OrderProcessingFunction-*'
 
   # Order Status Function (Non-Durable)
   OrderStatusFunction:
@@ -55,7 +54,6 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: status.handler
-      Runtime: nodejs22.x
       Timeout: 30
       Policies:
         - DynamoDBReadPolicy:
