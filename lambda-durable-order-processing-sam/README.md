@@ -1,4 +1,4 @@
-# Order Processing Workflow with Lambda Durable Functions
+# Order Processing Workflow with AWS Lambda Durable Functions
 
 This pattern demonstrates a multi-step order processing workflow using AWS Lambda Durable Functions. The workflow handles order validation, payment processing, inventory checking, and shipping arrangement with automatic checkpointing and state persistence across long-running operations.
 
