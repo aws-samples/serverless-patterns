@@ -50,7 +50,7 @@ Change directory to the pattern directory:
     cd serverless-patterns/documentdb-lambda-java-sam
     ```
 
-### Use the SAM CLI to build and deploy the lambda function
+### Build the project with SAM CLI
 
 Make sure you are connected to the EC2 instance as mentioned in the "Connect to the EC2 instance" step above
 
@@ -63,9 +63,7 @@ sam build
 
 The SAM CLI installs dependencies defined in `documentdb_streams_consumer_dynamo_sam/documentdb_streams_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
-```
-
-## Test the build locally
+### Test the build locally
 
 Test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
 
