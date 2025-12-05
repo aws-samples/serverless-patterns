@@ -1,6 +1,6 @@
 # Java AWS Lambda Amazon DocumentDB Streams consumer, using AWS SAM
 
-This pattern is an example of a AWS Lambda function written in Java that consumes messages from Amazon DocumentDB Streams. The pattern demonstrates how a SAM project can be configured to deploy an AWS Lambda function written in Java with an Amazon DocumentDB event trigger. The pattern demonstrates how Amazon DocumentDB streams can be parsed in an AWS Lambda function and the parsed content output to an Amazon DynamoDB table. The pattern provides an AWS CloudFormation template to install and set-up an Amazon DocumentDB cluster. The CloudFormation template also installs an Amazon EC2 instance with tools necessary to configure the Amazon DocumentDB cluster to generate Amazon DocumentDB streams and configuration needed by a Java producer that can generate the Amazon DocumentDB streams.
+This pattern demonstrates consuming messages from an Amazon DocumentDB stream with AWS Lambda. This Java Lambda function parses the stream data and writes the results to an Amazon DynamoDB table. The pattern provides an AWS CloudFormation template to install and configure an Amazon DocumentDB cluster, configures an Amazon EC2 instance with Amazon DocumentDB tools, and creates a Java producer for generating sample data. 
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
@@ -20,7 +20,8 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
-## Run the Cloudformation template to create the Amazon DocumentDB Cluster and Client Amazon EC2 instance
+## Deployment instructions
+### Run the Cloudformation template to create the Amazon DocumentDB Cluster and Client Amazon EC2 instance
 
 * [Run the Cloudformation template using the file DocumentDBAndMongoClientEC2.yaml] - You can go to the AWS Cloudformation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the Cloudformation stack to be created. This CloudFormation template will create an Amazon DocumentDB cluster. It will also create an EC2 instance that you can use as a client.
 
@@ -34,7 +35,7 @@ The AWS SAM CLI is a serverless tool for building and testing Lambda application
 * [Check if the database and cluster are available] - Once you are inside the EC2 instance, you should be in the /home/ec2-user folder. cd to the mongoshell folder and then run ./connect_to_mongo_shell.sh. This connects the mongosh tool to the Amazon DocumentDB cluster created by the CloudFormation template. Once inside the mongosh, you can issue commands like show dbs to see if the database was created, use <database name> to switch to the created database, and then show collections to see if the collection was created. If you did not modify the defaults in the CloudFormation template, then the name of the database should be DocumentDBJavaLambdaDB and the name of the collection should be DocumentDBJavaLambdaCollection
 
 
-## Pre-requisites to Deploy the sample Lambda function
+### Pre-requisites to Deploy the sample Lambda function
 
 * Java - On the EC2 machine, we have installed the version of Java that you selected. We have installed Amazon Corrretto JDK of the version that you had selected at the time of specifying the input parameters in the Cloudformation template. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
 * Maven - On the EC2 machine, we have installed Maven (https://maven.apache.org/install.html)
@@ -49,7 +50,7 @@ Change directory to the pattern directory:
     cd serverless-patterns/documentdb-lambda-java-sam
     ```
 
-## Use the SAM CLI to build and deploy the lambda function
+### Use the SAM CLI to build and deploy the lambda function
 
 Make sure you are connected to the EC2 instance as mentioned in the "Connect to the EC2 instance" step above
 
@@ -92,7 +93,7 @@ REPORT RequestId: 717b4978-4112-4f63-947f-bb9552482687  Init Duration: 0.03 ms  
 ```
 
 
-## Deploy the sample application
+### Deploy the sample application
 
 
 To deploy your application for the first time, run the following in your shell. Make sure the shell variable $AWS_REGION is set. If not, replace $AWS_REGION with the region in which you are deploying the AWS Lambda function:
@@ -120,7 +121,7 @@ The sam deploy command will package and deploy your application to AWS, with a s
 * **SAM configuration file [samconfig.toml]**: Name of the configuration file to store configuration information locally
 * **SAM configuration environment [default]**: Environment for storing deployment information locally
 
-You should get a message "Successfully created/updated stack - <StackName> in <Region>" if all goes well
+The message "Successfully created/updated stack - <StackName> in <Region>" indicates a successful deployment.
     
 **Note: In case you want to deploy the Lambda function by pointing to an existing DocumentDB Cluster and not the one created by running the CloudFormation template provided in this pattern, you will need to modify the values of the above parameters accordingly**
 
