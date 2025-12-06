@@ -1,6 +1,6 @@
-# Lambda Response streaming: time-to-first-byte using write() method
+# AWS Lambda Response streaming: time-to-first-byte using write() method
 
-This pattern shows how to use Lambda response streaming ability and bedrock LLM streaming inference api to improve time-to-first byte using the write() method and `InvokeModelWithResponseStreamCommand`. For more information on the feature, see the [launch blog post](https://aws.amazon.com/blogs/compute/introducing-aws-lambda-response-streaming/).
+This pattern shows how to use AWS Lambda response streaming ability and Amazon Bedrock LLM streaming inference api to improve time-to-first byte using the write() method and `InvokeModelWithResponseStreamCommand`. For more information on the feature, see the [launch blog post](https://aws.amazon.com/blogs/compute/introducing-aws-lambda-response-streaming/).
 
 Learn more about this pattern at Serverless Land Patterns: [lambda-streaming-ttfb-write-sam](https://github.com/aws-samples/serverless-patterns/tree/main/lambda-streaming-ttfb-write-sam)
 
